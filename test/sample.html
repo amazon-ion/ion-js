@@ -1,0 +1,116 @@
+<!--
+Copyright 2012-2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License").
+You may not use this file except in compliance with the License.
+A copy of the License is located at:
+    http://aws.amazon.com/apache2.0/
+
+or in the "license" file accompanying this file. This file is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific
+language governing permissions and limitations under the License.
+-->
+
+<html>
+<head>
+ <title>JavaScript Page</title>
+ <script type="text/javascript" src="../src/Ion.js"></script>
+ <script type="text/javascript" src="../src/IonSpan.js"></script>
+ <script type="text/javascript" src="../src/IonSymbols.js"></script>
+ <script type="text/javascript" src="../src/IonValueSupport.js"></script>
+ <script type="text/javascript" src="../src/IonParserTextRaw.js"></script>
+ <script type="text/javascript" src="../src/IonTextReader.js"></script>
+ <script type="text/javascript" src="../src/IonParserBinaryRaw.js"></script>
+ <script type="text/javascript" src="../src/IonBinaryReader.js"></script>
+ 
+<script type="text/javascript">
+
+  var loadValue = (function makeValueLoader() {
+	var loaders = {};
+	loaders[ION.NULL.bid]      = function(reader) { return undefined; };
+	loaders[ION.BOOL.bid]      = function(reader) { return (reader.stringValue() === "true"); };
+	loaders[ION.INT.bid]       = function(reader) { return reader.numberValue(); };
+	loaders[ION.FLOAT.bid]     = function(reader) { return reader.numberValue(); };
+	loaders[ION.DECIMAL.bid]   = function(reader) { return reader.numberValue(); };
+	loaders[ION.TIMESTAMP.bid] = function(reader) { return reader.stringValue(); };
+	loaders[ION.SYMBOL.bid]    = function(reader) { return reader.stringValue(); };
+	loaders[ION.STRING.bid]    = function(reader) { return reader.stringValue(); };
+	loaders[ION.CLOB.bid]      = function(reader) { return undefined; };
+	loaders[ION.BLOB.bid]      = function(reader) { return undefined; };
+	loaders[ION.SEXP.bid]      = function(reader) { return undefined; };
+	loaders[ION.DATAGRAM.bid]  = function(reader) { return undefined; };
+	
+	loaders[ION.LIST.bid] = function(reader) { 
+		var t, list = [];
+		reader.stepIn();
+		while ((t = reader.next())) {
+			list[list.length] = loadValue(reader);
+		}
+		reader.stepOut();
+		return list; 
+	};
+	loaders[ION.STRUCT.bid] = function(reader) { 
+		var t, fname, o = {};
+		reader.stepIn();
+		while ((t = reader.next())) {
+			fname = reader.fieldName();
+			o[fname] = loadValue(reader);
+		}
+		reader.stepOut();
+		return o;
+	};
+	var loader = function (reader) { 
+					var t = reader.valueType();
+					var fn = t ? loaders[t.bid] : undefined;
+					var v = fn ? fn(reader) : undefined;
+					return v; 
+			};
+	return loader;
+  })();
+
+  // assumes data is Ion input with a single struct
+  // reads data from the input filling in an object with 
+  // the struct data converting from Ion to a close JS type
+  // for scalars.  This version ignores sexp, blob and clob.
+  // It return decimal as ION._decimal and timestamps as 
+  // ION._timestamp. Other numeric types (int, float) it 
+  // convers to JS number and all other types to string.
+  function traverse(data) {
+	var reader = ION.makeReader(data);
+	var o = undefined;
+	var t = reader.next();
+	if (t === ION.STRUCT) {
+		o = loadValue(reader);
+	}
+	return o;
+  }
+
+  function runTests() {
+    var msg = "test not started";
+	
+	var data = "'com.amazon.foo.Bar@0.1'::{\n"
+	        + "my_field:[{key:\"9783593345291\"}],\n"
+            + "  creation_date:2012-11-27T06:25:50.820-00:00\n"
+            + "}";
+	
+    var myObject = traverse(data);
+	
+	var myValue = myObject.my_field[0].key; // "9783593345291"
+	var creationDate = myObject.creation_date // hopefully a JavaScript Date object
+
+	msg  = "<p>RESULTS:</p>";
+	msg += "<p>key: "+ myValue + "</p>";
+	msg += "<p>date: "+ creationDate + "</p>";
+	
+    window.alert("parsing done");
+
+    var b = document.body;
+    b.innerHTML = "<p>"+msg+"</p>";
+  }
+</script>
+ 
+</head>
+ <body onload="runTests()">
+  <p>wait for it ...</p>
+ </body>
+</html>
