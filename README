@@ -1,0 +1,13 @@
+Build prerequisites: Node.js and npm (the JavaScript package manager)
+
+First, install the Grunt CLI:
+
+ sudo npm install -g grunt-cli
+
+Next, use npm to install all the package's dependencies:
+
+ npm install
+
+Finally, run grunt to execute the build:
+
+ grunt
