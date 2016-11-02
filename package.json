@@ -21,6 +21,7 @@
   "homepage": "https://github.com/amznlabs/ion-js#readme",
   "devDependencies": {
     "grunt": "^1.0.1",
-    "grunt-contrib-jshint": "^1.0.0"
+    "grunt-contrib-jshint": "^1.0.0",
+    "grunt-typescript": "^0.8.0"
   }
 }
