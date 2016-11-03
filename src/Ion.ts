@@ -61,8 +61,8 @@ if (typeof ION === 'undefined') {
     var Class = (function() {
       var initializing = false;
 
-      var make_wrapper = function(name, fn, super_fn) {
-        var fn = function() {
+      var make_wrapper = function(name, fn1, super_fn) {
+        var fn2 = function() {
                   var tmp = this._super;
 
                   // Add a new ._super() method that is the same method
@@ -72,7 +72,7 @@ if (typeof ION === 'undefined') {
                   // we do the apply here so the calling code doesn't have to
                   // there's some overhead as this is done even if this function
                   // doesn't call the _super function.
-                  var ret = fn.apply(this, arguments);
+                  var ret = fn1.apply(this, arguments);
 
                   // The method only need to be bound temporarily, so we
                   // remove it when we're done executing
@@ -80,8 +80,8 @@ if (typeof ION === 'undefined') {
 
                   return ret;
                 };
-        return fn;
-      };      
+        return fn2;
+      };
 
       // The base Class implementation 
       var BaseClass = function(){ 

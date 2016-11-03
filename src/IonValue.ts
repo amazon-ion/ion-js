@@ -32,11 +32,11 @@ if (typeof ION.IonValue !== 'function') {
 
 !(function() {
 
-  var error : function(msg) 
+  var error = function(msg) 
   {
     ION.errorAt(msg, "IonValue");
   },
-  truncate : function(n)
+  truncate = function(n)
   {
     if (n < 0) return Math.ceil(n);
     return Math.floor(n);
@@ -332,7 +332,7 @@ if (typeof ION.IonValue !== 'function') {
           span.write( binary_image | ION.LEN_NULL );
         }
         else {
-          val b = 0, l = 0, m, v = this._datum;
+          var b = 0, l = 0, m, v = this._datum;
           if (typeof v !== "number" || v != Math.floor(v)) {
             error("Invalid integer!");
           }
@@ -358,7 +358,7 @@ if (typeof ION.IonValue !== 'function') {
             m = 0xF << ((l-1)*8);
             while (l > 0) {
               l--;
-              span.write( ( b & m ) >> (l * 8);
+              span.write( ( b & m ) >> (l * 8));
               m = m >>> 8;
             }
           }

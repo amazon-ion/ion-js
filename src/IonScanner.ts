@@ -49,7 +49,7 @@ if (typeof ION.Span != 'function') {
       if ((typeof value != 'string')
        && 
           (typeof value != 'object' || (typeof value.length === 'undefined')
-      ) {
+      )) {
         ION.error("invalid arg");
       }
       if (duration == -1) {
@@ -59,7 +59,7 @@ if (typeof ION.Span != 'function') {
       this._pos = start;
       this._len = duration;
     },
-    unread() : function() {
+    unread : function() {
       _pos--;
       _len++;
     },
@@ -75,7 +75,7 @@ if (typeof ION.Span != 'function') {
       this._super(value, start, duration);
     },
     skipWhitespace: function() {
-      isWhiteSpace(c) {
+      var isWhiteSpace = function(c) {
         return (c == SPACE 
              || c == LINE_FEED  
              || c == RETURN  
