@@ -30,7 +30,7 @@
 //      ION.LongInt.ZERO
 
 namespace ION {
-  class LongInt {
+  export class LongInt {
     private static readonly zero_bytes: number[] = [0];
     private static readonly zero_string = "0";
     private static readonly byte_base   = 256;
