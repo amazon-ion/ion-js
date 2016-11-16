@@ -24,18 +24,32 @@ namespace ION {
   const CARRAIGE_RETURN = 13;
   const DEBUG_FLAG = true;
 
-  abstract class Span {
+  export abstract class Span {
     protected readonly _type: number;
 
     constructor(_type: number) {
       this._type = _type;
     }
 
+    abstract position() : number;
+
+    abstract next() : number;
+
+    abstract valueAt(index: number): number;
+
+    abstract getRemaining() : number;
+
+    abstract setRemaining(r: number) : void;
+
+    abstract is_empty(): boolean;
+
+    abstract skip(dist: number) : void;
+
+    protected abstract clone(start: number, len: number): Span;
+
     static error() {
       throw new Error("span error");
     }
-
-    protected abstract clone(start: number, len: number): Span;
   }
 
   class StringSpan extends Span {
@@ -71,7 +85,7 @@ namespace ION {
       return this._limit - this._pos;
     }
 
-    setRemaining(r: number) {
+    setRemaining(r: number) : void {
       this._limit = r + this._pos;
     }
 
@@ -79,7 +93,7 @@ namespace ION {
       return (this._pos >= this._limit);
     }
 
-    next() {
+    next() : number {
       var ch;
       if (this.is_empty()) {
         if (this._pos > MAX_POS) {
@@ -124,19 +138,19 @@ namespace ION {
       if (ch != this.peek()) Span.error();  // DEBUG
     }
 
-    peek() {
+    peek() : number {
       if (this.is_empty()) return ION.EOF;
       return this._src.charCodeAt(this._pos);
     }
 
-    skip(dist: number): void {
+    skip(dist: number) : void {
       this._pos += dist;
       if (this._pos > this._limit) {
         this._pos = this._limit;
       }
     }
 
-    get(ii): number {
+    valueAt(ii: number) : number {
       if (ii < this._start || ii >= this._limit) return ION.EOF;
       return this._src.charCodeAt(ii);
     }
@@ -185,7 +199,7 @@ namespace ION {
       return this._limit - this._pos;
     }
 
-    setRemaining(r: number) {
+    setRemaining(r: number) : void {
       this._limit = r + this._pos;
     }
 
@@ -221,14 +235,14 @@ namespace ION {
       return (this._src[this._pos] & 0xFF);
     }
 
-    skip(dist: number) {
+    skip(dist: number) : void {
       this._pos += dist;
       if (this._pos > this._limit) {
         this._pos = this._limit;
       }
     }
 
-    get(ii: number) {
+    valueAt(ii: number) : number {
       if (ii < this._start || ii >= this._limit) return undefined;
       return (this._src[ii] & 0xFF);
     }
