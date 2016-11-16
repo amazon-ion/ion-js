@@ -50,8 +50,6 @@ namespace ION {
     msg: "error",
   };
 
-  const IVM = { text: "$ion_1_0", binary: [ 224 /*0xE0*/, 1 /*0x01*/, 0 /*0x00*/, 234 /*0xEA*/ ], sid : 3 };
-
   function get_buf_type(buf) {
     var b1, btype = typeof buf;
     if (btype === 'undefined' || typeof buf.length === 'undefined') this.error("invalid input");
