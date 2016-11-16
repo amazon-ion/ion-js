@@ -39,7 +39,7 @@
 //    the decimal NULL.
 
 namespace ION {
-  class Decimal {
+  export class Decimal {
     public static readonly NULL: Decimal = new Decimal(undefined, undefined);
 
     private _value: LongInt;
@@ -73,6 +73,10 @@ namespace ION {
         var n = this._value.numberValue();
         n = n * Math.pow(10, this._exponent);
         return n;
+    }
+
+    getNumber() : number {
+      return this.numberValue();
     }
 
     toString() : string {
