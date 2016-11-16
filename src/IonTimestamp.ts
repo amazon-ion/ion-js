@@ -30,7 +30,7 @@
 //    undefined, empty or a null image it returns the timestamp NULL.
 
 namespace ION {
-  class Timestamp {
+  export class Timestamp {
     private static readonly MIN_SECONDS: number = 0;
     private static readonly MAX_SECONDS: number = 60;
     private static readonly MIN_MINUTE: number = 0;
@@ -464,7 +464,7 @@ namespace ION {
 
   }
 
-  enum Precision {
+  export enum Precision {
     EMPTY = -1,
     NULL = 0,
     YEAR = 1,
