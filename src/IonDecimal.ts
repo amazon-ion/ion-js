@@ -41,6 +41,7 @@
 namespace ION {
   export class Decimal {
     public static readonly NULL: Decimal = new Decimal(undefined, undefined);
+    public static readonly ZERO: Decimal = new Decimal(LongInt.ZERO, 0);
 
     private _value: LongInt;
     private _exponent: number;
