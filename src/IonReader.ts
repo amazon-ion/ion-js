@@ -12,7 +12,17 @@
  * language governing permissions and limitations under the License.
  */
 namespace ION {
-  interface Reader {
+  export interface Reader {
+    blobValue: () => number[];
+    booleanValue: () => boolean;
+    decimalValue: () => Decimal;
+    fieldName: () => string;
+    next: () => IonType;
+    numberValue: () => number;
     stepIn: () => void;
+    stepOut: () => void;
+    stringValue: () => string;
+    timestampValue: () => Timestamp;
+    value: () => any;
   }
 }
