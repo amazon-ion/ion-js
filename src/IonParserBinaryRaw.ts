@@ -555,7 +555,7 @@ namespace ION {
 
   const ZERO_POINT_ZERO = new Float64Array([0.0]);
 
-  class ParserBinaryRaw {
+  export class ParserBinaryRaw {
     private buf = new ArrayBuffer(8);                   // TODO - what about threading?
     private buf_as_bytes = new Uint8Array(this.buf);    //        we could new them locally in normal_float_to_bytes
     private buf_as_double = new Float64Array(this.buf); //        but that seems wasteful. ... hmmm
@@ -970,6 +970,14 @@ namespace ION {
           break;
       }
       return bytes;
+    }
+
+    booleanValue() : boolean {
+      if (this._raw_type === TB_BOOL) {
+        return this._curr; 
+      } else {
+        return undefined;
+      }
     }
   }
 }
