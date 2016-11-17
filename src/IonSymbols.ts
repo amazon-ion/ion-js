@@ -14,60 +14,48 @@
 
 // Ion Symbol Table processing
 
-"use strict";
+namespace ION {
+  export class Symbol {
+    sid: number;
+    name: string;
 
-var ION;
-if (!ION) {
-  throw {
-    name: "IonError",
-    where: "loading IonSymbols.js",
-    msg: "IonSymbols.js must follow Ion.js"
-  };
-}
+    constructor(id: number, val: string) {
+      this.sid = id;
+      this.name = val;
+    }
 
-if (typeof ION.Symbol !== 'function') {
+    toString() : string {
+      var s = "sym::{id:" + asAscii(this.sid) + ",val:\"" + asAscii(this.name) + "\"";
+      return s;
+    }
+  }
 
-  ION.Symbol = (function() 
-  {
-    var 
-      Symbol_class = function(id, val)
-      {
-        this.sid = id;
-        this.name = val;
-      },
-      symbol_impl = {
-        toString: function() {
-          var s = "sym::{id:"+ION.asAscii(this.sid)+",val:\""+ION.asAscii(this.val)+"\"";
-          return s;
-        }
-      };
-    Symbol_class.prototype = symbol_impl;
-    Symbol_class.prototype.constructor = Symbol_class;
-    return Symbol_class;
-  })();
-}
+  export class SymbolTable {
+    private name: string;
+    private version: number;
+    private maxid: number;
+    private base: number;
+    private imports: Import[];
+    private symbols: Symbol[];
+    private _index: any;
+    private _overflow: any;
 
-ION.SymbolTable = ION.SymbolTable || (function() 
-{
-  var 
-    Symbol_class = ION.Symbol,
-
-    SymbolTable_class = function(name, ver, imports, symbols, overflow) {
-      var ii, len, maxid, fn;
+    constructor(name: string, ver: number, imports: Import[], symbols: string[] | Symbol[], maxid: number, overflow: any = {}) {
+      var ii, len, fn;
       this.name      =      name;
       this.version   = ver || -1;
-      this.maxid     =         1;
-      this.base      =         0;
       this.imports   =   imports;
-      this.symbols   =        {};
+      this.symbols   =        [];
       this._index    =        {};
       this._overflow =  overflow;
-      
-      maxid = 1;
-      if (typeof imports === 'object' && imports.length > 0) {
-        len = imports.length;
-        for (ii=0; ii<len; ii++) {
-          maxid += imports[ii].maxid;
+
+      if (maxid === undefined) {
+        maxid = 1;
+        if (typeof imports === 'object' && imports.length > 0) {
+          len = imports.length;
+          for (ii=0; ii<len; ii++) {
+            maxid += imports[ii].maxid;
+          }
         }
       }
       this.maxid = maxid;
@@ -79,121 +67,104 @@ ION.SymbolTable = ION.SymbolTable || (function()
           fn.call(this, symbols[ii]);
         }
       }
-    },
-    symbol_table_impl = 
-    {
-      addName : function(name) {
-        var id, t = this;
-        if (typeof name !== 'string') ION.error("invalid symbol");
-        id = t.getId(name);
-        if (id !== undefined) return id;
-        id = t.maxid;
-        t.maxid++;
-        t.addSymbol(new Symbol_class(id, name));
+    }
+
+    addName(name: string) : number {
+      var id, t = this;
+      if (typeof name !== 'string') throw new Error("invalid symbol");
+      id = t.getId(name);
+      if (id !== undefined) return id;
+      id = t.maxid;
+      t.maxid++;
+      t.addSymbol(new Symbol(id, name));
+      return id;
+    }
+
+    addSymbol(sym: Symbol) : number {
+      var id, name, t = this;
+      name = sym.name;
+      id = t.getId(name);
+      if (id !== undefined) {
+        if (id !== sym.sid) throw new Error("symbol is already defined");
         return id;
-      },
-      addSymbol : function(sym) {
-        var id, name, offset, t = this;
-        if (typeof sym !== 'object' || !sym.name || !sym.sid) ION.error("invalid symbol");
-        name = sym.name;
-        id = t.getId(name);
-        if (id !== undefined) {
-          if (id !== sym.sid) ION.error("symbol is already defined");
-          return id;
-        }
-        id = sym.sid;
-        offset = id - t.base;
-        if (offset < 0) {
-          ION.error("can't change symbols in import list");
-        }
-        if (offset >= t.maxid) t.maxid = offset + 1;
-        t.symbols[offset] = sym;
-        t._index[name] = offset; // we store the local id not the global
-        return sym.sid;
-      },
-      getId : function(name) {
-        var ii, id, len, base, imports, t = this;
-        if ((imports = t.imports) !== undefined 
-         && (len = imports.length) > 0) 
-        {
-          base = 1;
-          for (ii=0; ii<len; ii++) {
-            id = imports[ii]._index[name] || -1;
-            if (id > 0) {
-              return id + base;
-            }
-            base += imports[ii].maxid;
-          }
-        }
-        id = t._index[name];
-        return id ? id.sid : undefined;
-      },
-      getName : function(id) {
-        var ii, len, base, n, imports, symbols, t = this;
-        if (id < 1 || id >= t.maxid) return undefined;
-        symbols = t.symbols;
-        base = 1;
-        if ((imports = t.imports) !== undefined 
-         && (len = imports.length) > 0) 
-        {
-          n = undefined;
-          for (ii=0; ii<len; ii++) {
-            if (imports[ii].maxid > (id-base)) {
-              symbols = imports[ii].symtab ? imports[ii].symtab.symbols : undefined;
-              break;
-            }
-            base += imports[ii].maxid;
-          }
-        }
-        if (symbols) {
-          ii = id - base;
-          n = symbols[ii] ? symbols[ii].name : undefined;
-        }
-        else {
-          n = '$'+id.toString();
-        }
-        return n;
       }
-    };
-    
-  ION.ion_symbol_table = "$ion_symbol_table";
-  ION.ion_symbol_table_sid = 3;
+      id = sym.sid;
+      let offset: number = id - t.base;
+      if (offset < 0) {
+        throw new Error("can't change symbols in import list");
+      }
+      if (offset >= t.maxid) t.maxid = offset + 1;
+      t.symbols[offset] = sym;
+      t._index[name] = offset; // we store the local id not the global
+      return sym.sid;
+    }
 
-  SymbolTable_class.prototype = symbol_table_impl;
-  SymbolTable_class.prototype.constructor = SymbolTable_class;
-  return SymbolTable_class;
-})();
+    getId(name: string) : number {
+      var ii, id, len, base, imports, t = this;
+      if ((imports = t.imports) !== undefined 
+       && (len = imports.length) > 0) 
+      {
+        base = 1;
+        for (ii=0; ii<len; ii++) {
+          id = imports[ii]._index[name] || -1;
+          if (id > 0) {
+            return id + base;
+          }
+          base += imports[ii].maxid;
+        }
+      }
+      id = t._index[name];
+      return id ? id.sid : undefined;
+    }
 
-  
-ION.getSystemSymbolTable = ION.getSystemSymbolTable  || (function() 
-{
-  var system_symbol_table, no_change, impl;
+    getName(id: number) : string {
+      var ii, len, base, n, imports, symbols, t = this;
+      if (id < 1 || id >= t.maxid) return undefined;
+      symbols = t.symbols;
+      base = 1;
+      if ((imports = t.imports) !== undefined 
+       && (len = imports.length) > 0) 
+      {
+        n = undefined;
+        for (ii=0; ii<len; ii++) {
+          if (imports[ii].maxid > (id-base)) {
+            symbols = imports[ii].symtab ? imports[ii].symtab.symbols : undefined;
+            break;
+          }
+          base += imports[ii].maxid;
+        }
+      }
+      if (symbols) {
+        ii = id - base;
+        n = symbols[ii] ? symbols[ii].name : undefined;
+      }
+      else {
+        n = '$'+id.toString();
+      }
+      return n;
+    }
+  }
 
-  /* we just use the SYSTEM_SYMBOLS symbol table for these values
-  var s = {
-    ION_1_0_MAX_ID              : 9,
-    ION                         : "$ion",
-    ION_SID                     : 1,
-    ION_1_0                     : "$ion_1_0",
-    ION_1_0_SID                 : 2,
-    ION_SYMBOL_TABLE            : "$ion_symbol_table",
-    ION_SYMBOL_TABLE_SID        : 3,
-    NAME                        : "name",
-    NAME_SID                    : 4,
-    VERSION                     : "version",
-    VERSION_SID                 : 5,
-    IMPORTS                     : "imports",
-    IMPORTS_SID                 : 6,
-    SYMBOLS                     : "symbols",
-    SYMBOLS_SID                 : 7,
-    MAX_ID                      : "max_id",
-    MAX_ID_SID                  : 8,
-    ION_SHARED_SYMBOL_TABLE     : "$ion_shared_symbol_table",
-    ION_SHARED_SYMBOL_TABLE_SID : 9,
-  };
-*/
-  // we're hiding this a little bit
-  system_symbol_table = new ION.SymbolTable(
+  export const ion_symbol_table = "$ion_symbol_table";
+  export const ion_symbol_table_sid = 3;
+
+  class SystemSymbolTable extends SymbolTable {
+    private no_change() : never {
+      throw new Error("can't change the system symbol table");
+    }
+
+    addName(name: string) : number {
+      this.no_change();
+      return undefined;
+    }
+
+    addSymbol(sym: Symbol) : number {
+      this.no_change();
+      return undefined;
+    }
+  }
+
+  const systemSymbolTable: SystemSymbolTable = new SystemSymbolTable(
     "$ion",
     1,
     [], // no imports
@@ -207,31 +178,30 @@ ION.getSystemSymbolTable = ION.getSystemSymbolTable  || (function()
       "symbols",
       "max_id",
       "$ion_shared_symbol_table",
-    ]
+    ],
+    undefined
   );
-  no_change = function() {
-    ION.error("can't change the system symbol table");
-  };
-  system_symbol_table["addName"] = no_change;
-  system_symbol_table["addSymbol"] = no_change;
-  impl = function() {
-    return system_symbol_table;
-  };
-  return impl;
-})();
 
-ION.makeSymbolTable = ION.makeSymbolTable || (function() 
-{
-  //makeSymbolTable
-  //sp : system parser
-  //assumes the sp just encountered a struct on next which is infact a symbol table
-  var 
-  empty_struct = {},
-  load_imports = function (sp, cat)
-  {
-    var name, version, maxid, t, ii, st, imports = [];
+  export function getSystemSymbolTable() : SymbolTable {
+    return systemSymbolTable;
+  }
+
+  const empty_struct = {};
+
+  interface Import {
+    name: string;
+    version: number;
+    maxid: number;
+    offset: number;
+    symtab: {};
+  }
+
+  function load_imports(sp: Reader, cat: any) : Import[] {
+    let imports: Import[] = [];
+
+    var name, version, maxid, t, ii, st;
     sp.stepIn(); // into the array
-    
+
     for (;;) {
       t = sp.next(); 
       if (!t) break;
@@ -267,7 +237,7 @@ ION.makeSymbolTable = ION.makeSymbolTable || (function()
             maxid:   maxid,
             offset:  0,
             symtab:  empty_struct,
-          }
+          } as Import
         );
       }
       sp.stepOut(); // out of one import struct
@@ -275,9 +245,9 @@ ION.makeSymbolTable = ION.makeSymbolTable || (function()
     sp.stepOut(); // out of the array of imports
 
     return imports;
-  },
-  load_symbols = function (sp)
-  {
+  }
+
+  function load_symbols(sp: Reader) : string[] {
     var syms = [], name;
     sp.stepIn();
     while (sp.next() !== undefined) {
@@ -286,11 +256,17 @@ ION.makeSymbolTable = ION.makeSymbolTable || (function()
     }
     sp.stepOut();
     return syms;
-  },
-  make_symbol_table = function(cat, sp)
-  {
-    var st, len, t, err, off, ii, imp, fld, 
-        name, version, imports, symbols, maxid, overflow;
+  }
+
+  export function makeSymbolTable(cat, sp: Reader) : SymbolTable {
+    let name: string;
+    let version: number;
+    let imports: Import[];
+    let symbols: string[];
+    let maxid: number;
+    let overflow: any;
+
+    var len, t, off, ii, imp, fld;
     
     sp.stepIn();
     while ((t = sp.next()) !== undefined) {
@@ -312,26 +288,26 @@ ION.makeSymbolTable = ION.makeSymbolTable || (function()
         symbols = load_symbols(sp);
         break;
       case "max_id":              // sid 8
-        maxid = sp.getScalar();
+        maxid = sp.numberValue();
       //case 9 : //"$ion_shared_symbol_table",
       default:
         if (typeof overflow === 'undefined') overflow = {};
-        overflow[sp.fieldName()] = sp.getValue();
+        overflow[sp.fieldName()] = sp.value();
         break;
       }
     }
     sp.stepOut();
     
     // DEBUG
-    var err = "";
+    let err: string = "";
     if (typeof name !== 'undefined') {
       if (typeof name !== 'string') err += "bad type for name, ";
       if (typeof version !== 'number') err += "bad type for version, ";
     }
     if (typeof maxid !== 'undefined' && typeof maxid != 'number') err += "bad type for maxid, ";
-    if (err !== "") ION.error(err);
+    if (err !== "") throw new Error(err);
     
-    st = new ION.SymbolTable(name, version, imports, symbols, maxid, overflow);
+    let st: SymbolTable = new SymbolTable(name, version, imports, symbols, maxid, overflow);
     
     // step through the imports and resolve the imported symbol tables and
     // compute the _offset id and _max_id (if missing)
@@ -343,8 +319,8 @@ ION.makeSymbolTable = ION.makeSymbolTable || (function()
       imp = cat ? cat.getSymbolTable(name, version) : undefined;
       if (imp) {
         imports[ii].symtab = imp;
-        if (imports.maxid === undefined) {
-          imports.maxid = imp.maxid;
+        if (imports[ii].maxid === undefined) {
+          imports[ii].maxid = imp.maxid;
         }
       }
       imports[ii].offset = off;
@@ -352,7 +328,5 @@ ION.makeSymbolTable = ION.makeSymbolTable || (function()
     }
    
     return st;
-  };
-  return make_symbol_table;
-})();
-
+  }
+}
