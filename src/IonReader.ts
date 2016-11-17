@@ -13,8 +13,8 @@
  */
 namespace ION {
   export interface Reader {
-    blobValue: () => number[];
     booleanValue: () => boolean;
+    byteValue: () => number[];
     decimalValue: () => Decimal;
     fieldName: () => string;
     next: () => IonType;
