@@ -45,6 +45,8 @@ namespace ION {
 
     abstract skip(dist: number) : void;
 
+    abstract unread(ch: number) : void;
+
     protected abstract clone(start: number, len: number): Span;
 
     static error() {
@@ -123,7 +125,7 @@ namespace ION {
         this._line_start = this._pos;
     }
 
-    unread(ch) {
+    unread(ch: number) : void {
       if (this._pos <= this._start) Span.error();
       this._pos--;
       if (ch < 0) {
@@ -221,7 +223,7 @@ namespace ION {
       return (b & 0xFF);
     }
 
-    unread(b: number) {
+    unread(b: number) : void {
       if (this._pos <= this._start) Span.error();
       this._pos--;
       if (b == ION.EOF) {
@@ -256,7 +258,7 @@ namespace ION {
     }
   }
 
-  function makeSpan_impl(src, start: number, len: number): Span {
+  export function makeSpan(src, start: number, len: number): Span {
     let span: Span = undefined;
     let src_type = typeof src;
 
@@ -273,5 +275,5 @@ namespace ION {
       throw new Error("invalid span source");
     }
     return span;
-  };
+  }
 }
