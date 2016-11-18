@@ -203,7 +203,7 @@ namespace ION {
     return true;
   }
 
-  class ParserTextRaw {
+  export class ParserTextRaw {
     private _in: Span;
     private _ops: any[];
     private _value_type: any;
@@ -258,6 +258,14 @@ namespace ION {
       helpers[CH_MS] = this._read_value_helper_minus; // '-'
 
       this._read_value_helper_helpers = helpers;
+    }
+
+    fieldName() : string {
+      return this._fieldname;
+    }
+
+    annotations() : string[] {
+      return this._ann;
     }
 
     private _read_datagram_values() {
@@ -378,7 +386,7 @@ namespace ION {
 
     private _load_field_name() {
       var v = this._value_pop(),
-          s = this._get_value_as_string(v);
+          s = this.get_value_as_string(v);
       switch (v) {
       case T_IDENTIFIER:
         if (is_keyword(s)) {
@@ -835,7 +843,7 @@ namespace ION {
     private _test_string_as_annotation( op ) : boolean {  // we could use op to validate the string type (1 or 3) vs the op - meh
       var s, ch, is_ann, t = this._value_pop();
       if (t != T_STRING1 && t != T_STRING3) this._error("expecting quoted symbol here");
-      s = this._get_value_as_string(t);
+      s = this.get_value_as_string(t);
       ch = this._read_after_whitespace(true);
       if (ch == CH_CL && this._peek() == CH_CL) {
         this._read(); // consume the colon character
@@ -855,7 +863,7 @@ namespace ION {
           is_ann = true,
           t = this._value_pop();
       if (t != T_IDENTIFIER) this._error("expecting symbol here");
-      s = this._get_value_as_string(t);
+      s = this.get_value_as_string(t);
       kwt = get_keyword_type(s);
       ch = this._read_after_whitespace(true);
       if (ch == CH_CL && this._peek() == CH_CL) {
@@ -883,7 +891,7 @@ namespace ION {
               this._error("expected type name after 'null.'");
               return undefined;
             }
-            s = this._get_value_as_string(T_IDENTIFIER);
+            s = this.get_value_as_string(T_IDENTIFIER);
             kwt = get_type_from_name(s);
           }
           this._start = -1;
@@ -960,7 +968,7 @@ namespace ION {
     }
 
     numberValue() : number {
-      var n, s = this._get_value_as_string(this._value_type);
+      var n, s = this.get_value_as_string(this._value_type);
       switch (this._value_type) {
         case T_INT:
         case T_HEXINT:
@@ -979,7 +987,21 @@ namespace ION {
       return n;
     }
 
-    private _get_value_as_string(t: number) : string {
+    booleanValue() : boolean {
+      if (this._value_type !== T_BOOL) {
+        return undefined;
+      }
+      let s: string = this.get_value_as_string(T_BOOL);
+      if (s == "true") {
+        return true;
+      } else if (s == "false") {
+        return false;
+      } else {
+        return undefined;
+      }
+    }
+
+    get_value_as_string(t: number) : string {
       var ii, ch, s = "";
       switch (t) {
         case T_NULL:
@@ -1360,7 +1382,7 @@ namespace ION {
       if (v == T_IDENTIFIER) {
         len = this._end - this._start;
         if (len >= 3 && len <= 5) {
-          s = this._get_value_as_string(v);
+          s = this.get_value_as_string(v);
           v = get_keyword_type(s);
         }
       }
