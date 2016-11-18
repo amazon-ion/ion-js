@@ -19,86 +19,81 @@
 // input string to the desired Javascript value (scalar or
 // object, such as IonValue).
 
-"use strict";
+namespace ION {
+  const RAW_STRING = new IonType( -1, "raw_input", true,  false, false, false );
+  const ERROR = new IonType( -2, "error", true,  false, false, false );
 
-var ION;
-if (!ION 
-  || typeof ION.ParserTextRaw !== "function" 
-  || typeof ION.getSystemSymbolTable !== "function"
-) {
-  throw {
-    name: "IonError",
-    where: "loading TextReader.js",
-    msg: "IonTextReader.js must follow Ion.js, IonSymbols.js and IonParserTextRaw.js"
-  };
-}
+  const BOC = -2; // cloned from IonParserTextRaw
+  const EOF = -1;
+  const T_IDENTIFIER = 9;
+  const T_STRUCT = 19;
 
-ION.TextReader = ION.TextReader || (function() 
-{
-  var 
-    RAW_STRING = new ION.IonType( -1, "raw_input", true,  false, false, false ),
-    ERROR = new ION.IonType( -2, "error", true,  false, false, false ),
-    BOC = -2, // cloned from IonParserTextRaw
-    EOF = -1,
-    T_IDENTIFIER = 9,
-    T_STRUCT = 19
-  ;
+  class TextReader implements Reader {
+    private _parser: ParserTextRaw;
+    private _depth: number;
+    private _cat: any;
+    private _symtab: SymbolTable;
+    private _type: IonType;
+    private _raw_type: number;
+    private _raw: any;
 
-  var 
-  TextReader_class = function(source, catalog) 
-  {
-    if (!source) ION.error("a source Span is required to make a reader");
-    this._parser   = new ION.ParserTextRaw(source);
-    this._depth    = 0;
-    this._cat      = catalog;
-    this._symtab   = ION.getSystemSymbolTable();
-    this._type     = ERROR;
-    this._raw_type = EOF;
-    this._raw      = undefined;
-  },
-  
-  load_raw = function(t) {
-    if (t._raw !== undefined) return;
-    if (t.isNull()) return;
-    t._raw = t._parser._get_value_as_string(t._raw_type);
-    return;
-  },
-  skip_past_container = function(t) {
-    var type, 
-        d = 1,  // we want to have read the EOC tha matches the container we just saw
-        p = this._parser;
-    while (d > 0) {
-      type = p.next();
-      if (type === undefined) { // end of container
-        d--;
+    constructor(source: Span, catalog) {
+      if (!source) {
+        throw new Error("a source Span is required to make a reader");
       }
-      else if (type.container) {
-        d++;
+
+      this._parser   = new ParserTextRaw(source);
+      this._depth    = 0;
+      this._cat      = catalog;
+      this._symtab   = getSystemSymbolTable();
+      this._type     = ERROR;
+      this._raw_type = EOF;
+      this._raw      = undefined;
+    }
+
+    load_raw() {
+      let t: TextReader = this;
+      if (t._raw !== undefined) return;
+      if (t.isNull()) return;
+      t._raw = t._parser.get_value_as_string(t._raw_type);
+      return;
+    }
+
+    skip_past_container() {
+      var type, 
+          d = 1,  // we want to have read the EOC tha matches the container we just saw
+          p = this._parser;
+      while (d > 0) {
+        type = p.next();
+        if (type === undefined) { // end of container
+          d--;
+        }
+        else if (type.container) {
+          d++;
+        }
       }
     }
-  },
-  
-  TextReader_impl = {
-    next : function() {
+
+    next() {
       var type, p, rt, t = this;
       t._raw = undefined;
-      if (t._type === EOF) return undefined;
+      if (t._raw_type === EOF) return undefined;
       if (t._type && t._type.container) {
-        skip_past_container(t);
+        this.skip_past_container();
       }
       p = t._parser;
       for (;;) {
         t._raw_type = rt = p.next();
         if (t._depth > 0) break;
         if (rt === T_IDENTIFIER) { 
-          load_raw(t);
-          if (t._raw != ION.IVM.text) break;
-          t._symtab = ION.getSystemSymbolTable();
+          this.load_raw();
+          if (t._raw != IVM.text) break;
+          t._symtab = getSystemSymbolTable();
         }
         else if (rt === T_STRUCT) {
           if (p._ann.length !== 1) break;
-          if (p._ann[0] != ION.ion_symbol_table) break;
-          t._symtab = ION.makeSymbolTable(t._cat, t);
+          if (p._ann[0] != ion_symbol_table) break;
+          t._symtab = makeSymbolTable(t._cat, t);
         }
         else {
           break;
@@ -109,53 +104,60 @@ ION.TextReader = ION.TextReader || (function()
       type = p.get_ion_type(rt);
       t._type = type || EOF;
       return type;
-    },
-    stepIn : function() {
+    }
+
+    stepIn() {
       var t = this;
       if (!t._type.container) {
-        ION.error("can't step in to a scalar value");
+        throw new Error("can't step in to a scalar value");
       }
-      t._type = BOC;
+      t._raw_type = BOC;
       t._depth++;
-    },
-    stepOut : function() {
+    }
+
+    stepOut() {
       var t = this;
-      while ( t._type != EOF ) {
+      while ( t._raw_type != EOF ) {
         t.next();
       }
-      t._type = undefined;
+      t._raw_type = undefined;
       t._depth--;
-    },
-    
-    valueType : function() {
+    }
+
+    valueType() : IonType {
       return this._type;
-    },
-    depth : function() {
+    }
+
+    depth() : number {
       return this._depth;
-    },
-    fieldName : function() {
-      return this._parser._fieldname;
-    },
-    annotations : function() {
-      return this._parser._ann;
-    },
-    isNull : function() {
-      if (this._type == ION.NULL) return true;
+    }
+
+    fieldName() : string {
+      return this._parser.fieldName();
+    }
+
+    annotations() : string[] {
+      return this._parser.annotations();
+    }
+
+    isNull() : boolean {
+      if (this._type === IonTypes.NULL) return true;
       return this._parser.isNull();
-    },
-    stringValue : function() {
+    }
+
+    stringValue() : string {
       var i, s, t = this;
-      load_raw(t);
+      this.load_raw();
       if (t.isNull()) {
         s = "null";
-        if (t._type != ION.NULL) {
+        if (t._type != IonTypes.NULL) {
           s += "." + t._type.name;
         }
       }
       else if (t._type.scalar) {
         // BLOB is a scalar by you don't want to just use the string 
         // value otherwise all other scalars are fine as is
-        if (t._type !== ION.BLOB) {
+        if (t._type !== IonTypes.BLOB) {
           s = t._raw;
         }
         else {
@@ -167,22 +169,40 @@ ION.TextReader = ION.TextReader || (function()
         s = i.stringValue();
       }
       return s;
-    },
-    numberValue : function() {
-      if (!this._type.number) {
+    }
+
+    numberValue() {
+      if (!this._type.num) {
         return undefined;
       }
       return this._parser.numberValue();
-    },
-    byteValue : function() {
-      ION.error("E_NOT_IMPL: byteValue");
-    },
-    ionValue : function() {
-      ION.error("E_NOT_IMPL: ionValue");
-    },
-  };
+    }
 
-  TextReader_class.prototype = TextReader_impl;
-  TextReader_class.prototype.constructor = TextReader_class;
-  return TextReader_class;
-})();
+    byteValue() : number[] {
+      throw new Error("E_NOT_IMPL: byteValue");
+    }
+
+    booleanValue() {
+      if (this._type !== IonTypes.BOOL) {
+        return undefined;
+      }
+      return this._parser.booleanValue();
+    }
+
+    decimalValue() : Decimal {
+      throw new Error("E_NOT_IMPL: decimalValue");
+    }
+
+    timestampValue() : Timestamp {
+      throw new Error("E_NOT_IMPL: timestampValue");
+    }
+
+    value() : any {
+      throw new Error("E_NOT_IMPL: value");
+    }
+
+    ionValue() {
+      throw new Error("E_NOT_IMPL: ionValue");
+    }
+  }
+}
