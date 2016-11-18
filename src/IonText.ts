@@ -12,6 +12,10 @@
  * language governing permissions and limitations under the License.
  */
 namespace ION {
+  export const WHITESPACE_COMMENT1 = -2;
+  export const WHITESPACE_COMMENT2 = -3;
+  export const ESCAPED_NEWLINE     = -4;
+
   const DOUBLE_QUOTE = 34; // "\\\""
   const SINGLE_QUOTE = 39; // "\\\'"
   const SLASH =        92; // "\\\\"
@@ -26,6 +30,25 @@ namespace ION {
     SINGLE_QUOTE: "\\\'",
     SLASH: "\\\\",
   };
+
+  function _make_bool_array(str: string) : boolean[] {
+    let i = str.length
+    let a: boolean[] = [];
+    a[128] = false;
+    while (i > 0) {
+      --i;
+      a[str.charCodeAt(i)] = true;
+    }
+    return a;
+  }
+
+  const _is_base64_char = _make_bool_array("+/0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ");
+  const _is_hex_digit = _make_bool_array("0123456789abcdefABCDEF");
+  const _is_letter: boolean[] = _make_bool_array("_$abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ");
+  const _is_letter_or_digit = _make_bool_array("_$0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ");
+  const _is_numeric_terminator: boolean[] = _make_bool_array("{}[](),\"\'\ \t\n\r\u000c");
+  const _is_operator_char = _make_bool_array("!#%&*+-./;<=>?@^`|~");
+  const _is_whitespace = _make_bool_array(" \t\r\n\u000c");
 
   export function is_digit(ch: number) : boolean {
     if (ch < 48 || ch > 57) return false;
@@ -120,5 +143,38 @@ namespace ION {
       s = s.substring(s.length - len, s.length); 
     }
     return s;
+  }
+
+  export function is_letter(ch: number) : boolean {
+    return _is_letter[ch];
+  }
+
+  export function is_numeric_terminator(ch: number) : boolean {
+    if (ch == -1) return true;
+    return _is_numeric_terminator[ch];
+  }
+
+  export function is_letter_or_digit(ch: number) : boolean {
+    return _is_letter_or_digit[ch];
+  }
+
+  export function is_operator_char(ch: number) : boolean {
+    return _is_operator_char[ch];
+  }
+
+  export function is_whitespace(ch: number) : boolean {
+    if (ch > 32) return false;
+    if (ch == this.WHITESPACE_COMMENT1) return true;
+    if (ch == this.WHITESPACE_COMMENT2) return true;
+    if (ch == this.ESCAPED_NEWLINE)     return true;
+    return _is_whitespace[ch];
+  }
+
+  export function is_base64_char(ch: number) : boolean {
+    return _is_base64_char[ch];
+  }
+
+  export function is_hex_digit(ch: number) : boolean {
+    return _is_hex_digit[ch];
   }
 }
