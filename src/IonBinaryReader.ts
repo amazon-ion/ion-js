@@ -77,7 +77,7 @@ namespace ION {
     return s;
   }
 
-  class BinaryReader implements Reader {
+  export class BinaryReader implements Reader {
     private _parser: ParserBinaryRaw;
     private _cat;
     private _symtab;
