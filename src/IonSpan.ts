@@ -258,9 +258,16 @@ namespace ION {
     }
   }
 
-  export function makeSpan(src, start: number, len: number): Span {
+  export function makeSpan(src, start?: number, len?: number): Span {
     let span: Span = undefined;
     let src_type = typeof src;
+
+    if (typeof start === 'undefined') {
+      start = 0;
+    }
+    if (typeof len === 'undefined') {
+      len = src.length;
+    }
 
     if (src_type === 'undefined') {
       Span.error();
