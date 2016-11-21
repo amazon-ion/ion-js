@@ -28,7 +28,7 @@ namespace ION {
   const T_IDENTIFIER = 9;
   const T_STRUCT = 19;
 
-  class TextReader implements Reader {
+  export class TextReader implements Reader {
     private _parser: ParserTextRaw;
     private _depth: number;
     private _cat: any;
