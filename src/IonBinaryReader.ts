@@ -19,6 +19,9 @@
 // input byte array  to the desired Javascript value (scalar or
 // object, such as IonValue).
 
+/// <reference path="IonSymbols.ts" />
+/// <reference path="IonTypes.ts" />
+
 namespace ION {
   const RAW_STRING = new IonType( -1, "raw_input", true,  false, false, false );
 

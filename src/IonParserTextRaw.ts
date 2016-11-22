@@ -18,6 +18,8 @@
 // Returns on any value with value type. The _start and _end
 // members are set for scalar types.
 
+/// <reference path="IonText.ts" />
+
 namespace ION {
   const EOF = -1;  // EOF is end of container, distinct from undefined which is value has been consumed
   const ERROR           = -2;
