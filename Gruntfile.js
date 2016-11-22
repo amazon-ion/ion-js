@@ -2,25 +2,22 @@ module.exports = function(grunt) {
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
     jshint: {
-      files: [
-        'build/**/*.js',
-        'test/**/*.js'
-      ]
+      files: []
     },
-    typescript: {
-      src: {
+    ts: {
+      default: {
         src: ['src/**/*.ts'],
-        dest: 'build/src'
+        out: 'dist/ion-node.js',
+        options: {
+          module: "amd",
+          target: "es6",
+        }
       },
-      test: {
-        src: ['test/**/*.ts'],
-        dest: 'build/test'
-      }
     }
   });
 
   grunt.loadNpmTasks('grunt-contrib-jshint');
-  grunt.loadNpmTasks('grunt-typescript');
+  grunt.loadNpmTasks('grunt-ts');
 
-  grunt.registerTask('default', ['typescript', 'jshint']);
+  grunt.registerTask('default', ['ts', 'jshint']);
 };

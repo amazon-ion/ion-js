@@ -22,6 +22,7 @@
   "devDependencies": {
     "grunt": "^1.0.1",
     "grunt-contrib-jshint": "^1.0.0",
-    "grunt-typescript": "^0.8.0"
+    "grunt-ts": "^6.0.0-beta.3",
+    "intern": "^3.4.1"
   }
 }
