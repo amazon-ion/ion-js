@@ -31,6 +31,7 @@
 
 /// <reference path="IonDecimal.ts" />
 /// <reference path="IonLongInt.ts" />
+/// <reference path="IonPrecision.ts" />
 
 namespace ION {
   export class Timestamp {
@@ -467,15 +468,4 @@ namespace ION {
 
   }
 
-  export enum Precision {
-    EMPTY = -1,
-    NULL = 0,
-    YEAR = 1,
-    MONTH = 2,
-    DAY = 3,
-    HOUR = 4,
-    MINUTE = 5,
-    SECONDS = 6,
-    FRACTIONAL_SECONDS = 7
-  }
 }
