@@ -53,21 +53,6 @@ namespace ION {
 
   const EOF              = -1;  // EOF is end of container; distinct from undefined which is value has been consumed
   const ERROR            = -2;
-  const TB_NULL          =  0;
-  const TB_BOOL          =  1;
-  const TB_INT           =  2;
-  const TB_NEG_INT       =  3;
-  const TB_FLOAT         =  4;
-  const TB_DECIMAL       =  5;
-  const TB_TIMESTAMP     =  6;
-  const TB_SYMBOL        =  7;
-  const TB_STRING        =  8;
-  const TB_CLOB          =  9;
-  const TB_BLOB          = 10;  // 0xa
-  const TB_LIST          = 11;  // 0xb
-  const TB_SEXP          = 12;  // 0xc
-  const TB_STRUCT        = 13;  // 0xd
-  const TB_ANNOTATION    = 14;  // 0xe
   const TB_UNUSED__      = 15;
   const TB_DATAGRAM      = 20;  // fake type of the top level
   const TB_SEXP_CLOSE    = 21;
@@ -93,11 +78,6 @@ namespace ION {
       default:               return undefined;
     };
   }
-
-  const NIBBLE_MASK = 0xf;
-  const BYTE_MASK =  0xff;
-  const TYPE_SHIFT =    4;
-  const BYTE_SHIFT =    8;
 
   const TS_SHIFT =      5;
   const TS_MASK =    0x1f;
@@ -130,9 +110,6 @@ namespace ION {
     validate_ts(ts);
     return len;
   }
-
-  const LEN_VAR  =     14;  // 0xe
-  const LEN_NULL =     15;  // 0xf
 
   const VINT_SHIFT =    7;
   const VINT_MASK  = 0x7f; 
