@@ -29,6 +29,8 @@
 //      ION.LongInt.fromNumber(number)
 //      ION.LongInt.ZERO
 
+/// <reference path="IonText.ts" />
+
 namespace ION {
   export class LongInt {
     private static readonly zero_bytes: number[] = [0];

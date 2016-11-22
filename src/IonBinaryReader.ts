@@ -19,7 +19,11 @@
 // input byte array  to the desired Javascript value (scalar or
 // object, such as IonValue).
 
+/// <reference path="IonConstants.ts" />
+/// <reference path="IonParserBinaryRaw.ts" />
+/// <reference path="IonSpan.ts" />
 /// <reference path="IonSymbols.ts" />
+/// <reference path="IonType.ts" />
 /// <reference path="IonTypes.ts" />
 
 namespace ION {

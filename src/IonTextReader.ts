@@ -19,6 +19,16 @@
 // input string to the desired Javascript value (scalar or
 // object, such as IonValue).
 
+/// <reference path="IonConstants.ts" />
+/// <reference path="IonDecimal.ts" />
+/// <reference path="IonParserTextRaw.ts" />
+/// <reference path="IonReader.ts" />
+/// <reference path="IonSpan.ts" />
+/// <reference path="IonSymbols.ts" />
+/// <reference path="IonTimestamp.ts" />
+/// <reference path="IonType.ts" />
+/// <reference path="IonTypes.ts" />
+
 namespace ION {
   const RAW_STRING = new IonType( -1, "raw_input", true,  false, false, false );
   const ERROR = new IonType( -2, "error", true,  false, false, false );

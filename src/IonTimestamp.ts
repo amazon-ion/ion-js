@@ -29,6 +29,9 @@
 //    The parse function returns a newly minted timestamp. If the string is
 //    undefined, empty or a null image it returns the timestamp NULL.
 
+/// <reference path="IonDecimal.ts" />
+/// <reference path="IonLongInt.ts" />
+
 namespace ION {
   export class Timestamp {
     private static readonly MIN_SECONDS: number = 0;

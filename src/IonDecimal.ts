@@ -38,6 +38,9 @@
 //    If the string is undefined, empty or a null image it returns 
 //    the decimal NULL.
 
+/// <reference path="IonLongInt.ts" />
+/// <reference path="IonText.ts" />
+
 namespace ION {
   export class Decimal {
     public static readonly NULL: Decimal = new Decimal(undefined, undefined);

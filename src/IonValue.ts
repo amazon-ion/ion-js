@@ -17,7 +17,10 @@
 // set of javascript objects derived from IonValue using
 // the ION.Class extension mechanism.
 
-"use strict";
+/// <reference path="IonBinary.ts" />
+/// <reference path="IonSpan.ts" />
+/// <reference path="IonType.ts" />
+/// <reference path="IonTypes.ts" />
 
 namespace ION {
   function error(msg: string) {

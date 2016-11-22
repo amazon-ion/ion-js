@@ -12,7 +12,11 @@
  * language governing permissions and limitations under the License.
  */
 
+/// <reference path="IonBinaryReader.ts" />
 /// <reference path="IonConstants.ts" />
+/// <reference path="IonReader.ts" />
+/// <reference path="IonSpan.ts" />
+/// <reference path="IonTextReader.ts" />
 
 namespace ION {
   const e = {

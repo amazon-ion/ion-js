@@ -14,6 +14,9 @@
 
 // Ion Symbol Table processing
 
+/// <reference path="IonReader.ts" />
+/// <reference path="IonText.ts" />
+
 namespace ION {
   export class Symbol {
     sid: number;

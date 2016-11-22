@@ -12,6 +12,8 @@
  * language governing permissions and limitations under the License.
  */
 
+/// <reference path="IonConstants.ts" />
+
 namespace ION {
   const SPAN_TYPE_STRING = 0;
   const SPAN_TYPE_BINARY = 1;
