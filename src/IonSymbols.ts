@@ -30,7 +30,14 @@ namespace ION {
     }
   }
 
-  export class SymbolTable {
+  export interface SymbolTable {
+    addName(name: string) : number;
+    addSymbol(sym: Symbol) : number;
+    getId(name: string) : number;
+    getName(id: number) : string;
+  }
+
+  class UserSymbolTable implements SymbolTable {
     private name: string;
     private version: number;
     private maxid: number;
@@ -148,7 +155,13 @@ namespace ION {
   export const ion_symbol_table = "$ion_symbol_table";
   export const ion_symbol_table_sid = 3;
 
-  class SystemSymbolTable extends SymbolTable {
+  class SystemSymbolTable implements SymbolTable {
+    private delegate: UserSymbolTable;
+
+    constructor(delegate: UserSymbolTable) {
+      this.delegate = delegate;
+    }
+
     private no_change() : never {
       throw new Error("can't change the system symbol table");
     }
@@ -162,24 +175,34 @@ namespace ION {
       this.no_change();
       return undefined;
     }
+
+    getId(name: string) : number {
+      return this.delegate.getId(name);
+    }
+
+    getName(id: number) : string {
+      return this.delegate.getName(id);
+    }
   }
 
   const systemSymbolTable: SystemSymbolTable = new SystemSymbolTable(
-    "$ion",
-    1,
-    [], // no imports
-    [
+    new UserSymbolTable(
       "$ion",
-      "$ion_1_0",
-      "$ion_symbol_table",
-      "name",
-      "version",
-      "imports",
-      "symbols",
-      "max_id",
-      "$ion_shared_symbol_table",
-    ],
-    undefined
+      1,
+      [], // no imports
+      [
+        "$ion",
+        "$ion_1_0",
+        "$ion_symbol_table",
+        "name",
+        "version",
+        "imports",
+        "symbols",
+        "max_id",
+        "$ion_shared_symbol_table",
+      ],
+      undefined
+    )
   );
 
   export function getSystemSymbolTable() : SymbolTable {
@@ -307,7 +330,7 @@ namespace ION {
     if (typeof maxid !== 'undefined' && typeof maxid != 'number') err += "bad type for maxid, ";
     if (err !== "") throw new Error(err);
     
-    let st: SymbolTable = new SymbolTable(name, version, imports, symbols, maxid, overflow);
+    let st: SymbolTable = new UserSymbolTable(name, version, imports, symbols, maxid, overflow);
     
     // step through the imports and resolve the imported symbol tables and
     // compute the _offset id and _max_id (if missing)
