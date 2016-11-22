@@ -49,6 +49,10 @@ namespace ION {
 
     protected abstract clone(start: number, len: number): Span;
 
+    write(b: number) : never {
+      throw new Error("not implemented");
+    }
+
     static error() {
       throw new Error("span error");
     }
