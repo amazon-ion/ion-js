@@ -32,8 +32,8 @@ namespace ION {
   abstract class IonValue {
     private _fieldname: string;
     private _annotations: string[];
-    private _datum: any;
     private _parent: IonValue;
+    protected _datum: any;
 
     // Gets an enumeration value identifying the core Ion data type of this object.
     abstract getType() : IonType;
@@ -41,7 +41,7 @@ namespace ION {
     // Compares two Ion values for structural equality, which means that they represent the exact same semantics, including annotations, numeric precision, and so on.
     equals(otherValue: any) : boolean {
       if (!(otherValue instanceof IonValue)) return false;
-      if (this.type() !== otherValue.type()) return false;
+      if (this.getType() !== otherValue.getType()) return false;
       return (this._datum === otherValue._datum);
     }
 
@@ -75,7 +75,7 @@ namespace ION {
       if (this._parent) {
         error("a value can only be added to one container");
       }
-      if (!(p instanceof ION.IonValue) || !p.getType().container) {
+      if (!(p instanceof IonValue) || !p.getType().container) {
         error("a value can only be added an Ion container");
       }
       this._parent = p;
@@ -93,40 +93,38 @@ namespace ION {
       if (!this._annotations) {
           this._annotations = [annotation];
       } else {
-        var ii = this.annotations.indexOf(annotation);
+        var ii = this._annotations.indexOf(annotation);
         if (ii < 0) {
-            this.annotations.push(annotation)
-        } else {
-            Log.debug("not adding duplicate annotation: " + annotation);
+            this._annotations.push(annotation)
         }
       }
     }
 
     // Removes all the user type annotations attached to this value.
     clearTypeAnnotations() : void {
-        this.annotations = undefined;
+        this._annotations = undefined;
     }
 
     // Removes a user type annotation from the list of annotations attached to this value.
     removeTypeAnnotation(annotation: string) : void {
-      var ii = this.annotations ? this.annotations.indexOf(annotation) : -1;
+      var ii = this._annotations ? this._annotations.indexOf(annotation) : -1;
       if (ii >= 0) {
-        this.annotations.splice(ii, 1);
+        this._annotations.splice(ii, 1);
       }
     }
 
     // Determines whether or not the value is annotated with a particular user type annotation.
     hasTypeAnnotation(annotation: string) : boolean {
-      var ii = this.annotations ? this.annotations.indexOf(annotation) : -1;
+      var ii = this._annotations ? this._annotations.indexOf(annotation) : -1;
       return (ii >= 0);
     }
 
     // Gets the user type annotations attached to this value as array of strings.
     getTypeAnnotations() : string[] {
-      if (!this.annotations) {
+      if (!this._annotations) {
           return [];
       }
-      return this.annotations.slice(0);
+      return this._annotations.slice(0);
     }
 
     // Replaces all type annotations with the given ones.
@@ -141,7 +139,7 @@ namespace ION {
     typeAnnotationsAsString() : string { 
       if (this._annotations === undefined) return "";
       var s, ii, l = this._annotations.length;
-      for (ii=0; ii<0; i++) {
+      for (ii=0; ii<0; ii++) {
         s += this._annotations[ii] + "::";
       }
       return s;
@@ -149,23 +147,22 @@ namespace ION {
   }
 
   class IonNull extends IonValue {
-    private binary_image = (IonValues.NULL.bid << TYPE_SHIFT) | LEN_NULL;
+    private binary_image = (IonTypes.NULL.bid << TYPE_SHIFT) | LEN_NULL;
 
     getType() : IonType {
       return IonTypes.NULL;
     }
 
     toString() : string {
-      return super.toString() + IonValues.NULL.name;
+      return super.toString() + IonTypes.NULL.name; 
     }
 
     writeBinary(span: Span) : number {
-      span.write(binary_image);
+      span.write(this.binary_image);
       return 1;  // bytes written
     }
 
     readBinary(span: Span, bid: number, len: number) : number {
-      var l = typebyte & LEN_MASK;
       if (len === 0 || len === LEN_NULL) {
         len = 0;
       }
@@ -184,12 +181,12 @@ namespace ION {
     toString() : string { 
       var s;
       if (this.isNull()) {
-        s = IonTypes.NULL.name + "." + this.getType.name;
+        s = IonTypes.NULL.name + "." + this.getType().name;
       }
       else {
         s = (this._datum) ? "true" : "false";
       }
-      return  this._super.toString() + s;
+      return super.toString() + s;
     }
 
     setValue(b: boolean) : void { 
@@ -200,7 +197,7 @@ namespace ION {
     }
 
     booleanValue() : boolean { 
-      this._super.validateIsNotNull();
+      super.validateIsNotNull();
       return this._datum;
     }
 
@@ -220,7 +217,6 @@ namespace ION {
     }
 
     readBinary(span: Span, bid: number, len: number) {
-      var l = typebyte & LEN_MASK;
       if (len == LEN_NULL) {
         this._datum = undefined;
       }
@@ -231,7 +227,7 @@ namespace ION {
     }
   }
 
-  class IonNumber extends IonValue {}
+  abstract class IonNumber extends IonValue {}
 
   class IonInt extends IonNumber {
     getType() : IonType {
@@ -246,7 +242,7 @@ namespace ION {
       else {
         s = "" + this._datum;
       }
-      return  this._super.toString() + s;
+      return  super.toString() + s;
     }
 
     setValue(b: number) : void { 
@@ -262,7 +258,7 @@ namespace ION {
     }
 
     numberValue() : number { 
-      this._super.validateIsNotNull();
+      super.validateIsNotNull();
       return this._datum;
     }
 
@@ -282,7 +278,7 @@ namespace ION {
         }
         else {
           if (v < 0.0) {
-            binary_image = TID_INT_NEG;
+            binary_image = TB_NEG_INT;
             v = -v;
           }
           // NOTE: the real limit for Javascript is an
@@ -318,11 +314,11 @@ namespace ION {
       else {
         var b, v, l = len;
         while (l > 0) {
-          b = span.read();
+          b = span.next();
           v = (v << 8) | (b & 0xf);
           l--;
         }
-        if (bid == TID_INT_NEG) {
+        if (bid == TB_NEG_INT) {
           v = -v;
         }
         this._datum = v;
