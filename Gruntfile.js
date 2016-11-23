@@ -1,6 +1,14 @@
 module.exports = function(grunt) {
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
+    intern: {
+      default: {
+        options: {
+          config: 'tests/intern',
+          reporters: ['Console', 'Lcov'],
+        }
+      }
+    },
     jshint: {
       files: []
     },
@@ -18,6 +26,7 @@ module.exports = function(grunt) {
 
   grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-ts');
+  grunt.loadNpmTasks('intern');
 
-  grunt.registerTask('default', ['ts', 'jshint']);
+  grunt.registerTask('default', ['ts', 'intern']);
 };
