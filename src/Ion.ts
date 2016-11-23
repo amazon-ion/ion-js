@@ -25,19 +25,9 @@ namespace ION {
     msg: "error",
   }
 
-  function get_buf_type(buf) {
-    var b1, btype = typeof buf;
-    if (btype === 'undefined' || typeof buf.length === 'undefined') this.error("invalid input");
-    if (btype === 'string') {
-      b1 = buf.charCodeAt(0);
-    }
-    else if (btype === 'object') { //probably array, object with length
-      b1 = buf[0];
-    }
-    else {
-      this.error("invalid input");
-    }
-    return (b1 === IVM.binary[0]) ? 'binary' : 'text';
+  function get_buf_type(buf: Span) {
+    var firstByte = buf.valueAt(0);
+    return (firstByte === IVM.binary[0]) ? 'binary' : 'text';
   }
 
   function makeBinaryReader(buf, options) : BinaryReader {
@@ -52,7 +42,7 @@ namespace ION {
     return parser;
   }
 
-  function makeReader( buf: Span, options: any ) : Reader {
+  export function makeReader( buf: Span, options: any ) : Reader {
     var stype =  options && (typeof options.sourceType === 'undefined') 
                   ? options.sourceType 
                   : get_buf_type(buf);
