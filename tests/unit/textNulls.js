@@ -11,13 +11,23 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-define({
-  defaultTimeout: 2000, // ms
-  excludeInstrumentation: true,
-  filterErrorStack: true,
-  suites: [
-    'tests/unit/textNulls',
-    'tests/unit/spans',
-    'tests/unit/iontests',
-  ],
-});
+define(
+  function(require) {
+    const registerSuite = require('intern!object');
+    const assert = require('intern/chai!assert');
+    const ion = require('dist/ion-node');
+
+    var suite = {
+      name: 'Text nulls'
+    };
+
+    suite['null'] = function() {
+      var span = ION.makeSpan("null");
+      var reader = ION.makeReader(span);
+      assert.equal(reader.next(), ION.IonTypes.NULL);
+      assert.equal(reader.next(), undefined);
+    };
+
+    registerSuite(suite);
+  }
+);

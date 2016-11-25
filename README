@@ -11,3 +11,7 @@ Next, use npm to install all the package's dependencies:
 Finally, run grunt to execute the build:
 
  grunt
+
+To debug the unit tests, use the following command:
+
+ node debug node_modules/intern/client config=tests/intern

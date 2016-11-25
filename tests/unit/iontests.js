@@ -38,6 +38,27 @@ define(
     findFiles(ionTestsPath, accumulator);
     console.log(accumulator.join('\n'));
 
+    var skipList = [
+      //'timestamp2011.10n',
+      //'timestamp2011-02.10n',
+      'utf16.ion',
+      'utf32.ion',
+    ];
+
+    var unskipped = [];
+    for (var path of accumulator) {
+      var shouldSkip = false;
+      for (var skip of skipList) {
+        if (path.endsWith(skip)) {
+          shouldSkip = true;
+          break;
+        }
+      }
+      if (!shouldSkip) {
+        unskipped.push(path);
+      }
+    }
+
     var suite = {
       name: 'Good tests',
     };
@@ -45,11 +66,10 @@ define(
     function exhaust(reader) {
       var tries = 0;
       for (;;) {
+        debugger;
         var next = reader.next();
-        if (next === ION.EOF) {
+        if (typeof(next) === 'undefined') {
           break;
-        } else if (typeof(next) === 'undefined') {
-          throw new Error("Reader returned undefined!");
         }
 
         tries++;
@@ -91,7 +111,7 @@ define(
       }
     }
 
-    for (var file of accumulator) {
+    for (var file of unskipped) {
       suite[file] = makeTest(file);
     }
 
