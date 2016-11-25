@@ -39,6 +39,12 @@ define(
       assert.equal(-1, span.next());
     }
 
+    suite['Buffer initial position'] = function() {
+      var buffer = Buffer.from("null");
+      var span = ION.makeSpan(buffer);
+      assert.equal(0, span.position());
+    }
+
     registerSuite(suite);
   }
 );

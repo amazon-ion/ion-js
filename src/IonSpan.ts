@@ -185,17 +185,15 @@ namespace ION {
     private _start: number;
     private _limit: number;
 
-    constructor(src: number[], start: number, len: number) {
+    constructor(src: number[], start?: number, len?: number) {
       super(SPAN_TYPE_BINARY);
       this._src = src;
       this._limit = src.length;
-      if (typeof start !== 'undefined') {
-        this._start = start;
-        if (typeof len !== 'undefined') {
-          this._limit = start + len;
-        }
+      this._start = start || 0;
+      if (typeof len !== 'undefined') {
+        this._limit = start + len;
       }
-      this._start = this._pos;
+      this._pos = this._start;
     }
 
     position() : number {
@@ -263,10 +261,7 @@ namespace ION {
     }
   }
 
-  export function makeSpan(src, start?: number, len?: number): Span {
-    let span: Span = undefined;
-    let src_type = typeof src;
-
+  export function makeSpan(src: any, start?: number, len?: number): Span {
     if (typeof start === 'undefined') {
       start = 0;
     }
@@ -274,6 +269,8 @@ namespace ION {
       len = src.length;
     }
 
+    let span: Span = undefined;
+    let src_type = typeof src;
     if (src_type === 'undefined') {
       Span.error();
     } else if (src_type === 'string') {
