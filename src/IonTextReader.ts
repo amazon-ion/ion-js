@@ -57,7 +57,7 @@ namespace ION {
       this._cat      = catalog;
       this._symtab   = getSystemSymbolTable();
       this._type     = ERROR;
-      this._raw_type = EOF;
+      this._raw_type = undefined;
       this._raw      = undefined;
     }
 
@@ -87,7 +87,9 @@ namespace ION {
     next() {
       var type, p, rt, t = this;
       t._raw = undefined;
-      if (t._raw_type === EOF) return undefined;
+      if (t._raw_type === EOF) {
+        return undefined;
+      }
       if (t._type && t._type.container) {
         this.skip_past_container();
       }
