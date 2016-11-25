@@ -147,8 +147,7 @@ namespace ION {
     }
 
     peek() : number {
-      if (this.is_empty()) return ION.EOF;
-      return this._src.charCodeAt(this._pos);
+      return this.valueAt(this._pos);
     }
 
     skip(dist: number) : void {
