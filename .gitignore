@@ -1,3 +1,4 @@
 .tscache/
 dist/
 node_modules/
+lcov.info
