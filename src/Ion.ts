@@ -30,14 +30,12 @@ namespace ION {
     return (firstByte === IVM.binary[0]) ? 'binary' : 'text';
   }
 
-  function makeBinaryReader(buf, options) : BinaryReader {
-    var span = makeSpan(buf);
+  function makeBinaryReader(span: Span, options) : BinaryReader {
     var parser = new BinaryReader(span, options && options.catalog);
     return parser;
   }
 
-  function makeTextReader(buf, options) : TextReader {
-    var span = makeSpan(buf);
+  function makeTextReader(span, options) : TextReader {
     var parser = new TextReader(span, options && options.catalog);
     return parser;
   }
