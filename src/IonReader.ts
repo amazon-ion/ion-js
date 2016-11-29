@@ -16,18 +16,21 @@
 /// <reference path="IonTimestamp.ts" />
 /// <reference path="IonType.ts" />
 
-namespace ION {
-  export interface Reader {
-    booleanValue: () => boolean;
-    byteValue: () => number[];
-    decimalValue: () => Decimal;
-    fieldName: () => string;
-    next: () => IonType;
-    numberValue: () => number;
-    stepIn: () => void;
-    stepOut: () => void;
-    stringValue: () => string;
-    timestampValue: () => Timestamp;
-    value: () => any;
-  }
+import { Decimal } from "./IonDecimal";
+import { IonType } from "./IonType";
+import { Timestamp } from "./IonTimestamp";
+
+export interface Reader {
+  booleanValue: () => boolean;
+  byteValue: () => number[];
+  decimalValue: () => Decimal;
+  depth: () => number;
+  fieldName: () => string;
+  next: () => IonType;
+  numberValue: () => number;
+  stepIn: () => void;
+  stepOut: () => void;
+  stringValue: () => string;
+  timestampValue: () => Timestamp;
+  value: () => any;
 }

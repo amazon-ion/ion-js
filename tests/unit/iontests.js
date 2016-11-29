@@ -13,10 +13,19 @@
  */
 define(
   function(require) {
+    debugger;
     const registerSuite = require('intern!object');
     const fs = require('intern/dojo/node!fs');
     const paths = require('intern/dojo/node!path');
-    const ion = require('dist/ion-node');
+    debugger;
+    //const ion = require('../../dist/ion-node!IonSpan');
+    
+    var loady = function() {
+      debugger;
+      require('../../dist/ion-node');
+    };
+    debugger;
+    loady();
 
     function findFiles(folder, accumulator) {
       var files = fs.readdirSync(folder);
@@ -36,11 +45,11 @@ define(
     var ionTestsPath = paths.join(cwd, 'ion-tests', 'iontestdata', 'good');
     var accumulator = [];
     findFiles(ionTestsPath, accumulator);
-    console.log(accumulator.join('\n'));
+    //console.log(accumulator.join('\n'));
 
     var skipList = [
-      //'timestamp2011.10n',
-      //'timestamp2011-02.10n',
+      'good/timestamp/equivTimeline/leapDayRollover.ion',
+      'good/timestamp/equivTimeline/timestamps.ion',
       'utf16.ion',
       'utf32.ion',
     ];
@@ -66,15 +75,25 @@ define(
     function exhaust(reader) {
       var tries = 0;
       for (;;) {
-        debugger;
-        var next = reader.next();
-        if (typeof(next) === 'undefined') {
-          break;
-        }
-
+        // Safety valve
         tries++;
         if (tries > 1000) {
           throw new Error("Reader spinning forever!");
+        }
+
+        debugger;
+
+        var next = reader.next();
+        if (typeof(next) === 'undefined') {
+          if (reader.depth() > 0) {
+            // End of container
+            reader.stepOut();
+          } else {
+            // End of data
+            break;
+          }
+        } else if (next.container) {
+          reader.stepIn();
         }
       }
     }
@@ -91,8 +110,9 @@ define(
                 chunks.push(chunk);
               }
               var buffer = Buffer.concat(chunks);
-              var span = ION.makeSpan(buffer);
-              var reader = ION.makeReader(span);
+              debugger;
+              var span = ion.IonSpan.makeSpan(buffer);
+              var reader = ion.Ion.makeReader(span);
               console.log("Exhausting " + path);
               exhaust(reader);
               console.log("Exhausted!\n");

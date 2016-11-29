@@ -18,35 +18,39 @@
 /// <reference path="IonSpan.ts" />
 /// <reference path="IonTextReader.ts" />
 
-namespace ION {
-  const e = {
-    name: "IonError",
-    where: undefined,
-    msg: "error",
-  }
+import { BinaryReader } from "./IonBinaryReader";
+import { IVM } from "./IonConstants";
+import { Reader } from "./IonReader";
+import { Span } from "./IonSpan";
+import { TextReader } from "./IonTextReader";
 
-  function get_buf_type(buf: Span) {
-    var firstByte = buf.valueAt(0);
-    return (firstByte === IVM.binary[0]) ? 'binary' : 'text';
-  }
+const e = {
+  name: "IonError",
+  where: undefined,
+  msg: "error",
+}
 
-  function makeBinaryReader(span: Span, options) : BinaryReader {
-    var parser = new BinaryReader(span, options && options.catalog);
-    return parser;
-  }
+function get_buf_type(buf: Span) {
+  var firstByte = buf.valueAt(0);
+  return (firstByte === IVM.binary[0]) ? 'binary' : 'text';
+}
 
-  function makeTextReader(span, options) : TextReader {
-    var parser = new TextReader(span, options && options.catalog);
-    return parser;
-  }
+function makeBinaryReader(span: Span, options) : BinaryReader {
+  var parser = new BinaryReader(span, options && options.catalog);
+  return parser;
+}
 
-  export function makeReader( buf: Span, options: any ) : Reader {
-    var stype =  options && (typeof options.sourceType === 'undefined') 
-                  ? options.sourceType 
-                  : get_buf_type(buf);
-    var reader = (stype === 'binary') 
-               ? makeBinaryReader(buf, options) 
-               : makeTextReader(buf, options);
-    return reader;
-  }
+function makeTextReader(span, options) : TextReader {
+  var parser = new TextReader(span, options && options.catalog);
+  return parser;
+}
+
+export function makeReader( buf: Span, options: any ) : Reader {
+  var stype =  options && (typeof options.sourceType === 'undefined') 
+                ? options.sourceType 
+                : get_buf_type(buf);
+  var reader = (stype === 'binary') 
+             ? makeBinaryReader(buf, options) 
+             : makeTextReader(buf, options);
+  return reader;
 }

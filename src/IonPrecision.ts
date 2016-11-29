@@ -11,16 +11,14 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-namespace ION {
-  export enum Precision {
-    EMPTY = -1,
-    NULL = 0,
-    YEAR = 1,
-    MONTH = 2,
-    DAY = 3,
-    HOUR = 4,
-    MINUTE = 5,
-    SECONDS = 6,
-    FRACTIONAL_SECONDS = 7
-  }
+export enum Precision {
+  EMPTY = -1,
+  NULL = 0,
+  YEAR = 1,
+  MONTH = 2,
+  DAY = 3,
+  HOUR = 4,
+  MINUTE = 5,
+  SECONDS = 6,
+  FRACTIONAL_SECONDS = 7
 }

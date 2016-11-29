@@ -11,12 +11,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-namespace ION {
-  export const EOF = -1;
+export const EOF = -1;
 
-  export const IVM = {
-    text: "$ion_1_0",
-    binary: [ 224 /*0xE0*/, 1 /*0x01*/, 0 /*0x00*/, 234 /*0xEA*/ ],
-    sid : 3
-  }
+export const IVM = {
+  text: "$ion_1_0",
+  binary: [ 224 /*0xE0*/, 1 /*0x01*/, 0 /*0x00*/, 234 /*0xEA*/ ],
+  sid : 3
 }

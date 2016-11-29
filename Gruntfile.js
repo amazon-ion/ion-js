@@ -42,4 +42,5 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('intern');
 
   grunt.registerTask('default', ['ts', 'intern']);
+  grunt.registerTask('test', ['intern']);
 };
