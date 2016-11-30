@@ -22,6 +22,7 @@ export interface Reader {
   decimalValue: () => Decimal;
   depth: () => number;
   fieldName: () => string;
+  isNull: () => boolean;
   next: () => IonType;
   numberValue: () => number;
   stepIn: () => void;
