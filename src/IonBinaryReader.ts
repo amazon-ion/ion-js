@@ -19,13 +19,6 @@
 // input byte array  to the desired Javascript value (scalar or
 // object, such as IonValue).
 
-/// <reference path="IonConstants.ts" />
-/// <reference path="IonParserBinaryRaw.ts" />
-/// <reference path="IonSpan.ts" />
-/// <reference path="IonSymbols.ts" />
-/// <reference path="IonType.ts" />
-/// <reference path="IonTypes.ts" />
-
 import { Decimal } from "./IonDecimal";
 import { getSystemSymbolTable } from "./IonSymbols";
 import { ion_symbol_table_sid } from "./IonSymbols";

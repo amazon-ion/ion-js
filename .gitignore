@@ -1,4 +1,5 @@
 .tscache/
 dist/
 node_modules/
+src/.baseDir.ts
 lcov.info

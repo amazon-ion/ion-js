@@ -17,11 +17,6 @@
 // set of javascript objects derived from IonValue using
 // the ION.Class extension mechanism.
 
-/// <reference path="IonBinary.ts" />
-/// <reference path="IonSpan.ts" />
-/// <reference path="IonType.ts" />
-/// <reference path="IonTypes.ts" />
-
 import * as IonBinary from "./IonBinary";
 import { IonType } from "./IonType";
 import { IonTypes } from "./IonTypes";

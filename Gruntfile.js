@@ -28,7 +28,7 @@ module.exports = function(grunt) {
     ts: {
       default: {
         src: ['src/**/*.ts'],
-        out: 'dist/ion-node.js',
+        outDir: 'dist',
         options: {
           module: "amd",
           target: "es6",

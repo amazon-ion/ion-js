@@ -15,14 +15,14 @@ define(
   function(require) {
     const registerSuite = require('intern!object');
     const assert = require('intern/chai!assert');
-    const ion = require('dist/ion-node');
+    const ion = require('dist/Ion');
 
     var suite = {
       name: 'Spans'
     };
 
     suite['null valueAt'] = function() {
-      var span = ION.makeSpan("null");
+      var span = ion.makeSpan("null");
       assert.equal('n'.charCodeAt(0), span.valueAt(0));
       assert.equal('u'.charCodeAt(0), span.valueAt(1));
       assert.equal('l'.charCodeAt(0), span.valueAt(2));
@@ -31,7 +31,7 @@ define(
     };
 
     suite['null next'] = function() {
-      var span = ION.makeSpan("null");
+      var span = ion.makeSpan("null");
       assert.equal('n'.charCodeAt(0), span.next());
       assert.equal('u'.charCodeAt(0), span.next());
       assert.equal('l'.charCodeAt(0), span.next());
@@ -41,7 +41,7 @@ define(
 
     suite['Buffer initial position'] = function() {
       var buffer = Buffer.from("null");
-      var span = ION.makeSpan(buffer);
+      var span = ion.makeSpan(buffer);
       assert.equal(0, span.position());
     }
 

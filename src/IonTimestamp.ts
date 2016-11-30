@@ -29,10 +29,6 @@
 //    The parse function returns a newly minted timestamp. If the string is
 //    undefined, empty or a null image it returns the timestamp NULL.
 
-/// <reference path="IonDecimal.ts" />
-/// <reference path="IonLongInt.ts" />
-/// <reference path="IonPrecision.ts" />
-
 import { Decimal } from "./IonDecimal";
 import { LongInt } from "./IonLongInt";
 import { Precision } from "./IonPrecision";

@@ -12,10 +12,6 @@
  * language governing permissions and limitations under the License.
  */
 
-/// <reference path="IonDecimal.ts" />
-/// <reference path="IonTimestamp.ts" />
-/// <reference path="IonType.ts" />
-
 import { Decimal } from "./IonDecimal";
 import { IonType } from "./IonType";
 import { Timestamp } from "./IonTimestamp";

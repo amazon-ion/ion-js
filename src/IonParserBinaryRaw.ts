@@ -44,15 +44,6 @@
 //    timestampValue
 //    byteValue 
 
-/// <reference path="IonBinary.ts" />
-/// <reference path="IonConstants.ts" />
-/// <reference path="IonDecimal.ts" />
-/// <reference path="IonLongInt.ts" />
-/// <reference path="IonSpan.ts" />
-/// <reference path="IonTimestamp.ts" />
-/// <reference path="IonType.ts" />
-/// <reference path="IonTypes.ts" />
-
 import * as IonBinary from "./IonBinary";
 
 import { Decimal } from "./IonDecimal";

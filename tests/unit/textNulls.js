@@ -15,21 +15,16 @@ define(
   function(require) {
     const registerSuite = require('intern!object');
     const assert = require('intern/chai!assert');
-    //const ion = require('dist/ion-node');
-
-    console.log(typeof(ion));
-    for (var derp in ion) {
-      console.log(derp);
-    }
+    const ion = require('dist/Ion');
 
     var suite = {
       name: 'Text nulls'
     };
 
     suite['null'] = function() {
-      var span = ion.IonSpan.makeSpan("null");
-      var reader = ion.Ion.makeReader(span);
-      assert.equal(reader.next(), ion.IonTypes.IonTypes.NULL);
+      var span = ion.makeSpan("null");
+      var reader = ion.makeReader(span);
+      assert.equal(reader.next(), ion.IonTypes.NULL);
       assert.equal(reader.next(), undefined);
     };
 

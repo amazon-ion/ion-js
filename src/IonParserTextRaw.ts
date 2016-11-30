@@ -18,11 +18,6 @@
 // Returns on any value with value type. The _start and _end
 // members are set for scalar types.
 
-/// <reference path="IonSpan.ts" />
-/// <reference path="IonText.ts" />
-/// <reference path="IonType.ts" />
-/// <reference path="IonTypes.ts" />
-
 import * as IonText from "./IonText";
 
 import { IonType } from "./IonType";

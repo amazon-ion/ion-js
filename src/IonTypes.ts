@@ -12,8 +12,6 @@
  * language governing permissions and limitations under the License.
  */
 
-/// <reference path="IonType.ts" />
-
 import { IonType } from "./IonType";
 
 export const IonTypes = {

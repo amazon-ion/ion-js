@@ -14,9 +14,6 @@
 
 // Ion Symbol Table processing
 
-/// <reference path="IonReader.ts" />
-/// <reference path="IonText.ts" />
-
 import { asAscii } from "./IonText";
 import { Reader } from "./IonReader";
 

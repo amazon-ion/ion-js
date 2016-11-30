@@ -29,7 +29,6 @@
 //      ION.LongInt.fromNumber(number)
 //      ION.LongInt.ZERO
 
-/// <reference path="IonText.ts" />
 
 import { is_digit } from "./IonText";
 

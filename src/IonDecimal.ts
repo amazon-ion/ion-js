@@ -38,9 +38,6 @@
 //    If the string is undefined, empty or a null image it returns 
 //    the decimal NULL.
 
-/// <reference path="IonLongInt.ts" />
-/// <reference path="IonText.ts" />
-
 import { is_digit } from "./IonText";
 import { LongInt } from "./IonLongInt";
 

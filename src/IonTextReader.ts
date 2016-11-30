@@ -19,16 +19,6 @@
 // input string to the desired Javascript value (scalar or
 // object, such as IonValue).
 
-/// <reference path="IonConstants.ts" />
-/// <reference path="IonDecimal.ts" />
-/// <reference path="IonParserTextRaw.ts" />
-/// <reference path="IonReader.ts" />
-/// <reference path="IonSpan.ts" />
-/// <reference path="IonSymbols.ts" />
-/// <reference path="IonTimestamp.ts" />
-/// <reference path="IonType.ts" />
-/// <reference path="IonTypes.ts" />
-
 import { Decimal } from "./IonDecimal";
 import { getSystemSymbolTable } from "./IonSymbols";
 import { ion_symbol_table } from "./IonSymbols";

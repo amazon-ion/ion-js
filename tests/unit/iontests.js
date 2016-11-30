@@ -17,15 +17,7 @@ define(
     const registerSuite = require('intern!object');
     const fs = require('intern/dojo/node!fs');
     const paths = require('intern/dojo/node!path');
-    debugger;
-    //const ion = require('../../dist/ion-node!IonSpan');
-    
-    var loady = function() {
-      debugger;
-      require('../../dist/ion-node');
-    };
-    debugger;
-    loady();
+    const ion = require('dist/Ion');
 
     function findFiles(folder, accumulator) {
       var files = fs.readdirSync(folder);
@@ -111,8 +103,8 @@ define(
               }
               var buffer = Buffer.concat(chunks);
               debugger;
-              var span = ion.IonSpan.makeSpan(buffer);
-              var reader = ion.Ion.makeReader(span);
+              var span = ion.makeSpan(buffer);
+              var reader = ion.makeReader(span);
               console.log("Exhausting " + path);
               exhaust(reader);
               console.log("Exhausted!\n");

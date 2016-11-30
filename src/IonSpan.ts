@@ -12,8 +12,6 @@
  * language governing permissions and limitations under the License.
  */
 
-/// <reference path="IonConstants.ts" />
-
 import { EOF } from "./IonConstants";
 
 const SPAN_TYPE_STRING = 0;
