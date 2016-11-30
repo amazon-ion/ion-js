@@ -126,12 +126,14 @@ export class TextReader implements Reader {
   }
 
   stepIn() {
-    var t = this;
-    if (!t._type.container) {
+    if (!this._type.container) {
       throw new Error("can't step in to a scalar value");
     }
-    t._raw_type = BOC;
-    t._depth++;
+    if (this.isNull()) {
+      throw new Error("Can't step into a null container");
+    }
+    this._raw_type = BOC;
+    this._depth++;
   }
 
   stepOut() {

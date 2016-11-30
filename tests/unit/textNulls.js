@@ -28,6 +28,21 @@ define(
       assert.equal(reader.next(), undefined);
     };
 
+    suite['stepIntoNullContainer'] = function() {
+      var span = ion.makeSpan("null.list");
+      var reader = ion.makeReader(span);
+      assert.equal(reader.next(), ion.IonTypes.LIST);
+      assert.true(reader.isNull());
+
+      var fail = true;
+      try {
+        reader.stepIn();
+      } catch(e) {
+        fail = false;
+      }
+      assert.false(fail, "Stepped into null container");
+    }
+
     registerSuite(suite);
   }
 );
