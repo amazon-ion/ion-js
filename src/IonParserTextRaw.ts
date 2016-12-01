@@ -52,7 +52,7 @@ const T_STRUCT_CLOSE  = 22;
 const CH_CR =  13; // '\r'
 const CH_NL =  10; // '\n'
 const CH_BS =  92; // '\\'
-const CH_FS =  47; // '/'
+const CH_FORWARD_SLASH = "/".charChodeAt(0); // 47
 const CH_AS =  42; // '*'
 const CH_SQ =  39; // '\'' 
 const CH_DQ =  34; // '\"' 
@@ -1204,9 +1204,9 @@ export class ParserTextRaw {
 
   private _read_skipping_comments() {
     var ch = this._read();
-    if (ch == CH_FS) {
+    if (ch == CH_FORWARD_SLASH) {
       ch = this._read();
-      if (ch == CH_FS) {
+      if (ch == CH_FORWARD_SLASH) {
         this._read_to_newline();
         ch = IonText.WHITESPACE_COMMENT1;
       }
@@ -1216,7 +1216,7 @@ export class ParserTextRaw {
       }
       else {
         this._unread(ch);
-        ch = CH_FS;
+        ch = CH_FORWARD_SLASH;
       }
     }
     return ch;
@@ -1243,7 +1243,7 @@ export class ParserTextRaw {
       if (ch == EOF) break;
       if (ch == CH_AS) {
         ch = this._read();
-        if (ch == CH_FS) break;
+        if (ch == CH_FORWARD_SLASH) break;
       }
     }
   }
