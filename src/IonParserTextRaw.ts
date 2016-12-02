@@ -105,7 +105,7 @@ const empty_array: any[] = [];
 
 const INF = [ CH_i, CH_n, CH_f ];
 
-function get_ion_type(t) : IonType {
+export function get_ion_type(t) : IonType {
   switch(t) {
     case EOF:             return undefined;
     case ERROR:           return undefined;
@@ -1185,10 +1185,6 @@ export class ParserTextRaw {
       t = this._curr;
     }
     return t;
-  }
-
-  private get_ion_type(t) {
-    return get_ion_type(t);
   }
 
   private _run() {

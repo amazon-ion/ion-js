@@ -20,6 +20,7 @@
 // object, such as IonValue).
 
 import { Decimal } from "./IonDecimal";
+import { get_ion_type } from "./IonParserTextRaw";
 import { getSystemSymbolTable } from "./IonSymbols";
 import { ion_symbol_table } from "./IonSymbols";
 import { IonType } from "./IonType";
@@ -34,6 +35,7 @@ import { Timestamp } from "./IonTimestamp";
 
 const RAW_STRING = new IonType( -1, "raw_input", true,  false, false, false );
 const ERROR = new IonType( -2, "error", true,  false, false, false );
+const EOF_TYPE = new IonType( -3, "eof", true,  false, false, false );
 
 const BOC = -2; // cloned from IonParserTextRaw
 const EOF = -1;
@@ -87,42 +89,36 @@ export class TextReader implements Reader {
   }
 
   next() {
-    var type, p, rt, t = this;
-    t._raw = undefined;
-    if (t._raw_type === EOF) {
+    this._raw = undefined;
+    if (this._raw_type === EOF) {
       return undefined;
     }
-    if (t._type && t._type.container) {
+    if (this._type && this._type.container) {
       this.skip_past_container();
     }
-    p = t._parser;
+    let p: ParserTextRaw = this._parser;
     for (;;) {
-      t._raw_type = rt = p.next();
-      if (t._depth > 0) break;
-      if (rt === T_IDENTIFIER) { 
+      this._raw_type = p.next();
+      if (this._depth > 0) break;
+      if (this._raw_type === T_IDENTIFIER) {
         this.load_raw();
-        if (t._raw != IVM.text) break;
-        t._symtab = getSystemSymbolTable();
+        if (this._raw != IVM.text) break;
+        this._symtab = getSystemSymbolTable();
       }
-      else if (rt === T_STRUCT) {
-        if (p._ann.length !== 1) break;
-        if (p._ann[0] != ion_symbol_table) break;
-        t._symtab = makeSymbolTable(t._cat, t);
+      else if (this._raw_type === T_STRUCT) {
+        if (p.annotations().length !== 1) break;
+        if (p.annotations()[0] != ion_symbol_table) break;
+        this._symtab = makeSymbolTable(this._cat, this);
       }
       else {
         break;
       }
     }
 
-    if (rt === ERROR) {
-      throw new Error();
-    }
-
     // for system value (IVM's and symbol table's) we continue 
     // around this
-    type = p.get_ion_type(rt);
-    t._type = type || EOF;
-    return type;
+    this._type = get_ion_type(this._raw_type);
+    return this._type;
   }
 
   stepIn() {
