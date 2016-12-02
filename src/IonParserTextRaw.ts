@@ -208,6 +208,10 @@ function is_valid_string_char(ch: number, allow_new_line: boolean ) : boolean {
   return true;
 }
 
+type ReadValueHelper = (ch: number, accept_operator_symbols: boolean, calling_op: ReadValueHelper) => void;
+
+type ReadValueHelpers = {[index: number]: ReadValueHelper};
+
 export class ParserTextRaw {
   private _in: Span;
   private _ops: any[];
@@ -222,7 +226,7 @@ export class ParserTextRaw {
   private _error_msg: string;
   private _fieldname: string;
 
-  private readonly _read_value_helper_helpers: any;
+  private readonly _read_value_helper_helpers: ReadValueHelpers;
 
   constructor(source: Span) {
     this._in         = source; // should be a span
@@ -236,7 +240,7 @@ export class ParserTextRaw {
     this._ann        = empty_array; // ann can use a static empty array, a new one will be created only if there are some annotations to  put into it - the exception case
     this._msg        = "";
 
-    let helpers = {
+    let helpers: ReadValueHelpers = {
     //  -1 : this._read_value_helper_EOF,    //      == EOF
         40 : this._read_value_helper_paren,  // '('  == CH_OP
         91 : this._read_value_helper_square, // '['  == CH_OS
@@ -246,7 +250,7 @@ export class ParserTextRaw {
         39 : this._read_value_helper_single, // '\'' == CH_SQ
         34 : this._read_value_helper_double, // '\"' == CH_DQ
     };
-    let set_helper = function(str: string, fn ) {
+    let set_helper = function(str: string, fn: ReadValueHelper) {
       var i = str.length, ch;
       while (i > 0) {
         i--;
