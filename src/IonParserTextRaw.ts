@@ -425,13 +425,11 @@ export class ParserTextRaw {
     let ch: number = this._read_after_whitespace(true);
     if (ch == EOF) {  // since we can't index into our object with a value of -1
       this._read_value_helper_EOF(ch, accept_operator_symbols, calling_op);
-    }
-    else {
+    } else {
       let fn: ReadValueHelper = this._read_value_helper_helpers[ch];
       if (fn != undefined) {
         fn.call(this, ch, accept_operator_symbols, calling_op);
-      }
-      else {
+      } else {
         this._error("unexpected character '" + IonText.asAscii(ch) + "'");
       }
     }
