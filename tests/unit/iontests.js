@@ -39,6 +39,7 @@ define(
     //console.log(accumulator.join('\n'));
 
     var skipList = [
+      'good/allNulls.ion',
       'good/clobsWithWhitespace.ion',
       'good/decimalsWithUnderscores.ion',
       'good/equivs/binaryInts.ion',
@@ -46,6 +47,8 @@ define(
       'good/equivs/intsWithUnderscores.ion',
       'good/intBinary.ion',
       'good/intsWithUnderscores.ion',
+      'good/lists.ion',
+      'good/non-equivs/nulls.ion',
       'good/stringsWithWhitespace.ion',
       'good/testfile22.ion',
       'good/utf16.ion',
