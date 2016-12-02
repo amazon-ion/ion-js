@@ -32,7 +32,7 @@ define(
       var span = ion.makeSpan("null.list");
       var reader = ion.makeReader(span);
       assert.equal(reader.next(), ion.IonTypes.LIST);
-      assert.true(reader.isNull());
+      assert.isTrue(reader.isNull());
 
       var fail = true;
       try {
@@ -40,7 +40,7 @@ define(
       } catch(e) {
         fail = false;
       }
-      assert.false(fail, "Stepped into null container");
+      assert.isFalse(fail, "Stepped into null container");
     }
 
     registerSuite(suite);
