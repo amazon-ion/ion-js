@@ -105,7 +105,7 @@ const empty_array: any[] = [];
 
 const INF = [ CH_i, CH_n, CH_f ];
 
-export function get_ion_type(t) : IonType {
+export function get_ion_type(t: number) : IonType {
   switch(t) {
     case EOF:             return undefined;
     case ERROR:           return undefined;
