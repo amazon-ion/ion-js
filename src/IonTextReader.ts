@@ -34,8 +34,6 @@ import { SymbolTable } from "./IonSymbols";
 import { Timestamp } from "./IonTimestamp";
 
 const RAW_STRING = new IonType( -1, "raw_input", true,  false, false, false );
-const ERROR = new IonType( -2, "error", true,  false, false, false );
-const EOF_TYPE = new IonType( -3, "eof", true,  false, false, false );
 
 const BOC = -2; // cloned from IonParserTextRaw
 const EOF = -1;
@@ -60,7 +58,7 @@ export class TextReader implements Reader {
     this._depth    = 0;
     this._cat      = catalog;
     this._symtab   = getSystemSymbolTable();
-    this._type     = ERROR;
+    this._type     = undefined;
     this._raw_type = undefined;
     this._raw      = undefined;
   }
