@@ -39,7 +39,14 @@ define(
     //console.log(accumulator.join('\n'));
 
     var skipList = [
+      'clobsWithWhitespace.ion',
+      'decimalsWithUnderscores.ion',
       'equivs/annotatedIvms.ion',
+      'equivs/binaryInts.ion',
+      'equivs/decimalsWithUnderscores.ion',
+      'equivs/intsWithUnderscores.ion',
+      'intBinary.ion',
+      'intsWithUnderscores.ion',
       'localSymbolTables.ion',
       'localSymbolTableImportZeroMaxId.ion',
       'message2.ion',
@@ -64,9 +71,13 @@ define(
       'operators.ion',
       'sexpAnnotationQuotedOperator.ion',
       'sexps.ion',
+      'stringsWithWhitespace.ion',
+      'structFieldAnnotationsUnquotedThenQuoted.ion',
+      'structs.ion',
       'subfieldVarUInt.ion',
       'subfieldVarUInt15bit.ion',
       'subfieldVarUInt16bit.ion',
+      'subfieldVarUInt32bit.ion',
       'testfile0.ion',
       'testfile1.ion',
       'testfile3.ion',
