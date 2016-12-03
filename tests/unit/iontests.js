@@ -39,17 +39,17 @@ define(
     //console.log(accumulator.join('\n'));
 
     var skipList = [
-      'clobsWithWhitespace.ion',
-      'decimalsWithUnderscores.ion',
-      'equivs/binaryInts.ion',
-      'equivs/decimalsWithUnderscores.ion',
-      'equivs/intsWithUnderscores.ion',
-      'intBinary.ion',
-      'intsWithUnderscores.ion',
-      'stringsWithWhitespace.ion',
-      'testfile22.ion',
-      'utf16.ion',
-      'utf32.ion',
+      'good/clobsWithWhitespace.ion',
+      'good/decimalsWithUnderscores.ion',
+      'good/equivs/binaryInts.ion',
+      'good/equivs/decimalsWithUnderscores.ion',
+      'good/equivs/intsWithUnderscores.ion',
+      'good/intBinary.ion',
+      'good/intsWithUnderscores.ion',
+      'good/stringsWithWhitespace.ion',
+      'good/testfile22.ion',
+      'good/utf16.ion',
+      'good/utf32.ion',
     ];
 
     var unskipped = [];
