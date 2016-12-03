@@ -35,7 +35,7 @@ import { Timestamp } from "./IonTimestamp";
 
 const RAW_STRING = new IonType( -1, "raw_input", true,  false, false, false );
 
-const BOC = -2; // cloned from IonParserTextRaw
+const BEGINNING_OF_CONTAINER = -2; // cloned from IonParserTextRaw
 const EOF = -1;
 const T_IDENTIFIER = 9;
 const T_STRUCT = 19;
@@ -91,7 +91,7 @@ export class TextReader implements Reader {
     if (this._raw_type === EOF) {
       return undefined;
     }
-    if (this._type && this._type.container) {
+    if (this._raw_type !== BEGINNING_OF_CONTAINER && this._type && this._type.container) {
       this.skip_past_container();
     }
     let p: ParserTextRaw = this._parser;
@@ -126,7 +126,7 @@ export class TextReader implements Reader {
     if (this.isNull()) {
       throw new Error("Can't step into a null container");
     }
-    this._raw_type = BOC;
+    this._raw_type = BEGINNING_OF_CONTAINER;
     this._depth++;
   }
 

@@ -41,77 +41,13 @@ define(
     var skipList = [
       'clobsWithWhitespace.ion',
       'decimalsWithUnderscores.ion',
-      'equivs/annotatedIvms.ion',
       'equivs/binaryInts.ion',
       'equivs/decimalsWithUnderscores.ion',
       'equivs/intsWithUnderscores.ion',
       'intBinary.ion',
       'intsWithUnderscores.ion',
-      'localSymbolTables.ion',
-      'localSymbolTableImportZeroMaxId.ion',
-      'message2.ion',
-      'non-equivs/annotatedIvms.ion',
-      'non-equivs/annotations.ion',
-      'non-equivs/blobs.ion',
-      'non-equivs/bools.ion',
-      'non-equivs/clobs.ion',
-      'non-equivs/decimals.ion',
-      'non-equivs/documents.ion',
-      'non-equivs/floats.ion',
-      'non-equivs/floatsVsDecimals.ion',
-      'non-equivs/ints.ion',
-      'non-equivs/lists.ion',
-      'non-equivs/strings.ion',
-      'non-equivs/structs.ion',
-      'non-equivs/symbolTables.ion',
-      'non-equivs/symbols.ion',
-      'non-equivs/timestamps.ion',
-      'nonNulls.ion',
-      'nulls.ion',
-      'operators.ion',
-      'sexpAnnotationQuotedOperator.ion',
-      'sexps.ion',
       'stringsWithWhitespace.ion',
-      'structFieldAnnotationsUnquotedThenQuoted.ion',
-      'structs.ion',
-      'subfieldVarUInt.ion',
-      'subfieldVarUInt15bit.ion',
-      'subfieldVarUInt16bit.ion',
-      'subfieldVarUInt32bit.ion',
-      'testfile0.ion',
-      'testfile1.ion',
-      'testfile3.ion',
-      'testfile4.ion',
-      'testfile5.ion',
-      'testfile6.ion',
-      'testfile7.ion',
-      'testfile8.ion',
-      'testfile9.ion',
-      'testfile10.ion',
-      'testfile11.ion',
-      'testfile12.ion',
-      'testfile13.ion',
-      'testfile14.ion',
-      'testfile15.ion',
-      'testfile16.ion',
-      'testfile19.ion',
-      'testfile20.ion',
-      'testfile21.ion',
       'testfile22.ion',
-      'testfile23.ion',
-      'testfile24.ion',
-      'testfile25.ion',
-      'testfile26.ion',
-      'testfile28.ion',
-      'testfile29.ion',
-      'testfile30.ion',
-      'testfile31.ion',
-      'testfile33.ion',
-      'testfile34.ion',
-      'testfile35.ion',
-      'testfile37.ion',
-      'timestamp/equivTimeline/leapDayRollover.ion',
-      'timestamp/equivTimeline/timestamps.ion',
       'utf16.ion',
       'utf32.ion',
     ];
@@ -147,12 +83,14 @@ define(
         if (typeof(next) === 'undefined') {
           if (reader.depth() > 0) {
             // End of container
+            console.log("Stepping out");
             reader.stepOut();
           } else {
             // End of data
             break;
           }
         } else if (next.container && !reader.isNull()) {
+          console.log("Stepping in");
           reader.stepIn();
         }
       }

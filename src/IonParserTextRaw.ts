@@ -45,9 +45,6 @@ const T_BLOB          = 16;
 const T_SEXP          = 17;
 const T_LIST          = 18;
 const T_STRUCT        = 19;
-const T_SEXP_CLOSE    = 20;
-const T_LIST_CLOSE    = 21;
-const T_STRUCT_CLOSE  = 22;
 
 const CH_CR =  13; // '\r'
 const CH_NL =  10; // '\n'
@@ -128,9 +125,6 @@ export function get_ion_type(t: number) : IonType {
     case T_SEXP:          return IonTypes.SEXP;
     case T_LIST:          return IonTypes.LIST;
     case T_STRUCT:        return IonTypes.STRUCT;
-    case T_SEXP_CLOSE:    return undefined;
-    case T_LIST_CLOSE:    return undefined;
-    case T_STRUCT_CLOSE:  return undefined;
     default:              return undefined;
   }
 }
@@ -292,7 +286,7 @@ export class ParserTextRaw {
   private _read_sexp_values() {
     var ch = this._read_after_whitespace(true);
     if (ch == CH_CP) {
-      this._value_push( T_SEXP_CLOSE );
+      this._value_push( EOF );
     }
     else {
       this._unread(ch);
@@ -305,7 +299,7 @@ export class ParserTextRaw {
     var ch = this._read_after_whitespace(true);
     if (ch == CH_CS) {
       // degenerate case of an empty list
-      this._value_push( T_LIST_CLOSE );
+      this._value_push( EOF );
     }
     else {
       // otherwise we read a value and continue
@@ -330,7 +324,7 @@ export class ParserTextRaw {
         op = this._read_string2;
         break;
       case CH_CC :
-        this._value_push( T_STRUCT_CLOSE );
+        this._value_push( EOF );
         return;
       default : 
         if (IonText.is_letter(ch)) {
@@ -357,7 +351,7 @@ export class ParserTextRaw {
     if (ch == CH_CM) {
       ch = this._read_after_whitespace(true);
       if (ch == CH_CS) {
-        this._value_push( T_LIST_CLOSE );
+        this._value_push( EOF );
       }
       else {
         this._unread(ch);
@@ -366,7 +360,7 @@ export class ParserTextRaw {
       }
     }
     else if (ch == CH_CS) {
-      this._value_push( T_LIST_CLOSE );
+      this._value_push( EOF );
     }
     else {
       this._error("expected ',' or ']'");
@@ -378,7 +372,7 @@ export class ParserTextRaw {
     if (ch == CH_CM) {
       ch = this._read_after_whitespace(true);
       if (ch == CH_CC) {
-        this._value_push(T_STRUCT_CLOSE );
+        this._value_push(EOF );
       }
       else {
         this._unread(ch);
@@ -386,7 +380,7 @@ export class ParserTextRaw {
       }
     }
     else if (ch == CH_CC) {
-      this._value_push( T_STRUCT_CLOSE );
+      this._value_push( EOF );
     }
     else {
       this._error("expected ',' or '}'");
