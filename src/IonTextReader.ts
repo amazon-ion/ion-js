@@ -91,9 +91,16 @@ export class TextReader implements Reader {
     if (this._raw_type === EOF) {
       return undefined;
     }
-    if (this._raw_type !== BEGINNING_OF_CONTAINER && this._type && this._type.container) {
+
+    let should_skip: boolean =
+      this._raw_type !== BEGINNING_OF_CONTAINER
+      && !this.isNull()
+      && this._type
+      && this._type.container;
+    if (should_skip) {
       this.skip_past_container();
     }
+
     let p: ParserTextRaw = this._parser;
     for (;;) {
       this._raw_type = p.next();
