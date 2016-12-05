@@ -47,7 +47,7 @@ const _is_letter: boolean[] = _make_bool_array("_$abcdefghijklmnopqrstuvwxyzABCD
 const _is_letter_or_digit = _make_bool_array("_$0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ");
 const _is_numeric_terminator: boolean[] = _make_bool_array("{}[](),\"\'\ \t\n\r\u000c");
 const _is_operator_char = _make_bool_array("!#%&*+-./;<=>?@^`|~");
-const _is_whitespace = _make_bool_array(" \t\r\n\u000c");
+const _is_whitespace = _make_bool_array(" \t\r\n\u000b\u000c");
 
 export function is_digit(ch: number) : boolean {
   if (ch < 48 || ch > 57) return false;

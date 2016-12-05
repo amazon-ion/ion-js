@@ -39,14 +39,12 @@ define(
     //console.log(accumulator.join('\n'));
 
     var skipList = [
-      'good/clobsWithWhitespace.ion',
       'good/decimalsWithUnderscores.ion',
       'good/equivs/binaryInts.ion',
       'good/equivs/decimalsWithUnderscores.ion',
       'good/equivs/intsWithUnderscores.ion',
       'good/intBinary.ion',
       'good/intsWithUnderscores.ion',
-      'good/stringsWithWhitespace.ion',
       'good/utf16.ion',
       'good/utf32.ion',
     ];
@@ -110,7 +108,7 @@ define(
               var span = ion.makeSpan(buffer);
               var reader = ion.makeReader(span);
               console.log("Exhausting " + path);
-              if (path.endsWith('allNulls.ion')) {
+              if (path.endsWith('clobsWithWhitespace.ion')) {
                 debugger;
               }
               exhaust(reader);
