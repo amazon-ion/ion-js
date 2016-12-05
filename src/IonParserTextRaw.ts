@@ -52,11 +52,11 @@ const CH_BS =  92; // '\\'
 const CH_FORWARD_SLASH = "/".charCodeAt(0); // 47
 const CH_AS =  42; // '*'
 const CH_SQ =  39; // '\'' 
-const CH_DQ =  34; // '\"' 
+const CH_DOUBLE_QUOTE = "\"".charCodeAt(0); // 34
 const CH_CM =  44; // ';'
 const CH_OP =  40; // '('
 const CH_CP =  41; // ')'
-const CH_OC = 123; // '{'
+const CH_LEFT_CURLY: number = "{".charCodeAt(0); // 123
 const CH_CC = 125; // '}' 
 const CH_OS =  91; // '['
 const CH_CS =  93; // ']'
@@ -87,7 +87,7 @@ const ESC_nl =   110; //  values['n'] = '\n';     //    \ u000A  \ n  linefeed L
 const ESC_ff =   102; //  values['f'] = 0x0c;     //    \u000C  \f  form feed FF
 const ESC_cr =   114; //  values['r'] = '\r';     //    \ u000D  \ r  carriage return CR
 const ESC_v =    118; //  values['v'] = 0x0b;     //    \u000B  \v  vertical tab VT
-const ESC_dq = CH_DQ; //  values['"'] = '"';      //    \u0022  \"  double quote
+const ESC_dq = CH_DOUBLE_QUOTE; //  values['"'] = '"';      //    \u0022  \"  double quote
 const ESC_sq = CH_SQ; //  values['\''] = '\'';    //    \u0027  \'  single quote
 const ESC_qm =    63; //  values['?'] = '?';      //    \u003F  \?  question mark
 const ESC_bs =    92; //  values['\\'] = '\\';    //    \u005C  \\  backslash
@@ -238,7 +238,7 @@ export class ParserTextRaw {
     //  -1 : this._read_value_helper_EOF,    //      == EOF
         40 : this._read_value_helper_paren,  // '('  == CH_OP
         91 : this._read_value_helper_square, // '['  == CH_OS
-       123 : this._read_value_helper_curly,  // '{'  == CH_OC
+       123 : this._read_value_helper_curly, // '{'  == CH_LEFT_CURLY
         43 : this._read_value_helper_plus,   // '+'  == CH_PS // we'll have to patch these two back in after 
         45 : this._read_value_helper_minus,  // '-'  == CH_MS // we apply the operator characters fn
         39 : this._read_value_helper_single, // '\'' == CH_SQ
@@ -320,7 +320,7 @@ export class ParserTextRaw {
           op = this._read_string3;
         }
         break;
-      case CH_DQ :
+      case CH_DOUBLE_QUOTE :
         op = this._read_string2;
         break;
       case CH_CC :
@@ -446,12 +446,12 @@ export class ParserTextRaw {
 
   private _read_value_helper_curly( ch1, accept_operator_symbols, calling_op ) {
     var ch3, ch2 = this._read();
-    if (ch2 == CH_OC) {
+    if (ch2 == CH_LEFT_CURLY) {
       ch3 = this._read_after_whitespace(false);
       if ( ch3 == CH_SQ ) {
         this._ops.unshift( this._read_clob_string3 );
       }
-      else if( ch3 == CH_DQ ) {
+      else if( ch3 == CH_DOUBLE_QUOTE ) {
         this._ops.unshift( this._read_clob_string2 );
       }
       else {
@@ -749,7 +749,7 @@ export class ParserTextRaw {
   }
 
   private _read_string2() : void {
-    this._read_string_helper(CH_DQ, false);
+    this._read_string_helper(CH_DOUBLE_QUOTE, false);
     this._end = this._in.position() - 1;
     this._value_push( T_STRING2 );
   }
