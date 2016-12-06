@@ -11,14 +11,23 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-define({
-  defaultTimeout: 2000, // ms
-  excludeInstrumentation: true,
-  filterErrorStack: true,
-  suites: [
-    'tests/unit/textNulls',
-    'tests/unit/spans',
-    'tests/unit/iontests',
-    'tests/unit/IonBinaryWriterTest',
-  ],
-});
+import { Writeable } from "./IonWriteable";
+import { Writer } from "./IonWriter";
+
+const MAJOR_VERSION = 1;
+const MINOR_VERSION = 0;
+
+export class BinaryWriter implements Writer {
+  private readonly writeable: Writeable;
+
+  constructor(writeable: Writeable) {
+    this.writeable = writeable;
+  }
+
+  writeIvm() : void {
+    this.writeable.write(0xE0);
+    this.writeable.write(MAJOR_VERSION);
+    this.writeable.write(MINOR_VERSION);
+    this.writeable.write(0xEA);
+  }
+}

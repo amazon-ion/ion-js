@@ -49,5 +49,7 @@ export function makeReader( buf: Span, options: any ) : Reader {
   return reader;
 }
 
+export { BinaryWriter } from "./IonBinaryWriter";
 export { IonTypes } from "./IonTypes";
 export { makeSpan } from "./IonSpan";
+export { Writeable } from "./IonWriteable";
