@@ -47,7 +47,6 @@ define(
       'good/intBinary.ion',
       'good/intsWithUnderscores.ion',
       'good/stringsWithWhitespace.ion',
-      'good/testfile22.ion',
       'good/utf16.ion',
       'good/utf32.ion',
     ];
@@ -111,7 +110,7 @@ define(
               var span = ion.makeSpan(buffer);
               var reader = ion.makeReader(span);
               console.log("Exhausting " + path);
-              if (path.endsWith('nulls.ion')) {
+              if (path.endsWith('allNulls.ion')) {
                 debugger;
               }
               exhaust(reader);

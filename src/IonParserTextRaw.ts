@@ -210,11 +210,13 @@ export class ParserTextRaw {
   private _in: Span;
   private _ops: any[];
   private _value_type: any;
+  private _value_null: boolean;
   private _value: any[];
   private _start: number;
   private _end: number;
   private _esc_len: number;
-  private _curr: any;
+  private _curr: number;
+  private _curr_null: boolean;
   private _ann: any[];
   private _msg: string;
   private _error_msg: string;
@@ -879,6 +881,7 @@ export class ParserTextRaw {
       this._unread(ch);
       is_ann = false;
       if (kwt === T_NULL) {
+        this._value_null = true;
         ch = this._peek();
         if (ch === CH_DT) {
           this._read(); // consume the dot
@@ -963,9 +966,7 @@ export class ParserTextRaw {
   }
 
   isNull() : boolean {
-    if (this._value_type === T_NULL) return true;
-    if (this._start == -1) return true;
-    return false;
+    return this._curr_null;
   }
 
   numberValue() : number {
@@ -1164,20 +1165,23 @@ export class ParserTextRaw {
     return t;
   }
 
-  next() {
-    var t;
+  next(): number {
     if (this._value_type === ERROR) {
       this._run();
     }
     this._curr = this._value_pop();
-    if (this._curr == ERROR) {
+
+    let t: number;
+    if (this._curr === ERROR) {
       this._value.push(ERROR);
       t = undefined;
-    }
-    else {
-      //t = get_ion_type(this._curr);
+    } else {
       t = this._curr;
     }
+
+    this._curr_null = this._value_null;
+    this._value_null = false;
+
     return t;
   }
 
