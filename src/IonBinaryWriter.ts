@@ -30,4 +30,52 @@ export class BinaryWriter implements Writer {
     this.writeable.write(MINOR_VERSION);
     this.writeable.write(0xEA);
   }
+
+  writeUnsignedInt(value: number, length: number) {
+    let bytes: number[] = [];
+    while (value > 0) {
+      bytes.unshift(value & 0xFF);
+      value = value >>> 8;
+    }
+
+    // Padding
+    while (bytes.length < length) {
+      bytes.unshift(0);
+    }
+    if (bytes.length > length) {
+      throw new Error(`Value ${value} cannot fit into ${length} bytes`);
+    }
+
+    this.writeable.write(bytes);
+  }
+
+  writeSignedInt(value: number, length: number) {
+    let isNegative: boolean = value < 0;
+    value = Math.abs(value);
+
+    let bytes: number[] = [];
+
+    // Trailing bytes
+    while (value >= 128) {
+      bytes.unshift(value & 0xFF);
+      value = value >>> 8;
+    }
+
+    bytes.unshift(value);
+
+    // Padding
+    while (bytes.length < length) {
+      bytes.unshift(0);
+    }
+    if (bytes.length > length) {
+      throw new Error(`Value ${value} cannot fit into ${length} bytes`);
+    }
+
+    // Sign bit
+    if (isNegative) {
+      bytes[0] = bytes[0] | 0x80;
+    }
+
+    this.writeable.write(bytes);
+  }
 }
