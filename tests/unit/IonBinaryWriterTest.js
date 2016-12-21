@@ -141,6 +141,46 @@
        writeSignedInt(256, 2, bytes([0x01, 0x00]));
     };
 
+    var writeVariableLengthUnsignedInt = function(value, expected) {
+      var writeable = new ion.Writeable();
+      var writer = new ion.BinaryWriter(writeable);
+      writer.writeVariableLengthUnsignedInt(value);
+      var actual = writeable.getBytes();
+      assert.deepEqual(actual, expected);
+    }
+
+    suite['writeVariableLengthUnsignedInt0'] = function() {
+       writeVariableLengthUnsignedInt(0, bytes([0x80]));
+    };
+
+    suite['writeVariableLengthUnsignedInt1'] = function() {
+       writeVariableLengthUnsignedInt(1, bytes([0x81]));
+    };
+
+    suite['writeVariableLengthUnsignedInt127'] = function() {
+       writeVariableLengthUnsignedInt(127, bytes([0xFF]));
+    };
+
+    suite['writeVariableLengthUnsignedInt128'] = function() {
+       writeVariableLengthUnsignedInt(128, bytes([0x01, 0x80]));
+    };
+
+    suite['writeVariableLengthUnsignedInt255'] = function() {
+       writeVariableLengthUnsignedInt(255, bytes([0x01, 0xFF]));
+    };
+
+    suite['writeVariableLengthUnsignedInt256'] = function() {
+       writeVariableLengthUnsignedInt(256, bytes([0x02, 0x80]));
+    };
+
+    suite['writeVariableLengthUnsignedInt16383'] = function() {
+       writeVariableLengthUnsignedInt(16383, bytes([0x7F, 0xFF]));
+    };
+
+    suite['writeVariableLengthUnsignedInt16384'] = function() {
+       writeVariableLengthUnsignedInt(16384, bytes([0x01, 0x00, 0x80]));
+    };
+
     registerSuite(suite);
   }
 );

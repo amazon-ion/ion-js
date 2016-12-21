@@ -78,4 +78,19 @@ export class BinaryWriter implements Writer {
 
     this.writeable.write(bytes);
   }
+
+  writeVariableLengthUnsignedInt(value: number) {
+    let bytes: number[] = [];
+
+    // Trailing byte
+    bytes.unshift(0x80 | (value & 0x7F));
+
+    value = value >>> 7;
+    while (value > 0) {
+      bytes.unshift(value & 0x7F);
+      value = value >>> 7;
+    }
+
+    this.writeable.write(bytes);
+  }
 }
