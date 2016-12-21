@@ -83,7 +83,6 @@
     };
 
     suite['writeSignedInt0,2'] = function() {
-      debugger;
       writeSignedInt(0, 2, bytes([0, 0]));
     };
 
@@ -179,6 +178,74 @@
 
     suite['writeVariableLengthUnsignedInt16384'] = function() {
        writeVariableLengthUnsignedInt(16384, bytes([0x01, 0x00, 0x80]));
+    };
+
+    var writeVariableLengthSignedInt = function(value, expected) {
+      var writeable = new ion.Writeable();
+      var writer = new ion.BinaryWriter(writeable);
+      writer.writeVariableLengthSignedInt(value);
+      var actual = writeable.getBytes();
+      assert.deepEqual(actual, expected);
+    }
+
+    suite['writeVariableLengthSignedInt0'] = function() {
+       writeVariableLengthSignedInt(0, bytes([0x80]));
+    };
+
+    suite['writeVariableLengthSignedInt1'] = function() {
+       writeVariableLengthSignedInt(1, bytes([0x81]));
+    };
+
+    suite['writeVariableLengthSignedInt-1'] = function() {
+       writeVariableLengthSignedInt(-1, bytes([0xC1]));
+    };
+
+    suite['writeVariableLengthSignedInt63'] = function() {
+       writeVariableLengthSignedInt(63, bytes([0xBF]));
+    };
+
+    suite['writeVariableLengthSignedInt-63'] = function() {
+       writeVariableLengthSignedInt(-63, bytes([0xFF]));
+    };
+
+    suite['writeVariableLengthSignedInt64'] = function() {
+       writeVariableLengthSignedInt(64, bytes([0x00, 0xC0]));
+    };
+
+    suite['writeVariableLengthSignedInt-64'] = function() {
+       writeVariableLengthSignedInt(-64, bytes([0x40, 0xC0]));
+    };
+
+    suite['writeVariableLengthSignedInt128'] = function() {
+       writeVariableLengthSignedInt(128, bytes([0x01, 0x80]));
+    };
+
+    suite['writeVariableLengthSignedInt-128'] = function() {
+       writeVariableLengthSignedInt(-128, bytes([0x41, 0x80]));
+    };
+
+    suite['writeVariableLengthSignedInt8191'] = function() {
+       writeVariableLengthSignedInt(8191, bytes([0x3F, 0xFF]));
+    };
+
+    suite['writeVariableLengthSignedInt-8191'] = function() {
+       writeVariableLengthSignedInt(-8191, bytes([0x7F, 0xFF]));
+    };
+
+    suite['writeVariableLengthSignedInt8192'] = function() {
+       writeVariableLengthSignedInt(8192, bytes([0x00, 0x40, 0x80]));
+    };
+
+    suite['writeVariableLengthSignedInt-8192'] = function() {
+       writeVariableLengthSignedInt(-8192, bytes([0x40, 0x40, 0x80]));
+    };
+
+    suite['writeVariableLengthSignedInt16384'] = function() {
+       writeVariableLengthSignedInt(16384, bytes([0x01, 0x00, 0x80]));
+    };
+
+    suite['writeVariableLengthSignedInt-16384'] = function() {
+       writeVariableLengthSignedInt(-16384, bytes([0x41, 0x00, 0x80]));
     };
 
     registerSuite(suite);

@@ -93,4 +93,29 @@ export class BinaryWriter implements Writer {
 
     this.writeable.write(bytes);
   }
+
+  writeVariableLengthSignedInt(value: number) {
+    let isNegative: boolean = value < 0;
+    value = Math.abs(value);
+
+    let bytes: number[] = [];
+
+    while (value >= 64) {
+      bytes.unshift(value & 0x7F);
+      value = value >>> 7;
+    }
+
+    // Leading byte
+    bytes.unshift(value);
+
+    // Sign bit
+    if (isNegative) {
+      bytes[0] = bytes[0] | 0x40;
+    }
+
+    // Stop bit
+    bytes[bytes.length - 1] = bytes[bytes.length - 1] | 0x80;
+
+    this.writeable.write(bytes);
+  }
 }
