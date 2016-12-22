@@ -38,12 +38,12 @@ export class BinaryWriter implements Writer {
 
     while (value > 0) {
       this.numberBuffer[--i] = value & 0xFF;
-      value = value >>> 8;
+      value >>>= 8;
     }
 
     // Padding
-    let bytesWritten = this.numberBuffer.length - i;
-    for (let j = 0; j < length - bytesWritten; j++) {
+    let bytesWritten: number = this.numberBuffer.length - i;
+    for (let j: number = 0; j < length - bytesWritten; j++) {
       this.numberBuffer[--i] = 0;
     }
 
@@ -54,34 +54,35 @@ export class BinaryWriter implements Writer {
     this.writeable.write(this.numberBuffer, i);
   }
 
-  writeSignedInt(value: number, length: number) {
-    let isNegative: boolean = value < 0;
-    value = Math.abs(value);
+  writeSignedInt(originalValue: number, length: number) {
+    let value: number = Math.abs(originalValue);
 
-    let bytes: number[] = [];
+    let i: number = this.numberBuffer.length;
 
     // Trailing bytes
     while (value >= 128) {
-      bytes.unshift(value & 0xFF);
-      value = value >>> 8;
+      this.numberBuffer[--i] = value & 0xFF;
+      value >>>= 8;
     }
 
-    bytes.unshift(value);
+    this.numberBuffer[--i] = value;
 
     // Padding
-    while (bytes.length < length) {
-      bytes.unshift(0);
+    let bytesWritten: number = this.numberBuffer.length - i;
+    for (let j: number = 0; j < length - bytesWritten; j++) {
+      this.numberBuffer[--i] = 0;
     }
-    if (bytes.length > length) {
+
+    if (bytesWritten > length) {
       throw new Error(`Value ${value} cannot fit into ${length} bytes`);
     }
 
     // Sign bit
-    if (isNegative) {
-      bytes[0] = bytes[0] | 0x80;
+    if (originalValue < 0) {
+      this.numberBuffer[i] |= 0x80;
     }
 
-    this.writeable.write(bytes);
+    this.writeable.write(this.numberBuffer, i);
   }
 
   writeVariableLengthUnsignedInt(value: number) {
