@@ -93,4 +93,34 @@ export class BinaryWriter implements Writer {
 
     this.writeable.write(bytes);
   }
+
+  private numberBuffer: number[] = new Array(10);
+
+  writeVariableLengthSignedInt(originalValue: number) {
+    if (!Number.isInteger(originalValue)) {
+      throw new Error(`Cannot call writeVariableLengthSignedInt with non-integer value ${originalValue}`);
+    }
+
+    let value: number = Math.abs(originalValue);
+
+    let i: number = this.numberBuffer.length - 1;
+
+    while (value >= 64) {
+      this.numberBuffer[i--] = value & 0x7F;
+      value >>>= 7;
+    }
+
+    // Leading byte
+    this.numberBuffer[i] = value;
+
+    // Sign bit
+    if (originalValue < 0) {
+      this.numberBuffer[i] |= 0x40;
+    }
+
+    // Stop bit
+    this.numberBuffer[this.numberBuffer.length - 1] |= 0x80;
+
+    this.writeable.write(this.numberBuffer, i, this.numberBuffer.length - i);
+  }
 }
