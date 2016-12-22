@@ -255,6 +255,13 @@
       );
     };
 
+    suite['writeVariableLengthSignedInt1.0'] = function() {
+      assert.throws(
+        () => writeVariableLengthSignedInt(1.0, null),
+        Error
+      );
+    };
+
     registerSuite(suite);
   }
 );
