@@ -11,15 +11,27 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-define({
-  defaultTimeout: 2000, // ms
-  excludeInstrumentation: true,
-  filterErrorStack: true,
-  suites: [
-    'tests/unit/textNulls',
-    'tests/unit/spans',
-    'tests/unit/iontests',
-    'tests/unit/IonBinaryWriterTest',
-    'tests/unit/IonWriteableTest',
-  ],
-});
+ define(
+  function(require) {
+    const registerSuite = require('intern!object');
+    const assert = require('intern/chai!assert');
+    const ion = require('dist/Ion');
+
+    var suite = {
+      name: 'Binary Writer'
+    };
+
+    var bytes = function(array) {
+      return new Uint8Array(array);
+    };
+
+    suite['writePartialArray'] = function() {
+      var writeable = new ion.Writeable();
+      debugger;
+      writeable.write([1,2,3,4,5,6,7,8], 4, 4);
+      assert.deepEqual(writeable.getBytes(), bytes([5,6,7,8]));
+    };
+
+    registerSuite(suite);
+  }
+);

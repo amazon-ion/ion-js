@@ -29,48 +29,65 @@ export class Writeable {
     }
     this.bufferSize = bufferSize;
     this.buffers = [new Uint8Array(bufferSize)];
+    // Next byte to be written in current buffer
     this.index = 0;
+    // Total number of bytes written across all buffers
     this.written = 0;
   }
 
-  write(b: number | number[], offset?: number, length?: number) : void {
-    if (Array.isArray(b)) {
-      if (typeof(offset) === 'undefined') {
-        offset = 0;
-      }
-      if (typeof(length) === 'undefined') {
-        length = b.length;
-      }
+  write(x: number | number[], offset?: number, length?: number) : void {
+    if (Array.isArray(x)) {
+      this.writeArray(x, offset, length);
+    } else if (typeof(x) === 'number') {
+      this.writeNumber(x);
+    }
+  }
 
-      let remaining: number = length - offset;
-      while (remaining > 0) {
-        if (remaining < this.capacity()) {
-          last(this.buffers).set(b, offset);
-          this.index += remaining;
-          this.written += remaining;
-          break;
-        } else {
-          let buffer: Uint8Array = last(this.buffers);
-          for (let i: number = 0; i < this.capacity(); i++) {
-            buffer[this.written + i] = b[offset + i];
-          }
-          remaining -= this.capacity();
-          this.written += this.capacity();
-          this.allocate();
-          this.index = 0;
-        }
-      }
-    } else if (typeof(b) === 'number') {
-      if (this.capacity() === 0) {
+  private writeArray(b: number[], offset?: number, length?: number) : void {
+    if (typeof(offset) === 'undefined') {
+      offset = 0;
+    }
+    if (typeof(length) === 'undefined') {
+      length = b.length - offset;
+    }
+
+    let canCopyEntireArray =
+      length == b.length
+      && length <= this.capacity();
+    if (canCopyEntireArray) {
+      last(this.buffers).set(b, this.index);
+      this.index += length;
+      this.written += length;
+      return;
+    }
+
+    let remaining: number = length;
+    while (remaining > 0) {
+      if (this.capacity() == 0) {
         this.allocate();
-        last(this.buffers)[0] = b;
-        this.written += 1;
-        this.index = 1;
-      } else {
-        last(this.buffers)[this.written] = b;
-        this.written += 1;
-        this.index += 1;
+        this.index = 0;
       }
+      let buffer: Uint8Array = last(this.buffers);
+      let limit: number = Math.min(remaining, this.capacity());
+      for (let i: number = 0; i < limit; i++) {
+        buffer[this.index + i] = b[offset + i];
+      }
+      remaining -= limit;
+      this.index += limit;
+      this.written += limit;
+    }
+  }
+
+  private writeNumber(n: number) : void {
+    if (this.capacity() === 0) {
+      this.allocate();
+      last(this.buffers)[0] = n;
+      this.index = 1;
+      this.written += 1;
+    } else {
+      last(this.buffers)[this.index] = n;
+      this.index += 1;
+      this.written += 1;
     }
   }
 
