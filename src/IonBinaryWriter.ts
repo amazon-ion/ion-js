@@ -19,6 +19,7 @@ const MINOR_VERSION = 0;
 
 export class BinaryWriter implements Writer {
   private readonly writeable: Writeable;
+  private numberBuffer: number[] = new Array(10);
 
   constructor(writeable: Writeable) {
     this.writeable = writeable;
@@ -31,22 +32,26 @@ export class BinaryWriter implements Writer {
     this.writeable.write(0xEA);
   }
 
-  writeUnsignedInt(value: number, length: number) {
-    let bytes: number[] = [];
+  writeUnsignedInt(originalValue: number, length: number) {
+    let value: number = originalValue;
+    let i: number = this.numberBuffer.length;
+
     while (value > 0) {
-      bytes.unshift(value & 0xFF);
+      this.numberBuffer[--i] = value & 0xFF;
       value = value >>> 8;
     }
 
     // Padding
-    while (bytes.length < length) {
-      bytes.unshift(0);
+    let bytesWritten = this.numberBuffer.length - i;
+    for (let j = 0; j < length - bytesWritten; j++) {
+      this.numberBuffer[--i] = 0;
     }
-    if (bytes.length > length) {
+
+    if (bytesWritten > length) {
       throw new Error(`Value ${value} cannot fit into ${length} bytes`);
     }
 
-    this.writeable.write(bytes);
+    this.writeable.write(this.numberBuffer, i);
   }
 
   writeSignedInt(value: number, length: number) {
@@ -93,8 +98,6 @@ export class BinaryWriter implements Writer {
 
     this.writeable.write(bytes);
   }
-
-  private numberBuffer: number[] = new Array(10);
 
   writeVariableLengthSignedInt(originalValue: number) {
     if (!Number.isInteger(originalValue)) {
