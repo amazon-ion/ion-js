@@ -95,6 +95,10 @@ export class BinaryWriter implements Writer {
   }
 
   writeVariableLengthSignedInt(originalValue: number) {
+    if (!Number.isInteger(originalValue)) {
+      throw new Error(`Cannot call writeVariableLengthSignedInt with non-integer value ${originalValue}`);
+    }
+
     let value: number = Math.abs(originalValue);
 
     let bytes: number[] = [];
