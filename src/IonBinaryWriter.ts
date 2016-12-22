@@ -85,19 +85,19 @@ export class BinaryWriter implements Writer {
     this.writeable.write(this.numberBuffer, i);
   }
 
-  writeVariableLengthUnsignedInt(value: number) {
-    let bytes: number[] = [];
+  writeVariableLengthUnsignedInt(originalValue: number) {
+    let value: number = originalValue;
+    let i: number = this.numberBuffer.length;
 
-    // Trailing byte
-    bytes.unshift(0x80 | (value & 0x7F));
+    this.numberBuffer[--i] = (value & 0x7F) | 0x80;
+    value >>>= 7;
 
-    value = value >>> 7;
     while (value > 0) {
-      bytes.unshift(value & 0x7F);
-      value = value >>> 7;
+      this.numberBuffer[--i] = value & 0x7F
+      value >>>= 7;
     }
 
-    this.writeable.write(bytes);
+    this.writeable.write(this.numberBuffer, i);
   }
 
   writeVariableLengthSignedInt(originalValue: number) {
