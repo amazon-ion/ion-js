@@ -11,12 +11,4 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-import { SymbolTable } from "./IonSymbolTable";
-
-export interface Import {
-  name: string;
-  version: number;
-  maxid: number;
-  offset: number;
-  symtab: SymbolTable;
-}
+export interface Index { [name: string]: number }

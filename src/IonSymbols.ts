@@ -12,6 +12,7 @@
  * language governing permissions and limitations under the License.
  */
 import { Import } from "./IonImport";
+import { Index } from "./IonIndex";
 import { Reader } from "./IonReader";
 import { Symbol } from "./IonSymbol";
 import { SymbolTable } from "./IonSymbolTable";
@@ -47,6 +48,14 @@ class SystemSymbolTable implements SymbolTable {
 
   getName(id: number) : string {
     return this.delegate.getName(id);
+  }
+
+  getIndex() : Index {
+    return this.delegate.getIndex();
+  }
+
+  getSymbols() : Symbol[] {
+    return this.delegate.getSymbols();
   }
 }
 

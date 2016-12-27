@@ -12,6 +12,7 @@
  * language governing permissions and limitations under the License.
  */
 import { Import } from "./IonImport";
+import { Index } from "./IonIndex";
 import { Symbol } from "./IonSymbol";
 import { SymbolTable } from "./IonSymbolTable";
 
@@ -22,11 +23,10 @@ export class UserSymbolTable implements SymbolTable {
   private base: number;
   private imports: Import[];
   private symbols: Symbol[];
-  private _index: any;
+  private _index: Index;
   private _overflow: any;
 
-  constructor(name: string, ver: number, imports: Import[], symbols: string[] | Symbol[], maxid: number, overflow: any = {}) {
-    var ii, len, fn;
+  constructor(name: string, ver: number, imports: Import[], symbols: string[] | Symbol[], maxid?: number, overflow: any = {}) {
     this.name      =      name;
     this.version   = ver || -1;
     this.imports   =   imports;
@@ -34,98 +34,121 @@ export class UserSymbolTable implements SymbolTable {
     this._index    =        {};
     this._overflow =  overflow;
 
-    if (maxid === undefined) {
+    if (typeof(maxid) == 'undefined') {
       maxid = 1;
       if (typeof imports === 'object' && imports.length > 0) {
-        len = imports.length;
-        for (ii=0; ii<len; ii++) {
-          maxid += imports[ii].maxid;
+        let len: number = imports.length;
+        for (let i: number = 0; i < len; i++) {
+          maxid += imports[i].maxid;
         }
       }
     }
     this.maxid = maxid;
     this.base  = maxid;
 
-    if (typeof symbols !== 'undefined' && (len = symbols.length) > 0) {
-      fn = (typeof symbols[0] === 'string') ? this.addName : this.addSymbol;
-      for (ii = 0; ii<len; ii++) {
-        fn.call(this, symbols[ii]);
+    if (typeof symbols != 'undefined' && symbols.length > 0) {
+      type Callback<T> = (value: T | Symbol, index: number, array: T[]) => void;
+      if (typeof(symbols[0]) == 'string') {
+        (<string[]>symbols).forEach(
+          (value: string, index: number, array: string[]) => { this.addName(value); },
+          this
+        );
+      } else {
+        (<Symbol[]>symbols).forEach(
+          (value: Symbol, index: number, array: Symbol[]) => { this.addSymbol(value); },
+          this
+        );
       }
     }
   }
 
   addName(name: string) : number {
-    var id, t = this;
-    if (typeof name !== 'string') throw new Error("invalid symbol");
-    id = t.getId(name);
-    if (id !== undefined) return id;
-    id = t.maxid;
-    t.maxid++;
-    t.addSymbol(new Symbol(id, name));
+    let id: number = this.getId(name);
+    let alreadyDefined: boolean = typeof(id) != 'undefined';
+    if (alreadyDefined) {
+      return id;
+    }
+    id = this.maxid;
+    this.maxid++;
+    this.addSymbol(new Symbol(id, name));
     return id;
   }
 
   addSymbol(sym: Symbol) : number {
-    var id, name, t = this;
-    name = sym.name;
-    id = t.getId(name);
-    if (id !== undefined) {
-      if (id !== sym.sid) throw new Error("symbol is already defined");
+    let name: string = sym.name;
+    let id: number = this.getId(name);
+    if (typeof(id) != 'undefined') {
+      if (id !== sym.sid) {
+        throw new Error("symbol is already defined");
+     }
       return id;
     }
     id = sym.sid;
-    let offset: number = id - t.base;
+    let offset: number = id - this.base;
     if (offset < 0) {
       throw new Error("can't change symbols in import list");
     }
-    if (offset >= t.maxid) t.maxid = offset + 1;
-    t.symbols[offset] = sym;
-    t._index[name] = offset; // we store the local id not the global
+    if (offset >= this.maxid) {
+      this.maxid = offset + 1;
+    }
+    this.symbols[offset] = sym;
+    this._index[name] = offset; // we store the local id not the global
     return sym.sid;
   }
 
   getId(name: string) : number {
-    var ii, id, len, base, imports, t = this;
-    if ((imports = t.imports) !== undefined 
-     && (len = imports.length) > 0) 
-    {
-      base = 1;
-      for (ii=0; ii<len; ii++) {
-        id = imports[ii]._index[name] || -1;
-        if (id > 0) {
-          return id + base;
+    let imports: Import[] = this.imports;
+    if (typeof(imports) != 'undefined') {
+      let len: number = imports.length;
+      if (len > 0) {
+        let base: number = 1;
+        for (let i: number = 0; i < len; i++) {
+          let id: number = imports[i].symtab.getIndex()[name] || -1;
+          if (id > 0) {
+            return id + base;
+          }
+          base += imports[i].maxid;
         }
-        base += imports[ii].maxid;
       }
     }
-    id = t._index[name];
-    return id ? id.sid : undefined;
+    return this._index[name];
   }
 
   getName(id: number) : string {
-    var ii, len, base, n, imports, symbols, t = this;
-    if (id < 1 || id >= t.maxid) return undefined;
-    symbols = t.symbols;
-    base = 1;
-    if ((imports = t.imports) !== undefined 
-     && (len = imports.length) > 0) 
-    {
-      n = undefined;
-      for (ii=0; ii<len; ii++) {
-        if (imports[ii].maxid > (id-base)) {
-          symbols = imports[ii].symtab ? imports[ii].symtab.symbols : undefined;
+    if (id < 1 || id >= this.maxid) {
+      return undefined;
+    }
+
+    let symbols: Symbol[] = this.symbols;
+    let base: number = 1;
+    let imports: Import[] = this.imports;
+    let n: string = undefined;
+
+    if (typeof(imports) != 'undefined' && imports.length > 0) {
+      let len: number = imports.length;
+      for (let i: number = 0; i < len; i++) {
+        if (imports[i].maxid > (id - base)) {
+          symbols = imports[i].symtab ? imports[i].symtab.getSymbols() : undefined;
           break;
         }
-        base += imports[ii].maxid;
+        base += imports[i].maxid;
       }
     }
+
     if (symbols) {
-      ii = id - base;
-      n = symbols[ii] ? symbols[ii].name : undefined;
-    }
-    else {
+      let index: number = id - base;
+      n = symbols[index] ? symbols[index].name : undefined;
+    } else {
       n = '$'+id.toString();
     }
     return n;
+  }
+
+  getIndex(): Index {
+    return this._index;
+  }
+
+  getSymbols() : Symbol[] {
+    return this.symbols;
   }
 }

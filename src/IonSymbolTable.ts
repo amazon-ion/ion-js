@@ -11,11 +11,14 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
+import { Index } from "./IonIndex";
 import { Symbol } from "./IonSymbol";
 
 export interface SymbolTable {
   addName(name: string) : number;
   addSymbol(sym: Symbol) : number;
   getId(name: string) : number;
+  getIndex() : Index;
   getName(id: number) : string;
+  getSymbols() : Symbol[];
 }
