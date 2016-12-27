@@ -13,13 +13,7 @@
  */
 import { Reader } from "./IonReader";
 import { Symbol } from "./IonSymbol";
-
-export interface SymbolTable {
-  addName(name: string) : number;
-  addSymbol(sym: Symbol) : number;
-  getId(name: string) : number;
-  getName(id: number) : string;
-}
+import { SymbolTable } from "./IonSymbolTable";
 
 class UserSymbolTable implements SymbolTable {
   private name: string;

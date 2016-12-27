@@ -30,7 +30,7 @@ import { makeSymbolTable } from "./IonSymbols";
 import { ParserTextRaw } from "./IonParserTextRaw";
 import { Reader } from "./IonReader";
 import { Span } from "./IonSpan";
-import { SymbolTable } from "./IonSymbols";
+import { SymbolTable } from "./IonSymbolTable";
 import { Timestamp } from "./IonTimestamp";
 
 const RAW_STRING = new IonType( -1, "raw_input", true,  false, false, false );
