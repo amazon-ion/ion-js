@@ -35,21 +35,19 @@ function get_buf_type(buf: Span) {
 }
 
 function makeBinaryReader(span: Span, options: Options) : BinaryReader {
-  var parser = new BinaryReader(span, options && options.catalog);
-  return parser;
+  return new BinaryReader(span, options && options.catalog);
 }
 
 function makeTextReader(span: Span, options: Options) : TextReader {
-  var parser = new TextReader(span, options && options.catalog);
-  return parser;
+  return new TextReader(span, options && options.catalog);
 }
 
 export function makeReader(buf: Span, options: Options) : Reader {
-  var stype =  options && (typeof options.sourceType === 'undefined') 
-                ? options.sourceType 
+  var stype =  options && (typeof options.sourceType === 'undefined')
+                ? options.sourceType
                 : get_buf_type(buf);
-  var reader = (stype === 'binary') 
-             ? makeBinaryReader(buf, options) 
+  let reader: Reader = (stype === 'binary')
+             ? makeBinaryReader(buf, options)
              : makeTextReader(buf, options);
   return reader;
 }
