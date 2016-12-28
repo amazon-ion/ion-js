@@ -238,7 +238,7 @@ export class BinaryReader implements Reader {
     let s: string = undefined;
     if (symbolId > 0) {
       s = this._symtab.getName(symbolId);
-      if (typeof s === 'undefined') {
+      if (typeof(s) == 'undefined') {
         s = "$" + symbolId.toString();
       }
     }
