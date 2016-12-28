@@ -25,278 +25,134 @@
       return new Uint8Array(array);
     };
 
-    suite['writeIvm'] = function() {
+    suite['Write IVM'] = function() {
       var writeable = new ion.Writeable();
       var writer = new ion.BinaryWriter(writeable);
       writer.writeIvm();
       assert.deepEqual(bytes([0xE0, 0x01, 0x00, 0xEA]), writeable.getBytes());
     };
 
-    var writeUnsignedInt = function(value, length, expected) {
-      var writeable = new ion.Writeable();
-      var writer = new ion.BinaryWriter(writeable);
-      writer.writeUnsignedInt(value, length);
-      var actual = writeable.getBytes();
-      assert.deepEqual(actual, expected);
+    var writeUnsignedIntTest = function(value, length, expected, exception) {
+      var testName = 'Write unsigned int ' + value.toString() + ' with length ' + length.toString();
+      var test = function() {
+        var writeable = new ion.Writeable();
+        var writer = new ion.BinaryWriter(writeable);
+        writer.writeUnsignedInt(value, length);
+        var actual = writeable.getBytes();
+        assert.deepEqual(actual, bytes(expected));
+      };
+      suite[testName] = exception
+        ? function() { assert.throws(test, Error); }
+        : test;
     };
 
-    suite['writeUnsignedInt0,1'] = function() {
-      writeUnsignedInt(0, 1, bytes([0]));
-    };
+    writeUnsignedIntTest(0, 1, [0]);
+    writeUnsignedIntTest(0, 2, [0, 0]);
+    writeUnsignedIntTest(255, 1, [255]);
+    writeUnsignedIntTest(255, 2, [0, 255]);
+    writeUnsignedIntTest(256, 2, [1, 0]);
+    writeUnsignedIntTest(256, 1, undefined, true);
 
-    suite['writeUnsignedInt0,2'] = function() {
-      writeUnsignedInt(0, 2, bytes([0, 0]));
-    };
-
-    suite['writeUnsignedInt255,1'] = function() {
-      writeUnsignedInt(255, 1, bytes([255]));
-    };
-
-    suite['writeUnsignedInt255,2'] = function() {
-      writeUnsignedInt(255, 2, bytes([0, 255]));
-    };
-
-    suite['writeUnsignedInt256,2'] = function() {
-      writeUnsignedInt(256, 2, bytes([1, 0]));
-    };
-
-    suite['writeUnsignedInt256,1'] = function() {
-      let error = false;
-      try {
-        writeUnsignedInt(256, 1, null);
-      } catch (e) {
-        error = true;
-      }
-      assert.isTrue(error);
-    };
-
-    var writeSignedInt = function(value, length, expected) {
-      var writeable = new ion.Writeable();
-      var writer = new ion.BinaryWriter(writeable);
-      writer.writeSignedInt(value, length);
-      var actual = writeable.getBytes();
-      assert.deepEqual(actual, expected);
+    var writeSignedIntTest = function(value, length, expected, exception) {
+      var testName = 'Write signed int ' + value.toString() + ' with length ' + length.toString();
+      var test = function() {
+        var writeable = new ion.Writeable();
+        var writer = new ion.BinaryWriter(writeable);
+        writer.writeSignedInt(value, length);
+        var actual = writeable.getBytes();
+        assert.deepEqual(actual, bytes(expected));
+      };
+      suite[testName] = exception
+        ? function() { assert.throws(test, Error); }
+        : test;
     }
 
-    suite['writeSignedInt0,1'] = function() {
-      writeSignedInt(0, 1, bytes([0]));
-    };
+    writeSignedIntTest(0, 1, [0]);
+    writeSignedIntTest(0, 2, [0, 0]);
+    writeSignedIntTest(-1, 1, [0x81]);
+    writeSignedIntTest(-1, 2, [0x80, 0x01]);
+    writeSignedIntTest(1, 1, [1]);
+    writeSignedIntTest(1, 2, [0, 1]);
+    writeSignedIntTest(-127, 1, [0xFF]);
+    writeSignedIntTest(-127, 3, [0x80, 0x00, 0x7F]);
+    writeSignedIntTest(127, 1, [0x7F]);
+    writeSignedIntTest(-128, 2, [0x80, 0x80]);
+    writeSignedIntTest(-128, 1, undefined, true);
+    writeSignedIntTest(128, 2, [0x00, 0x80]);
+    writeSignedIntTest(-256, 2, [0x81, 0x00]);
+    writeSignedIntTest(256, 2, [0x01, 0x00]);
 
-    suite['writeSignedInt0,2'] = function() {
-      writeSignedInt(0, 2, bytes([0, 0]));
-    };
-
-    suite['writeSignedInt-1,1'] = function() {
-      writeSignedInt(-1, 1, bytes([0x81]));
-    };
-
-    suite['writeSignedInt-1,2'] = function() {
-      writeSignedInt(-1, 2, bytes([0x80, 0x01]));
-    };
-
-    suite['writeSignedInt1,1'] = function() {
-      writeSignedInt(1, 1, bytes([1]));
-    };
-
-    suite['writeSignedInt1,2'] = function() {
-      writeSignedInt(1, 2, bytes([0, 1]));
-    };
-
-    suite['writeSignedInt-127,1'] = function() {
-      writeSignedInt(-127, 1, bytes([0xFF]));
-    };
-
-    suite['writeSignedInt-127,3'] = function() {
-      writeSignedInt(-127, 3, bytes([0x80, 0x00, 0x7F]));
-    };
-
-    suite['writeSignedInt127,1'] = function() {
-      writeSignedInt(127, 1, bytes([0x7F]));
-    };
-
-    suite['writeSignedInt-128, 2'] = function() {
-      writeSignedInt(-128, 2, bytes([0x80, 0x80]));
-    };
-
-    suite['writeSignedInt-128, 1'] = function() {
-      let error = false;
-      try {
-        writeSignedInt(-128, 1, null);
-      } catch (e) {
-        error = true;
-      }
-      assert.isTrue(error);
-    };
-
-    suite['writeSignedInt128,2'] = function() {
-       writeSignedInt(128, 2, bytes([0x00, 0x80]));
-    };
-
-    suite['writeSignedInt-256,2'] = function() {
-       writeSignedInt(-256, 2, bytes([0x81, 0x00]));
-    };
-
-    suite['writeSignedInt256,2'] = function() {
-       writeSignedInt(256, 2, bytes([0x01, 0x00]));
-    };
-
-    var writeVariableLengthUnsignedInt = function(value, expected) {
-      var writeable = new ion.Writeable();
-      var writer = new ion.BinaryWriter(writeable);
-      writer.writeVariableLengthUnsignedInt(value);
-      var actual = writeable.getBytes();
-      assert.deepEqual(actual, expected);
+    var writeVariableLengthUnsignedIntTest = function(value, expected) {
+      var testName = 'Write variable length unsigned int ' + value.toString();
+      suite[testName] = function() {
+        var writeable = new ion.Writeable();
+        var writer = new ion.BinaryWriter(writeable);
+        writer.writeVariableLengthUnsignedInt(value);
+        var actual = writeable.getBytes();
+        assert.deepEqual(actual, bytes(expected));
+      };
     }
 
-    suite['writeVariableLengthUnsignedInt0'] = function() {
-       writeVariableLengthUnsignedInt(0, bytes([0x80]));
-    };
+    writeVariableLengthUnsignedIntTest(0, [0x80]);
+    writeVariableLengthUnsignedIntTest(1, [0x81]);
+    writeVariableLengthUnsignedIntTest(127, [0xFF]);
+    writeVariableLengthUnsignedIntTest(128, [0x01, 0x80]);
+    writeVariableLengthUnsignedIntTest(255, [0x01, 0xFF]);
+    writeVariableLengthUnsignedIntTest(256, [0x02, 0x80]);
+    writeVariableLengthUnsignedIntTest(16383, [0x7F, 0xFF]);
+    writeVariableLengthUnsignedIntTest(16384, [0x01, 0x00, 0x80]);
 
-    suite['writeVariableLengthUnsignedInt1'] = function() {
-       writeVariableLengthUnsignedInt(1, bytes([0x81]));
-    };
-
-    suite['writeVariableLengthUnsignedInt127'] = function() {
-       writeVariableLengthUnsignedInt(127, bytes([0xFF]));
-    };
-
-    suite['writeVariableLengthUnsignedInt128'] = function() {
-       writeVariableLengthUnsignedInt(128, bytes([0x01, 0x80]));
-    };
-
-    suite['writeVariableLengthUnsignedInt255'] = function() {
-       writeVariableLengthUnsignedInt(255, bytes([0x01, 0xFF]));
-    };
-
-    suite['writeVariableLengthUnsignedInt256'] = function() {
-       writeVariableLengthUnsignedInt(256, bytes([0x02, 0x80]));
-    };
-
-    suite['writeVariableLengthUnsignedInt16383'] = function() {
-       writeVariableLengthUnsignedInt(16383, bytes([0x7F, 0xFF]));
-    };
-
-    suite['writeVariableLengthUnsignedInt16384'] = function() {
-       writeVariableLengthUnsignedInt(16384, bytes([0x01, 0x00, 0x80]));
-    };
-
-    var writeVariableLengthSignedInt = function(value, expected) {
-      var writeable = new ion.Writeable();
-      var writer = new ion.BinaryWriter(writeable);
-      writer.writeVariableLengthSignedInt(value);
-      var actual = writeable.getBytes();
-      assert.deepEqual(actual, expected);
+    var writeVariableLengthSignedIntTest = function(value, expected, exception) {
+      var testName = 'Write variable length signed int ' + value.toString();
+      var test = function() {
+        var writeable = new ion.Writeable();
+        var writer = new ion.BinaryWriter(writeable);
+        writer.writeVariableLengthSignedInt(value);
+        var actual = writeable.getBytes();
+        assert.deepEqual(actual, bytes(expected));
+      };
+      suite[testName] = exception
+        ? function() { assert.throws(test, Error); }
+        : test;
     }
 
-    suite['writeVariableLengthSignedInt0'] = function() {
-      writeVariableLengthSignedInt(0, bytes([0x80]));
+    writeVariableLengthSignedIntTest(0, [0x80]);
+    writeVariableLengthSignedIntTest(1, [0x81]);
+    writeVariableLengthSignedIntTest(-1, [0xC1]);
+    writeVariableLengthSignedIntTest(63, [0xBF]);
+    writeVariableLengthSignedIntTest(-63, [0xFF]);
+    writeVariableLengthSignedIntTest(64, [0x00, 0xC0]);
+    writeVariableLengthSignedIntTest(-64, [0x40, 0xC0]);
+    writeVariableLengthSignedIntTest(128, [0x01, 0x80]);
+    writeVariableLengthSignedIntTest(-128, [0x41, 0x80]);
+    writeVariableLengthSignedIntTest(8191, [0x3F, 0xFF]);
+    writeVariableLengthSignedIntTest(-8191, [0x7F, 0xFF]);
+    writeVariableLengthSignedIntTest(8192, [0x00, 0x40, 0x80]);
+    writeVariableLengthSignedIntTest(-8192, [0x40, 0x40, 0x80]);
+    writeVariableLengthSignedIntTest(16384, [0x01, 0x00, 0x80]);
+    writeVariableLengthSignedIntTest(-16384, [0x41, 0x00, 0x80]);
+    writeVariableLengthSignedIntTest(1.5, undefined, true);
+    writeVariableLengthSignedIntTest(1.0, undefined, true);
+
+    var sizeOfVariableLengthUnsignedIntTest = function(value, expected) {
+      var testName = "Size of unsigned int " + value.toString() + " is " + expected.toString();
+      suite[testName] = function() {
+        assert.equal(expected, ion.BinaryWriter.getVariableLengthUnsignedIntSize(value));
+      };
     };
 
-    suite['writeVariableLengthSignedInt1'] = function() {
-      writeVariableLengthSignedInt(1, bytes([0x81]));
-    };
-
-    suite['writeVariableLengthSignedInt-1'] = function() {
-      writeVariableLengthSignedInt(-1, bytes([0xC1]));
-    };
-
-    suite['writeVariableLengthSignedInt63'] = function() {
-      writeVariableLengthSignedInt(63, bytes([0xBF]));
-    };
-
-    suite['writeVariableLengthSignedInt-63'] = function() {
-      writeVariableLengthSignedInt(-63, bytes([0xFF]));
-    };
-
-    suite['writeVariableLengthSignedInt64'] = function() {
-      writeVariableLengthSignedInt(64, bytes([0x00, 0xC0]));
-    };
-
-    suite['writeVariableLengthSignedInt-64'] = function() {
-      writeVariableLengthSignedInt(-64, bytes([0x40, 0xC0]));
-    };
-
-    suite['writeVariableLengthSignedInt128'] = function() {
-      writeVariableLengthSignedInt(128, bytes([0x01, 0x80]));
-    };
-
-    suite['writeVariableLengthSignedInt-128'] = function() {
-      writeVariableLengthSignedInt(-128, bytes([0x41, 0x80]));
-    };
-
-    suite['writeVariableLengthSignedInt8191'] = function() {
-      writeVariableLengthSignedInt(8191, bytes([0x3F, 0xFF]));
-    };
-
-    suite['writeVariableLengthSignedInt-8191'] = function() {
-      writeVariableLengthSignedInt(-8191, bytes([0x7F, 0xFF]));
-    };
-
-    suite['writeVariableLengthSignedInt8192'] = function() {
-      writeVariableLengthSignedInt(8192, bytes([0x00, 0x40, 0x80]));
-    };
-
-    suite['writeVariableLengthSignedInt-8192'] = function() {
-      writeVariableLengthSignedInt(-8192, bytes([0x40, 0x40, 0x80]));
-    };
-
-    suite['writeVariableLengthSignedInt16384'] = function() {
-      writeVariableLengthSignedInt(16384, bytes([0x01, 0x00, 0x80]));
-    };
-
-    suite['writeVariableLengthSignedInt-16384'] = function() {
-      writeVariableLengthSignedInt(-16384, bytes([0x41, 0x00, 0x80]));
-    };
-
-    suite['writeVariableLengthSignedInt1.5'] = function() {
-      assert.throws(
-        () => writeVariableLengthSignedInt(1.5, null),
-        Error
-      );
-    };
-
-    suite['writeVariableLengthSignedInt1.0'] = function() {
-      assert.throws(
-        () => writeVariableLengthSignedInt(1.0, null),
-        Error
-      );
-    };
-
-    suite['Size of unsigned int 0 is 1'] = function() {
-      assert.equal(1, ion.BinaryWriter.getVariableLengthUnsignedIntSize(0));
-    }
-
-    suite['Size of unsigned int 1 is 1'] = function() {
-      assert.equal(1, ion.BinaryWriter.getVariableLengthUnsignedIntSize(1));
-    }
-
-    suite['Size of unsigned int 2 is 1'] = function() {
-      assert.equal(1, ion.BinaryWriter.getVariableLengthUnsignedIntSize(2));
-    }
-
-    suite['Size of unsigned int 127 is 1'] = function() {
-      assert.equal(1, ion.BinaryWriter.getVariableLengthUnsignedIntSize(127));
-    }
-
-    suite['Size of unsigned int 128 is 2'] = function() {
-      assert.equal(2, ion.BinaryWriter.getVariableLengthUnsignedIntSize(128));
-    }
-
-    suite['Size of unsigned int 255 is 2'] = function() {
-      assert.equal(2, ion.BinaryWriter.getVariableLengthUnsignedIntSize(255));
-    }
-
-    suite['Size of unsigned int 256 is 2'] = function() {
-      assert.equal(2, ion.BinaryWriter.getVariableLengthUnsignedIntSize(256));
-    }
-
-    suite['Size of unsigned int 16383 is 2'] = function() {
-      assert.equal(2, ion.BinaryWriter.getVariableLengthUnsignedIntSize(16383));
-    }
-
-    suite['Size of unsigned int 16384 is 3'] = function() {
-      assert.equal(3, ion.BinaryWriter.getVariableLengthUnsignedIntSize(16384));
-    }
+    sizeOfVariableLengthUnsignedIntTest(0, 1);
+    sizeOfVariableLengthUnsignedIntTest(1, 1);
+    sizeOfVariableLengthUnsignedIntTest(2, 1);
+    sizeOfVariableLengthUnsignedIntTest(127, 1);
+    sizeOfVariableLengthUnsignedIntTest(128, 2);
+    sizeOfVariableLengthUnsignedIntTest(255, 2);
+    sizeOfVariableLengthUnsignedIntTest(256, 2);
+    sizeOfVariableLengthUnsignedIntTest(16383, 2);
+    sizeOfVariableLengthUnsignedIntTest(16384, 3);
+    sizeOfVariableLengthUnsignedIntTest(0, 1);
+    sizeOfVariableLengthUnsignedIntTest(0, 1);
+    sizeOfVariableLengthUnsignedIntTest(0, 1);
 
     var sizeOfVariableLengthSignedIntTest = function(value, expected) {
       var testName = 'Size of signed int ' + value.toString() + ' is ' + expected.toString();
