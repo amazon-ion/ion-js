@@ -105,8 +105,8 @@ export class BinaryWriter implements Writer {
       return 1;
     }
     let valueBits: number = Math.floor(Math.log2(value)) + 1;
-    let encodingBits = Math.ceil(valueBits / 7);
-    return Math.ceil((valueBits + encodingBits) / 8);
+    let stopBits: number = Math.ceil(valueBits / 7);
+    return Math.ceil((valueBits + stopBits) / 8);
   }
 
   writeVariableLengthSignedInt(originalValue: number) {
@@ -135,5 +135,17 @@ export class BinaryWriter implements Writer {
     this.numberBuffer[this.numberBuffer.length - 1] |= 0x80;
 
     this.writeable.writeBytes(this.numberBuffer, i, this.numberBuffer.length - i);
+  }
+
+  static getVariableLengthSignedIntSize(value: number) {
+    let absoluteValue: number = Math.abs(value);
+    if (absoluteValue === 0) {
+      return 1;
+    }
+    let valueBits: number = Math.floor(Math.log2(absoluteValue)) + 1;
+    let trailingStopBits: number = Math.floor(valueBits / 7);
+    let leadingStopBit = 1;
+    let signBit = 1;
+    return Math.ceil((valueBits + trailingStopBits + leadingStopBit + signBit) / 8);
   }
 }

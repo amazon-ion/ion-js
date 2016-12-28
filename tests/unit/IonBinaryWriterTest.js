@@ -298,6 +298,27 @@
       assert.equal(3, ion.BinaryWriter.getVariableLengthUnsignedIntSize(16384));
     }
 
+    var sizeOfVariableLengthSignedIntTest = function(value, expected) {
+      var testName = 'Size of signed int ' + value.toString() + ' is ' + expected.toString();
+      suite[testName] = function() {
+        assert.equal(expected, ion.BinaryWriter.getVariableLengthSignedIntSize(value));
+      }
+    }
+
+    sizeOfVariableLengthSignedIntTest(0, 1);
+    sizeOfVariableLengthSignedIntTest(-0, 1);
+    sizeOfVariableLengthSignedIntTest(1, 1);
+    sizeOfVariableLengthSignedIntTest(-1, 1);
+    sizeOfVariableLengthSignedIntTest(63, 1);
+    sizeOfVariableLengthSignedIntTest(-63, 1);
+    sizeOfVariableLengthSignedIntTest(64, 2);
+    sizeOfVariableLengthSignedIntTest(-64, 2);
+    sizeOfVariableLengthSignedIntTest(63, 1);
+    sizeOfVariableLengthSignedIntTest(8191, 2);
+    sizeOfVariableLengthSignedIntTest(-8191, 2);
+    sizeOfVariableLengthSignedIntTest(8192, 3);
+    sizeOfVariableLengthSignedIntTest(-8192, 3);
+
     registerSuite(suite);
   }
 );
