@@ -11,14 +11,26 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-import { SymbolIndex } from "./IonSymbolIndex";
-import { Symbol } from "./IonSymbol";
+export class SharedSymbolTable {
+  private readonly name: string;
+  private readonly version: number;
+  private readonly symbols: string[]
 
-export interface SymbolTable {
-  addName(name: string) : number;
-  addSymbol(sym: Symbol) : number;
-  getId(name: string) : number;
-  getIndex() : SymbolIndex;
-  getSymbol(id: number) : string;
-  getSymbols() : Symbol[];
+  constructor(name: string, version: number, symbols: string[]) {
+    this.name = name;
+    this.version = version;
+    this.symbols = symbols;
+  }
+
+  getName() : string {
+    return this.name;
+  }
+
+  getVersion() : number {
+    return this.version;
+  }
+
+  getSymbols() : string[] {
+    return this.symbols;
+  }
 }

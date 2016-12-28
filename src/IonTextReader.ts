@@ -20,17 +20,18 @@
 // object, such as IonValue).
 import { Catalog } from "./IonCatalog";
 import { Decimal } from "./IonDecimal";
+import { defaultLocalSymbolTable } from "./IonLocalSymbolTable";
 import { get_ion_type } from "./IonParserTextRaw";
 import { getSystemSymbolTable } from "./IonSystemSymbolTable";
 import { ion_symbol_table } from "./IonSymbols";
 import { IonType } from "./IonType";
 import { IonTypes } from "./IonTypes";
 import { IVM } from "./IonConstants";
+import { LocalSymbolTable } from "./IonLocalSymbolTable";
 import { makeSymbolTable } from "./IonSymbols";
 import { ParserTextRaw } from "./IonParserTextRaw";
 import { Reader } from "./IonReader";
 import { Span } from "./IonSpan";
-import { SymbolTable } from "./IonSymbolTable";
 import { Timestamp } from "./IonTimestamp";
 
 const RAW_STRING = new IonType( -1, "raw_input", true,  false, false, false );
@@ -44,7 +45,7 @@ export class TextReader implements Reader {
   private _parser: ParserTextRaw;
   private _depth: number;
   private _cat: Catalog;
-  private _symtab: SymbolTable;
+  private _symtab: LocalSymbolTable;
   private _type: IonType;
   private _raw_type: number;
   private _raw: any;
@@ -57,7 +58,7 @@ export class TextReader implements Reader {
     this._parser   = new ParserTextRaw(source);
     this._depth    = 0;
     this._cat      = catalog;
-    this._symtab   = getSystemSymbolTable();
+    this._symtab   = defaultLocalSymbolTable();
     this._type     = undefined;
     this._raw_type = undefined;
     this._raw      = undefined;
@@ -108,7 +109,7 @@ export class TextReader implements Reader {
       if (this._raw_type === T_IDENTIFIER) {
         this.load_raw();
         if (this._raw != IVM.text) break;
-        this._symtab = getSystemSymbolTable();
+        this._symtab = defaultLocalSymbolTable();
       }
       else if (this._raw_type === T_STRUCT) {
         if (p.annotations().length !== 1) break;

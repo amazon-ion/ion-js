@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -11,18 +11,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-define({
-  defaultTimeout: 2000, // ms
-  excludeInstrumentation: true,
-  filterErrorStack: true,
-  suites: [
-    'tests/unit/textNulls',
-    'tests/unit/spans',
-    'tests/unit/iontests',
-    'tests/unit/IonCatalogTest',
-    'tests/unit/IonImportTest',
-    'tests/unit/IonLocalSymbolTableTest',
-    'tests/unit/IonBinaryWriterTest',
-    'tests/unit/IonWriteableTest',
-  ],
-});
+import { SharedSymbolTable } from "./IonSharedSymbolTable";
+
+export class SubstituteSymbolTable extends SharedSymbolTable {
+  constructor(length: number) {
+    super(null, undefined, new Array(length));
+  }
+}
