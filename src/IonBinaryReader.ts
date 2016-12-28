@@ -77,17 +77,6 @@ function get_ion_type(t: number) : IonType {
   };
 }
 
-function get_symbol_string(t, n: number) : string {
-  var s = undefined;
-  if (n > 0) {
-    s = t._symtab.getName(n);
-    if (typeof s === 'undefined') {
-      s = "$" + n.toString();
-    }
-  }
-  return s;
-}
-
 export class BinaryReader implements Reader {
   private _parser: ParserBinaryRaw;
   private _cat;
@@ -102,7 +91,8 @@ export class BinaryReader implements Reader {
   }
 
   next() : IonType {
-    var p, rt, t = this;
+    let t: BinaryReader = this;
+    var p, rt;
     if (t._raw_type === EOF) return undefined;
     p = t._parser;
     for (;;) {
@@ -126,7 +116,7 @@ export class BinaryReader implements Reader {
   }
 
   stepIn() : void {
-    var t = this;
+    let t: BinaryReader = this;
     if (!get_ion_type(t._raw_type).container) {
       throw new Error("can't step in to a scalar value");
     }
@@ -135,7 +125,7 @@ export class BinaryReader implements Reader {
   }
 
   stepOut() : void {
-    var t = this;
+    let t: BinaryReader = this;
     t._parser.stepOut();
     t._raw_type = BOC;
   }
@@ -149,9 +139,10 @@ export class BinaryReader implements Reader {
   }
 
   fieldName() : string {
-    var n, s, t = this;
+    let t: BinaryReader = this;
+    var n, s;
     n = t._parser.getFieldId();
-    s = get_symbol_string(t, n)
+    s = this.getSymbolString(n)
     return s;
   }
 
@@ -160,20 +151,22 @@ export class BinaryReader implements Reader {
   }
 
   getAnnotation(index: number) : string {
-    var id, n, t = this;
+    let t: BinaryReader = this;
+    var id, n;
     id = t._parser.getAnnotation(index);
-    n = get_symbol_string(t, id);
+    n = this.getSymbolString(id);
     return n;
   }
 
   isNull() : boolean {
-    var t = this,
-        is_null = (t._raw_type === TB_NULL) || t._parser.isNull();
+    let t: BinaryReader = this;
+    var is_null = (t._raw_type === TB_NULL) || t._parser.isNull();
     return is_null;
   }
 
   stringValue() : string {
-    var n, s, t = this, p = t._parser;
+    let t: BinaryReader = this;
+    var n, s, p = t._parser;
     if (t.isNull()) {
       s = "null";
       if (t._raw_type != TB_NULL) {
@@ -185,7 +178,7 @@ export class BinaryReader implements Reader {
       // value otherwise all other scalars are fine as is
       if (t._raw_type === TB_SYMBOL) {
         n = p.numberValue();
-        s = get_symbol_string(t, n);
+        s = this.getSymbolString(n);
       }
       else {
         s = p.stringValue();
@@ -239,4 +232,16 @@ export class BinaryReader implements Reader {
         return undefined;
     }
   }
+
+  private getSymbolString(n: number) : string {
+    var s = undefined;
+    if (n > 0) {
+      s = this._symtab.getName(n);
+      if (typeof s === 'undefined') {
+        s = "$" + n.toString();
+      }
+    }
+    return s;
+  }
 }
+
