@@ -11,8 +11,8 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-import { Catalog } from "./IonCatalog";
 import { BinaryReader } from "./IonBinaryReader";
+import { Catalog } from "./IonCatalog";
 import { IVM } from "./IonConstants";
 import { Reader } from "./IonReader";
 import { Span } from "./IonSpan";
