@@ -24,22 +24,27 @@ const e = {
   msg: "error",
 }
 
+interface Options {
+  catalog: any;
+  sourceType: string;
+}
+
 function get_buf_type(buf: Span) {
   var firstByte = buf.valueAt(0);
   return (firstByte === IVM.binary[0]) ? 'binary' : 'text';
 }
 
-function makeBinaryReader(span: Span, options) : BinaryReader {
+function makeBinaryReader(span: Span, options: Options) : BinaryReader {
   var parser = new BinaryReader(span, options && options.catalog);
   return parser;
 }
 
-function makeTextReader(span, options) : TextReader {
+function makeTextReader(span: Span, options: Options) : TextReader {
   var parser = new TextReader(span, options && options.catalog);
   return parser;
 }
 
-export function makeReader( buf: Span, options: any ) : Reader {
+export function makeReader(buf: Span, options: Options) : Reader {
   var stype =  options && (typeof options.sourceType === 'undefined') 
                 ? options.sourceType 
                 : get_buf_type(buf);
