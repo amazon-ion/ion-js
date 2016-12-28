@@ -29,6 +29,7 @@ import { makeSymbolTable } from "./IonSymbols";
 import { ParserBinaryRaw } from "./IonParserBinaryRaw";
 import { Reader } from "./IonReader";
 import { Span } from "./IonSpan";
+import { SymbolTable } from "./IonSymbolTable";
 import { Timestamp } from "./IonTimestamp";
 
 const RAW_STRING = new IonType( -1, "raw_input", true,  false, false, false );
@@ -80,7 +81,7 @@ function get_ion_type(t: number) : IonType {
 export class BinaryReader implements Reader {
   private _parser: ParserBinaryRaw;
   private _cat: Catalog;
-  private _symtab;
+  private _symtab: SymbolTable;
   private _raw_type: number;
 
   constructor(source: Span, catalog: Catalog) {
@@ -233,12 +234,12 @@ export class BinaryReader implements Reader {
     }
   }
 
-  private getSymbolString(n: number) : string {
-    var s = undefined;
-    if (n > 0) {
-      s = this._symtab.getName(n);
+  private getSymbolString(symbolId: number) : string {
+    let s: string = undefined;
+    if (symbolId > 0) {
+      s = this._symtab.getName(symbolId);
       if (typeof s === 'undefined') {
-        s = "$" + n.toString();
+        s = "$" + symbolId.toString();
       }
     }
     return s;
