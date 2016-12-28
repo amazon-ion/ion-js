@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -11,21 +11,20 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-const DEFAULT_BUFFER_SIZE: number = 4096;
+import { isUndefined } from "./IonUtilities";
+import { last } from "./IonUtilities";
 
-function last<T>(array: T[]) : T {
-  return array[array.length - 1];
-}
+const DEFAULT_BUFFER_SIZE: number = 4096;
 
 export class Writeable {
   private bufferGrowthSize: number;
-  private buffers: Uint8Array[];
+  private buffers: number[][];
   private index: number;
   private written: number;
 
   constructor(bufferInitialSize: number = DEFAULT_BUFFER_SIZE, bufferGrowthSize: number = DEFAULT_BUFFER_SIZE) {
     this.bufferGrowthSize = bufferGrowthSize;
-    this.buffers = [new Uint8Array(bufferInitialSize)];
+    this.buffers = [new Array(bufferInitialSize)];
     // Next byte to be written in current buffer
     this.index = 0;
     // Total number of bytes written across all buffers
@@ -45,22 +44,9 @@ export class Writeable {
     }
   }
 
-  writeBytes(b: number[], offset?: number, length?: number) : void {
-    if (typeof(offset) === 'undefined') {
-      offset = 0;
-    }
-    if (typeof(length) === 'undefined') {
+  writeBytes(b: number[] | Uint8Array, offset: number = 0, length?: number) : void {
+    if (isUndefined(length)) {
       length = b.length - offset;
-    }
-
-    let canCopyEntireArray =
-      length == b.length
-      && length <= this.capacity();
-    if (canCopyEntireArray) {
-      last(this.buffers).set(b, this.index);
-      this.index += length;
-      this.written += length;
-      return;
     }
 
     let remaining: number = length;
@@ -69,7 +55,7 @@ export class Writeable {
         this.allocate();
         this.index = 0;
       }
-      let buffer: Uint8Array = last(this.buffers);
+      let buffer: number[] = last(this.buffers);
       let limit: number = Math.min(remaining, this.capacity());
       for (let i: number = 0; i < limit; i++) {
         buffer[this.index + i] = b[offset + i];
@@ -85,27 +71,26 @@ export class Writeable {
   }
 
   private allocate() {
-    this.buffers.push(new Uint8Array(new ArrayBuffer(this.bufferGrowthSize)));
+    if (this.bufferGrowthSize === 0) {
+      "Cannot allocate additional capacity in a fixed-size writeable";
+    }
+    this.buffers.push(new Array(this.bufferGrowthSize));
   }
 
-  getBytes() : Uint8Array {
+  getBytes() : number[] {
     let singleFullBuffer: boolean = (this.buffers.length == 1) && this.index == last(this.buffers).length;
     if (singleFullBuffer) {
       return last(this.buffers);
     }
 
-    let result: Uint8Array = new Uint8Array(this.written);
+    let result: number[] = new Array(this.written);
     let offset: number = 0;
-    for (let i = 0; i < this.buffers.length - 1; i++) {
-      let buffer: Uint8Array = this.buffers[i];
-      result.set(buffer, offset);
-      offset += buffer.length;
-    }
-
-    // Special case for possible partial final buffer
-    let buffer: Uint8Array = last(this.buffers);
-    for (let i = 0; i < this.index; i++) {
-      result[offset + i] = buffer[i];
+    for (let i: number = 0; i < this.buffers.length; i++) {
+      let buffer: number[] = this.buffers[i];
+      let limit: number = Math.min(this.written - offset, buffer.length);
+      for (let j: number = 0; j < limit; j++) {
+        result[offset++] = buffer[j];
+      }
     }
 
     // Replace individual buffers with concatenated buffer

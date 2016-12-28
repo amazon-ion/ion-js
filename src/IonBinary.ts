@@ -35,3 +35,54 @@ export const TB_LIST          = 11;  // 0xb
 export const TB_SEXP          = 12;  // 0xc
 export const TB_STRUCT        = 13;  // 0xd
 export const TB_ANNOTATION    = 14;  // 0xe
+
+export enum TypeCodes {
+  NULL = 0,
+  BOOL = 1,
+  POSITIVE_INT = 2,
+  NEGATIVE_INT = 3,
+  FLOAT = 4,
+  DECIMAL = 5,
+  TIMESTAMP = 6,
+  SYMBOL = 7,
+  STRING = 8,
+  CLOB = 9,
+  BLOB = 10,
+  LIST = 11,
+  SEXP = 12,
+  STRUCT = 13,
+  ANNOTATION = 14,
+}
+
+export function getBits(value: number[], offset: number, count: number) : number {
+  if (count > 8) {
+    throw new Error("Can only get up to 8 bits at a time");
+  }
+  if (count < 0) {
+    throw new Error("Must get at least one bit");
+  }
+  if ((offset + count) > (value.length * 8)) {
+    throw new Error("Bits region runs past the end of the value");
+  }
+
+  let leftArrayIndex: number = offset >>> 3;
+  let rightArrayIndex: number = (offset + count - 1) >>> 3;
+
+  let leftByteOffset = offset % 8;
+  let rightByteOffset = ((offset + count - 1) % 8) + 1;
+
+  let isSameByte: boolean = leftArrayIndex === rightArrayIndex;
+  if (isSameByte) {
+    let result: number =
+      (value[leftArrayIndex] & (255 >>> leftByteOffset))
+      >>> (8 - rightByteOffset);
+    return result;
+  } else {
+    let leftResult: number =
+      (value[leftArrayIndex] & (255 >>> leftByteOffset))
+      << rightByteOffset;
+    let rightResult: number = value[rightArrayIndex] >>> (8 - rightByteOffset);
+    let result: number = leftResult | rightResult;
+    return result;
+  }
+}

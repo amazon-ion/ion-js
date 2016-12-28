@@ -18,13 +18,23 @@
     const ion = require('dist/Ion');
 
     var suite = {
-      name: 'Writeable'
+      name: 'Unicode'
     };
 
-    suite['writePartialArray'] = function() {
-      var writeable = new ion.Writeable();
-      writeable.writeBytes([1,2,3,4,5,6,7,8], 4, 4);
-      assert.deepEqual(writeable.getBytes(), [5,6,7,8]);
+    suite['Encode dollar sign'] = function() {
+      assert.deepEqual(ion.encodeUtf8('$'), [0x24]);
+    }
+
+    suite['Encode cent sign'] = function() {
+      assert.deepEqual(ion.encodeUtf8('¢'), [0xc2, 0xa2]);
+    }
+
+    suite['Encode euro sign'] = function() {
+      assert.deepEqual(ion.encodeUtf8('€'), [0xe2, 0x82, 0xac]);
+    };
+
+    suite['Encode Gothic letter hwair'] = function() {
+      assert.deepEqual(ion.encodeUtf8(String.fromCodePoint(0x10348)), [0xf0, 0x90, 0x8d, 0x88]);
     };
 
     registerSuite(suite);

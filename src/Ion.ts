@@ -54,12 +54,20 @@ export function makeReader(buf: Span, options: Options) : Reader {
 
 export { BinaryWriter } from "./IonBinaryWriter";
 export { Catalog } from "./IonCatalog";
+export { Decimal } from "./IonDecimal";
 export { defaultLocalSymbolTable } from "./IonLocalSymbolTable";
+export { encodeUtf8 } from "./IonUnicode";
+export { getBits } from "./IonBinary";
 export { getSystemSymbolTable } from "./IonSystemSymbolTable";
 export { getSystemSymbolTableImport } from "./IonSystemSymbolTable";
 export { Import } from "./IonImport";
 export { IonTypes } from "./IonTypes";
 export { LocalSymbolTable } from "./IonLocalSymbolTable";
+export { LowLevelBinaryWriter } from "./IonLowLevelBinaryWriter";
 export { makeSpan } from "./IonSpan";
+export { NullNode } from "./IonBinaryWriter";
+export { Precision } from "./IonPrecision";
 export { SharedSymbolTable } from "./IonSharedSymbolTable";
+export { Timestamp } from "./IonTimestamp";
+export { TypeCodes } from "./IonBinary";
 export { Writeable } from "./IonWriteable";

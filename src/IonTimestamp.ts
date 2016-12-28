@@ -86,7 +86,7 @@ export class Timestamp {
       day: number = 0,
       hour: number = 0,
       minute: number = 0,
-      seconds: number | Decimal = 0
+      seconds: number | string | Decimal = 0
     ) {
 
     this.precision = precision;
@@ -101,6 +101,8 @@ export class Timestamp {
       // we allow whole number seconds to be specified as a number
       // in which case we convert it to a decimal value
       this.seconds = new Decimal(LongInt.fromNumber(seconds), 0);
+    } else if (typeof(seconds) == 'string') {
+      this.seconds = Decimal.parse(seconds);
     } else {
       this.seconds = <Decimal>seconds;
     }
