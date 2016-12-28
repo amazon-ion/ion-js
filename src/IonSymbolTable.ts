@@ -19,6 +19,6 @@ export interface SymbolTable {
   addSymbol(sym: Symbol) : number;
   getId(name: string) : number;
   getIndex() : Index;
-  getName(id: number) : string;
+  getSymbol(id: number) : string;
   getSymbols() : Symbol[];
 }

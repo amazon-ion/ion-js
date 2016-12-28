@@ -114,7 +114,7 @@ export class UserSymbolTable implements SymbolTable {
     return this._index[name];
   }
 
-  getName(id: number) : string {
+  getSymbol(id: number) : string {
     if (id < 1 || id >= this.maxid) {
       return undefined;
     }

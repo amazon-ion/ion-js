@@ -47,8 +47,8 @@ class SystemSymbolTable implements SymbolTable {
     return this.delegate.getId(name);
   }
 
-  getName(id: number) : string {
-    return this.delegate.getName(id);
+  getSymbol(id: number) : string {
+    return this.delegate.getSymbol(id);
   }
 
   getIndex() : Index {
