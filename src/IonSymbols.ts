@@ -11,6 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
+import { Catalog } from "./IonCatalog";
 import { Import } from "./IonImport";
 import { Index } from "./IonIndex";
 import { Reader } from "./IonReader";
@@ -85,7 +86,7 @@ export function getSystemSymbolTable() : SymbolTable {
 
 const empty_struct = {};
 
-function load_imports(sp: Reader, cat: any) : Import[] {
+function load_imports(sp: Reader, cat: Catalog) : Import[] {
   let imports: Import[] = [];
 
   var name, version, maxid, t, ii, st;
@@ -147,7 +148,7 @@ function load_symbols(sp: Reader) : string[] {
   return syms;
 }
 
-export function makeSymbolTable(cat, sp: Reader) : SymbolTable {
+export function makeSymbolTable(cat: Catalog, sp: Reader) : SymbolTable {
   let name: string;
   let version: number;
   let imports: Import[];

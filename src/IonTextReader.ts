@@ -18,7 +18,7 @@
 // Handles system symbols, and conversion from the parsed
 // input string to the desired Javascript value (scalar or
 // object, such as IonValue).
-
+import { Catalog } from "./IonCatalog";
 import { Decimal } from "./IonDecimal";
 import { get_ion_type } from "./IonParserTextRaw";
 import { getSystemSymbolTable } from "./IonSymbols";
@@ -43,13 +43,13 @@ const T_STRUCT = 19;
 export class TextReader implements Reader {
   private _parser: ParserTextRaw;
   private _depth: number;
-  private _cat: any;
+  private _cat: Catalog;
   private _symtab: SymbolTable;
   private _type: IonType;
   private _raw_type: number;
   private _raw: any;
 
-  constructor(source: Span, catalog) {
+  constructor(source: Span, catalog: Catalog) {
     if (!source) {
       throw new Error("a source Span is required to make a reader");
     }

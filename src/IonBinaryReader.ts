@@ -18,7 +18,7 @@
 // Handles system symbols, and conversion from the parsed
 // input byte array  to the desired Javascript value (scalar or
 // object, such as IonValue).
-
+import { Catalog } from "./IonCatalog";
 import { Decimal } from "./IonDecimal";
 import { getSystemSymbolTable } from "./IonSymbols";
 import { ion_symbol_table_sid } from "./IonSymbols";
@@ -79,11 +79,11 @@ function get_ion_type(t: number) : IonType {
 
 export class BinaryReader implements Reader {
   private _parser: ParserBinaryRaw;
-  private _cat;
+  private _cat: Catalog;
   private _symtab;
   private _raw_type: number;
 
-  constructor(source: Span, catalog) {
+  constructor(source: Span, catalog: Catalog) {
     this._parser   = new ParserBinaryRaw(source);
     this._cat      = catalog;
     this._symtab   = getSystemSymbolTable();
