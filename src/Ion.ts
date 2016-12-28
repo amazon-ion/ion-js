@@ -53,6 +53,11 @@ export function makeReader(buf: Span, options: Options) : Reader {
 }
 
 export { BinaryWriter } from "./IonBinaryWriter";
+export { Catalog } from "./IonCatalog";
+export { getSystemSymbolTable } from "./IonSymbols";
+export { Import } from "./IonImport";
 export { IonTypes } from "./IonTypes";
+export { LocalSymbolTable } from "./IonLocalSymbolTable";
 export { makeSpan } from "./IonSpan";
+export { SharedSymbolTable } from "./IonSharedSymbolTable";
 export { Writeable } from "./IonWriteable";

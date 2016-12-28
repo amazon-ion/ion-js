@@ -11,9 +11,32 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-import { Index } from "./IonIndex";
+import { SymbolTable } from "./IonSymbolTable";
 
-export interface SymbolTable {
-  getSymbol(id: number): string;
-  getSymbols() : string[];
+export class SharedSymbolTable implements SymbolTable {
+  private name: string;
+  private version: number;
+  private symbols: string[];
+
+  constructor(name: string, version: number, symbols: string[]) {
+    this.name = name;
+    this.version = version;
+    this.symbols = symbols;
+  }
+
+  getName() : string {
+    return this.name;
+  }
+
+  getVersion() : number {
+    return this.version;
+  }
+
+  getSymbols() : string[] {
+    return this.symbols;
+  }
+
+  getSymbol(id: number) : string {
+    return this.symbols[id];
+  }
 }

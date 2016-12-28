@@ -13,10 +13,26 @@
  */
 import { SymbolTable } from "./IonSymbolTable";
 
-export interface Import {
-  name: string;
-  version: number;
-  maxid: number;
-  offset: number;
-  symtab: SymbolTable;
+export class Import {
+  private name: string;
+  private version: number;
+  private maxId: number;
+
+  constructor(name: string, version: number, maxId?: number) {
+    this.name = name;
+    this.version = version;
+    this.maxId = maxId;
+  }
+
+  getName() : string {
+    return this.name;
+  }
+
+  getVersion() : number {
+    return this.version;
+  }
+
+  getMaxId() : number {
+    return this.maxId;
+  }
 }
