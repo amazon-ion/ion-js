@@ -262,6 +262,42 @@
       );
     };
 
+    suite['Size of unsigned int 0 is 1'] = function() {
+      assert.equal(1, ion.BinaryWriter.getVariableLengthUnsignedIntSize(0));
+    }
+
+    suite['Size of unsigned int 1 is 1'] = function() {
+      assert.equal(1, ion.BinaryWriter.getVariableLengthUnsignedIntSize(1));
+    }
+
+    suite['Size of unsigned int 2 is 1'] = function() {
+      assert.equal(1, ion.BinaryWriter.getVariableLengthUnsignedIntSize(2));
+    }
+
+    suite['Size of unsigned int 127 is 1'] = function() {
+      assert.equal(1, ion.BinaryWriter.getVariableLengthUnsignedIntSize(127));
+    }
+
+    suite['Size of unsigned int 128 is 2'] = function() {
+      assert.equal(2, ion.BinaryWriter.getVariableLengthUnsignedIntSize(128));
+    }
+
+    suite['Size of unsigned int 255 is 2'] = function() {
+      assert.equal(2, ion.BinaryWriter.getVariableLengthUnsignedIntSize(255));
+    }
+
+    suite['Size of unsigned int 256 is 2'] = function() {
+      assert.equal(2, ion.BinaryWriter.getVariableLengthUnsignedIntSize(256));
+    }
+
+    suite['Size of unsigned int 16383 is 2'] = function() {
+      assert.equal(2, ion.BinaryWriter.getVariableLengthUnsignedIntSize(16383));
+    }
+
+    suite['Size of unsigned int 16384 is 3'] = function() {
+      assert.equal(3, ion.BinaryWriter.getVariableLengthUnsignedIntSize(16384));
+    }
+
     registerSuite(suite);
   }
 );

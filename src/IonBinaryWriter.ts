@@ -100,6 +100,15 @@ export class BinaryWriter implements Writer {
     this.writeable.writeBytes(this.numberBuffer, i);
   }
 
+  static getVariableLengthUnsignedIntSize(value: number) {
+    if (value === 0) {
+      return 1;
+    }
+    let valueBits: number = Math.floor(Math.log2(value)) + 1;
+    let encodingBits = Math.ceil(valueBits / 7);
+    return Math.ceil((valueBits + encodingBits) / 8);
+  }
+
   writeVariableLengthSignedInt(originalValue: number) {
     if (!Number.isInteger(originalValue)) {
       throw new Error(`Cannot call writeVariableLengthSignedInt with non-integer value ${originalValue}`);

@@ -89,6 +89,11 @@ export class Writeable {
   }
 
   getBytes() : Uint8Array {
+    let singleFullBuffer: boolean = (this.buffers.length == 1) && this.index == last(this.buffers).length;
+    if (singleFullBuffer) {
+      return last(this.buffers);
+    }
+
     let result: Uint8Array = new Uint8Array(this.written);
     let offset: number = 0;
     for (let i = 0; i < this.buffers.length - 1; i++) {
