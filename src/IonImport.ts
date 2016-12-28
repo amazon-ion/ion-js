@@ -22,14 +22,14 @@ export class Import {
   private readonly index: SymbolIndex = {};
 
   constructor(
-    private readonly parent: Import,
-    private readonly symbolTable: SharedSymbolTable,
+    private readonly _parent: Import,
+    private readonly _symbolTable: SharedSymbolTable,
     length?: number
   ) {
-    this._offset = (parent && (parent.offset + parent.length)) || 1;
-    this._length = length || symbolTable.symbols.length;
+    this._offset = (_parent && (_parent.offset + _parent.length)) || 1;
+    this._length = length || _symbolTable.symbols.length;
 
-    let symbols: string[] = symbolTable.symbols;
+    let symbols: string[] = _symbolTable.symbols;
     for (let i: number = 0; i < this._length; i++) {
       this.index[symbols[i]] = this._offset + i;
     }
@@ -56,11 +56,19 @@ export class Import {
       || this.index[symbol_];
   }
 
+  get parent() : Import {
+    return this._parent;
+  }
+
   get offset() : number {
     return this._offset;
   }
 
   get length() : number {
     return this._length;
+  }
+
+  get symbolTable() : SharedSymbolTable {
+    return this._symbolTable;
   }
 }

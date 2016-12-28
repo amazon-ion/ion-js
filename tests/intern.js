@@ -22,7 +22,11 @@ define({
     'tests/unit/IonCatalogTest',
     'tests/unit/IonImportTest',
     'tests/unit/IonLocalSymbolTableTest',
-    'tests/unit/IonBinaryWriterTest',
+    'tests/unit/IonDecimalTest',
     'tests/unit/IonWriteableTest',
+    'tests/unit/IonUnicodeTest',
+    'tests/unit/IonBinaryTest',
+    'tests/unit/IonLowLevelBinaryWriterTest',
+    'tests/unit/IonBinaryWriterTest',
   ],
 });
