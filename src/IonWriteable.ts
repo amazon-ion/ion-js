@@ -13,37 +13,39 @@
  */
 const DEFAULT_BUFFER_SIZE: number = 4096;
 
-function last(array: Uint8Array[]) : Uint8Array {
+function last<T>(array: T[]) : T {
   return array[array.length - 1];
 }
 
 export class Writeable {
-  private bufferSize: number;
+  private bufferGrowthSize: number;
   private buffers: Uint8Array[];
   private index: number;
   private written: number;
 
-  constructor(bufferSize?: number) {
-    if (typeof(bufferSize) === 'undefined') {
-      bufferSize = DEFAULT_BUFFER_SIZE;
-    }
-    this.bufferSize = bufferSize;
-    this.buffers = [new Uint8Array(bufferSize)];
+  constructor(bufferInitialSize: number = DEFAULT_BUFFER_SIZE, bufferGrowthSize: number = DEFAULT_BUFFER_SIZE) {
+    this.bufferGrowthSize = bufferGrowthSize;
+    this.buffers = [new Uint8Array(bufferInitialSize)];
     // Next byte to be written in current buffer
     this.index = 0;
     // Total number of bytes written across all buffers
     this.written = 0;
   }
 
-  write(x: number | number[], offset?: number, length?: number) : void {
-    if (Array.isArray(x)) {
-      this.writeArray(x, offset, length);
-    } else if (typeof(x) === 'number') {
-      this.writeNumber(x);
+  writeByte(b: number) {
+    if (this.capacity() === 0) {
+      this.allocate();
+      last(this.buffers)[0] = b;
+      this.index = 1;
+      this.written += 1;
+    } else {
+      last(this.buffers)[this.index] = b;
+      this.index += 1;
+      this.written += 1;
     }
   }
 
-  private writeArray(b: number[], offset?: number, length?: number) : void {
+  writeBytes(b: number[], offset?: number, length?: number) : void {
     if (typeof(offset) === 'undefined') {
       offset = 0;
     }
@@ -78,25 +80,12 @@ export class Writeable {
     }
   }
 
-  private writeNumber(n: number) : void {
-    if (this.capacity() === 0) {
-      this.allocate();
-      last(this.buffers)[0] = n;
-      this.index = 1;
-      this.written += 1;
-    } else {
-      last(this.buffers)[this.index] = n;
-      this.index += 1;
-      this.written += 1;
-    }
-  }
-
   private capacity() : number {
     return last(this.buffers).length - this.index;
   }
 
   private allocate() {
-    this.buffers.push(new Uint8Array(new ArrayBuffer(this.bufferSize)));
+    this.buffers.push(new Uint8Array(new ArrayBuffer(this.bufferGrowthSize)));
   }
 
   getBytes() : Uint8Array {

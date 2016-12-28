@@ -27,8 +27,7 @@
 
     suite['writePartialArray'] = function() {
       var writeable = new ion.Writeable();
-      debugger;
-      writeable.write([1,2,3,4,5,6,7,8], 4, 4);
+      writeable.writeBytes([1,2,3,4,5,6,7,8], 4, 4);
       assert.deepEqual(writeable.getBytes(), bytes([5,6,7,8]));
     };
 

@@ -26,10 +26,10 @@ export class BinaryWriter implements Writer {
   }
 
   writeIvm() : void {
-    this.writeable.write(0xE0);
-    this.writeable.write(MAJOR_VERSION);
-    this.writeable.write(MINOR_VERSION);
-    this.writeable.write(0xEA);
+    this.writeable.writeByte(0xE0);
+    this.writeable.writeByte(MAJOR_VERSION);
+    this.writeable.writeByte(MINOR_VERSION);
+    this.writeable.writeByte(0xEA);
   }
 
   writeUnsignedInt(originalValue: number, length: number) {
@@ -51,7 +51,7 @@ export class BinaryWriter implements Writer {
       throw new Error(`Value ${value} cannot fit into ${length} bytes`);
     }
 
-    this.writeable.write(this.numberBuffer, i);
+    this.writeable.writeBytes(this.numberBuffer, i);
   }
 
   writeSignedInt(originalValue: number, length: number) {
@@ -82,7 +82,7 @@ export class BinaryWriter implements Writer {
       this.numberBuffer[i] |= 0x80;
     }
 
-    this.writeable.write(this.numberBuffer, i);
+    this.writeable.writeBytes(this.numberBuffer, i);
   }
 
   writeVariableLengthUnsignedInt(originalValue: number) {
@@ -97,7 +97,7 @@ export class BinaryWriter implements Writer {
       value >>>= 7;
     }
 
-    this.writeable.write(this.numberBuffer, i);
+    this.writeable.writeBytes(this.numberBuffer, i);
   }
 
   writeVariableLengthSignedInt(originalValue: number) {
@@ -125,6 +125,6 @@ export class BinaryWriter implements Writer {
     // Stop bit
     this.numberBuffer[this.numberBuffer.length - 1] |= 0x80;
 
-    this.writeable.write(this.numberBuffer, i, this.numberBuffer.length - i);
+    this.writeable.writeBytes(this.numberBuffer, i, this.numberBuffer.length - i);
   }
 }
