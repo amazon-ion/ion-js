@@ -148,7 +148,7 @@ function load_symbols(sp: Reader) : string[] {
   return syms;
 }
 
-export function makeSymbolTable(cat: Catalog, sp: Reader) : SymbolTable {
+export function makeSymbolTable(catalog: Catalog, sp: Reader) : SymbolTable {
   let name: string;
   let version: number;
   let imports: Import[];
@@ -172,7 +172,7 @@ export function makeSymbolTable(cat: Catalog, sp: Reader) : SymbolTable {
       version = sp.numberValue();
       break;
     case "imports":             // sid 6
-      imports = load_imports(sp, cat);
+      imports = load_imports(sp, catalog);
       break;
     case "symbols":             // sid 7
       symbols = load_symbols(sp);
@@ -206,7 +206,7 @@ export function makeSymbolTable(cat: Catalog, sp: Reader) : SymbolTable {
   for (ii=0; ii<len; ii++) {
     name = imports[ii].name;
     version = imports[ii].version;
-    imp = cat ? cat.getSymbolTable(name, version) : undefined;
+    imp = catalog ? catalog.getSymbolTable(name, version) : undefined;
     if (imp) {
       imports[ii].symtab = imp;
       if (imports[ii].maxid === undefined) {
