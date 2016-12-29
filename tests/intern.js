@@ -19,7 +19,9 @@ define({
     'tests/unit/textNulls',
     'tests/unit/spans',
     'tests/unit/iontests',
+    'tests/unit/IonCatalogTest',
     'tests/unit/IonBinaryWriterTest',
+    'tests/unit/IonLocalSymbolTableTest',
     'tests/unit/IonWriteableTest',
   ],
 });

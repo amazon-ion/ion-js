@@ -14,71 +14,37 @@
 import { Catalog } from "./IonCatalog";
 import { Import } from "./IonImport";
 import { Index } from "./IonIndex";
+import { LocalSymbolTable } from "./IonLocalSymbolTable";
 import { Reader } from "./IonReader";
 import { Symbol } from "./IonSymbol";
 import { SymbolTable } from "./IonSymbolTable";
-import { UserSymbolTable } from "./IonUserSymbolTable";
 
 export const ion_symbol_table = "$ion_symbol_table";
 export const ion_symbol_table_sid = 3;
 
 class SystemSymbolTable implements SymbolTable {
-  private delegate: UserSymbolTable;
+  private symbols: string[] = [
+    "$ion",
+    "$ion_1_0",
+    "$ion_symbol_table",
+    "name",
+    "version",
+    "imports",
+    "symbols",
+    "max_id",
+    "$ion_shared_symbol_table",
+  ];
 
-  constructor(delegate: UserSymbolTable) {
-    this.delegate = delegate;
-  }
-
-  private no_change() : never {
-    throw new Error("can't change the system symbol table");
-  }
-
-  addName(name: string) : number {
-    this.no_change();
-    return undefined;
-  }
-
-  addSymbol(sym: Symbol) : number {
-    this.no_change();
-    return undefined;
-  }
-
-  getId(name: string) : number {
-    return this.delegate.getId(name);
+  getSymbols() : string[] {
+    return this.symbols;
   }
 
   getSymbol(id: number) : string {
-    return this.delegate.getSymbol(id);
-  }
-
-  getIndex() : Index {
-    return this.delegate.getIndex();
-  }
-
-  getSymbols() : Symbol[] {
-    return this.delegate.getSymbols();
+    return this.symbols[id];
   }
 }
 
-const systemSymbolTable: SystemSymbolTable = new SystemSymbolTable(
-  new UserSymbolTable(
-    "$ion",
-    1,
-    [], // no imports
-    [
-      "$ion",
-      "$ion_1_0",
-      "$ion_symbol_table",
-      "name",
-      "version",
-      "imports",
-      "symbols",
-      "max_id",
-      "$ion_shared_symbol_table",
-    ],
-    undefined
-  )
-);
+const systemSymbolTable: SystemSymbolTable = new SystemSymbolTable();
 
 export function getSystemSymbolTable() : SymbolTable {
   return systemSymbolTable;
@@ -120,15 +86,7 @@ function load_imports(sp: Reader, cat: Catalog) : Import[] {
       }
     }
     if (typeof name != 'undefined') {
-      imports.push(
-        {
-          name:    name,
-          version: version,
-          maxid:   maxid,
-          offset:  0,
-          symtab:  empty_struct,
-        } as Import
-      );
+      imports.push(new Import(name, version, maxid));
     }
     sp.stepOut(); // out of one import struct
   }
@@ -197,25 +155,6 @@ export function makeSymbolTable(catalog: Catalog, sp: Reader) : SymbolTable {
   if (typeof maxid !== 'undefined' && typeof maxid != 'number') err += "bad type for maxid, ";
   if (err !== "") throw new Error(err);
   
-  let st: SymbolTable = new UserSymbolTable(name, version, imports, symbols, maxid, overflow);
-  
-  // step through the imports and resolve the imported symbol tables and
-  // compute the _offset id and _max_id (if missing)
-  off = 0;
-  len = imports ? imports.length : 0;
-  for (ii=0; ii<len; ii++) {
-    name = imports[ii].name;
-    version = imports[ii].version;
-    imp = catalog ? catalog.getSymbolTable(name, version) : undefined;
-    if (imp) {
-      imports[ii].symtab = imp;
-      if (imports[ii].maxid === undefined) {
-        imports[ii].maxid = imp.maxid;
-      }
-    }
-    imports[ii].offset = off;
-    off += imports[ii].maxid;
-  }
- 
+  let st: SymbolTable = new LocalSymbolTable(catalog, getSystemSymbolTable(), imports, symbols);
   return st;
 }
