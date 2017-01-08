@@ -27,12 +27,12 @@ function load_imports(reader: Reader, catalog: Catalog) : Import[] {
   let imports: Import[] = [];
 
   reader.stepIn(); // into the array
-  while(reader.next()) {
+  while (reader.next()) {
     reader.stepIn(); // into the struct of 1 import
 
     let name: string;
-    let maxId: number;
     let version: number;
+    let maxId: number;
 
     while (reader.next()) {
       switch(reader.fieldName()) {
@@ -66,11 +66,13 @@ function load_imports(reader: Reader, catalog: Catalog) : Import[] {
 
 function load_symbols(reader: Reader) : string[] {
   let symbols: string[] = [];
+
   reader.stepIn();
   while (reader.next()) {
     symbols.push(reader.stringValue());
   }
   reader.stepOut();
+
   return symbols;
 }
 
