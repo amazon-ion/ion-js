@@ -80,14 +80,14 @@ define(
         if (typeof(next) === 'undefined') {
           if (reader.depth() > 0) {
             // End of container
-            console.log("Stepping out");
+            //console.log("Stepping out");
             reader.stepOut();
           } else {
             // End of data
             break;
           }
         } else if (next.container && !reader.isNull()) {
-          console.log("Stepping in");
+          //console.log("Stepping in");
           reader.stepIn();
         }
       }
@@ -109,10 +109,9 @@ define(
               var reader = ion.makeReader(span);
               console.log("Exhausting " + path);
               if (path.endsWith('clobsWithWhitespace.ion')) {
-                debugger;
+                //debugger;
               }
               exhaust(reader);
-              console.log("Exhausted!\n");
               resolve();
             } catch (e) {
               reject(e);
