@@ -23,66 +23,55 @@ export const ion_symbol_table_sid = 3;
 
 const empty_struct = {};
 
-function load_imports(sp: Reader, cat: Catalog) : Import[] {
+function load_imports(reader: Reader, catalog: Catalog) : Import[] {
   let imports: Import[] = [];
 
-  var name, version, maxid, t, ii, st;
-  sp.stepIn(); // into the array
+  reader.stepIn(); // into the array
+  while(reader.next()) {
+    reader.stepIn(); // into the struct of 1 import
 
-  for (;;) {
-    t = sp.next(); 
-    if (!t) break;
-    sp.stepIn(); // into the struct of 1 import
-    name = undefined;
-    maxid = undefined;
-    version = undefined;
-    while ((t = sp.next()) !== undefined) {
-      switch(sp.fieldName()) {
-      //case 1:  //"$ion",
-      //case 2 : //"$ion_1_0",
-      //case 3 : //"$ion_symbol_table",
-      case "name":
-        name = sp.stringValue();
-        break;
-      case "version":
-        version = sp.numberValue();
-        break;
-      // case 6 : //"imports",
-      // case 7 : //"symbols",
-      case "max_id":
-        maxid = sp.numberValue();
-      //case 9 : //"$ion_shared_symbol_table",
-      default:
-        break;
+    let name: string;
+    let maxId: number;
+    let version: number;
+
+    while (reader.next()) {
+      switch(reader.fieldName()) {
+        case "name":
+          name = reader.stringValue();
+          break;
+        case "version":
+          version = reader.numberValue();
+          break;
+        case "max_id":
+          maxId = reader.numberValue();
       }
     }
-    if (typeof name != 'undefined') {
+    if (name) {
       imports.push(
         {
           name:    name,
           version: version,
-          maxid:   maxid,
+          maxid:   maxId,
           offset:  0,
           symtab:  empty_struct,
         } as Import
       );
     }
-    sp.stepOut(); // out of one import struct
+    reader.stepOut(); // out of one import struct
   }
-  sp.stepOut(); // out of the array of imports
+  reader.stepOut(); // out of the array of imports
 
   return imports;
 }
 
-function load_symbols(sp: Reader) : string[] {
-  var syms = [], name;
-  sp.stepIn();
-  while (sp.next() !== undefined) {
-    name = sp.stringValue();
-    syms.push(name);
+function load_symbols(reader: Reader) : string[] {
+  let symbols: string[] = [];
+  reader.stepIn();
+  while (reader.next()) {
+    symbols.push(reader.stringValue());
   }
-  sp.stepOut();
-  return syms;
+  reader.stepOut();
+  return symbols;
 }
 
 export function makeSymbolTable(catalog: Catalog, sp: Reader) : SymbolTable {
