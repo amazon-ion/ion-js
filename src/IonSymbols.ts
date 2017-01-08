@@ -22,68 +22,6 @@ import { UserSymbolTable } from "./IonUserSymbolTable";
 export const ion_symbol_table = "$ion_symbol_table";
 export const ion_symbol_table_sid = 3;
 
-class SystemSymbolTable implements SymbolTable {
-  private delegate: UserSymbolTable;
-
-  constructor(delegate: UserSymbolTable) {
-    this.delegate = delegate;
-  }
-
-  private no_change() : never {
-    throw new Error("can't change the system symbol table");
-  }
-
-  addName(name: string) : number {
-    this.no_change();
-    return undefined;
-  }
-
-  addSymbol(sym: Symbol) : number {
-    this.no_change();
-    return undefined;
-  }
-
-  getId(name: string) : number {
-    return this.delegate.getId(name);
-  }
-
-  getSymbol(id: number) : string {
-    return this.delegate.getSymbol(id);
-  }
-
-  getIndex() : Index {
-    return this.delegate.getIndex();
-  }
-
-  getSymbols() : Symbol[] {
-    return this.delegate.getSymbols();
-  }
-}
-
-const systemSymbolTable: SystemSymbolTable = new SystemSymbolTable(
-  new UserSymbolTable(
-    "$ion",
-    1,
-    [], // no imports
-    [
-      "$ion",
-      "$ion_1_0",
-      "$ion_symbol_table",
-      "name",
-      "version",
-      "imports",
-      "symbols",
-      "max_id",
-      "$ion_shared_symbol_table",
-    ],
-    undefined
-  )
-);
-
-export function getSystemSymbolTable() : SymbolTable {
-  return systemSymbolTable;
-}
-
 const empty_struct = {};
 
 function load_imports(sp: Reader, cat: Catalog) : Import[] {

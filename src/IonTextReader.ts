@@ -21,7 +21,7 @@
 import { Catalog } from "./IonCatalog";
 import { Decimal } from "./IonDecimal";
 import { get_ion_type } from "./IonParserTextRaw";
-import { getSystemSymbolTable } from "./IonSymbols";
+import { getSystemSymbolTable } from "./IonSystemSymbolTable";
 import { ion_symbol_table } from "./IonSymbols";
 import { IonType } from "./IonType";
 import { IonTypes } from "./IonTypes";

@@ -20,7 +20,7 @@
 // object, such as IonValue).
 import { Catalog } from "./IonCatalog";
 import { Decimal } from "./IonDecimal";
-import { getSystemSymbolTable } from "./IonSymbols";
+import { getSystemSymbolTable } from "./IonSystemSymbolTable";
 import { ion_symbol_table_sid } from "./IonSymbols";
 import { IonType } from "./IonType";
 import { IonTypes } from "./IonTypes";
