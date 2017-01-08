@@ -11,8 +11,8 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-import { Index } from "./IonIndex";
 import { Symbol } from "./IonSymbol";
+import { SymbolIndex } from "./IonSymbolIndex";
 import { SymbolTable } from "./IonSymbolTable";
 import { UserSymbolTable } from "./IonUserSymbolTable";
 
@@ -45,7 +45,7 @@ class SystemSymbolTable implements SymbolTable {
     return this.delegate.getSymbol(id);
   }
 
-  getIndex() : Index {
+  getIndex() : SymbolIndex {
     return this.delegate.getIndex();
   }
 

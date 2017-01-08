@@ -12,8 +12,8 @@
  * language governing permissions and limitations under the License.
  */
 import { Import } from "./IonImport";
-import { Index } from "./IonIndex";
 import { Symbol } from "./IonSymbol";
+import { SymbolIndex } from "./IonSymbolIndex";
 import { SymbolTable } from "./IonSymbolTable";
 
 export class UserSymbolTable implements SymbolTable {
@@ -23,7 +23,7 @@ export class UserSymbolTable implements SymbolTable {
   private base: number;
   private imports: Import[];
   private symbols: Symbol[];
-  private _index: Index;
+  private _index: SymbolIndex;
   private _overflow: any;
 
   constructor(name: string, ver: number, imports: Import[], symbols: string[] | Symbol[], maxid?: number, overflow: any = {}) {
@@ -144,7 +144,7 @@ export class UserSymbolTable implements SymbolTable {
     return n;
   }
 
-  getIndex(): Index {
+  getIndex(): SymbolIndex {
     return this._index;
   }
 

@@ -13,7 +13,6 @@
  */
 import { Catalog } from "./IonCatalog";
 import { Import } from "./IonImport";
-import { Index } from "./IonIndex";
 import { Reader } from "./IonReader";
 import { Symbol } from "./IonSymbol";
 import { SymbolTable } from "./IonSymbolTable";
