@@ -483,21 +483,14 @@ function read_timestamp_value(span: Span, len: number) : Timestamp {
       if (span.position() >= end) break;
       
       hour = read_var_unsigned_int(span);
-      precision = Precision.HOUR;
+      precision = Precision.HOUR_AND_MINUTE;
       if (span.position() >= end) break;
       
       minutes = read_var_unsigned_int(span);
-      precision = Precision.MINUTE;
       if (span.position() >= end) break;
       
       seconds = read_decimal_value(span, end - span.position());
-      if (seconds.getExponent() >= 0) {
-        precision = Precision.SECONDS;
-        seconds = seconds.numberValue();
-      }
-      else {
-        precision = Precision.FRACTIONAL_SECONDS;
-      }
+      precision = Precision.SECONDS;
       break;
     }
   }   

@@ -17,8 +17,6 @@ export enum Precision {
   YEAR = 1,
   MONTH = 2,
   DAY = 3,
-  HOUR = 4,
-  MINUTE = 5,
-  SECONDS = 6,
-  FRACTIONAL_SECONDS = 7
+  HOUR_AND_MINUTE = 4,
+  SECONDS = 5,
 }

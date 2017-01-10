@@ -69,58 +69,43 @@ export class Timestamp {
   private static readonly S_offset_mins = 11;
   private static readonly S_zoffset     = 12;
 
-  private _year: number = 0;
-  private _month: number = 0;
-  private _day: number = 0;
-  private _hour: number = 0;
-  private _minute: number = 0;
-  private _seconds: number | Decimal = 0;
-  private _offset: number = 0;
-  private _p: Precision = Precision.NULL;
+  private precision: Precision;
+  private offset: number;
+  private year: number;
+  private month: number;
+  private day: number;
+  private hour: number;
+  private minute: number;
+  private seconds: Decimal;
 
-  constructor(precision: Precision = undefined, offset: number = undefined, year: number = undefined,
-      month: number = undefined, day: number = undefined, hour: number = undefined, minute: number = undefined,
-      seconds: number | Decimal = undefined) {
+  constructor(
+      precision: Precision = Precision.NULL,
+      offset: number = 0,
+      year: number = 0,
+      month: number = 0,
+      day: number = 0,
+      hour: number = 0,
+      minute: number = 0,
+      seconds: number | Decimal = 0
+    ) {
 
-    if (precision === undefined) {
-      // null
-      this._p = Precision.NULL;
-      return;
-    }
+    this.precision = precision;
+    this.offset = offset;
+    this.year = year;
+    this.month = month;
+    this.day = day;
+    this.hour = hour;
+    this.minute = minute;
 
-    // otherwise the values should be as named
-    if (year !== undefined) {
-      this._year = year;
-    }
-    if (month !== undefined) {
-      this._month = month;
-    }
-    if (day !== undefined) {
-      this._day = day;
-    }
-    if (hour !== undefined) {
-      this._hour = hour;
-    }
-    if (minute !== undefined) {
-      this._minute = minute;
-    }
-
-    if (typeof seconds === "number" && Math.floor(seconds) === seconds) {
+    if (typeof(seconds) == "number" && Math.floor(seconds) === seconds) {
       // we allow whole number seconds to be specified as a number
       // in which case we convert it to a decimal value
-      this._seconds = new Decimal(LongInt.fromNumber(seconds), 0);
+      this.seconds = new Decimal(LongInt.fromNumber(seconds), 0);
     } else {
-      // otherwise we use whatever is passed in and we'll check it in "is_valid"
-      this._seconds = seconds;
+      this.seconds = <Decimal>seconds;
     }
 
-    this._p = precision;
-    this._offset = offset;
-
-    if (!this._is_valid()) {
-      this._p = 0;
-      throw { msg: "invalid timestamp initialization", where: "IonTimestamp.constructor" };
-    }
+    this.checkValid();
   }
 
   private static _to_2_digits(v: number) : string {
@@ -164,7 +149,7 @@ export class Timestamp {
     month: {f: Timestamp.S_month,       p: Precision.MONTH,   len: 2, t: { "T": "off", "-": "day" } } ,
     day:   {f: Timestamp.S_day,         p: Precision.DAY,     len: 2, t: { "T": "hour" } } ,
     hour:  {f: Timestamp.S_hour,        p: -1,        len: 2, t: { ":": "min" } },
-    min:   {f: Timestamp.S_minute,      p: Precision.MINUTE,  len: 2, t: { ":": "secs", "+": "poff", "-": "moff", "Z": "zulu" } },
+    min:   {f: Timestamp.S_minute,      p: Precision.HOUR_AND_MINUTE,  len: 2, t: { ":": "secs", "+": "poff", "-": "moff", "Z": "zulu" } },
     secs:  {f: Timestamp.S_seconds,     p: Precision.SECONDS, len: 2, t: { ".": "frac", "+": "pofft", "-": "moff", "Z": "zulu" } },
     frac:  {f: Timestamp.S_frac_secs,   p: Precision.SECONDS, len: 2, t: { "+": "poff", "-": "moff", "Z": "zulu" } },
     off:   {f: Timestamp.S_offset,      p: -1,        len: 0, t: { "+": "poff", "-": "moff", "Z": "zulu" } },
@@ -213,13 +198,6 @@ export class Timestamp {
     return d;
   })();
 
-  private static is_decimal(v: any) : boolean {
-    if (typeof v === 'object' && typeof v.getExponent === 'function') {
-      return true;
-    }
-    return false;
-  }
-
   private static bad_timestamp(m: any) : never {
     if (typeof m === "number") {
       m = "invalid format for timestamp at offset" + m;
@@ -227,92 +205,83 @@ export class Timestamp {
     throw { msg: m, where: "IonValueSupport.timestamp.parse" };
   }
 
-  private _is_valid() : boolean {
-    let t = this;
-    var s;
-    if (t._p === Precision.NULL) return true; // null
-
-    if_false:for(;;) {
-      if (typeof t._offset !== "number" || t._offset < Timestamp.MIN_OFFSET || t._offset > Timestamp.MAX_OFFSET) break if_false;
-      switch (t._p) {
-      default:
-        break if_false;
-
-      case Precision.SECONDS:
-      case Precision.FRACTIONAL_SECONDS:
-        if (typeof t._seconds === 'number') {
-          s = t._seconds;
-        }
-        else if (Timestamp.is_decimal(t._seconds)) {
-          s = t._seconds.numberValue();
-        }
-        else {
-          break if_false;
-        }
-        if (s < Timestamp.MIN_SECONDS || s >= Timestamp.MAX_SECONDS) break if_false;
-        if (t._p ===  Precision.SECONDS && s !== Math.floor(s)) break if_false; // precision says no fraction, but there's fraction here
-      case Precision.MINUTE:
-        if (typeof t._minute !== "number" || t._minute < Timestamp.MIN_MINUTE || t._minute > Timestamp.MAX_MINUTE) break if_false;
-      case Precision.HOUR:
-        if (typeof t._hour !== "number" || t._hour < Timestamp.MIN_HOUR || t._hour > Timestamp.MAX_HOUR) break if_false;
-      case Precision.DAY:
-        if (typeof t._day !== "number" || t._day < Timestamp.MIN_DAY || t._day > Timestamp.MAX_DAY) break if_false;
-      case Precision.MONTH:
-        if (typeof t._month !== "number" || t._month < Timestamp.MIN_MONTH || t._month > Timestamp.MAX_MONTH) break if_false;
-      case Precision.YEAR:
-        if (typeof t._year !== "number" || t._year < Timestamp.MIN_YEAR || t._year > Timestamp.MAX_YEAR) break if_false;
-      }
-
-      if (t._p > Precision.MONTH) {
-        // check the days per month - first the general case
-        if (t._day > Timestamp.DAYS_PER_MONTH[t._month]) break if_false;
-
-        // now the special case for feb 29th and leap year
-        if (t._month === 2 && t._day === 29) {
-          if (!Timestamp.is_leapyear(t._year)) break if_false; // not a leap year and they say feb 29th, nope
-        }
-      }
-      return true;
+  private checkValid() : void {
+    if (this.precision === Precision.NULL) {
+      return;
     }
-    return false; // we end up here when we "break if_false"
+
+    if (this.offset < Timestamp.MIN_OFFSET || this.offset > Timestamp.MAX_OFFSET) {
+      throw new Error(`Offset ${this.offset} must be between ${Timestamp.MIN_OFFSET} and ${Timestamp.MAX_OFFSET} inclusive`);
+    }
+
+    switch (this.precision) {
+      default:
+        throw new Error(`Unknown precision ${this.precision}`);
+      case Precision.SECONDS:
+        let seconds: number = this.seconds.numberValue();
+        if (seconds < Timestamp.MIN_SECONDS || seconds >= Timestamp.MAX_SECONDS) {
+          throw new Error(`Seconds ${seconds} must be between ${Timestamp.MIN_SECONDS} inclusive and ${Timestamp.MAX_SECONDS} exclusive`);
+        }
+      case Precision.HOUR_AND_MINUTE:
+        if (this.minute < Timestamp.MIN_MINUTE || this.minute > Timestamp.MAX_MINUTE) {
+          throw new Error(`Minute ${this.minute} must be between ${Timestamp.MIN_MINUTE} and ${Timestamp.MAX_MINUTE} inclusive`);
+        }
+        if (this.hour < Timestamp.MIN_HOUR || this.hour > Timestamp.MAX_HOUR) {
+          throw new Error(`Hour ${this.hour} must be between ${Timestamp.MIN_HOUR} and ${Timestamp.MAX_HOUR} inclusive`);
+        }
+      case Precision.DAY:
+        if (this.day < Timestamp.MIN_DAY || this.day > Timestamp.MAX_DAY) {
+          throw new Error(`Day ${this.day} must be between ${Timestamp.MIN_DAY} and ${Timestamp.MAX_DAY} inclusive`);
+        }
+      case Precision.MONTH:
+        if (this.month < Timestamp.MIN_MONTH || this.month > Timestamp.MAX_MONTH) {
+          throw new Error(`Month ${this.month} must be between ${Timestamp.MIN_MONTH} and ${Timestamp.MAX_MONTH} inclusive`);
+        }
+      case Precision.YEAR:
+        if (this.year < Timestamp.MIN_YEAR || this.year > Timestamp.MAX_YEAR) {
+          throw new Error(`Year ${this.year} must be between ${Timestamp.MIN_YEAR} and ${Timestamp.MAX_YEAR} inclusive`);
+        }
+    }
+
+    if (this.precision > Precision.MONTH) {
+      // check the days per month - first the general case
+      if (this.day > Timestamp.DAYS_PER_MONTH[this.month]) {
+        throw new Error(`Month ${this.month} has less than ${this.day} days`);
+      }
+
+      // now the special case for feb 29th and leap year
+      if (this.month === 2 && this.day === 29) {
+        if (!Timestamp.is_leapyear(this.year)) {
+          throw new Error(`Given February 29th but year ${this.year} is not a leap year`);
+        }
+      }
+    }
   }
 
   getEpochMilliseconds() : number {
-    var n, p;
-    let t: Timestamp = this;
-    p = t._p;
-
-    switch(p) {
+    let n: number = 0;
+    switch (this.precision) {
       case Precision.NULL:
         return undefined;
-      case Precision.FRACTIONAL_SECONDS:
-        n = (<Decimal>t._seconds).getNumber(); 
-        break;
       case Precision.SECONDS:
-        n = t._seconds;
-        break;
-      default:
-        n = 0;
-        break;
-    }
-    switch(p) {
-      case Precision.FRACTIONAL_SECONDS:
-      case Precision.SECONDS:
-      case Precision.MINUTE:
-        n += t._minute * Timestamp.SECS_PER_MIN;
-      case Precision.HOUR:
-        n += t._hour * Timestamp.SECS_PER_HOUR;
+        n += this.seconds.getNumber(); 
+      case Precision.HOUR_AND_MINUTE:
+        n += this.minute * Timestamp.SECS_PER_MIN;
+        n += this.hour * Timestamp.SECS_PER_HOUR;
       case Precision.DAY:
-        n += (t._day - 1) * Timestamp.SECS_PER_DAY;
+        n += (this.day - 1) * Timestamp.SECS_PER_DAY;
       case Precision.MONTH:
-        n += Timestamp.days_to_start_of_month(t._month, t._year) * Timestamp.SECS_PER_DAY;
+        n += Timestamp.days_to_start_of_month(this.month, this.year) * Timestamp.SECS_PER_DAY;
       case Precision.YEAR:
-        n += Timestamp.days_to_start_of_year(t._year) * Timestamp.SECS_PER_DAY;
-        break;
+        n += Timestamp.days_to_start_of_year(this.year) * Timestamp.SECS_PER_DAY;
     }
-    n = n = (t._offset * 60);         // adjust back the offset to get GMT
-    n = n - Timestamp.SECONDS_AT_EPOCH_START;   // back up for the epoch
-    n = n / 1000;                     // we did say milliseconds
+
+    // adjust back the offset to get GMT
+    n -= this.offset * 60;
+    // back up for the epoch
+    n -= Timestamp.SECONDS_AT_EPOCH_START;
+    // we did say milliseconds
+    n *= 1000;
     return n;
   }
 
@@ -321,34 +290,32 @@ export class Timestamp {
     let image: string = undefined;
     let t: Timestamp = this;
 
-    switch(t._p) {
+    switch (t.precision) {
       default: throw { msg: "invalid value for timestamp precision", where: "IonValueSupport.timestamp.toString" };
       case Precision.NULL:
         return "null.timestamp";
       case Precision.SECONDS:
-      case Precision.FRACTIONAL_SECONDS:
-        image = t._seconds.toString();
-      case Precision.MINUTE:
-        image = Timestamp._to_2_digits(t._minute) + (image ? ":" + image : "");
-      case Precision.HOUR:
-        image = Timestamp._to_2_digits(t._hour) + (image ? ":" + image : "");
+        image = t.seconds.toString();
+      case Precision.HOUR_AND_MINUTE:
+        image = Timestamp._to_2_digits(t.minute) + (image ? ":" + image : "");
+        image = Timestamp._to_2_digits(t.hour) + (image ? ":" + image : "");
       case Precision.DAY:
-        image = Timestamp._to_2_digits(t._day) + (image ? "T" + image : "");
+        image = Timestamp._to_2_digits(t.day) + (image ? "T" + image : "");
       case Precision.MONTH:
-        image = Timestamp._to_2_digits(t._month) + (image ? "-" + image : "");
+        image = Timestamp._to_2_digits(t.month) + (image ? "-" + image : "");
       case Precision.YEAR:
-        if (t._p === Precision.YEAR) {
-          image = Timestamp.to_4_digits(t._year) + "T";
-        } else if (t._p === Precision.MONTH) {
-          image = Timestamp.to_4_digits(t._year) + "-" + image + "T";
+        if (t.precision === Precision.YEAR) {
+          image = Timestamp.to_4_digits(t.year) + "T";
+        } else if (t.precision === Precision.MONTH) {
+          image = Timestamp.to_4_digits(t.year) + "-" + image + "T";
         } else {
-          image = Timestamp.to_4_digits(t._year) + "-" + image;
+          image = Timestamp.to_4_digits(t.year) + "-" + image;
         }
     }
 
     // hours : minute (for offset)
-    o = t._offset;
-    if (t._p > Precision.DAY || o === undefined) {  // TODO: is this right?
+    o = t.offset;
+    if (t.precision > Precision.DAY || o === undefined) {  // TODO: is this right?
       if (o === undefined) {
         image = image + "Z";
       }
@@ -376,39 +343,39 @@ export class Timestamp {
   }
 
   isNull() : boolean {
-    return (this._p === Precision.NULL);
+    return (this.precision === Precision.NULL);
   }
 
   getZuluYear() : number {
-    return (this._p >= Precision.YEAR) ? this._year : undefined;
+    return (this.precision >= Precision.YEAR) ? this.year : undefined;
   }
 
   getZuluMonth() : number {
-    return (this._p >= Precision.MONTH) ? this._month : undefined;
+    return (this.precision >= Precision.MONTH) ? this.month : undefined;
   }
 
   getZuluDay() : number {
-    return (this._p >= Precision.DAY) ? this._day : undefined;
+    return (this.precision >= Precision.DAY) ? this.day : undefined;
   }
 
   getZuluHour() : number {
-    return (this._p >= Precision.HOUR) ? this._hour : undefined;
+    return (this.precision >= Precision.HOUR_AND_MINUTE) ? this.hour : undefined;
   }
 
   getZuluMinute() : number {
-    return (this._p >= Precision.MINUTE) ? this._minute : undefined;
+    return (this.precision >= Precision.HOUR_AND_MINUTE) ? this.minute : undefined;
   }
 
-  getZuluSeconds() : number {
-    return (this._p >= Precision.SECONDS) ? (<number>this._seconds) : undefined;
+  getZuluSeconds() : Decimal {
+    return (this.precision >= Precision.SECONDS) ? this.seconds : undefined;
   }
 
   getOffset() : number {
-    return (this._p > Precision.NULL) ? this._offset : undefined;
+    return (this.precision > Precision.NULL) ? this.offset : undefined;
   }
 
-  getPrecision() : number {
-    return this._p;
+  getPrecision() : Precision {
+    return this.precision;
   }
 
   static readonly NULL: Timestamp = new Timestamp(Precision.NULL);
