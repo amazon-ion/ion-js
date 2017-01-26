@@ -20,7 +20,7 @@ import { SharedSymbolTable } from "./IonSharedSymbolTable";
 interface SymbolTableIndex { [name: string]: SharedSymbolTable[] }
 
 function byVersion(x: SharedSymbolTable, y: SharedSymbolTable) : number {
-  return x.getVersion() - y.getVersion();
+  return x.version - y.version;
 }
 
 export class Catalog {
@@ -31,13 +31,13 @@ export class Catalog {
   }
 
   addSymbolTable(symbolTable: SharedSymbolTable) : void {
-    let versions: SharedSymbolTable[] = this.symbolTables[symbolTable.getName()];
+    let versions: SharedSymbolTable[] = this.symbolTables[symbolTable.name];
     if (isUndefined(versions)) {
       versions = [];
-      this.symbolTables[symbolTable.getName()] = versions;
+      this.symbolTables[symbolTable.name] = versions;
     }
 
-    versions[symbolTable.getVersion()] = symbolTable;
+    versions[symbolTable.version] = symbolTable;
   }
 
   findSpecificVersion(name: string, version: number) : SharedSymbolTable {

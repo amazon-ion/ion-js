@@ -36,7 +36,7 @@
       catalog.addSymbolTable(version1);
       catalog.addSymbolTable(version2);
       var match = catalog.findLatestVersion('foo');
-      assert.strictEqual(2, match.getVersion());
+      assert.strictEqual(2, match.version);
     }
 
     registerSuite(suite);

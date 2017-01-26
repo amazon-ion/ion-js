@@ -12,25 +12,21 @@
  * language governing permissions and limitations under the License.
  */
 export class SharedSymbolTable {
-  private readonly name: string;
-  private readonly version: number;
-  private readonly symbols: string[]
+  constructor(
+    private readonly _name: string,
+    private readonly _version: number,
+    private readonly _symbols: string[]
+  ) {}
 
-  constructor(name: string, version: number, symbols: string[]) {
-    this.name = name;
-    this.version = version;
-    this.symbols = symbols;
+  get name() : string {
+    return this._name;
   }
 
-  getName() : string {
-    return this.name;
+  get version() : number {
+    return this._version;
   }
 
-  getVersion() : number {
-    return this.version;
-  }
-
-  getSymbols() : string[] {
-    return this.symbols;
+  get symbols() : string[] {
+    return this._symbols;
   }
 }

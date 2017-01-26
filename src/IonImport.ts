@@ -27,9 +27,9 @@ export class Import {
     this.parent = parent;
     this.symbolTable = symbolTable;
     this.offset = (parent && (parent.getOffset() + parent.getLength())) || 1;
-    this.length = length || symbolTable.getSymbols().length;
+    this.length = length || symbolTable.symbols.length;
 
-    let symbols: string[] = symbolTable.getSymbols();
+    let symbols: string[] = symbolTable.symbols;
     for (let i: number = 0; i < this.length; i++) {
       this.index[symbols[i]] = this.offset + i;
     }
@@ -45,7 +45,7 @@ export class Import {
 
     let index: number = symbolId - this.offset;
     if (index < this.length) {
-      return this.symbolTable.getSymbols()[index];
+      return this.symbolTable.symbols[index];
     }
 
     return undefined;
