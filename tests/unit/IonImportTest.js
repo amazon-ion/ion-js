@@ -18,7 +18,7 @@
     const ion = require('dist/Ion');
 
     var suite = {
-      name: 'Binary Writer'
+      name: 'Import'
     };
 
     var bytes = function(array) {
@@ -37,6 +37,8 @@
       var childSymbolTable = new ion.SharedSymbolTable('bar', 1, ['c']);
       var childImport = new ion.Import(parentImport, childSymbolTable);
 
+      assert.equal(childImport.getSymbolId('a'), 1);
+      assert.equal(childImport.getSymbolId('b'), 2);
       assert.equal(childImport.getSymbolId('c'), 3);
     };
 
@@ -60,6 +62,31 @@
       assert.equal(child.getSymbol(5), 'b');
       assert.equal(child.getSymbol(6), 'c');
     };
+
+    suite['Short length omits symbols'] = function() {
+      var symbolTable = new ion.SharedSymbolTable('foo', 1, ['a', 'b', 'c']);
+      var parent = new ion.Import(null, symbolTable, 1);
+      var child = new ion.Import(parent, symbolTable);
+
+      assert.equal(child.getSymbol(1), 'a');
+      assert.equal(child.getSymbol(2), 'a');
+      assert.equal(child.getSymbol(3), 'b');
+      assert.equal(child.getSymbol(4), 'c');
+    }
+
+    suite['Long length pads symbols'] = function() {
+      var symbolTable = new ion.SharedSymbolTable('foo', 1, ['a', 'b', 'c']);
+      var parent = new ion.Import(null, symbolTable, 4);
+      var child = new ion.Import(parent, symbolTable);
+
+      assert.equal(child.getSymbol(1), 'a');
+      assert.equal(child.getSymbol(2), 'b');
+      assert.equal(child.getSymbol(3), 'c');
+      assert.isUndefined(child.getSymbol(4));
+      assert.equal(child.getSymbol(5), 'a');
+      assert.equal(child.getSymbol(6), 'b');
+      assert.equal(child.getSymbol(7), 'c');
+    }
 
     registerSuite(suite);
   }
