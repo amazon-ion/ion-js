@@ -176,3 +176,57 @@ export function is_base64_char(ch: number) : boolean {
 export function is_hex_digit(ch: number) : boolean {
   return _is_hex_digit[ch];
 }
+
+let BASE64: string = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+let BASE64_PADDING = "=";
+
+const TWO_BIT_MASK: number = 0x3;
+const FOUR_BIT_MASK: number = 0xF;
+const SIX_BIT_MASK: number = 0x3F;
+
+export function toBase64(value: number[]) {
+  let result: string = "";
+
+  let i: number = 0;
+  for (; i < value.length - 2; i += 3) {
+    let octet1 = value[i];
+    let octet2 = value[i + 1];
+    let octet3 = value[i + 2];
+
+    let index1 = (octet1 >>> 2) & SIX_BIT_MASK;
+    let index2 = ((octet1 & TWO_BIT_MASK) << 4) | ((octet2 >>> 4) & FOUR_BIT_MASK);
+    let index3 = ((octet2 & FOUR_BIT_MASK) << 2) | ((octet3 >>> 6) & TWO_BIT_MASK);
+    let index4 = octet3 & SIX_BIT_MASK;
+
+    result += BASE64[index1];
+    result += BASE64[index2];
+    result += BASE64[index3];
+    result += BASE64[index4];
+  }
+
+  if ((value.length - i) === 2) {
+    let octet1 = value[i];
+    let octet2 = value[i + 1];
+
+    let index1 = (octet1 >>> 2) & SIX_BIT_MASK;
+    let index2 = ((octet1 & TWO_BIT_MASK) << 4) | ((octet2 >>> 4) & FOUR_BIT_MASK);
+    let index3 = (octet2 & FOUR_BIT_MASK) << 2;
+
+    result += BASE64[index1];
+    result += BASE64[index2];
+    result += BASE64[index3];
+    result += BASE64_PADDING;
+  } else if ((value.length - i) === 1) {
+    let octet1 = value[i];
+
+    let index1 = (octet1 >>> 2) & SIX_BIT_MASK;
+    let index2 = (octet1 & TWO_BIT_MASK) << 4;
+
+    result += BASE64[index1]
+    result += BASE64[index2]
+    result += BASE64_PADDING;
+    result += BASE64_PADDING;
+  }
+
+  return result;
+}

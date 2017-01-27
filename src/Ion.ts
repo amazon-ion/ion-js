@@ -69,5 +69,6 @@ export { NullNode } from "./IonBinaryWriter";
 export { Precision } from "./IonPrecision";
 export { SharedSymbolTable } from "./IonSharedSymbolTable";
 export { Timestamp } from "./IonTimestamp";
+export { toBase64 } from "./IonText";
 export { TypeCodes } from "./IonBinary";
 export { Writeable } from "./IonWriteable";
