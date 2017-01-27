@@ -69,7 +69,7 @@ export class LocalSymbolTable  {
     return this._symbols;
   }
 
-  getImport() : Import {
-    return this.import_;
+  get import() : Import {
+    return this._import;
   }
 }
