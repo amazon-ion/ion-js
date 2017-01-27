@@ -420,8 +420,8 @@ export class BinaryWriter implements Writer {
   }
 
   private writeSymbolTable() {
-    let hasImports: boolean = this.symbolTable.getImport().getSymbolTable().getName() != "$ion";
-    let hasLocalSymbols = this.symbolTable.getSymbols().length > 0;
+    let hasImports: boolean = this.symbolTable.import.symbolTable.name != "$ion";
+    let hasLocalSymbols = this.symbolTable.symbols.length > 0;
     if (!(hasImports || hasLocalSymbols)) {
       return;
     }
@@ -430,13 +430,13 @@ export class BinaryWriter implements Writer {
     if (hasImports) {
       this.writeFieldName('imports');
       this.writeList();
-      this.writeImport(this.symbolTable.getImport());
+      this.writeImport(this.symbolTable.import);
       this.endContainer();
     }
     if (hasLocalSymbols) {
       this.writeFieldName('symbols');
       this.writeList();
-      for (let symbol_ of this.symbolTable.getSymbols()) {
+      for (let symbol_ of this.symbolTable.symbols) {
         if (!isUndefined(symbol_)) {
           this.writeString(symbol_);
         }
@@ -451,14 +451,14 @@ export class BinaryWriter implements Writer {
     if (!import_) {
       return;
     }
-    this.writeImport(import_.getParent());
+    this.writeImport(import_.parent);
     this.writeStruct();
     this.writeFieldName('name');
-    this.writeString(import_.getSymbolTable().getName());
+    this.writeString(import_.symbolTable.name);
     this.writeFieldName('version');
-    this.writeInt(import_.getSymbolTable().getVersion());
+    this.writeInt(import_.symbolTable.version);
     this.writeFieldName('max_id');
-    this.writeInt(import_.getLength());
+    this.writeInt(import_.length);
     this.endContainer();
   }
 }
@@ -471,17 +471,12 @@ interface Node {
 }
 
 abstract class AbstractNode implements Node {
-  private readonly writer: LowLevelBinaryWriter;
-  private readonly parent: Node;
-  private readonly typeCode: TypeCodes;
-  private readonly annotations: number[];
-
-  constructor(writer: LowLevelBinaryWriter, parent: Node, typeCode: TypeCodes, annotations: number[]) {
-    this.writer = writer;
-    this.parent = parent;
-    this.typeCode = typeCode;
-    this.annotations = annotations || [];
-  }
+  constructor(
+    private readonly _writer: LowLevelBinaryWriter,
+    private readonly parent: Node,
+    private readonly _typeCode: TypeCodes,
+    private readonly annotations: number[] = []
+  ) {}
 
   private hasAnnotations() {
     return this.annotations.length > 0;
@@ -558,12 +553,12 @@ abstract class AbstractNode implements Node {
     this.writer.writeBytes(this.annotations);
   }
 
-  getTypeCode() : number {
-    return this.typeCode;
+  get typeCode() : number {
+    return this._typeCode;
   }
 
-  getWriter() : LowLevelBinaryWriter {
-    return this.writer;
+  get writer() : LowLevelBinaryWriter {
+    return this._writer;
   }
 
   abstract isContainer() : boolean;
@@ -597,7 +592,7 @@ class SequenceNode extends ContainerNode {
 
   write() : void {
     this.writeAnnotations();
-    this.writeTypeDescriptorAndLength(this.getTypeCode(), false, this.getValueLength());
+    this.writeTypeDescriptorAndLength(this.typeCode, false, this.getValueLength());
     for (let child of this.children) {
       child.write();
     }
@@ -657,9 +652,9 @@ class StructNode extends ContainerNode {
 
   write() : void {
     this.writeAnnotations();
-    this.writeTypeDescriptorAndLength(this.getTypeCode(), false, this.getValueLength());
+    this.writeTypeDescriptorAndLength(this.typeCode, false, this.getValueLength());
     for (let field of this.fields) {
-      this.getWriter().writeBytes(field.name);
+      this.writer.writeBytes(field.name);
       field.value.write();
     }
   }
@@ -676,16 +671,13 @@ abstract class LeafNode extends AbstractNode {
 }
 
 class BooleanNode extends LeafNode {
-  private readonly value: boolean;
-
-  constructor(writer: LowLevelBinaryWriter, parent: Node, annotations: number[], value: boolean) {
+  constructor(writer: LowLevelBinaryWriter, parent: Node, annotations: number[], private readonly value: boolean) {
     super(writer, parent, TypeCodes.BOOL, annotations);
-    this.value = value;
   }
 
   write() : void {
     this.writeAnnotations();
-    this.writeTypeDescriptorAndLength(this.getTypeCode(), false, this.value ? 1 : 0);
+    this.writeTypeDescriptorAndLength(this.typeCode, false, this.value ? 1 : 0);
   }
 
   getValueLength() : number {
@@ -694,17 +686,14 @@ class BooleanNode extends LeafNode {
 }
 
 class BytesNode extends LeafNode {
-  private readonly value: number[];
-
-  constructor(writer: LowLevelBinaryWriter, parent: Node, typeCode: TypeCodes, annotations: number[], value: number[]) {
+  constructor(writer: LowLevelBinaryWriter, parent: Node, typeCode: TypeCodes, annotations: number[], private readonly value: number[]) {
     super(writer, parent, typeCode, annotations);
-    this.value = value;
   }
 
   write() : void {
     this.writeAnnotations();
-    this.writeTypeDescriptorAndLength(this.getTypeCode(), false, this.value.length);
-    this.getWriter().writeBytes(this.value);
+    this.writeTypeDescriptorAndLength(this.typeCode, false, this.value.length);
+    this.writer.writeBytes(this.value);
   }
 
   getValueLength() : number {
@@ -719,7 +708,7 @@ export class NullNode extends LeafNode {
 
   write() : void {
     this.writeAnnotations();
-    this.writeTypeDescriptorAndLength(this.getTypeCode(), true, 0);
+    this.writeTypeDescriptorAndLength(this.typeCode, true, 0);
   }
 
   getValueLength() : number {
