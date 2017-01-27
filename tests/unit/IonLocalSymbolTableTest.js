@@ -140,15 +140,15 @@
 
     suite['Duplicate symbols are not added'] = function() {
       var symbolTable = ion.defaultLocalSymbolTable();
-      var originalLength = symbolTable.getSymbols().length;
+      var originalLength = symbolTable.symbols.length;
 
       var symbol_ = "foo";
       var originalId = symbolTable.addSymbol(symbol_);
-      assert.equal(originalLength + 1, symbolTable.getSymbols().length, "Original symbol was not added to symbol table");
+      assert.equal(originalLength + 1, symbolTable.symbols.length, "Original symbol was not added to symbol table");
 
       var duplicateId = symbolTable.addSymbol(symbol_);
       assert.equal(originalId, duplicateId, "Duplicate symbol was not given original id");
-      assert.equal(originalLength + 1, symbolTable.getSymbols().length, "Duplicate symbol added to symbol table");
+      assert.equal(originalLength + 1, symbolTable.symbols.length, "Duplicate symbol added to symbol table");
     };
 
     registerSuite(suite);

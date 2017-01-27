@@ -18,7 +18,7 @@ import { SymbolIndex } from "./IonSymbolIndex";
 
 export class Import {
   private readonly _offset: number;
-  private readonly length: number;
+  private readonly _length: number;
   private readonly index: SymbolIndex = {};
 
   constructor(
@@ -26,11 +26,11 @@ export class Import {
     private readonly symbolTable: SharedSymbolTable,
     length?: number
   ) {
-    this._offset = (parent && (parent.offset + parent.getLength())) || 1;
-    this.length = length || symbolTable.symbols.length;
+    this._offset = (parent && (parent.offset + parent.length)) || 1;
+    this._length = length || symbolTable.symbols.length;
 
     let symbols: string[] = symbolTable.symbols;
-    for (let i: number = 0; i < this.length; i++) {
+    for (let i: number = 0; i < this._length; i++) {
       this.index[symbols[i]] = this._offset + i;
     }
   }
@@ -60,7 +60,7 @@ export class Import {
     return this._offset;
   }
 
-  getLength() : number {
-    return this.length;
+  get length() : number {
+    return this._length;
   }
 }

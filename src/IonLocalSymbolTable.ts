@@ -22,14 +22,12 @@ export function defaultLocalSymbolTable() : LocalSymbolTable {
 }
 
 export class LocalSymbolTable  {
-  private import_: Import;
   private offset: number;
-  private symbols: string[] = [];
+  private _symbols: string[] = [];
   private index: SymbolIndex = {};
 
-  constructor(import_: Import = getSystemSymbolTableImport(), symbols: string[] = []) {
-    this.import_ = import_;
-    this.offset = import_.offset + import_.getLength();
+  constructor(private _import: Import = getSystemSymbolTableImport(), symbols: string[] = []) {
+    this.offset = _import.offset + _import.length;
 
     for (let symbol_ of symbols) {
       this.addSymbol(symbol_);
@@ -37,7 +35,7 @@ export class LocalSymbolTable  {
   }
 
   getSymbolId(symbol_: string) : number {
-    return this.import_.getSymbolId(symbol_)
+    return this._import.getSymbolId(symbol_)
       || this.index[symbol_];
   }
 
@@ -54,7 +52,7 @@ export class LocalSymbolTable  {
   }
 
   getSymbol(symbolId: number): string {
-    let importedSymbol: string = this.import_.getSymbol(symbolId);
+    let importedSymbol: string = this._import.getSymbol(symbolId);
     if (!isUndefined(importedSymbol)) {
       return importedSymbol;
     }
@@ -67,7 +65,7 @@ export class LocalSymbolTable  {
     return undefined;
   }
 
-  getSymbols() : string[] {
-    return this.symbols;
+  get symbols() : string[] {
+    return this._symbols;
   }
 }
