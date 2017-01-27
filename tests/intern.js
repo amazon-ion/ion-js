@@ -24,6 +24,7 @@ define({
     'tests/unit/IonLocalSymbolTableTest',
     'tests/unit/IonDecimalTest',
     'tests/unit/IonWriteableTest',
+    'tests/unit/IonTextTest',
     'tests/unit/IonUnicodeTest',
     'tests/unit/IonLowLevelBinaryWriterTest',
     'tests/unit/IonBinaryWriterTest',
