@@ -43,6 +43,7 @@
     suite['Imports system symbol table by default'] = function() {
       var symbolTable = ion.defaultLocalSymbolTable();
       assertSystemSymbols(symbolTable);
+      assert.isUndefined(symbolTable.getSymbol(10));
     }
 
     suite['Imports are added in order'] = function() {
@@ -78,9 +79,10 @@
       assert.equal(symbolTable.getSymbolId('d'), 13);
       assert.equal(symbolTable.getSymbolId('e'), 14);
       assert.equal(symbolTable.getSymbolId('f'), 15);
+      assert.isUndefined(symbolTable.getSymbol(16));
     }
 
-    suite['Maxid restricts imports'] = function() {
+    suite['Maxid less than symbol table length restricts imports'] = function() {
       var catalog = defaultCatalog();
 
       var import1 = new ion.Import(ion.getSystemSymbolTableImport(), catalog.findSpecificVersion('foo', 1), 1);
@@ -98,6 +100,28 @@
       assert.isUndefined(symbolTable.getSymbolId('d'));
       assert.equal(symbolTable.getSymbolId('e'), 12);
       assert.equal(symbolTable.getSymbolId('f'), 13);
+    }
+
+    suite['Maxid greater than symbol table length extends imports'] = function() {
+      var catalog = defaultCatalog();
+
+      var import1 = new ion.Import(ion.getSystemSymbolTableImport(), catalog.findSpecificVersion('foo', 1), 3);
+      var import2 = new ion.Import(import1, catalog.findSpecificVersion('bar', 1), 3);
+
+      var symbolTable = new ion.LocalSymbolTable(import2, ['e', 'f']);
+
+      assert.isDefined(symbolTable.getSymbol(17));
+      assert.isUndefined(symbolTable.getSymbol(18));
+
+      assertSystemSymbols(symbolTable);
+      assert.equal(symbolTable.getSymbolId('a'), 10);
+      assert.equal(symbolTable.getSymbolId('b'), 11);
+      assert.isUndefined(symbolTable.getSymbol(12));
+      assert.equal(symbolTable.getSymbolId('c'), 13);
+      assert.equal(symbolTable.getSymbolId('d'), 14);
+      assert.isUndefined(symbolTable.getSymbol(15));
+      assert.equal(symbolTable.getSymbolId('e'), 16);
+      assert.equal(symbolTable.getSymbolId('f'), 17);
     }
 
     suite['addSymbol'] = function() {
