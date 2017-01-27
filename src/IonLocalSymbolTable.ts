@@ -29,7 +29,7 @@ export class LocalSymbolTable  {
 
   constructor(import_: Import = getSystemSymbolTableImport(), symbols: string[] = []) {
     this.import_ = import_;
-    this.offset = import_.getOffset() + import_.getLength();
+    this.offset = import_.offset + import_.getLength();
 
     for (let symbol_ of symbols) {
       this.addSymbol(symbol_);

@@ -17,21 +17,21 @@ import { SharedSymbolTable } from "./IonSharedSymbolTable";
 import { SymbolIndex } from "./IonSymbolIndex";
 
 export class Import {
-  private readonly parent: Import;
-  private readonly symbolTable: SharedSymbolTable;
-  private readonly offset: number;
+  private readonly _offset: number;
   private readonly length: number;
   private readonly index: SymbolIndex = {};
 
-  constructor(parent: Import, symbolTable: SharedSymbolTable, length?: number) {
-    this.parent = parent;
-    this.symbolTable = symbolTable;
-    this.offset = (parent && (parent.getOffset() + parent.getLength())) || 1;
+  constructor(
+    private readonly parent: Import,
+    private readonly symbolTable: SharedSymbolTable,
+    length?: number
+  ) {
+    this._offset = (parent && (parent.offset + parent.getLength())) || 1;
     this.length = length || symbolTable.symbols.length;
 
     let symbols: string[] = symbolTable.symbols;
     for (let i: number = 0; i < this.length; i++) {
-      this.index[symbols[i]] = this.offset + i;
+      this.index[symbols[i]] = this._offset + i;
     }
   }
 
@@ -56,8 +56,8 @@ export class Import {
       || this.index[symbol_];
   }
 
-  getOffset() : number {
-    return this.offset;
+  get offset() : number {
+    return this._offset;
   }
 
   getLength() : number {
