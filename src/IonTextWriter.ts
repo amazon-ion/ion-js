@@ -74,7 +74,16 @@ export class TextWriter implements Writer {
     this.writeUtf8('}}');
   }
 
-  writeDecimal(value: Decimal, annotations?: string[]) : void {}
+  writeDecimal(value: Decimal, annotations?: string[]) : void {
+    if (isNullOrUndefined(value)) {
+      this.writeNull(TypeCodes.DECIMAL, annotations);
+      return;
+    }
+
+    this.writeAnnotations(annotations);
+    this.writeUtf8(value.toString());
+  }
+
   writeFieldName(fieldName: string) : void {}
   writeFloat32(value: number, annotations?: string[]) : void {}
   writeFloat64(value: number, annotations?: string[]) : void {}
