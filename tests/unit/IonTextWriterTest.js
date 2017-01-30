@@ -32,6 +32,18 @@
       }
     }
 
+    var badWriterTest = function(name, instructions) {
+      var test = function() {
+        var writeable = new ion.Writeable();
+        var writer = new ion.TextWriter(writeable);
+        instructions(writer);
+        writer.close();
+      };
+      suite[name] = function() {
+        assert.throws(test, Error);
+      }
+    }
+
     // Blobs
 
     writerTest('Writes blob',
@@ -94,6 +106,8 @@
     writerTest('Writes clob escapes',
       writer => writer.writeClob([0x00, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x22, 0x27, 0x2f, 0x3f, 0x5c]),
       '{{"\\0\\a\\b\\t\\n\\v\\f\\r\\"\\\'\\/\\?\\\\"}}');
+    badWriterTest('Rejects clob with non-ASCII character',
+      writer => writer.writeClob([128]));
 
     registerSuite(suite);
   }
