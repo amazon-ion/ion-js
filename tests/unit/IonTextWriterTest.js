@@ -119,7 +119,20 @@
 
     decimalTest('Writes positive decimal', '123.456', '123.456');
     decimalTest('Writes negative decimal', '-123.456', '-123.456');
+    decimalTest('Writes integer decimal', '123456', '123456');
     decimalTest('Mantissa-only decimal has leading zero', '123456d-6', '0.123456');
+    writerTest('Writes null decimal using null',
+      writer => writer.writeDecimal(null),
+      'null.decimal');
+    writerTest('Writes null decimal using undefined',
+      writer => writer.writeDecimal(),
+      'null.decimal');
+    writerTest('Writes null decimal using type',
+      writer => writer.writeNull(ion.TypeCodes.DECIMAL),
+      'null.decimal');
+    writerTest('Writes decimal with annotations',
+      writer => writer.writeDecimal(ion.Decimal.parse('123.456'), ['foo', 'bar']),
+      'foo::bar::123.456');
 
     registerSuite(suite);
   }
