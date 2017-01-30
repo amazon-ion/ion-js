@@ -48,6 +48,7 @@ const _is_letter_or_digit = _make_bool_array("_$0123456789abcdefghijklmnopqrstuv
 const _is_numeric_terminator: boolean[] = _make_bool_array("{}[](),\"\'\ \t\n\r\u000c");
 const _is_operator_char = _make_bool_array("!#%&*+-./;<=>?@^`|~");
 const _is_whitespace = _make_bool_array(" \t\r\n\u000b\u000c");
+const isIdentifierArray: boolean[] = _make_bool_array("_$0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ");
 
 export function is_digit(ch: number) : boolean {
   if (ch < 48 || ch > 57) return false;
@@ -229,4 +230,61 @@ export function toBase64(value: number[]) {
   }
 
   return result;
+}
+
+export enum CharCodes {
+  NULL = 0x00,
+  BELL = 0x07,
+  BACKSPACE = 0x08,
+  HORIZONTAL_TAB = 0x09,
+  LINE_FEED = 0x0a,
+  VERTICAL_TAB = 0x0b,
+  FORM_FEED = 0x0c,
+  CARRIAGE_RETURN = 0x0d,
+  DOUBLE_QUOTE = 0x22,
+  SINGLE_QUOTE = 0x27,
+  FORWARD_SLASH = 0x2f,
+  QUESTION_MARK = 0x3f,
+  BACKSLASH = 0x5c,
+}
+
+interface EscapeIndex {
+  [index: number]: number[];
+}
+
+function makeEscapeFromString(s: string) : number[] {
+  return [CharCodes.BACKSLASH, s.charCodeAt(0)];
+}
+
+function makeEscapeFromCharCode(c: number) : number[] {
+  return [CharCodes.BACKSLASH, c];
+}
+
+export let ClobEscapes : EscapeIndex = {};
+ClobEscapes[CharCodes.NULL] = makeEscapeFromString("0");
+ClobEscapes[CharCodes.BELL] = makeEscapeFromString("t");
+ClobEscapes[CharCodes.BACKSPACE] = makeEscapeFromString("b");
+ClobEscapes[CharCodes.HORIZONTAL_TAB] = makeEscapeFromString("t");
+ClobEscapes[CharCodes.LINE_FEED] = makeEscapeFromString("n");
+ClobEscapes[CharCodes.FORM_FEED] = makeEscapeFromString("f");
+ClobEscapes[CharCodes.CARRIAGE_RETURN] = makeEscapeFromString("r");
+ClobEscapes[CharCodes.VERTICAL_TAB] = makeEscapeFromString("v");
+ClobEscapes[CharCodes.DOUBLE_QUOTE] = makeEscapeFromString('"');
+ClobEscapes[CharCodes.SINGLE_QUOTE] = makeEscapeFromString("'");
+ClobEscapes[CharCodes.QUESTION_MARK] = makeEscapeFromString("?");
+ClobEscapes[CharCodes.BACKSLASH] = makeEscapeFromString("\\");
+ClobEscapes[CharCodes.FORWARD_SLASH] = makeEscapeFromString("/");
+
+export function isIdentifier(s: string) : boolean {
+  if (is_digit(s.charCodeAt(0))) {
+    return false;
+  }
+  for (let i: number = 0; i < s.length; i++) {
+    let c: number = s.charCodeAt(i);
+    let b: boolean = isIdentifierArray[c];
+    if (!b) {
+      return false;
+    }
+  }
+  return true;
 }
