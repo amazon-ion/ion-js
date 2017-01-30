@@ -109,6 +109,18 @@
     badWriterTest('Rejects clob with non-ASCII character',
       writer => writer.writeClob([128]));
 
+    // Decimals
+
+    var decimalTest = function(name, decimalString, expected) {
+      writerTest(name,
+        writer => writer.writeDecimal(ion.Decimal.parse(decimalString)),
+        expected);
+    }
+
+    decimalTest('Writes positive decimal', '123.456', '123.456');
+    decimalTest('Writes negative decimal', '-123.456', '-123.456');
+    decimalTest('Mantissa-only decimal has leading zero', '123456d-6', '0.123456');
+
     registerSuite(suite);
   }
 );
