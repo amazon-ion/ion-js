@@ -262,18 +262,18 @@ function makeEscapeFromCharCode(c: number) : number[] {
 
 export let ClobEscapes : EscapeIndex = {};
 ClobEscapes[CharCodes.NULL] = makeEscapeFromString("0");
-ClobEscapes[CharCodes.BELL] = makeEscapeFromString("t");
+ClobEscapes[CharCodes.BELL] = makeEscapeFromString("a");
 ClobEscapes[CharCodes.BACKSPACE] = makeEscapeFromString("b");
 ClobEscapes[CharCodes.HORIZONTAL_TAB] = makeEscapeFromString("t");
 ClobEscapes[CharCodes.LINE_FEED] = makeEscapeFromString("n");
+ClobEscapes[CharCodes.VERTICAL_TAB] = makeEscapeFromString("v");
 ClobEscapes[CharCodes.FORM_FEED] = makeEscapeFromString("f");
 ClobEscapes[CharCodes.CARRIAGE_RETURN] = makeEscapeFromString("r");
-ClobEscapes[CharCodes.VERTICAL_TAB] = makeEscapeFromString("v");
 ClobEscapes[CharCodes.DOUBLE_QUOTE] = makeEscapeFromString('"');
 ClobEscapes[CharCodes.SINGLE_QUOTE] = makeEscapeFromString("'");
+ClobEscapes[CharCodes.FORWARD_SLASH] = makeEscapeFromString("/");
 ClobEscapes[CharCodes.QUESTION_MARK] = makeEscapeFromString("?");
 ClobEscapes[CharCodes.BACKSLASH] = makeEscapeFromString("\\");
-ClobEscapes[CharCodes.FORWARD_SLASH] = makeEscapeFromString("/");
 
 export function isIdentifier(s: string) : boolean {
   if (is_digit(s.charCodeAt(0))) {

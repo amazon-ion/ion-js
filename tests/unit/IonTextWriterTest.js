@@ -91,6 +91,9 @@
     writerTest('Writes clob with annotations',
       writer => writer.writeClob(['A'.charCodeAt(0)], ['baz', 'qux']),
       'baz::qux::{{"A"}}');
+    writerTest('Writes clob escapes',
+      writer => writer.writeClob([0x00, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x22, 0x27, 0x2f, 0x3f, 0x5c]),
+      '{{"\\0\\a\\b\\t\\n\\v\\f\\r\\"\\\'\\/\\?\\\\"}}');
 
     registerSuite(suite);
   }
