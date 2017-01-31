@@ -171,6 +171,7 @@
       'null.int');
 
     // Lists
+
     writerTest('Writes empty list',
       writer => writer.writeList(),
       '[]');
@@ -194,7 +195,17 @@
       },
       '[foo,bar,[baz,qux]]');
 
-    // Datagram
+    // Nulls
+
+    writerTest('Writes null',
+      writer => writer.writeNull(ion.TypeCodes.NULL),
+      'null.null');
+    writerTest('Writes null with annotations',
+      writer => writer.writeNull(ion.TypeCodes.NULL, ['foo', 'bar']),
+      'foo::bar::null.null');
+
+    // Datagrams
+
     writerTest('Writes two top-level symbols',
       writer => { writer.writeSymbol('a'); writer.writeSymbol('b') },
       'a\nb');
