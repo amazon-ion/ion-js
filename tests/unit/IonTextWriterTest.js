@@ -134,6 +134,77 @@
       writer => writer.writeDecimal(ion.Decimal.parse('123.456'), ['foo', 'bar']),
       'foo::bar::123.456');
 
+    // Floats
+
+    writerTest('Writes 32-bit float',
+      writer => writer.writeFloat32(8.125),
+      '8.125');
+    writerTest('Writes null 32-bit float using null',
+      writer => writer.writeFloat32(null),
+      'null.float');
+    writerTest('Writes null 32-bit float using undefined',
+      writer => writer.writeFloat32(),
+      'null.float');
+    writerTest('Writes 32-bit float with annotations',
+      writer => writer.writeFloat32(8.125, ['foo', 'bar']),
+      'foo::bar::8.125');
+    writerTest('Writes negative 32-bit float',
+      writer => writer.writeFloat32(-8.125),
+      '-8.125');
+
+    // Ints
+
+    writerTest('Writes positive int',
+      writer => writer.writeInt(123456),
+      '123456');
+    writerTest('Writes negative int',
+      writer => writer.writeInt(-123456),
+      '-123456');
+    writerTest('Writes null int using null',
+      writer => writer.writeInt(null),
+      'null.int');
+    writerTest('Writes null int using undefined',
+      writer => writer.writeInt(),
+      'null.int');
+    writerTest('Writes null using type',
+      writer => writer.writeNull(ion.TypeCodes.POSITIVE_INT),
+      'null.int');
+
+    // Lists
+    writerTest('Writes empty list',
+      writer => writer.writeList(),
+      '[]');
+    writerTest('Writes empty list with annotations',
+      writer => writer.writeList(['foo', 'bar']),
+      'foo::bar::[]');
+    writerTest('Writes nested empty lists',
+      writer => { writer.writeList(); writer.writeList(); writer.writeList() },
+      '[[[]]]');
+    writerTest('Writes list with multiple values',
+      writer => { writer.writeList(); writer.writeSymbol('$'); writer.writeSymbol('%') },
+      "[$,'%']");
+    writerTest('Writes nested lists with multiple values',
+      writer => {
+        writer.writeList();
+        writer.writeSymbol('foo');
+        writer.writeSymbol('bar');
+        writer.writeList();
+        writer.writeSymbol('baz');
+        writer.writeSymbol('qux');
+      },
+      '[foo,bar,[baz,qux]]');
+
+    // Datagram
+    writerTest('Writes two top-level symbols',
+      writer => { writer.writeSymbol('a'); writer.writeSymbol('b') },
+      'a\nb');
+    writerTest('Writes two top-level lists',
+      writer => { writer.writeList(); writer.endContainer(); writer.writeList() },
+      '[]\n[]');
+    writerTest('Writes two top-level lists with annotations',
+      writer => { writer.writeList(['foo']); writer.endContainer(); writer.writeList(['bar']) },
+      'foo::[]\nbar::[]');
+
     registerSuite(suite);
   }
 );
