@@ -246,6 +246,14 @@ export enum CharCodes {
   FORWARD_SLASH = 0x2f,
   QUESTION_MARK = 0x3f,
   BACKSLASH = 0x5c,
+  LEFT_PARENTHESIS = '('.charCodeAt(0),
+  RIGHT_PARENTHESIS = ')'.charCodeAt(0),
+  LEFT_BRACE = '{'.charCodeAt(0),
+  RIGHT_BRACE = '}'.charCodeAt(0),
+  LEFT_BRACKET = '['.charCodeAt(0),
+  RIGHT_BRACKET = ']'.charCodeAt(0),
+  COMMA = ','.charCodeAt(0),
+  SPACE = ' '.charCodeAt(0),
 }
 
 interface EscapeIndex {
