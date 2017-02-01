@@ -299,3 +299,14 @@ export function isIdentifier(s: string) : boolean {
   }
   return true;
 }
+
+export function isOperator(s: string) : boolean {
+  for (let i: number = 0; i < s.length; i++) {
+    let c: number = s.charCodeAt(i);
+    let b: boolean = _is_operator_char[c];
+    if (!b) {
+      return false;
+    }
+  }
+  return true;
+}

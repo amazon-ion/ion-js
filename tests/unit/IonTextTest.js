@@ -43,6 +43,33 @@
     base64Test("ManMa", "TWFuTWE=");
     base64Test("ManMan", "TWFuTWFu");
 
+    var isIdentifierTest = function(value, expected) {
+      var suiteName = value + ' ' + (expected ? 'is' : 'is not') + ' an identifier';
+      suite[suiteName] = function() {
+        assert.equal(ion.isIdentifier(value), expected);
+      }
+    }
+
+    isIdentifierTest('$', true);
+    isIdentifierTest('0$', false);
+    isIdentifierTest('abc123', true);
+    isIdentifierTest('_', true);
+    isIdentifierTest('{}', false);
+
+    var isOperatorTest = function(value, expected) {
+      var suiteName = value + ' ' + (expected ? 'is' : 'is not') + ' an operator';
+      suite[suiteName] = function() {
+        assert.equal(ion.isOperator(value), expected);
+      }
+    }
+
+    isOperatorTest('!', true);
+    isOperatorTest('!!', true);
+    isOperatorTest('a', false);
+    isOperatorTest('a!', false);
+    isOperatorTest('!a', false);
+    isOperatorTest('<=>', true);
+
     registerSuite(suite);
   }
 );

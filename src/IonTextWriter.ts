@@ -17,6 +17,7 @@ import { Decimal } from "./IonDecimal";
 import { encodeUtf8 } from "./IonUnicode";
 import { isIdentifier } from "./IonText";
 import { isNullOrUndefined } from "./IonUtilities";
+import { isOperator } from "./IonText";
 import { isUndefined } from "./IonUtilities";
 import { last } from "./IonUtilities";
 import { Timestamp } from "./IonTimestamp";
@@ -96,15 +97,7 @@ export class TextWriter implements Writer {
   }
 
   writeList(annotations?: string[], isNull?: boolean) : void {
-    if (isNull) {
-      this.writeNull(TypeCodes.LIST, annotations);
-      return;
-    }
-
-    this.handleSeparator();
-    this.writeAnnotations(annotations);
-    this.writeable.writeByte(CharCodes.LEFT_BRACKET);
-    this.stepIn(TypeCodes.LIST);
+    this.writeContainer(TypeCodes.LIST, CharCodes.LEFT_BRACKET, annotations, isNull);
   }
 
   writeNull(type_: TypeCodes, annotations?: string[]) : void {
@@ -158,7 +151,10 @@ export class TextWriter implements Writer {
     this.writeUtf8("null." + s);
   }
 
-  writeSexp(annotations?: string[], isNull?: boolean) : void {}
+  writeSexp(annotations?: string[], isNull?: boolean) : void {
+    this.writeContainer(TypeCodes.SEXP, CharCodes.LEFT_PARENTHESIS, annotations, isNull);
+  }
+
   writeString(value: string, annotations?: string[]) : void {}
   writeStruct(annotations?: string[], isNull?: boolean) : void {}
 
@@ -202,6 +198,18 @@ export class TextWriter implements Writer {
     this.handleSeparator();
     this.writeAnnotations(annotations);
     serialize(value);
+  }
+
+  private writeContainer(typeCode: TypeCodes, openingCharacter: number, annotations?: string[], isNull?: boolean) : void {
+    if (isNull) {
+      this.writeNull(typeCode, annotations);
+      return;
+    }
+
+    this.handleSeparator();
+    this.writeAnnotations(annotations);
+    this.writeable.writeByte(openingCharacter);
+    this.stepIn(typeCode);
   }
 
   private handleSeparator() : void {
@@ -260,6 +268,8 @@ export class TextWriter implements Writer {
 
   private writeSymbolToken(s: string) : void {
     if (isIdentifier(s)) {
+      this.writeUtf8(s);
+    } else if ((!this.isTopLevel) && (this.currentContainer === TypeCodes.SEXP) && isOperator(s)) {
       this.writeUtf8(s);
     } else {
       this.writeable.writeByte(CharCodes.SINGLE_QUOTE);
