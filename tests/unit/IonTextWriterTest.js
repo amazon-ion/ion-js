@@ -204,6 +204,34 @@
       writer => writer.writeNull(ion.TypeCodes.NULL, ['foo', 'bar']),
       'foo::bar::null.null');
 
+    // S-Expressions
+
+    writerTest('Writes empty sexp',
+      writer => writer.writeSexp(),
+      '()');
+    writerTest('Writes null sexp',
+      writer => writer.writeNull(ion.TypeCodes.SEXP),
+      'null.sexp');
+    writerTest('Writes empty sexp with annotations',
+      writer => writer.writeSexp(['foo', 'bar']),
+      'foo::bar::()');
+    writerTest('Writes sexp with adjacent operators',
+      writer => {
+        writer.writeSexp();
+        writer.writeSymbol('+');
+        writer.writeSymbol('-');
+        writer.writeSymbol('/');
+      },
+      '(+ - /)');
+    writerTest('Writes sexp with expression',
+      writer => {
+        writer.writeSexp();
+        writer.writeSymbol('x');
+        writer.writeSymbol('+');
+        writer.writeSymbol('y');
+      },
+      '(x + y)');
+
     // Datagrams
 
     writerTest('Writes two top-level symbols',

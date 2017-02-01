@@ -63,6 +63,7 @@ export { getSystemSymbolTableImport } from "./IonSystemSymbolTable";
 export { Import } from "./IonImport";
 export { IonTypes } from "./IonTypes";
 export { isIdentifier } from "./IonText";
+export { isOperator } from "./IonText";
 export { LocalSymbolTable } from "./IonLocalSymbolTable";
 export { LowLevelBinaryWriter } from "./IonLowLevelBinaryWriter";
 export { makeSpan } from "./IonSpan";
