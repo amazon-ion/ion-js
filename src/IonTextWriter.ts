@@ -32,7 +32,14 @@ import { Writer } from "./IonWriter";
 
 type Serializer<T> = (value: T) => void;
 
+enum State {
+  VALUE,
+  STRUCT_FIELD,
+  STRUCT_VALUE,
+}
+
 export class TextWriter implements Writer {
+  private state: State = State.VALUE;
   private isFirstValue: boolean = true;
   private isFirstValueInContainer: boolean = false;
   private containers: TypeCodes[] = [];
@@ -80,7 +87,23 @@ export class TextWriter implements Writer {
     });
   }
 
-  writeFieldName(fieldName: string) : void {}
+  writeFieldName(fieldName: string) : void {
+    if (this.isTopLevel || this.currentContainer !== TypeCodes.STRUCT) {
+      throw new Error("Cannot write field name outside of a struct");
+    }
+    if (this.state !== State.STRUCT_FIELD) {
+      throw new Error("Expecting a struct value");
+    }
+
+    if (!this.isFirstValueInContainer) {
+      this.writeable.writeByte(CharCodes.COMMA);
+    }
+
+    this.writeSymbolToken(fieldName);
+    this.writeable.writeByte(CharCodes.COLON);
+
+    this.state = State.STRUCT_VALUE;
+  }
 
   writeFloat32(value: number, annotations?: string[]) : void {
     this.writeValue(TypeCodes.FLOAT, value, annotations, (value: number) => {
@@ -167,7 +190,10 @@ export class TextWriter implements Writer {
     });
   }
 
-  writeStruct(annotations?: string[], isNull?: boolean) : void {}
+  writeStruct(annotations?: string[], isNull?: boolean) : void {
+    this.writeContainer(TypeCodes.STRUCT, CharCodes.LEFT_BRACE, annotations, isNull);
+    this.state = State.STRUCT_FIELD;
+  }
 
   writeSymbol(value: string, annotations?: string[]) : void {
     this.writeValue(TypeCodes.SYMBOL, value, annotations, (value: string) => {
@@ -179,7 +205,10 @@ export class TextWriter implements Writer {
   endContainer() : void {
     if (this.isTopLevel) {
       throw new Error("Can't step out when not in a container");
+    } else if (this.state === State.STRUCT_VALUE) {
+      throw new Error("Expecting a struct value");
     }
+
     let container: TypeCodes = this.containers.pop();
     switch (container) {
       case TypeCodes.LIST:
@@ -192,6 +221,13 @@ export class TextWriter implements Writer {
         this.writeable.writeByte(CharCodes.RIGHT_BRACE);
         break;
     }
+
+    if (!this.isTopLevel) {
+      if (this.currentContainer === TypeCodes.STRUCT) {
+        this.state = State.STRUCT_FIELD;
+      }
+      this.isFirstValueInContainer = false;
+    }
   }
 
   close() : void {
@@ -201,6 +237,9 @@ export class TextWriter implements Writer {
   }
 
   private writeValue<T>(typeCode: TypeCodes, value: T, annotations: string[], serialize: Serializer<T>) {
+    if (this.state === State.STRUCT_FIELD) {
+      throw new Error("Expecting a struct field");
+    }
     if (isNullOrUndefined(value)) {
       this.writeNull(typeCode, annotations);
       return;
@@ -209,6 +248,10 @@ export class TextWriter implements Writer {
     this.handleSeparator();
     this.writeAnnotations(annotations);
     serialize(value);
+
+    if (this.state === State.STRUCT_VALUE) {
+      this.state = State.STRUCT_FIELD;
+    }
   }
 
   private writeContainer(typeCode: TypeCodes, openingCharacter: number, annotations?: string[], isNull?: boolean) : void {
@@ -240,9 +283,6 @@ export class TextWriter implements Writer {
             break;
           case TypeCodes.SEXP:
             this.writeable.writeByte(CharCodes.SPACE);
-            break;
-          case TypeCodes.STRUCT:
-            this.writeable.writeByte(CharCodes.COMMA);
             break;
         }
       }

@@ -28,7 +28,7 @@
         instructions(writer);
         writer.close();
         var actual = writeable.getBytes();
-        assert.deepEqual(actual, ion.encodeUtf8(expected));
+        assert.deepEqual(actual, ion.encodeUtf8(expected), String.fromCharCode.apply(null, actual) + " != " + expected);
       }
     }
 
@@ -244,6 +244,40 @@
       writer => writer.writeString(String.fromCharCode(1)),
       '"\\u0001"');
 
+    // Structs
+
+    writerTest('Writes empty struct',
+      writer => writer.writeStruct(),
+      '{}');
+    writerTest('Writes nested structs',
+      writer => {
+        debugger;
+        writer.writeStruct();
+        writer.writeFieldName('foo');
+        writer.writeStruct();
+        writer.endContainer();
+        writer.writeFieldName('bar');
+        writer.writeStruct();
+      },
+      '{foo:{},bar:{}}');
+    writerTest('Writes struct with non-identifier field name and annotation',
+      writer => {
+        writer.writeStruct(['1foo']);
+        writer.writeFieldName('123');
+        writer.writeStruct(['2bar']);
+     },
+     "'1foo'::{'123':'2bar'::{}}");
+    badWriterTest('Cannot write field name at top level',
+      writer => writer.writeFieldName('foo'));
+    badWriterTest('Cannot write field name inside non-struct',
+      writer => { writer.writeList(); writer.writeFieldName('foo') });
+    badWriterTest('Cannot write two adjacent field names',
+      writer => { writer.writeStruct(); writer.writeFieldName('foo'); writer.writeFieldName('foo') });
+    badWriterTest('Cannot write value without field name',
+      writer => { writer.writeStruct(); writer.writeSymbol('foo') });
+    badWriterTest('Cannot end struct with missing field value',
+      writer => { writer.writeStruct(); writer.writeFieldName('foo'); writer.endContainer() });
+
     // Symbols
 
     writerTest('Writes symbol containing single quote',
@@ -267,6 +301,9 @@
     writerTest('Writes two top-level lists with annotations',
       writer => { writer.writeList(['foo']); writer.endContainer(); writer.writeList(['bar']) },
       'foo::[]\nbar::[]');
+    writerTest('Writes two top-level structs',
+      writer => { writer.writeStruct(); writer.endContainer(); writer.writeStruct() },
+      '{}\n{}');
 
     registerSuite(suite);
   }

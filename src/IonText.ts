@@ -257,6 +257,7 @@ export enum CharCodes {
   COMMA = ','.charCodeAt(0),
   SPACE = ' '.charCodeAt(0),
   LOWERCASE_U = 'u'.charCodeAt(0),
+  COLON = ':'.charCodeAt(0),
 }
 
 interface EscapeIndex {
