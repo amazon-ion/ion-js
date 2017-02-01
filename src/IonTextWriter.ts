@@ -15,11 +15,15 @@ import { CharCodes } from "./IonText";
 import { ClobEscapes } from "./IonText";
 import { Decimal } from "./IonDecimal";
 import { encodeUtf8 } from "./IonUnicode";
+import { encodeUtf8Stream } from "./IonUnicode";
+import { escape } from "./IonText";
 import { isIdentifier } from "./IonText";
 import { isNullOrUndefined } from "./IonUtilities";
 import { isOperator } from "./IonText";
 import { isUndefined } from "./IonUtilities";
 import { last } from "./IonUtilities";
+import { StringEscapes } from "./IonText";
+import { SymbolEscapes } from "./IonText";
 import { Timestamp } from "./IonTimestamp";
 import { toBase64 } from "./IonText";
 import { TypeCodes } from "./IonBinary";
@@ -146,7 +150,7 @@ export class TextWriter implements Writer {
         s = "struct";
         break;
       default:
-        throw new Error(`Cannot write null for type ${type_}`); 
+        throw new Error(`Cannot write null for type ${type_}`);
     }
     this.writeUtf8("null." + s);
   }
@@ -155,7 +159,14 @@ export class TextWriter implements Writer {
     this.writeContainer(TypeCodes.SEXP, CharCodes.LEFT_PARENTHESIS, annotations, isNull);
   }
 
-  writeString(value: string, annotations?: string[]) : void {}
+  writeString(value: string, annotations?: string[]) : void {
+    this.writeValue(TypeCodes.STRING, value, annotations, (value: string) => {
+      this.writeable.writeByte(CharCodes.DOUBLE_QUOTE);
+      this.writeable.writeStream(encodeUtf8Stream(escape(value, StringEscapes)));
+      this.writeable.writeByte(CharCodes.DOUBLE_QUOTE);
+    });
+  }
+
   writeStruct(annotations?: string[], isNull?: boolean) : void {}
 
   writeSymbol(value: string, annotations?: string[]) : void {
@@ -273,7 +284,7 @@ export class TextWriter implements Writer {
       this.writeUtf8(s);
     } else {
       this.writeable.writeByte(CharCodes.SINGLE_QUOTE);
-      this.writeUtf8(s);
+      this.writeable.writeStream(encodeUtf8Stream(escape(s, SymbolEscapes)));
       this.writeable.writeByte(CharCodes.SINGLE_QUOTE);
     }
   }

@@ -232,6 +232,30 @@
       },
       '(x + y)');
 
+    // Strings
+
+    writerTest('Writes string containing double quote',
+      writer => writer.writeString('"'),
+      '"\\""');
+    writerTest('Writes string containing null',
+      writer => writer.writeString(String.fromCharCode(0)),
+      '"\\0"');
+    writerTest('Writes string containing control character',
+      writer => writer.writeString(String.fromCharCode(1)),
+      '"\\u0001"');
+
+    // Symbols
+
+    writerTest('Writes symbol containing single quote',
+      writer => writer.writeSymbol("'"),
+      "'\\''");
+    writerTest('Writes symbol containing null',
+      writer => writer.writeSymbol(String.fromCharCode(0)),
+      "'\\0'");
+    writerTest('Writes symbol containing control character',
+      writer => writer.writeSymbol(String.fromCharCode(1)),
+      "'\\u0001'");
+
     // Datagrams
 
     writerTest('Writes two top-level symbols',

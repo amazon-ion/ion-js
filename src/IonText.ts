@@ -14,6 +14,7 @@
 /**
  * @file Constants and helper methods for reading and writing the Ion text format
  */
+import { isUndefined } from "./IonUtilities";
 
 export const WHITESPACE_COMMENT1 = -2;
 export const WHITESPACE_COMMENT2 = -3;
@@ -257,34 +258,76 @@ export enum CharCodes {
   RIGHT_BRACKET = ']'.charCodeAt(0),
   COMMA = ','.charCodeAt(0),
   SPACE = ' '.charCodeAt(0),
+  LOWERCASE_U = 'u'.charCodeAt(0),
 }
 
 interface EscapeIndex {
   [index: number]: number[];
 }
 
-function makeEscapeFromString(s: string) : number[] {
+function backslashEscape(s: string) : number[] {
   return [CharCodes.BACKSLASH, s.charCodeAt(0)];
 }
 
-function makeEscapeFromCharCode(c: number) : number[] {
-  return [CharCodes.BACKSLASH, c];
+function toCharCodes(s: string) {
+  let charCodes: number[] = new Array(s.length);
+  for (let i: number = 0; i < s.length; i++) {
+    charCodes[i] = s.charCodeAt(i);
+  }
+  return charCodes;
+}
+
+function unicodeEscape(codePoint: number) : number[] {
+  let prefix: number[] = [CharCodes.BACKSLASH, CharCodes.LOWERCASE_U];
+  let hexEscape: string = codePoint.toString(16);
+  while (hexEscape.length < 4) {
+    hexEscape = "0" + hexEscape;
+  }
+  return prefix.concat(toCharCodes(hexEscape));
 }
 
 export let ClobEscapes : EscapeIndex = {};
-ClobEscapes[CharCodes.NULL] = makeEscapeFromString("0");
-ClobEscapes[CharCodes.BELL] = makeEscapeFromString("a");
-ClobEscapes[CharCodes.BACKSPACE] = makeEscapeFromString("b");
-ClobEscapes[CharCodes.HORIZONTAL_TAB] = makeEscapeFromString("t");
-ClobEscapes[CharCodes.LINE_FEED] = makeEscapeFromString("n");
-ClobEscapes[CharCodes.VERTICAL_TAB] = makeEscapeFromString("v");
-ClobEscapes[CharCodes.FORM_FEED] = makeEscapeFromString("f");
-ClobEscapes[CharCodes.CARRIAGE_RETURN] = makeEscapeFromString("r");
-ClobEscapes[CharCodes.DOUBLE_QUOTE] = makeEscapeFromString('"');
-ClobEscapes[CharCodes.SINGLE_QUOTE] = makeEscapeFromString("'");
-ClobEscapes[CharCodes.FORWARD_SLASH] = makeEscapeFromString("/");
-ClobEscapes[CharCodes.QUESTION_MARK] = makeEscapeFromString("?");
-ClobEscapes[CharCodes.BACKSLASH] = makeEscapeFromString("\\");
+ClobEscapes[CharCodes.NULL] = backslashEscape("0");
+ClobEscapes[CharCodes.BELL] = backslashEscape("a");
+ClobEscapes[CharCodes.BACKSPACE] = backslashEscape("b");
+ClobEscapes[CharCodes.HORIZONTAL_TAB] = backslashEscape("t");
+ClobEscapes[CharCodes.LINE_FEED] = backslashEscape("n");
+ClobEscapes[CharCodes.VERTICAL_TAB] = backslashEscape("v");
+ClobEscapes[CharCodes.FORM_FEED] = backslashEscape("f");
+ClobEscapes[CharCodes.CARRIAGE_RETURN] = backslashEscape("r");
+ClobEscapes[CharCodes.DOUBLE_QUOTE] = backslashEscape('"');
+ClobEscapes[CharCodes.SINGLE_QUOTE] = backslashEscape("'");
+ClobEscapes[CharCodes.FORWARD_SLASH] = backslashEscape("/");
+ClobEscapes[CharCodes.QUESTION_MARK] = backslashEscape("?");
+ClobEscapes[CharCodes.BACKSLASH] = backslashEscape("\\");
+
+function unicodeEscapes(escapes: EscapeIndex, start: number, end?: number) {
+  if (isUndefined(end)) {
+    escapes[start] = unicodeEscape(start);
+  } else {
+    for (let i: number = start; i < end; i++) {
+      escapes[i] = unicodeEscape(i);
+    }
+  }
+}
+
+let CommonEscapes : EscapeIndex = {};
+CommonEscapes[CharCodes.NULL] = backslashEscape('0');
+unicodeEscapes(CommonEscapes, 1, 6);
+CommonEscapes[CharCodes.BELL] = backslashEscape('a');
+CommonEscapes[CharCodes.BACKSPACE] = backslashEscape('b');
+CommonEscapes[CharCodes.HORIZONTAL_TAB] = backslashEscape('t');
+CommonEscapes[CharCodes.LINE_FEED] = backslashEscape('n');
+CommonEscapes[CharCodes.VERTICAL_TAB] = backslashEscape('v');
+CommonEscapes[CharCodes.FORM_FEED] = backslashEscape('f');
+CommonEscapes[CharCodes.CARRIAGE_RETURN] = backslashEscape['r'];
+CommonEscapes[CharCodes.BACKSLASH] = backslashEscape('\\');
+
+export let StringEscapes : EscapeIndex = Object.assign({}, CommonEscapes);
+StringEscapes[CharCodes.DOUBLE_QUOTE] = backslashEscape('"');
+
+export let SymbolEscapes : EscapeIndex = Object.assign({}, CommonEscapes);
+SymbolEscapes[CharCodes.SINGLE_QUOTE] = backslashEscape("'");
 
 export function isIdentifier(s: string) : boolean {
   if (is_digit(s.charCodeAt(0))) {
@@ -309,4 +352,18 @@ export function isOperator(s: string) : boolean {
     }
   }
   return true;
+}
+
+export function *escape(s: string, escapes: EscapeIndex) : IterableIterator<number> {
+  for (let i = 0; i < s.length; i++) {
+    let charCode: number = s.charCodeAt(i);
+    let escape: number[] = escapes[charCode];
+    if (!isUndefined(escape)) {
+      for (let j = 0; j < escape.length; j++) {
+        yield escape[j];
+      }
+    } else {
+      yield charCode;
+    }
+  }
 }
