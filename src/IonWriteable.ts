@@ -17,13 +17,11 @@ import { last } from "./IonUtilities";
 const DEFAULT_BUFFER_SIZE: number = 4096;
 
 export class Writeable {
-  private bufferGrowthSize: number;
   private buffers: number[][];
   private index: number;
   private written: number;
 
-  constructor(bufferInitialSize: number = DEFAULT_BUFFER_SIZE, bufferGrowthSize: number = DEFAULT_BUFFER_SIZE) {
-    this.bufferGrowthSize = bufferGrowthSize;
+  constructor(bufferInitialSize: number = DEFAULT_BUFFER_SIZE, private bufferGrowthSize: number = DEFAULT_BUFFER_SIZE) {
     this.buffers = [new Array(bufferInitialSize)];
     // Next byte to be written in current buffer
     this.index = 0;
@@ -63,6 +61,12 @@ export class Writeable {
       remaining -= limit;
       this.index += limit;
       this.written += limit;
+    }
+  }
+
+  writeStream(it: IterableIterator<number>) {
+    for (let b of it) {
+      this.writeByte(b);
     }
   }
 

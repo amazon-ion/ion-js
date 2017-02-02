@@ -51,13 +51,7 @@ export class Decimal {
   public static readonly NULL: Decimal = new Decimal(undefined, undefined);
   public static readonly ZERO: Decimal = new Decimal(LongInt.ZERO, 0);
 
-  private _value: LongInt;
-  private _exponent: number;
-
-  constructor(value: LongInt, exponent: number) {
-    this._value = value;
-    this._exponent = exponent;
-  }
+  constructor(private _value: LongInt, private _exponent: number) {}
 
   isZero() : boolean {
     if (this.isNull()) return false;
@@ -97,24 +91,26 @@ export class Decimal {
   }
 
   stringValue(): string {
-    var v = this._value,
-        s = this._exponent,
-        image, decimal_location, ii, zeros, exp;
-
-    if (this.isNull()) { // is null
+    if (this.isNull()) {
       return "null.decimal";
     }
 
-    image = v.digits();
+    let s: number = this._exponent;
+    let image: string = this._value.digits();
+
     if (s < 0) {
       // negative shift - prefix decimal point this may require leading zero's
-      if (image.length < s+1) {
-        for (ii = s + 1 - image.length; ii>0; ii--) {
+      if (image.length < s + 1) {
+        for (let i : number = s + 1 - image.length; i > 0; i--) {
           image = "0" + image;
         }
       }
-      decimal_location = image.length + s;
-      image = image.substr(0, decimal_location) + "." + image.substr(decimal_location);
+      let decimal_location: number = image.length + s;
+      if (decimal_location === 0) {
+        image = '0.' + image;
+      } else {
+        image = image.substr(0, decimal_location) + "." + image.substr(decimal_location);
+      }
     }
     else if (s > 0) {
       // positive shift, 
@@ -125,7 +121,7 @@ export class Decimal {
       image = image + "d" + s.toString();
     }
 
-    if (v.signum() === -1) {
+    if (this.isNegative()) {
       image = "-" + image;
     }
     return image;

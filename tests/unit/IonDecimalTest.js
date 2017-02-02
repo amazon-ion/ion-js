@@ -52,6 +52,10 @@
       assert.equal(ion.Decimal.stripTrailingZeroes('123456000'), '123456');
     }
 
+    suite['Mantissa-only decimal string has leading zero'] = function() {
+      assert.equal(ion.Decimal.parse('123456d-6').toString(), '0.123456');
+    }
+
     registerSuite(suite);
   }
 );
