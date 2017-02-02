@@ -200,7 +200,12 @@ export class TextWriter implements Writer {
       this.writeSymbolToken(value);
     });
   }
-  writeTimestamp(value: Timestamp, annotations?: string[]) : void {}
+
+  writeTimestamp(value: Timestamp, annotations?: string[]) : void {
+    this.writeValue(TypeCodes.TIMESTAMP, value, annotations, (value: Timestamp) => {
+      this.writeUtf8(value.toString());
+    });
+  }
 
   endContainer() : void {
     if (this.isTopLevel) {

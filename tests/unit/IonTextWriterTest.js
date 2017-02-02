@@ -28,7 +28,9 @@
         instructions(writer);
         writer.close();
         var actual = writeable.getBytes();
-        assert.deepEqual(actual, ion.encodeUtf8(expected), String.fromCharCode.apply(null, actual) + " != " + expected);
+        var errorMessage = String.fromCharCode.apply(null, actual) + " != " + expected;
+        var encodedExpected = ion.encodeUtf8(expected);
+        assert.deepEqual(actual, encodedExpected, errorMessage);
       }
     }
 
@@ -251,7 +253,6 @@
       '{}');
     writerTest('Writes nested structs',
       writer => {
-        debugger;
         writer.writeStruct();
         writer.writeFieldName('foo');
         writer.writeStruct();
@@ -289,6 +290,28 @@
     writerTest('Writes symbol containing control character',
       writer => writer.writeSymbol(String.fromCharCode(1)),
       "'\\u0001'");
+
+    // Timestamps
+
+    var timestampTest = function(name, timestamp, expected) {
+      writerTest(name,
+        writer => {
+          var parsed = ion.Timestamp.parse(timestamp);
+          writer.writeTimestamp(parsed);
+        },
+        expected);
+    };
+
+    timestampTest('Writes year timestamp', '2017T', '2017T');
+    timestampTest('Writes month timestamp', '2017-02T', '2017-02T');
+    timestampTest('Writes day timestamp', '2017-02-01', '2017-02-01');
+    timestampTest('Writes hour and minute timestamp', '2017-02-01T22:38', '2017-02-01T22:38Z');
+    timestampTest('Writes whole second timestamp', '2017-02-01T22:38:43', '2017-02-01T22:38:43Z');
+    timestampTest('Writes fractional second timestamp', '2017-02-01T22:38:43.125', '2017-02-01T22:38:43.125Z');
+
+    timestampTest('Writes positive offset timestamp', '2017-02-01T22:38+08:00', '2017-02-01T22:38+08:00');
+    timestampTest('Writes negative offset timestamp', '2017-02-01T22:38-08:00', '2017-02-01T22:38-08:00');
+    timestampTest('Writes zulu offset timestamp', '2017-02-01T22:38Z', '2017-02-01T22:38Z');
 
     // Datagrams
 
