@@ -11,6 +11,11 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
+/**
+ * @file Constants and helper methods for Unicode.
+ * @see https://amznlabs.github.io/ion-docs/stringclob.html
+ * @see http://www.unicode.org/versions/Unicode5.0.0/
+ */
 import { Writeable } from "./IonWriteable";
 
 const SIX_BIT_MASK: number = 0x3F;

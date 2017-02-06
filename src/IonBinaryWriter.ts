@@ -37,13 +37,26 @@ const NULL_VALUE_FLAG: number = 15;
 
 const TYPE_DESCRIPTOR_LENGTH: number = 1;
 
+/** Possible writer states */
 enum States {
+  /** The writer expects a value (a call to writeInt(), writeString(), etc.) or a transition (endContainer(), close()) */
   VALUE,
+  /** The writer expects a struct field name (valid calls are writeFieldName() and endContainer()) */
   STRUCT_FIELD,
+  /** The writer expects a struct value (writeInt(), writeString(), etc.) but not a transition (endContainer() and close() will throw an exception) */
   STRUCT_VALUE,
+  /** The writer is closed, no further operations may be performed */
   CLOSED,
 }
 
+/**
+ * Writes out Ion values in Ion's binary format.
+ *
+ * This implementation caches serialized values in an in-memory tree.
+ * It does not support multiple local symbol tables (aka "symbol table append").
+ *
+ * @see http://amznlabs.github.io/ion-docs/binary.html
+ */
 export class BinaryWriter implements Writer {
   private readonly symbolTable: LocalSymbolTable;
   private readonly writer: LowLevelBinaryWriter;
