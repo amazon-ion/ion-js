@@ -103,7 +103,9 @@ export class BinaryWriter implements Writer {
     }
 
     let symbolIds: number[] = this.encodeAnnotations(annotations);
-    if (value.isZero() && !value.isNegative()) {
+    let isPositiveZero: boolean = value.isZero() && !value.isNegative();
+    if (isPositiveZero) {
+      // Special case per the spec: http://amznlabs.github.io/ion-docs/binary.html#decimal
       this.addNode(new BytesNode(this.writer, this.getCurrentContainer(), TypeCodes.DECIMAL, symbolIds, []));
       return;
     }
