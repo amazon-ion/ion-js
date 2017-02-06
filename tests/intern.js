@@ -25,7 +25,6 @@ define({
     'tests/unit/IonDecimalTest',
     'tests/unit/IonWriteableTest',
     'tests/unit/IonUnicodeTest',
-    'tests/unit/IonBinaryTest',
     'tests/unit/IonLowLevelBinaryWriterTest',
     'tests/unit/IonBinaryWriterTest',
   ],

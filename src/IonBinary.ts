@@ -53,36 +53,3 @@ export enum TypeCodes {
   STRUCT = 13,
   ANNOTATION = 14,
 }
-
-export function getBits(value: number[], offset: number, count: number) : number {
-  if (count > 8) {
-    throw new Error("Can only get up to 8 bits at a time");
-  }
-  if (count < 0) {
-    throw new Error("Must get at least one bit");
-  }
-  if ((offset + count) > (value.length * 8)) {
-    throw new Error("Bits region runs past the end of the value");
-  }
-
-  let leftArrayIndex: number = offset >>> 3;
-  let rightArrayIndex: number = (offset + count - 1) >>> 3;
-
-  let leftByteOffset = offset % 8;
-  let rightByteOffset = ((offset + count - 1) % 8) + 1;
-
-  let isSameByte: boolean = leftArrayIndex === rightArrayIndex;
-  if (isSameByte) {
-    let result: number =
-      (value[leftArrayIndex] & (255 >>> leftByteOffset))
-      >>> (8 - rightByteOffset);
-    return result;
-  } else {
-    let leftResult: number =
-      (value[leftArrayIndex] & (255 >>> leftByteOffset))
-      << rightByteOffset;
-    let rightResult: number = value[rightArrayIndex] >>> (8 - rightByteOffset);
-    let result: number = leftResult | rightResult;
-    return result;
-  }
-}
