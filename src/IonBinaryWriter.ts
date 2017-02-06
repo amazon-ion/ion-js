@@ -49,7 +49,7 @@ export class BinaryWriter implements Writer {
   private readonly writer: LowLevelBinaryWriter;
 
   private datagram: Node[] = [];
-  private containers: Node[] = [];
+  private containers: ContainerNode[] = [];
   private fieldName: number[];
   private state: States = States.VALUE;
 
@@ -206,7 +206,8 @@ export class BinaryWriter implements Writer {
     }
 
     let symbolIds: number[] = this.encodeAnnotations(annotations);
-    this.addNode(new SequenceNode(this.writer, this.getCurrentContainer(), TypeCodes.LIST, symbolIds));
+    let node: ContainerNode = new SequenceNode(this.writer, this.getCurrentContainer(), TypeCodes.LIST, symbolIds);
+    this.addContainerNode(node);
   }
 
   writeNull(type_: TypeCodes = TypeCodes.NULL, annotations?: string[]) {
@@ -223,7 +224,8 @@ export class BinaryWriter implements Writer {
     }
 
     let symbolIds: number[] = this.encodeAnnotations(annotations);
-    this.addNode(new SequenceNode(this.writer, this.getCurrentContainer(), TypeCodes.SEXP, symbolIds));
+    let node: ContainerNode = new SequenceNode(this.writer, this.getCurrentContainer(), TypeCodes.SEXP, symbolIds);
+    this.addContainerNode(node);
   }
 
   writeString(value: string, annotations?: string[]) : void {
@@ -246,7 +248,8 @@ export class BinaryWriter implements Writer {
     }
 
     let symbolIds: number[] = this.encodeAnnotations(annotations);
-    this.addNode(new StructNode(this.writer, this.getCurrentContainer(), symbolIds));
+    let node: ContainerNode = new StructNode(this.writer, this.getCurrentContainer(), symbolIds);
+    this.addContainerNode(node);
 
     this.state = States.STRUCT_FIELD;
   }
@@ -353,6 +356,12 @@ export class BinaryWriter implements Writer {
     this.state = States.STRUCT_VALUE;
   }
 
+  private addContainerNode(node: ContainerNode) : void {
+    this.addNode(node);
+    this.containers.push(node);
+    this.state = States.VALUE;
+  }
+
   private encodeAnnotations(annotations: string[]) : number[] {
     if (!annotations || annotations.length === 0) {
       return [];
@@ -371,7 +380,7 @@ export class BinaryWriter implements Writer {
     return this.containers.length === 0;
   }
 
-  private getCurrentContainer() : Node {
+  private getCurrentContainer() : ContainerNode {
     return last(this.containers);
   }
 
@@ -385,11 +394,6 @@ export class BinaryWriter implements Writer {
       } else {
         this.getCurrentContainer().addChild(node);
       }
-    }
-
-    if (node.isContainer()) {
-      this.containers.push(node);
-      this.state = States.VALUE;
     }
   }
 
@@ -466,8 +470,6 @@ export class BinaryWriter implements Writer {
 }
 
 interface Node {
-  isContainer(): boolean;
-  addChild(child: Node, name?: number[]): void;
   write() : void;
   getLength() : number;
 }
@@ -563,10 +565,6 @@ abstract class AbstractNode implements Node {
     return this._writer;
   }
 
-  abstract isContainer() : boolean;
-
-  abstract addChild(child: Node, name?: number[]) : void;
-
   abstract write() : void;
 }
 
@@ -575,9 +573,7 @@ abstract class ContainerNode extends AbstractNode {
     super(writer, parent, typeCode, annotations);
   }
 
-  isContainer() : boolean {
-    return true;
-  }
+  abstract addChild(child: Node, name?: number[]): void;
 }
 
 class SequenceNode extends ContainerNode {
@@ -665,10 +661,6 @@ class StructNode extends ContainerNode {
 abstract class LeafNode extends AbstractNode {
   addChild(child: Node, name?: number[]) : void {
     throw new Error("Cannot add a child to a leaf node");
-  }
-
-  isContainer() : boolean {
-    return false;
   }
 }
 
