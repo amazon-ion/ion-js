@@ -15,6 +15,9 @@ import { Decimal } from "./IonDecimal";
 import { Timestamp } from "./IonTimestamp";
 import { TypeCodes } from "./IonBinary";
 
+/**
+ * Writes values in the Ion text or binary formats.
+ */
 export interface Writer {
   writeBlob(value: number[], annotations?: string[]) : void;
   writeBoolean(value: boolean, annotations?: string[]) : void;

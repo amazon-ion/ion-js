@@ -16,6 +16,12 @@ import { last } from "./IonUtilities";
 
 const DEFAULT_BUFFER_SIZE: number = 4096;
 
+/**
+ * A byte array builder.
+ *
+ * This implementation attempts to minimize append and allocate operations by writing into
+ * a pre-allocated array, although additional arrays are allocated as necessary.
+ */
 export class Writeable {
   private bufferGrowthSize: number;
   private buffers: number[][];

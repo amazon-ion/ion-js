@@ -16,6 +16,17 @@ import { isUndefined } from "./IonUtilities";
 import { SharedSymbolTable } from "./IonSharedSymbolTable";
 import { SymbolIndex } from "./IonSymbolIndex";
 
+/**
+ * A shared symbol table import.
+ * 
+ * Import order in shared symbol tables is important, so each import also
+ * references a parent (previous) import (except for the implicit system symbol
+ * table import, which has no parent). Optionally, the number of symbols to
+ * import from a given symbol table may be specified as the "length" of the
+ * import.
+ * 
+ * @see http://amznlabs.github.io/ion-docs/symbols.html#imports
+ */
 export class Import {
   private readonly _offset: number;
   private readonly _length: number;

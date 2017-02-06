@@ -11,6 +11,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
+/**
+ * @file Constants and helper methods for reading and writing the Ion text format
+ */
+
 export const WHITESPACE_COMMENT1 = -2;
 export const WHITESPACE_COMMENT2 = -3;
 export const ESCAPED_NEWLINE     = -4;

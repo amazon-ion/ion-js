@@ -16,6 +16,9 @@ import { Decimal } from "./IonDecimal";
 import { IonType } from "./IonType";
 import { Timestamp } from "./IonTimestamp";
 
+/**
+ * Reads a sequence of Ion values.
+ */
 export interface Reader {
   booleanValue: () => boolean;
   byteValue: () => number[];

@@ -11,6 +11,8 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
+/** @file Constants and enums for the Ion Binary format */
+
 export const NIBBLE_MASK = 0xf;
 export const BYTE_MASK =  0xff;
 export const TYPE_SHIFT =    4;
@@ -36,6 +38,7 @@ export const TB_SEXP          = 12;  // 0xc
 export const TB_STRUCT        = 13;  // 0xd
 export const TB_ANNOTATION    = 14;  // 0xe
 
+/** Four-bit type codes per http://amznlabs.github.io/ion-docs/binary.html#typed-value-formats */
 export enum TypeCodes {
   NULL = 0,
   BOOL = 1,

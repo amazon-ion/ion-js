@@ -23,6 +23,10 @@ function byVersion(x: SharedSymbolTable, y: SharedSymbolTable) : number {
   return x.version - y.version;
 }
 
+/**
+ * A catalog holds available shared symbol tables and always includes the system symbol table.
+ * @see http://amznlabs.github.io/ion-docs/symbols.html#the-catalog
+ */
 export class Catalog {
   private symbolTables: SymbolTableIndex = {};
 
