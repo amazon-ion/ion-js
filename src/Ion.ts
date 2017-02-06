@@ -57,7 +57,6 @@ export { Catalog } from "./IonCatalog";
 export { Decimal } from "./IonDecimal";
 export { defaultLocalSymbolTable } from "./IonLocalSymbolTable";
 export { encodeUtf8 } from "./IonUnicode";
-export { getBits } from "./IonBinary";
 export { getSystemSymbolTable } from "./IonSystemSymbolTable";
 export { getSystemSymbolTableImport } from "./IonSystemSymbolTable";
 export { Import } from "./IonImport";
