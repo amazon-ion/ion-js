@@ -523,7 +523,7 @@ abstract class AbstractNode implements Node {
   }
 
   isNull() : boolean {
-      return false;
+    return false;
   }
 
   getAnnotationsLength() : number {
