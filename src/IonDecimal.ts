@@ -41,12 +41,6 @@
 import { is_digit } from "./IonText";
 import { LongInt } from "./IonLongInt";
 
-function * stringGenerator(str: string) {
-  for (let i: number = 0; i < str.length; i++) {
-    yield str.charCodeAt(i);
-  }
-}
-
 export class Decimal {
   public static readonly NULL: Decimal = new Decimal(undefined, undefined);
   public static readonly ZERO: Decimal = new Decimal(LongInt.ZERO, 0);
@@ -209,7 +203,7 @@ export class Decimal {
     }
 
     let explicitExponentDigits: string = Decimal.readDigits(str, index);
-    let explicitExponent = Number.parseInt(explicitExponentDigits, 10);
+    let explicitExponent = parseInt(explicitExponentDigits, 10);
     if (isExplicitExponentNegative) {
       explicitExponent = -explicitExponent;
     }
