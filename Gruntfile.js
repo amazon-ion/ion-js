@@ -15,23 +15,39 @@ module.exports = function(grunt) {
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
     intern: {
-      default: {
+      es5: {
         options: {
           config: 'tests/intern',
           reporters: ['Console', 'Lcov'],
-        }
-      }
+          ionVersion: 'es5',
+        },
+      },
+      es6: {
+        options: {
+          config: 'tests/intern',
+          reporters: ['Console', 'Lcov'],
+          ionVersion: 'es6',
+        },
+      },
     },
     jshint: {
       files: []
     },
     ts: {
-      default: {
+      'amd-es5': {
         src: ['src/**/*.ts'],
-        outDir: 'dist',
+        outDir: 'dist/amd/es5',
         options: {
-          module: "amd",
+          target: "es5",
+          module: "amd"
+        }
+      },
+      'amd-es6': {
+        src: ['src/**/*.ts'],
+        outDir: 'dist/amd/es6',
+        options: {
           target: "es6",
+          module: "amd"
         }
       },
     }
@@ -41,6 +57,5 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-ts');
   grunt.loadNpmTasks('intern');
 
-  grunt.registerTask('default', ['ts', 'intern']);
-  grunt.registerTask('test', ['intern']);
+  grunt.registerTask('default', ['ts:amd-es5', 'intern:es5', 'ts:amd-es6', 'intern:es6']);
 };

@@ -159,7 +159,7 @@ export class BinaryWriter implements Writer {
       let buffer: ArrayBuffer = new ArrayBuffer(4);
       let dataview: DataView = new DataView(buffer);
       dataview.setFloat32(0, value, false);
-      bytes = Array.from(new Uint8Array(buffer));
+      bytes = Array['from'](new Uint8Array(buffer));
     }
     this.addNode(new BytesNode(this.writer, this.getCurrentContainer(), TypeCodes.FLOAT, symbolIds, bytes));
   }
@@ -179,7 +179,7 @@ export class BinaryWriter implements Writer {
       let buffer: ArrayBuffer = new ArrayBuffer(8);
       let dataview: DataView = new DataView(buffer);
       dataview.setFloat64(0, value, false);
-      bytes = Array.from(new Uint8Array(buffer));
+      bytes = Array['from'](new Uint8Array(buffer));
     }
     this.addNode(new BytesNode(this.writer, this.getCurrentContainer(), TypeCodes.FLOAT, symbolIds, bytes));
   }
@@ -377,7 +377,7 @@ export class BinaryWriter implements Writer {
       let symbolId: number = this.symbolTable.addSymbol(annotation);
       writer.writeVariableLengthUnsignedInt(symbolId);
     }
-    return Array.from(writeable.getBytes());
+    return Array['from'](writeable.getBytes());
   }
 
   private isTopLevel() : boolean {

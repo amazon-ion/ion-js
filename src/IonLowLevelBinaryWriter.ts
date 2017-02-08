@@ -96,7 +96,7 @@ export class LowLevelBinaryWriter {
   }
 
   writeVariableLengthSignedInt(originalValue: number) : void {
-    if (!Number.isInteger(originalValue)) {
+    if (!Number['isInteger'](originalValue)) {
       throw new Error(`Cannot call writeVariableLengthSignedInt with non-integer value ${originalValue}`);
     }
 
@@ -153,7 +153,7 @@ export class LowLevelBinaryWriter {
     if (value === 0) {
       return 1;
     }
-    let numberOfBits = Math.floor(Math.log2(value)) + 1;
+    let numberOfBits = Math.floor(Math['log2'](value)) + 1;
     let numberOfBytes = Math.ceil(numberOfBits / 8);
     return numberOfBytes;
   }
@@ -163,7 +163,7 @@ export class LowLevelBinaryWriter {
     if (absoluteValue === 0) {
       return 1;
     }
-    let valueBits: number = Math.floor(Math.log2(absoluteValue)) + 1;
+    let valueBits: number = Math.floor(Math['log2'](absoluteValue)) + 1;
     let trailingStopBits: number = Math.floor(valueBits / 7);
     let leadingStopBit = 1;
     let signBit = 1;
@@ -174,7 +174,7 @@ export class LowLevelBinaryWriter {
     if (value === 0) {
       return 1;
     }
-    let valueBits: number = Math.floor(Math.log2(value)) + 1;
+    let valueBits: number = Math.floor(Math['log2'](value)) + 1;
     let stopBits: number = Math.ceil(valueBits / 7);
     return Math.ceil((valueBits + stopBits) / 8);
   }
