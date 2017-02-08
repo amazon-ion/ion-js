@@ -11,12 +11,20 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-define(
-  function(require) {
-    const registerSuite = require('intern!object');
-    const fs = require('intern/dojo/node!fs');
-    const paths = require('intern/dojo/node!path');
-    const ion = require('dist/Ion');
+define([
+    'intern',
+    'intern!object',
+    'intern/dojo/node!fs',
+    'intern/dojo/node!path',
+    'dist/amd/es5/IonTests',
+    'dist/amd/es6/IonTests',
+  ],
+  function(intern, registerSuite, fs, paths, ionEs5, ionEs6) {
+    var ionVersions = {
+      es5: ionEs5,
+      es6: ionEs6,
+    };
+    var ion = ionVersions[intern.args.ionVersion];
 
     function findFiles(folder, accumulator) {
       var files = fs.readdirSync(folder);
