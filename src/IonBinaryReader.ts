@@ -20,16 +20,19 @@
 // object, such as IonValue).
 import { Catalog } from "./IonCatalog";
 import { Decimal } from "./IonDecimal";
+import { defaultLocalSymbolTable } from "./IonLocalSymbolTable";
 import { getSystemSymbolTable } from "./IonSystemSymbolTable";
+import { Import } from "./IonImport";
 import { ion_symbol_table_sid } from "./IonSymbols";
 import { IonType } from "./IonType";
 import { IonTypes } from "./IonTypes";
 import { IVM } from "./IonConstants";
+import { LocalSymbolTable } from "./IonLocalSymbolTable";
 import { makeSymbolTable } from "./IonSymbols";
 import { ParserBinaryRaw } from "./IonParserBinaryRaw";
 import { Reader } from "./IonReader";
+import { SharedSymbolTable } from "./IonSharedSymbolTable";
 import { Span } from "./IonSpan";
-import { SymbolTable } from "./IonSymbolTable";
 import { Timestamp } from "./IonTimestamp";
 
 const RAW_STRING = new IonType( -1, "raw_input", true,  false, false, false );
@@ -81,13 +84,13 @@ function get_ion_type(t: number) : IonType {
 export class BinaryReader implements Reader {
   private _parser: ParserBinaryRaw;
   private _cat: Catalog;
-  private _symtab: SymbolTable;
+  private _symtab: LocalSymbolTable;
   private _raw_type: number;
 
   constructor(source: Span, catalog: Catalog) {
     this._parser   = new ParserBinaryRaw(source);
-    this._cat      = catalog;
-    this._symtab   = getSystemSymbolTable();
+    this._cat      = catalog || new Catalog();
+    this._symtab   = defaultLocalSymbolTable();
     this._raw_type = BOC;
   }
 
@@ -102,7 +105,7 @@ export class BinaryReader implements Reader {
       if (rt === TB_SYMBOL) {
         let raw: number = p.numberValue();
         if (raw !== IVM.sid) break;
-        t._symtab = getSystemSymbolTable();
+        t._symtab = defaultLocalSymbolTable();
       }
       else if (rt === TB_STRUCT) {
         if (!p.hasAnnotations()) break;

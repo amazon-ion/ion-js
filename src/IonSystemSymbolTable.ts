@@ -11,69 +11,29 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-import { Symbol } from "./IonSymbol";
-import { SymbolIndex } from "./IonSymbolIndex";
-import { SymbolTable } from "./IonSymbolTable";
-import { UserSymbolTable } from "./IonUserSymbolTable";
+import { Import } from "./IonImport";
+import { SharedSymbolTable } from "./IonSharedSymbolTable";
 
-class SystemSymbolTable implements SymbolTable {
-  private delegate: UserSymbolTable;
-
-  constructor(delegate: UserSymbolTable) {
-    this.delegate = delegate;
-  }
-
-  private no_change() : never {
-    throw new Error("can't change the system symbol table");
-  }
-
-  addName(name: string) : number {
-    this.no_change();
-    return undefined;
-  }
-
-  addSymbol(sym: Symbol) : number {
-    this.no_change();
-    return undefined;
-  }
-
-  getId(name: string) : number {
-    return this.delegate.getId(name);
-  }
-
-  getSymbol(id: number) : string {
-    return this.delegate.getSymbol(id);
-  }
-
-  getIndex() : SymbolIndex {
-    return this.delegate.getIndex();
-  }
-
-  getSymbols() : Symbol[] {
-    return this.delegate.getSymbols();
-  }
-}
-
-const systemSymbolTable: SystemSymbolTable = new SystemSymbolTable(
-  new UserSymbolTable(
+const systemSymbolTable: SharedSymbolTable = new SharedSymbolTable(
+  "$ion",
+  1,
+  [
     "$ion",
-    1,
-    [], // no imports
-    [
-      "$ion",
-      "$ion_1_0",
-      "$ion_symbol_table",
-      "name",
-      "version",
-      "imports",
-      "symbols",
-      "max_id",
-      "$ion_shared_symbol_table",
-    ],
-    undefined
-  )
+    "$ion_1_0",
+    "$ion_symbol_table",
+    "name",
+    "version",
+    "imports",
+    "symbols",
+    "max_id",
+    "$ion_shared_symbol_table"
+  ]
 );
 
-export function getSystemSymbolTable() : SymbolTable {
+export function getSystemSymbolTable() : SharedSymbolTable {
   return systemSymbolTable;
+}
+
+export function getSystemSymbolTableImport() : Import {
+  return new Import(null, getSystemSymbolTable());
 }

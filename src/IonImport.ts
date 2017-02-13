@@ -11,12 +11,56 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-import { SymbolTable } from "./IonSymbolTable";
+import { isNullOrUndefined } from "./IonUtilities";
+import { isUndefined } from "./IonUtilities";
+import { SharedSymbolTable } from "./IonSharedSymbolTable";
+import { SymbolIndex } from "./IonSymbolIndex";
 
-export interface Import {
-  name: string;
-  version: number;
-  maxid: number;
-  offset: number;
-  symtab: SymbolTable;
+export class Import {
+  private readonly _offset: number;
+  private readonly _length: number;
+  private readonly index: SymbolIndex = {};
+
+  constructor(
+    private readonly parent: Import,
+    private readonly symbolTable: SharedSymbolTable,
+    length?: number
+  ) {
+    this._offset = (parent && (parent.offset + parent.length)) || 1;
+    this._length = length || symbolTable.symbols.length;
+
+    let symbols: string[] = symbolTable.symbols;
+    for (let i: number = 0; i < this._length; i++) {
+      this.index[symbols[i]] = this._offset + i;
+    }
+  }
+
+  getSymbol(symbolId: number) : string {
+    if (!isNullOrUndefined(this.parent)) {
+      let parentSymbol = this.parent.getSymbol(symbolId);
+      if (!isUndefined(parentSymbol)) {
+        return parentSymbol;
+      }
+    }
+
+    let index: number = symbolId - this.offset;
+    if (index < this.length) {
+      return this.symbolTable.symbols[index];
+    }
+
+    return undefined;
+  }
+
+  getSymbolId(symbol_: string) : number {
+    return (this.parent && this.parent.getSymbolId(symbol_))
+      || this.index[symbol_];
+  }
+
+  get offset() : number {
+    return this._offset;
+  }
+
+  get length() : number {
+    return this._length;
+  }
 }

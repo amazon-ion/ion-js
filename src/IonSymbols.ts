@@ -12,26 +12,31 @@
  * language governing permissions and limitations under the License.
  */
 import { Catalog } from "./IonCatalog";
+import { getSystemSymbolTableImport } from "./IonSystemSymbolTable";
 import { Import } from "./IonImport";
+import { IonType } from "./IonType";
+import { isUndefined } from "./IonUtilities";
+import { LocalSymbolTable } from "./IonLocalSymbolTable";
 import { Reader } from "./IonReader";
+import { SharedSymbolTable } from "./IonSharedSymbolTable";
+import { SubstituteSymbolTable } from "./IonSubstituteSymbolTable";
 import { Symbol } from "./IonSymbol";
-import { SymbolTable } from "./IonSymbolTable";
-import { UserSymbolTable } from "./IonUserSymbolTable";
+import { SymbolIndex } from "./IonSymbolIndex";
 
 export const ion_symbol_table = "$ion_symbol_table";
 export const ion_symbol_table_sid = 3;
 
 const empty_struct = {};
 
-function load_imports(reader: Reader, catalog: Catalog) : Import[] {
-  let imports: Import[] = [];
+function load_imports(reader: Reader, catalog: Catalog) : Import {
+  let import_: Import = getSystemSymbolTableImport();
 
   reader.stepIn(); // into the array
   while (reader.next()) {
     reader.stepIn(); // into the struct of 1 import
 
     let name: string;
-    let version: number;
+    let version: number = 1;
     let maxId: number;
 
     while (reader.next()) {
@@ -46,22 +51,33 @@ function load_imports(reader: Reader, catalog: Catalog) : Import[] {
           maxId = reader.numberValue();
       }
     }
-    if (name) {
-      imports.push(
-        {
-          name:    name,
-          version: version,
-          maxid:   maxId,
-          offset:  0,
-          symtab:  empty_struct,
-        } as Import
-      );
+
+    if (version < 1) {
+      version = 1;
     }
+
+    if (name && name != "$ion") {
+      let symbolTable: SharedSymbolTable = catalog.findSpecificVersion(name, version);
+      if (!symbolTable) {
+        if (!maxId) {
+          throw new Error(`No exact match found when trying to import symbol table ${name} version ${version}`);
+        } else {
+          symbolTable = catalog.findLatestVersion(name);
+        }
+      }
+
+      if (!symbolTable) {
+        symbolTable = new SubstituteSymbolTable(maxId);
+      }
+
+      import_ = new Import(import_, symbolTable, maxId);
+    }
+
     reader.stepOut(); // out of one import struct
   }
   reader.stepOut(); // out of the array of imports
 
-  return imports;
+  return import_;
 }
 
 function load_symbols(reader: Reader) : string[] {
@@ -76,74 +92,23 @@ function load_symbols(reader: Reader) : string[] {
   return symbols;
 }
 
-export function makeSymbolTable(catalog: Catalog, sp: Reader) : SymbolTable {
-  let name: string;
-  let version: number;
-  let imports: Import[];
+export function makeSymbolTable(catalog: Catalog, reader: Reader) : LocalSymbolTable {
+  let import_: Import;
   let symbols: string[];
-  let maxid: number;
-  let overflow: any;
+  let maxId: number;
 
-  var len, t, off, ii, imp, fld;
-  
-  sp.stepIn();
-  while ((t = sp.next()) !== undefined) {
-    fld = sp.fieldName();
-    switch(fld) {
-    //case "$ion":                // sid 1
-    //case "$ion_1_0":            // sid 2
-    //case "$ion_symbol_table":   // sid 3
-    case "name":                // sid 4
-      name = sp.stringValue();
-      break;
-    case "version":             // sid 5
-      version = sp.numberValue();
-      break;
-    case "imports":             // sid 6
-      imports = load_imports(sp, catalog);
-      break;
-    case "symbols":             // sid 7
-      symbols = load_symbols(sp);
-      break;
-    case "max_id":              // sid 8
-      maxid = sp.numberValue();
-    //case 9 : //"$ion_shared_symbol_table",
-    default:
-      if (typeof overflow === 'undefined') overflow = {};
-      overflow[sp.fieldName()] = sp.value();
-      break;
+  reader.stepIn();
+  while (reader.next()) {
+    switch(reader.fieldName()) {
+      case "imports":
+        import_ = load_imports(reader, catalog);
+        break;
+      case "symbols":
+        symbols = load_symbols(reader);
+        break;
     }
   }
-  sp.stepOut();
-  
-  // DEBUG
-  let err: string = "";
-  if (typeof name !== 'undefined') {
-    if (typeof name !== 'string') err += "bad type for name, ";
-    if (typeof version !== 'number') err += "bad type for version, ";
-  }
-  if (typeof maxid !== 'undefined' && typeof maxid != 'number') err += "bad type for maxid, ";
-  if (err !== "") throw new Error(err);
-  
-  let st: SymbolTable = new UserSymbolTable(name, version, imports, symbols, maxid, overflow);
-  
-  // step through the imports and resolve the imported symbol tables and
-  // compute the _offset id and _max_id (if missing)
-  off = 0;
-  len = imports ? imports.length : 0;
-  for (ii=0; ii<len; ii++) {
-    name = imports[ii].name;
-    version = imports[ii].version;
-    imp = catalog ? catalog.getSymbolTable(name, version) : undefined;
-    if (imp) {
-      imports[ii].symtab = imp;
-      if (imports[ii].maxid === undefined) {
-        imports[ii].maxid = imp.maxid;
-      }
-    }
-    imports[ii].offset = off;
-    off += imports[ii].maxid;
-  }
- 
-  return st;
+  reader.stepOut();
+
+  return new LocalSymbolTable(import_, symbols);
 }

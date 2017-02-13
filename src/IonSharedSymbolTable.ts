@@ -11,18 +11,22 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-define({
-  defaultTimeout: 2000, // ms
-  excludeInstrumentation: true,
-  filterErrorStack: true,
-  suites: [
-    'tests/unit/textNulls',
-    'tests/unit/spans',
-    'tests/unit/iontests',
-    'tests/unit/IonCatalogTest',
-    'tests/unit/IonImportTest',
-    'tests/unit/IonLocalSymbolTableTest',
-    'tests/unit/IonBinaryWriterTest',
-    'tests/unit/IonWriteableTest',
-  ],
-});
+export class SharedSymbolTable {
+  constructor(
+    private readonly _name: string,
+    private readonly _version: number,
+    private readonly _symbols: string[]
+  ) {}
+
+  get name() : string {
+    return this._name;
+  }
+
+  get version() : number {
+    return this._version;
+  }
+
+  get symbols() : string[] {
+    return this._symbols;
+  }
+}
