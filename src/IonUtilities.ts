@@ -11,12 +11,22 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
+/**
+ * A collection of general language-level helper methods.
+ */
+export function isNumber(value: any) : value is number {
+  return typeof(value) == 'number';
+}
 
-export function isUndefined(value: any) {
+export function isString(value: any) : value is string {
+  return typeof(value) == 'string';
+}
+
+export function isUndefined(value: any) : boolean {
   return typeof(value) == 'undefined';
 }
 
-export function isNullOrUndefined(value: any) {
+export function isNullOrUndefined(value: any) : boolean {
   return isUndefined(value) || value === null;
 }
 

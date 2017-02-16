@@ -29,8 +29,8 @@
 //      ION.LongInt.fromNumber(number)
 //      ION.LongInt.ZERO
 
-
 import { is_digit } from "./IonText";
+import { isNullOrUndefined } from "./IonUtilities";
 
 export class LongInt {
   private static readonly zero_bytes: number[] = [0];
@@ -113,7 +113,12 @@ export class LongInt {
   isZero() : boolean {
     if (this.isNull()) return false;
     if (this.s === 0) return true;
-    if (typeof this.b === 'object') return LongInt._is_zero_bytes(this.b);
+    if (!isNullOrUndefined(this.b)) {
+      return LongInt._is_zero_bytes(this.b);
+    }
+    if (!isNullOrUndefined(this.d)) {
+      return this.d == '0';
+    }
     return undefined;
   }
 
@@ -123,7 +128,7 @@ export class LongInt {
 
   private _d() : void { // forces creation of base 10 string
     var dec, str, bytes, len, dg, src, dst;
-    if (this.d === undefined) {
+    if (isNullOrUndefined(this.d)) {
       if (this.isZero()) {
         this.d = LongInt.zero_string;
       } else {
@@ -182,30 +187,33 @@ export class LongInt {
     }
   }
 
-  private _b() { // forces creation of base 256 byte array
-    var bytes, dec, dst, src, len, dg;
-    if (this.b === undefined) {
+  private _b() : void { // forces creation of base 256 byte array
+    if (isNullOrUndefined(this.b)) {
       if (this.isZero()) {
         this.b = LongInt.zero_bytes;
+        return;
       }
-      else {
-        dec = this.d;
-        len = dec.length;
-        bytes = LongInt._make_zero_array(len);
-        src = 0;
-        for (;;) {
-          dg = dec.charCodeAt(src) - LongInt.char_zero;
-          LongInt._add(bytes, dg);
-          src++;
-          if (src >= len) break;
-          LongInt._mult(bytes, LongInt.string_base);
+
+      let dec: string = this.d;
+      let len: number = dec.length;
+      let bytes: number[] = LongInt._make_zero_array(len);
+      let src: number = 0;
+      for (;;) {
+        let dg: number = dec.charCodeAt(src) - LongInt.char_zero;
+        LongInt._add(bytes, dg);
+        src++;
+        if (src >= len) {
+          break;
         }
-        // we start at 1 because we always want at least 1 byte in the array
-        for (dst = 1; dst < len; dst++) {
-          if (bytes[dst] > 0) break;
-        }
-        this.b = bytes.slice(dst);
+        LongInt._mult(bytes, LongInt.string_base);
       }
+
+      // We end at length - 1 because we always want at least 1 byte in the array
+      let firstNonzeroDigitIndex: number = 0;
+      for (; firstNonzeroDigitIndex < len; firstNonzeroDigitIndex++) {
+        if (bytes[firstNonzeroDigitIndex] > 0) break;
+      }
+      this.b = bytes.slice(firstNonzeroDigitIndex);
     }
   }
 

@@ -21,6 +21,10 @@ export function defaultLocalSymbolTable() : LocalSymbolTable {
   return new LocalSymbolTable(getSystemSymbolTableImport());
 }
 
+/**
+ * A local symbol table defines all the symbols which aren't included in the system
+ * symbol table or from a shared symbol table via an import.
+ */
 export class LocalSymbolTable  {
   private offset: number;
   private _symbols: string[] = [];
@@ -67,5 +71,9 @@ export class LocalSymbolTable  {
 
   get symbols() : string[] {
     return this._symbols;
+  }
+
+  get import() : Import {
+    return this._import;
   }
 }

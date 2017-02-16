@@ -41,6 +41,12 @@
 import { is_digit } from "./IonText";
 import { LongInt } from "./IonLongInt";
 
+function * stringGenerator(str: string) {
+  for (let i: number = 0; i < str.length; i++) {
+    yield str.charCodeAt(i);
+  }
+}
+
 export class Decimal {
   public static readonly NULL: Decimal = new Decimal(undefined, undefined);
   public static readonly ZERO: Decimal = new Decimal(LongInt.ZERO, 0);
@@ -58,8 +64,12 @@ export class Decimal {
     return this._value.isZero();
   }
 
+  isNegative() : boolean {
+    return this._value.signum() === -1;
+  }
+
   isNegativeZero() : boolean {
-    return (this._value.signum() === -1) && (this.isZero());
+    return this.isZero() && this.isNegative();
   }
 
   isZeroZero() : boolean {
@@ -103,7 +113,7 @@ export class Decimal {
           image = "0" + image;
         }
       }
-      decimal_location = image.length - s;
+      decimal_location = image.length + s;
       image = image.substr(0, decimal_location) + "." + image.substr(decimal_location);
     }
     else if (s > 0) {
@@ -135,97 +145,115 @@ export class Decimal {
   }
 
   static parse(str: string) : Decimal {
-    var v = undefined, 
-        s = 0,
-        is_negative = false,
-        exp_is_negative = false,
-        c, t;
-
-    if (typeof str !== "string" || str.length < 0) {
-      throw new Error("only strings can be parsed");
-    }
-
-    c = str.charCodeAt(0);
-    switch (c) {
-      case 43:              // "+"
-        str = str.substr(1);
-        break;
-      case 45:              //  "-"
-        is_negative = true;
-        str = str.substr(1);
-        break;
-      case 46:              //  "."
-        c = str.charCodeAt(1);
-        if (!is_digit(c)) str = "0" + str;
-        break;
-      case 110:            // "n"
-        if (str === "null" || str === "null.decimal") {
-          return Decimal.NULL;
-        }
-        break;
-      default:
-        break;
-    }
-    c = str.charCodeAt(0);
-    if (!is_digit(c)) throw new Error("invalid decimal");
-
-    // now we really start decoding
-    let len: number = str.length;
-    let past_decimal: boolean = false;
-    let temp: number = 0;
+    let index: number = 0;
     let exponent: number = 0;
-    for (let ii: number = 0; ii < len; ii++) {
-      c = str.charCodeAt(ii);
-      switch (c) {
-      case 46: // decimal point
-        past_decimal = true;
+    let c: number;
+    let isNegative: boolean = false;
+
+    c = str.charCodeAt(index);
+    if (c === '+'.charCodeAt(0)) {
+      index++;
+    } else if (c === '-'.charCodeAt(0)) {
+      isNegative = true;
+      index++;
+    } else if (c === 'n'.charCodeAt(0)) {
+      if (str == 'null' || str == 'null.decimal') {
+        return Decimal.NULL;
+      } 
+    }
+
+    let digits: string = Decimal.readDigits(str, index);
+    index += digits.length;
+    digits = Decimal.stripLeadingZeroes(digits);
+
+    if (index === str.length) {
+      let trimmedDigits: string = Decimal.stripTrailingZeroes(digits);
+      exponent += digits.length - trimmedDigits.length;
+      return new Decimal(new LongInt(trimmedDigits, null, isNegative? -1: 1), exponent);
+    }
+
+    let hasDecimal: boolean = false;
+    c = str.charCodeAt(index);
+    if (c === '.'.charCodeAt(0)) {
+      hasDecimal = true;
+      index++;
+      let mantissaDigits: string = Decimal.readDigits(str, index);
+      index += mantissaDigits.length;
+      exponent -= mantissaDigits.length;
+      digits = digits.concat(mantissaDigits);
+    }
+
+    if (!hasDecimal) {
+      let trimmedDigits: string = Decimal.stripTrailingZeroes(digits);
+      exponent += digits.length - trimmedDigits.length;
+      digits = trimmedDigits;
+    }
+
+    if (index === str.length) {
+      return new Decimal(new LongInt(digits, null, isNegative? -1 : 1), exponent);
+    }
+
+    c = str.charCodeAt(index);
+    if (c !== 'd'.charCodeAt(0) && c !== 'D'.charCodeAt(0)) {
+      throw new Error(`Invalid decimal ${str}`);
+    }
+    index++;
+
+    let isExplicitExponentNegative: boolean = false;
+    c = str.charCodeAt(index);
+    if (c === '+'.charCodeAt(0)) {
+      index++;
+    } else if (c === '-'.charCodeAt(0)) {
+      isExplicitExponentNegative = true;
+      index++;
+    }
+
+    let explicitExponentDigits: string = Decimal.readDigits(str, index);
+    let explicitExponent = Number.parseInt(explicitExponentDigits, 10);
+    if (isExplicitExponentNegative) {
+      explicitExponent = -explicitExponent;
+    }
+    exponent += explicitExponent;
+    index += explicitExponentDigits.length;
+
+    if (index !== str.length) {
+      // Did not consume the entire string so it must be invalid
+      throw new Error(`Invalid decimal ${str}`);
+    }
+
+    let decimal: Decimal = new Decimal(new LongInt(digits, null, isNegative ? -1 : 1), exponent);
+    return decimal;
+  }
+
+  private static readDigits(s: string, offset: number) : string {
+    let digits: number = 0;
+    for (let i: number = offset; i < s.length; i++) {
+      if (is_digit(s.charCodeAt(i))) {
+        digits++;
+      } else {
         break;
-      case 48: case 49: case 50: case 51: case 52:  // '0' - '4'
-      case 53: case 54: case 55: case 56: case 57:  // '5' - '9'
-        v = v * 10 + c - 48;
-        if (past_decimal) {
-          exponent--;
-        }
-        break;
-      case  68: case  69: case  70: // D, E, F  - exponent start
-      case 100: case 101: case 102: // d, e, f
-        v = temp;  // store this as the value
-        temp = 0;  // not switch to adding up the exponent
-        // check for an exponent sign
-        c = str.charCodeAt(ii+1);
-        if (c === 43) {  // '+'
-          ii++;
-          c = str.charCodeAt(ii+1);
-        } 
-        else if (c === 45) { // '-'
-          exp_is_negative = true;
-          ii++;
-          c = str.charCodeAt(ii+1);
-        } 
-        if (!is_digit(c)) {
-          ii = len; // we're done - break us out of the for loop
-        }
-        past_decimal = false; // turn off any scale shifting, we're not in the value part any longer
-        break;
-      default:
-        ii = len; // we're done - break out of the for loop
       }
     }
-    if (v === undefined) { 
-      // we never saw an exponent character, so our value is still in temp
-      v = temp;
-    }
-    else {
-      // we did see an exponent, so v is loaded and we need to adjust 
-      // the exponent_shift we built up byte the user exponent
-      if (exp_is_negative) {
-        exponent -= temp;
-      }
-      else {
-        exponent += temp;
+    return s.slice(offset, offset + digits);
+  }
+
+  private static stripLeadingZeroes(s: string) : string {
+    let i: number = 0;
+    for (; i < s.length - 1; i++) {
+      if (s.charCodeAt(i) !== '0'.charCodeAt(0)) {
+        break;
       }
     }
-    t = new Decimal(v, exponent);
-    return t;
+    return (i > 0) ? s.slice(i) : s;
+  }
+
+  private static stripTrailingZeroes(s: string) : string {
+    let i: number = s.length - 1;
+    for (; i >= 1; i--) {
+      if (s.charCodeAt(i) !== '0'.charCodeAt(0)) {
+        break;
+      }
+    }
+    return (i < s.length - 1) ? s.slice(0, i + 1) : s;
   }
 }
