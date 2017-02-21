@@ -11,9 +11,6 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-/**
- * @file Constants and helper methods for reading and writing the Ion text format
- */
 import { isUndefined } from "./IonUtilities";
 
 export const WHITESPACE_COMMENT1 = -2;
@@ -325,10 +322,10 @@ CommonEscapes[CharCodes.FORM_FEED] = backslashEscape('f');
 CommonEscapes[CharCodes.CARRIAGE_RETURN] = backslashEscape['r'];
 CommonEscapes[CharCodes.BACKSLASH] = backslashEscape('\\');
 
-export let StringEscapes : EscapeIndex = Object.assign({}, CommonEscapes);
+export let StringEscapes : EscapeIndex = Object['assign']({}, CommonEscapes);
 StringEscapes[CharCodes.DOUBLE_QUOTE] = backslashEscape('"');
 
-export let SymbolEscapes : EscapeIndex = Object.assign({}, CommonEscapes);
+export let SymbolEscapes : EscapeIndex = Object['assign']({}, CommonEscapes);
 SymbolEscapes[CharCodes.SINGLE_QUOTE] = backslashEscape("'");
 
 export function isIdentifier(s: string) : boolean {

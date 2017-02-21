@@ -471,7 +471,7 @@ export class Timestamp {
         if (digits.length === 0) {
           bad_timestamp(pos);
         }
-        v = Number.parseInt(digits, 10);
+        v = parseInt(digits, 10);
         pos += digits.length;
       } else if (state.len > 0) {
         v = read_digits(str, pos, state.len);
