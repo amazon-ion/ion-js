@@ -15,7 +15,9 @@
   function(require) {
     const registerSuite = require('intern!object');
     const assert = require('intern/chai!assert');
-    const ion = require('dist/Ion');
+    const ion = require('dist/amd/es6/Ion');
+    const ionUnicode = require('dist/amd/es6/IonUnicode');
+    const ionTextWriter = require('dist/amd/es6/IonTextWriter');
 
     var suite = {
       name: 'Text Writer'
@@ -24,12 +26,12 @@
     var writerTest = function(name, instructions, expected) {
       suite[name] = function() {
         var writeable = new ion.Writeable();
-        var writer = new ion.TextWriter(writeable);
+        var writer = new ionTextWriter.TextWriter(writeable);
         instructions(writer);
         writer.close();
         var actual = writeable.getBytes();
         var errorMessage = String.fromCharCode.apply(null, actual) + " != " + expected;
-        var encodedExpected = ion.encodeUtf8(expected);
+        var encodedExpected = ionUnicode.encodeUtf8(expected);
         assert.deepEqual(actual, encodedExpected, errorMessage);
       }
     }

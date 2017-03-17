@@ -28,7 +28,6 @@ define({
     'tests/unit/IonTextTest',
     'tests/unit/IonTextWriterTest',
     'tests/unit/IonUnicodeTest',
-    'tests/unit/IonBinaryTest',
     'tests/unit/IonLowLevelBinaryWriterTest',
     'tests/unit/IonBinaryWriterTest',
   ],

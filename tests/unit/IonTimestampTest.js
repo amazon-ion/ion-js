@@ -15,7 +15,7 @@
   function(require) {
     const registerSuite = require('intern!object');
     const assert = require('intern/chai!assert');
-    const ion = require('dist/Ion');
+    const ion = require('dist/amd/es6/Ion');
 
     var suite = {
       name: 'Timestamp'
