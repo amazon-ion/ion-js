@@ -15,15 +15,9 @@ define([
     'intern',
     'intern!object',
     'intern/chai!assert',
-    'dist/amd/es5/IonTests',
     'dist/amd/es6/IonTests',
   ],
-  function(intern, registerSuite, assert, ionEs5, ionEs6) {
-    var ionVersions = {
-      es5: ionEs5,
-      es6: ionEs6,
-    };
-    var ion = ionVersions[intern.args.ionVersion];
+  function(intern, registerSuite, assert, ion) {
 
     var suite = {
       name: 'Binary Writer'

@@ -15,7 +15,8 @@
   function(require) {
     const registerSuite = require('intern!object');
     const assert = require('intern/chai!assert');
-    const ion = require('dist/Ion');
+    const ion = require('dist/amd/es6/Ion');
+    const ionText = require('dist/amd/es6/IonText');
 
     var suite = {
       name: 'Text'
@@ -30,8 +31,9 @@
     }
 
     var base64Test = function(value, expected) {
-      suite[`${value} encoded in base64 is ${expected}`] = function() {
-        var charCodes = stringToCharCodes(value);
+        let msg = value + ' encoded in base64 is ' + expected;
+      suite[msg] = function() {
+        let charCodes = stringToCharCodes(value);
         assert.equal(ion.toBase64(charCodes), expected);
       };
     };
@@ -46,7 +48,7 @@
     var isIdentifierTest = function(value, expected) {
       var suiteName = value + ' ' + (expected ? 'is' : 'is not') + ' an identifier';
       suite[suiteName] = function() {
-        assert.equal(ion.isIdentifier(value), expected);
+        assert.equal(ionText.isIdentifier(value), expected);
       }
     }
 
@@ -59,7 +61,7 @@
     var isOperatorTest = function(value, expected) {
       var suiteName = value + ' ' + (expected ? 'is' : 'is not') + ' an operator';
       suite[suiteName] = function() {
-        assert.equal(ion.isOperator(value), expected);
+        assert.equal(ionText.isOperator(value), expected);
       }
     }
 
