@@ -29,6 +29,12 @@ interface Options {
   sourceType: string;
 }
 
+/**
+ * Returns the `buf` type as binary or text. 
+ * 
+ * @param buffer we want to check its type 
+ * @returns either `'binary'` or `'text'`
+ */
 function get_buf_type(buf: Span) {
   var firstByte = buf.valueAt(0);
   return (firstByte === IVM.binary[0]) ? 'binary' : 'text';
