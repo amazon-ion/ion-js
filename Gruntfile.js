@@ -18,13 +18,36 @@ module.exports = function(grunt) {
       es6: {
         options: {
           config: 'tests/intern',
-          reporters: ['Console', 'Lcov'],
+          reporters: ['Console', 'node_modules/remap-istanbul/lib/intern-reporters/JsonCoverage'],
           ionVersion: 'es6',
         },
       },
     },
+    clean: ['dist/', 'docs/', 'coverage-final.json'], 
     jshint: {
       files: []
+    },
+    typedoc: { 
+      build: { 
+        options: { 
+          module: 'amd', 
+          target: 'es6',
+          out: 'docs/api/',
+          name: 'Ion Library',
+        }, 
+        src: 'src/**/*'
+      }
+    },
+    remapIstanbul: {
+      build: {
+        src: 'coverage-final.json',
+          options: {
+            reports: {
+              'html': 'docs/coverage/html',
+              'json': 'docs/coverage/coverage-final-mapped.json'
+            }
+          }
+      }
     },
     ts: {
       'amd-es6': {
@@ -34,13 +57,18 @@ module.exports = function(grunt) {
           target: "es6",
           module: "amd"
         }
-      },
+      }
     }
   });
 
   grunt.loadNpmTasks('grunt-contrib-jshint');
+  grunt.loadNpmTasks('grunt-contrib-clean');
   grunt.loadNpmTasks('grunt-ts');
+  grunt.loadNpmTasks('grunt-typedoc');
+  grunt.loadNpmTasks('remap-istanbul');
   grunt.loadNpmTasks('intern');
 
-  grunt.registerTask('default', ['ts:amd-es6', 'intern:es6']);
+  grunt.registerTask('default', ['clean', 'ts:amd-es6', 'intern:es6']);
+  grunt.registerTask('release', ['clean', 'ts:amd-es6', 'intern:es6', 'typedoc']);
+  grunt.registerTask('coverage', ['intern:es6', 'remapIstanbul']);
 };

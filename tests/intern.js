@@ -13,7 +13,7 @@
  */
 define({
   defaultTimeout: 2000, // ms
-  excludeInstrumentation: true,
+  excludeInstrumentation: /^(?:tests|node_modules)\//,
   filterErrorStack: true,
   suites: [
     'tests/unit/textNulls',
