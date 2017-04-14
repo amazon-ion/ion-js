@@ -88,13 +88,18 @@ function asSpan(buf: any) : Span {
  */
 export function makeReader(buf: any, options: Options) : Reader {
   let inSpan : Span = asSpan(buf);
-  let stype =  options && (typeof options.sourceType === 'undefined')
+  let stype =  options && isSourceType(options.sourceType)
                 ? options.sourceType
                 : get_buf_type(inSpan);
   let reader: Reader = (stype === 'binary')
              ? makeBinaryReader(inSpan, options)
              : makeTextReader(inSpan, options);
   return reader;
+}
+
+
+function isSourceType(val):boolean {
+  return val === 'text' || val === 'binary';
 }
 
 /**
