@@ -98,7 +98,7 @@ export function makeReader(buf: any, options: Options) : Reader {
 }
 
 
-function isSourceType(val):boolean {
+function isSourceType(val) : boolean {
   return val === 'text' || val === 'binary';
 }
 
