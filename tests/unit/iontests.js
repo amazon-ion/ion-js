@@ -107,8 +107,7 @@ define([
                 chunks.push(chunk);
               }
               var buffer = Buffer.concat(chunks);
-              var span = ion.makeSpan(buffer);
-              var reader = ion.makeReader(span);
+              var reader = ion.makeReader(buffer);
               console.log("Exhausting " + path);
               if (path.endsWith('clobsWithWhitespace.ion')) {
                 //debugger;

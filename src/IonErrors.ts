@@ -11,24 +11,17 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-define([
-    'intern',
-    'intern!object',
-    'intern/chai!assert',
-    'dist/amd/es6/IonTests',
-  ],
-  function(intern, registerSuite, assert, ionTest) {
 
-    var suite = {
-      name: 'Writeable'
-    };
+ //  Ion Errors (Exceptions)
 
-    suite['writePartialArray'] = function() {
-      var writeable = new ionTest.Writeable();
-      writeable.writeBytes([1,2,3,4,5,6,7,8], 4, 4);
-      assert.deepEqual(writeable.getBytes(), [5,6,7,8]);
-    };
 
-    registerSuite(suite);
-  }
-);
+export interface InvalidArgumentError extends Error {
+}
+
+export interface InvalidArgumentConstructor {
+  new (message?: string): InvalidArgumentError;
+  (message?: string): InvalidArgumentError;
+  readonly prototype: InvalidArgumentError;
+}
+
+export declare const InvalidArgumentError: InvalidArgumentConstructor;

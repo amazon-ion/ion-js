@@ -13,6 +13,7 @@
  */
 
 import { EOF } from "./IonConstants";
+import { InvalidArgumentError } from "./IonErrors"
 
 const SPAN_TYPE_STRING = 0;
 const SPAN_TYPE_BINARY = 1;
@@ -260,7 +261,22 @@ class BinarySpan extends Span {
   }
 }
 
+
+
+
+/**
+ * Create a Span object that wraps src.
+ * @see http://www.cs.cmu.edu/~wjh/papers/subseq.html
+ *
+ * @param src value to be stored inside a span, typically a string
+ * @param start beginning index of src
+ * @param len end index of src
+ * @returns {Span}
+ */
 export function makeSpan(src: any, start?: number, len?: number): Span {
+  if (src instanceof Span) {
+    return src as Span;
+  }
   if (typeof start === 'undefined') {
     start = 0;
   }
@@ -271,16 +287,17 @@ export function makeSpan(src: any, start?: number, len?: number): Span {
   let span: Span = undefined;
   let src_type = typeof src;
   if (src_type === 'undefined') {
-    Span.error();
+    throw new InvalidArgumentError("Given \'undefined\' as input");
   } else if (src_type === 'string') {
     span = new StringSpan(src, start, len);
   } else if (src_type === 'object') {
+    // TODO: this seems fishy since isSpan is not defined on Span types!
     if (typeof (src.isSpan) === 'undefined') { // probably an array
       span = new BinarySpan(src, start, len);
     }
   }
   if (span === undefined) {
-    throw new Error("invalid span source");
+    throw new InvalidArgumentError("invalid span source");
   }
   return span;
 }

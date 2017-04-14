@@ -15,8 +15,14 @@ import { BinaryReader } from "./IonBinaryReader";
 import { Catalog } from "./IonCatalog";
 import { IVM } from "./IonConstants";
 import { Reader } from "./IonReader";
-import { Span } from "./IonSpan";
+import { Span, makeSpan } from "./IonSpan";
 import { TextReader } from "./IonTextReader";
+import { InvalidArgumentError } from "./IonErrors";
+import { Writer } from "./IonWriter";
+import { TextWriter } from "./IonTextWriter";
+import { Writeable } from "./IonWriteable";
+import { BinaryWriter } from "./IonBinaryWriter";
+import { LocalSymbolTable, defaultLocalSymbolTable } from "./IonLocalSymbolTable";
 
 const e = {
   name: "IonError",
@@ -24,6 +30,12 @@ const e = {
   msg: "error",
 }
 
+
+/**
+ * Options object to be passed during the creation of an Ion Reader.
+ * Holds the Ion catalogue @see http://amznlabs.github.io/ion-docs/symbols.html#the-catalog
+ * and the Ion source type (i.e., binary or text) as a `string`
+ */
 interface Options {
   catalog: Catalog;
   sourceType: string;
@@ -48,25 +60,72 @@ function makeTextReader(span: Span, options: Options) : TextReader {
   return new TextReader(span, options && options.catalog);
 }
 
-export function makeReader(buf: Span, options: Options) : Reader {
-  var stype =  options && (typeof options.sourceType === 'undefined')
+/**
+ * Wrapper method to capture and/or propagate exceptions occuring during span creation.
+ *
+ * @param buf value passed in that should represent Ion data, typically as a `string`
+ * @returns {Span}
+ */
+function asSpan(buf: any) : Span {
+  try {
+    return  makeSpan(buf)
+  } catch (e) {
+    if (e instanceof InvalidArgumentError) {
+      throw new Error("Invalid argument, expected \'string\' value found:  " + buf);
+    } else {
+      throw e;
+    }
+  }
+}
+
+/**
+ * Create an Ion Reader object from a buffer `buf` and `options`.
+ *
+ *
+ * @param buf the Ion data to be used by the reader. Typically a string.
+ * @param options for the reader including catalogue and type of source, e.g., `'binary'` or `'text'`
+ * @returns {Reader}
+ */
+export function makeReader(buf: any, options: Options) : Reader {
+  let inSpan : Span = asSpan(buf);
+  let stype =  options && (typeof options.sourceType === 'undefined')
                 ? options.sourceType
-                : get_buf_type(buf);
+                : get_buf_type(inSpan);
   let reader: Reader = (stype === 'binary')
-             ? makeBinaryReader(buf, options)
-             : makeTextReader(buf, options);
+             ? makeBinaryReader(inSpan, options)
+             : makeTextReader(inSpan, options);
   return reader;
 }
 
-export { BinaryWriter } from "./IonBinaryWriter";
+/**
+ * Create a new Ion Text Writer.
+ *
+ * @returns {TextWriter}
+ */
+export function makeTextWriter() : Writer {
+  return new TextWriter(new Writeable());
+}
+
+
+/**
+ * Create a new Ion Binary Writer. You can optionally provide a local symbol table else
+ * the default local symbol table will be used.
+ *
+ * @param localSymbolTable to use for the new writer
+ * @returns {BinaryWriter}
+ */
+export function makeBinaryWriter(localSymbolTable : LocalSymbolTable = defaultLocalSymbolTable()) : Writer {
+  return new BinaryWriter(localSymbolTable, new Writeable());
+}
+
+//export { BinaryWriter } from "./IonBinaryWriter";
 export { Catalog } from "./IonCatalog";
 export { Decimal } from "./IonDecimal";
 export { defaultLocalSymbolTable } from "./IonLocalSymbolTable";
 export { IonTypes } from "./IonTypes";
-export { makeSpan } from "./IonSpan";
 export { Precision } from "./IonPrecision";
 export { SharedSymbolTable } from "./IonSharedSymbolTable";
 export { Timestamp } from "./IonTimestamp";
 export { toBase64 } from "./IonText";
 export { TypeCodes } from "./IonBinary";
-export { Writeable } from "./IonWriteable";
+

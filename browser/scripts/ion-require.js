@@ -1,9 +1,29 @@
-requirejs(["Ion"], function(ion) {
-  var symbolTable = new ion.LocalSymbolTable(ion.getSystemSymbolTableImport());
-  var writeable = new ion.Writeable();
-  var writer = new ion.BinaryWriter(symbolTable, writeable);
-  writer.writeStruct();
-  writer.close();
-  var actual = writeable.getBytes();
-  alert(actual);
+requirejs(["ion/Ion"], function(ion) {
+ var writer = ion.makeTextWriter();
+ writer.writeStruct();
+ writer.writeFieldName('f1');
+ writer.writeBoolean(true);
+ writer.endContainer();
+ writer.close();
+ alert(String.fromCharCode.apply(null, writer.getBytes()));
+   
+ var ionData = '{ hello: "world" }'; 
+ var ionReader = ion.makeReader(ionData); 
+
+ console.log('ionData : ', ionData);
+ console.log('ionReader : ', ionReader);
+ 
+ ionReader.next(); 
+ ionReader.stepIn(); 
+ ionReader.next(); 
+ var hello = ionReader.fieldName(); 
+ var world = ionReader.stringValue(); 
+ ionReader.stepOut(); 
+ console.log(hello, '...', world);
+
+ 
 });
+ 
+function test(str) { 
+    console.log(str); 
+} 

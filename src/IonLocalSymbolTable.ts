@@ -17,9 +17,7 @@ import { isNullOrUndefined } from "./IonUtilities";
 import { isUndefined } from "./IonUtilities";
 import { SymbolIndex } from "./IonSymbolIndex";
 
-export function defaultLocalSymbolTable() : LocalSymbolTable {
-  return new LocalSymbolTable(getSystemSymbolTableImport());
-}
+
 
 /**
  * A local symbol table defines all the symbols which aren't included in the system
@@ -76,4 +74,9 @@ export class LocalSymbolTable  {
   get import() : Import {
     return this._import;
   }
+}
+
+
+export function defaultLocalSymbolTable() : LocalSymbolTable {
+  return new LocalSymbolTable(getSystemSymbolTableImport());
 }

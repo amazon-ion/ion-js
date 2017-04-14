@@ -39,6 +39,10 @@ enum State {
 }
 
 export class TextWriter implements Writer {
+  getBytes(): number[] {
+    return this.writeable.getBytes();
+  }
+  
   private state: State = State.VALUE;
   private isFirstValue: boolean = true;
   private isFirstValueInContainer: boolean = false;

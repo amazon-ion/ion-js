@@ -14,6 +14,9 @@
 module.exports = function(grunt) {
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
+      /**
+       * Tests configuration
+       */
     intern: {
       es6: {
         options: {
@@ -23,21 +26,32 @@ module.exports = function(grunt) {
         },
       },
     },
-    clean: ['dist/', 'docs/', 'coverage-final.json'], 
+    clean: ['dist/',
+            'docs/',
+            'coverage-final.json',
+            'browser/scripts/ion/'
+           ],
     jshint: {
       files: []
     },
-    typedoc: { 
-      build: { 
-        options: { 
-          module: 'amd', 
+      /**
+       * Typescript document generator
+       */
+    typedoc: {
+      build: {
+        options: {
+          module: 'amd',
           target: 'es6',
           out: 'docs/api/',
           name: 'Ion Library',
-        }, 
+        },
         src: 'src/**/*'
       }
     },
+      /**
+       * Coverage report that maps coverage results to .ts files instead
+       * of the generated .js files.
+       */
     remapIstanbul: {
       build: {
         src: 'coverage-final.json',
@@ -58,17 +72,38 @@ module.exports = function(grunt) {
           module: "amd"
         }
       }
-    }
+    },
+      /**
+       * Copy of generated .js files to
+       *  1. the dist folder
+       *  2. the browser folder for use within a browser
+       */
+    copy: {
+      main: {
+        files: [
+          { expand: true,
+            src: ['dist/amd/es6/*.js'],
+            dest: 'browser/scripts/ion/',
+            flatten: true
+          }
+        ]
+      }
+    },
   });
 
   grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-contrib-clean');
+  grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks('grunt-ts');
   grunt.loadNpmTasks('grunt-typedoc');
   grunt.loadNpmTasks('remap-istanbul');
   grunt.loadNpmTasks('intern');
 
-  grunt.registerTask('default', ['clean', 'ts:amd-es6', 'intern:es6']);
-  grunt.registerTask('release', ['clean', 'ts:amd-es6', 'intern:es6', 'typedoc']);
-  grunt.registerTask('coverage', ['intern:es6', 'remapIstanbul']);
+  grunt.registerTask('build', ['clean', 'ts:amd-es6','copy:main']);
+  grunt.registerTask('test', ['build', 'intern:es6']);
+  grunt.registerTask('doc', ['test', 'typedoc']);
+  grunt.registerTask('coverage', ['doc', 'remapIstanbul']);
+  grunt.registerTask('all', ['coverage']);
+
+  grunt.registerTask('default', ['test']);
 };

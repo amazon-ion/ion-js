@@ -58,6 +58,9 @@ enum States {
  * @see http://amznlabs.github.io/ion-docs/binary.html
  */
 export class BinaryWriter implements Writer {
+  getBytes(): number[] {
+    return this.writer.getBytes();
+  }
   private readonly symbolTable: LocalSymbolTable;
   private readonly writer: LowLevelBinaryWriter;
 

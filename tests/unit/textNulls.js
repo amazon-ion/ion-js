@@ -24,15 +24,13 @@ define([
     };
 
     suite['null'] = function() {
-      var span = ion.makeSpan("null");
-      var reader = ion.makeReader(span);
+      var reader = ion.makeReader("null");
       assert.equal(reader.next(), ion.IonTypes.NULL);
       assert.equal(reader.next(), undefined);
     };
 
     suite['stepIntoNullContainer'] = function() {
-      var span = ion.makeSpan("null.list");
-      var reader = ion.makeReader(span);
+      var reader = ion.makeReader("null.list");
       assert.equal(reader.next(), ion.IonTypes.LIST);
       assert.isTrue(reader.isNull());
 

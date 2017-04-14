@@ -34,6 +34,7 @@ export interface Writer {
   writeStruct(annotations?: string[], isNull?: boolean) : void;
   writeSymbol(value: string, annotations?: string[]) : void;
   writeTimestamp(value: Timestamp, annotations?: string[]) : void;
+  getBytes(): number[];
 
   close() : void;
   endContainer() : void;
