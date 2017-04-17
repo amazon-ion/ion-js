@@ -1,0 +1,35 @@
+{
+  "name": "ion-js",
+  "version": "0.9.0",
+  "description": "A JavaScript implementation of the Ion data interchange format",
+  "main": "Gruntfile.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/amznlabs/ion-js.git"
+  },
+  "author": "ion-team@amazon.com",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/amznlabs/ion-js/issues"
+  },
+  "homepage": "https://github.com/amznlabs/ion-js#readme",
+  "devDependencies": {
+    "grunt": "^1.0.1",
+    "grunt-cli": "^1.2.0",
+    "grunt-contrib-clean": "^1.0.0",
+    "grunt-contrib-copy": "^1.0.0",
+    "grunt-contrib-jshint": "^1.0.0",
+    "grunt-ts": "^6.0.0-beta.3",
+    "grunt-typedoc": "^0.2.4",
+    "intern": "^3.4.1",
+    "remap-istanbul": "^0.9.1",
+    "typedoc": "^0.5.8",
+    "typescript": "^2.2.1"
+  }
+}
