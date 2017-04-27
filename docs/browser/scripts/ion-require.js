@@ -1,5 +1,6 @@
-requirejs(["ion/Ion"], function(ion) {
- var writer = ion.makeTextWriter();
+
+requirejs(["ion/Ion"], function(ionLib) {
+ var writer = ionLib.makeTextWriter();
  writer.writeStruct();
  writer.writeFieldName('f1');
  writer.writeBoolean(true);
@@ -8,7 +9,7 @@ requirejs(["ion/Ion"], function(ion) {
  alert(String.fromCharCode.apply(null, writer.getBytes()));
    
  var ionData = '{ hello: "world" }'; 
- var ionReader = ion.makeReader(ionData); 
+ var ionReader = ionLib.makeReader(ionData); 
 
  console.log('ionData : ', ionData);
  console.log('ionReader : ', ionReader);
@@ -24,6 +25,12 @@ requirejs(["ion/Ion"], function(ion) {
  
 });
  
+var ion = undefined;
+
 function test(str) { 
-    console.log(str); 
+    requirejs(["ion/Ion"], function(ionLib) {
+        ion = ionLib;
+    });
+    
 } 
+
