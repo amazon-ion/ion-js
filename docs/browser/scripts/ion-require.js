@@ -31,6 +31,7 @@ function test(str) {
     requirejs(["ion/Ion"], function(ionLib) {
         ion = ionLib;
     });
+    console.log("You can now use the variable \'ion\' interactively in the JS console to play with Ion Data"); 
     
 } 
 
