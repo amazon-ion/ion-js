@@ -1,4 +1,4 @@
-<p align="center">
+<p align="right">
  <a title="" href="https://api.travis-ci.org/amzn/ion-js.svg?branch=master">
  <img src="https://api.travis-ci.org/amzn/ion-js.svg?branch=master"/>
  </a>
