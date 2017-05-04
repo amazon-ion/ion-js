@@ -3,6 +3,8 @@
  <img src="https://api.travis-ci.org/amzn/ion-js.svg?branch=master"/>
  </a>
 </p>
+
+
 Build prerequisites: Node.js and npm (the JavaScript package manager)
 
 First, install the Grunt CLI:
