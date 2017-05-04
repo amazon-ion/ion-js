@@ -11,14 +11,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/amznlabs/ion-js.git"
+    "url": "git+https://github.com/amzn/ion-js.git"
   },
   "author": "ion-team@amazon.com",
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/amznlabs/ion-js/issues"
+    "url": "https://github.com/amzn/ion-js/issues"
   },
-  "homepage": "https://github.com/amznlabs/ion-js#readme",
+  "homepage": "https://github.com/amzn/ion-js#readme",
   "devDependencies": {
     "grunt": "^1.0.1",
     "grunt-cli": "^1.2.0",
