@@ -4,23 +4,46 @@
  </a>
 </p>
 
+# About 
 
-Build prerequisites: Node.js and npm (the JavaScript package manager)
+Ion-JS is a Javascript library for [Ion](https://amznlabs.github.io/ion-docs/). The library allows for reading/writing Ion 
+data from within Javascript code. 
 
-First, install the Grunt CLI:
+For more information on Ion have a look at the [Ion Specification](https://amznlabs.github.io/ion-docs/) as well as some of the other Ion language specific libraries such as 
 
- sudo npm install -g grunt-cli
+* [Ion C](https://github.com/amznlabs/ion-c)
+* [Ion Java](https://github.com/amznlabs/ion-java)
+* [Ion Python](https://github.com/amznlabs/ion-python)
 
-Next, use npm to install all the package's dependencies:
 
- npm install
+# Download
 
-Finally, run grunt to execute the build:
+The library is written in typescript and uses `npm` for its dependencies. Make sure you have the latest, stable, release 
+for [`npm`](https://nodejs.org/en/).
 
- grunt
+1. Clone this repo 
+```
+git clone --recursive https://github.com/amzn/ion-js.git
+```
+1. Use `npm` to install all dependencies
+```
+npm install 
+```
+1. We use [`grunt`](https://gruntjs.com/) for managing our build process, to see all of our build targets look at [`Gruntfile.js`](Gruntfile.js). 
+```
+grunt all
+```
+Javascript code is generated under the folder `dist`. Documentation is generated under the folder `doc`.  
+
+
+## Tests 
 
 To debug the unit tests, use the following command:
 
- node debug node_modules/intern/client config=tests/intern ionVersion=es6
+```
+node debug node_modules/intern/client config=tests/intern ionVersion=es6
+```
+
+## Browser 
 
 To run Ion in a browser, see the example in the "browser" folder. You'll need to copy require.js and the Ion JavaScript files (Ion.js etc.) into the "scripts" folder.
