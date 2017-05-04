@@ -9,7 +9,7 @@
 Ion-JS is a Javascript library for [Ion](https://amznlabs.github.io/ion-docs/). The library allows for reading/writing Ion 
 data from within Javascript code. 
 
-For more information on Ion have a look at the [Ion Specification](https://amznlabs.github.io/ion-docs/) as well as some of the other Ion language specific libraries such as 
+For more information on Ion have a look at the [Ion Specification](https://amznlabs.github.io/ion-docs/spec.html) as well as some of the other Ion language specific libraries such as 
 
 * [Ion C](https://github.com/amznlabs/ion-c)
 * [Ion Java](https://github.com/amznlabs/ion-java)
