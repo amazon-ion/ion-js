@@ -22,17 +22,17 @@ The library is written in typescript and uses `npm` for its dependencies. Make s
 for [`npm`](https://nodejs.org/en/).
 
 1. Clone this repo 
-```
-git clone --recursive https://github.com/amzn/ion-js.git
-```
+    ```
+    git clone --recursive https://github.com/amzn/ion-js.git
+    ```
 1. Use `npm` to install all dependencies
-```
-npm install 
-```
+    ```
+    npm install 
+    ```
 1. We use [`grunt`](https://gruntjs.com/) for managing our build process, to see all of our build targets look at [`Gruntfile.js`](Gruntfile.js). 
-```
-grunt all
-```
+    ```
+    grunt all
+    ```
 Javascript code is generated under the folder `dist`. Documentation is generated under the folder `doc`.  
 
 
