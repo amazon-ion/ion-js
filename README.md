@@ -33,7 +33,8 @@ for [`npm`](https://nodejs.org/en/).
     ```
     grunt all
     ```
-Javascript code is generated under the folder `dist`. Documentation is generated under the folder `doc`.  
+Javascript code is generated under the folder `dist`. 
+Documentation is generated under the folder `doc` and is also available [online](https://amzn.github.io/ion-js/api/). 
 
 
 ## Tests 
