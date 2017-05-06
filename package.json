@@ -14,9 +14,11 @@
     "type": "git",
     "url": "git+https://github.com/amzn/ion-js.git"
   },
-  "keywords" : [ 
-    "ion", "JSON", "data format"
-  ], 
+  "keywords": [
+    "ion",
+    "JSON",
+    "data format"
+  ],
   "author": "The Ion Team <ion-team@amazon.com> (https://amznlabs.github.io/ion-docs/)",
   "license": "Apache-2.0",
   "bugs": {
@@ -24,7 +26,10 @@
   },
   "homepage": "https://github.com/amzn/ion-js#readme",
   "devDependencies": {
+    "babel-cli": "^6.24.1",
+    "babel-preset-es2015": "^6.24.1",
     "grunt": "^1.0.1",
+    "grunt-babel": "^6.0.0",
     "grunt-cli": "^1.2.0",
     "grunt-contrib-clean": "^1.0.0",
     "grunt-contrib-copy": "^1.0.0",
