@@ -69,7 +69,8 @@ module.exports = function(grunt) {
         outDir: 'dist/amd/es6',
         options: {
           target: "es6",
-          module: "amd"
+          module: "amd",
+          declaration: true
         }
       }
     },
