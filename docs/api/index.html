@@ -64,6 +64,37 @@
 	<div class="row">
 		<div class="col-8 col-content">
 			<div class="tsd-panel tsd-typography">
+				<p align="right">
+					<a title="" href="https://api.travis-ci.org/amzn/ion-js.svg?branch=master">
+						<img src="https://api.travis-ci.org/amzn/ion-js.svg?branch=master"/>
+					</a>
+				</p>
+				<h1 id="about">About</h1>
+				<p>Ion-JS is a Javascript library for <a href="https://amzn.github.io/ion-docs/">Ion</a>. The library allows for reading/writing Ion
+				data from within Javascript code. </p>
+				<p>For more information on Ion have a look at the <a href="https://amzn.github.io/ion-docs/spec.html">Ion Specification</a> as well as some of the other Ion language specific libraries such as </p>
+				<ul>
+					<li><a href="https://github.com/amzn/ion-c">Ion C</a></li>
+					<li><a href="https://github.com/amzn/ion-java">Ion Java</a></li>
+					<li><a href="https://github.com/amzn/ion-python">Ion Python</a></li>
+				</ul>
+				<h1 id="download">Download</h1>
+				<p>The library is written in typescript and uses <code>npm</code> for its dependencies. Make sure you have the latest, stable, release
+				for <a href="https://nodejs.org/en/"><code>npm</code></a>.</p>
+				<ol>
+					<li>Clone this repo <pre><code> git <span class="hljs-keyword">clone</span> <span class="hljs-title">--recursive</span> https://github.com/amzn/ion-js.git
+</code></pre></li>
+					<li>Use <code>npm</code> to install all dependencies<pre><code> npm <span class="hljs-keyword">install</span>
+</code></pre></li>
+					<li>We use <a href="https://gruntjs.com/"><code>grunt</code></a> for managing our build process, to see all of our build targets look at <a href="Gruntfile.js"><code>Gruntfile.js</code></a>. <pre><code> grunt <span class="hljs-keyword">all</span>
+</code></pre>Javascript code is generated under the folder <code>dist</code>. 
+					Documentation is generated under the folder <code>doc</code> and is also available <a href="https://amzn.github.io/ion-js/api/">online</a>. </li>
+				</ol>
+				<h2 id="tests">Tests</h2>
+				<p>To debug the unit tests, use the following command:</p>
+				<pre><code><span class="hljs-keyword">node</span> <span class="hljs-title">debug</span> node_modules/intern/client <span class="hljs-attr">config=</span>tests/intern <span class="hljs-attr">ionVersion=</span>es6
+</code></pre><h2 id="browser">Browser</h2>
+				<p>To run Ion in a browser, see the example in the &quot;browser&quot; folder. You&#39;ll need to copy require.js and the Ion JavaScript files (Ion.js etc.) into the &quot;scripts&quot; folder.</p>
 			</div>
 		</div>
 		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
