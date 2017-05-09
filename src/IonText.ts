@@ -260,7 +260,7 @@ export enum CharCodes {
   COLON = ':'.charCodeAt(0),
 }
 
-interface EscapeIndex {
+export interface EscapeIndex {
   [index: number]: number[];
 }
 

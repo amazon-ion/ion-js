@@ -69,7 +69,17 @@ module.exports = function(grunt) {
         outDir: 'dist/amd/es6',
         options: {
           target: "es6",
-          module: "amd"
+          module: "amd",
+          declaration: true
+        }
+      },
+      'commonjs-es6': {
+        src: ['src/**/*.ts'],
+        outDir: 'dist/commonjs/es6',
+        options: {
+          target: "es6",
+          module: "commonjs",
+          declaration: true
         }
       }
     },
@@ -82,15 +92,31 @@ module.exports = function(grunt) {
       main: {
         files: [
           { expand: true,
-            src: ['dist/amd/es6/*.js'],
+            src: ['dist/amd/es5/*.js'],
             dest: 'browser/scripts/ion/',
             flatten: true
           }
         ]
       }
     },
+    babel: { 
+      options: { 
+        sourceMap: true, 
+        presets: ['es2015']
+      },
+      dist: { 
+        files: [{ 
+          'expand': true, 
+          cwd: 'dist/amd/es6',
+          'src': ['*.js'], 
+          'dest': 'dist/amd/es5/', 
+          'ext': '.js',
+        }], 
+      },
+    },
   });
 
+  grunt.loadNpmTasks('grunt-babel');
   grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-contrib-clean');
   grunt.loadNpmTasks('grunt-contrib-copy');
@@ -99,11 +125,15 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('remap-istanbul');
   grunt.loadNpmTasks('intern');
 
-  grunt.registerTask('build', ['clean', 'ts:amd-es6','copy:main']);
+  grunt.registerTask('build', ['clean', 'ts:amd-es6', 'ts:commonjs-es6','babel', 'copy:main']);
   grunt.registerTask('test', ['build', 'intern:es6']);
   grunt.registerTask('doc', ['test', 'typedoc']);
   grunt.registerTask('coverage', ['doc', 'remapIstanbul']);
   grunt.registerTask('all', ['coverage']);
+
+
+  // NPM
+  grunt.registerTask('build:npm', ['ts:commonjs-es6']);
 
   grunt.registerTask('default', ['test']);
 };

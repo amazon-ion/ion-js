@@ -1,0 +1,16 @@
+# See https://docs.npmjs.com/misc/developers#keeping-files-out-of-your-package
+# Use `npm pack` to create a tgz file. View the contents of the .tgz to test your .npmignore
+docs
+ion-tests 
+tests
+.baseDir*
+.travis.yml
+_config.yml
+.nojekyll 
+.gitmodules
+.tscache
+.idea
+browser
+src
+*.map
+Gruntfile.js
