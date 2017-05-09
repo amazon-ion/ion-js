@@ -55,7 +55,7 @@ enum States {
  * This implementation caches serialized values in an in-memory tree.
  * It does not support multiple local symbol tables (aka "symbol table append").
  *
- * @see http://amznlabs.github.io/ion-docs/binary.html
+ * @see http://amzn.github.io/ion-docs/binary.html
  */
 export class BinaryWriter implements Writer {
   getBytes(): number[] {
@@ -121,7 +121,7 @@ export class BinaryWriter implements Writer {
     let symbolIds: number[] = this.encodeAnnotations(annotations);
     let isPositiveZero: boolean = value.isZero() && !value.isNegative();
     if (isPositiveZero) {
-      // Special case per the spec: http://amznlabs.github.io/ion-docs/binary.html#decimal
+      // Special case per the spec: http://amzn.github.io/ion-docs/binary.html#decimal
       this.addNode(new BytesNode(this.writer, this.getCurrentContainer(), TypeCodes.DECIMAL, symbolIds, []));
       return;
     }

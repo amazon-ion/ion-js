@@ -25,7 +25,7 @@ import { SymbolIndex } from "./IonSymbolIndex";
  * import from a given symbol table may be specified as the "length" of the
  * import.
  * 
- * @see http://amznlabs.github.io/ion-docs/symbols.html#imports
+ * @see http://amzn.github.io/ion-docs/symbols.html#imports
  */
 export class Import {
   private readonly _offset: number;

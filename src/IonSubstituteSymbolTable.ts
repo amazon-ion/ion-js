@@ -16,7 +16,7 @@ import { SharedSymbolTable } from "./IonSharedSymbolTable";
 /**
  * A special case of shared symbol table whose entries are all undefined. Used in certain cases
  * when an import cannot be satisfied by the current catalog.
- * @see http://amznlabs.github.io/ion-docs/symbols.html#imports
+ * @see http://amzn.github.io/ion-docs/symbols.html#imports
  */
 export class SubstituteSymbolTable extends SharedSymbolTable {
   constructor(length: number) {

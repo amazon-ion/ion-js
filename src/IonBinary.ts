@@ -38,7 +38,7 @@ export const TB_SEXP          = 12;  // 0xc
 export const TB_STRUCT        = 13;  // 0xd
 export const TB_ANNOTATION    = 14;  // 0xe
 
-/** Four-bit type codes per http://amznlabs.github.io/ion-docs/binary.html#typed-value-formats */
+/** Four-bit type codes per http://amzn.github.io/ion-docs/binary.html#typed-value-formats */
 export enum TypeCodes {
   NULL = 0,
   BOOL = 1,
