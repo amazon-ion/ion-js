@@ -481,14 +481,14 @@ export class BinaryWriter implements Writer {
   }
 }
 
-interface Node {
+export interface Node {
   isContainer(): boolean;
   addChild(child: Node, name?: number[]): void;
   write() : void;
   getLength() : number;
 }
 
-abstract class AbstractNode implements Node {
+export abstract class AbstractNode implements Node {
   constructor(
     private readonly _writer: LowLevelBinaryWriter,
     private readonly parent: Node,
@@ -678,7 +678,7 @@ class StructNode extends ContainerNode {
   }
 }
 
-abstract class LeafNode extends AbstractNode {
+export abstract class LeafNode extends AbstractNode {
   addChild(child: Node, name?: number[]) : void {
     throw new Error("Cannot add a child to a leaf node");
   }

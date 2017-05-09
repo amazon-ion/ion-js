@@ -1,8 +1,18 @@
-
 language: node_js
-
-node_js: 
-  - "node"
-
-script: grunt all
-
+cache:
+  directories:
+    - node_modules
+notifications:
+  email: false
+node_js:
+  - '7'
+before_script:
+  - npm prune
+script: 
+  - npm run test
+after_success:
+  - 'if [ "$TRAVIS_BRANCH" == "master" -a "$TRAVIS_PULL_REQUEST" == "false" ]; then npm run semantic-release; fi'
+  - 'if [ "$TRAVIS_BRANCH" != "master" ]; then exit 0; fi'
+branches:
+  except:
+    - /^v\d+\.\d+\.\d+$/

@@ -37,7 +37,7 @@ export function last<T>(array: T[]) : T {
   return array[array.length - 1];
 }
 
-type Comparator<T> = (x: T, y: T) => number;
+export type Comparator<T> = (x: T, y: T) => number;
 
 export function max<T>(array: T[], comparator: Comparator<T>): T {
   let best: T;
