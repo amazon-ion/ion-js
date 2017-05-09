@@ -18,7 +18,7 @@
     "JSON",
     "data format"
   ],
-  "author": "The Ion Team <ion-team@amazon.com> (https://amznlabs.github.io/ion-docs/)",
+  "author": "The Ion Team <ion-team@amazon.com> (https://amzn.github.io/ion-docs/index.html)",
   "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/amzn/ion-js/issues"
