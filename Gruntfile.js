@@ -92,7 +92,7 @@ module.exports = function(grunt) {
       main: {
         files: [
           { expand: true,
-            src: ['dist/amd/es6/*.js'],
+            src: ['dist/amd/es5/*.js'],
             dest: 'browser/scripts/ion/',
             flatten: true
           }
@@ -125,9 +125,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('remap-istanbul');
   grunt.loadNpmTasks('intern');
 
-  grunt.registerTask('build', ['clean', 'ts:amd-es6', 'ts:commonjs-es6','copy:main']);
-  grunt.registerTask('build', ['clean', 'ts:amd-es6','copy:main']);
-  grunt.registerTask('toES5', ['build', 'babel']);
+  grunt.registerTask('build', ['clean', 'ts:amd-es6', 'ts:commonjs-es6','babel', 'copy:main']);
   grunt.registerTask('test', ['build', 'intern:es6']);
   grunt.registerTask('doc', ['test', 'typedoc']);
   grunt.registerTask('coverage', ['doc', 'remapIstanbul']);
