@@ -13,7 +13,7 @@
  */
 /**
  * A shared symbol table.
- * @see http://amznlabs.github.io/ion-docs/symbols.html#shared-symbol-tables
+ * @see http://amzn.github.io/ion-docs/symbols.html#shared-symbol-tables
  */
 export class SharedSymbolTable {
   constructor(
