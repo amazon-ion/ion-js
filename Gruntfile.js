@@ -72,6 +72,15 @@ module.exports = function(grunt) {
           module: "amd",
           declaration: true
         }
+      },
+      'commonjs-es6': {
+        src: ['src/**/*.ts'],
+        outDir: 'dist/commonjs/es6',
+        options: {
+          target: "es6",
+          module: "commonjs",
+          declaration: true
+        }
       }
     },
       /**
@@ -116,12 +125,17 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('remap-istanbul');
   grunt.loadNpmTasks('intern');
 
+  grunt.registerTask('build', ['clean', 'ts:amd-es6', 'ts:commonjs-es6','copy:main']);
   grunt.registerTask('build', ['clean', 'ts:amd-es6','copy:main']);
   grunt.registerTask('toES5', ['build', 'babel']);
   grunt.registerTask('test', ['build', 'intern:es6']);
   grunt.registerTask('doc', ['test', 'typedoc']);
   grunt.registerTask('coverage', ['doc', 'remapIstanbul']);
   grunt.registerTask('all', ['coverage']);
+
+
+  // NPM
+  grunt.registerTask('build:npm', ['ts:commonjs-es6']);
 
   grunt.registerTask('default', ['test']);
 };
