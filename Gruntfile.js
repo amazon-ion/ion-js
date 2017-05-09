@@ -99,8 +99,24 @@ module.exports = function(grunt) {
         ]
       }
     },
+    babel: { 
+      options: { 
+        sourceMap: true, 
+        presets: ['es2015']
+      },
+      dist: { 
+        files: [{ 
+          'expand': true, 
+          cwd: 'dist/amd/es6',
+          'src': ['*.js'], 
+          'dest': 'dist/amd/es5/', 
+          'ext': '.js',
+        }], 
+      },
+    },
   });
 
+  grunt.loadNpmTasks('grunt-babel');
   grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-contrib-clean');
   grunt.loadNpmTasks('grunt-contrib-copy');
@@ -110,6 +126,8 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('intern');
 
   grunt.registerTask('build', ['clean', 'ts:amd-es6', 'ts:commonjs-es6','copy:main']);
+  grunt.registerTask('build', ['clean', 'ts:amd-es6','copy:main']);
+  grunt.registerTask('toES5', ['build', 'babel']);
   grunt.registerTask('test', ['build', 'intern:es6']);
   grunt.registerTask('doc', ['test', 'typedoc']);
   grunt.registerTask('coverage', ['doc', 'remapIstanbul']);
