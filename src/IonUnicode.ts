@@ -13,7 +13,7 @@
  */
 /**
  * @file Constants and helper methods for Unicode.
- * @see https://amznlabs.github.io/ion-docs/stringclob.html
+ * @see https://amzn.github.io/ion-docs/stringclob.html
  * @see http://www.unicode.org/versions/Unicode5.0.0/
  */
 import { Writeable } from "./IonWriteable";
