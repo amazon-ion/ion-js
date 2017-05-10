@@ -44,8 +44,8 @@
     "grunt-typedoc": "^0.2.4",
     "intern": "^3.4.1",
     "remap-istanbul": "^0.9.1",
-    "typedoc": "^0.5.8",
-    "typescript": "^2.2.1",
-    "semantic-release": "^6.3.6"
+    "semantic-release": "^6.3.6",
+    "typedoc": "^0.6.0",
+    "typescript": "^2.3.2"
   }
 }
