@@ -1,5 +1,6 @@
 /*
  * Copyright 2012-2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * <h1> Ion JS in your browser</h1>
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -27,7 +28,7 @@ module.exports = function(grunt) {
       },
     },
     clean: ['dist/',
-            'docs/',
+            // 'docs/',  removing for now till we move to ghpages
             'coverage-final.json',
             'browser/scripts/ion/'
            ],
@@ -89,12 +90,20 @@ module.exports = function(grunt) {
        *  2. the browser folder for use within a browser
        */
     copy: {
-      main: {
+      bundle: {
         files: [
           { expand: true,
-            src: ['dist/amd/es5/*.js'],
-            dest: 'browser/scripts/ion/',
+            src: ['dist/browser/js/ion-bundle*'],
+            dest: 'browser/scripts/',
             flatten: true
+          }
+        ]
+      },
+      tutorial:{
+        files: [
+          { expand: true,
+            src: ['browser/**'],
+            dest: 'docs/',
           }
         ]
       }
@@ -114,26 +123,87 @@ module.exports = function(grunt) {
         }], 
       },
     },
+    /**
+     * Two steps here
+     *   1. Take CommonJS and generates ES5 using Bable (babelify)
+     *   2. Package the ES5 code to be used in the browser (browserify)
+     */
+    browserify: {
+      development: {
+        src: [ "./dist/commonjs/es6/Ion.js" ],
+        dest: './dist/browser/js/ion-bundle.js',
+        options: {
+         browserifyOptions: { 
+           standalone: 'ion', // add `ion` to global JS variable `window` in browsers
+           debug: true,
+         },
+        transform: [["babelify", 
+                     { 
+                       "presets": ["es2015"],
+                       "plugins" : [["transform-runtime", {"polyfill" : true}]] 
+                     }]],
+        }
+      },
+      prod: {
+        src: [ "./dist/commonjs/es6/Ion.js" ],
+        dest: './dist/browser/js/ion-bundle.js',
+        options: {
+         browserifyOptions: { 
+           standalone: 'ion', // add `ion` to global JS variable `window` in browsers
+           debug: false,
+         },
+        transform: [["babelify", 
+                     { 
+                       "presets": ["es2015"],
+                       "plugins" : [["transform-runtime", {"polyfill" : true}]] 
+                     }]],
+        }
+      }
+    },
+      uglify: { 
+          options: { 
+              compress: true, 
+              mangle: true, 
+              sourceMap: false
+          }, 
+          target: { 
+              src: './dist/browser/js/ion-bundle.js',
+              dest: './dist/browser/js/ion-bundle.min.js',
+          }
+      }
   });
 
   grunt.loadNpmTasks('grunt-babel');
+  grunt.loadNpmTasks('grunt-browserify');
   grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-contrib-clean');
   grunt.loadNpmTasks('grunt-contrib-copy');
+  grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-ts');
   grunt.loadNpmTasks('grunt-typedoc');
   grunt.loadNpmTasks('remap-istanbul');
   grunt.loadNpmTasks('intern');
 
-  grunt.registerTask('build', ['clean', 'ts:amd-es6', 'ts:commonjs-es6','babel', 'copy:main']);
+  // Copy tasks
+  grunt.registerTask('copy:all', ['copy:bundle', 'copy:tutorial']);
+
+  // Build and Translation tasks 
+  grunt.registerTask('build:browser', ['build', 'browserify:prod', 'uglify']); // standalone for browser
+  grunt.registerTask('trans:browser', ['browserify:prod', 'uglify']); // browserify (assumes 'build' was run)
+  grunt.registerTask('build:cjs', ['ts:commonjs-es6']);
+  grunt.registerTask('build:amd', ['ts:amd-es6']);
+  grunt.registerTask('build', ['clean', 'build:amd', 'build:cjs','trans:browser', 'copy:all']);
+
+
+  // Tests
   grunt.registerTask('test', ['build', 'intern:es6']);
-  grunt.registerTask('doc', ['test', 'typedoc']);
-  grunt.registerTask('coverage', ['doc', 'remapIstanbul']);
-  grunt.registerTask('all', ['coverage']);
+  grunt.registerTask('test:coverage', ['test', 'remapIstanbul']);
+
+  // Documentation
+  grunt.registerTask('doc', ['typedoc']);
 
 
-  // NPM
-  grunt.registerTask('build:npm', ['ts:commonjs-es6']);
+
 
   grunt.registerTask('default', ['test']);
 };
