@@ -196,14 +196,22 @@ module.exports = function(grunt) {
 
 
   // Tests
-  grunt.registerTask('test', ['build', 'intern:es6']);
-  grunt.registerTask('test:coverage', ['test', 'remapIstanbul']);
+  grunt.registerTask('test', ['build', 'intern:es6']);     // build and test
+  grunt.registerTask('test:run', ['intern:es6']);          // run test do not build
+  grunt.registerTask('test:coverage', ['remapIstanbul']);  // depends on `test:run`. Generates html output
 
   // Documentation
+  grunt.registerTask('nojekyll', 'Write an empty .nojekyll file to allow typedoc html output to be rendered',
+    function(){ 
+      grunt.file.write('docs/.nojekyll', '');
+    });
+
   grunt.registerTask('doc', ['typedoc']);
 
 
+  // release target used by Travis 
+  grunt.registerTask('release', ['build', 'test:run', 'test:coverage', 'typedoc', 'nojekyll']);
 
-
+  // default for development
   grunt.registerTask('default', ['test']);
 };
