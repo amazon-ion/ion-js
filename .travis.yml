@@ -19,7 +19,7 @@ branches:
 deploy:
   provider: pages
   skip_clean: true
-  local_dir: doc
+  local_dir: docs
   github_token: $GH_TOKEN
   on: 
     branch: master
