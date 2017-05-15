@@ -84,7 +84,7 @@ The steps are similar to the steps for [Creating a `release` branch](#creating-a
 
 # Releases 
     
-**For all merging between branches you should use the `--no-ff` option.**
+**For all merging between branches you should use the `--no-ff --log=100` option.**
 
 ### Directly from the `development` branch
 
