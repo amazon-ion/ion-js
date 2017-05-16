@@ -59,7 +59,7 @@ Here is the proposed workflow for creating a pull request
     ```
     where `mynewfeature` is the name to be given to your new branch 
 1. Run `npm install`. This step will install all dependencies needed for `ion-js`
-  * if you do not have `grunt` installed run `npm install -g grunt`. 
+    * if you do not have `grunt` installed run `npm install -g grunt`. 
 1. Make changes to the code. 
 1. `ion-js` uses `grunt` to build and run tests. Use 
     ``` 
