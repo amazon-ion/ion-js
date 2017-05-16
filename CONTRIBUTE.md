@@ -44,6 +44,8 @@ the `development` branch to merge into `master`. You should therefore fork/branc
 
 ## Pull Requests
 
+**TL;DR**: *we follow the typical git workflow with the only differnece of using `npm run commit` instead of `git commit`. See  this [video](https://egghead.io/lessons/javascript-how-to-write-a-javascript-library-writing-conventional-commits-with-commitizen). You can ignore the installation of dependencies from the video and you can focus on the process that starts at 2:17 in the video.*
+
 Here is the proposed workflow for creating a pull request 
 
 1. Fork `ion-js` into your account and configure the our repo as your upstream. See the documentation on [Form a Repo](https://help.github.com/articles/fork-a-repo/)
