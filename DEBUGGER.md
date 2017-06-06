@@ -17,7 +17,7 @@ This is a rough guide on how to use Chrome to debug intern tests. If you know of
 1. Open Chrome and paste `chrome://inspect/#devices` in the address bar. 
 1. Under the section titled `Remote Target`  you should see 
    ```
-   node_modules/intern/client.js file:///Users/therapon/Amazon/OSS/ion-js/node_modules/intern/client.js
+   node_modules/intern/client.js file:///Users/joe/ion-js/node_modules/intern/client.js
    inspect
    ```
    with the last word `inspect` being a link. Click on it and the debugger pops-up in a new window
