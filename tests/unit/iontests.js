@@ -110,7 +110,6 @@ define([
               var reader = ion.makeReader(buffer);
               console.log("Exhausting " + path);
               if (path.endsWith('clobsWithWhitespace.ion')) {
-                //debugger;
               }
               exhaust(reader);
               resolve();

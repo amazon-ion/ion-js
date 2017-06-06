@@ -516,7 +516,6 @@ define([
         writer.writeFieldName('t');
         writer.writeTimestamp(new ion.Timestamp(ion.Precision.DAY, 0, 2000, 1, 1));
         writer.endContainer();
-        debugger;
       },
       [
         // Symbol table

@@ -28,7 +28,7 @@ module.exports = function(grunt) {
       },
     },
     clean: ['dist/',
-            // 'docs/',  removing for now till we move to ghpages
+            'docs/',
             'coverage-final.json',
             'browser/scripts/ion/'
            ],
@@ -65,13 +65,24 @@ module.exports = function(grunt) {
       }
     },
     ts: {
+      'amd-es6-debug': {
+        src: ['src/**/*.ts'],
+        outDir: 'dist/amd/es6',
+        options: {
+          target: "es6",
+          module: "amd",
+          declaration: true,
+          sourceMap: true  // generate .map files for debugging
+        }
+      },
+ 
       'amd-es6': {
         src: ['src/**/*.ts'],
         outDir: 'dist/amd/es6',
         options: {
           target: "es6",
           module: "amd",
-          declaration: true
+          declaration: true,
         }
       },
       'commonjs-es6': {
@@ -192,6 +203,7 @@ module.exports = function(grunt) {
   grunt.registerTask('trans:browser', ['browserify:prod', 'uglify']); // browserify (assumes 'build' was run)
   grunt.registerTask('build:cjs', ['ts:commonjs-es6']);
   grunt.registerTask('build:amd', ['ts:amd-es6']);
+  grunt.registerTask('build:amd:debug', ['ts:amd-es6-debug']); 
   grunt.registerTask('build', ['clean', 'build:amd', 'build:cjs','trans:browser', 'copy:all']);
 
 
