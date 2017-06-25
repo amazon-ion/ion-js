@@ -13,7 +13,7 @@
  */
 define({
   defaultTimeout: 2000, // ms
-  excludeInstrumentation: /^(?:tests|node_modules)\//,
+  excludeInstrumentation: true, // disable codecoverate instrucmentation to allow debugging 
   filterErrorStack: true,
   suites: [
     'tests/unit/textNulls',
