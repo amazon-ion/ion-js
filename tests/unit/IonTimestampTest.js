@@ -17,18 +17,21 @@
     const assert = require('intern/chai!assert');
     const ion = require('dist/amd/es6/Ion');
 
-    var suite = {
+    let suite = {
       name: 'Timestamp'
     };
 
-    var parseTest = function(name, timestamp) {
+    const parseTest = function(name, timestamp) {
       suite[name] = function() {
         ion.Timestamp.parse(timestamp);
       }
-    }
+    };
 
     parseTest('Parses year', '2017T');
     parseTest('Parses month', '2017-02T');
+    // Seconds are optional, but local offset is not.
+    parseTest('Parses date and time with only hour and minutes', '2007-02-23T12:14Z');
+    parseTest('Parses timestamp: The same instant in UTC ("zero" or "zulu")', '2017-05-01T01:00:00.000Z');
 
     registerSuite(suite);
   }

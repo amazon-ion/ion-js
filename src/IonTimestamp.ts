@@ -30,7 +30,6 @@
 //    undefined, empty or a null image it returns the timestamp NULL.
 
 import { Decimal } from "./IonDecimal";
-import { is_digit } from "./IonText";
 import { isNumber } from "./IonUtilities";
 import { isString } from "./IonUtilities";
 import { isUndefined } from "./IonUtilities";
@@ -178,7 +177,7 @@ function to_4_digits(v: number) : string {
 function read_unknown_digits(str: string, pos: number) : string {
   let i: number = pos;
   for (; i < str.length; i++) {
-    if (!isNumber(str.charCodeAt(i))) {
+    if (!isNumber(parseInt(str[i], 10))) {
       break;
     }
   }
@@ -501,7 +500,10 @@ export class Timestamp {
           break;
         // 1234-67-89T12:45:78.dddd
         case States.FRACTIONAL_SECONDS:
-          seconds = Decimal.parse(str.substr(17, pos - 17));
+          const START_POSITION_OF_SECONDS = 17;
+
+          seconds = Decimal.parse(str.substring(START_POSITION_OF_SECONDS, pos));
+
           break;
         case States.OFFSET:
           break;
