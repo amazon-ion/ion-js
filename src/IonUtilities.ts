@@ -15,7 +15,7 @@
  * A collection of general language-level helper methods.
  */
 export function isNumber(value: any) : value is number {
-  return typeof(value) == 'number';
+  return typeof(value) == 'number' && !isNaN(value);
 }
 
 export function isString(value: any) : value is string {
