@@ -151,7 +151,8 @@ module.exports = function(grunt) {
         transform: [["babelify", 
                      { 
                        "presets": ["es2015"],
-                       "plugins" : [["transform-runtime", {"polyfill" : true}]] 
+                       "plugins" : [["transform-runtime", {"polyfill" : true}],
+                                    ["transform-object-assign"]]
                      }]],
         }
       },
@@ -166,7 +167,8 @@ module.exports = function(grunt) {
         transform: [["babelify", 
                      { 
                        "presets": ["es2015"],
-                       "plugins" : [["transform-runtime", {"polyfill" : true}]] 
+                       "plugins" : [["transform-runtime", {"polyfill" : true}],
+                                    ["transform-object-assign"]]
                      }]],
         }
       }
