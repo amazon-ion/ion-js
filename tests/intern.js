@@ -15,10 +15,12 @@ define({
   defaultTimeout: 2000, // ms
   excludeInstrumentation: /^(?:tests|node_modules)\//,
   filterErrorStack: true,
+  xsuites: [ 'tests/unit/iontests' ],
   suites: [
     'tests/unit/textNulls',
     'tests/unit/spans',
     'tests/unit/iontests',
+    'tests/unit/tokens',
     'tests/unit/IonCatalogTest',
     'tests/unit/IonImportTest',
     'tests/unit/IonLocalSymbolTableTest',
@@ -33,3 +35,4 @@ define({
     'tests/unit/IonBinaryTimestampTest',
   ],
 });
+

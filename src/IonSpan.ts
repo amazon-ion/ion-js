@@ -21,9 +21,9 @@ const SPAN_TYPE_SUB_FLAG = 2;
 const SPAN_TYPE_SUB_STRING = SPAN_TYPE_SUB_FLAG | SPAN_TYPE_STRING;
 const SPAN_TYPE_SUB_BINARY = SPAN_TYPE_SUB_FLAG | SPAN_TYPE_BINARY;
 
-const MAX_POS = 1024*1024*1024; // 1 gig 
+const MAX_POS = 1024*1024*1024; // 1 gig
 const LINE_FEED = 10;
-const CARRAIGE_RETURN = 13;
+const CARRIAGE_RETURN = 13;
 const DEBUG_FLAG = true;
 
 export abstract class Span {
@@ -50,6 +50,14 @@ export abstract class Span {
   abstract unread(ch: number) : void;
 
   protected abstract clone(start: number, len: number): Span;
+
+  locator(pos: number) : number[] {
+    throw new Error("not implemented");
+  }
+
+  error_line(start: number, end: number) : any[] {
+    throw new Error("not implemented");
+  }
 
   write(b: number) : never {
     throw new Error("not implemented");
@@ -107,13 +115,13 @@ class StringSpan extends Span {
       if (this._pos > MAX_POS) {
         throw new Error("span position is out of bounds");
       }
-      this._pos++; // we increment this even though we don't use it (this 
-                   // should not have other issues since past the end is 
+      this._pos++; // we increment this even though we don't use it (this
+                   // should not have other issues since past the end is
                    // still past the end) to allow unread to be happy
       return EOF;
     }
     ch = this._src.charCodeAt(this._pos);
-    if (ch === CARRAIGE_RETURN) {
+    if (ch === CARRIAGE_RETURN) {
       if (this.peek() != LINE_FEED) {
         this._inc_line();
       }
@@ -162,12 +170,51 @@ class StringSpan extends Span {
     return this._src.charCodeAt(ii);
   }
 
-  line_number() : number {
-    return this._line;
+  charAt(ii: number) : string {
+    if (ii < this._start || ii >= this._limit) return "";
+    return this._src[ii];
   }
 
   offset() : number {
     return this._pos - this._line_start;
+  }
+
+  // Return the line and column number for a given character in the span
+  locator(pos: number): number[] {
+    var line = 1, column = 1;
+    for (var i = 0; i < pos; i++) {
+      var ch = this.valueAt(i);
+      if (ch == LINE_FEED) {
+        line++;
+        column = 1;
+      } else {
+        column++;
+      }
+    }
+    return [line, column];
+  }
+
+  // Return a string which displays the line containing the given token followed
+  // by a line which places carats under the offending token
+  error_line(start: number, end: number): any[] {
+    var line_start = start;
+    while (line_start > 0 && this.valueAt(line_start-1) != LINE_FEED) {
+      line_start--;
+    }
+    var line_end = end;
+    while (line_end < this._limit && this.valueAt(line_end) != LINE_FEED) {
+      line_end++;
+    }
+    var str = "";
+    for (var x = line_start; x < line_end; x++) {
+      str += this.charAt(x);
+    }
+    var pointer = "";
+    for (var x = line_start; x < start; x++) {
+      pointer += " ";
+    }
+    for (; x < end; x++) pointer += "^";
+    return [str, pointer];
   }
 
   clone(start: number, len: number) : StringSpan {
@@ -292,6 +339,7 @@ export function makeSpan(src: any, start?: number, len?: number): Span {
     span = new StringSpan(src, start, len);
   } else if (src_type === 'object') {
     // TODO: this seems fishy since isSpan is not defined on Span types!
+    // NB: Also seems fishy to create a binary span for input to text readers!
     if (typeof (src.isSpan) === 'undefined') { // probably an array
       span = new BinarySpan(src, start, len);
     }

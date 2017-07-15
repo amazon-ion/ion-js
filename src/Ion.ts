@@ -39,12 +39,13 @@ const e = {
 export interface Options {
   catalog: Catalog;
   sourceType: string;
+  raw_tokens: boolean;
 }
 
 /**
- * Returns the `buf` type as binary or text. 
- * 
- * @param buffer we want to check its type 
+ * Returns the `buf` type as binary or text.
+ *
+ * @param buffer we want to check its type
  * @returns either `'binary'` or `'text'`
  */
 function get_buf_type(buf: Span) {
@@ -57,7 +58,7 @@ function makeBinaryReader(span: Span, options: Options) : BinaryReader {
 }
 
 function makeTextReader(span: Span, options: Options) : TextReader {
-  return new TextReader(span, options && options.catalog);
+  return new TextReader(span, options && options.catalog, options && options.raw_tokens);
 }
 
 /**
@@ -133,4 +134,4 @@ export { SharedSymbolTable } from "./IonSharedSymbolTable";
 export { Timestamp } from "./IonTimestamp";
 export { toBase64 } from "./IonText";
 export { TypeCodes } from "./IonBinary";
-
+export { get_ion_type } from "./IonParserTextRaw";
