@@ -22,7 +22,7 @@ import * as IonText from "./IonText";
 
 import { IonType } from "./IonType";
 import { IonTypes } from "./IonTypes";
-import { Span } from "./IonSpan";
+import { StringSpan } from "./IonSpan";
 
 const EOF = -1;  // EOF is end of container, distinct from undefined which is value has been consumed
 const ERROR           = -2;
@@ -102,7 +102,7 @@ const empty_array: any[] = [];
 
 const INF = [ CH_i, CH_n, CH_f ];
 
-export function get_ion_type(t: number) : IonType {
+export function getIonType(t: number) : IonType {
   switch(t) {
     case EOF:             return undefined;
     case ERROR:           return undefined;
@@ -207,7 +207,7 @@ type ReadValueHelper = (ch: number, accept_operator_symbols: boolean, calling_op
 type ReadValueHelpers = {[index: number]: ReadValueHelper};
 
 export class ParserTextRaw {
-  private _in: Span;
+  private _in: StringSpan;
   private _ops: any[];
   private _raw: boolean;
   private _value_type: any;
@@ -226,7 +226,7 @@ export class ParserTextRaw {
   private readonly _read_value_helper_helpers: ReadValueHelpers;
   private readonly _read_token_helper_helpers: ReadValueHelpers;
 
-  constructor(source: Span, raw_tokens_only: boolean) {
+  constructor(source: StringSpan, raw_tokens_only: boolean) {
     this._in         = source; // should be a span
     this._raw = raw_tokens_only
     if (raw_tokens_only) {
@@ -243,44 +243,37 @@ export class ParserTextRaw {
     this._ann        = empty_array; // ann can use a static empty array, a new one will be created only if there are some annotations to  put into it - the exception case
     this._msg        = "";
 
-    let helpers: ReadValueHelpers = {
-        40 : this._read_value_helper_paren,  // '('  == CH_OP
-        91 : this._read_value_helper_square, // '['  == CH_OS
-       123 : this._read_value_helper_curly, // '{'  == CH_LEFT_CURLY
-        43 : this._read_value_helper_plus,   // '+'  == CH_PS // we'll have to patch these two back in after
-        45 : this._read_value_helper_minus,  // '-'  == CH_MS // we apply the operator characters fn
-        39 : this._read_value_helper_single, // '\'' == CH_SQ
-        34 : this._read_value_helper_double, // '\"' == CH_DQ
-    };
-    let set_helper = function(str: string, fn: ReadValueHelper) {
-      var i = str.length, ch;
-      while (i > 0) {
-        i--;
-        ch = str.charCodeAt(i);
-        helpers[ch] = fn;
+    function remap(map: { [val: string]: ReadValueHelper }): ReadValueHelpers {
+      let ret = {};
+      for (let s in map) {
+        let val = map[s];
+        for (let i = 0; i < s.length; i++) {
+          ret[s.charCodeAt(i)] = val;
+        }
       }
+      return ret;
     }
 
-    set_helper("0123456789", this._read_value_helper_digit);
-    set_helper("_$abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ", this._read_value_helper_letter);
-    set_helper("!#%&*+-./;<=>?@^`|~", this._read_value_helper_operator);
-    // patch (back) in the two special to the operator functions
-    helpers[CH_PS] = this._read_value_helper_plus; // '+'
-    helpers[CH_MS] = this._read_value_helper_minus; // '-'
+    let helpers = remap({
+      "0123456789": this._read_value_helper_digit,
+      "_$abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ": this._read_value_helper_letter,
+      "!#%&*./;<=>?@^`|~": this._read_value_helper_operator,
+      "+": this._read_value_helper_plus,
+      "-": this._read_value_helper_minus,
+      "'": this._read_value_helper_single,
+      '"': this._read_value_helper_double,
+      '{': this._read_value_helper_curly
+    });
 
-    this._read_value_helper_helpers = helpers;
+    this._read_value_helper_helpers = Object.assign({}, helpers, remap({
+      '(': this._read_value_helper_paren,
+      '[': this._read_value_helper_square
+    }));
 
-    helpers = {};
-    set_helper("0123456789", this._read_value_helper_digit);
-    set_helper("_$abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ", this._read_value_helper_letter);
-    set_helper("!#%&*+-./;<=>?@^`|~()[]{},", this._read_value_helper_operator);
-    helpers[CH_CL] = this._read_token_helper_colon;
-    helpers[CH_PS] = this._read_value_helper_plus; // '+'
-    helpers[CH_MS] = this._read_value_helper_minus; // '-'
-    helpers[CH_SQ] = this._read_value_helper_single; // "'"
-    helpers[CH_DOUBLE_QUOTE] = this._read_value_helper_double; // '"'
-    helpers[CH_LEFT_CURLY] = this._read_value_helper_curly; // {
-    this._read_token_helper_helpers = helpers;
+    this._read_token_helper_helpers = Object.assign({}, helpers, remap({
+      ':': this._read_token_helper_colon,
+      '()[]};,': this._read_value_helper_operator
+    }));
   }
 
   fieldName() : string {

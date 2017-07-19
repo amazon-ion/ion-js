@@ -15,7 +15,7 @@ import { BinaryReader } from "./IonBinaryReader";
 import { Catalog } from "./IonCatalog";
 import { IVM } from "./IonConstants";
 import { Reader } from "./IonReader";
-import { Span, makeSpan } from "./IonSpan";
+import { BinarySpan, StringSpan } from "./IonSpan";
 import { TextReader } from "./IonTextReader";
 import { InvalidArgumentError } from "./IonErrors";
 import { Writer } from "./IonWriter";
@@ -48,35 +48,19 @@ export interface Options {
  * @param buffer we want to check its type
  * @returns either `'binary'` or `'text'`
  */
-function get_buf_type(buf: Span) {
-  var firstByte = buf.valueAt(0);
+function get_buf_type(buf: any) {
+  let firstByte = typeof(buf) === 'string'
+    ? buf.charCodeAt(0)
+    : buf[0];
   return (firstByte === IVM.binary[0]) ? 'binary' : 'text';
 }
 
-function makeBinaryReader(span: Span, options: Options) : BinaryReader {
+function makeBinaryReader(span: BinarySpan, options: Options) : BinaryReader {
   return new BinaryReader(span, options && options.catalog);
 }
 
-function makeTextReader(span: Span, options: Options) : TextReader {
+function makeTextReader(span: StringSpan, options: Options) : TextReader {
   return new TextReader(span, options && options.catalog, options && options.raw_tokens);
-}
-
-/**
- * Wrapper method to capture and/or propagate exceptions occuring during span creation.
- *
- * @param buf value passed in that should represent Ion data, typically as a `string`
- * @returns {Span}
- */
-function asSpan(buf: any) : Span {
-  try {
-    return  makeSpan(buf)
-  } catch (e) {
-    if (e instanceof InvalidArgumentError) {
-      throw new Error("Invalid argument, expected \'string\' value found:  " + buf);
-    } else {
-      throw e;
-    }
-  }
 }
 
 /**
@@ -88,13 +72,12 @@ function asSpan(buf: any) : Span {
  * @returns {Reader}
  */
 export function makeReader(buf: any, options: Options) : Reader {
-  let inSpan : Span = asSpan(buf);
-  let stype =  options && isSourceType(options.sourceType)
-                ? options.sourceType
-                : get_buf_type(inSpan);
+  let stype = options && isSourceType(options.sourceType)
+    ? options.sourceType
+    : get_buf_type(buf);
   let reader: Reader = (stype === 'binary')
-             ? makeBinaryReader(inSpan, options)
-             : makeTextReader(inSpan, options);
+    ? makeBinaryReader(new BinarySpan(buf), options)
+    : makeTextReader(new StringSpan(buf), options);
   return reader;
 }
 
@@ -134,4 +117,9 @@ export { SharedSymbolTable } from "./IonSharedSymbolTable";
 export { Timestamp } from "./IonTimestamp";
 export { toBase64 } from "./IonText";
 export { TypeCodes } from "./IonBinary";
-export { get_ion_type } from "./IonParserTextRaw";
+export { getIonType } from "./IonParserTextRaw";
+// Local Variables:
+// mode: c++
+// c-basic-offset:2
+// indent-tabs-mode:nil
+// End:

@@ -15,7 +15,6 @@ define({
   defaultTimeout: 2000, // ms
   excludeInstrumentation: /^(?:tests|node_modules)\//,
   filterErrorStack: true,
-  xsuites: [ 'tests/unit/iontests' ],
   suites: [
     'tests/unit/textNulls',
     'tests/unit/spans',

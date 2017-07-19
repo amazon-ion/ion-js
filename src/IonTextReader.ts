@@ -21,7 +21,7 @@
 import { Catalog } from "./IonCatalog";
 import { Decimal } from "./IonDecimal";
 import { defaultLocalSymbolTable } from "./IonLocalSymbolTable";
-import { get_ion_type } from "./IonParserTextRaw";
+import { getIonType } from "./IonParserTextRaw";
 import { getSystemSymbolTable } from "./IonSystemSymbolTable";
 import { ion_symbol_table } from "./IonSymbols";
 import { IonType } from "./IonType";
@@ -31,7 +31,7 @@ import { LocalSymbolTable } from "./IonLocalSymbolTable";
 import { makeSymbolTable } from "./IonSymbols";
 import { ParserTextRaw } from "./IonParserTextRaw";
 import { Reader } from "./IonReader";
-import { Span } from "./IonSpan";
+import { StringSpan } from "./IonSpan";
 import { Timestamp } from "./IonTimestamp";
 
 const RAW_STRING = new IonType( -1, "raw_input", true,  false, false, false );
@@ -50,7 +50,7 @@ export class TextReader implements Reader {
   private _raw_type: number;
   private _raw: any;
 
-  constructor(source: Span, catalog: Catalog, raw_tokens: boolean) {
+  constructor(source: StringSpan, catalog: Catalog, raw_tokens: boolean) {
     if (!source) {
       throw new Error("a source Span is required to make a reader");
     }
@@ -123,7 +123,7 @@ export class TextReader implements Reader {
 
     // for system value (IVM's and symbol table's) we continue
     // around this
-    this._type = get_ion_type(this._raw_type);
+    this._type = getIonType(this._raw_type);
     return this._type;
   }
 

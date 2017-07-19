@@ -33,10 +33,10 @@ define(
                 console.log("end = " + parser.end());
                 console.log("s = " + parser.get_value_as_string(t));
                 console.log("raw = " + parser.get_raw_token());
-                console.log("type(t) = " + JSON.stringify(ion.get_ion_type(t)));
+                console.log("type(t) = " + JSON.stringify(ion.getIonType(t)));
                 console.log("exp = " + JSON.stringify(expected_type));
             }
-            assert.equal(ion.get_ion_type(t), expected_type);
+            assert.equal(ion.getIonType(t), expected_type);
             assert.equal(parser.get_value_as_string(t), expected_value);
         }
 
