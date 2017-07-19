@@ -267,9 +267,3 @@ export class BinarySpan {
     throw new Error("not implemented");
   }
 }
-
-// Local Variables:
-// mode: c++
-// c-basic-offset:2
-// indent-tabs-mode:nil
-// End:

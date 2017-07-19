@@ -20,8 +20,7 @@ define(
     ],
     function(intern, registerSuite, assert, ion) {
         function make_parser(str) {
-            var reader = ion.makeReader(str, { raw_tokens: true });
-            var parser = reader.raw_parser();
+            var parser = ion.makeTextTokenizer(str);
             return parser;
         }
 
@@ -82,119 +81,124 @@ define(
         var suite = {
             name: 'Tokens'
         };
-        if (false) {  // for isolating failures within a single test
-            console.log("+++++++ DEBUGGING MODE, don't check this in!! ++++++");
-            suite['foo'] = function() {
-                test_int("0x10");
-            };
-        } else {
-            suite['null'] = function() {
-                test_null("null");
-                for (var t in ion.IonTypes) {
-                    var type = ion.IonTypes[t];
-                    if (type.bid >= 0 && type.bid < 16) {
-                        test_null("null." + type.name);
-                    }
+
+        suite['null'] = function() {
+            test_null("null");
+            for (var t in ion.IonTypes) {
+                var type = ion.IonTypes[t];
+                if (type.bid >= 0 && type.bid < 16) {
+                    test_null("null." + type.name);
                 }
-            };
+            }
+        };
 
-            suite['bool'] = function() {
-                test_bool("true");
-                test_bool("false");
-            };
+        suite['bool'] = function() {
+            test_bool("true");
+            test_bool("false");
+        };
 
-            suite['int'] = function() {
-                test_int("0");
-                test_int("-0");
-                test_int("88888888888888888888888888888888888888888888");
-                test_int("0x10");
-            };
+        suite['int'] = function() {
+            test_int("0");
+            test_int("-0");
+            test_int("88888888888888888888888888888888888888888888");
+            test_int("0x10");
+        };
 
-            suite['decimal'] = function() {
-                test_decimal("0.0");
-                test_decimal("-0.0");
-                test_decimal("0d0");
-                test_decimal("88888888888888888888888888888888888888888888.0");
-            };
+        suite['decimal'] = function() {
+            test_decimal("0.0");
+            test_decimal("-0.0");
+            test_decimal("0d0");
+            test_decimal("88888888888888888888888888888888888888888888.0");
+        };
 
-            suite['float'] = function() {
-                test_float("nan");
-                test_float("+inf");
-                test_float("-inf");
-                test_float("0.0e0");
-            };
+        suite['float'] = function() {
+            test_float("nan");
+            test_float("+inf");
+            test_float("-inf");
+            test_float("0.0e0");
+        };
 
-            suite['timestamp'] = function() {
-                test_timestamp("1999-12-25T00:00:00Z");
-            };
+        suite['timestamp'] = function() {
+            test_timestamp("1999-12-25T00:00:00Z");
+        };
 
-            suite['symbol'] = function() {
-                test_symbol("ab");
-                test_symbol("a");
-                test_symbol("$3");
-            };
+        suite['symbol'] = function() {
+            test_symbol("ab");
+            test_symbol("a");
+            test_symbol("$3");
+        };
 
-            suite['string'] = function() {
-                test_string("\"abc\"", "abc");
-                test_string("'''abc'''", "abc");
-                test_string('"ab\\"c"', 'ab"c');
-                test_string("'''abc''' // cmt\n'''def'''", "abcdef");
-                test_string("'''abc''' /* cmt */'''def'''", "abcdef");
-            };
+        suite['string'] = function() {
+            test_string("\"abc\"", "abc");
+            test_string("'''abc'''", "abc");
+            test_string('"ab\\"c"', 'ab"c');
+            test_string("'''abc''' // cmt\n'''def'''", "abcdef");
+            test_string("'''abc''' /* cmt */'''def'''", "abcdef");
+        };
 
-            suite['blob'] = function() {
-                test_blob("{{OiBTIKUgTyAASb8=}}");
-            };
+        suite['blob'] = function() {
+            test_blob("{{OiBTIKUgTyAASb8=}}");
+        };
 
 
-            suite['clob'] = function() {
-                test_clob('{{"a b c"}}', "a b c");
-                test_clob("{{ '''line 1'''\n    '''line 2'''\n}}", 'line 1line 2');
-                test_clob('{{ "line 3 \\" line 4" }}', 'line 3 " line 4');
-                test_clob('{{ "line 3 \\n line 4" }}', 'line 3 \n line 4');
-            };
+        suite['clob'] = function() {
+            test_clob('{{"a b c"}}', "a b c");
+            test_clob("{{ '''line 1'''\n    '''line 2'''\n}}", 'line 1line 2');
+            test_clob('{{ "line 3 \\" line 4" }}', 'line 3 " line 4');
+            test_clob('{{ "line 3 \\n line 4" }}', 'line 3 \n line 4');
+        };
 
-            suite['empty list'] = function() {
-                var parser = make_parser("[]");
-                next(parser, ion.IonTypes.SYMBOL, "[");
-                next(parser, ion.IonTypes.SYMBOL, "]");
-                assert.equal(parser.next(), -1);
-            };
+        suite['empty list'] = function() {
+            var parser = make_parser("[]");
+            next(parser, ion.IonTypes.SYMBOL, "[");
+            next(parser, ion.IonTypes.SYMBOL, "]");
+            assert.equal(parser.next(), -1);
+        };
 
-            suite['empty sexp'] = function() {
-                var parser = make_parser("()");
-                next(parser, ion.IonTypes.SYMBOL, "(");
-                next(parser, ion.IonTypes.SYMBOL, ")");
-                assert.equal(parser.next(), -1);
-            };
+        suite['empty sexp'] = function() {
+            var parser = make_parser("()");
+            next(parser, ion.IonTypes.SYMBOL, "(");
+            next(parser, ion.IonTypes.SYMBOL, ")");
+            assert.equal(parser.next(), -1);
+        };
 
-            suite['empty struct'] = function() {
-                var parser = make_parser("{}");
-                next(parser, ion.IonTypes.SYMBOL, "{");
-                next(parser, ion.IonTypes.SYMBOL, "}");
-                assert.equal(parser.next(), -1);
-            };
+        suite['empty struct'] = function() {
+            var parser = make_parser("{}");
+            next(parser, ion.IonTypes.SYMBOL, "{");
+            next(parser, ion.IonTypes.SYMBOL, "}");
+            assert.equal(parser.next(), -1);
+        };
 
-            suite['annotation'] = function() {
-                var parser = make_parser("abc::def");
-                next(parser, ion.IonTypes.SYMBOL, "abc");
-                next(parser, ion.IonTypes.SYMBOL, "::");
-                next(parser, ion.IonTypes.SYMBOL, "def");
-                assert.equal(parser.next(), -1);
-            };
+        suite['annotation'] = function() {
+            var parser = make_parser("abc::def");
+            next(parser, ion.IonTypes.SYMBOL, "abc");
+            next(parser, ion.IonTypes.SYMBOL, "::");
+            next(parser, ion.IonTypes.SYMBOL, "def");
+            assert.equal(parser.next(), -1);
+        };
 
-            suite['sexp'] = function() {
-                var parser = make_parser("(+ ++ abc::-1)");
-                next(parser, ion.IonTypes.SYMBOL, "(");
-                next(parser, ion.IonTypes.SYMBOL, "+");
-                next(parser, ion.IonTypes.SYMBOL, "++");
-                next(parser, ion.IonTypes.SYMBOL, "abc");
-                next(parser, ion.IonTypes.SYMBOL, "::");
-                next(parser, ion.IonTypes.INT, "-1");
-                next(parser, ion.IonTypes.SYMBOL, ")");
-                assert.equal(parser.next(), -1);
-            };
-        }
+        suite['sexp'] = function() {
+            var parser = make_parser("(+ ++ abc::-1)");
+            next(parser, ion.IonTypes.SYMBOL, "(");
+            next(parser, ion.IonTypes.SYMBOL, "+");
+            next(parser, ion.IonTypes.SYMBOL, "++");
+            next(parser, ion.IonTypes.SYMBOL, "abc");
+            next(parser, ion.IonTypes.SYMBOL, "::");
+            next(parser, ion.IonTypes.INT, "-1");
+            next(parser, ion.IonTypes.SYMBOL, ")");
+            assert.equal(parser.next(), -1);
+        };
+
+        suite['errors'] = function() {
+            var parser = make_parser("null.foo");
+            let error = false;
+            try {
+                next(parser, 0, "");
+            } catch (ex) {
+                error = true;
+            }
+            assert.equal(error, true);
+        };
         registerSuite(suite);
     }
 );
