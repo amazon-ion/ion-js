@@ -22,7 +22,7 @@ import * as IonText from "./IonText";
 
 import { IonType } from "./IonType";
 import { IonTypes } from "./IonTypes";
-import { Span } from "./IonSpan";
+import { StringSpan } from "./IonSpan";
 
 const EOF = -1;  // EOF is end of container, distinct from undefined which is value has been consumed
 const ERROR           = -2;
@@ -51,13 +51,13 @@ const CH_NL =  10; // '\n'
 const CH_BS =  92; // '\\'
 const CH_FORWARD_SLASH = "/".charCodeAt(0); // 47
 const CH_AS =  42; // '*'
-const CH_SQ =  39; // '\'' 
+const CH_SQ =  39; // '\''
 const CH_DOUBLE_QUOTE = "\"".charCodeAt(0); // 34
 const CH_CM =  44; // ';'
 const CH_OP =  40; // '('
 const CH_CP =  41; // ')'
 const CH_LEFT_CURLY: number = "{".charCodeAt(0); // 123
-const CH_CC = 125; // '}' 
+const CH_CC = 125; // '}'
 const CH_OS =  91; // '['
 const CH_CS =  93; // ']'
 const CH_CL =  58; // ':'
@@ -102,7 +102,7 @@ const empty_array: any[] = [];
 
 const INF = [ CH_i, CH_n, CH_f ];
 
-export function get_ion_type(t: number) : IonType {
+export function getIonType(t: number) : IonType {
   switch(t) {
     case EOF:             return undefined;
     case ERROR:           return undefined;
@@ -116,7 +116,7 @@ export function get_ion_type(t: number) : IonType {
     case T_TIMESTAMP:     return IonTypes.TIMESTAMP;
     case T_IDENTIFIER:    return IonTypes.SYMBOL;
     case T_OPERATOR:      return IonTypes.SYMBOL;
-    case T_STRING1:       return IonTypes.STRING;
+    case T_STRING1:       return IonTypes.SYMBOL;
     case T_STRING2:       return IonTypes.STRING;
     case T_STRING3:       return IonTypes.STRING;
     case T_CLOB2:         return IonTypes.CLOB;
@@ -161,7 +161,7 @@ function is_keyword(str: string) : boolean {
 }
 
 function get_hex_value(ch: number) : number {
-  switch(ch) { // quick and dirty - we need a better impl TODO 
+  switch(ch) { // quick and dirty - we need a better impl TODO
     case  48: return  0; // '0'
     case  49: return  1; // '1'
     case  50: return  2; // '2'
@@ -207,13 +207,14 @@ type ReadValueHelper = (ch: number, accept_operator_symbols: boolean, calling_op
 type ReadValueHelpers = {[index: number]: ReadValueHelper};
 
 export class ParserTextRaw {
-  private _in: Span;
+  private _in: StringSpan;
   private _ops: any[];
+  private _raw: boolean;
   private _value_type: any;
   private _value_null: boolean;
   private _value: any[];
-  private _start: number;
-  private _end: number;
+  private _start: number;        // when next() completes, points to first char
+  private _end: number;          // points just after last char
   private _esc_len: number;
   private _curr: number;
   private _curr_null: boolean;
@@ -223,10 +224,16 @@ export class ParserTextRaw {
   private _fieldname: string;
 
   private readonly _read_value_helper_helpers: ReadValueHelpers;
+  private readonly _read_token_helper_helpers: ReadValueHelpers;
 
-  constructor(source: Span) {
+  constructor(source: StringSpan, raw_tokens_only: boolean) {
     this._in         = source; // should be a span
-    this._ops        = [ this._read_datagram_values ];
+    this._raw = raw_tokens_only
+    if (raw_tokens_only) {
+        this._ops = [this._read_token];
+    } else {
+        this._ops = [this._read_datagram_values];
+    }
     this._value_type = ERROR;
     this._value      = [];     // value gets a new array since it will modify it
     this._start      = -1;
@@ -236,33 +243,37 @@ export class ParserTextRaw {
     this._ann        = empty_array; // ann can use a static empty array, a new one will be created only if there are some annotations to  put into it - the exception case
     this._msg        = "";
 
-    let helpers: ReadValueHelpers = {
-    //  -1 : this._read_value_helper_EOF,    //      == EOF
-        40 : this._read_value_helper_paren,  // '('  == CH_OP
-        91 : this._read_value_helper_square, // '['  == CH_OS
-       123 : this._read_value_helper_curly, // '{'  == CH_LEFT_CURLY
-        43 : this._read_value_helper_plus,   // '+'  == CH_PS // we'll have to patch these two back in after 
-        45 : this._read_value_helper_minus,  // '-'  == CH_MS // we apply the operator characters fn
-        39 : this._read_value_helper_single, // '\'' == CH_SQ
-        34 : this._read_value_helper_double, // '\"' == CH_DQ
-    };
-    let set_helper = function(str: string, fn: ReadValueHelper) {
-      var i = str.length, ch;
-      while (i > 0) {
-        i--;
-        ch = str.charCodeAt(i);
-        helpers[ch] = fn;
+    function remap(map: { [val: string]: ReadValueHelper }): ReadValueHelpers {
+      let ret = {};
+      for (let s in map) {
+        let val = map[s];
+        for (let i = 0; i < s.length; i++) {
+          ret[s.charCodeAt(i)] = val;
+        }
       }
+      return ret;
     }
 
-    set_helper("0123456789", this._read_value_helper_digit);
-    set_helper("_$abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ", this._read_value_helper_letter);
-    set_helper("!#%&*+-./;<=>?@^`|~", this._read_value_helper_operator);
-    // patch (back) in the two special to the operator functions
-    helpers[CH_PS] = this._read_value_helper_plus; // '+'
-    helpers[CH_MS] = this._read_value_helper_minus; // '-'
+    let helpers = remap({
+      "0123456789": this._read_value_helper_digit,
+      "_$abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ": this._read_value_helper_letter,
+      "!#%&*./;<=>?@^`|~": this._read_value_helper_operator,
+      "+": this._read_value_helper_plus,
+      "-": this._read_value_helper_minus,
+      "'": this._read_value_helper_single,
+      '"': this._read_value_helper_double,
+      '{': this._read_value_helper_curly
+    });
 
-    this._read_value_helper_helpers = helpers;
+    this._read_value_helper_helpers = Object.assign({}, helpers, remap({
+      '(': this._read_value_helper_paren,
+      '[': this._read_value_helper_square
+    }));
+
+    this._read_token_helper_helpers = Object.assign({}, helpers, remap({
+      ':': this._read_token_helper_colon,
+      '()[]};,': this._read_value_helper_operator
+    }));
   }
 
   fieldName() : string {
@@ -271,6 +282,22 @@ export class ParserTextRaw {
 
   annotations() : string[] {
     return this._ann;
+  }
+
+  start() : number {
+    return this._start;
+  }
+
+  end() : number {
+    return this._end;
+  }
+
+  locator(start: number) : number[] {
+    return this._in.locator(start);
+  }
+
+  error_line(start: number, end: number) : any[] {
+    return this._in.error_line(start, end);
   }
 
   private _read_datagram_values() {
@@ -312,7 +339,7 @@ export class ParserTextRaw {
   }
 
   private _read_struct_values() {
-    var op = this._done_with_error, 
+    var op = this._done_with_error,
         ch = this._read_after_whitespace(true);
 
     switch (ch) {
@@ -328,7 +355,7 @@ export class ParserTextRaw {
       case CH_CC :
         this._value_push( EOF );
         return;
-      default : 
+      default :
         if (IonText.is_letter(ch)) {
           op = this._read_symbol;
         }
@@ -395,7 +422,7 @@ export class ParserTextRaw {
     switch (v) {
     case T_IDENTIFIER:
       if (is_keyword(s)) {
-        this._error( "can't use '"+s+"' as a fieldname without quotes");
+        this._tok_error( "can't use '"+s+"' as a fieldname without quotes");
         break;
       }
     case T_STRING1:
@@ -404,7 +431,7 @@ export class ParserTextRaw {
       this._fieldname = s;
       break;
     default:
-      this._error( "invalid fieldname" );
+      this._tok_error( "invalid fieldname" );
       break;
     }
   }
@@ -425,6 +452,21 @@ export class ParserTextRaw {
       let fn: ReadValueHelper = this._read_value_helper_helpers[ch];
       if (fn != undefined) {
         fn.call(this, ch, accept_operator_symbols, calling_op);
+      } else {
+        this._error("unexpected character '" + IonText.asAscii(ch) + "'");
+      }
+    }
+  }
+
+  private _read_token() : void {
+    let ch: number = this._read_after_whitespace(true);
+    if (ch == EOF) {  // since we can't index into our object with a value of -1
+        this._read_value_helper_EOF(ch, true, this._read_token);
+    } else {
+      this._start = this._in.position() - 1;
+      let fn: ReadValueHelper = this._read_token_helper_helpers[ch];
+      if (fn != undefined) {
+          fn.call(this, ch, true, this._read_token);
       } else {
         this._error("unexpected character '" + IonText.asAscii(ch) + "'");
       }
@@ -461,23 +503,29 @@ export class ParserTextRaw {
         this._ops.unshift( this._read_blob );
       }
     }
-    else { 
+    else {
       this._unread( ch2 );
-      this._value_push( T_STRUCT );
-      this._ops.unshift( this._read_struct_values ) 
+      if (this._raw) {
+        this._end = this._in.position();
+        this._value_push( T_OPERATOR );
+      } else {
+        this._value_push( T_STRUCT );
+        this._ops.unshift( this._read_struct_values );
+      }
     }
   }
 
   private _read_value_helper_plus( ch1, accept_operator_symbols: boolean, calling_op ) {
     var ch2 = this._peek("inf");
     this._unread(ch1); // in any case we'll leave this character for the next function to use
-    if (IonText.is_numeric_terminator(ch2)) {
+    if (ch2 != ERROR) {
       this._ops.unshift( this._read_plus_inf );
     }
     else if (accept_operator_symbols) {
-          this._ops.unshift( this._read_operator_symbol );
+      this._ops.unshift( this._read_operator_symbol );
     }
     else {
+      this._read(); // get the cursor pointed to the offending character
       this._error("unexpected '+'");
     }
   }
@@ -529,9 +577,9 @@ export class ParserTextRaw {
       op = this._read_string1;
     }
     op.call(this);
-    if (this._test_string_as_annotation(op)) {
-      // this was an annoation, so we need to try again for the actual value
-      this._ops.unshift( calling_op ); 
+    if (!this._raw && this._test_string_as_annotation(op)) {
+      // this was an annotation, so we need to try again for the actual value
+      this._ops.unshift( calling_op );
     }
   }
 
@@ -541,20 +589,37 @@ export class ParserTextRaw {
 
   private _read_value_helper_letter( ch1, accept_operator_symbols: boolean, calling_op ) {
     this._read_symbol();
-    if (this._test_symbol_as_annotation()) {
-      // this was an annoation, so we need to try again for the actual value
-      this._ops.unshift( calling_op );
+    if (this._raw) {
+      this._check_for_special_symbol();
+    } else {
+      if (this._test_symbol_as_annotation()) {
+        // this was an annotation, so we need to try again for the actual value
+        this._ops.unshift( calling_op );
+      }
     }
   }
 
   private _read_value_helper_operator( ch1, accept_operator_symbols: boolean, calling_op ) {
     if (accept_operator_symbols) {
-      this._unread(ch1)
-      this._ops.unshift( this._read_operator_symbol );
+      if (IonText.is_single_operator_char(ch1)) {
+        this._end = this._in.position();
+        this._value_push(T_OPERATOR);
+      } else {
+        this._ops.unshift( this._read_operator_symbol );
+      }
     }
     else {
        this._error( "unexpected operator character" );
     }
+  }
+
+  private _read_token_helper_colon( ch1, accept_operator_symbols: boolean, calling_op ) {
+    var ch = this._peek();
+    if (ch == CH_CL) {
+      this._read();
+    }
+    this._end = this._in.position();
+    this._value_push(T_OPERATOR);
   }
 
   private _done() {
@@ -578,7 +643,7 @@ export class ParserTextRaw {
         return;
       }
       if (IonText.is_digit(ch)) {
-        this._error("leading zero's are not allowed");
+        this._error("leading zeroes are not allowed");
       }
       ch = CH_0;
     }
@@ -590,6 +655,7 @@ export class ParserTextRaw {
     }
     if (!IonText.is_numeric_terminator(ch)) {
       if (ch == CH_d || ch == CH_D) {
+        t = T_DECIMAL;
         ch = this._read_exponent();
       }
       else if (ch == CH_e || ch == CH_E || ch == CH_f || ch == CH_F ) {
@@ -597,7 +663,7 @@ export class ParserTextRaw {
         ch = this._read_exponent();
       }
     }
-    if (!IonText.is_numeric_terminator(ch)) {
+    if (!this._raw && !IonText.is_numeric_terminator(ch)) {
       this._error( "invalid character after number" );
     }
     else {
@@ -613,8 +679,9 @@ export class ParserTextRaw {
       ch = this._read(); // read the first hex digits
       ch = this._read_required_hex_digits(ch);
     }
-    if (IonText.is_numeric_terminator(ch)) {
+    if (this._raw || IonText.is_numeric_terminator(ch)) {
       this._unread(ch);
+      this._end = this._in.position();
       this._value_push( T_HEXINT );
     }
     else {
@@ -630,10 +697,10 @@ export class ParserTextRaw {
     ch = this._read_required_digits(ch);
     return ch;
   }
- 
+
   private _read_plus_inf() {
     if (this._read() == CH_PS) {
-     this._read_inf_helper();
+      this._read_inf_helper();
     }
     else {
       this._error( "expected +inf" );
@@ -658,12 +725,13 @@ export class ParserTextRaw {
         return;
       }
     }
-    if (IonText.is_numeric_terminator( this._peek() )) {
-      this._end = this._in.position() - 1;
+    if (this._raw || IonText.is_numeric_terminator( this._peek() )) {
+      this._end = this._in.position();
       this._start = this._end - 4; // -4 to include the sign we've already read
-      this._value_push( T_FLOAT_SPECIAL ); 
+      this._value_push( T_FLOAT_SPECIAL );
     }
     else {
+      this._read(); // advance to point to the offending character
       this._error( "invalid numeric terminator after 'inf'" );
     }
   }
@@ -682,8 +750,8 @@ export class ParserTextRaw {
       }
       ch = this._read_optional_time(ch);  // no time unless you at least include month - TODO really !?
     }
-    ch = this._read_optional_time_offset(ch); // we only allow an offset 
-    if (IonText.is_numeric_terminator(ch)) {
+    ch = this._read_optional_time_offset(ch); // we only allow an offset
+    if (this._raw || IonText.is_numeric_terminator(ch)) {
       this._unread(ch);
       this._end = this._in.position();
       this._value_push( T_TIMESTAMP );
@@ -723,7 +791,7 @@ export class ParserTextRaw {
 
   private _read_symbol() : void {
     var ch;
-    this._start = this._in.position() - 1;  
+    this._start = this._in.position() - 1;
     for(;;) {
       ch = this._read();
       if (!IonText.is_letter_or_digit(ch)) break;
@@ -737,37 +805,38 @@ export class ParserTextRaw {
     var ch;
     for(;;) {
       ch = this._read();
-      if (!IonText.is_operator_char(ch))  break;
+      if (!IonText.is_operator_char(ch) || IonText.is_single_operator_char(ch)) {
+        this._unread(ch);
+        break;
+      }
     }
-    this._end = this._in.position() - 1;
-    this._unread(ch);
+    this._end = this._in.position();
     this._value_push( T_OPERATOR );
   }
 
   private _read_string1() : void {
     this._read_string_helper(CH_SQ, false);
-    this._end = this._in.position() - 1;
+    this._end = this._in.position();
     this._value_push( T_STRING1 );
   }
 
   private _read_string2() : void {
     this._read_string_helper(CH_DOUBLE_QUOTE, false);
-    this._end = this._in.position() - 1;
+    this._end = this._in.position();
     this._value_push( T_STRING2 );
   }
 
   private _read_string3() : void {
     var ch;
+    this._start = this._in.position() - 1;
     if (this._read() != CH_SQ || this._read() != CH_SQ) {
       this._error( "expected triple quote" );
     }
-    this._start = this._in.position();
     for(;;) {  // read sequence of triple quoted strings
       for(;;) { // read single quoted strings until we see the triple quoted terminator
         this._read_string_helper(CH_SQ, true);
         // if it's not a triple quote, it's just content
         if (this._read() == CH_SQ && this._read() == CH_SQ) {
-          this._end = this._in.position() - 3;
           break;
         }
       }
@@ -782,12 +851,12 @@ export class ParserTextRaw {
       this._read(); // consume the 2 pending single quotes
       this._read();
     }
+    this._end = this._in.position();
     this._value_push( T_STRING3 );
   }
 
   private _read_string_helper = function(terminator: number, allow_new_line: boolean) : void {
     var ch;
-    this._start = this._in.position();
     for (;;) {
       ch = this._read();
       if (ch == CH_BS) {
@@ -797,7 +866,7 @@ export class ParserTextRaw {
         break;
       }
       else if (!is_valid_string_char(ch, allow_new_line)) {
-        this._error( "invalid character "+ch+" in string" );
+        this._error( "invalid character in string: " + String.fromCharCode(ch));
         break;
       }
     }
@@ -862,12 +931,13 @@ export class ParserTextRaw {
   }
 
   private _test_symbol_as_annotation() : boolean {
-    var s, ii, ch, kwt, 
+    var s, ii, ch, kwt,
         is_ann = true,
         t = this._value_pop();
     if (t != T_IDENTIFIER) this._error("expecting symbol here");
     s = this.get_value_as_string(t);
     kwt = get_keyword_type(s);
+    var ch2 = this._peek();  // so we don't confuse eg, "null .foo" with typed null
     ch = this._read_after_whitespace(true);
     if (ch == CH_CL && this._peek() == CH_CL) {
       if (kwt != undefined) this._error("the keyword '"+s+"' can't be used as an annotation without quotes");
@@ -882,8 +952,7 @@ export class ParserTextRaw {
       is_ann = false;
       if (kwt === T_NULL) {
         this._value_null = true;
-        ch = this._peek();
-        if (ch === CH_DT) {
+        if (ch2 === CH_DT) {
           this._read(); // consume the dot
           ch = this._read();
           if (IonText.is_letter(ch) !== true) {
@@ -892,11 +961,15 @@ export class ParserTextRaw {
           }
           this._read_symbol();
           if (this._value_pop() != T_IDENTIFIER) {
-            this._error("expected type name after 'null.'");
+            this._tok_error("expected type name after 'null.'");
             return undefined;
           }
           s = this.get_value_as_string(T_IDENTIFIER);
           kwt = get_type_from_name(s);
+          if (kwt === undefined) {
+            this._tok_error("expected type name after 'null.'");
+            return undefined;
+          }
         }
         this._start = -1;
         this._end = -1;
@@ -906,22 +979,72 @@ export class ParserTextRaw {
     return is_ann;
   }
 
+  // In raw mode handle typed nulls, booleans and 'nan', converting them to the
+  // proper type
+  private _check_for_special_symbol() {
+    var s, ii, ch, kwt,
+        is_ann = true,
+        t = this._value_pop();
+    if (t != T_IDENTIFIER) this._tok_error("expecting symbol here");
+    s = this.get_value_as_string(t);
+    kwt = get_keyword_type(s);
+    if (kwt === T_NULL) {
+      this._value_null = true;
+      ch = this._peek();
+      if (ch === CH_DT) {
+        this._read(); // consume the dot
+        ch = this._read();
+        if (IonText.is_letter(ch) !== true) {
+          this._error("expected type name after 'null.'");
+          return;
+        }
+        var save_start = this._start;
+        this._read_symbol();
+        if (this._value_pop() != T_IDENTIFIER) {
+          this._error("expected type name after 'null.'");
+          return;
+        }
+        s = this.get_value_as_string(T_IDENTIFIER);
+        kwt = get_type_from_name(s);
+        if (kwt === undefined) {
+          this._error("expected type name after 'null.'");
+          return;
+        }
+        this._start = save_start;
+        this._end = this._in.position();
+      }
+      this._value_push(T_NULL); // put the typed null value back on the stack
+    } else if (kwt === T_BOOL) {
+      this._value_push(T_BOOL);
+    } else if (kwt === T_FLOAT_SPECIAL) {
+      this._value_push(T_FLOAT_SPECIAL);
+    } else {
+      this._value_push(T_IDENTIFIER);
+    }
+  }
+
   private _read_clob_string2() : void {
     var t;
+    var save_start = this._start;
     this._read_string2();
     t = this._value_pop();
     if (t != T_STRING2) this._error("string expected");
+    this._start = save_start;
     this._value_push(T_CLOB2);
-    this._ops.unshift( this._read_close_double_brace );
+    this._read_close_double_brace();
+    this._end = this._in.position();
   }
 
   private _read_clob_string3() : void {
     var t;
+    var save_start = this._start;
     this._read_string3();
     t = this._value_pop();
     if (t != T_STRING3) this._error("string expected");
-    this._value_push(T_CLOB2);
-    this._ops.unshift( this._read_close_double_brace );
+    this._start = save_start;
+    this._value_push(T_CLOB3);
+    this._read_close_double_brace();
+    this._end = this._in.position();
   }
 
   private _read_blob() : void {
@@ -947,7 +1070,7 @@ export class ParserTextRaw {
         this._error( "invalid base64 value" );
       }
       else {
-        this._end = this._in.position() - 1;
+        this._end = this._in.position();
         this._value_push( T_BLOB );
       }
     }
@@ -981,7 +1104,7 @@ export class ParserTextRaw {
         if (s == "+inf")      n = Number.POSITIVE_INFINITY;
         else if (s == "-inf") n = Number.NEGATIVE_INFINITY;
         else if (s == "nan")  n = Number.NaN;
-        else throw new Error("can't convert to number"); 
+        else throw new Error("can't convert to number");
         break;
       default:
         throw new Error("can't convert to number");
@@ -1003,8 +1126,12 @@ export class ParserTextRaw {
     }
   }
 
+  get_raw_token() : string {
+    return this.get_value_as_string(T_BLOB);
+  }
+
   get_value_as_string(t: number) : string {
-    var ii, ch, s = "";
+    var start, end, ii, ch, s = "";
     switch (t) {
       case T_NULL:
       case T_BOOL:
@@ -1023,38 +1150,24 @@ export class ParserTextRaw {
         break;
       case T_STRING1:
       case T_STRING2:
+        s = this._get_string2(this._start, this._end);
+        break;
       case T_CLOB2:
-        for (ii=this._start; ii<this._end; ii++) {
-          ch = this._in.valueAt(ii);
-          if (ch == CH_BS) {
-            s += this._read_escape_sequence(ii, this._end);
-            ii += this._esc_len;
-          } 
-          else {
-            s += String.fromCharCode(ch);
-          }
-        }
+        start = this._start+2;
+        while (IonText.is_whitespace(this._in.valueAt(start))) start++;
+        end = this._end-2;
+        while (end > start && (IonText.is_whitespace(this._in.valueAt(end-1)))) end--;
+        s = this._get_string2(start, end);
         break;
       case T_CLOB3:
+        start = this._start+2;
+        while (IonText.is_whitespace(this._in.valueAt(start))) start++;
+        end = this._end-2;
+        while (end > start && (IonText.is_whitespace(this._in.valueAt(end-1)))) end--;
+        s = this._get_string3(start, end);
+        break;
       case T_STRING3:
-        for (ii=this._start; ii<this._end; ii++) {
-          ch = this._in.valueAt(ii);
-          if (ch == CH_SQ) {
-            if (ii+2<this._end && this._in.valueAt(ii+1) == CH_SQ && this._in.valueAt(ii+1) == CH_SQ) {
-              this._skip_triple_quote_gap(ii, this._end);
-            }
-            else {
-              s += "\'";
-            }
-          }
-          else if (ch == CH_BS) {
-            s += this._read_escape_sequence(ii, this._end);
-            ii += this._esc_len;
-          }
-          else {
-            s += String.fromCharCode(ch);
-          }
-        }
+        s = this._get_string3(this._start, this._end);
         break;
       default:
         this._error("can't get this value as a string");
@@ -1063,21 +1176,82 @@ export class ParserTextRaw {
     return s;
   }
 
+  private _get_string2(start: number, end: number): string {
+    start++;     // since we know it's a string2, chop off the quotes
+    end--;
+    var s = "";
+    for (var ii=start; ii<end; ii++) {
+      var ch = this._in.valueAt(ii);
+      if (ch == CH_BS) {
+        s += String.fromCharCode(this._read_escape_sequence(ii, this._end));
+        ii += this._esc_len;
+      }
+      else {
+        s += String.fromCharCode(ch);
+      }
+    }
+    return s;
+  }
+
+  private _get_string3(start: number, end: number): string {
+    var s = "";
+    var ii = 0;
+    start += 3;  // if it's really a string3, it must start and end with triples
+    end -= 3;
+    for (ii=start; ii<end; ii++) {
+      var ch = this._in.valueAt(ii);
+      if (ch == CH_SQ) {
+        if (ii+2<end && this._in.valueAt(ii+1) == CH_SQ && this._in.valueAt(ii+2) == CH_SQ) {
+          ii = this._skip_triple_quote_gap(ii, end);
+        }
+        else {
+          s += "\'";
+        }
+      }
+      else if (ch == CH_BS) {
+        s += String.fromCharCode(this._read_escape_sequence(ii, end));
+        ii += this._esc_len;
+      }
+      else {
+        s += String.fromCharCode(ch);
+      }
+    }
+    return s;
+  }
+
   private _skip_triple_quote_gap(ii: number, end: number) : number {
-    ii += 2; // skip the two quotes we peeked ahead to see
+    ii += 3; // skip triple quotes that we have confirmed exist at this point
     while (ii<end) {
       let ch: number = this._in.valueAt(ii);
       if (IonText.is_whitespace(ch)) {
-        // do nothing
+        ii++; // do nothing
       }
-      else if (ch == CH_SQ) {
-        ii+= 3;
-        if (ii > end || this._in.valueAt(ii-2) != CH_SQ || this._in.valueAt(ii-1) != CH_SQ) {
-          return ii;
+      else if (ch == CH_SQ && ii+2 < end && this._in.valueAt(ii+1) == CH_SQ &&
+                 this._in.valueAt(ii+1) == CH_SQ) {
+        return ii+2;
+      }
+      else if (ch == CH_FORWARD_SLASH && ii+1 < end &&
+               this._in.valueAt(ii+1) == CH_FORWARD_SLASH) {
+        ii += 2;
+        while (ii < end) {
+          ch = this._in.valueAt(ii++);
+          if (ch == CH_NL) break;
+        }
+      }
+      else if (ch == CH_FORWARD_SLASH && ii+1 < end &&
+               this._in.valueAt(ii+1) == CH_AS) {
+        ii += 2;
+        while (ii < end) {
+          ch = this._in.valueAt(ii++);
+          if (ch == CH_AS && ii < end && this._in.valueAt(ii) == CH_FORWARD_SLASH) {
+            ii++;
+            break;
+          }
         }
       }
       else {
-        this._error("unexpected character");
+        this._errorAt("unexpected character: " + String.fromCharCode(ch), ii, ii+1);
+        break;
       }
     }
     return ii;
@@ -1166,6 +1340,9 @@ export class ParserTextRaw {
   }
 
   next(): number {
+    if (this._raw) {
+      this._ops = [ this._read_token ];
+    }
     if (this._value_type === ERROR) {
       this._run();
     }
@@ -1267,12 +1444,12 @@ export class ParserTextRaw {
 
   private _peek(expected?: string) : number {
     var ch, ii=0;
-    if (expected === undefined || expected.length<1) { 
+    if (expected === undefined || expected.length<1) {
       ch = this._read();
       this._unread(ch);
       return ch;
     }
-    while (ii<expected.length) { 
+    while (ii<expected.length) {
       ch = this._read();
       if (ch != expected.charCodeAt(ii)) break;
       ii++;
@@ -1378,20 +1555,25 @@ export class ParserTextRaw {
     return ch;
   }
 
-  private _check_for_keywords() : void {
-    var len, s, v = this._value_pop();
-    if (v == T_IDENTIFIER) {
-      len = this._end - this._start;
-      if (len >= 3 && len <= 5) {
-        s = this.get_value_as_string(v);
-        v = get_keyword_type(s);
-      }
-    }
-    this._value_push(v);
+  // report an error relative to the most recently read character
+  private _error(msg: string) : void {
+    var pos = this._in.position();
+    this._errorAt(msg, pos-1, pos);
   }
 
-  private _error(msg: string) : void {
+  // report an error relatvie to the most recently read token
+  private _tok_error(msg: string) : void {
+    this._errorAt(msg, this._start, this._end);
+  }
+
+  // report an error relative to a specify subsequence
+  private _errorAt(msg: string, start: number, end: number) : void {
+    var locator = this.locator(start);
+    msg = msg + " at line " + locator[0] + ", column " + locator[1] + ":\n" +
+      this.error_line(start, end).join('\n');
+
     this._ops.unshift(this._done_with_error);
     this._error_msg = msg;
+    //throw new Error(msg); // uncomment to debug (or just make it be like this?)
   }
 }

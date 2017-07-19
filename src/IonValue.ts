@@ -20,7 +20,7 @@
 import * as IonBinary from "./IonBinary";
 import { IonType } from "./IonType";
 import { IonTypes } from "./IonTypes";
-import { Span } from "./IonSpan";
+import { BinarySpan } from "./IonSpan";
 
 function error(msg: string) {
   throw {message: msg, where: "IonValue"};
@@ -138,7 +138,7 @@ abstract class IonValue {
     }
   }
 
-  typeAnnotationsAsString() : string { 
+  typeAnnotationsAsString() : string {
     if (this._annotations === undefined) return "";
     var s, ii, l = this._annotations.length;
     for (ii=0; ii<0; ii++) {
@@ -156,15 +156,15 @@ class IonNull extends IonValue {
   }
 
   toString() : string {
-    return super.toString() + IonTypes.NULL.name; 
+    return super.toString() + IonTypes.NULL.name;
   }
 
-  writeBinary(span: Span) : number {
+  writeBinary(span: BinarySpan) : number {
     span.write(this.binary_image);
     return 1;  // bytes written
   }
 
-  readBinary(span: Span, bid: number, len: number) : number {
+  readBinary(span: BinarySpan, bid: number, len: number) : number {
     if (len === 0 || len === IonBinary.LEN_NULL) {
       len = 0;
     }
@@ -176,11 +176,11 @@ class IonNull extends IonValue {
 }
 
 class IonBool extends IonValue {
-  getType() : IonType { 
+  getType() : IonType {
     return IonTypes.BOOL;
   }
 
-  toString() : string { 
+  toString() : string {
     var s;
     if (this.isNull()) {
       s = IonTypes.NULL.name + "." + this.getType().name;
@@ -191,19 +191,19 @@ class IonBool extends IonValue {
     return super.toString() + s;
   }
 
-  setValue(b: boolean) : void { 
+  setValue(b: boolean) : void {
     if (b !== undefined && (typeof b !== "boolean")) {
       error("IonBool values must be boolean (or undefined for null)");
     }
     this._datum = b;
   }
 
-  booleanValue() : boolean { 
+  booleanValue() : boolean {
     super.validateIsNotNull();
     return this._datum;
   }
 
-  writeBinary(span : Span) : number {
+  writeBinary(span : BinarySpan) : number {
     var binary_image = (IonTypes.BOOL.bid << IonBinary.TYPE_SHIFT)
     if (this.isNull()) {
       binary_image = binary_image | IonBinary.LEN_NULL;
@@ -218,7 +218,7 @@ class IonBool extends IonValue {
     return 1;  // bytes written
   }
 
-  readBinary(span: Span, bid: number, len: number) {
+  readBinary(span: BinarySpan, bid: number, len: number) {
     if (len == IonBinary.LEN_NULL) {
       this._datum = undefined;
     }
@@ -236,7 +236,7 @@ class IonInt extends IonNumber {
     return IonTypes.INT;
   }
 
-  toString() : string { 
+  toString() : string {
     var s;
     if (this.isNull()) {
       s = IonTypes.NULL.name + "." + this.getType().name;
@@ -247,7 +247,7 @@ class IonInt extends IonNumber {
     return  super.toString() + s;
   }
 
-  setValue(b: number) : void { 
+  setValue(b: number) : void {
     if (b === undefined) {
       this._datum = undefined;
     }
@@ -259,12 +259,12 @@ class IonInt extends IonNumber {
     }
   }
 
-  numberValue() : number { 
+  numberValue() : number {
     super.validateIsNotNull();
     return this._datum;
   }
 
-  writeBinary(span: Span) : number {
+  writeBinary(span: BinarySpan) : number {
     var binary_image = (IonTypes.INT.bid << IonBinary.TYPE_SHIFT),
         len = 1;
     if (this.isNull()) {
@@ -305,7 +305,7 @@ class IonInt extends IonNumber {
     return len;  // bytes written
   }
 
-  readBinary(span: Span, bid: number, len: number) : number {
+  readBinary(span: BinarySpan, bid: number, len: number) : number {
     if (len == IonBinary.LEN_NULL) {
       this._datum = undefined;
       len = 0;

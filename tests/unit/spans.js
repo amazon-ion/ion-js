@@ -15,16 +15,16 @@ define([
     'intern',
     'intern!object',
     'intern/chai!assert',
-    'dist/amd/es6/IonSpan',
+    'dist/amd/es6/IonTests'
   ],
-  function(intern, registerSuite, assert, ionSpan) {
+  function(intern, registerSuite, assert, ion) {
 
     var suite = {
       name: 'Spans'
     };
 
     suite['null valueAt'] = function() {
-      var span = ionSpan.makeSpan("null");
+      var span = new ion.StringSpan("null");
       assert.equal('n'.charCodeAt(0), span.valueAt(0));
       assert.equal('u'.charCodeAt(0), span.valueAt(1));
       assert.equal('l'.charCodeAt(0), span.valueAt(2));
@@ -33,7 +33,7 @@ define([
     };
 
     suite['null next'] = function() {
-      var span = ionSpan.makeSpan("null");
+      var span = new ion.StringSpan("null");
       assert.equal('n'.charCodeAt(0), span.next());
       assert.equal('u'.charCodeAt(0), span.next());
       assert.equal('l'.charCodeAt(0), span.next());
@@ -42,21 +42,8 @@ define([
     };
 
     suite['Buffer initial position'] = function() {
-      var buffer = Buffer.from("null");
-      var span = ionSpan.makeSpan(buffer);
+      var span = new ion.StringSpan('null');
       assert.equal(0, span.position());
-    };
-    
-    suite['makeSpan - Span input'] = function() {
-      let spanIn = ionSpan.makeSpan("{ hello: \"world\"}");
-      let actual = ionSpan.makeSpan(spanIn);
-      assert.strictEqual(actual, spanIn, 'a span input to makeSpan should return the input untouched')
-    };
-  
-    suite['makeSpan - Object input'] = function() {
-      let spanIn = ionSpan.makeSpan("{ hello: \"world\"}");
-      let actual = ionSpan.makeSpan(spanIn);
-      assert.strictEqual(actual, spanIn, 'a span input to makeSpan should return the input untouched')
     };
 
     registerSuite(suite);
