@@ -46,6 +46,45 @@ define([
       assert.equal(reader.next(), ion.IonTypes.INT);
     };
 
+    suite['numberValueForInt'] = function() {
+        var reader = ion.makeReader("1");
+        assert.equal(reader.next(), ion.IonTypes.INT);
+        assert.equal(reader.numberValue(), 1);
+    };
+
+    suite['numberValueForFloat'] = function() {
+        var reader = ion.makeReader("15e-1");
+        assert.equal(reader.next(), ion.IonTypes.FLOAT);
+        assert.equal(reader.numberValue(), 1.5);
+    };
+
+    suite['numberValueForHexInt'] = function() {
+        var reader = ion.makeReader("0x1234");
+        assert.equal(reader.next(), ion.IonTypes.INT);
+        assert.equal(reader.numberValue(), 0x1234);
+    };
+
+    suite['numberValueForInf'] = function() {
+        var reader = ion.makeReader("+inf");
+        assert.equal(reader.next(), ion.IonTypes.FLOAT);
+        assert(!isFinite(reader.numberValue()));
+    };
+
+    suite['numberValueInStruct'] = function() {
+        var reader = ion.makeReader("{num:1}");
+        reader.next();
+        reader.stepIn();
+        assert.equal(reader.next(), ion.IonTypes.INT);
+        assert.equal(reader.numberValue(), 1);
+        reader.stepOut();
+    };
+
+    suite['booleanValue'] = function() {
+        var reader = ion.makeReader("true");
+        assert.equal(reader.next(), ion.IonTypes.BOOL);
+        assert.equal(reader.booleanValue(), true);
+    };
+
     registerSuite(suite);
   }
 );

@@ -1093,8 +1093,8 @@ export class ParserTextRaw {
   }
 
   numberValue() : number {
-    var n, s = this.get_value_as_string(this._value_type);
-    switch (this._value_type) {
+    var n, s = this.get_value_as_string(this._curr);
+    switch (this._curr) {
       case T_INT:
       case T_HEXINT:
       case T_FLOAT:
@@ -1113,7 +1113,7 @@ export class ParserTextRaw {
   }
 
   booleanValue() : boolean {
-    if (this._value_type !== T_BOOL) {
+    if (this._curr !== T_BOOL) {
       return undefined;
     }
     let s: string = this.get_value_as_string(T_BOOL);
