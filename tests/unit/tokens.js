@@ -26,7 +26,7 @@ define(
 
         function next(parser, expected_type, expected_value) {
             var t = parser.next();
-            if (false) {
+            if (ion.getIonType(t) != expected_type) {
                 console.log("t = " + JSON.stringify(t));
                 console.log("start = " + parser.start());
                 console.log("end = " + parser.end());
@@ -41,10 +41,16 @@ define(
 
         function test_token(type, str, exp) {
             if (exp === undefined) exp = str;
-            var parser = make_parser(str);
-            next(parser, type, exp);
-            assert.equal(parser.get_raw_token(), str);
-            assert.equal(parser.next(), -1);
+            try {
+                var parser = make_parser(str);
+                next(parser, type, exp);
+                assert.equal(parser.get_raw_token(), str);
+                assert.equal(parser.next(), -1);
+            } catch (ex) {
+                if (exp != "EXCEPTION") {
+                    throw ex;
+                }
+            }
         }
 
         function test_null(s) {
@@ -62,8 +68,8 @@ define(
         function test_float(s) {
             test_token(ion.IonTypes.FLOAT, s);
         }
-        function test_timestamp(s) {
-            test_token(ion.IonTypes.TIMESTAMP, s);
+        function test_timestamp(s, exp) {
+            test_token(ion.IonTypes.TIMESTAMP, s, exp);
         }
         function test_symbol(s) {
             test_token(ion.IonTypes.SYMBOL, s);
@@ -120,6 +126,11 @@ define(
 
         suite['timestamp'] = function() {
             test_timestamp("1999-12-25T00:00:00Z");
+            test_timestamp("1999-12-25T00:00:00");
+            test_timestamp("1999-12-25T00:00Z");
+            test_timestamp("1999-12-25T00:00");
+            test_timestamp("1999-12-25T");
+            test_timestamp("1999-12-25T00", "EXCEPTION");
         };
 
         suite['symbol'] = function() {
@@ -187,6 +198,14 @@ define(
             next(parser, ion.IonTypes.INT, "-1");
             next(parser, ion.IonTypes.SYMBOL, ")");
             assert.equal(parser.next(), -1);
+        };
+
+        suite['token stream'] = function() {
+            var parser = make_parser("-inf; 1999-12-12T;");
+            next(parser, ion.IonTypes.FLOAT, "-inf");
+            next(parser, ion.IonTypes.SYMBOL, ";");
+            next(parser, ion.IonTypes.TIMESTAMP, "1999-12-12T");
+            next(parser, ion.IonTypes.SYMBOL, ";");
         };
 
         suite['errors'] = function() {
