@@ -212,17 +212,42 @@ export class TextReader implements Reader {
     return this._parser.booleanValue();
   }
 
-  decimalValue() : Decimal {
-    throw new Error("E_NOT_IMPL: decimalValue");
-  }
+    decimalValue() : Decimal {
+        return Decimal.parse(this.stringValue());
+    }
 
-  timestampValue() : Timestamp {
-    throw new Error("E_NOT_IMPL: timestampValue");
-  }
+    timestampValue() : Timestamp {
+        return Timestamp.parse(this.stringValue());
+    }
 
-  value() : any {
-    throw new Error("E_NOT_IMPL: value");
-  }
+    value() {//switch for each tid???
+        switch(this._type) {
+            case IonTypes.BOOL : {
+                return this.booleanValue();
+            }
+            case IonTypes.INT : {
+                return this.numberValue();
+            }
+            case IonTypes.FLOAT : {
+                return this.numberValue();
+            }
+            case IonTypes.DECIMAL : {
+                return this.decimalValue();
+            }
+            case IonTypes.SYMBOL : {
+                return this.stringValue();
+            }
+            case IonTypes.STRING : {
+                return this.stringValue();
+            }
+            case IonTypes.TIMESTAMP : {
+                return this.timestampValue();
+            }
+            default : {
+                return undefined;
+            }
+        }
+    }
 
   ionValue() {
     throw new Error("E_NOT_IMPL: ionValue");
