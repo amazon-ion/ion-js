@@ -23,6 +23,7 @@ import { TextWriter } from "./IonTextWriter";
 import { Writeable } from "./IonWriteable";
 import { BinaryWriter } from "./IonBinaryWriter";
 import { LocalSymbolTable, defaultLocalSymbolTable } from "./IonLocalSymbolTable";
+import { IonEventStream } from "./IonEventStream";
 
 const e = {
   name: "IonError",
@@ -133,4 +134,5 @@ export { SharedSymbolTable } from "./IonSharedSymbolTable";
 export { Timestamp } from "./IonTimestamp";
 export { toBase64 } from "./IonText";
 export { TypeCodes } from "./IonBinary";
+export { IonEventStream } from "./IonEventStream";
 
