@@ -19,6 +19,7 @@ define({
     'tests/unit/textNulls',
     'tests/unit/spans',
     'tests/unit/iontests',
+    'tests/unit/tokens',
     'tests/unit/IonCatalogTest',
     'tests/unit/IonImportTest',
     'tests/unit/IonLocalSymbolTableTest',
@@ -26,6 +27,7 @@ define({
     'tests/unit/IonWriteableTest',
     'tests/unit/IonTimestampTest',
     'tests/unit/IonTextTest',
+    'tests/unit/IonTextReaderTest',
     'tests/unit/IonTextWriterTest',
     'tests/unit/IonUnicodeTest',
     'tests/unit/IonLowLevelBinaryWriterTest',
@@ -33,3 +35,4 @@ define({
     'tests/unit/IonBinaryTimestampTest',
   ],
 });
+
