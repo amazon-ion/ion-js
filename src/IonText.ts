@@ -49,6 +49,7 @@ const _is_letter: boolean[] = _make_bool_array("_$abcdefghijklmnopqrstuvwxyzABCD
 const _is_letter_or_digit = _make_bool_array("_$0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ");
 const _is_numeric_terminator: boolean[] = _make_bool_array("{}[](),\"\'\ \t\n\r\u000c");
 const _is_operator_char = _make_bool_array("!#%&*+-./;<=>?@^`|~");
+const _is_single_operator_char = _make_bool_array("()[],.;?^`~");
 const _is_whitespace = _make_bool_array(" \t\r\n\u000b\u000c");
 const isIdentifierArray: boolean[] = _make_bool_array("_$0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ");
 
@@ -62,7 +63,7 @@ export function asAscii(s: any) : string {
     s = "undefined::null";
   }
   else if (typeof s == 'number') {
-    s = ""+s;
+    s = String.fromCharCode(s);
   }
   else if (typeof s != 'string') {
     var esc = nextEscape(s, s.length);
@@ -142,7 +143,7 @@ export function toHex(c: number, len: number) : string {
   }
   if (s.length < len) {
     s = "000000000" + s; // TODO: 9 0's, 9 > max len expected (but what about bigger than that?)
-    s = s.substring(s.length - len, s.length); 
+    s = s.substring(s.length - len, s.length);
   }
   return s;
 }
@@ -162,6 +163,10 @@ export function is_letter_or_digit(ch: number) : boolean {
 
 export function is_operator_char(ch: number) : boolean {
   return _is_operator_char[ch];
+}
+
+export function is_single_operator_char(ch: number) : boolean {
+  return _is_single_operator_char[ch];
 }
 
 export function is_whitespace(ch: number) : boolean {

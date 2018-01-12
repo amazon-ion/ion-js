@@ -38,7 +38,6 @@ define([
     var ionTestsPath = paths.join(cwd, 'ion-tests', 'iontestdata', 'good');
     var accumulator = [];
     findFiles(ionTestsPath, accumulator);
-    //console.log(accumulator.join('\n'));
 
     var skipList = [
       'good/decimalsWithUnderscores.ion',
@@ -51,13 +50,29 @@ define([
       'good/utf32.ion',
     ];
 
+    // For debugging, put single files in this list to have the test run only
+    // that file.   (But don't forget to clean this up on checkin!)
+    var debugList = [
+        //'good/sexps.ion'
+    ];
+
     var unskipped = [];
     for (var path of accumulator) {
+      var spath = path.replace(/\\/g, "/");
       var shouldSkip = false;
       for (var skip of skipList) {
-        if (path.endsWith(skip)) {
+        if (spath.endsWith(skip)) {
           shouldSkip = true;
           break;
+        }
+      }
+      if (debugList.length > 0) {
+        shouldSkip = true;
+        for (var debug of debugList) {
+          if (spath.endsWith(debug)) {
+            shouldSkip = false;
+            break;
+          }
         }
       }
       if (!shouldSkip) {
@@ -107,10 +122,9 @@ define([
                 chunks.push(chunk);
               }
               var buffer = Buffer.concat(chunks);
-              var reader = ion.makeReader(buffer);
+              var reader = ion.makeReader(path.endsWith(".10n") ?
+                                          buffer : buffer.toString("utf8"));
               console.log("Exhausting " + path);
-              if (path.endsWith('clobsWithWhitespace.ion')) {
-              }
               exhaust(reader);
               resolve();
             } catch (e) {

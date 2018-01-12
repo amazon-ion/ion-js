@@ -773,13 +773,14 @@ export class ParserTextRaw {
             // read single quoted strings until we see the triple quoted terminator
             // if it's not a triple quote, it's just content
           }
-          // mark the possible end of the series of values in triple quotes
+          // Set the end of the value,
           // this._end will reset later if further triple quotes are found after indexing through whitespace,
           this._end = this._in.position() - 1;
           //Index past the triple quote.
           this._read();
           this._read();
           this._read();
+
           // the reader will parse values from the source so that it can be roundtripped.
           // eat next whitespace sequence until first non whitespace char found.
       }
@@ -788,6 +789,11 @@ export class ParserTextRaw {
 
     private verifyTriple(entryIndex : number) : boolean {
         return this._in.valueAt(entryIndex) === CH_SQ && this._in.valueAt(entryIndex++) === CH_SQ && this._in.valueAt(entryIndex++) === CH_SQ;
+    }
+
+    private findTriple() : boolean {
+
+        return false;
     }
 
   private _read_string_helper = function(terminator: number, allow_new_line: boolean) : void {
@@ -1034,8 +1040,9 @@ export class ParserTextRaw {
           if (ch == CH_BS) {
               s += this._read_escape_sequence(indice, this._end);
               indice += this._esc_len;
-          } else {
-              s += String.fromCharCode(ch);
+          } 
+          else {
+            s += String.fromCharCode(ch);
           }
         }
         break;
@@ -1045,9 +1052,9 @@ export class ParserTextRaw {
               ch = this._in.valueAt(indice);
               if(indice + 2 < this._end && this.verifyTriple(indice)) {
                   indice = this._skip_triple_quote_gap(indice, this._end);
-              } else if (ch == CH_BS) {
+              } else if(ch == CH_BS) {
                   s += this._read_escape_sequence(indice, this._end);
-                  indice += this._esc_len; //this builds up over time, may be incorrect?
+                  indice += this._esc_len;
               } else {
                   s += String.fromCharCode(ch);
               }
