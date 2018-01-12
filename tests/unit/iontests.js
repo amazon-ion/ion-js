@@ -11,126 +11,343 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-define([
-    'intern',
-    'intern!object',
-    'intern/dojo/node!fs',
-    'intern/dojo/node!path',
-    'dist/amd/es6/IonTests',
-  ],
-  function(intern, registerSuite, fs, paths, ion) {
+define(['intern', 'intern!object', 'intern/dojo/node!fs', 'intern/dojo/node!path', 'dist/amd/es6/IonTests'],
+    function(intern, registerSuite, fs, paths, ion) {
 
-    function findFiles(folder, accumulator) {
-      var files = fs.readdirSync(folder);
-      while (files.length > 0) {
-        var file = files.pop();
-        var path = paths.join(folder, file);
-        var stats = fs.lstatSync(path);
-        if (stats.isDirectory()) {
-          findFiles(path, accumulator);
-        } else if (stats.isFile()) {
-          accumulator.push(path);
-        }
-      }
-    }
-
-    var cwd = process.cwd();
-    var ionTestsPath = paths.join(cwd, 'ion-tests', 'iontestdata', 'good');
-    var accumulator = [];
-    findFiles(ionTestsPath, accumulator);
-    //console.log(accumulator.join('\n'));
-
-    var skipList = [
-      'good/decimalsWithUnderscores.ion',
-      'good/equivs/binaryInts.ion',
-      'good/equivs/decimalsWithUnderscores.ion',
-      'good/equivs/intsWithUnderscores.ion',
-      'good/intBinary.ion',
-      'good/intsWithUnderscores.ion',
-      'good/utf16.ion',
-      'good/utf32.ion',
-    ];
-
-    var unskipped = [];
-    for (var path of accumulator) {
-      var shouldSkip = false;
-      for (var skip of skipList) {
-        if (path.endsWith(skip)) {
-          shouldSkip = true;
-          break;
-        }
-      }
-      if (!shouldSkip) {
-        unskipped.push(path);
-      }
-    }
-
-    var suite = {
-      name: 'Good tests',
-    };
-
-    function exhaust(reader) {
-      var tries = 0;
-      for (;;) {
-        // Safety valve
-        tries++;
-        if (tries > 1000) {
-          throw new Error("Reader spinning forever!");
-        }
-
-        var next = reader.next();
-        if (typeof(next) === 'undefined') {
-          if (reader.depth() > 0) {
-            // End of container
-            //console.log("Stepping out");
-            reader.stepOut();
-          } else {
-            // End of data
-            break;
-          }
-        } else if (next.container && !reader.isNull()) {
-          //console.log("Stepping in");
-          reader.stepIn();
-        }
-      }
-    }
-
-    function makeTest(path) {
-      return function() {
-        var executor = function(resolve, reject) {
-          var stream = fs.createReadStream(path);
-          var chunks = [];
-
-          stream.on('end', function(chunk) {
-            try {
-              if (typeof(chunk) !== 'undefined') {
-                chunks.push(chunk);
-              }
-              var buffer = Buffer.concat(chunks);
-              var reader = ion.makeReader(buffer);
-              console.log("Exhausting " + path);
-              if (path.endsWith('clobsWithWhitespace.ion')) {
-              }
-              exhaust(reader);
-              resolve();
-            } catch (e) {
-              reject(e);
+        function findFiles(folder, accumulator) {
+            var files = fs.readdirSync(folder);
+            while (files.length > 0) {
+                var file = files.pop();
+                var path = paths.join(folder, file);
+                var stats = fs.lstatSync(path);
+                if (stats.isDirectory()) {
+                    findFiles(path, accumulator);
+                } else if (stats.isFile()) {
+                    accumulator.push(path);
+                }
             }
-          });
+        }
 
-          stream.on('data', function(chunk) {
-            chunks.push(chunk);
-          });
+        var cwd = process.cwd();
+        var ionGoodTestsPath = paths.join(cwd, 'ion-tests', 'iontestdata', 'good');
+        var ionBadTestsPath = paths.join(cwd, 'ion-tests', 'iontestdata', 'bad');
+
+        var goodAccumulator = [];
+        findFiles(ionGoodTestsPath, goodAccumulator);
+        var badAccumulator = [];
+        findFiles(ionBadTestsPath, badAccumulator);
+
+
+        //need to mark why these tests are being skipped.
+        var skipList = [
+            'good/decimalsWithUnderscores.ion',
+            'good/whitespace.ion',
+            'good/floatsWithUnderscores.ion',
+            'good/equivs/floatsWithUnderscores.ion',
+            'good/equivs/binaryInts.ion',
+            'good/equivs/decimalsWithUnderscores.ion',
+            'good/equivs/intsWithUnderscores.ion',
+            'good/intBinary.ion',
+            'good/intsWithUnderscores.ion',
+            'good/utf16.ion',
+            'good/utf32.ion',
+            'good/equivs/timestampsLargeFractionalPrecision.ion',
+            'bad/timestamp/timestampLenTooLarge.10n',
+            'bad/decimalLenTooLarge.10n',
+            'bad/longStringSplitEscape_3.ion',
+            'bad/clob_10.ion',
+            'bad/blob_2.ion',
+            'bad/decimalLenCauses64BitOverflow.10n',
+            'bad/decimalExpTooLarge.10n',
+            'good/equivs/bigInts.ion',
+        ];
+
+        // For debugging, put single files in this list to have the test run only
+        // that file.   (But don't forget to clean this up on checkin!)
+        var debugList = [
+            //'good/sexps.ion'
+        ];
+
+        var goodUnskipped = [];
+        for (var path of goodAccumulator) {
+            var spath = path.replace(/\\/g, "/");
+            var shouldSkip = false;
+            for (var skip of skipList) {
+                if (spath.endsWith(skip)) {
+                    shouldSkip = true;
+                    break;
+                }
+            }
+            if (debugList.length > 0) {
+                shouldSkip = true;
+                for (var debug of debugList) {
+                    if (spath.endsWith(debug)) {
+                        shouldSkip = false;
+                        break;
+                    }
+                }
+            }
+            if (!shouldSkip) {
+                goodUnskipped.push(path);
+            }
+        }
+
+        var badUnskipped = [];
+        for (var path of badAccumulator) {
+            var spath = path.replace(/\\/g, "/");
+            var shouldSkip = false;
+            for (var skip of skipList) {
+                if (spath.endsWith(skip)) {
+                    shouldSkip = true;
+                    break;
+                }
+            }
+            if (debugList.length > 0) {
+                shouldSkip = true;
+                for (var debug of debugList) {
+                    if (spath.endsWith(debug)) {
+                        shouldSkip = false;
+                        break;
+                    }
+                }
+            }
+            if (!shouldSkip) {
+                badUnskipped.push(path);
+            }
+        }
+
+        var goodSuite = {
+            name: 'Good tests'
+        };
+        var badSuite = {
+            name: 'Bad tests'
         };
 
-        return new Promise(executor);
-      }
-    }
+        var eventStreamSuite = {
+            name: 'EventStream tests'
+        };
+        var badEventStreamSuite = {
+            name: 'Bad EventStream tests'
+        };
 
-    for (var file of unskipped) {
-      suite[file] = makeTest(file);
-    }
+        function goodExhaust(reader) {
+            var tries = 0;
+            for (;;) {
+                // Safety valve
+                tries++;
+                if (tries > 1000) {
+                    throw new Error("Reader spinning forever!");
+                }
 
-    registerSuite(suite);
-  }
+                var next = reader.next();
+                if (typeof(next) === 'undefined') {
+                    if (reader.depth() > 0) {
+                        // End of container
+                        //console.log("Stepping out");
+                        reader.stepOut();
+                    } else {
+                        // End of data
+                        break;
+                    }
+                } else if (next.container && !reader.isNull()) {
+                    //console.log("Stepping in");
+                    reader.stepIn();
+                }
+            }
+        }
+
+        function badExhaust(reader) {
+            var tries = 0;
+            try {
+                for (; ;) {
+                    // Safety valve
+                    tries++;
+                    if (tries > 1000) {
+                        throw new Error("Reader spinning forever!");
+                    }
+
+                    var next = reader.next();
+                    if (typeof(next) === 'undefined') {
+                        if (reader.depth() > 0) {
+                            // End of container
+                            //console.log("Stepping out");
+                            reader.stepOut();
+                        } else {
+                            // End of data
+                            break;
+                        }
+                    } else if (next.container && !reader.isNull()) {
+                        //console.log("Stepping in");
+                        reader.stepIn();
+                    }
+                }
+            }catch(e){
+                return;
+            }
+            throw new Error("Bad test should have failed!");
+        }
+
+
+        function makeGoodTest(path) {
+            return function() {
+                var executor = function(resolve, reject) {
+                    var options = path.endsWith(".10n") ? null : "utf8";
+                    var input = fs.readFileSync(path, options);
+                    goodExhaust(ion.makeReader(squashEscapes(input)));
+                    resolve();
+                };
+
+                return new Promise(executor);
+            }
+        }
+
+        function makeBadTest(path) {
+            return function() {
+                var executor = function(resolve, reject) {
+                    var options = path.endsWith(".10n") ? null : "utf8";
+                    var input = fs.readFileSync(path, options);
+                    badExhaust(ion.makeReader(squashEscapes(input)));
+                    resolve();
+                };
+
+                return new Promise(executor);
+            }
+        }
+
+        function makeEventStreamTest(path) {
+            return function() {
+                var executor = function(resolve, reject) {
+                    var options = path.endsWith(".10n") ? null : "utf8";
+                    var input = fs.readFileSync(path, options);
+                    roundTripEventStreams(ion.makeReader(squashEscapes(input)));
+                    resolve();
+                };
+
+                return new Promise(executor);
+            }
+        }
+
+        function makeBadEventStreamTest(path) {
+            return function() {
+                var executor = function(resolve, reject) {
+                    var options = path.endsWith(".10n") ? null : "utf8";
+                    var input = fs.readFileSync(path, options);
+                    roundTripBadEventStreams(ion.makeReader(squashEscapes(input)));
+                    resolve();
+                };
+
+                return new Promise(executor);
+            }
+        }
+
+        function roundTripEventStreams(reader){
+            var eventStream = new ion.IonEventStream(reader);
+            var writer = ion.makeTextWriter();
+            eventStream.write(writer);
+            writer.close();
+            var buf = writer.getBytes();
+            var tempString = "";
+            for(var i = 0; i < buf.length; i++){
+                tempString = tempString + String.fromCharCode(buf[i]);
+            }
+            var tempStream = new ion.IonEventStream(new ion.makeReader(tempString));
+            if(!eventStream.equals(tempStream)) {
+                var tempWriter = ion.makeTextWriter();
+                tempStream.write(tempWriter);
+                tempWriter.close();
+                var tempBuf = tempWriter.getBytes();
+                var unequalString = "";
+                for(var i = 0; i < buf.length; i++){
+                    unequalString = unequalString + String.fromCharCode(buf[i]);
+                }
+                throw new Error('Round tripped stream was unequal: ' + tempString + '\n vs: ' + unequalString);
+            }
+            //console.log(tempString);
+
+
+        }
+
+        function roundTripBadEventStreams(reader){
+            try {
+                var eventStream = new ion.IonEventStream(reader);
+                var writer = ion.makeTextWriter();
+                eventStream.write(writer);
+                var buf = writer.getBytes();
+                var tempString = "";
+                for(var i = 0; i < buf.length; i++){
+                    tempString = tempString + String.fromCharCode(buf[i]);
+                }
+                //console.log(tempString);
+            }catch(e){
+                return;
+            }
+            throw new Error("Bad test should have failed!");
+
+
+        }
+
+        for (var file of goodUnskipped) {
+            goodSuite[file] = makeGoodTest(file);
+            eventStreamSuite[file] = makeEventStreamTest(file);
+        }
+        for (var file of badUnskipped) {
+            badSuite[file] = makeBadTest(file);
+            badEventStreamSuite[file] = makeBadEventStreamTest(file);
+        }
+
+        function squashEscapes(inputString){
+            tempStr = '';
+            for(i = 0; i < inputString.length; i++){
+                if(inputString[i] === '\\'){
+                    tempStr = tempStr  + swapEscape(inputString[i+1]);
+                    i++;
+                } else {
+                    tempStr = tempStr + inputString[i];
+                }
+            }
+            return tempStr;
+        }
+
+        function swapEscape(char) {
+            switch (char) {
+                case '0':
+                    return '\0';
+                case 'a':
+                    return '\a';
+                case 'b':
+                    return '\b';
+                case 'f':
+                    return '\f';
+                case 'n':
+                    return '\n';
+                case 'r':
+                    return '\r';
+                case 't':
+                    return '\t';
+                case 'v':
+                    return '\v';
+                case 'e':
+                    return '\e';
+                case '"':
+                    return '"';
+                case '&':
+                    return '\&';
+                case "'":
+                    return "'";
+                case '\\':
+                    return '\\';
+                case '?':
+                    return '\?';
+                case '/':
+                    return '/';
+                default:
+                    return '\\' + char;
+            }
+        }
+
+        //registerSuite(goodSuite);
+        //registerSuite(badSuite);
+        registerSuite(eventStreamSuite);
+        //registerSuite(badEventStreamSuite);
+    }
 );
