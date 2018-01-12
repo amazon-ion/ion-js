@@ -22,7 +22,7 @@ import * as IonText from "./IonText";
 
 import { IonType } from "./IonType";
 import { IonTypes } from "./IonTypes";
-import { Span } from "./IonSpan";
+import { StringSpan, Span } from "./IonSpan";
 
 const EOF = -1;  // EOF is end of container, distinct from undefined which is value has been consumed
 const ERROR           = -2;
@@ -757,33 +757,39 @@ export class ParserTextRaw {
   }
 
   private _read_string3() : void {
-    var ch;
-    if (this._read() != CH_SQ || this._read() != CH_SQ) {
-      this._error( "expected triple quote" );
-    }
-    this._start = this._in.position();
-    for(;;) {  // read sequence of triple quoted strings
-      for(;;) { // read single quoted strings until we see the triple quoted terminator
-        this._read_string_helper(CH_SQ, true);
-        // if it's not a triple quote, it's just content
-        if (this._read() == CH_SQ && this._read() == CH_SQ) {
-          this._end = this._in.position() - 3;
-          break;
-        }
+      let ch : number;
+      this._unread(this._peek(""));
+      // read sequence of triple quoted strings:
+      for(this._start = this._in.position() + 3; this._peek("\'\'\'") !== ERROR; this._in.unread(this._read_after_whitespace(true))) {//need to check if this off by ones on print?
+          this._read();
+          this._read();
+          this._read();
+          //in tripleQuotes
+          //index content of current triple quoted string,
+          //looking for more triple quotes
+          while(this._peek("\'\'\'") === ERROR) {
+              ch = this._read();
+              if( ch === EOF) throw new Error('Closing triple quotes not found.');
+            // read single quoted strings until we see the triple quoted terminator
+            // if it's not a triple quote, it's just content
+          }
+          //mark the possible end of the series of triplequotes
+          // Set the end of the value,
+          // this._end will reset later if further triple quotes are found after indexing through whitespace,
+          this._end = this._in.position() - 1;
+          //Index past the triple quote.
+          this._read();
+          this._read();
+          this._read();
+          // the reader will parse values from the source so that it can be roundtripped.
+          // eat next whitespace sequence until first non whitespace char found.
       }
-      ch = this._read_after_whitespace(true);
-      if (ch != CH_SQ) {
-        this._unread(ch);
-        break;
-      }
-      if (this._peek("\'\'") == ERROR) {
-        break;
-      }
-      this._read(); // consume the 2 pending single quotes
-      this._read();
-    }
-    this._value_push( T_STRING3 );
+      this._value_push( T_STRING3 );
   }
+
+    private verifyTriple(entryIndex : number) : boolean {
+        return this._in.valueAt(entryIndex) === CH_SQ && this._in.valueAt(entryIndex++) === CH_SQ && this._in.valueAt(entryIndex++) === CH_SQ;
+    }
 
   private _read_string_helper = function(terminator: number, allow_new_line: boolean) : void {
     var ch;
@@ -791,7 +797,7 @@ export class ParserTextRaw {
     for (;;) {
       ch = this._read();
       if (ch == CH_BS) {
-        this._read_string_escape_sequence();
+          this._read_string_escape_sequence();
       }
       else if (ch == terminator) {
         break;
@@ -970,8 +976,8 @@ export class ParserTextRaw {
   }
 
   numberValue() : number {
-    var n, s = this.get_value_as_string(this._value_type);
-    switch (this._value_type) {
+    var n, s = this.get_value_as_string(this._curr);
+    switch (this._curr) {
       case T_INT:
       case T_HEXINT:
       case T_FLOAT:
@@ -1004,7 +1010,7 @@ export class ParserTextRaw {
   }
 
   get_value_as_string(t: number) : string {
-    var ii, ch, s = "";
+    let indice, ch, s = "";
     switch (t) {
       case T_NULL:
       case T_BOOL:
@@ -1017,18 +1023,18 @@ export class ParserTextRaw {
       case T_IDENTIFIER:
       case T_OPERATOR:
       case T_BLOB:
-        for (ii=this._start; ii<this._end; ii++) {
-          s += String.fromCharCode(this._in.valueAt(ii));
+        for (indice = this._start; indice < this._end; indice++) {
+          s += String.fromCharCode(this._in.valueAt(indice));
         }
         break;
       case T_STRING1:
       case T_STRING2:
       case T_CLOB2:
-        for (ii=this._start; ii<this._end; ii++) {
-          ch = this._in.valueAt(ii);
+        for (indice = this._start; indice < this._end; indice++) {
+          ch = this._in.valueAt(indice);
           if (ch == CH_BS) {
-            s += this._read_escape_sequence(ii, this._end);
-            ii += this._esc_len;
+              s += this._read_escape_sequence(indice, this._end);
+              indice += this._esc_len;
           } 
           else {
             s += String.fromCharCode(ch);
@@ -1037,24 +1043,17 @@ export class ParserTextRaw {
         break;
       case T_CLOB3:
       case T_STRING3:
-        for (ii=this._start; ii<this._end; ii++) {
-          ch = this._in.valueAt(ii);
-          if (ch == CH_SQ) {
-            if (ii+2<this._end && this._in.valueAt(ii+1) == CH_SQ && this._in.valueAt(ii+1) == CH_SQ) {
-              this._skip_triple_quote_gap(ii, this._end);
-            }
-            else {
-              s += "\'";
-            }
+          for(indice = this._start; indice <= this._end; indice++) {
+              ch = this._in.valueAt(indice);
+              if(indice + 2 < this._end && this.verifyTriple(indice)) {
+                  indice = this._skip_triple_quote_gap(indice, this._end);
+              } else if(ch == CH_BS) {
+                  s += this._read_escape_sequence(indice, this._end);
+                  indice += this._esc_len; //this builds up over time, may be incorrect?
+              } else {
+                  s += String.fromCharCode(ch);
+              }
           }
-          else if (ch == CH_BS) {
-            s += this._read_escape_sequence(ii, this._end);
-            ii += this._esc_len;
-          }
-          else {
-            s += String.fromCharCode(ch);
-          }
-        }
         break;
       default:
         this._error("can't get this value as a string");
@@ -1063,25 +1062,20 @@ export class ParserTextRaw {
     return s;
   }
 
-  private _skip_triple_quote_gap(ii: number, end: number) : number {
-    ii += 2; // skip the two quotes we peeked ahead to see
-    while (ii<end) {
-      let ch: number = this._in.valueAt(ii);
-      if (IonText.is_whitespace(ch)) {
-        // do nothing
-      }
-      else if (ch == CH_SQ) {
-        ii+= 3;
-        if (ii > end || this._in.valueAt(ii-2) != CH_SQ || this._in.valueAt(ii-1) != CH_SQ) {
-          return ii;
+    private _skip_triple_quote_gap(entryIndex: number, end: number) : number {
+        let tempIndex = entryIndex;
+        tempIndex += 3; // skip quotes we peeked ahead to see
+        while (tempIndex < end) {
+            let ch: number = this._in.valueAt(tempIndex);
+            if (IonText.is_whitespace(ch)) {
+                tempIndex++;
+            } else if (tempIndex + 2 <= end && this.verifyTriple(tempIndex)) {
+                 return tempIndex + 2;
+            } else {
+                this._error("unexpected character");
+            }
         }
-      }
-      else {
-        this._error("unexpected character");
-      }
     }
-    return ii;
-  }
 
   private _read_escape_sequence(ii: number, end: number) : number {
     // actually converts the escape sequence to the code point
@@ -1206,7 +1200,7 @@ export class ParserTextRaw {
         this._read_to_newline();
         ch = IonText.WHITESPACE_COMMENT1;
       }
-      else if (ch == CH_AS) {
+      else if (ch == CH_AS)  {
         this._read_to_close_comment();
         ch = IonText.WHITESPACE_COMMENT2;
       }
@@ -1248,23 +1242,23 @@ export class ParserTextRaw {
     this._in.unread(ch);
   }
 
-  private _read_after_whitespace(recognize_comments: boolean) {
-    var ch;
-    if (recognize_comments) {
-      ch = this._read_skipping_comments();
-      while (IonText.is_whitespace(ch)) {
-        ch = this._read_skipping_comments();
-      }
+    private _read_after_whitespace(recognize_comments: boolean) {
+        let ch;
+        if (recognize_comments) {
+            ch = this._read_skipping_comments();
+            while (IonText.is_whitespace(ch)) {
+                ch = this._read_skipping_comments();
+            }
+        } else {
+            ch = this._read();
+            while (IonText.is_whitespace(ch)) {
+                ch = this._read();
+            }
+        }
+        return ch;
     }
-    else {
-      ch = this._read();
-      while (IonText.is_whitespace(ch)) {
-        ch = this._read();
-      }
-    }
-    return ch;
-  }
 
+    //peek does not work with the different types of string input.
   private _peek(expected?: string) : number {
     var ch, ii=0;
     if (expected === undefined || expected.length<1) { 
@@ -1274,7 +1268,7 @@ export class ParserTextRaw {
     }
     while (ii<expected.length) { 
       ch = this._read();
-      if (ch != expected.charCodeAt(ii)) break;
+       if (ch != expected.charCodeAt(ii)) break;
       ii++;
     }
     if (ii == expected.length) {
