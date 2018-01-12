@@ -27,7 +27,7 @@ const CARRAIGE_RETURN = 13;
 const DEBUG_FLAG = true;
 
 export abstract class Span {
-  protected readonly _type: number;
+  protected readonly _type : number;
 
   constructor(_type: number) {
     this._type = _type;
@@ -40,7 +40,7 @@ export abstract class Span {
   abstract valueAt(index: number): number;
 
   abstract getRemaining() : number;
-
+a
   abstract setRemaining(r: number) : void;
 
   abstract is_empty(): boolean;
@@ -48,6 +48,8 @@ export abstract class Span {
   abstract skip(dist: number) : void;
 
   abstract unread(ch: number) : void;
+
+  abstract peek() : number;
 
   protected abstract clone(start: number, len: number): Span;
 
@@ -60,7 +62,7 @@ export abstract class Span {
   }
 }
 
-class StringSpan extends Span {
+export class StringSpan extends Span {
   private _src : string;
   private _pos : number;
   private _start : number;
@@ -101,7 +103,7 @@ class StringSpan extends Span {
     return (this._pos >= this._limit);
   }
 
-  next() : number {
+   next() : number {
     var ch;
     if (this.is_empty()) {
       if (this._pos > MAX_POS) {
