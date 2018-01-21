@@ -75,7 +75,7 @@ module.exports = function(grunt) {
           sourceMap: true  // generate .map files for debugging
         }
       },
- 
+
       'amd-es6': {
         src: ['src/**/*.ts'],
         outDir: 'dist/amd/es6',
@@ -119,19 +119,19 @@ module.exports = function(grunt) {
         ]
       }
     },
-    babel: { 
-      options: { 
-        sourceMap: true, 
+    babel: {
+      options: {
+        sourceMap: true,
         presets: ['es2015']
       },
-      dist: { 
-        files: [{ 
-          'expand': true, 
+      dist: {
+        files: [{
+          'expand': true,
           cwd: 'dist/amd/es6',
-          'src': ['*.js'], 
-          'dest': 'dist/amd/es5/', 
+          'src': ['*.js'],
+          'dest': 'dist/amd/es5/',
           'ext': '.js',
-        }], 
+        }],
       },
     },
     /**
@@ -144,12 +144,12 @@ module.exports = function(grunt) {
         src: [ "./dist/commonjs/es6/Ion.js" ],
         dest: './dist/browser/js/ion-bundle.js',
         options: {
-         browserifyOptions: { 
+         browserifyOptions: {
            standalone: 'ion', // add `ion` to global JS variable `window` in browsers
            debug: true,
          },
-        transform: [["babelify", 
-                     { 
+        transform: [["babelify",
+                     {
                        "presets": ["es2015"],
                        "plugins" : [["transform-runtime", {"polyfill" : true}],
                                     ["transform-object-assign"]]
@@ -160,12 +160,12 @@ module.exports = function(grunt) {
         src: [ "./dist/commonjs/es6/Ion.js" ],
         dest: './dist/browser/js/ion-bundle.js',
         options: {
-         browserifyOptions: { 
+         browserifyOptions: {
            standalone: 'ion', // add `ion` to global JS variable `window` in browsers
            debug: false,
          },
-        transform: [["babelify", 
-                     { 
+        transform: [["babelify",
+                     {
                        "presets": ["es2015"],
                        "plugins" : [["transform-runtime", {"polyfill" : true}],
                                     ["transform-object-assign"]]
@@ -173,13 +173,13 @@ module.exports = function(grunt) {
         }
       }
     },
-      uglify: { 
-          options: { 
-              compress: true, 
-              mangle: true, 
+      uglify: {
+          options: {
+              compress: true,
+              mangle: true,
               sourceMap: false
-          }, 
-          target: { 
+          },
+          target: {
               src: './dist/browser/js/ion-bundle.js',
               dest: './dist/browser/js/ion-bundle.min.js',
           }
@@ -200,12 +200,12 @@ module.exports = function(grunt) {
   // Copy tasks
   grunt.registerTask('copy:all', ['copy:bundle', 'copy:tutorial']);
 
-  // Build and Translation tasks 
+  // Build and Translation tasks
   grunt.registerTask('build:browser', ['build', 'browserify:prod', 'uglify']); // standalone for browser
   grunt.registerTask('trans:browser', ['browserify:prod', 'uglify']); // browserify (assumes 'build' was run)
   grunt.registerTask('build:cjs', ['ts:commonjs-es6']);
   grunt.registerTask('build:amd', ['ts:amd-es6']);
-  grunt.registerTask('build:amd:debug', ['ts:amd-es6-debug']); 
+  grunt.registerTask('build:amd:debug', ['ts:amd-es6-debug']);
   grunt.registerTask('build', ['clean', 'build:amd', 'build:cjs','trans:browser', 'copy:all']);
 
 
@@ -216,14 +216,14 @@ module.exports = function(grunt) {
 
   // Documentation
   grunt.registerTask('nojekyll', 'Write an empty .nojekyll file to allow typedoc html output to be rendered',
-    function(){ 
+    function(){
       grunt.file.write('docs/.nojekyll', '');
     });
 
   grunt.registerTask('doc', ['typedoc']);
 
 
-  // release target used by Travis 
+  // release target used by Travis
   grunt.registerTask('release', ['build', 'test:run', 'test:coverage', 'typedoc', 'nojekyll']);
 
   // default for development
