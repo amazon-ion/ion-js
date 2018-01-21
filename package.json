@@ -4,6 +4,7 @@
   "description": "A JavaScript implementation of the Ion data interchange format",
   "main": "dist/commonjs/es6/Ion.js",
   "types": "dist/commonjs/es6/Ion.d.ts",
+  "browser": "dist/commonjs/es5/Ion.js",
   "scripts": {
     "commit": "git-cz",
     "test": "grunt test",
