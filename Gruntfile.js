@@ -93,6 +93,17 @@ module.exports = function(grunt) {
           module: "commonjs",
           declaration: true
         }
+      },
+      'commonjs-es5': {
+        src: ['src/**/*.ts'],
+        outDir: 'dist/commonjs/es5',
+        options: {
+          target: "es5",
+          module: "commonjs",
+          downlevelIteration: true,
+          declaration: true,
+          lib: ['ESNext','DOM.Iterable', 'esnext.asynciterable']
+        }
       }
     },
       /**
@@ -203,11 +214,10 @@ module.exports = function(grunt) {
   // Build and Translation tasks
   grunt.registerTask('build:browser', ['build', 'browserify:prod', 'uglify']); // standalone for browser
   grunt.registerTask('trans:browser', ['browserify:prod', 'uglify']); // browserify (assumes 'build' was run)
-  grunt.registerTask('build:cjs', ['ts:commonjs-es6']);
+  grunt.registerTask('build:cjs', ['ts:commonjs-es6', 'ts:commonjs-es5']);
   grunt.registerTask('build:amd', ['ts:amd-es6']);
   grunt.registerTask('build:amd:debug', ['ts:amd-es6-debug']);
-  grunt.registerTask('build', ['clean', 'build:amd', 'build:cjs','trans:browser', 'copy:all']);
-
+  grunt.registerTask('build', ['clean', 'build:amd', 'build:cjs', 'trans:browser', 'copy:all']);
 
   // Tests
   grunt.registerTask('test', ['build', 'intern:es6']);     // build and test
