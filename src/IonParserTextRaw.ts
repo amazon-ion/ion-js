@@ -1043,7 +1043,7 @@ export class ParserTextRaw {
         for (indice = this._start; indice < this._end; indice++) {
           ch = this._in.valueAt(indice);
           if (ch == CH_BS) {
-              s += this._read_escape_sequence(indice, this._end);
+              s += String.fromCharCode(this._read_escape_sequence(indice, this._end));
               indice += this._esc_len;
           } 
           else {
@@ -1058,7 +1058,7 @@ export class ParserTextRaw {
               if(indice + 2 < this._end && this.verifyTriple(indice)) {
                   indice = this._skip_triple_quote_gap(indice, this._end);
               } else if(ch == CH_BS) {
-                  s += this._read_escape_sequence(indice, this._end);
+                  s += String.fromCharCode(this._read_escape_sequence(indice, this._end));
                   indice += this._esc_len; //this builds up over time, may be incorrect?
               } else {
                   s += String.fromCharCode(ch);
