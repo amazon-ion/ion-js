@@ -590,6 +590,7 @@ export class ParserTextRaw {
     }
     if (!IonText.is_numeric_terminator(ch)) {
       if (ch == CH_d || ch == CH_D) {
+        t = T_DECIMAL;
         ch = this._read_exponent();
       }
       else if (ch == CH_e || ch == CH_E || ch == CH_f || ch == CH_F ) {
@@ -632,6 +633,7 @@ export class ParserTextRaw {
   }
  
   private _read_plus_inf() {
+    this._start = this._in.position();
     if (this._read() == CH_PS) {
      this._read_inf_helper();
     }
@@ -641,6 +643,7 @@ export class ParserTextRaw {
   }
 
   private _read_minus_inf() {
+    this._start = this._in.position();
     if (this._read() == CH_MS) {
      this._read_inf_helper();
     }
@@ -659,8 +662,7 @@ export class ParserTextRaw {
       }
     }
     if (IonText.is_numeric_terminator( this._peek() )) {
-      this._end = this._in.position() - 1;
-      this._start = this._end - 4; // -4 to include the sign we've already read
+      this._end = this._in.position();
       this._value_push( T_FLOAT_SPECIAL ); 
     }
     else {
@@ -994,7 +996,7 @@ export class ParserTextRaw {
         n = Number(s);
         break;
       case T_FLOAT_SPECIAL:
-        if (s == "+inf")      n = Number.POSITIVE_INFINITY;
+        if (s == "+inf")      n =  Number.POSITIVE_INFINITY;
         else if (s == "-inf") n = Number.NEGATIVE_INFINITY;
         else if (s == "nan")  n = Number.NaN;
         else throw new Error("can't convert to number"); 
@@ -1271,10 +1273,8 @@ export class ParserTextRaw {
     //peek does not work with the different types of string input.
   private _peek(expected?: string) : number {
     var ch, ii=0;
-    if (expected === undefined || expected.length<1) { 
-      ch = this._read();
-      this._unread(ch);
-      return ch;
+    if (expected === undefined || expected.length < 1) {
+      return this._in.valueAt(this._in.position());
     }
     while (ii<expected.length) { 
       ch = this._read();

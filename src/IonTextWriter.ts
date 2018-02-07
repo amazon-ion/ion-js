@@ -119,14 +119,34 @@ export class TextWriter implements Writer {
     }
 
     writeFloat32(value: number, annotations?: string[]) : void {
+        var tempVal : any = value;
+        if(value === Number.POSITIVE_INFINITY){
+            tempVal = "+inf";
+        } else if(value === Number.NEGATIVE_INFINITY){
+            tempVal = "-inf";
+        } else if(value === Number.NaN){
+            tempVal = "nan";
+        } else {
+            tempVal = tempVal.toString(10);
+        }
         this.writeValue(TypeCodes.FLOAT, value, annotations, (value: number) => {
-            this.writeUtf8(value.toString(10));
+            this.writeUtf8(tempVal);
         });
     }
 
     writeFloat64(value: number, annotations?: string[]) : void {
+        var tempVal : any = value;
+        if(value === Number.POSITIVE_INFINITY){
+            tempVal = "+inf";
+        } else if(value === Number.NEGATIVE_INFINITY){
+            tempVal = "-inf";
+        } else if(value === Number.NaN){
+            tempVal = "nan";
+        } else {
+            tempVal = tempVal.toString(10);
+        }
         this.writeValue(TypeCodes.FLOAT, value, annotations, (value: number) => {
-            this.writeUtf8(value.toString(10));
+            this.writeUtf8(tempVal);
         });
     }
 

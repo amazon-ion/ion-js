@@ -83,30 +83,35 @@ export class IonEventStream {
         let currentContainer : IonContainerEvent[] = [];
         let currentContainerIndex : number[] = [];
         while(true) {
-            switch(tid) {
-                case IonTypes.LIST :
-                case IonTypes.SEXP :
-                case IonTypes.STRUCT : {
-                    let containerEvent = this.eventFactory.makeContainerEvent(IonEventType.CONTAINER_START, tid, this.reader.fieldName(), undefined, this.reader.depth(), undefined);
-                    this.eventStream.push(containerEvent);
-                    currentContainer.push(containerEvent);
-                    currentContainerIndex.push(this.eventStream.length);
-                    this.reader.stepIn();
-                    break;
-                }
-                case undefined : {
-                    if (this.reader.depth() === 0) {
-                        this.eventStream.push(this.eventFactory.makeEndEvent(IonEventType.STREAM_END, IonTypes.NULL, undefined, undefined, this.reader.depth(), undefined));
-                        return;
-                    } else {
-                        this.reader.stepOut();
-                        this.closeContainer(currentContainer.pop(), currentContainerIndex.pop());
+            if(this.reader.isNull()){
+                this.eventStream.push(this.eventFactory.makeScalarEvent(tid, this.reader.fieldName(), this.reader.depth(), undefined, this.reader));
+                tid = this.reader.next();
+            } else {
+                switch (tid) {
+                    case IonTypes.LIST :
+                    case IonTypes.SEXP :
+                    case IonTypes.STRUCT : {
+                        let containerEvent = this.eventFactory.makeContainerEvent(IonEventType.CONTAINER_START, tid, this.reader.fieldName(), undefined, this.reader.depth(), undefined);
+                        this.eventStream.push(containerEvent);
+                        currentContainer.push(containerEvent);
+                        currentContainerIndex.push(this.eventStream.length);
+                        this.reader.stepIn();
                         break;
                     }
-                }
-                default : {
-                    this.eventStream.push(this.eventFactory.makeScalarEvent(tid, this.reader.fieldName(), this.reader.depth(), undefined, this.reader));
-                    break;
+                    case undefined : {
+                        if (this.reader.depth() === 0) {
+                            this.eventStream.push(this.eventFactory.makeEndEvent(IonEventType.STREAM_END, IonTypes.NULL, undefined, undefined, this.reader.depth(), undefined));
+                            return;
+                        } else {
+                            this.reader.stepOut();
+                            this.closeContainer(currentContainer.pop(), currentContainerIndex.pop());
+                            break;
+                        }
+                    }
+                    default : {
+                        this.eventStream.push(this.eventFactory.makeScalarEvent(tid, this.reader.fieldName(), this.reader.depth(), undefined, this.reader));
+                        break;
+                    }
                 }
             }
             tid = this.reader.next();
