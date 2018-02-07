@@ -243,6 +243,12 @@ export class TextReader implements Reader {
             case IonTypes.TIMESTAMP : {
                 return this.timestampValue();
             }
+            case IonTypes.CLOB : {
+                return this.stringValue();
+            }
+            case IonTypes.BLOB : {
+                return this.stringValue();
+            }
             default : {
                 return undefined;
             }

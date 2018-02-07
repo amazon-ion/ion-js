@@ -126,7 +126,7 @@ export class TextWriter implements Writer {
             tempVal = "-inf";
         } else if(value === Number.NaN){
             tempVal = "nan";
-        } else {
+        } else if (tempVal !== null && tempVal !== undefined){
             tempVal = tempVal.toString(10);
         }
         this.writeValue(TypeCodes.FLOAT, value, annotations, (value: number) => {
@@ -142,7 +142,7 @@ export class TextWriter implements Writer {
             tempVal = "-inf";
         } else if(value === Number.NaN){
             tempVal = "nan";
-        } else {
+        } else if(tempVal !== null && tempVal !== undefined){
             tempVal = tempVal.toString(10);
         }
         this.writeValue(TypeCodes.FLOAT, value, annotations, (value: number) => {

@@ -85,7 +85,6 @@ export class IonEventStream {
         while(true) {
             if(this.reader.isNull()){
                 this.eventStream.push(this.eventFactory.makeScalarEvent(tid, this.reader.fieldName(), this.reader.depth(), undefined, this.reader));
-                tid = this.reader.next();
             } else {
                 switch (tid) {
                     case IonTypes.LIST :
