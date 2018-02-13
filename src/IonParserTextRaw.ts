@@ -782,7 +782,7 @@ export class ParserTextRaw {
 
           // Set the end of the value,
           // this._end will reset later if further triple quotes are found after indexing through whitespace,
-          this._end = this._in.position() - 1;
+          this._end = this._in.position();
           //Index past the triple quote.
           this._read();
           this._read();
@@ -938,7 +938,7 @@ export class ParserTextRaw {
     this._read_string3();
     t = this._value_pop();
     if (t != T_STRING3) this._error("string expected");
-    this._value_push(T_CLOB2);
+    this._value_push(T_CLOB3);
     this._ops.unshift( this._read_close_double_brace );
   }
 
@@ -1047,20 +1047,48 @@ export class ParserTextRaw {
           if (ch == CH_BS) {
               s += String.fromCharCode(this._read_escape_sequence(indice, this._end));
               indice += this._esc_len;
-          } 
-          else {
+          } else {
             s += String.fromCharCode(ch);
           }
         }
         break;
       case T_CLOB3:
       case T_STRING3:
-          for(indice = this._start; indice <= this._end; indice++) {
+          //current attempt at changes
+          let acceptComments = (t === T_STRING3);
+          for(indice = this._start; this.verifyTriple(indice); indice += 3) {
+              ch = this._in.valueAt(indice);
+              switch (ch) {
+                  case CH_BS:
+                      var escaped = this._read_escape_sequence(indice, this._end);
+                      if(escaped >= 0){
+                          s += String.fromCharCode(escaped);
+                      }
+                      indice += this._esc_len; //this builds up over time, may be incorrect?
+                      break;
+                  case CH_SQ:
+                      if(this.verifyTriple(indice)){
+                          indice = this._skip_triple_quote_gap(indice, this._end, acceptComments);
+                      } else {
+                          s += String.fromCharCode(ch);
+                      }
+                      break;
+
+                  default:
+                      s += String.fromCharCode(ch);
+                      break;
+              }
+          }
+// what i wrote to fix it before
+          for(indice = this._start; indice < this._end; indice++) {
               ch = this._in.valueAt(indice);
               if(indice + 2 < this._end && this.verifyTriple(indice)) {
-                  indice = this._skip_triple_quote_gap(indice, this._end);
+                  indice = this._skip_triple_quote_gap(indice, this._end, acceptComments);
               } else if(ch == CH_BS) {
-                  s += String.fromCharCode(this._read_escape_sequence(indice, this._end));
+                  var escaped = this._read_escape_sequence(indice, this._end);
+                  if(escaped >= 0){
+                      s += String.fromCharCode(escaped);
+                  }
                   indice += this._esc_len; //this builds up over time, may be incorrect?
               } else {
                   s += String.fromCharCode(ch);
@@ -1073,8 +1101,8 @@ export class ParserTextRaw {
     }
     return s;
   }
-
-    private _skip_triple_quote_gap(entryIndex: number, end: number) : number {
+//broken attempt to fix triple quote gaps (breaks on newlines in comments/comments
+    private _skip_triple_quote_gap(entryIndex: number, end: number, acceptsComments: boolean) : number {
         let tempIndex = entryIndex;
         tempIndex += 3; // skip quotes we peeked ahead to see
         while (tempIndex < end) {
@@ -1084,7 +1112,7 @@ export class ParserTextRaw {
             } else if (tempIndex + 2 <= end && this.verifyTriple(tempIndex)) {
                  return tempIndex + 2;
             } else {
-                this._error("unexpected character");
+                return entryIndex;
             }
         }
     }

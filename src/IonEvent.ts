@@ -357,7 +357,11 @@ export class IonClobEvent extends IonEvent {
         return this.ionValue === expected.ionValue;
     }
     writeIonValue(writer : Writer) : void {
-        writer.writeClob(this.ionValue);
+        var tempBuf = [];
+        for(var i = 0; i < this.ionValue.length; i++){
+            tempBuf.push(this.ionValue.charCodeAt(i))
+        }
+        writer.writeClob(tempBuf);
     }
 }
 /*
