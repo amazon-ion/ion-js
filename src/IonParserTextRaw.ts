@@ -23,6 +23,7 @@ import * as IonText from "./IonText";
 import { IonType } from "./IonType";
 import { IonTypes } from "./IonTypes";
 import { StringSpan, Span } from "./IonSpan";
+import {is_whitespace} from "./IonText";
 
 const EOF = -1;  // EOF is end of container, distinct from undefined which is value has been consumed
 const ERROR           = -2;
@@ -795,7 +796,7 @@ export class ParserTextRaw {
   }
 
     private verifyTriple(entryIndex : number) : boolean {
-        return this._in.valueAt(entryIndex) === CH_SQ && this._in.valueAt(entryIndex++) === CH_SQ && this._in.valueAt(entryIndex++) === CH_SQ;
+        return this._in.valueAt(entryIndex) === CH_SQ && this._in.valueAt(entryIndex + 1) === CH_SQ && this._in.valueAt(entryIndex + 2) === CH_SQ;
     }
 
     private findTriple() : boolean {
@@ -857,6 +858,7 @@ export class ParserTextRaw {
         this._unread(ch);
         break;
       default:
+          console.log(ch);
         this._error("unexpected character after escape slash");
     }
   }
@@ -1022,7 +1024,7 @@ export class ParserTextRaw {
   }
 
   get_value_as_string(t: number) : string {
-    let indice, ch, s = "";
+    let indice : number, ch : number, escaped, acceptComments : boolean, s : string = "";
     switch (t) {
       case T_NULL:
       case T_BOOL:
@@ -1041,11 +1043,21 @@ export class ParserTextRaw {
         break;
       case T_STRING1:
       case T_STRING2:
+          for (indice = this._start; indice < this._end; indice++) {
+              ch = this._in.valueAt(indice);
+              if (ch == CH_BS) {
+                  s += String.fromCharCode(this._read_escape_sequence(indice, this._end));
+                  indice += this._esc_len;
+              } else {
+                  s += String.fromCharCode(ch);
+              }
+          }
+          break;
       case T_CLOB2:
         for (indice = this._start; indice < this._end; indice++) {
           ch = this._in.valueAt(indice);
           if (ch == CH_BS) {
-              s += String.fromCharCode(this._read_escape_sequence(indice, this._end));
+              s += String.fromCharCode(this.readClobEscapes(indice, this._end));
               indice += this._esc_len;
           } else {
             s += String.fromCharCode(ch);
@@ -1053,14 +1065,12 @@ export class ParserTextRaw {
         }
         break;
       case T_CLOB3:
-      case T_STRING3:
-          //current attempt at changes
-          let acceptComments = (t === T_STRING3);
-          for(indice = this._start; this.verifyTriple(indice); indice += 3) {
+          acceptComments = false;
+          for(indice = this._start; indice < this._end; indice++) {
               ch = this._in.valueAt(indice);
               switch (ch) {
                   case CH_BS:
-                      var escaped = this._read_escape_sequence(indice, this._end);
+                      escaped = this.readClobEscapes(indice, this._end);
                       if(escaped >= 0){
                           s += String.fromCharCode(escaped);
                       }
@@ -1079,19 +1089,30 @@ export class ParserTextRaw {
                       break;
               }
           }
-// what i wrote to fix it before
+          break;
+      case T_STRING3:
+          acceptComments = true;
           for(indice = this._start; indice < this._end; indice++) {
               ch = this._in.valueAt(indice);
-              if(indice + 2 < this._end && this.verifyTriple(indice)) {
-                  indice = this._skip_triple_quote_gap(indice, this._end, acceptComments);
-              } else if(ch == CH_BS) {
-                  var escaped = this._read_escape_sequence(indice, this._end);
-                  if(escaped >= 0){
-                      s += String.fromCharCode(escaped);
-                  }
-                  indice += this._esc_len; //this builds up over time, may be incorrect?
-              } else {
-                  s += String.fromCharCode(ch);
+              switch (ch) {
+                  case CH_BS:
+                      escaped = this._read_escape_sequence(indice, this._end);
+                      if(escaped >= 0){
+                          s += String.fromCharCode(escaped);
+                      }
+                      indice += this._esc_len; //this builds up over time, may be incorrect?
+                      break;
+                  case CH_SQ:
+                      if(this.verifyTriple(indice)){
+                          indice = this._skip_triple_quote_gap(indice, this._end, acceptComments);
+                      } else {
+                          s += String.fromCharCode(ch);
+                      }
+                      break;
+
+                  default:
+                      s += String.fromCharCode(ch);
+                      break;
               }
           }
         break;
@@ -1101,20 +1122,118 @@ export class ParserTextRaw {
     }
     return s;
   }
-//broken attempt to fix triple quote gaps (breaks on newlines in comments/comments
-    private _skip_triple_quote_gap(entryIndex: number, end: number, acceptsComments: boolean) : number {
-        let tempIndex = entryIndex;
-        tempIndex += 3; // skip quotes we peeked ahead to see
-        while (tempIndex < end) {
-            let ch: number = this._in.valueAt(tempIndex);
-            if (IonText.is_whitespace(ch)) {
-                tempIndex++;
-            } else if (tempIndex + 2 <= end && this.verifyTriple(tempIndex)) {
-                 return tempIndex + 2;
-            } else {
-                return entryIndex;
-            }
+
+  private indexWhiteSpace(indice : number, acceptComments : boolean) : number {
+      let ch : number = this._in.valueAt(indice);
+      if(!acceptComments){
+          for(; is_whitespace(ch); ch = this._in.valueAt(indice++)){}
+      } else {
+          for(;is_whitespace(ch) || ch === CH_FORWARD_SLASH;ch = this._in.valueAt(indice++)){
+              if (ch === CH_FORWARD_SLASH) {
+                  ch = this._in.valueAt(indice++);
+                  switch (ch) {
+                      case CH_FORWARD_SLASH:
+                          indice = this.indexToNewLine(indice);
+                          break;
+                      case CH_AS:
+                          indice = this.indexToCloseComment(indice);
+                          break;
+                      default:
+                          indice--;
+                          break;
+                  }
+              }
+          }
+      }
+      return indice;
+  }
+
+  private indexToNewLine(indice : number){
+      let ch : number = this._in.valueAt(indice);
+      while(ch !== EOF && ch !== CH_NL){
+          if (ch === CH_CR) {
+              if (this._in.valueAt(indice + 1) !== CH_NL){
+                  return indice;
+              }
+          }
+          ch = this._in.valueAt(indice++);
+      }
+      return indice;
+  }
+
+  private indexToCloseComment(indice : number) : number{
+        while(this._in.valueAt(indice) !== CH_AS && this._in.valueAt(indice + 1) !== CH_FORWARD_SLASH){
+            indice++;
         }
+    return indice;
+  }
+
+
+    private _skip_triple_quote_gap(entryIndex: number, end: number, acceptComments: boolean) : number {
+        let tempIndex : number = entryIndex + 3;
+        let ch: number = this._in.valueAt(tempIndex);
+        tempIndex = this.indexWhiteSpace(tempIndex, acceptComments);
+        if (tempIndex + 2 <= end && this.verifyTriple(tempIndex)) {
+            tempIndex += 3;
+            return tempIndex;
+        } else {
+            return tempIndex;
+        }
+    }
+
+    private readClobEscapes(ii: number, end: number) : number {
+        // actually converts the escape sequence to a byte
+        var ch;
+        if (ii + 1 >= end) {
+            this._error("invalid escape sequence");
+            return;
+        }
+        ch = this._in.valueAt(ii + 1);
+        this._esc_len = 1;
+        switch (ch) {
+            case ESC_0:
+                return 0; // =  48, //  values['0']  = 0;       //    \0  alert NUL
+            case ESC_a:
+                return 7; // =  97, //  values['a']  = 7;       //    \a  alert BEL
+            case ESC_b:
+                return 8; // =  98, //  values['b']  = 8;       //    \b  backspace BS
+            case ESC_t:
+                return 9; // = 116, //  values['t']  = 9;       //    \t  horizontal tab HT
+            case ESC_nl:
+                return 10; // = 110, //  values['n']  = '\n';    //    \ n  linefeed LF
+            case ESC_ff:
+                return 12;  // = 102, //  values['f']  = 0x0c;    //    \f  form feed FF
+            case ESC_cr:
+                return 13; // = 114, //  values['r']  = '\r';    //    \ r  carriage return CR
+            case ESC_v:
+                return 11; // = 118, //  values['v']  = 0x0b;    //    \v  vertical tab VT
+            case ESC_dq:
+                return 34; // =  34, //  values['"']  = '"';     //    \"  double quote
+            case ESC_sq:
+                return 39; // =  39, //  values['\''] = '\'';    //    \'  single quote
+            case ESC_qm:
+                return 63; // =  63, //  values['?']  = '?';     //    \\?  question mark
+            case ESC_bs:
+                return 92; // =  92, //  values['\\'] = '\\';    //    \\  backslash
+            case ESC_fs:
+                return 47; // =  47, //  values['/']  = '/';     //    \/  forward slash nothing  \NL  escaped NL expands to nothing
+            case ESC_nl2:
+                return -1; // =  10, //  values['\n'] = ESCAPE_REMOVES_NEWLINE;  // slash-new line the new line eater
+            case ESC_nl3: // =  13, //  values['\r'] = ESCAPE_REMOVES_NEWLINE2;  // slash-new line the new line eater
+                if (ii + 3 < end && this._in.valueAt(ii + 3) == CH_NL) {
+                    this._esc_len = 2;
+                }
+                return IonText.ESCAPED_NEWLINE;
+            case ESC_x: // = CH_x, //  values['x'] = ESCAPE_HEX; //    any  \xHH  2-digit hexadecimal unicode character equivalent to \ u00HH
+                if (ii + 3 >= end) {
+                    this._error("invalid escape sequence");
+                    return;
+                }
+                ch = this._get_N_hexdigits(ii + 2, ii + 4);
+                this._esc_len = 3;
+                break;
+        }
+        return ch;
     }
 
   private _read_escape_sequence(ii: number, end: number) : number {
@@ -1173,17 +1292,24 @@ export class ParserTextRaw {
       default:
         this._error("unexpected character after escape slash");
     }
-    return;
+    return ch;
   }
 
   private _get_N_hexdigits(ii: number, end: number) : number {
-    var ch, v = 0;
+      let tempStr = '';
+      for(let indice = ii; indice < end; indice++){
+          tempStr += String.fromCharCode(this._in.valueAt(indice));
+      }
+      return parseInt(tempStr, 16);
+    /*
+      var ch, v = 0;
     while (ii < end) {
       ch = this._in.valueAt(ii);
       v = v*16 + get_hex_value(ch);
       ii++;
     }
     return v;
+    */
   }
 
   private _value_push(t) : void {

@@ -193,7 +193,7 @@ define(['intern', 'intern!object', 'intern/dojo/node!fs', 'intern/dojo/node!path
                 var executor = function(resolve, reject) {
                     var options = path.endsWith(".10n") ? null : "utf8";
                     var input = fs.readFileSync(path, options);
-                    goodExhaust(ion.makeReader(squashEscapes(input)));
+                    goodExhaust(ion.makeReader(input));
                     resolve();
                 };
 
@@ -206,7 +206,7 @@ define(['intern', 'intern!object', 'intern/dojo/node!fs', 'intern/dojo/node!path
                 var executor = function(resolve, reject) {
                     var options = path.endsWith(".10n") ? null : "utf8";
                     var input = fs.readFileSync(path, options);
-                    badExhaust(ion.makeReader(squashEscapes(input)));
+                    badExhaust(ion.makeReader(input));
                     resolve();
                 };
 
@@ -219,7 +219,8 @@ define(['intern', 'intern!object', 'intern/dojo/node!fs', 'intern/dojo/node!path
                 var executor = function(resolve, reject) {
                     var options = path.endsWith(".10n") ? null : "utf8";
                     var input = fs.readFileSync(path, options);
-                    roundTripEventStreams(ion.makeReader(squashEscapes(input)));
+                    console.log(path);
+                    roundTripEventStreams(ion.makeReader(input));
                     resolve();
                 };
 
@@ -232,7 +233,7 @@ define(['intern', 'intern!object', 'intern/dojo/node!fs', 'intern/dojo/node!path
                 var executor = function(resolve, reject) {
                     var options = path.endsWith(".10n") ? null : "utf8";
                     var input = fs.readFileSync(path, options);
-                    roundTripBadEventStreams(ion.makeReader(squashEscapes(input)));
+                    roundTripBadEventStreams(ion.makeReader(input));
                     resolve();
                 };
 
@@ -246,11 +247,12 @@ define(['intern', 'intern!object', 'intern/dojo/node!fs', 'intern/dojo/node!path
             eventStream.write(writer);
             writer.close();
             var buf = writer.getBytes();
-            var tempString = "";
+            var tempString = '';
             for(var i = 0; i < buf.length; i++){
                 tempString = tempString + String.fromCharCode(buf[i]);
             }
-            var tempStream = new ion.IonEventStream(new ion.makeReader(tempString));
+            var tempReader = new ion.makeReader(tempString);
+            var tempStream = new ion.IonEventStream(tempReader);
             if(!eventStream.equals(tempStream)) {
                 var tempWriter = ion.makeTextWriter();
                 tempStream.write(tempWriter);

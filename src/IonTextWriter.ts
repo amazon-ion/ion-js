@@ -75,18 +75,30 @@ export class TextWriter implements Writer {
 
     writeClob(value: number[], annotations?: string[]) : void {
         this.writeValue(TypeCodes.CLOB, value, annotations, (value: number[]) => {
+            let hexStr : string;
             this.writeUtf8('{{');
             this.writeUtf8('"');
             for (let i : number = 0; i < value.length; i++) {
                 let c : number = value[i];
-                if (c >= 128) {
-                    throw new Error(`Illegal clob character ${c} at index ${i}`);
-                }
-                let escape: number[] = ClobEscapes[c];
-                if (isUndefined(escape)) {
-                    this.writeable.writeByte(c);
+                if (c > 127 && c < 256) {
+                    hexStr = "\\x" + c.toString(16);
+                    for(let j = 0; j < hexStr.length; j++){
+                        this.writeable.writeByte(hexStr.charCodeAt(j));
+                    }
                 } else {
-                    this.writeable.writeBytes(escape);
+                    let escape: number[] = ClobEscapes[c];
+                    if (isUndefined(escape)) {
+                        if(c < 32){
+                            hexStr = "\\x" + c.toString(16);
+                            for(let j = 0; j < hexStr.length; j++){
+                                this.writeable.writeByte(hexStr.charCodeAt(j));
+                            }
+                        }else {
+                            this.writeable.writeByte(c);
+                        }
+                    } else {
+                        this.writeable.writeBytes(escape);
+                    }
                 }
             }
             this.writeUtf8('"');
