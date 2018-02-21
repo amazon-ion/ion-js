@@ -134,7 +134,7 @@ export class Decimal {
     return this._exponent;
   }
 
-  static parse(str: string) : Decimal {
+  static parse(str: string, dontStrip? : boolean) : Decimal {
     let index: number = 0;
     let exponent: number = 0;
     let c: number;
@@ -154,7 +154,7 @@ export class Decimal {
 
     let digits: string = Decimal.readDigits(str, index);
     index += digits.length;
-    digits = Decimal.stripLeadingZeroes(digits);
+    if(!dontStrip) digits = Decimal.stripLeadingZeroes(digits);
 
     if (index === str.length) {
       let trimmedDigits: string = Decimal.stripTrailingZeroes(digits);

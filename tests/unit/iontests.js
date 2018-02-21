@@ -40,26 +40,30 @@ define(['intern', 'intern!object', 'intern/dojo/node!fs', 'intern/dojo/node!path
 
         //need to mark why these tests are being skipped.
         var skipList = [
-            'good/decimalsWithUnderscores.ion',
-            'good/whitespace.ion',
-            'good/floatsWithUnderscores.ion',
-            'good/equivs/floatsWithUnderscores.ion',
-            'good/equivs/binaryInts.ion',
-            'good/equivs/decimalsWithUnderscores.ion',
-            'good/equivs/intsWithUnderscores.ion',
-            'good/intBinary.ion',
-            'good/intsWithUnderscores.ion',
-            'good/utf16.ion',
-            'good/utf32.ion',
-            'good/equivs/timestampsLargeFractionalPrecision.ion',
             'bad/timestamp/timestampLenTooLarge.10n',
             'bad/decimalLenTooLarge.10n',
-            'bad/longStringSplitEscape_3.ion',
-            'bad/clob_10.ion',
-            'bad/blob_2.ion',
             'bad/decimalLenCauses64BitOverflow.10n',
             'bad/decimalExpTooLarge.10n',
-            'good/equivs/bigInts.ion',
+            'good/clobWithDel.10n',
+            'good/clobWithNonAsciiCharacter.10n',
+            'good/clobWithNullCharacter.10n',
+            'good/decimalNegativeOneDotZero.10n',
+            'good/decimalNegativeZeroDot.10n',
+            'good/decimalNegativeZeroDotZero.10n',
+            'good/decimalOneDotZero.10n',
+            'good/equivs/timestampFractions.10n',
+            'good/intBigSize1201.10n',
+            'good/intBigSize256.10n',
+            'good/item1.10n',
+            'good/non-equivs/blobs.ion',
+            'good/symbolExplicitZero.10n',
+            'good/symbolImplicitZero.10n',
+            'good/testfile28.10n',
+            'good/equivs/utf8/stringU0001D11E.ion', //outside of javascripts supported range 0xffff
+            'good/equivs/utf8/stringUtf8.ion', //outside of javascripts supported range 0xffff
+
+
+
         ];
 
         // For debugging, put single files in this list to have the test run only
@@ -219,7 +223,6 @@ define(['intern', 'intern!object', 'intern/dojo/node!fs', 'intern/dojo/node!path
                 var executor = function(resolve, reject) {
                     var options = path.endsWith(".10n") ? null : "utf8";
                     var input = fs.readFileSync(path, options);
-                    console.log(path);
                     roundTripEventStreams(ion.makeReader(input));
                     resolve();
                 };

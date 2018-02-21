@@ -1046,7 +1046,13 @@ export class ParserTextRaw {
           for (indice = this._start; indice < this._end; indice++) {
               ch = this._in.valueAt(indice);
               if (ch == CH_BS) {
-                  s += String.fromCharCode(this._read_escape_sequence(indice, this._end));
+                  let codepoint : number = this._read_escape_sequence(indice, this._end);
+                  if(codepoint > 0xFFFF) {
+                      s += String.fromCodePoint(codepoint);
+                      throw new Error("escape sequence is outside of javascript's support range for strings(OXFFFF)");
+                  } else {
+                      s += String.fromCharCode(codepoint);
+                  }
                   indice += this._esc_len;
               } else {
                   s += String.fromCharCode(ch);
@@ -1296,12 +1302,6 @@ export class ParserTextRaw {
   }
 
   private _get_N_hexdigits(ii: number, end: number) : number {
-      let tempStr = '';
-      for(let indice = ii; indice < end; indice++){
-          tempStr += String.fromCharCode(this._in.valueAt(indice));
-      }
-      return parseInt(tempStr, 16);
-    /*
       var ch, v = 0;
     while (ii < end) {
       ch = this._in.valueAt(ii);
@@ -1309,7 +1309,6 @@ export class ParserTextRaw {
       ii++;
     }
     return v;
-    */
   }
 
   private _value_push(t) : void {
