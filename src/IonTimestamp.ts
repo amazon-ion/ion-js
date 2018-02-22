@@ -358,6 +358,9 @@ export class Timestamp {
         return "null.timestamp";
       case Precision.SECONDS:
         image = t.seconds.toString();
+        if(image.length  == 1){
+            image = "0" + image;
+        }
       case Precision.HOUR_AND_MINUTE:
         image = _to_2_digits(t.minute) + (image ? ":" + image : "");
         image = _to_2_digits(t.hour) + (image ? ":" + image : "");
@@ -502,8 +505,7 @@ export class Timestamp {
         case States.FRACTIONAL_SECONDS:
           const START_POSITION_OF_SECONDS = 17;
 
-          seconds = Decimal.parse(str.substring(START_POSITION_OF_SECONDS, pos));
-
+          seconds = Decimal.parse(str.substring(START_POSITION_OF_SECONDS, pos), true);
           break;
         case States.OFFSET:
           break;
