@@ -1325,6 +1325,7 @@ export class ParserTextRaw {
   }
 
   next(): number {
+      this._ann = [];
     if (this._value_type === ERROR) {
       this._run();
     }
@@ -1340,7 +1341,7 @@ export class ParserTextRaw {
 
     this._curr_null = this._value_null;
     this._value_null = false;
-    this._ann = [];
+
 
     return t;
   }
