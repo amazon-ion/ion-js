@@ -89,7 +89,7 @@ export class IonEventStream {
                     case IonTypes.LIST :
                     case IonTypes.SEXP :
                     case IonTypes.STRUCT : {
-                        let containerEvent = this.eventFactory.makeContainerEvent(IonEventType.CONTAINER_START, tid, this.reader.fieldName(), undefined, this.reader.depth(), undefined);
+                        let containerEvent = this.eventFactory.makeContainerEvent(IonEventType.CONTAINER_START, tid, this.reader.fieldName(), this.reader.annotations(), this.reader.depth(), undefined);
                         this.eventStream.push(containerEvent);
                         currentContainer.push(containerEvent);
                         currentContainerIndex.push(this.eventStream.length);
@@ -107,7 +107,7 @@ export class IonEventStream {
                         }
                     }
                     default : {
-                        this.eventStream.push(this.eventFactory.makeScalarEvent(tid, this.reader.fieldName(), this.reader.depth(), undefined, this.reader));
+                        this.eventStream.push(this.eventFactory.makeScalarEvent(tid, this.reader.fieldName(), this.reader.depth(), this.reader.annotations(), this.reader));
                         break;
                     }
                 }
@@ -118,7 +118,7 @@ export class IonEventStream {
 
     private closeContainer(thisContainer : IonContainerEvent, thisContainerIndex : number) {
         this.eventStream.push(this.eventFactory.makeEndEvent(IonEventType.CONTAINER_END, thisContainer.ionType, undefined, undefined, thisContainer.depth, undefined));
-        thisContainer.setEvents(this.eventStream.slice(thisContainerIndex, this.eventStream.length)); //todo probably some off by one error around the .length calls.
+        thisContainer.setEvents(this.eventStream.slice(thisContainerIndex, this.eventStream.length));
     }
 
 //(event_type: EventType, ion_type: IonType, field_name: SymbolToken, annotations: list<SymbolToken>, value_text: string, value_binary: list<byte>, imports: list<ImportDescriptor>, depth: int)

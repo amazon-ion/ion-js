@@ -33,4 +33,5 @@ export interface Reader {
   stringValue: () => string;
   timestampValue: () => Timestamp;
   value: () => any;
+  annotations: () => string[];
 }

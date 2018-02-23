@@ -67,7 +67,7 @@ export abstract class IonEvent implements IIonEvent {
         writer.writeFieldName('field_name');
         writer.writeString(this.fieldName);
         writer.writeFieldName('annotations');
-        this.writeAnnotations(writer, this.annotations());
+        this.writeAnnotations(writer);
         this.writeValues(writer);
         writer.writeFieldName('imports');
         this.writeImportDescriptor(writer);
@@ -76,11 +76,14 @@ export abstract class IonEvent implements IIonEvent {
         writer.endContainer();
     }
 
-    writeAnnotations(writer : Writer, annotations : string[]) {
-
+    writeAnnotations(writer : Writer) {
+        if(this.annotations === undefined){
+            writer.writeNull(TypeCodes.LIST);
+            return;
+        }
         writer.writeList();
-        for(var i = 0; i < annotations.length; i++){
-            writer.writeSymbol(annotations[i]);
+        for(var i = 0; i < this.annotations.length; i++){
+            writer.writeSymbol(this.annotations[i]);
         }
         writer.endContainer();
     }
@@ -144,7 +147,11 @@ export abstract class IonEvent implements IIonEvent {
         );
     }
 
-    annotationEquals(expectedAnnotations : string[]) : boolean {//TODO
+    annotationEquals(expectedAnnotations : string[]) : boolean {
+        if(this.annotations.length !== expectedAnnotations.length) return false;
+        for(let i = 0; i < this.annotations.length; i++){
+            if(this.annotations[i] !== expectedAnnotations[i]) return false;
+        }
         return true;
     }
 }
