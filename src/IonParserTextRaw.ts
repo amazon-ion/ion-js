@@ -1340,6 +1340,7 @@ export class ParserTextRaw {
 
     this._curr_null = this._value_null;
     this._value_null = false;
+    this._ann = [];
 
     return t;
   }
