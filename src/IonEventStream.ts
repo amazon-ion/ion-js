@@ -61,7 +61,7 @@ export class IonEventStream {
                 }
                 case IonEventType.CONTAINER_START : {
                     if(actualEvent.equals(expectedEvent)){
-                        actualIndex = actualIndex + (<IonContainerEvent>actualEvent).events.length; //todo probably some off by one error around lengths and incrementing the for loop.
+                        actualIndex = actualIndex + (<IonContainerEvent>actualEvent).events.length;
                         expectedIndex = expectedIndex + (<IonContainerEvent>expectedEvent).events.length;
                     } else {
                         return false;
@@ -73,7 +73,6 @@ export class IonEventStream {
         return true;
     }
 
-    //doesnt handle clobs, blobs, datagrams
     private generateStream() : void {
         let tid : IonType = this.reader.next();
         if(tid === IonTypes.SYMBOL && this.reader.stringValue() === "ion_event_stream"){
