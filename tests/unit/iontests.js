@@ -75,17 +75,19 @@ define(['intern', 'intern!object', 'intern/dojo/node!fs', 'intern/dojo/node!path
             'good/equivs/blobs.ion', //blobs unsupported
             'good/equivs/binaryInts.ion', //binary ints unsupported
             'good/blobs.ion', //blobs unsupported
-
-
-
-
-
-
-
-
-
-
-
+            'good/timestamp/equivTimeline/timestamps.ion', //timestamps are not spec compliant
+            'good/testfile35.ion', //symbol table imports unsupported
+            'good/testfile29.ion', //IVM unsupported
+            'good/testfile26.ion', //IVM unsupported
+            'good/subfieldVarUInt32bit.ion', //IVM and imports unsupported
+            'good/subfieldVarUInt16bit.ion', //IVM and imports unsupported
+            'good/subfieldVarUInt15bit.ion', //IVM and imports unsupported
+            'good/subfieldVarUInt.ion', //IVM and imports unsupported
+            'good/localSymbolTableImportZeroMaxId.ion', //IVM and imports unsupported
+            'good/floatsWithUnderscores.ion', //numbers with underscores unsupported
+            'good/equivs/floatsWithUnderscores.ion', //numbers with underscores unsupported
+            'good/equivs/decimalsWithUnderscores.ion', //numbers with underscores unsupported
+            'good/decimalsWithUnderscores.ion', //numbers with underscores unsupported
 
 
 
