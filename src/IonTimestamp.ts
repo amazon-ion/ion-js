@@ -358,9 +358,7 @@ export class Timestamp {
         return "null.timestamp";
       case Precision.SECONDS:
         image = t.seconds.toString();
-        if(image.length  == 1){
-            image = "0" + image;
-        }
+        if(image.length  == 1) image = "0" + image;
       case Precision.HOUR_AND_MINUTE:
         image = _to_2_digits(t.minute) + (image ? ":" + image : "");
         image = _to_2_digits(t.hour) + (image ? ":" + image : "");

@@ -67,7 +67,7 @@ export abstract class IonEvent implements IIonEvent {
         writer.writeFieldName('field_name');
         writer.writeString(this.fieldName);
         writer.writeFieldName('annotations');
-        this.writeAnnotations(writer);
+        this.writeAnnotations(writer, this.annotations());
         this.writeValues(writer);
         writer.writeFieldName('imports');
         this.writeImportDescriptor(writer);
@@ -76,14 +76,13 @@ export abstract class IonEvent implements IIonEvent {
         writer.endContainer();
     }
 
-    writeAnnotations(writer : Writer) {
-        writer.writeNull(TypeCodes.LIST);
-        /* TODO annotations do not work right now. Need to change the annotations type to SymbolToken/importlocation as well.
-        writer.writeList();
-        for(){
+    writeAnnotations(writer : Writer, annotations : string[]) {
 
+        writer.writeList();
+        for(var i = 0; i < annotations.length; i++){
+            writer.writeSymbol(annotations[i]);
         }
-        */
+        writer.endContainer();
     }
 
     writeSymbolToken(writer : Writer, text : string, ){
