@@ -90,7 +90,7 @@ define(['intern', 'intern!object', 'intern/dojo/node!fs', 'intern/dojo/node!path
             'good/decimalsWithUnderscores.ion', //numbers with underscores unsupported
             'good/equivs/bigInts.ion', //numbers unsupported by js's int or float are unsupported
             'good/equivs/strings.ion', //triplequote interaction with span and whitespace corrupts the state of the parser.
-
+            'good/timestamp/timestamps.ion', //timestamp is not spec compliant.
 
         ];
 
