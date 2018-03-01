@@ -37,10 +37,90 @@ export class IonEventStream {
 
     }
 
-    write(writer : Writer) {
+    writeEventStream(writer : Writer) {
         writer.writeSymbol("ion_event_stream");
         for(let i : number = 0; i < this.eventStream.length; i++) {
             this.eventStream[i].write(writer);
+        }
+    }
+
+    writeIon(writer : Writer) {
+        let tempBuf : number[];
+        let tempEvent : IonEvent;
+        for(let indice : number = 0; indice < this.eventStream.length; indice++){
+            tempEvent = this.eventStream[indice];
+            if(tempEvent.fieldName !== undefined) {
+                writer.writeFieldName(tempEvent.fieldName);
+            }
+            switch(tempEvent.eventType){
+                case IonEventType.SCALAR:
+                    switch(tempEvent.ionType) {
+                        case IonTypes.BOOL :
+                            writer.writeBoolean(tempEvent.ionValue, tempEvent.annotations);
+                            break;
+                        case IonTypes.STRING:
+                            writer.writeString(tempEvent.ionValue, tempEvent.annotations);
+                            break;
+                        case IonTypes.SYMBOL :
+                            writer.writeSymbol(tempEvent.ionValue, tempEvent.annotations);
+                            break;
+                        case IonTypes.INT :
+                            writer.writeInt(tempEvent.ionValue, tempEvent.annotations);
+                            break;
+                        case IonTypes.DECIMAL :
+                            writer.writeDecimal(tempEvent.ionValue, tempEvent.annotations);
+                            break;
+                        case IonTypes.FLOAT :
+                            writer.writeFloat32(tempEvent.ionValue, tempEvent.annotations);
+                            break;
+                        case IonTypes.NULL :
+                            writer.writeNull(tempEvent.ionType.bid, tempEvent.annotations);
+                            break;
+                        case IonTypes.TIMESTAMP :
+                            break;
+                        case IonTypes.CLOB :
+                            tempBuf = [];
+                            for(let i = 0; i < tempEvent.ionValue.length; i++){
+                                tempBuf.push(tempEvent.ionValue.charCodeAt(i))
+                            }
+                            writer.writeClob(tempBuf, tempEvent.annotations);
+                            break;
+                        case IonTypes.BLOB :
+                            tempBuf = [];
+                            for(let i = 0; i < tempEvent.ionValue.length; i++){
+                                tempBuf.push(tempEvent.ionValue.charCodeAt(i))
+                            }
+                            writer.writeBlob(tempBuf, tempEvent.annotations);
+                            break;
+                        default :
+                            throw new Error("unexpected type: " + tempEvent.ionType.name);
+                    }
+                    break;
+                case IonEventType.CONTAINER_START:
+                    switch(tempEvent.ionType) {
+                        case IonTypes.STRUCT :
+                            writer.writeStruct(tempEvent.annotations, false);//need to change.
+                            break;
+                        case IonTypes.LIST :
+                            writer.writeList(tempEvent.annotations, false);
+                            break;
+                        case IonTypes.SEXP :
+                            writer.writeSexp(tempEvent.annotations, false);
+                            break;
+                    }
+
+                case IonEventType.CONTAINER_END:
+                    writer.endContainer();
+
+                case IonEventType.STREAM_END:
+                    writer.close();
+                    break;
+                case IonEventType.SYMBOL_TABLE:
+                    throw new Error("symboltables unsupported.");
+                default:
+                    throw new Error("Unexpected event type: "+ tempEvent.eventType);
+
+            }
         }
     }
 
@@ -98,7 +178,7 @@ export class IonEventStream {
                     }
                     case undefined : {
                         if (this.reader.depth() === 0) {
-                            this.eventStream.push(this.eventFactory.makeEndEvent(IonEventType.STREAM_END, IonTypes.NULL, undefined, undefined, this.reader.depth(), undefined));
+                            this.eventStream.push(this.eventFactory.makeEndEvent(IonEventType.STREAM_END, IonTypes.NULL, undefined, this.reader.annotations(), this.reader.depth(), undefined));
                             return;
                         } else {
                             this.reader.stepOut();

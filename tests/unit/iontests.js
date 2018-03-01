@@ -88,7 +88,8 @@ define(['intern', 'intern!object', 'intern/dojo/node!fs', 'intern/dojo/node!path
             'good/equivs/floatsWithUnderscores.ion', //numbers with underscores unsupported
             'good/equivs/decimalsWithUnderscores.ion', //numbers with underscores unsupported
             'good/decimalsWithUnderscores.ion', //numbers with underscores unsupported
-
+            'good/equivs/bigInts.ion', //numbers unsupported by js's int or float are unsupported
+            'good/equivs/strings.ion', //triplequote interaction with span and whitespace corrupts the state of the parser.
 
 
         ];
@@ -274,7 +275,7 @@ define(['intern', 'intern!object', 'intern/dojo/node!fs', 'intern/dojo/node!path
         function roundTripEventStreams(reader){
             var eventStream = new ion.IonEventStream(reader);
             var writer = ion.makeTextWriter();
-            eventStream.write(writer);
+            eventStream.writeEventStream(writer);
             writer.close();
             var buf = writer.getBytes();
             var tempString = '';
@@ -303,7 +304,7 @@ define(['intern', 'intern!object', 'intern/dojo/node!fs', 'intern/dojo/node!path
             try {
                 var eventStream = new ion.IonEventStream(reader);
                 var writer = ion.makeTextWriter();
-                eventStream.write(writer);
+                eventStream.writeEventStream(writer);
                 var buf = writer.getBytes();
                 var tempString = "";
                 for(var i = 0; i < buf.length; i++){

@@ -303,8 +303,7 @@ export class ParserTextRaw {
     if (ch == CH_CS) {
       // degenerate case of an empty list
       this._value_push( EOF );
-    }
-    else {
+    } else {
       // otherwise we read a value and continue
       this._unread(ch);
       this._ops.unshift( this._read_list_comma );
@@ -349,26 +348,23 @@ export class ParserTextRaw {
     }
   }
 
-  private _read_list_comma() : void {
-    var ch = this._read_after_whitespace(true);
-    if (ch == CH_CM) {
-      ch = this._read_after_whitespace(true);
-      if (ch == CH_CS) {
-        this._value_push( EOF );
-      }
-      else {
-        this._unread(ch);
-        this._ops.unshift( this._read_list_comma );
-        this._ops.unshift( this._read_value );
-      }
+    private _read_list_comma() : void {
+        var ch = this._read_after_whitespace(true);
+        if (ch == CH_CM) {
+            ch = this._read_after_whitespace(true);
+            if (ch == CH_CS) {
+                this._value_push( EOF );
+            } else {
+                this._unread(ch);
+                this._ops.unshift( this._read_list_comma );
+                this._ops.unshift( this._read_value );
+            }
+        } else if (ch == CH_CS) {
+            this._value_push( EOF );
+        } else {
+            this._error("expected ',' or ']'");
+        }
     }
-    else if (ch == CH_CS) {
-      this._value_push( EOF );
-    }
-    else {
-      this._error("expected ',' or ']'");
-    }
-  }
 
   private _read_struct_comma() : void {
     var ch = this._read_after_whitespace(true);
@@ -521,20 +517,20 @@ export class ParserTextRaw {
     }
   }
 
-  private _read_value_helper_single( ch1, accept_operator_symbols: boolean, calling_op ) {
-    var op;
-    if (this._peek("\'\'") != ERROR) {
-      op = this._read_string3;
+    private _read_value_helper_single( ch1, accept_operator_symbols: boolean, calling_op ) {
+        var op;
+        if (this._peek("\'\'") != ERROR) {
+            op = this._read_string3;
+            op.call(this);
+        } else {
+            op = this._read_string1;
+            op.call(this);
+            if (this._test_string_as_annotation(op)) {
+                // this was an annoation, so we need to try again for the actual value
+                this._ops.unshift( calling_op );
+            }
+        }
     }
-    else {
-      op = this._read_string1;
-    }
-    op.call(this);
-    if (this._test_string_as_annotation(op)) {
-      // this was an annoation, so we need to try again for the actual value
-      this._ops.unshift( calling_op ); 
-    }
-  }
 
   private _read_value_helper_double( ch1, accept_operator_symbols: boolean, calling_op ) {
     this._ops.unshift( this._read_string2 );
@@ -759,8 +755,6 @@ export class ParserTextRaw {
     this._value_push( T_STRING2 );
   }
 
-  //I dont like how we are assuming that the function that sent us here handed us off at the correct span index...
-  //Prone to having other people mishand data to it. Need trust but verify behavior.
   private _read_string3() : void {
       let ch : number;
       this._unread(this._peek(""));
@@ -785,6 +779,7 @@ export class ParserTextRaw {
           // this._end will reset later if further triple quotes are found after indexing through whitespace,
           this._end = this._in.position();
           //Index past the triple quote.
+
           this._read();
           this._read();
           this._read();
@@ -881,50 +876,54 @@ export class ParserTextRaw {
     return is_ann;
   }
 
-  private _test_symbol_as_annotation() : boolean {
-    var s, ii, ch, kwt, 
-        is_ann = true,
-        t = this._value_pop();
+private _test_symbol_as_annotation() : boolean {
+    var s, ii, ch, kwt,
+    is_ann = true,
+    t = this._value_pop();
     if (t != T_IDENTIFIER) this._error("expecting symbol here");
     s = this.get_value_as_string(t);
     kwt = get_keyword_type(s);
-    ch = this._read_after_whitespace(true);
-    if (ch == CH_CL && this._peek() == CH_CL) {
-      if (kwt != undefined) this._error("the keyword '"+s+"' can't be used as an annotation without quotes");
-      this._read(); // consume the colon character
-      this._ann.push(s);
-      is_ann = true;
-    }
-    else {
-      // if this is a keyword, we'll just keep it's type, otherwise switch back to the generic "identifier"
-      if (kwt == undefined) kwt = T_IDENTIFIER;
-      this._unread(ch);
-      is_ann = false;
-      if (kwt === T_NULL) {
+    if (kwt === T_NULL) {
         this._value_null = true;
+        is_ann = false;
         ch = this._peek();
         if (ch === CH_DT) {
-          this._read(); // consume the dot
-          ch = this._read();
-          if (IonText.is_letter(ch) !== true) {
-            this._error("expected type name after 'null.'");
-            return undefined;
-          }
-          this._read_symbol();
-          if (this._value_pop() != T_IDENTIFIER) {
-            this._error("expected type name after 'null.'");
-            return undefined;
-          }
-          s = this.get_value_as_string(T_IDENTIFIER);
-          kwt = get_type_from_name(s);
+            this._read(); // consume the dot
+            ch = this._read();
+            if (IonText.is_letter(ch) !== true) {
+                this._error("expected type name after 'null.'");
+                return undefined;
+            }
+            this._read_symbol();
+            if (this._value_pop() != T_IDENTIFIER) {
+                this._error("expected type name after 'null.'");
+                return undefined;
+            }
+            s = this.get_value_as_string(T_IDENTIFIER);
+            kwt = get_type_from_name(s);
         }
         this._start = -1;
         this._end = -1;
-      }
-      this._value_push(kwt); // put the value back on the stack
+        this._value_push(kwt);
+        return is_ann;
+    }
+
+    ch = this._read_after_whitespace(true);
+    if (ch == CH_CL && this._peek() == CH_CL) {
+        if (kwt != undefined) this._error("the keyword '"+s+"' can't be used as an annotation without quotes");
+        this._read(); // consume the colon character
+        this._ann.push(s);
+        is_ann = true;
+    } else {
+        // if this is a keyword, we'll just keep it's type, otherwise switch back to the generic "identifier"
+        if (kwt == undefined) kwt = T_IDENTIFIER;
+        this._unread(ch);
+        is_ann = false;
+
+        this._value_push(kwt); // put the value back on the stack
     }
     return is_ann;
-  }
+}
 
   private _read_clob_string2() : void {
     var t;
@@ -1180,8 +1179,7 @@ export class ParserTextRaw {
         let ch: number = this._in.valueAt(tempIndex);
         tempIndex = this.indexWhiteSpace(tempIndex, acceptComments);
         if (tempIndex + 2 <= end && this.verifyTriple(tempIndex)) {
-            tempIndex += 3;
-            return tempIndex;
+            return tempIndex + 4;
         } else {
             return tempIndex;
         }

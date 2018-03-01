@@ -116,7 +116,7 @@ export abstract class IonEvent implements IIonEvent {
     writeTextValue(writer : Writer) : void {
         let tempTextWriter = new TextWriter(new Writeable());
         this.writeIonValue(tempTextWriter);
-        tempTextWriter.close();
+        //tempTextWriter.close();
         const numBuffer = tempTextWriter.getBytes();
         let stringValue : string = "";
         for(let i : number = 0; i < numBuffer.length; i++){
@@ -352,7 +352,11 @@ export class IonBlobEvent extends IonEvent {
         return this.ionValue === expected.ionValue;
     }
     writeIonValue(writer : Writer) : void {
-        writer.writeBlob(this.ionValue);
+        let tempBuf = [];
+        for(let i = 0; i < this.ionValue.length; i++){
+            tempBuf.push(this.ionValue.charCodeAt(i))
+        }
+        writer.writeBlob(tempBuf);
     }
 }
 export class IonClobEvent extends IonEvent {
@@ -363,8 +367,8 @@ export class IonClobEvent extends IonEvent {
         return this.ionValue === expected.ionValue;
     }
     writeIonValue(writer : Writer) : void {
-        var tempBuf = [];
-        for(var i = 0; i < this.ionValue.length; i++){
+        let tempBuf = [];
+        for(let i = 0; i < this.ionValue.length; i++){
             tempBuf.push(this.ionValue.charCodeAt(i))
         }
         writer.writeClob(tempBuf);
@@ -411,7 +415,7 @@ export class IonStructEvent extends IonContainerEvent {//no embed support as of 
         for(let i : number = 0; matchFound && i < actualEvents.length; i++) {
             matchFound = false;
             for(let j : number = 0; !matchFound && j < expectedEvents.length; j++) {
-                if(paired[j] !== true) {
+                if(!paired[j]) {
                     matchFound = actualEvents[i].equals(expectedEvents[j]);
                     paired[j] = matchFound;
                 }

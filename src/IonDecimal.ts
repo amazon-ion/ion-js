@@ -84,42 +84,42 @@ export class Decimal {
     return this.stringValue();
   }
 
-  stringValue(): string {
-    if (this.isNull()) {
-      return "null.decimal";
-    }
-
-    let s: number = this._exponent;
-    let image: string = this._value.digits();
-
-    if (s < 0) {
-      // negative shift - prefix decimal point this may require leading zero's
-      if (image.length < s + 1) {
-        for (let i : number = s + 1 - image.length; i > 0; i--) {
-          image = "0" + image;
+    stringValue(): string {
+        if (this.isNull()) {
+            return "null.decimal";
         }
-      }
-      let decimal_location: number = image.length + s;
-      if (decimal_location === 0) {
-        image = '0.' + image;
-      } else {
-        image = image.substr(0, decimal_location) + "." + image.substr(decimal_location);
-      }
-    }
-    else if (s > 0) {
-      // positive shift, 
-      if (image.length > 1) {
-        s = s + image.length - 1;
-        image = image.substr(0, 1) + "." + image.substr(1);
-      }
-      image = image + "d" + s.toString();
-    }
 
-    if (this.isNegative()) {
-      image = "-" + image;
+        let shift: number = this._exponent;
+        let image: string = this._value.digits();
+
+        if (shift < 0) {
+            // negative shift - prefix decimal point this may require leading zero's
+            if (image.length < shift + 1) {
+                for (let i : number = shift + 1 - image.length; i > 0; i--) {
+                    image = "0" + image;
+                }
+            }
+            let decimal_location: number = image.length + shift;
+            if (decimal_location <= 0) {
+                image = '0.' + image;
+            } else {
+                image = image.substr(0, decimal_location) + "." + image.substr(decimal_location);
+            }
+        } else if (shift > 0) {
+            // positive shift,
+            if (image.length > 1) {
+                shift = shift + image.length - 1;
+                image = image.substr(0, 1) + "." + image.substr(1);
+            }
+            image = image + "d" + shift.toString();
+        }
+
+
+        if (this.isNegative()) {
+            image = "-" + image;
+        }
+        return image;
     }
-    return image;
-  }
 
   isNull() : boolean {
     var isnull = (this._value === undefined);
