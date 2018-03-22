@@ -13,7 +13,7 @@
  */
 
 import { Reader } from "./IonReader";
-import {IonContainerEvent, IonEndEvent, IonEvent, IonEventFactory} from "./IonEvent";
+import {IonEvent, IonEventFactory} from "./IonEvent";
 import { Writer } from "./IonWriter";
 import { IonType } from "./IonType";
 import { IonTypes } from "./IonTypes";
@@ -111,7 +111,7 @@ export class IonEventStream {
 
                 case IonEventType.CONTAINER_END:
                     writer.endContainer();
-
+                    break;
                 case IonEventType.STREAM_END:
                     writer.close();
                     break;
@@ -141,12 +141,27 @@ export class IonEventStream {
                 }
                 case IonEventType.CONTAINER_START : {
                     if(actualEvent.equals(expectedEvent)){
-                        actualIndex = actualIndex + (<IonContainerEvent>actualEvent).events.length;
-                        expectedIndex = expectedIndex + (<IonContainerEvent>expectedEvent).events.length;
+                        actualIndex = actualIndex + actualEvent.ionValue.length;
+                        expectedIndex = expectedIndex + expectedEvent.ionValue.length;
                     } else {
                         return false;
                     }
                     break;
+                }
+                case IonEventType.SYMBOL_TABLE : {
+                    //no op for now
+                    break;
+                }
+                case IonEventType.CONTAINER_END : {
+                    //no op
+                    break;
+                }
+                case IonEventType.STREAM_END : {
+                    //no op
+                    break;
+                }
+                default : {
+                    throw new Error("Unexpexted event type: " + actualEvent.eventType);
                 }
             }
         }
@@ -159,17 +174,17 @@ export class IonEventStream {
             this.marshalStream();
             return;
         }
-        let currentContainer : IonContainerEvent[] = [];
+        let currentContainer : IonEvent[] = [];
         let currentContainerIndex : number[] = [];
         while(true) {
             if(this.reader.isNull()){
-                this.eventStream.push(this.eventFactory.makeScalarEvent(tid, this.reader.fieldName(), this.reader.depth(), undefined, this.reader));
+                this.eventStream.push(this.eventFactory.makeEvent(IonEventType.SCALAR, tid, this.reader.fieldName(), this.reader.depth(), this.reader.annotations(), true, this.reader.value()));
             } else {
                 switch (tid) {
                     case IonTypes.LIST :
                     case IonTypes.SEXP :
                     case IonTypes.STRUCT : {
-                        let containerEvent = this.eventFactory.makeContainerEvent(IonEventType.CONTAINER_START, tid, this.reader.fieldName(), this.reader.annotations(), this.reader.depth(), undefined);
+                        let containerEvent = this.eventFactory.makeEvent(IonEventType.CONTAINER_START, tid, this.reader.fieldName(), this.reader.depth(), this.reader.annotations(), false, null);
                         this.eventStream.push(containerEvent);
                         currentContainer.push(containerEvent);
                         currentContainerIndex.push(this.eventStream.length);
@@ -178,16 +193,16 @@ export class IonEventStream {
                     }
                     case undefined : {
                         if (this.reader.depth() === 0) {
-                            this.eventStream.push(this.eventFactory.makeEndEvent(IonEventType.STREAM_END, IonTypes.NULL, undefined, this.reader.annotations(), this.reader.depth(), undefined));
+                            this.eventStream.push(this.eventFactory.makeEvent(IonEventType.STREAM_END, IonTypes.NULL, undefined, this.reader.depth(), undefined, false,undefined));
                             return;
                         } else {
                             this.reader.stepOut();
                             this.closeContainer(currentContainer.pop(), currentContainerIndex.pop());
-                            break;
                         }
+                        break;
                     }
                     default : {
-                        this.eventStream.push(this.eventFactory.makeScalarEvent(tid, this.reader.fieldName(), this.reader.depth(), this.reader.annotations(), this.reader));
+                        this.eventStream.push(this.eventFactory.makeEvent(IonEventType.SCALAR, tid, this.reader.fieldName(), this.reader.depth(), this.reader.annotations(), this.reader.isNull(), this.reader.value()));
                         break;
                     }
                 }
@@ -196,25 +211,25 @@ export class IonEventStream {
         }
     }
 
-    private closeContainer(thisContainer : IonContainerEvent, thisContainerIndex : number) {
-        this.eventStream.push(this.eventFactory.makeEndEvent(IonEventType.CONTAINER_END, thisContainer.ionType, undefined, undefined, thisContainer.depth, undefined));
-        thisContainer.setEvents(this.eventStream.slice(thisContainerIndex, this.eventStream.length));
+    private closeContainer(thisContainer : IonEvent, thisContainerIndex : number) {
+        this.eventStream.push(this.eventFactory.makeEvent(IonEventType.CONTAINER_END, thisContainer.ionType, undefined, thisContainer.depth, undefined,false, null));
+        thisContainer.ionValue = this.eventStream.slice(thisContainerIndex, this.eventStream.length);
     }
 
 //(event_type: EventType, ion_type: IonType, field_name: SymbolToken, annotations: list<SymbolToken>, value_text: string, value_binary: list<byte>, imports: list<ImportDescriptor>, depth: int)
-    private marshalStream() {
-        let currentContainer : IonContainerEvent[] = [];
+    private marshalStream() : void {
+        let currentContainer : IonEvent[] = [];
         let currentContainerIndex : number[] = [];
         let tid : IonType = this.reader.next();
             while(tid === IonTypes.STRUCT) {
                 this.reader.stepIn();
                 let tempEvent : IonEvent = this.marshalEvent();
-                if(tempEvent instanceof IonContainerEvent) {
+                if(tempEvent.eventType === IonEventType.CONTAINER_START) {
                     currentContainerIndex.push(this.eventStream.length);
                     currentContainer.push(tempEvent);
-                } else if(tempEvent instanceof IonEndEvent) {
+                } else if(tempEvent.eventType === IonEventType.CONTAINER_END) {
                     this.closeContainer(currentContainer.pop(), currentContainerIndex.pop());
-                } else if(tempEvent instanceof IonEvent) {
+                } else if(tempEvent.eventType === IonEventType.SCALAR) {
                     this.eventStream.push(tempEvent);
                 }
                 this.reader.stepOut();
@@ -228,13 +243,12 @@ export class IonEventStream {
         while(currentEvent.size < 8) {
             tid = this.reader.next();
             let fieldName = this.reader.fieldName();
-            //console.log('fieldname: ' + fieldName);
             if (currentEvent.has(fieldName)) {
                 throw new Error('Repeated event field: ' + fieldName);
             }
             switch (fieldName) {
                 case 'event_type' : {
-                    currentEvent.set(fieldName, this.reader.stringValue);
+                    currentEvent.set(fieldName, this.reader.stringValue());
                     break;
                 }
 
@@ -244,7 +258,7 @@ export class IonEventStream {
                 }
 
                 case 'field_name' : {
-                    currentEvent.set(fieldName, this.reader.stringValue());//might have issues with the $ at the start?
+                    currentEvent.set(fieldName, this.reader.stringValue());
                     break;
                 }
 
@@ -254,7 +268,11 @@ export class IonEventStream {
                 }
 
                 case 'value_text' : {
-                    currentEvent.set(fieldName, this.parseTextValue());
+                    let tempString : string = this.reader.stringValue();
+                    let tempReader : Reader = makeReader(tempString, undefined);
+                    tempReader.next();
+                    currentEvent.set('isNull', tempReader.isNull);
+                    currentEvent.set(fieldName,tempReader.value());
                     break;
                 }
 
@@ -277,46 +295,33 @@ export class IonEventStream {
                     throw new Error('Unexpected event field: ' + fieldName);
             }
         }
-
-        switch(currentEvent.get('event_type')) {
+        let eventType;
+        switch(currentEvent.get('event_type')){
             case 'CONTAINER_START' :
-                return this.eventFactory.makeContainerEvent(
-                    IonEventType.CONTAINER_START,
-                    currentEvent.get('ion_type'),
-                    currentEvent.get('field_name'),
-                    currentEvent.get('annotations'),
-                    currentEvent.get('depth'),
-                    currentEvent.get('value_text')
-                );
+                eventType = IonEventType.CONTAINER_START;
+                break;
             case 'STREAM_END' :
-                return this.eventFactory.makeEndEvent(
-                    IonEventType.STREAM_END,
-                    currentEvent.get('ion_type'),
-                    currentEvent.get('field_name'),
-                    currentEvent.get('annotations'),
-                    currentEvent.get('depth'),
-                    currentEvent.get('value_text')
-                );
+                eventType = IonEventType.STREAM_END;
+                break;
             case 'CONTAINER_END' :
-                return this.eventFactory.makeEndEvent(
-                    IonEventType.CONTAINER_END,
-                    currentEvent.get('ion_type'),
-                    currentEvent.get('field_name'),
-                    currentEvent.get('annotations'),
-                    currentEvent.get('depth'),
-                    currentEvent.get('value_text')
-                );
+                eventType = IonEventType.CONTAINER_END;
+                break;
             case 'SCALAR' :
-                return this.eventFactory.makeScalarEvent(
-                    currentEvent.get('ion_type'),
-                    currentEvent.get('field_name'),
-                    currentEvent.get('annotations'),
-                    currentEvent.get('depth'),
-                    currentEvent.get('value_text')
-                );
+                eventType = IonEventType.SCALAR;
+                break;
             case 'SYMBOL_TABLE' :
-                return undefined;
+                throw new Error('Symbol tables unsupported');
         }
+        if(currentEvent.get('isNull'))eventType = IonEventType.SCALAR;
+        return this.eventFactory.makeEvent(
+            eventType,
+            currentEvent.get('ion_type'),
+            currentEvent.get('field_name'),
+            currentEvent.get('depth'),
+            currentEvent.get('annotations'),
+            currentEvent.get('isNull'),
+            currentEvent.get('value_text')
+        );
     }
 
     private parseIonType() : IonType{
@@ -369,30 +374,17 @@ export class IonEventStream {
     }
 
     private parseAnnotations() : string[] {
+        let annotations : string[] = [];
         if(this.reader.isNull()) {
-           return undefined;
+           return annotations;
         } else {
             this.reader.stepIn();
             let tid = this.reader.next();
-            while(tid !== undefined) {
-                tid = this.reader.next();
-                if(tid === IonTypes.STRUCT || tid === IonTypes.LIST || tid === IonTypes.SEXP) {
-                    this.reader.stepIn();
-                    this.parseAnnotations();
-                    this.reader.stepOut();
-                }
+            while(this.reader.next() !== undefined) {
+                annotations.push(this.reader.value());
             }
             this.reader.stepOut();
         }
-    }
-
-    private parseTextValue() : any {
-        //create reader from stringvalue of reader and generate IonEvent from factory.
-        //start with a nullcheck
-        let tempString : string = this.reader.stringValue();
-        let tempReader : Reader = makeReader(tempString, undefined);
-        tempReader.next();
-        return tempReader.value();
     }
 
     private parseBinaryValue() : any {
