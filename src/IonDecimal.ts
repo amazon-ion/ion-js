@@ -92,7 +92,7 @@ export class Decimal {
         let shift: number = this._exponent;
         let image: string = this._value.digits();
 
-        if (shift < 0) {
+        if (shift <  0) {
             // negative shift - prefix decimal point this may require leading zero's
             if (image.length < shift + 1) {
                 for (let i : number = shift + 1 - image.length; i > 0; i--) {
@@ -132,6 +132,10 @@ export class Decimal {
 
   getExponent() : number {
     return this._exponent;
+  }
+
+  equals(expected : Decimal) : boolean {
+      return this.getExponent() === expected.getExponent() && this.isNegative() === expected.isNegative() && this.getDigits().numberValue() === expected.getDigits().numberValue();
   }
 
   static parse(str: string, dontStrip? : boolean) : Decimal {

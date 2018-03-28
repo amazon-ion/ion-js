@@ -1009,9 +1009,6 @@ private _test_symbol_as_annotation() : boolean {
   }
 
   booleanValue() : boolean {
-    if (this._value_type !== T_BOOL) {
-      return undefined;
-    }
     let s: string = this.get_value_as_string(T_BOOL);
     if (s == "true") {
       return true;
@@ -1056,6 +1053,7 @@ private _test_symbol_as_annotation() : boolean {
               } else {
                   s += String.fromCharCode(ch);
               }
+
           }
           break;
       case T_CLOB2:

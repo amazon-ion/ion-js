@@ -33,11 +33,11 @@ export enum IonEventType {
 }
 
 export interface IonEvent {
-    readonly eventType : IonEventType;
-    readonly ionType : IonType;
-    readonly fieldName : string;
-    readonly annotations : string[];
-    readonly depth : number;
+    eventType : IonEventType;
+    ionType : IonType;
+    fieldName : string;
+    annotations : string[];
+    depth : number;
     ionValue : any;
     write(writer : Writer) : void;
     equals(expected : IonEvent) : boolean;
@@ -45,11 +45,11 @@ export interface IonEvent {
 }
 
 abstract class AbsIonEvent implements IonEvent {
-    readonly eventType: IonEventType;
-    readonly ionType: IonType;
-    readonly fieldName: string;
-    readonly annotations: string[];
-    readonly depth: number;
+    eventType: IonEventType;
+    ionType: IonType;
+    fieldName: string;
+    annotations: string[];
+    depth: number;
     ionValue: any;
 
 
@@ -69,15 +69,27 @@ abstract class AbsIonEvent implements IonEvent {
         writer.writeStruct();
         writer.writeFieldName('event_type');
         writer.writeSymbol(IonEventType[this.eventType]);
-        writer.writeFieldName('ion_type');
-        writer.writeSymbol(this.ionType.name);
-        writer.writeFieldName('field_name');
-        writer.writeString(this.fieldName);
-        writer.writeFieldName('annotations');
-        this.writeAnnotations(writer);
-        this.writeValues(writer);
-        writer.writeFieldName('imports');
-        this.writeImportDescriptor(writer);
+        if(this.ionType !== null) {
+            writer.writeFieldName('ion_type');
+            writer.writeSymbol(this.ionType.name);
+        }
+        if(this.fieldName !== null && this.fieldName !== undefined) {
+            writer.writeFieldName('field_name');
+            writer.writeString(this.fieldName);
+        }
+        if(this.annotations !== null) {
+            writer.writeFieldName('annotations');
+            this.writeAnnotations(writer);
+        }
+        if(this.eventType === IonEventType.SCALAR){
+            this.writeValues(writer);
+        }
+        /*
+        if(this.imports !== null){
+            writer.writeFieldName('imports');
+            this.writeImportDescriptor(writer);
+        }
+        */
         writer.writeFieldName('depth');
         writer.writeInt(this.depth);
         writer.endContainer();
@@ -115,10 +127,13 @@ abstract class AbsIonEvent implements IonEvent {
     }
 
     writeValues(writer : Writer) : void {
-        writer.writeFieldName('value_text');
-        this.writeTextValue(writer);
-        writer.writeFieldName('value_binary');
-        this.writeBinaryValue(writer);
+        let containerCutoff : number = 11;
+        if(this.eventType === IonEventType.SCALAR) {
+            writer.writeFieldName('value_text');
+            this.writeTextValue(writer);
+            writer.writeFieldName('value_binary');
+            this.writeBinaryValue(writer);
+        }
     }
 
     writeTextValue(writer : Writer) : void {
@@ -155,6 +170,7 @@ abstract class AbsIonEvent implements IonEvent {
     }
 
     annotationEquals(expectedAnnotations : string[]) : boolean {
+        if(this.annotations === expectedAnnotations) return true;
         if(this.annotations.length !== expectedAnnotations.length) return false;
         for(let i = 0; i < this.annotations.length; i++){
             if(this.annotations[i] !== expectedAnnotations[i]) return false;
@@ -217,7 +233,7 @@ export class IonEventFactory {
                 throw new Error("symbol tables unsupported.");
             case IonEventType.CONTAINER_END :
             case IonEventType.STREAM_END :
-                return new IonEndEvent(eventType, ionType, fieldName, annotations, depth);
+                return new IonEndEvent(eventType, null, null, null, depth);
         }
     }
 }
