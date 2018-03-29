@@ -89,29 +89,31 @@ export class Decimal {
             return "null.decimal";
         }
 
-        let shift: number = this._exponent;
+        let exponent: number = this._exponent;
         let image: string = this._value.digits();
 
-        if (shift <  0) {
+        if (exponent <  0) {
             // negative shift - prefix decimal point this may require leading zero's
-            if (image.length < shift + 1) {
-                for (let i : number = shift + 1 - image.length; i > 0; i--) {
+            if (image.length < exponent + 1) {
+                for (let i : number = exponent + 1 - image.length; i > 0; i--) {
                     image = "0" + image;
                 }
             }
-            let decimal_location: number = image.length + shift;
+            let decimal_location: number = image.length + exponent;
             if (decimal_location <= 0) {
                 image = '0.' + image;
             } else {
                 image = image.substr(0, decimal_location) + "." + image.substr(decimal_location);
             }
-        } else if (shift > 0) {
+        } else if (exponent > 0) {
             // positive shift,
             if (image.length > 1) {
-                shift = shift + image.length - 1;
+                exponent = exponent + image.length - 1;
                 image = image.substr(0, 1) + "." + image.substr(1);
             }
-            image = image + "d" + shift.toString();
+            image = image + "d" + exponent.toString();
+        } else if(exponent === 0) {
+            image = image + ".";
         }
 
 

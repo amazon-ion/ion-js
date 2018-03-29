@@ -139,7 +139,7 @@ export class TextWriter implements Writer {
         } else if(value === Number.NaN){
             tempVal = "nan";
         } else if (tempVal !== null && tempVal !== undefined){
-            tempVal = tempVal.toString(10);
+            tempVal = tempVal.toExponential();
         }
         this.writeValue(TypeCodes.FLOAT, value, annotations, (value: number) => {
             this.writeUtf8(tempVal);
@@ -155,7 +155,7 @@ export class TextWriter implements Writer {
         } else if(value === Number.NaN){
             tempVal = "nan";
         } else if(tempVal !== null && tempVal !== undefined){
-            tempVal = tempVal.toString(10);
+            tempVal = tempVal.toExponential();
         }
         this.writeValue(TypeCodes.FLOAT, value, annotations, (value: number) => {
             this.writeUtf8(tempVal);

@@ -91,6 +91,26 @@ define(['intern', 'intern!object', 'intern/dojo/node!fs', 'intern/dojo/node!path
             'good/equivs/bigInts.ion', //numbers unsupported by js's int or float are unsupported
             'good/equivs/strings.ion', //triplequote interaction with span and whitespace corrupts the state of the parser.
             'good/timestamp/timestamps.ion', //timestamp is not spec compliant.
+            'good/decimalZeroDot.10n', //binary',
+            'good/equivs/paddedInts.10n', //binary
+            'good/equivs/nopPadNonEmptyStruct.10n',
+            'good/equivs/paddedInts.10n',
+            'good/equivs/timestampSuperfluousOffset.10n',
+            'good/intBigSize13.10n',
+            'good/intBigSize14.10n',
+            'good/intBigSize16.10n',
+            'good/intLongMaxValuePlusOne.10n',
+            'good/intLongMinValue.10n',
+            'good/nopPadInsideStructWithNopPadThenValueNonZeroSymbolId.10n',
+            'good/nopPadInsideStructWithNopPadThenValueZeroSymbolId.10n',
+            'good/nopPadInsideStructWithValueThenNopPad.10n',
+            'good/structAnnotatedOrdered.10n',
+            'good/structOrdered.10n',
+            'good/structUnordered.10n',
+            'good/timestamp/timestamp2011-02-20.10n',
+            'good/timestamp/timestamp2011-02-20T19_30_59_100-08_00.10n',
+            'good/timestamp/timestamp2011-02.10n',
+            'good/timestamp/timestamp2011.10n',
 
         ];
 
@@ -326,56 +346,6 @@ define(['intern', 'intern!object', 'intern/dojo/node!fs', 'intern/dojo/node!path
         for (var file of badUnskipped) {
             badSuite[file] = makeBadTest(file);
             badEventStreamSuite[file] = makeBadEventStreamTest(file);
-        }
-
-        function squashEscapes(inputString){
-            tempStr = '';
-            for(i = 0; i < inputString.length; i++){
-                if(inputString[i] === '\\'){
-                    tempStr = tempStr  + swapEscape(inputString[i+1]);
-                    i++;
-                } else {
-                    tempStr = tempStr + inputString[i];
-                }
-            }
-            return tempStr;
-        }
-
-        function swapEscape(char) {
-            switch (char) {
-                case '0':
-                    return '\0';
-                case 'a':
-                    return '\a';
-                case 'b':
-                    return '\b';
-                case 'f':
-                    return '\f';
-                case 'n':
-                    return '\n';
-                case 'r':
-                    return '\r';
-                case 't':
-                    return '\t';
-                case 'v':
-                    return '\v';
-                case 'e':
-                    return '\e';
-                case '"':
-                    return '"';
-                case '&':
-                    return '\&';
-                case "'":
-                    return "'";
-                case '\\':
-                    return '\\';
-                case '?':
-                    return '\?';
-                case '/':
-                    return '/';
-                default:
-                    return '\\' + char;
-            }
         }
 
         //registerSuite(goodSuite);
