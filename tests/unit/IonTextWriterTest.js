@@ -121,7 +121,7 @@
 
     decimalTest('Writes positive decimal', '123.456', '123.456');
     decimalTest('Writes negative decimal', '-123.456', '-123.456');
-    decimalTest('Writes integer decimal', '123456', '123456');
+    decimalTest('Writes integer decimal', '123456.', '123456.');
     decimalTest('Mantissa-only decimal has leading zero', '123456d-6', '0.123456');
     writerTest('Writes null decimal using null',
       writer => writer.writeDecimal(null),
@@ -140,7 +140,7 @@
 
     writerTest('Writes 32-bit float',
       writer => writer.writeFloat32(8.125),
-      '8.125');
+      '8.125e0');
     writerTest('Writes null 32-bit float using null',
       writer => writer.writeFloat32(null),
       'null.float');
@@ -149,10 +149,10 @@
       'null.float');
     writerTest('Writes 32-bit float with annotations',
       writer => writer.writeFloat32(8.125, ['foo', 'bar']),
-      'foo::bar::8.125');
+      'foo::bar::8.125e0');
     writerTest('Writes negative 32-bit float',
       writer => writer.writeFloat32(-8.125),
-      '-8.125');
+      '-8.125e0');
 
     // Ints
 

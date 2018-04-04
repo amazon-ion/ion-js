@@ -108,7 +108,7 @@ export class TextReader implements Reader {
       if (this._depth > 0) break;
       if (this._raw_type === T_IDENTIFIER) {
         this.load_raw();
-        if (this._raw != IVM.text) break;
+        if (this._raw !== IVM.text) break;
         this._symtab = defaultLocalSymbolTable();
       }
       else if (this._raw_type === T_STRUCT) {

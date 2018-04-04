@@ -348,6 +348,27 @@ export class Timestamp {
     return n;
   }
 
+  equals(expected : Timestamp) : boolean {
+    return this.getPrecision() === expected.getPrecision() && this.offset === expected.offset && this.instantEquals(expected);
+  }
+  instantEquals(expected : Timestamp) : boolean {
+      switch (this.precision) {
+          case Precision.NULL:
+              return expected.precision === Precision.NULL;
+          case Precision.SECONDS:
+              if(!this.seconds.equals(expected.seconds)) return false;
+          case Precision.HOUR_AND_MINUTE:
+              if(this.minute !== expected.minute || this.hour !== expected.hour) return false;
+          case Precision.DAY:
+              if(this.day !== expected.day) return false;
+          case Precision.MONTH:
+              if(this.month !== expected.month) return false;
+          case Precision.YEAR:
+              if(this.year !== expected.year) return false;
+      }
+      return true;
+  }
+
   stringValue() : string {
     let image: string;
     let t: Timestamp = this;
@@ -356,9 +377,11 @@ export class Timestamp {
       default: throw { msg: "invalid value for timestamp precision", where: "IonValueSupport.timestamp.toString" };
       case Precision.NULL:
         return "null.timestamp";
-      case Precision.SECONDS:
+        case Precision.SECONDS:
+          //formats decimal to timestamp second, adds a leading 0 and/or cuts off the trailing period
         image = t.seconds.toString();
-        if(image.length  == 1) image = "0" + image;
+        if(image.charAt(1)  === '.') image = "0" + image;
+        if(image.charAt(image.length - 1) === '.') image = image.slice(0, image.length - 1);
       case Precision.HOUR_AND_MINUTE:
         image = _to_2_digits(t.minute) + (image ? ":" + image : "");
         image = _to_2_digits(t.hour) + (image ? ":" + image : "");

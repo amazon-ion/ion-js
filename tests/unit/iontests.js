@@ -79,6 +79,7 @@ define(['intern', 'intern!object', 'intern/dojo/node!fs', 'intern/dojo/node!path
             'good/testfile35.ion', //symbol table imports unsupported
             'good/testfile29.ion', //IVM unsupported
             'good/testfile26.ion', //IVM unsupported
+            'good/innerVersionIdentifiers.ion',//even though these are not IVM values on roundtrip the marshalling behavior treats text values as if they are top level and the IVM corrupts the reader.
             'good/subfieldVarUInt32bit.ion', //IVM and imports unsupported
             'good/subfieldVarUInt16bit.ion', //IVM and imports unsupported
             'good/subfieldVarUInt15bit.ion', //IVM and imports unsupported
@@ -111,6 +112,7 @@ define(['intern', 'intern!object', 'intern/dojo/node!fs', 'intern/dojo/node!path
             'good/timestamp/timestamp2011-02-20T19_30_59_100-08_00.10n',
             'good/timestamp/timestamp2011-02.10n',
             'good/timestamp/timestamp2011.10n',
+            'good/equivs/systemSymbols.ion',//IVM
 
         ];
 

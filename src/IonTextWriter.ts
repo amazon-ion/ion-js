@@ -136,10 +136,13 @@ export class TextWriter implements Writer {
             tempVal = "+inf";
         } else if(value === Number.NEGATIVE_INFINITY){
             tempVal = "-inf";
-        } else if(value === Number.NaN){
+        } else if(isNaN(value)){
             tempVal = "nan";
         } else if (tempVal !== null && tempVal !== undefined){
             tempVal = tempVal.toExponential();
+            if (tempVal.charAt(tempVal.length - 2) === '+') {
+                tempVal = tempVal.slice(0, tempVal.length - 2) + tempVal.charAt(tempVal.length - 1);
+            }
         }
         this.writeValue(TypeCodes.FLOAT, value, annotations, (value: number) => {
             this.writeUtf8(tempVal);
@@ -154,8 +157,11 @@ export class TextWriter implements Writer {
             tempVal = "-inf";
         } else if(value === Number.NaN){
             tempVal = "nan";
-        } else if(tempVal !== null && tempVal !== undefined){
+        } else if(tempVal !== null && tempVal !== undefined) {
             tempVal = tempVal.toExponential();
+            if (tempVal.charAt(tempVal.length - 2) === '+') {
+                tempVal = tempVal.slice(0, tempVal.length - 2) + tempVal.charAt(tempVal.length - 1);
+            }
         }
         this.writeValue(TypeCodes.FLOAT, value, annotations, (value: number) => {
             this.writeUtf8(tempVal);
@@ -232,7 +238,7 @@ export class TextWriter implements Writer {
     writeString(value: string, annotations?: string[]) : void {
         this.writeValue(TypeCodes.STRING, value, annotations, (value: string) => {
             this.writeable.writeByte(CharCodes.DOUBLE_QUOTE);
-            this.writeable.writeStream(encodeUtf8Stream(escape(value, StringEscapes)));
+            this.writeable.writeStream(escape(value, StringEscapes));
             this.writeable.writeByte(CharCodes.DOUBLE_QUOTE);
         });
     }

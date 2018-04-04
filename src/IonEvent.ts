@@ -102,7 +102,7 @@ abstract class AbsIonEvent implements IonEvent {
         }
         writer.writeList();
         for(var i = 0; i < this.annotations.length; i++){
-            writer.writeSymbol(this.annotations[i]);
+            writer.writeString(this.annotations[i]);
         }
         writer.endContainer();
     }
@@ -283,6 +283,7 @@ class IonFloatEvent extends AbsIonEvent {
 
     }
     valueEquals(expected : IonFloatEvent) : boolean {
+        if(isNaN(this.ionValue) && isNaN(expected.ionValue)) return true;
         return expected.constructor.name === IonFloatEvent.name &&  this.ionValue === expected.ionValue;
     }
     writeIonValue(writer : Writer) : void {

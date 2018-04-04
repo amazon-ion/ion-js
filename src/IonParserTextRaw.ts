@@ -129,7 +129,7 @@ export function get_ion_type(t: number) : IonType {
     default:              return undefined;
   }
 }
-
+//needs to differentiate between quoted text of 'null' and the symbol keyword null
 function get_keyword_type(str: string) : number {
   if (str === "null")  return T_NULL;
   if (str === "true")  return T_BOOL;
@@ -234,7 +234,7 @@ export class ParserTextRaw {
     this._end        = -1;
     this._esc_len    = -1;
     this._curr       = EOF;
-    this._ann        = empty_array; // ann can use a static empty array, a new one will be created only if there are some annotations to  put into it - the exception case
+    this._ann        = [];
     this._msg        = "";
 
     let helpers: ReadValueHelpers = {

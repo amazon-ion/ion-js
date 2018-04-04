@@ -90,37 +90,29 @@ export class Decimal {
         }
 
         let exponent: number = this._exponent;
-        let image: string = this._value.digits();
-
-        if (exponent <  0) {
+        let coefficient: string = this._value.digits();
+        let significantDigits : number = coefficient.length;
+        let result : string = '';
+        //digits returns an integer coefficient with an exponent that shifts it back to its original state
+        if (exponent < 0) {
             // negative shift - prefix decimal point this may require leading zero's
-            if (image.length < exponent + 1) {
-                for (let i : number = exponent + 1 - image.length; i > 0; i--) {
-                    image = "0" + image;
-                }
-            }
-            let decimal_location: number = image.length + exponent;
-            if (decimal_location <= 0) {
-                image = '0.' + image;
-            } else {
-                image = image.substr(0, decimal_location) + "." + image.substr(decimal_location);
+            let adjustedExponent : number = significantDigits - 1 + exponent;
+            if(adjustedExponent >= 0){
+                let decimalIndex : number = significantDigits + exponent;
+                result = coefficient.slice(0, decimalIndex) + '.' + coefficient.slice(decimalIndex);
+            }else if(adjustedExponent >= -6){//adapted from http://speleotrove.com/decimal/daconvs.html
+                result = '0.00000'.slice(0, (2 - exponent) - significantDigits) + coefficient;
+            }else{
+                result = coefficient + '.d' + exponent;
             }
         } else if (exponent > 0) {
-            // positive shift,
-            if (image.length > 1) {
-                exponent = exponent + image.length - 1;
-                image = image.substr(0, 1) + "." + image.substr(1);
-            }
-            image = image + "d" + exponent.toString();
+            // positive shift
+            result = coefficient + '.d' + exponent;
         } else if(exponent === 0) {
-            image = image + ".";
+            result = coefficient + ".";
         }
-
-
-        if (this.isNegative()) {
-            image = "-" + image;
-        }
-        return image;
+        if (this.isNegative()) result = '-' + result;
+        return result;
     }
 
   isNull() : boolean {
