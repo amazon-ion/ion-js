@@ -15,11 +15,11 @@ define(['intern', 'intern!object', 'intern/dojo/node!fs', 'intern/dojo/node!path
     function(intern, registerSuite, fs, paths, ion) {
 
         function findFiles(folder, accumulator) {
-            var files = fs.readdirSync(folder);
+            let files = fs.readdirSync(folder);
             while (files.length > 0) {
-                var file = files.pop();
-                var path = paths.join(folder, file);
-                var stats = fs.lstatSync(path);
+                let file = files.pop();
+                let path = paths.join(folder, file);
+                let stats = fs.lstatSync(path);
                 if (stats.isDirectory()) {
                     findFiles(path, accumulator);
                 } else if (stats.isFile()) {
@@ -28,16 +28,16 @@ define(['intern', 'intern!object', 'intern/dojo/node!fs', 'intern/dojo/node!path
             }
         }
 
-        var cwd = process.cwd();
-        var ionGoodTestsPath = paths.join(cwd, 'ion-tests', 'iontestdata', 'good');
-        var ionBadTestsPath = paths.join(cwd, 'ion-tests', 'iontestdata', 'bad');
+        let cwd = process.cwd();
+        let ionGoodTestsPath = paths.join(cwd, 'ion-tests', 'iontestdata', 'good');
+        let ionBadTestsPath = paths.join(cwd, 'ion-tests', 'iontestdata', 'bad');
 
         let goodAccumulator = [];
         findFiles(ionGoodTestsPath, goodAccumulator);
         let badAccumulator = [];
         findFiles(ionBadTestsPath, badAccumulator);
 
-        var skipList = [
+        let skipList = [
             'bad/timestamp/timestampLenTooLarge.10n',
             'bad/decimalLenTooLarge.10n',
             'bad/decimalLenCauses64BitOverflow.10n',
@@ -136,15 +136,15 @@ define(['intern', 'intern!object', 'intern/dojo/node!fs', 'intern/dojo/node!path
 
         // For debugging, put single files in this list to have the test run only
         // that file.   (But don't forget to clean this up on checkin!)
-        var debugList = [
+        let debugList = [
             //'good/sexps.ion'
         ];
 
-        var goodUnskipped = [];
-        for (var path of goodAccumulator) {
-            var spath = path.replace(/\\/g, "/");
-            var shouldSkip = false;
-            for (var skip of skipList) {
+        let goodUnskipped = [];
+        for (let path of goodAccumulator) {
+            let spath = path.replace(/\\/g, "/");
+            let shouldSkip = false;
+            for (let skip of skipList) {
                 if (spath.endsWith(skip)) {
                     shouldSkip = true;
                     break;
@@ -152,7 +152,7 @@ define(['intern', 'intern!object', 'intern/dojo/node!fs', 'intern/dojo/node!path
             }
             if (debugList.length > 0) {
                 shouldSkip = true;
-                for (var debug of debugList) {
+                for (let debug of debugList) {
                     if (spath.endsWith(debug)) {
                         shouldSkip = false;
                         break;
@@ -164,11 +164,11 @@ define(['intern', 'intern!object', 'intern/dojo/node!fs', 'intern/dojo/node!path
             }
         }
 
-        var badUnskipped = [];
-        for (var path of badAccumulator) {
-            var spath = path.replace(/\\/g, "/");
-            var shouldSkip = false;
-            for (var skip of skipList) {
+        let badUnskipped = [];
+        for (let path of badAccumulator) {
+            let spath = path.replace(/\\/g, "/");
+            let shouldSkip = false;
+            for (let skip of skipList) {
                 if (spath.endsWith(skip)) {
                     shouldSkip = true;
                     break;
@@ -176,7 +176,7 @@ define(['intern', 'intern!object', 'intern/dojo/node!fs', 'intern/dojo/node!path
             }
             if (debugList.length > 0) {
                 shouldSkip = true;
-                for (var debug of debugList) {
+                for (let debug of debugList) {
                     if (spath.endsWith(debug)) {
                         shouldSkip = false;
                         break;
@@ -188,22 +188,22 @@ define(['intern', 'intern!object', 'intern/dojo/node!fs', 'intern/dojo/node!path
             }
         }
 
-        var goodSuite = {
+        let goodSuite = {
             name: 'Good tests'
         };
-        var badSuite = {
+        let badSuite = {
             name: 'Bad tests'
         };
 
-        var eventStreamSuite = {
+        let eventStreamSuite = {
             name: 'EventStream tests'
         };
-        var badEventStreamSuite = {
+        let badEventStreamSuite = {
             name: 'Bad EventStream tests'
         };
 
         function goodExhaust(reader) {
-            var tries = 0;
+            let tries = 0;
             for (;;) {
                 tries++;
                 if (tries > 1000) {
@@ -226,7 +226,7 @@ define(['intern', 'intern!object', 'intern/dojo/node!fs', 'intern/dojo/node!path
         }
 
         function badExhaust(reader) {
-            var tries = 0;
+            let tries = 0;
             try {
                 for (; ;) {
                     // Safety valve
@@ -257,9 +257,9 @@ define(['intern', 'intern!object', 'intern/dojo/node!fs', 'intern/dojo/node!path
 
         function makeGoodTest(path) {
             return function() {
-                var executor = function(resolve, reject) {
-                    var options = path.endsWith(".10n") ? null : "utf8";
-                    var input = fs.readFileSync(path, options);
+                let executor = function(resolve, reject) {
+                    let options = path.endsWith(".10n") ? null : "utf8";
+                    let input = fs.readFileSync(path, options);
                     goodExhaust(ion.makeReader(input));
                     resolve();
                 };
@@ -270,9 +270,9 @@ define(['intern', 'intern!object', 'intern/dojo/node!fs', 'intern/dojo/node!path
 
         function makeBadTest(path) {
             return function() {
-                var executor = function(resolve, reject) {
-                    var options = path.endsWith(".10n") ? null : "utf8";
-                    var input = fs.readFileSync(path, options);
+                let executor = function(resolve, reject) {
+                    let options = path.endsWith(".10n") ? null : "utf8";
+                    let input = fs.readFileSync(path, options);
                     badExhaust(ion.makeReader(input));
                     resolve();
                 };
@@ -283,9 +283,9 @@ define(['intern', 'intern!object', 'intern/dojo/node!fs', 'intern/dojo/node!path
 
         function makeEventStreamTest(path) {
             return function() {
-                var executor = function(resolve, reject) {
-                    var options = path.endsWith(".10n") ? null : "utf8";
-                    var input = fs.readFileSync(path, options);
+                let executor = function(resolve, reject) {
+                    let options = path.endsWith(".10n") ? null : "utf8";
+                    let input = fs.readFileSync(path, options);
                     roundTripEventStreams(ion.makeReader(input));
                     resolve();
                 };
@@ -296,9 +296,9 @@ define(['intern', 'intern!object', 'intern/dojo/node!fs', 'intern/dojo/node!path
 
         function makeBadEventStreamTest(path) {
             return function() {
-                var executor = function(resolve, reject) {
-                    var options = path.endsWith(".10n") ? null : "utf8";
-                    var input = fs.readFileSync(path, options);
+                let executor = function(resolve, reject) {
+                    let options = path.endsWith(".10n") ? null : "utf8";
+                    let input = fs.readFileSync(path, options);
                     roundTripBadEventStreams(ion.makeReader(input));
                     resolve();
                 };
@@ -308,24 +308,24 @@ define(['intern', 'intern!object', 'intern/dojo/node!fs', 'intern/dojo/node!path
         }
 
         function roundTripEventStreams(reader){
-            var eventStream = new ion.IonEventStream(reader);
-            var writer = ion.makeTextWriter();
+            let eventStream = new ion.IonEventStream(reader);
+            let writer = ion.makeTextWriter();
             eventStream.writeEventStream(writer);
             writer.close();
-            var buf = writer.getBytes();
-            var tempString = '';
-            for(var i = 0; i < buf.length; i++){
+            let buf = writer.getBytes();
+            let tempString = '';
+            for(let i = 0; i < buf.length; i++){
                 tempString = tempString + String.fromCharCode(buf[i]);
             }
-            var tempReader = new ion.makeReader(tempString);
-            var tempStream = new ion.IonEventStream(tempReader);
+            let tempReader = new ion.makeReader(tempString);
+            let tempStream = new ion.IonEventStream(tempReader);
             if(!eventStream.equals(tempStream)) {
-                var tempWriter = ion.makeTextWriter();
+                let tempWriter = ion.makeTextWriter();
                 tempStream.write(tempWriter);
                 tempWriter.close();
-                var tempBuf = tempWriter.getBytes();
-                var unequalString = "";
-                for(var i = 0; i < buf.length; i++){
+                let tempBuf = tempWriter.getBytes();
+                let unequalString = "";
+                for(let i = 0; i < buf.length; i++){
                     unequalString = unequalString + String.fromCharCode(buf[i]);
                 }
                 throw new Error('Round tripped stream was unequal: ' + tempString + '\n vs: ' + unequalString);
@@ -336,12 +336,12 @@ define(['intern', 'intern!object', 'intern/dojo/node!fs', 'intern/dojo/node!path
 
         function roundTripBadEventStreams(reader){
             try {
-                var eventStream = new ion.IonEventStream(reader);
-                var writer = ion.makeTextWriter();
+                let eventStream = new ion.IonEventStream(reader);
+                let writer = ion.makeTextWriter();
                 eventStream.writeEventStream(writer);
-                var buf = writer.getBytes();
-                var tempString = "";
-                for(var i = 0; i < buf.length; i++){
+                let buf = writer.getBytes();
+                let tempString = "";
+                for(let i = 0; i < buf.length; i++){
                     tempString = tempString + String.fromCharCode(buf[i]);
                 }
             }catch(e){
@@ -353,16 +353,16 @@ define(['intern', 'intern!object', 'intern/dojo/node!fs', 'intern/dojo/node!path
         }
 
         function uintToString(uintArray) {
-            var encodedString = String.fromCharCode.apply(null, uintArray),
+            let encodedString = String.fromCharCode.apply(null, uintArray),
                 decodedString = decodeURIComponent(escape(encodedString));
             return decodedString;
         }
 
-        for (var file of goodUnskipped) {
+        for (let file of goodUnskipped) {
             goodSuite[file] = makeGoodTest(file);
             eventStreamSuite[file] = makeEventStreamTest(file);
         }
-        for (var file of badUnskipped) {
+        for (let file of badUnskipped) {
             badSuite[file] = makeBadTest(file);
             badEventStreamSuite[file] = makeBadEventStreamTest(file);
         }
