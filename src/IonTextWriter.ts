@@ -377,7 +377,7 @@ export class TextWriter implements Writer {
             this.writeUtf8(s);
         } else {
             this.writeable.writeByte(CharCodes.SINGLE_QUOTE);
-            this.writeable.writeStream(encodeUtf8Stream(escape(s, SymbolEscapes)));
+            this.writeable.writeStream(escape(s, SymbolEscapes));
             this.writeable.writeByte(CharCodes.SINGLE_QUOTE);
         }
     }

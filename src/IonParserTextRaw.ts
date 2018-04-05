@@ -794,11 +794,6 @@ export class ParserTextRaw {
         return this._in.valueAt(entryIndex) === CH_SQ && this._in.valueAt(entryIndex + 1) === CH_SQ && this._in.valueAt(entryIndex + 2) === CH_SQ;
     }
 
-    private findTriple() : boolean {
-
-        return false;
-    }
-
   private _read_string_helper = function(terminator: number, allow_new_line: boolean) : void {
     var ch;
     this._start = this._in.position();
@@ -1298,7 +1293,7 @@ private _test_symbol_as_annotation() : boolean {
   }
 
   private _get_N_hexdigits(ii: number, end: number) : number {
-      var ch, v = 0;
+    var ch, v = 0;
     while (ii < end) {
       ch = this._in.valueAt(ii);
       v = v*16 + get_hex_value(ch);
@@ -1320,27 +1315,25 @@ private _test_symbol_as_annotation() : boolean {
     return t;
   }
 
-  next(): number {
-      this._ann = [];
-    if (this._value_type === ERROR) {
-      this._run();
+    next(): number {
+        this._ann = [];
+        if (this._value_type === ERROR) {
+            this._run();
+        }
+        this._curr = this._value_pop();
+
+        let t: number;
+        if (this._curr === ERROR) {
+            this._value.push(ERROR);
+            t = undefined;
+        } else {
+            t = this._curr;
+        }
+
+        this._curr_null = this._value_null;
+        this._value_null = false;
+        return t;
     }
-    this._curr = this._value_pop();
-
-    let t: number;
-    if (this._curr === ERROR) {
-      this._value.push(ERROR);
-      t = undefined;
-    } else {
-      t = this._curr;
-    }
-
-    this._curr_null = this._value_null;
-    this._value_null = false;
-
-
-    return t;
-  }
 
   private _run() {
     var op;
@@ -1422,29 +1415,28 @@ private _test_symbol_as_annotation() : boolean {
     }
 
     //peek does not work with the different types of string input.
-  private _peek(expected?: string) : number {
-    var ch, ii=0;
-    if (expected === undefined || expected.length < 1) {
-      return this._in.valueAt(this._in.position());
+    private _peek(expected?: string) : number {
+        var ch, ii=0;
+        if (expected === undefined || expected.length < 1) {
+            return this._in.valueAt(this._in.position());
+        }
+        while (ii<expected.length) {
+            ch = this._read();
+            if (ch != expected.charCodeAt(ii)) break;
+            ii++;
+        }
+        if (ii == expected.length) {
+            ch = this._peek(); // if we did match we need to read the next character
+        } else {
+            this._unread(ch); // if we didn't match we've read an extra character
+            ch = ERROR;
+        }
+        while (ii > 0) { // unread whatever matched
+            ii--;
+            this._unread(expected.charCodeAt(ii));
+        }
+        return ch;
     }
-    while (ii<expected.length) { 
-      ch = this._read();
-       if (ch != expected.charCodeAt(ii)) break;
-      ii++;
-    }
-    if (ii == expected.length) {
-      ch = this._peek(); // if we did match we need to read the next character
-    }
-    else {
-      this._unread(ch); // if we didn't match we've read an extra character
-      ch = ERROR;
-    }
-    while (ii > 0) { // unread whatever matched
-      ii--;
-      this._unread(expected.charCodeAt(ii));
-    }
-    return ch;
-  }
 
   private _peek_after_whitespace(recognize_comments: boolean) : number {
     var ch = this._read_after_whitespace(recognize_comments);

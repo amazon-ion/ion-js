@@ -99,7 +99,7 @@ export class IonEventStream {
                 case IonEventType.CONTAINER_START:
                     switch(tempEvent.ionType) {
                         case IonTypes.STRUCT :
-                            writer.writeStruct(tempEvent.annotations, false);//need to change.
+                            writer.writeStruct(tempEvent.annotations, false);
                             break;
                         case IonTypes.LIST :
                             writer.writeList(tempEvent.annotations, false);
@@ -107,6 +107,8 @@ export class IonEventStream {
                         case IonTypes.SEXP :
                             writer.writeSexp(tempEvent.annotations, false);
                             break;
+                        default :
+                            throw new Error('Unexpected IonType: ' + tempEvent.ionType.name);
                     }
 
                 case IonEventType.CONTAINER_END:

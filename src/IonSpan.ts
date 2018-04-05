@@ -40,7 +40,7 @@ export abstract class Span {
   abstract valueAt(index: number): number;
 
   abstract getRemaining() : number;
-a
+
   abstract setRemaining(r: number) : void;
 
   abstract is_empty(): boolean;
