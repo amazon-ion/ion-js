@@ -525,8 +525,7 @@ export class Timestamp {
         // 1234-67-89T12:45:78.dddd
         case States.FRACTIONAL_SECONDS:
           const START_POSITION_OF_SECONDS = 17;
-
-          seconds = Decimal.parse(str.substring(START_POSITION_OF_SECONDS, pos), true);
+          seconds = Decimal.parse(str.substring(START_POSITION_OF_SECONDS, pos), false);
           break;
         case States.OFFSET:
           break;

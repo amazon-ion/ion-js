@@ -282,7 +282,7 @@ export class TextWriter implements Writer {
         }
     }
 
-    close() : void { //close seems wrong
+    close() : void {
         while (!this.isTopLevel) {
             this.endContainer();
         }
@@ -290,7 +290,7 @@ export class TextWriter implements Writer {
 
     private writeValue<T>(typeCode: TypeCodes, value: T, annotations: string[], serialize: Serializer<T>) {
         if (this.currentContainer.state === State.STRUCT_FIELD) throw new Error("Expecting a struct field");
-        if (isNullOrUndefined(value)) {//should this still call write null for symbols? they should evaluate as undefined?
+        if (isNullOrUndefined(value)) {
             this.writeNull(typeCode, annotations);
             return;
         }
@@ -334,6 +334,8 @@ export class TextWriter implements Writer {
                     case TypeCodes.SEXP:
                         this.writeable.writeByte(CharCodes.SPACE);
                         break;
+                    default:
+                        //no op
                 }
             }
         }

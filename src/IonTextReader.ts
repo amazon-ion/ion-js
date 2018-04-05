@@ -220,7 +220,7 @@ export class TextReader implements Reader {
         return Timestamp.parse(this.stringValue());
     }
 
-    value() {//switch for each tid???
+    value() {
         switch(this._type) {
             case IonTypes.BOOL : {
                 return this.booleanValue();

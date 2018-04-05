@@ -414,7 +414,7 @@ export class ParserTextRaw {
     this._read_value_helper(true, this._read_sexp_value);
   }
 
-  private _read_value_helper(accept_operator_symbols: boolean, calling_op) {
+  private _read_value_helper(accept_operator_symbols: boolean, calling_op : ReadValueHelper) {
     let ch: number = this._read_after_whitespace(true);
     if (ch == EOF) {  // since we can't index into our object with a value of -1
       this._read_value_helper_EOF(ch, accept_operator_symbols, calling_op);
@@ -429,21 +429,21 @@ export class ParserTextRaw {
   }
 
   // helper for the read_value_helper function
-  private _read_value_helper_EOF( ch1, accept_operator_symbols, calling_op ) {
+  private _read_value_helper_EOF( ch1 : number, accept_operator_symbols : boolean, calling_op : ReadValueHelper) {
     this._ops.unshift( this._done );
   }
 
-  private _read_value_helper_paren( ch1, accept_operator_symbols, calling_op ) {
+  private _read_value_helper_paren( ch1 : number, accept_operator_symbols : boolean, calling_op : ReadValueHelper) {
     this._value_push( T_SEXP );
     this._ops.unshift( this._read_sexp_values );
   }
 
-  private _read_value_helper_square( ch1, accept_operator_symbols, calling_op ) {
+  private _read_value_helper_square( ch1 : number, accept_operator_symbols : boolean, calling_op : ReadValueHelper) {
     this._value_push( T_LIST );
     this._ops.unshift( this._read_list_values );
   }
 
-  private _read_value_helper_curly( ch1, accept_operator_symbols, calling_op ) {
+  private _read_value_helper_curly( ch1 : number, accept_operator_symbols : boolean, calling_op : ReadValueHelper) {
     var ch3, ch2 = this._read();
     if (ch2 == CH_LEFT_CURLY) {
       ch3 = this._read_after_whitespace(false);
@@ -465,7 +465,7 @@ export class ParserTextRaw {
     }
   }
 
-  private _read_value_helper_plus( ch1, accept_operator_symbols: boolean, calling_op ) {
+  private _read_value_helper_plus( ch1 : number, accept_operator_symbols: boolean, calling_op : ReadValueHelper) {
     var ch2 = this._peek("inf");
     this._unread(ch1); // in any case we'll leave this character for the next function to use
     if (IonText.is_numeric_terminator(ch2)) {
@@ -479,7 +479,7 @@ export class ParserTextRaw {
     }
   }
 
-  private _read_value_helper_minus = function( ch1, accept_operator_symbols: boolean, calling_op ) {
+  private _read_value_helper_minus = function( ch1 : number, accept_operator_symbols: boolean, calling_op : ReadValueHelper) {
     var op = undefined,
         ch2 = this._peek();
     if (ch2 == CH_i) {
@@ -506,7 +506,7 @@ export class ParserTextRaw {
     }
   }
 
-  private _read_value_helper_digit( ch1, accept_operator_symbols: boolean, calling_op ) {
+  private _read_value_helper_digit( ch1 : number, accept_operator_symbols: boolean, calling_op : ReadValueHelper) {
     var ch2 = this._peek_4_digits(ch1);
     this._unread(ch1);
     if (ch2 == CH_T || ch2 == CH_MS) {
@@ -517,7 +517,7 @@ export class ParserTextRaw {
     }
   }
 
-    private _read_value_helper_single( ch1, accept_operator_symbols: boolean, calling_op ) {
+    private _read_value_helper_single( ch1 : number, accept_operator_symbols: boolean, calling_op : ReadValueHelper) {
         var op;
         if (this._peek("\'\'") != ERROR) {
             op = this._read_string3;
@@ -526,17 +526,17 @@ export class ParserTextRaw {
             op = this._read_string1;
             op.call(this);
             if (this._test_string_as_annotation(op)) {
-                // this was an annoation, so we need to try again for the actual value
+                // this was an annotation, so we need to try again for the actual value
                 this._ops.unshift( calling_op );
             }
         }
     }
 
-  private _read_value_helper_double( ch1, accept_operator_symbols: boolean, calling_op ) {
+  private _read_value_helper_double( ch1 : number, accept_operator_symbols: boolean, calling_op : ReadValueHelper) {
     this._ops.unshift( this._read_string2 );
   }
 
-  private _read_value_helper_letter( ch1, accept_operator_symbols: boolean, calling_op ) {
+  private _read_value_helper_letter( ch1 : number, accept_operator_symbols: boolean, calling_op : ReadValueHelper) {
     this._read_symbol();
     if (this._test_symbol_as_annotation()) {
       // this was an annoation, so we need to try again for the actual value
@@ -544,7 +544,7 @@ export class ParserTextRaw {
     }
   }
 
-  private _read_value_helper_operator( ch1, accept_operator_symbols: boolean, calling_op ) {
+  private _read_value_helper_operator( ch1 : number, accept_operator_symbols: boolean, calling_op : ReadValueHelper) {
     if (accept_operator_symbols) {
       this._unread(ch1)
       this._ops.unshift( this._read_operator_symbol );
@@ -758,32 +758,21 @@ export class ParserTextRaw {
   private _read_string3() : void {
       let ch : number;
       this._unread(this._peek(""));
-      // read sequence of triple quoted strings:
-        //not exiting correctly, need to put a correcting boolean to check for the end. just finds error probably due to the read calls or something.
-      for(this._start = this._in.position() + 3; this._peek("\'\'\'") !== ERROR; this._in.unread(this._read_after_whitespace(true))) {//need to check if this off by ones on print?
-          this._read();
-          this._read();
-          this._read();
-          //in tripleQuotes
-          //index content of current triple quoted string,
+      // read sequence of triple quoted strings
+      for(this._start = this._in.position() + 3; this._peek("\'\'\'") !== ERROR; this._in.unread(this._read_after_whitespace(true))) {
+          for(let i : number = 0; i < 3; i++){this._read()}
+          //in tripleQuotes, index content of current triple quoted string,
           //looking for more triple quotes
           while(this._peek("\'\'\'") === ERROR) {
               ch = this._read();
-              if( ch === EOF) throw new Error('Closing triple quotes not found.');
+              if(ch === EOF) throw new Error('Closing triple quotes not found.');
             // read single quoted strings until we see the triple quoted terminator
             // if it's not a triple quote, it's just content
           }
-          //mark the possible end of the series of triplequotes
-
-          // Set the end of the value,
-          // this._end will reset later if further triple quotes are found after indexing through whitespace,
+          //mark the possible end of the series of triplequotes, set the end of the value, it will reset later if further triple quotes are found after indexing through whitespace.
           this._end = this._in.position();
           //Index past the triple quote.
-
-          this._read();
-          this._read();
-          this._read();
-
+          for(let i : number = 0; i < 3; i++){this._read()}
           // the reader will parse values from the source so that it can be roundtripped.
           // eat next whitespace sequence until first non white char found.
       }
@@ -791,7 +780,9 @@ export class ParserTextRaw {
   }
 
     private verifyTriple(entryIndex : number) : boolean {
-        return this._in.valueAt(entryIndex) === CH_SQ && this._in.valueAt(entryIndex + 1) === CH_SQ && this._in.valueAt(entryIndex + 2) === CH_SQ;
+        return this._in.valueAt(entryIndex) === CH_SQ &&
+            this._in.valueAt(entryIndex + 1) === CH_SQ &&
+            this._in.valueAt(entryIndex + 2) === CH_SQ;
     }
 
   private _read_string_helper = function(terminator: number, allow_new_line: boolean) : void {
@@ -849,7 +840,7 @@ export class ParserTextRaw {
         break;
       default:
           console.log(ch);
-        this._error("unexpected character after escape slash");
+        this._error('unexpected character: ' + ch + ' after escape slash');
     }
   }
 
@@ -1015,7 +1006,7 @@ private _test_symbol_as_annotation() : boolean {
   }
 
   get_value_as_string(t: number) : string {
-    let indice : number, ch : number, escaped, acceptComments : boolean, s : string = "";
+    let index : number, ch : number, escaped, acceptComments : boolean, s : string = "";
     switch (t) {
       case T_NULL:
       case T_BOOL:
@@ -1028,23 +1019,23 @@ private _test_symbol_as_annotation() : boolean {
       case T_IDENTIFIER:
       case T_OPERATOR:
       case T_BLOB:
-        for (indice = this._start; indice < this._end; indice++) {
-          s += String.fromCharCode(this._in.valueAt(indice));
+        for (index = this._start; index < this._end; index++) {
+          s += String.fromCharCode(this._in.valueAt(index));
         }
         break;
       case T_STRING1:
       case T_STRING2:
-          for (indice = this._start; indice < this._end; indice++) {
-              ch = this._in.valueAt(indice);
+          for (index = this._start; index < this._end; index++) {
+              ch = this._in.valueAt(index);
               if (ch == CH_BS) {
-                  let codepoint : number = this._read_escape_sequence(indice, this._end);
+                  let codepoint : number = this._read_escape_sequence(index, this._end);
                   if(codepoint > 0xFFFF) {
                       s += String.fromCodePoint(codepoint);
                       throw new Error("escape sequence is outside of javascript's support range for strings(OXFFFF)");
                   } else {
                       s += String.fromCharCode(codepoint);
                   }
-                  indice += this._esc_len;
+                  index += this._esc_len;
               } else {
                   s += String.fromCharCode(ch);
               }
@@ -1052,11 +1043,11 @@ private _test_symbol_as_annotation() : boolean {
           }
           break;
       case T_CLOB2:
-        for (indice = this._start; indice < this._end; indice++) {
-          ch = this._in.valueAt(indice);
+        for (index = this._start; index < this._end; index++) {
+          ch = this._in.valueAt(index);
           if (ch == CH_BS) {
-              s += String.fromCharCode(this.readClobEscapes(indice, this._end));
-              indice += this._esc_len;
+              s += String.fromCharCode(this.readClobEscapes(index, this._end));
+              index += this._esc_len;
           } else {
             s += String.fromCharCode(ch);
           }
@@ -1064,19 +1055,19 @@ private _test_symbol_as_annotation() : boolean {
         break;
       case T_CLOB3:
           acceptComments = false;
-          for(indice = this._start; indice < this._end; indice++) {
-              ch = this._in.valueAt(indice);
+          for(index = this._start; index < this._end; index++) {
+              ch = this._in.valueAt(index);
               switch (ch) {
                   case CH_BS:
-                      escaped = this.readClobEscapes(indice, this._end);
+                      escaped = this.readClobEscapes(index, this._end);
                       if(escaped >= 0){
                           s += String.fromCharCode(escaped);
                       }
-                      indice += this._esc_len; //this builds up over time, may be incorrect?
+                      index += this._esc_len;
                       break;
                   case CH_SQ:
-                      if(this.verifyTriple(indice)){
-                          indice = this._skip_triple_quote_gap(indice, this._end, acceptComments);
+                      if(this.verifyTriple(index)){
+                          index = this._skip_triple_quote_gap(index, this._end, acceptComments);
                       } else {
                           s += String.fromCharCode(ch);
                       }
@@ -1090,19 +1081,19 @@ private _test_symbol_as_annotation() : boolean {
           break;
       case T_STRING3:
           acceptComments = true;
-          for(indice = this._start; indice < this._end; indice++) {
-              ch = this._in.valueAt(indice);
+          for(index = this._start; index < this._end; index++) {
+              ch = this._in.valueAt(index);
               switch (ch) {
                   case CH_BS:
-                      escaped = this._read_escape_sequence(indice, this._end);
+                      escaped = this._read_escape_sequence(index, this._end);
                       if(escaped >= 0){
                           s += String.fromCharCode(escaped);
                       }
-                      indice += this._esc_len; //this builds up over time, may be incorrect?
+                      index += this._esc_len;
                       break;
                   case CH_SQ:
-                      if(this.verifyTriple(indice)){
-                          indice = this._skip_triple_quote_gap(indice, this._end, acceptComments);
+                      if(this.verifyTriple(index)){
+                          index = this._skip_triple_quote_gap(index, this._end, acceptComments);
                       } else {
                           s += String.fromCharCode(ch);
                       }
@@ -1121,49 +1112,49 @@ private _test_symbol_as_annotation() : boolean {
     return s;
   }
 
-  private indexWhiteSpace(indice : number, acceptComments : boolean) : number {
-      let ch : number = this._in.valueAt(indice);
+  private indexWhiteSpace(index : number, acceptComments : boolean) : number {
+      let ch : number = this._in.valueAt(index);
       if(!acceptComments){
-          for(; is_whitespace(ch); ch = this._in.valueAt(indice++)){}
+          for(; is_whitespace(ch); ch = this._in.valueAt(index++)){}
       } else {
-          for(;is_whitespace(ch) || ch === CH_FORWARD_SLASH;ch = this._in.valueAt(indice++)){
+          for(;is_whitespace(ch) || ch === CH_FORWARD_SLASH;ch = this._in.valueAt(index++)){
               if (ch === CH_FORWARD_SLASH) {
-                  ch = this._in.valueAt(indice++);
+                  ch = this._in.valueAt(index++);
                   switch (ch) {
                       case CH_FORWARD_SLASH:
-                          indice = this.indexToNewLine(indice);
+                          index = this.indexToNewLine(index);
                           break;
                       case CH_AS:
-                          indice = this.indexToCloseComment(indice);
+                          index = this.indexToCloseComment(index);
                           break;
                       default:
-                          indice--;
+                          index--;
                           break;
                   }
               }
           }
       }
-      return indice;
+      return index;
   }
 
-  private indexToNewLine(indice : number){
-      let ch : number = this._in.valueAt(indice);
+  private indexToNewLine(index : number){
+      let ch : number = this._in.valueAt(index);
       while(ch !== EOF && ch !== CH_NL){
           if (ch === CH_CR) {
-              if (this._in.valueAt(indice + 1) !== CH_NL){
-                  return indice;
+              if (this._in.valueAt(index + 1) !== CH_NL){
+                  return index;
               }
           }
-          ch = this._in.valueAt(indice++);
+          ch = this._in.valueAt(index++);
       }
-      return indice;
+      return index;
   }
 
-  private indexToCloseComment(indice : number) : number{
-        while(this._in.valueAt(indice) !== CH_AS && this._in.valueAt(indice + 1) !== CH_FORWARD_SLASH){
-            indice++;
+  private indexToCloseComment(index : number) : number{
+        while(this._in.valueAt(index) !== CH_AS && this._in.valueAt(index + 1) !== CH_FORWARD_SLASH){
+            index++;
         }
-    return indice;
+    return index;
   }
 
 
@@ -1229,6 +1220,8 @@ private _test_symbol_as_annotation() : boolean {
                 ch = this._get_N_hexdigits(ii + 2, ii + 4);
                 this._esc_len = 3;
                 break;
+            default:
+                return ch;
         }
         return ch;
     }

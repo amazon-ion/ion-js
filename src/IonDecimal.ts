@@ -132,7 +132,7 @@ export class Decimal {
       return this.getExponent() === expected.getExponent() && this.isNegative() === expected.isNegative() && this.getDigits().numberValue() === expected.getDigits().numberValue();
   }
 
-  static parse(str: string, dontStrip? : boolean) : Decimal {
+  static parse(str: string, stripLeadingZeroes : boolean = true) : Decimal {
     let index: number = 0;
     let exponent: number = 0;
     let c: number;
@@ -152,7 +152,7 @@ export class Decimal {
 
     let digits: string = Decimal.readDigits(str, index);
     index += digits.length;
-    if(!dontStrip) digits = Decimal.stripLeadingZeroes(digits);
+    if(stripLeadingZeroes) digits = Decimal.stripLeadingZeroes(digits);
 
     if (index === str.length) {
       let trimmedDigits: string = Decimal.stripTrailingZeroes(digits);

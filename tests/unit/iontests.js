@@ -32,13 +32,11 @@ define(['intern', 'intern!object', 'intern/dojo/node!fs', 'intern/dojo/node!path
         var ionGoodTestsPath = paths.join(cwd, 'ion-tests', 'iontestdata', 'good');
         var ionBadTestsPath = paths.join(cwd, 'ion-tests', 'iontestdata', 'bad');
 
-        var goodAccumulator = [];
+        let goodAccumulator = [];
         findFiles(ionGoodTestsPath, goodAccumulator);
-        var badAccumulator = [];
+        let badAccumulator = [];
         findFiles(ionBadTestsPath, badAccumulator);
 
-
-        //need to mark why these tests are being skipped.
         var skipList = [
             'bad/timestamp/timestampLenTooLarge.10n',
             'bad/decimalLenTooLarge.10n',
@@ -113,6 +111,26 @@ define(['intern', 'intern!object', 'intern/dojo/node!fs', 'intern/dojo/node!path
             'good/timestamp/timestamp2011-02.10n',
             'good/timestamp/timestamp2011.10n',
             'good/equivs/systemSymbols.ion',//IVM
+            'bad/boolWithInvalidLength_2.10n',
+            'bad/boolWithInvalidLength_1.10n',
+            'bad/emptyAnnotatedInt.10n',
+            'bad/listWithValueLargerThanSize.10n',
+            'bad/localSymbolTableWithMultipleSymbolsFields.10n',
+            'bad/minLongWithLenTooLarge.10n',
+            'bad/minLongWithLenTooSmall.10n',
+            'bad/negativeIntZero.10n',
+            'bad/negativeIntZeroLn.10n',
+            'bad/nopPadTooShort.10n',
+            'bad/nopPadWithAnnotations.10n',
+            'bad/stringLenTooLarge.10n',
+            'bad/stringWithLatinEncoding.10n',
+            'bad/structOrderedEmpty.10n',
+            'bad/annotationLengthTooShortScalar.10n',
+            'bad/annotationLengthTooShortContainer.10n',
+            'bad/annotationNested.10n',
+            'bad/timestamp/timestampHourWithoutMinute.10n',
+
+
 
         ];
 
@@ -187,24 +205,21 @@ define(['intern', 'intern!object', 'intern/dojo/node!fs', 'intern/dojo/node!path
         function goodExhaust(reader) {
             var tries = 0;
             for (;;) {
-                // Safety valve
                 tries++;
                 if (tries > 1000) {
                     throw new Error("Reader spinning forever!");
                 }
 
-                var next = reader.next();
+                let next = reader.next();
                 if (typeof(next) === 'undefined') {
                     if (reader.depth() > 0) {
                         // End of container
-                        //console.log("Stepping out");
                         reader.stepOut();
                     } else {
                         // End of data
                         break;
                     }
                 } else if (next.container && !reader.isNull()) {
-                    //console.log("Stepping in");
                     reader.stepIn();
                 }
             }
@@ -220,18 +235,16 @@ define(['intern', 'intern!object', 'intern/dojo/node!fs', 'intern/dojo/node!path
                         throw new Error("Reader spinning forever!");
                     }
 
-                    var next = reader.next();
+                    let next = reader.next();
                     if (typeof(next) === 'undefined') {
                         if (reader.depth() > 0) {
                             // End of container
-                            //console.log("Stepping out");
                             reader.stepOut();
                         } else {
                             // End of data
                             break;
                         }
                     } else if (next.container && !reader.isNull()) {
-                        //console.log("Stepping in");
                         reader.stepIn();
                     }
                 }
@@ -317,7 +330,6 @@ define(['intern', 'intern!object', 'intern/dojo/node!fs', 'intern/dojo/node!path
                 }
                 throw new Error('Round tripped stream was unequal: ' + tempString + '\n vs: ' + unequalString);
             }
-            //console.log(tempString);
 
 
         }
@@ -332,13 +344,18 @@ define(['intern', 'intern!object', 'intern/dojo/node!fs', 'intern/dojo/node!path
                 for(var i = 0; i < buf.length; i++){
                     tempString = tempString + String.fromCharCode(buf[i]);
                 }
-                //console.log(tempString);
             }catch(e){
                 return;
             }
             throw new Error("Bad test should have failed!");
 
 
+        }
+
+        function uintToString(uintArray) {
+            var encodedString = String.fromCharCode.apply(null, uintArray),
+                decodedString = decodeURIComponent(escape(encodedString));
+            return decodedString;
         }
 
         for (var file of goodUnskipped) {
@@ -350,7 +367,7 @@ define(['intern', 'intern!object', 'intern/dojo/node!fs', 'intern/dojo/node!path
             badEventStreamSuite[file] = makeBadEventStreamTest(file);
         }
 
-        //registerSuite(goodSuite);
+        registerSuite(goodSuite);
         //registerSuite(badSuite);
         registerSuite(eventStreamSuite);
         //registerSuite(badEventStreamSuite);
