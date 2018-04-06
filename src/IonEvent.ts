@@ -313,7 +313,7 @@ class IonSymbolEvent extends AbstractIonEvent {
         return this.ionValue.name === expected.ionValue.name;//will need to change when symboltokens are introduced.
     }
     writeIonValue(writer : Writer) : void{
-        writer.writeSymbol(this.ionValue.toString());//if symboltokens text is unknown we will need
+        writer.writeSymbol(this.ionValue.toString());//if symboltokens text is unknown we will need to write out symboltable
     }
 
 }
@@ -348,7 +348,7 @@ class IonTimestampEvent extends AbstractIonEvent {
 }
 
 class IonBlobEvent extends AbstractIonEvent {
-    constructor(eventType : IonEventType, ionType : IonType, fieldName : string, annotations : string[], depth : number, ionValue : Timestamp){
+    constructor(eventType : IonEventType, ionType : IonType, fieldName : string, annotations : string[], depth : number, ionValue : string){
         super(eventType , ionType, fieldName, annotations, depth, ionValue);
     }
     valueEquals(expected : IonBlobEvent) : boolean {
@@ -364,7 +364,7 @@ class IonBlobEvent extends AbstractIonEvent {
 }
 
 class IonClobEvent extends AbstractIonEvent {
-    constructor(eventType : IonEventType, ionType : IonType, fieldName : string, annotations : string[], depth : number, ionValue : Timestamp){
+    constructor(eventType : IonEventType, ionType : IonType, fieldName : string, annotations : string[], depth : number, ionValue : string){
         super(eventType , ionType, fieldName, annotations, depth, ionValue);
     }
     valueEquals(expected : IonClobEvent) : boolean {

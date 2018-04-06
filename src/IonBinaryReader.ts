@@ -154,7 +154,7 @@ export class BinaryReader implements Reader {
     return this._parser.hasAnnotations();
   }
 
-  annotations() : string[] {
+  annotations() : string[] {//TODO binary support
       return ["test"];
   }
 

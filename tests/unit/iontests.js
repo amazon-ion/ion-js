@@ -203,13 +203,7 @@ define(['intern', 'intern!object', 'intern/dojo/node!fs', 'intern/dojo/node!path
         };
 
         function goodExhaust(reader) {
-            let tries = 0;
             for (;;) {
-                tries++;
-                if (tries > 1000) {
-                    throw new Error("Reader spinning forever!");
-                }
-
                 let next = reader.next();
                 if (typeof(next) === 'undefined') {
                     if (reader.depth() > 0) {
@@ -226,15 +220,8 @@ define(['intern', 'intern!object', 'intern/dojo/node!fs', 'intern/dojo/node!path
         }
 
         function badExhaust(reader) {
-            let tries = 0;
             try {
-                for (; ;) {
-                    // Safety valve
-                    tries++;
-                    if (tries > 1000) {
-                        throw new Error("Reader spinning forever!");
-                    }
-
+                for (;;) {
                     let next = reader.next();
                     if (typeof(next) === 'undefined') {
                         if (reader.depth() > 0) {

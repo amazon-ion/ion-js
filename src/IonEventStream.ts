@@ -404,7 +404,7 @@ export class IonEventStream {
         return tempReader.value();
     }
 
-    private parseImports() : any { //TODO
+    private parseImports() : any { //TODO needed for symboltoken support.
         return this.reader.value();
     }
 }
