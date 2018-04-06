@@ -127,7 +127,6 @@ abstract class AbstractIonEvent implements IonEvent {
     }
 
     writeValues(writer : Writer) : void {
-        let containerCutoff : number = 11;
         if(this.eventType === IonEventType.SCALAR) {
             writer.writeFieldName('value_text');
             this.writeTextValue(writer);
@@ -163,6 +162,7 @@ abstract class AbstractIonEvent implements IonEvent {
         return (
             this.eventType === expected.eventType &&
             this.ionType === expected.ionType &&
+            this.fieldName === expected.fieldName &&
             this.depth === expected.depth &&
             this.annotationEquals(expected.annotations) &&
             this.valueEquals(expected)
@@ -310,10 +310,10 @@ class IonSymbolEvent extends AbstractIonEvent {
     }
     valueEquals(expected : IonSymbolEvent) : boolean {
         if(expected.constructor.name !== IonSymbolEvent.name) return false;
-        return this.ionValue.name === expected.ionValue.name;
+        return this.ionValue.name === expected.ionValue.name;//will need to change when symboltokens are introduced.
     }
     writeIonValue(writer : Writer) : void{
-        writer.writeSymbol(this.ionValue.toString());
+        writer.writeSymbol(this.ionValue.toString());//if symboltokens text is unknown we will need
     }
 
 }

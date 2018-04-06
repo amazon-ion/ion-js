@@ -839,7 +839,6 @@ export class ParserTextRaw {
         this._unread(ch);
         break;
       default:
-          console.log(ch);
         this._error('unexpected character: ' + ch + ' after escape slash');
     }
   }
@@ -983,7 +982,7 @@ private _test_symbol_as_annotation() : boolean {
         n = Number(s);
         break;
       case T_FLOAT_SPECIAL:
-        if (s == "+inf")      n =  Number.POSITIVE_INFINITY;
+        if (s == "+inf")      n = Number.POSITIVE_INFINITY;
         else if (s == "-inf") n = Number.NEGATIVE_INFINITY;
         else if (s == "nan")  n = Number.NaN;
         else throw new Error("can't convert to number"); 
@@ -1006,7 +1005,11 @@ private _test_symbol_as_annotation() : boolean {
   }
 
   get_value_as_string(t: number) : string {
-    let index : number, ch : number, escaped, acceptComments : boolean, s : string = "";
+    let index : number;
+    let ch : number;
+    let escaped : number;
+    let acceptComments : boolean;
+    let s : string = "";
     switch (t) {
       case T_NULL:
       case T_BOOL:
@@ -1162,8 +1165,8 @@ private _test_symbol_as_annotation() : boolean {
         let tempIndex : number = entryIndex + 3;
         let ch: number = this._in.valueAt(tempIndex);
         tempIndex = this.indexWhiteSpace(tempIndex, acceptComments);
-        if (tempIndex + 2 <= end && this.verifyTriple(tempIndex)) {
-            return tempIndex + 4;
+        if (tempIndex + 2 <= end && this.verifyTriple(tempIndex)) {//index === ' index + 1 === ' index + 2 === ' and not at the end of the value
+            return tempIndex + 4;//indexes us past the triple quote we just found
         } else {
             return tempIndex;
         }
@@ -1349,7 +1352,7 @@ private _test_symbol_as_annotation() : boolean {
         this._read_to_newline();
         ch = IonText.WHITESPACE_COMMENT1;
       }
-      else if (ch == CH_AS)  {
+      else if (ch == CH_AS) {
         this._read_to_close_comment();
         ch = IonText.WHITESPACE_COMMENT2;
       }
