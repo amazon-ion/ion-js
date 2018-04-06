@@ -133,16 +133,19 @@ export class IonEventStream {
     equals(expected : IonEventStream) {
         let actualIndex : number = 0;
         let expectedIndex : number = 0;
-        for(; actualIndex < this.eventStream.length && expectedIndex < expected.eventStream.length; actualIndex++, expectedIndex++) {
+        while(actualIndex < this.eventStream.length && expectedIndex < expected.eventStream.length) {
             let actualEvent = this.eventStream[actualIndex];
             let expectedEvent = expected.eventStream[expectedIndex];
+            if(actualEvent.eventType === IonEventType.SYMBOL_TABLE) actualIndex++;
+            if(expectedEvent.eventType === IonEventType.SYMBOL_TABLE) expectedIndex++;
+            if(actualEvent.eventType === IonEventType.SYMBOL_TABLE || expectedEvent.eventType === IonEventType.SYMBOL_TABLE) continue;
             switch(actualEvent.eventType) {
                 case IonEventType.SCALAR : {
-                    if(!actualEvent.equals(expectedEvent)) return false;
+                    if (!actualEvent.equals(expectedEvent)) return false;
                     break;
                 }
                 case IonEventType.CONTAINER_START : {
-                    if(actualEvent.equals(expectedEvent)){
+                    if (actualEvent.equals(expectedEvent)) {
                         actualIndex = actualIndex + actualEvent.ionValue.length;
                         expectedIndex = expectedIndex + expectedEvent.ionValue.length;
                     } else {
@@ -150,22 +153,17 @@ export class IonEventStream {
                     }
                     break;
                 }
-                case IonEventType.SYMBOL_TABLE : {
-                    //no op for now
-                    break;
-                }
-                case IonEventType.CONTAINER_END : {
-                    //no op
-                    break;
-                }
+                case IonEventType.CONTAINER_END :
                 case IonEventType.STREAM_END : {
                     //no op
                     break;
                 }
                 default : {
-                    throw new Error("Unexpexted event type: " + actualEvent.eventType);
+                    throw new Error("Unexpected event type: " + actualEvent.eventType);
                 }
             }
+                actualIndex++;
+                expectedIndex++;
         }
         return true;
     }

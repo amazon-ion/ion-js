@@ -44,7 +44,7 @@ export interface IonEvent {
     writeIonValue(writer : Writer) : void;
 }
 
-abstract class AbsIonEvent implements IonEvent {
+abstract class AbstractIonEvent implements IonEvent {
     eventType: IonEventType;
     ionType: IonType;
     fieldName: string;
@@ -238,7 +238,7 @@ export class IonEventFactory {
     }
 }
 
-class IonNullEvent extends AbsIonEvent {
+class IonNullEvent extends AbstractIonEvent {
     constructor(eventType : IonEventType, ionType : IonType, fieldName : string, annotations : string[], depth : number){
         super(eventType , ionType, fieldName, annotations, depth, null);
 
@@ -251,7 +251,7 @@ class IonNullEvent extends AbsIonEvent {
     }
 }
 
-class IonIntEvent extends AbsIonEvent {
+class IonIntEvent extends AbstractIonEvent {
     constructor(eventType : IonEventType, ionType : IonType, fieldName : string, annotations : string[], depth : number, ionValue : number) {
         super(eventType , ionType, fieldName, annotations, depth, ionValue);
 
@@ -264,7 +264,7 @@ class IonIntEvent extends AbsIonEvent {
     }
 }
 
-class IonBoolEvent extends AbsIonEvent {
+class IonBoolEvent extends AbstractIonEvent {
     constructor(eventType : IonEventType, ionType : IonType, fieldName : string, annotations : string[], depth : number, ionValue : boolean) {
         super(eventType , ionType, fieldName, annotations, depth, ionValue);
 
@@ -277,7 +277,7 @@ class IonBoolEvent extends AbsIonEvent {
     }
 }
 
-class IonFloatEvent extends AbsIonEvent {
+class IonFloatEvent extends AbstractIonEvent {
     constructor(eventType : IonEventType, ionType : IonType, fieldName : string, annotations : string[], depth : number, ionValue : number){
         super(eventType , ionType, fieldName, annotations, depth, ionValue);
 
@@ -287,11 +287,11 @@ class IonFloatEvent extends AbsIonEvent {
         return expected.constructor.name === IonFloatEvent.name &&  this.ionValue === expected.ionValue;
     }
     writeIonValue(writer : Writer) : void {
-        writer.writeFloat32(this.ionValue);
+        writer.writeFloat64(this.ionValue);
     }
 }
 
-class IonDecimalEvent extends AbsIonEvent {
+class IonDecimalEvent extends AbstractIonEvent {
     constructor(eventType : IonEventType, ionType : IonType, fieldName : string, annotations : string[], depth : number, ionValue : Decimal){
         super(eventType , ionType, fieldName, annotations, depth, ionValue);
 
@@ -304,7 +304,7 @@ class IonDecimalEvent extends AbsIonEvent {
     }
 }
 
-class IonSymbolEvent extends AbsIonEvent {
+class IonSymbolEvent extends AbstractIonEvent {
     constructor(eventType : IonEventType, ionType : IonType, fieldName : string, annotations : string[], depth : number, ionValue : string){
         super(eventType , ionType, fieldName, annotations, depth, ionValue);
     }
@@ -318,7 +318,7 @@ class IonSymbolEvent extends AbsIonEvent {
 
 }
 
-class IonStringEvent extends AbsIonEvent {
+class IonStringEvent extends AbstractIonEvent {
     constructor(eventType : IonEventType, ionType : IonType, fieldName : string, annotations : string[], depth : number, ionValue : string){
         super(eventType , ionType, fieldName, annotations, depth, ionValue);
 
@@ -333,7 +333,7 @@ class IonStringEvent extends AbsIonEvent {
 
 }
 
-class IonTimestampEvent extends AbsIonEvent {
+class IonTimestampEvent extends AbstractIonEvent {
     constructor(eventType : IonEventType, ionType : IonType, fieldName : string, annotations : string[], depth : number, ionValue : Timestamp){
         super(eventType , ionType, fieldName, annotations, depth, ionValue);
 
@@ -347,7 +347,7 @@ class IonTimestampEvent extends AbsIonEvent {
     }
 }
 
-class IonBlobEvent extends AbsIonEvent {
+class IonBlobEvent extends AbstractIonEvent {
     constructor(eventType : IonEventType, ionType : IonType, fieldName : string, annotations : string[], depth : number, ionValue : Timestamp){
         super(eventType , ionType, fieldName, annotations, depth, ionValue);
     }
@@ -363,7 +363,7 @@ class IonBlobEvent extends AbsIonEvent {
     }
 }
 
-class IonClobEvent extends AbsIonEvent {
+class IonClobEvent extends AbstractIonEvent {
     constructor(eventType : IonEventType, ionType : IonType, fieldName : string, annotations : string[], depth : number, ionValue : Timestamp){
         super(eventType , ionType, fieldName, annotations, depth, ionValue);
     }
@@ -379,7 +379,7 @@ class IonClobEvent extends AbsIonEvent {
     }
 }
 
-abstract class AbsIonContainerEvent extends AbsIonEvent{
+abstract class AbsIonContainerEvent extends AbstractIonEvent{
 
     constructor(eventType : IonEventType, ionType : IonType, fieldName : string, annotations : string[], depth : number) {
         super(eventType , ionType, fieldName, annotations, depth, null);
@@ -406,7 +406,7 @@ class IonStructEvent extends AbsIonContainerEvent {//no embed support as of yet.
 
     //for each actual ionEvent, searches for an equivalent expected ionEvent,
     //equivalent pairings remove the paired expectedEvent from the search space.
-    structsEqual(actualEvents : AbsIonEvent[], expectedEvents : AbsIonEvent[]) : boolean {
+    structsEqual(actualEvents : AbstractIonEvent[], expectedEvents : AbstractIonEvent[]) : boolean {
         let matchFound : boolean = true;
         let paired : boolean[] = new Array<boolean>(expectedEvents.length);
         for(let i : number = 0; matchFound && i < actualEvents.length; i++) {
@@ -429,6 +429,7 @@ class IonListEvent extends AbsIonContainerEvent {
 
     }
     valueEquals(expected : IonListEvent) : boolean {
+        if(this.ionValue.length !== expected.ionValue.length) return false;
         for(let i : number = 0; i < this.ionValue.length; i++){
             if(!this.ionValue[i].equals(expected.ionValue[i])){
                 return false;
@@ -453,13 +454,13 @@ class IonSexpEvent extends AbsIonContainerEvent {
     }
 }
 
-class IonEndEvent extends AbsIonEvent {
+class IonEndEvent extends AbstractIonEvent {
     constructor(eventType : IonEventType, ionType : IonType, fieldName : string, annotations : string[], depth : number){
         super(eventType , ionType, fieldName, annotations, depth, undefined);
 
     }
     valueEquals(expected : IonEndEvent) {
-        return this.ionValue === expected.ionValue; //should be undefined === undefined if they are both end events.
+        return this.ionValue === expected.ionValue; //should be null === null if they are both end events.
     }
 
     writeIonValue(writer : Writer) : void {
