@@ -130,8 +130,6 @@ define(['intern', 'intern!object', 'intern/dojo/node!fs', 'intern/dojo/node!path
             'bad/annotationNested.10n',
             'bad/timestamp/timestampHourWithoutMinute.10n',
 
-
-
         ];
 
         // For debugging, put single files in this list to have the test run only
@@ -140,53 +138,35 @@ define(['intern', 'intern!object', 'intern/dojo/node!fs', 'intern/dojo/node!path
             //'good/sexps.ion'
         ];
 
-        let goodUnskipped = [];
-        for (let path of goodAccumulator) {
-            let spath = path.replace(/\\/g, "/");
-            let shouldSkip = false;
-            for (let skip of skipList) {
-                if (spath.endsWith(skip)) {
-                    shouldSkip = true;
-                    break;
-                }
-            }
-            if (debugList.length > 0) {
-                shouldSkip = true;
-                for (let debug of debugList) {
-                    if (spath.endsWith(debug)) {
-                        shouldSkip = false;
+        function filesToRead(accumulator, skiplist) {
+            unskipped = [];
+            for (let path of accumulator) {
+                let spath = path.replace(/\\/g, "/");
+                let shouldSkip = false;
+                for (let skip of skipList) {
+                    if (spath.endsWith(skip)) {
+                        shouldSkip = true;
                         break;
                     }
                 }
+                if (debugList.length > 0) {
+                    shouldSkip = true;
+                    for (let debug of debugList) {
+                        if (spath.endsWith(debug)) {
+                            shouldSkip = false;
+                            break;
+                        }
+                    }
+                }
+                if (!shouldSkip) {
+                    unskipped.push(path);
+                }
             }
-            if (!shouldSkip) {
-                goodUnskipped.push(path);
-            }
+            return unskipped;
         }
 
-        let badUnskipped = [];
-        for (let path of badAccumulator) {
-            let spath = path.replace(/\\/g, "/");
-            let shouldSkip = false;
-            for (let skip of skipList) {
-                if (spath.endsWith(skip)) {
-                    shouldSkip = true;
-                    break;
-                }
-            }
-            if (debugList.length > 0) {
-                shouldSkip = true;
-                for (let debug of debugList) {
-                    if (spath.endsWith(debug)) {
-                        shouldSkip = false;
-                        break;
-                    }
-                }
-            }
-            if (!shouldSkip) {
-                badUnskipped.push(path);
-            }
-        }
+        let goodUnskipped = filesToRead(goodAccumulator, skipList);
+        let badUnskipped = filesToRead(badAccumulator, skipList);
 
         let goodSuite = {
             name: 'Good tests'
@@ -198,11 +178,8 @@ define(['intern', 'intern!object', 'intern/dojo/node!fs', 'intern/dojo/node!path
         let eventStreamSuite = {
             name: 'EventStream tests'
         };
-        let badEventStreamSuite = {
-            name: 'Bad EventStream tests'
-        };
 
-        function goodExhaust(reader) {
+        function exhaust(reader) {
             for (;;) {
                 let next = reader.next();
                 if (typeof(next) === 'undefined') {
@@ -219,35 +196,15 @@ define(['intern', 'intern!object', 'intern/dojo/node!fs', 'intern/dojo/node!path
             }
         }
 
-        function badExhaust(reader) {
-            try {
-                for (;;) {
-                    let next = reader.next();
-                    if (typeof(next) === 'undefined') {
-                        if (reader.depth() > 0) {
-                            // End of container
-                            reader.stepOut();
-                        } else {
-                            // End of data
-                            break;
-                        }
-                    } else if (next.container && !reader.isNull()) {
-                        reader.stepIn();
-                    }
-                }
-            }catch(e){
-                return;
-            }
-            throw new Error("Bad test should have failed!");
+        function getInput(path){
+            let options = path.endsWith(".10n") ? null : "utf8";
+            return fs.readFileSync(path, options);
         }
-
 
         function makeGoodTest(path) {
             return function() {
                 let executor = function(resolve, reject) {
-                    let options = path.endsWith(".10n") ? null : "utf8";
-                    let input = fs.readFileSync(path, options);
-                    goodExhaust(ion.makeReader(input));
+                    exhaust(ion.makeReader(getInput(path)));
                     resolve();
                 };
 
@@ -258,9 +215,12 @@ define(['intern', 'intern!object', 'intern/dojo/node!fs', 'intern/dojo/node!path
         function makeBadTest(path) {
             return function() {
                 let executor = function(resolve, reject) {
-                    let options = path.endsWith(".10n") ? null : "utf8";
-                    let input = fs.readFileSync(path, options);
-                    badExhaust(ion.makeReader(input));
+                    try {
+                        exhaust(ion.makeReader(getInput(path)))
+                    }catch(e){
+                        return;
+                    }
+                    throw new Error("Bad test should have failed!");
                     resolve();
                 };
 
@@ -271,22 +231,7 @@ define(['intern', 'intern!object', 'intern/dojo/node!fs', 'intern/dojo/node!path
         function makeEventStreamTest(path) {
             return function() {
                 let executor = function(resolve, reject) {
-                    let options = path.endsWith(".10n") ? null : "utf8";
-                    let input = fs.readFileSync(path, options);
-                    roundTripEventStreams(ion.makeReader(input));
-                    resolve();
-                };
-
-                return new Promise(executor);
-            }
-        }
-
-        function makeBadEventStreamTest(path) {
-            return function() {
-                let executor = function(resolve, reject) {
-                    let options = path.endsWith(".10n") ? null : "utf8";
-                    let input = fs.readFileSync(path, options);
-                    roundTripBadEventStreams(ion.makeReader(input));
+                    roundTripEventStreams(ion.makeReader(getInput(path)));
                     resolve();
                 };
 
@@ -321,42 +266,16 @@ define(['intern', 'intern!object', 'intern/dojo/node!fs', 'intern/dojo/node!path
 
         }
 
-        function roundTripBadEventStreams(reader){
-            try {
-                let eventStream = new ion.IonEventStream(reader);
-                let writer = ion.makeTextWriter();
-                eventStream.writeEventStream(writer);
-                let buf = writer.getBytes();
-                let tempString = "";
-                for(let i = 0; i < buf.length; i++){
-                    tempString = tempString + String.fromCharCode(buf[i]);
-                }
-            }catch(e){
-                return;
-            }
-            throw new Error("Bad test should have failed!");
-
-
-        }
-
-        function uintToString(uintArray) {
-            let encodedString = String.fromCharCode.apply(null, uintArray),
-                decodedString = decodeURIComponent(escape(encodedString));
-            return decodedString;
-        }
-
         for (let file of goodUnskipped) {
             goodSuite[file] = makeGoodTest(file);
             eventStreamSuite[file] = makeEventStreamTest(file);
         }
         for (let file of badUnskipped) {
             badSuite[file] = makeBadTest(file);
-            badEventStreamSuite[file] = makeBadEventStreamTest(file);
         }
 
         registerSuite(goodSuite);
         //registerSuite(badSuite);
         registerSuite(eventStreamSuite);
-        //registerSuite(badEventStreamSuite);
     }
 );

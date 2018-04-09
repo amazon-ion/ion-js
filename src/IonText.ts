@@ -33,7 +33,7 @@ const _escapeStrings = {
 };
 
 function _make_bool_array(str: string) : boolean[] {
-  let i = str.length
+  let i = str.length;
   let a: boolean[] = [];
   a[128] = false;
   while (i > 0) {
