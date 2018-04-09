@@ -112,6 +112,13 @@ export class TextWriter implements Writer {
         });
     }
 
+
+    /*
+    Another way to handle this is simply to store the field name here, and actually write it in writeValue.
+    This is how the other implementations I know of handle it.
+    This allows you to move the comma-writing logic into handleSeparator, and might even enable you to get rid of currentContainer.state altogether.
+    I can't think of a reason why it HAS to be done that way right now, but if that feels cleaner to you, then consider it.
+     */
     writeFieldName(fieldName: string) : void {
         if (this.currentContainer.containerType !== TypeCodes.STRUCT) {
             throw new Error("Cannot write field name outside of a struct");
@@ -282,9 +289,9 @@ export class TextWriter implements Writer {
         }
     }
 
-    close() : void {
-        while (!this.isTopLevel) {
-            this.endContainer();
+    close() : void {//TODO clear out resources when writer uses more than a basic array/devs have built in IO support etc.
+        if(!this.isTopLevel) {
+            throw new Error("Writer was not at the top level, call closeContainer in the future.");
         }
     }
 
@@ -356,7 +363,7 @@ export class TextWriter implements Writer {
         }
     }
 
-    private get isTopLevel() : boolean {
+    get isTopLevel() : boolean {
         return this.depth() === 0;
     }
 

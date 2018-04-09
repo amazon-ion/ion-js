@@ -29,6 +29,9 @@
         var writeable = new ionTest.Writeable();
         var writer = new ionTextWriter.TextWriter(writeable);
         instructions(writer);
+        while(!writer.isTopLevel){
+            writer.endContainer();
+        }
         writer.close();
         var actual = writeable.getBytes();
         var errorMessage = String.fromCharCode.apply(null, actual) + " != " + expected;

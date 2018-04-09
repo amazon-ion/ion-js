@@ -33,5 +33,5 @@ export interface Reader {
   stringValue: () => string;
   timestampValue: () => Timestamp;
   value: () => any;
-  annotations: () => string[];
+  annotations: () => string[];//TODO implement symboltokens to replace string[] https://github.com/amzn/ion-js/issues/121
 }

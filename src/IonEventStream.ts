@@ -314,6 +314,7 @@ export class IonEventStream {
             case 'SYMBOL_TABLE' :
                 throw new Error('Symbol tables unsupported');
         }
+        //TODO add binary side back into the logic flow https://github.com/amzn/ion-js/issues/131
         return this.eventFactory.makeEvent(
             eventType,
             currentEvent.get('ion_type'),

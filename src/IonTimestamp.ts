@@ -348,10 +348,11 @@ export class Timestamp {
     return n;
   }
 
-  equals(expected : Timestamp) : boolean {
-    return this.getPrecision() === expected.getPrecision() && this.offset === expected.offset && this.instantEquals(expected);
+  equals(expected : Timestamp) : boolean {//TODO implement instant equals https://github.com/amzn/ion-js/issues/132
+    return this.getPrecision() === expected.getPrecision() && this.offset === expected.offset && this.dataModelEquals(expected);
   }
-  instantEquals(expected : Timestamp) : boolean {
+
+  dataModelEquals(expected : Timestamp) : boolean {
       switch (this.precision) {
           case Precision.NULL:
               return expected.precision === Precision.NULL;
@@ -377,8 +378,8 @@ export class Timestamp {
       default: throw { msg: "invalid value for timestamp precision", where: "IonValueSupport.timestamp.toString" };
       case Precision.NULL:
         return "null.timestamp";
-        case Precision.SECONDS:
-          //formats decimal to timestamp second, adds a leading 0 and/or cuts off the trailing period
+      case Precision.SECONDS:
+        //formats decimal to timestamp second, adds a leading 0 and/or cuts off the trailing period
         image = t.seconds.toString();
         if(image.charAt(1)  === '.') image = "0" + image;
         if(image.charAt(image.length - 1) === '.') image = image.slice(0, image.length - 1);
