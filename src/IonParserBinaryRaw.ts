@@ -15,7 +15,7 @@
 // IonParserBinaryRaw
 //
 // Handles parsing the Ion from a binary span.
-// Returns on any value with value type. The
+// Returns on any value with value type. The 
 //
 // members of ParserBinaryRaw:
 //    _in    = source span
@@ -42,7 +42,7 @@
 //    stringValue
 //    decimalValue
 //    timestampValue
-//    byteValue
+//    byteValue 
 
 import * as IonBinary from "./IonBinary";
 
@@ -52,7 +52,7 @@ import { IonTypes } from "./IonTypes";
 import { IVM } from "./IonConstants";
 import { LongInt } from "./IonLongInt";
 import { Precision } from "./IonPrecision";
-import { BinarySpan } from "./IonSpan";
+import { Span } from "./IonSpan";
 import { Timestamp } from "./IonTimestamp";
 
 const DEBUG_FLAG = true;
@@ -122,7 +122,7 @@ function decode_type_stack_len(ts) {
 }
 
 const VINT_SHIFT =    7;
-const VINT_MASK  = 0x7f;
+const VINT_MASK  = 0x7f; 
 const VINT_FLAG  = 0x80;
 
 function high_nibble(tb) {
@@ -139,7 +139,7 @@ const UNICODE_MAX_THREE_BYTE_SCALAR     = 0x0000FFFF; // 4 + 6+6    = 16 / 3 = 5
 const UNICODE_MAX_FOUR_BYTE_SCALAR      = 0x0010FFFF; // 3 + 6+6+6  = 21 / 4 = 5.25 bits per byte
 const UNICODE_THREE_BYTES_OR_FEWER_MASK = 0xFFFF0000; // if any bits under the f's are set the scalar is either 4 bytes long, or invalid (negative or too large)
 
-const UNICODE_ONE_BYTE_MASK             = 0x7F;       // 8-1 = 7 bits
+const UNICODE_ONE_BYTE_MASK             = 0x7F;       // 8-1 = 7 bits    
 const UNICODE_ONE_BYTE_HEADER           = 0x00;       // the high bit is off
 const UNICODE_TWO_BYTE_MASK             = 0x1F;       // 8-3 = 5 bits
 const UNICODE_TWO_BYTE_HEADER           = 0xC0;       // 8 + 4 = 12 = 0xC0
@@ -164,10 +164,10 @@ function utf8_is_multibyte_char(scalar : number) : boolean {
 }
 
 function utf8_length_from_first_byte(scalar: number) : number {
-  // shift the top 4 bits to the bottom
+  // shift the top 4 bits to the bottom 
   // these have all the valid alternatives for
   // the first byte of the UTF8 sequence
-  switch (scalar >> 4) {
+  switch (scalar >> 4) {  
     case  0: // 0000
     case  1: // 0001
     case  2: // 0010
@@ -192,7 +192,7 @@ function utf8_length_from_first_byte(scalar: number) : number {
   }
 }
 
-function read_utf8_tail(span: BinarySpan, c: number, len: number) : number {
+function read_utf8_tail(span: Span, c: number, len: number) : number {
   switch (len) {
     case 1:
         break;
@@ -217,7 +217,7 @@ function read_utf8_tail(span: BinarySpan, c: number, len: number) : number {
   return c;
 }
 
-function read_var_unsigned_int(span: BinarySpan) : number {
+function read_var_unsigned_int(span: Span) : number {
   var b, v;
 
   do {
@@ -230,7 +230,7 @@ function read_var_unsigned_int(span: BinarySpan) : number {
   return v;
 }
 
-function read_var_unsigned_int_past(span: BinarySpan, pos: number, limit: number) : number {
+function read_var_unsigned_int_past(span: Span, pos: number, limit: number) : number {
   var b, v;
 
   while (pos < limit) {
@@ -244,18 +244,18 @@ function read_var_unsigned_int_past(span: BinarySpan, pos: number, limit: number
   return v;
 }
 
-function read_var_signed_int(span: BinarySpan) : number {
-  var b,
-      v = 0,
+function read_var_signed_int(span: Span) : number { 
+  var b, 
+      v = 0, 
       shift = 6,      // the first byte has only 6 bits so if we shift it we shift 6 (7 after than)
       is_neg = false;
-
+  
   b = span.next();
   if ((b & 0x40) !== 0) {
     b = (b & (0x3f | 0x80));  // clears the sign bit
     is_neg = true;
   }
-
+  
   // shift in all but the last byte (we've already read the first)
   while ((b & 0x80) === 0) {
     v = (v << shift);
@@ -265,21 +265,21 @@ function read_var_signed_int(span: BinarySpan) : number {
   }
   // if we run off the end the bytes will all by EOF, so we can just check once
   if (b === EOF) undefined;
-
+  
   if (shift > 0) {
     v = (v << shift);
   }
   v = v | (b & 0x7f);
-
+  
   // now we put the sign on, if it's needed
   if (is_neg) v = - v;
-
+  
   return v;
 }
 
-function read_var_signed_longint(span: BinarySpan) : LongInt {
-  var b,
-      v = 0,
+function read_var_signed_longint(span: Span) : LongInt {
+  var b, 
+      v = 0, 
       bytes = [],
       dst = [],
       bit_count, byte_count,
@@ -287,13 +287,13 @@ function read_var_signed_longint(span: BinarySpan) : LongInt {
       dst_idx, src_idx,
       src_offset, dst_offset,
       is_neg = false;
-
+  
   b = span.next();
   if ((b & 0x40) !== 0) {
     b = (b & (0x3f | 0x80));  // clears the sign bit
     is_neg = true;
   }
-
+  
   // shift in all but the last byte (we've already read the first)
   while ((b & 0x80) === 0) {
     bytes.push(b & 0x7f);
@@ -302,21 +302,21 @@ function read_var_signed_longint(span: BinarySpan) : LongInt {
   // if we run off the end the bytes will all by EOF, so we can just check once
   if (b === EOF) return undefined;
   bytes.push(b & 0x7f);
-
+  
   // now we need to compress the bytes
   bit_count = 6 + (bytes.length - 1) * 7;
   byte_count = Math.floor((bit_count + 1) / 8) + 1;
-
+  
   dst_idx = byte_count - 1;
   src_idx = bytes.length - 1;
-
+  
   src_offset = 0;
   dst_offset = 0;
-
+  
   dst = [];
   dst[dst_idx] = 0;
   bits_to_copy = bit_count;
-
+  
   while (bits_to_copy > 0) {
     to_copy = 7 - src_offset;
     if (to_copy > bits_to_copy) to_copy = bits_to_copy;
@@ -344,12 +344,12 @@ function read_var_signed_longint(span: BinarySpan) : LongInt {
   return LongInt.fromBytes(bytes, is_neg ? -1 : 1);
 }
 
-function read_signed_int(span: BinarySpan, len: number) : number {
+function read_signed_int(span: Span, len: number) : number { 
   var v = 0, b, is_neg = false;
 
   // they have to tell us the length
   if (len < 1) return 0;
-
+  
   // the first byte get special treatment since it holds the sign
   b = span.next();
   len--; // we count the bytes as we read them
@@ -358,58 +358,58 @@ function read_signed_int(span: BinarySpan, len: number) : number {
     is_neg = true;
   }
   v = (b & 0xff);
-
+  
   // shift in all but the last byte (we've already read the first)
   while (len > 0) {
-    b = span.next();
+    b = span.next(); 
     len--;
     v = v << 8;
     v = v | (b & 0xff);
   }
-
+  
   // if we run off the end the bytes will all by EOF, so we can just check once
   if (b === EOF) return undefined;
 
   // now we put the sign on, if it's needed
   if (is_neg) v = - v;
-
+  
   return v;
 }
 
-function read_signed_longint(span: BinarySpan, len: number) : LongInt {
+function read_signed_longint(span: Span, len: number) : LongInt {
   var v = [], b, signum = 1;
 
   // they have to tell us the length
   if (len < 1) return LongInt.ZERO;
-
+  
   // shift in all but the last byte (we've already read the first)
   while (len > 0) {
-    b = span.next();
+    b = span.next(); 
     len--;
     v.push(b & 0xff);
   }
 
   // if we run off the end the bytes will all by EOF, so we can just check once
   if (b === EOF) undefined;
-
+  
   // check the sign
   if (v[0] & 0x80) {
     signum = -1;
     v[0] = v[0] & 0x7f; // remove the sign bit, we don't need it any longer
   }
-
+  
   return LongInt.fromBytes(v, signum);
 }
 
-function read_unsigned_int(span: BinarySpan, len: number) : number {
+function read_unsigned_int(span: Span, len: number) : number {
   var v = 0, b;
 
   // they have to tell us the length
   if (len < 1) return 0;
-
+  
   // shift in all but the last byte (we've already read the first)
   while (len > 0) {
-    b = span.next();
+    b = span.next(); 
     len--;
     v = v << 8;
     v = v | (b & 0xff);
@@ -417,48 +417,48 @@ function read_unsigned_int(span: BinarySpan, len: number) : number {
 
   // if we run off the end the bytes will all by EOF, so we can just check once
   if (b === EOF) undefined;
-
+  
   return v;
 }
 
-function read_unsigned_longint(span: BinarySpan, len: number, signum: number) : LongInt {
+function read_unsigned_longint(span: Span, len: number, signum: number) : LongInt {
   var v = [], b;
 
   // they have to tell us the length
   if (len < 1) throw new Error("no length supplied");
-
+  
   // shift in all but the last byte (we've already read the first)
   while (len > 0) {
-    b = span.next();
+    b = span.next(); 
     len--;
     v.push(b & 0xff);
   }
 
   // if we run off the end the bytes will all by EOF, so we can just check once
   if (b === EOF) return undefined;
-
+  
   return LongInt.fromBytes(v, signum);
 }
 
-function read_decimal_value(span: BinarySpan, len: number) : Decimal {
+function read_decimal_value(span: Span, len: number) : Decimal {
   var pos, digits, exp, d;
 
   // so it's a normal value
   pos = span.position();
   exp = read_var_signed_longint(span);
-
+  
   len = len - (span.position() - pos);
   digits = read_signed_longint(span, len);
-
+  
   d = new Decimal(digits, exp);
-
+  
   return d;
 }
 
-function read_timestamp_value(span: BinarySpan, len: number) : Timestamp {
+function read_timestamp_value(span: Span, len: number) : Timestamp {
   var v, pos, end,
-      precision, offset,
-      year, month, day,
+      precision, offset, 
+      year, month, day, 
       hour, minutes, seconds;
 
   if (len < 1) {
@@ -473,22 +473,22 @@ function read_timestamp_value(span: BinarySpan, len: number) : Timestamp {
       year = read_var_unsigned_int(span);
       precision = Precision.YEAR;
       if (span.position() >= end) break;
-
+      
       month = read_var_unsigned_int(span);
       precision = Precision.MONTH;
       if (span.position() >= end) break;
-
+      
       day = read_var_unsigned_int(span);
       precision = Precision.DAY;
       if (span.position() >= end) break;
-
+      
       hour = read_var_unsigned_int(span);
       precision = Precision.HOUR_AND_MINUTE;
       if (span.position() >= end) break;
-
+      
       minutes = read_var_unsigned_int(span);
       if (span.position() >= end) break;
-
+      
       seconds = read_var_unsigned_int(span);
       precision = Precision.SECONDS;
       if (span.position() >= end) break;
@@ -496,16 +496,16 @@ function read_timestamp_value(span: BinarySpan, len: number) : Timestamp {
       seconds += read_decimal_value(span, end - span.position());
       break;
     }
-  }
+  }   
   v = new Timestamp(precision, offset, year, month, day, hour, minutes, seconds);
   return v;
 }
 
 var from_char_code_fn = String.fromCharCode;
 
-function read_string_value(span: BinarySpan, len: number) : string {
+function read_string_value(span: Span, len: number) : string {
   var s, b, char_len, chars = [];
-
+  
   if (len < 1) return ""; // avoids an edge case failure in the apply below
 
   while (len > 0) {
@@ -543,7 +543,7 @@ export class ParserBinaryRaw {
   private buf_as_bytes = new Uint8Array(this.buf);    //        we could new them locally in normal_float_to_bytes
   private buf_as_double = new Float64Array(this.buf); //        but that seems wasteful. ... hmmm
 
-  private _in: BinarySpan;
+  private _in: Span;
   private _raw_type: number = EOF;
   private _len: number = -1;
   private _curr = undefined;
@@ -555,11 +555,11 @@ export class ParserBinaryRaw {
   private _ts = [ TB_DATAGRAM ];
   private _in_struct: boolean = false;
 
-  constructor(source: BinarySpan) {
+  constructor(source: Span) {
     this._in = source;
   }
 
-  private read_binary_float(span: BinarySpan, len: number) : Float64Array {
+  private read_binary_float(span: Span, len: number) : Float64Array {
     var ii;
     if (len === IonBinary.LEN_NULL) return undefined;
     if (len === 0) return ZERO_POINT_ZERO;
@@ -571,7 +571,7 @@ export class ParserBinaryRaw {
     return this.buf_as_double;
   }
 
-  private clear_value() : void {
+  private clear_value() : void { 
     this._raw_type = EOF;
     this._curr     = undefined;
     this._a        = empty_array;
@@ -591,8 +591,8 @@ export class ParserBinaryRaw {
         if (high_nibble(tb) === IonBinary.TB_STRUCT) {
           // special case of a struct with a length of 1 (which
           // is otherwise not possible since the minimum value
-          // length is 1 and struct fields have a field name as
-          // well so the min field length is 2 - 1 marks this as
+          // length is 1 and struct fields have a field name as 
+          // well so the min field length is 2 - 1 marks this as 
           // an ordered struct (fields are in fid order)
           t._len = read_var_unsigned_int(t._in);
         }
@@ -674,7 +674,7 @@ export class ParserBinaryRaw {
     let t: ParserBinaryRaw = this;
 
     var a, b, pos, limit, arr;
-    if ((pos = t._as) < 0) return;  // nothing to do,
+    if ((pos = t._as) < 0) return;  // nothing to do, 
     arr = [];
     limit = t._ae;
     a = 0;
@@ -703,7 +703,7 @@ export class ParserBinaryRaw {
       case IonBinary.TB_INT:
         if (t._len === 0) {
           c = 0;
-        }
+        } 
         else if (t._len < MAX_BYTES_FOR_INT_IN_NUMBER) {
           c = read_unsigned_int(t._in, t._len);
         }
@@ -714,7 +714,7 @@ export class ParserBinaryRaw {
       case IonBinary.TB_NEG_INT:
         if (t._len === 0) {
           c = 0;
-        }
+        } 
         else if (t._len < MAX_BYTES_FOR_INT_IN_NUMBER) {
           c = -read_unsigned_int(t._in, t._len);
         }
@@ -732,7 +732,7 @@ export class ParserBinaryRaw {
       case IonBinary.TB_DECIMAL:
         if (t._len === 0) {
           c = Decimal.ZERO;
-        }
+        } 
         else {
           c = read_decimal_value(t._in, t._len);
         }
@@ -787,7 +787,7 @@ export class ParserBinaryRaw {
     switch(t._raw_type) {
       case IonBinary.TB_STRUCT:
       case IonBinary.TB_LIST:
-      case IonBinary.TB_SEXP:
+      case IonBinary.TB_SEXP: 
         break;
       default:
         throw new Error("you can only 'stepIn' to a container");
@@ -811,12 +811,12 @@ export class ParserBinaryRaw {
     t._in_struct = (parent_type === IonBinary.TB_STRUCT);
     t.clear_value();
 
-    // check to see if there is any of the container left in the
+    // check to see if there is any of the container left in the 
     // input span and skip over it if there is
     r = t._in.getRemaining();
     t._in.skip(r);
-
-    // then reset what is remaining (remember we already
+    
+    // then reset what is remaining (remember we already 
     // subtracted out the length of the just finished container
     t._in.setRemaining(l);
   }
@@ -855,7 +855,7 @@ export class ParserBinaryRaw {
   }
 
   numberValue() : number {
-    var n = undefined,
+    var n = undefined, 
         t = this;
     if (!t.isNull()) {
       t.load_value();
@@ -869,7 +869,7 @@ export class ParserBinaryRaw {
         case IonBinary.TB_DECIMAL:
           n = t._curr.getNumber();
           break;
-        default:
+        default: 
           break; // return undefined or ION.error("can't convert to number");
       }
     }
@@ -890,7 +890,7 @@ export class ParserBinaryRaw {
       case IonBinary.TB_SYMBOL:
       case IonBinary.TB_STRING:
         break;
-      default:
+      default: 
         return s; // return undefined or ION.error("can't convert to number");
     }
     if (t.isNull()) {
@@ -933,7 +933,7 @@ export class ParserBinaryRaw {
   }
 
   decimalValue() : Decimal {
-    var n = undefined,
+    var n = undefined, 
         t = this;
     if (!t.isNull() && t._raw_type === IonBinary.TB_DECIMAL) {
       t.load_value();
@@ -943,7 +943,7 @@ export class ParserBinaryRaw {
   }
 
   timestampValue() : Timestamp {
-    var n = undefined,
+    var n = undefined, 
         t = this;
     if (!t.isNull() && t._raw_type === IonBinary.TB_TIMESTAMP) {
       t.load_value();
@@ -962,7 +962,7 @@ export class ParserBinaryRaw {
         t.load_value();
         bytes = t._curr;
         break;
-      default:
+      default: 
         break;
     }
     return bytes;

@@ -21,7 +21,7 @@
 import { Catalog } from "./IonCatalog";
 import { Decimal } from "./IonDecimal";
 import { defaultLocalSymbolTable } from "./IonLocalSymbolTable";
-import { getIonType } from "./IonParserTextRaw";
+import { get_ion_type } from "./IonParserTextRaw";
 import { getSystemSymbolTable } from "./IonSystemSymbolTable";
 import { ion_symbol_table } from "./IonSymbols";
 import { IonType } from "./IonType";
@@ -31,7 +31,7 @@ import { LocalSymbolTable } from "./IonLocalSymbolTable";
 import { makeSymbolTable } from "./IonSymbols";
 import { ParserTextRaw } from "./IonParserTextRaw";
 import { Reader } from "./IonReader";
-import { StringSpan } from "./IonSpan";
+import { Span } from "./IonSpan";
 import { Timestamp } from "./IonTimestamp";
 
 const RAW_STRING = new IonType( -1, "raw_input", true,  false, false, false );
@@ -50,12 +50,12 @@ export class TextReader implements Reader {
   private _raw_type: number;
   private _raw: any;
 
-  constructor(source: StringSpan, catalog: Catalog, raw_tokens: boolean) {
+  constructor(source: Span, catalog: Catalog) {
     if (!source) {
       throw new Error("a source Span is required to make a reader");
     }
 
-    this._parser   = new ParserTextRaw(source, raw_tokens);
+    this._parser   = new ParserTextRaw(source);
     this._depth    = 0;
     this._cat      = catalog;
     this._symtab   = defaultLocalSymbolTable();
@@ -73,12 +73,12 @@ export class TextReader implements Reader {
   }
 
   skip_past_container() {
-    var type,
+    var type, 
         d = 1,  // we want to have read the EOC tha matches the container we just saw
         p = this._parser;
     while (d > 0) {
       type = p.next();
-      if (type === EOF) { // end of container
+      if (type === undefined) { // end of container
         d--;
       }
       else if (type.container) {
@@ -121,9 +121,9 @@ export class TextReader implements Reader {
       }
     }
 
-    // for system value (IVM's and symbol table's) we continue
+    // for system value (IVM's and symbol table's) we continue 
     // around this
-    this._type = getIonType(this._raw_type);
+    this._type = get_ion_type(this._raw_type);
     return this._type;
   }
 
@@ -178,7 +178,7 @@ export class TextReader implements Reader {
       }
     }
     else if (t._type.scalar) {
-      // BLOB is a scalar by you don't want to just use the string
+      // BLOB is a scalar by you don't want to just use the string 
       // value otherwise all other scalars are fine as is
       if (t._type !== IonTypes.BLOB) {
         s = t._raw;
@@ -226,9 +226,5 @@ export class TextReader implements Reader {
 
   ionValue() {
     throw new Error("E_NOT_IMPL: ionValue");
-  }
-
-  raw_parser() : ParserTextRaw {
-    return this._parser;
   }
 }

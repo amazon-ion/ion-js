@@ -22,8 +22,8 @@
 
 # About 
 
-Ion-JS is a JavaScript library for [Ion](https://amzn.github.io/ion-docs/) -- this is currently alpha software and is subject to change. The library allows for reading/writing Ion 
-data from within JavaScript code. 
+Ion-JS is a Javascript library for [Ion](https://amzn.github.io/ion-docs/). The library allows for reading/writing Ion 
+data from within Javascript code. 
 
 For more information on Ion have a look at the [Ion Specification](https://amzn.github.io/ion-docs/spec.html) as well as some of the other Ion language specific libraries such as 
 
@@ -42,7 +42,7 @@ You can use ion-js either as a Node.js module or inside an html page.
     ```
     npm install --save-dev ion-js
     ```
-1. Use the library to read/write ion data. Here is an example that reads Ion data from a JavaScript string
+1. Use the library to read/write ion data. Here is an example that reads Ion data from a Javascript string
     ```javascript
     var ionJs = require("ion-js")
 

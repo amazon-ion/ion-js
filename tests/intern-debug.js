@@ -13,13 +13,12 @@
  */
 define({
   defaultTimeout: 2000, // ms
-  excludeInstrumentation: true, // disable code coverage for debugging
+  excludeInstrumentation: true, // disable codecoverate instrucmentation to allow debugging 
   filterErrorStack: true,
   suites: [
     'tests/unit/textNulls',
     'tests/unit/spans',
     'tests/unit/iontests',
-    'tests/unit/tokens',
     'tests/unit/IonCatalogTest',
     'tests/unit/IonImportTest',
     'tests/unit/IonLocalSymbolTableTest',
@@ -27,11 +26,10 @@ define({
     'tests/unit/IonWriteableTest',
     'tests/unit/IonTimestampTest',
     'tests/unit/IonTextTest',
-    'tests/unit/IonTextReaderTest',
     'tests/unit/IonTextWriterTest',
     'tests/unit/IonUnicodeTest',
     'tests/unit/IonLowLevelBinaryWriterTest',
     'tests/unit/IonBinaryWriterTest',
-    'tests/unit/IonBinaryTimestampTest'
-  ]
+    'tests/unit/IonBinaryTimestampTest',
+  ],
 });
