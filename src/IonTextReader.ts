@@ -108,7 +108,7 @@ export class TextReader implements Reader {
       if (this._depth > 0) break;
       if (this._raw_type === T_IDENTIFIER) {
         this.load_raw();
-        if (this._raw != IVM.text) break;
+        if (this._raw !== IVM.text) break;
         this._symtab = defaultLocalSymbolTable();
       }
       else if (this._raw_type === T_STRUCT) {
@@ -212,17 +212,48 @@ export class TextReader implements Reader {
     return this._parser.booleanValue();
   }
 
-  decimalValue() : Decimal {
-    throw new Error("E_NOT_IMPL: decimalValue");
-  }
+    decimalValue() : Decimal {
+        return Decimal.parse(this.stringValue());
+    }
 
-  timestampValue() : Timestamp {
-    throw new Error("E_NOT_IMPL: timestampValue");
-  }
+    timestampValue() : Timestamp {
+        return Timestamp.parse(this.stringValue());
+    }
 
-  value() : any {
-    throw new Error("E_NOT_IMPL: value");
-  }
+    value() {
+        switch(this._type) {
+            case IonTypes.BOOL : {
+                return this.booleanValue();
+            }
+            case IonTypes.INT : {
+                return this.numberValue();
+            }
+            case IonTypes.FLOAT : {
+                return this.numberValue();
+            }
+            case IonTypes.DECIMAL : {
+                return this.decimalValue();
+            }
+            case IonTypes.SYMBOL : {
+                return this.stringValue();
+            }
+            case IonTypes.STRING : {
+                return this.stringValue();
+            }
+            case IonTypes.TIMESTAMP : {
+                return this.timestampValue();
+            }
+            case IonTypes.CLOB : {
+                return this.stringValue();
+            }
+            case IonTypes.BLOB : {
+                return this.stringValue();
+            }
+            default : {
+                return undefined;
+            }
+        }
+    }
 
   ionValue() {
     throw new Error("E_NOT_IMPL: ionValue");

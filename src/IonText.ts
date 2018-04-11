@@ -33,7 +33,7 @@ const _escapeStrings = {
 };
 
 function _make_bool_array(str: string) : boolean[] {
-  let i = str.length
+  let i = str.length;
   let a: boolean[] = [];
   a[128] = false;
   while (i > 0) {
@@ -47,7 +47,7 @@ const _is_base64_char = _make_bool_array("+/0123456789abcdefghijklmnopqrstuvwxyz
 const _is_hex_digit = _make_bool_array("0123456789abcdefABCDEF");
 const _is_letter: boolean[] = _make_bool_array("_$abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ");
 const _is_letter_or_digit = _make_bool_array("_$0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ");
-const _is_numeric_terminator: boolean[] = _make_bool_array("{}[](),\"\'\ \t\n\r\u000c");
+const _is_numeric_terminator: boolean[] = _make_bool_array("{}[](),\"\'\ \t\n\r\v\u000c");
 const _is_operator_char = _make_bool_array("!#%&*+-./;<=>?@^`|~");
 const _is_whitespace = _make_bool_array(" \t\r\n\u000b\u000c");
 const isIdentifierArray: boolean[] = _make_bool_array("_$0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ");
@@ -319,7 +319,7 @@ CommonEscapes[CharCodes.HORIZONTAL_TAB] = backslashEscape('t');
 CommonEscapes[CharCodes.LINE_FEED] = backslashEscape('n');
 CommonEscapes[CharCodes.VERTICAL_TAB] = backslashEscape('v');
 CommonEscapes[CharCodes.FORM_FEED] = backslashEscape('f');
-CommonEscapes[CharCodes.CARRIAGE_RETURN] = backslashEscape['r'];
+CommonEscapes[CharCodes.CARRIAGE_RETURN] = backslashEscape('r');
 CommonEscapes[CharCodes.BACKSLASH] = backslashEscape('\\');
 
 export let StringEscapes : EscapeIndex = Object['assign']({}, CommonEscapes);

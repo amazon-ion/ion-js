@@ -26,7 +26,7 @@ export class LowLevelBinaryWriter {
 
   constructor(writeableOrLength: Writeable | number) {
     if (isNumber(writeableOrLength)) {
-      this.writeable = new Writeable(writeableOrLength, 0);
+      this.writeable = new Writeable();
     } else {
       this.writeable = <Writeable>writeableOrLength;
     }
