@@ -301,7 +301,7 @@ define(['intern', 'intern!object', 'intern/dojo/node!fs', 'intern/dojo/node!path
             badSuite[file] = makeBadTest(file);
         }
 
-        //registerSuite(goodSuite);
+        registerSuite(goodSuite);
         //registerSuite(badSuite);
         registerSuite(eventStreamSuite);
     }
