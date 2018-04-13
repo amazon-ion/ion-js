@@ -1317,7 +1317,7 @@ private _test_symbol_as_annotation() : boolean {
   }
 
     next(): number {
-        this._fieldname = null;
+        this.clearFieldName();
         this._ann = [];
         if (this._value_type === ERROR) {
             this._run();
