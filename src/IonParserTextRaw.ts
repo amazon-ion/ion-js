@@ -117,7 +117,7 @@ export function get_ion_type(t: number) : IonType {
     case T_TIMESTAMP:     return IonTypes.TIMESTAMP;
     case T_IDENTIFIER:    return IonTypes.SYMBOL;
     case T_OPERATOR:      return IonTypes.SYMBOL;
-    case T_STRING1:       return IonTypes.STRING;
+    case T_STRING1:       return IonTypes.SYMBOL;
     case T_STRING2:       return IonTypes.STRING;
     case T_STRING3:       return IonTypes.STRING;
     case T_CLOB2:         return IonTypes.CLOB;
