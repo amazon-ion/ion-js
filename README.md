@@ -45,7 +45,7 @@ is unsupported at this time.
 | float | yes      | no      |    underscores |
 | decimal | yes      | no      |    none |
 | timestamp | yes      | no      |    offsets/max values non spec-compliant |
-| string | yes      | no      |    values outside of ucs2, escapes between triplequotes |
+| string | yes      | no      |    values outside of ucs2, whitespace escapes between triplequotes |
 | symbol | yes      | no      |    sid0, no symboltokens |
 | blob | no      | no      |    broken |
 | clob | yes      | no      |    backed by string |
