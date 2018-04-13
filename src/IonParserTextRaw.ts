@@ -387,6 +387,10 @@ export class ParserTextRaw {
     }
   }
 
+  clearFieldName() : void {
+      this._fieldname = null;
+  }
+
   private _load_field_name() {
     var v = this._value_pop(),
         s = this.get_value_as_string(v);

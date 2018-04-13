@@ -156,7 +156,7 @@ define(['intern', 'intern!object', 'intern/dojo/node!fs', 'intern/dojo/node!path
             'good/nopPadInsideEmptyStructNonZeroSymbolId.10n',
             'good/nopPad16Bytes.10n',
             'good/emptyThreeByteNopPad.10n',
-            'good/equivs/nopPadEmptyStruct.10n',
+            'good/equivs/nopPadEmptyStruct.10n',//all binary files that are failing testing are automatically added to the skiplist.
 
         ];
 
