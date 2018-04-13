@@ -45,7 +45,7 @@ is unsupported at this time.
 |:-------------:|:-------------:|:-------------:|:-------------:|
 | null      | yes | no      | none |
 | bool      | yes      | no      |   none |
-| int | yes      | no      |    underscores, binaryints |
+| int | yes      | no      |    underscores, binaryints, bigints |
 | float | yes      | no      |    underscores |
 | decimal | yes      | no      |    none |
 | timestamp | yes      | no      |    offsets/max values non spec-compliant |
