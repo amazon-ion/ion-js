@@ -134,17 +134,18 @@ export class TextReader implements Reader {
     if (this.isNull()) {
       throw new Error("Can't step into a null container");
     }
+    this._parser.clearFieldName();
     this._raw_type = BEGINNING_OF_CONTAINER;
     this._depth++;
   }
 
   stepOut() {
-    var t = this;
-    while ( t._raw_type != EOF ) {
-      t.next();
+    this._parser.clearFieldName();
+    while ( this._raw_type != EOF ) {
+      this.next();
     }
-    t._raw_type = undefined;
-    t._depth--;
+    this._raw_type = undefined;
+    this._depth--;
   }
 
   valueType() : IonType {

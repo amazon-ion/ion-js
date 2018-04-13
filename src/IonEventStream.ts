@@ -49,7 +49,7 @@ export class IonEventStream {
         let tempEvent : IonEvent;
         for(let indice : number = 0; indice < this.eventStream.length; indice++){
             tempEvent = this.eventStream[indice];
-            if(tempEvent.fieldName !== undefined) {
+            if(tempEvent.fieldName !== null) {
                 writer.writeFieldName(tempEvent.fieldName);
             }
             switch(tempEvent.eventType){
@@ -193,7 +193,7 @@ export class IonEventStream {
                     }
                     case undefined : {
                         if (this.reader.depth() === 0) {
-                            this.eventStream.push(this.eventFactory.makeEvent(IonEventType.STREAM_END, IonTypes.NULL, undefined, this.reader.depth(), undefined, false,undefined));
+                            this.eventStream.push(this.eventFactory.makeEvent(IonEventType.STREAM_END, IonTypes.NULL, null, this.reader.depth(), undefined, false,undefined));
                             return;
                         } else {
                             this.reader.stepOut();
@@ -314,11 +314,12 @@ export class IonEventStream {
             case 'SYMBOL_TABLE' :
                 throw new Error('Symbol tables unsupported');
         }
+        let fieldname = (currentEvent.has('field_name') ? currentEvent.get('field_name') : null);
         //TODO add binary side back into the logic flow https://github.com/amzn/ion-js/issues/131
         return this.eventFactory.makeEvent(
             eventType,
             currentEvent.get('ion_type'),
-            currentEvent.get('field_name'),
+            fieldname,
             currentEvent.get('depth'),
             currentEvent.get('annotations'),
             currentEvent.get('isNull'),

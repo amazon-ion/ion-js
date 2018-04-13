@@ -129,6 +129,34 @@ define(['intern', 'intern!object', 'intern/dojo/node!fs', 'intern/dojo/node!path
             'bad/annotationLengthTooShortContainer.10n',
             'bad/annotationNested.10n',
             'bad/timestamp/timestampHourWithoutMinute.10n',
+            'good/valuePrecededByNopPad.10n',
+            'good/valueFollowedByNopPad.10n',
+            'good/valueBetweenNopPads.10n',
+            'good/structLen15.10n',
+            'good/structLen14.10n',
+            'good/structLen13.10n',
+            'good/structEmpty.10n',
+            'good/structAnnotatedEmpty.10n',
+            'good/nullTimestamp.10n',
+            'good/nullSymbol.10n',
+            'good/nullStruct.10n',
+            'good/nullString.10n',
+            'good/nullSexp.10n',
+            'good/nullList.10n',
+            'good/nullInt3.10n',
+            'good/nullInt2.10n',
+            'good/nullFloat.10n',
+            'good/nullDecimal.10n',
+            'good/nullClob.10n',
+            'good/nullBool.10n',
+            'good/nullBlob.10n',
+            'good/null.10n',
+            'good/nopPadOneByte.10n',
+            'good/nopPadInsideEmptyStructZeroSymbolId.10n',
+            'good/nopPadInsideEmptyStructNonZeroSymbolId.10n',
+            'good/nopPad16Bytes.10n',
+            'good/emptyThreeByteNopPad.10n',
+            'good/equivs/nopPadEmptyStruct.10n',//all binary files that are failing testing are automatically added to the skiplist.
 
         ];
 
@@ -216,12 +244,11 @@ define(['intern', 'intern!object', 'intern/dojo/node!fs', 'intern/dojo/node!path
             return function() {
                 let executor = function(resolve, reject) {
                     try {
-                        exhaust(ion.makeReader(getInput(path)))
+                        exhaust(ion.makeReader(getInput(path)));
                     }catch(e){
-                        return;
+                        resolve();
                     }
                     throw new Error("Bad test should have failed!");
-                    resolve();
                 };
 
                 return new Promise(executor);

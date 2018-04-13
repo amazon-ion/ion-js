@@ -236,6 +236,7 @@ export class ParserTextRaw {
     this._curr       = EOF;
     this._ann        = [];
     this._msg        = "";
+    this._fieldname  = null;
 
     let helpers: ReadValueHelpers = {
     //  -1 : this._read_value_helper_EOF,    //      == EOF
@@ -384,6 +385,10 @@ export class ParserTextRaw {
     else {
       this._error("expected ',' or '}'");
     }
+  }
+
+  clearFieldName() : void {
+      this._fieldname = null;
   }
 
   private _load_field_name() {
@@ -1312,6 +1317,7 @@ private _test_symbol_as_annotation() : boolean {
   }
 
     next(): number {
+        this.clearFieldName();
         this._ann = [];
         if (this._value_type === ERROR) {
             this._run();
