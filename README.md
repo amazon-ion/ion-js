@@ -31,6 +31,40 @@ For more information on Ion have a look at the [Ion Specification](https://amzn.
 * [Ion Java](https://github.com/amzn/ion-java)
 * [Ion Python](https://github.com/amzn/ion-python)
 
+# Master Specification Support
+The current release on master branch  <a title="npm-version" href="https://www.npmjs.com/package/ion-js"><img src="https://img.shields.io/npm/v/ion-js.svg"/></a> 
+is unsupported at this time.
+
+# Development Specification Support
+
+| Types        | IonText | IonBinary | Limitations  |
+|:-------------:|:-------------:|:-------------:|:-------------:|
+| null      | yes | no      | none |
+| bool      | yes      | no      |   none |
+| int | yes      | no      |    underscores, binaryints, bigints |
+| float | yes      | no      |    underscores |
+| decimal | yes      | no      |    none |
+| timestamp | yes      | no      |    offsets/max values non spec-compliant |
+| string | yes      | no      |    values outside of ucs2, whitespace escapes between triplequotes |
+| symbol | yes      | no      |    sid0, no symboltokens |
+| blob | no      | no      |    broken |
+| clob | yes      | no      |    backed by string |
+| struct | yes      | no      |    none |
+| list | yes      | no      |    none |
+| sexp | yes      | no      |    none |
+| annotations | yes      | no      |    none |
+| local symbol tables | no      | no      |    IVM corrupts the parser |
+| shared symbol tables | no      | no      |    not implemented |
+
+| Github Issues |
+|:-------------|
+| [SymbolTokens](https://github.com/amzn/ion-js/issues/121) |
+| [IVM](https://github.com/amzn/ion-js/issues/122) |
+| [Numbers](https://github.com/amzn/ion-js/issues/123) |
+| [Utf8/32/64](https://github.com/amzn/ion-js/issues/124) |
+| [Blobs](https://github.com/amzn/ion-js/issues/125) |
+| [Triplequotes](https://github.com/amzn/ion-js/issues/126) |
+| [Binary](https://github.com/amzn/ion-js/issues/131) |
 
 # Use
 
