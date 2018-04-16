@@ -148,7 +148,7 @@ function get_type_from_name(str: string) : number {
   if (str === "decimal")   return T_DECIMAL;
   if (str === "timestamp") return T_TIMESTAMP;
   if (str === "symbol")    return T_IDENTIFIER;
-  if (str === "string")    return T_STRING1;
+  if (str === "string")    return T_STRING2;
   if (str === "clob")      return T_CLOB2;
   if (str === "blob")      return T_BLOB;
   if (str === "sexp")      return T_SEXP;

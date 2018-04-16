@@ -307,7 +307,7 @@
 
     timestampTest('Writes year timestamp', '2017T', '2017T');
     timestampTest('Writes month timestamp', '2017-02T', '2017-02T');
-    timestampTest('Writes day timestamp', '2017-02-01', '2017-02-01');
+    timestampTest('Writes day timestamp', '2017-02-01', '2017-02-01T');
     timestampTest('Writes hour and minute timestamp', '2017-02-01T22:38', '2017-02-01T22:38Z');
     timestampTest('Writes whole second timestamp', '2017-02-01T22:38:43', '2017-02-01T22:38:43Z');
     timestampTest('Writes fractional second timestamp', '2017-02-01T22:38:43.125', '2017-02-01T22:38:43.125Z');
