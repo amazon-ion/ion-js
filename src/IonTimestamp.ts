@@ -387,7 +387,7 @@ export class Timestamp {
         image = _to_2_digits(t.minute) + (image ? ":" + image : "");
         image = _to_2_digits(t.hour) + (image ? ":" + image : "");
       case Precision.DAY:
-        image = _to_2_digits(t.day) + (image ? "T" + image : "");
+        image = _to_2_digits(t.day) + (image ? "T" + image : "T");
       case Precision.MONTH:
         image = _to_2_digits(t.month) + (image ? "-" + image : "");
       case Precision.YEAR:
