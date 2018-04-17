@@ -1009,6 +1009,14 @@ private _test_symbol_as_annotation() : boolean {
     }
   }
 
+    private isHighSurrogate(ch : number) : boolean{
+        return ch > 0xD800 && ch < 0xDBFF;
+    }
+
+    private isLowSurrogate(ch : number) : boolean{
+        return ch > 0xDC00 && ch < 0xDFFF;
+    }
+
   get_value_as_string(t: number) : string {
     let index : number;
     let ch : number;
@@ -1035,20 +1043,29 @@ private _test_symbol_as_annotation() : boolean {
       case T_STRING2:
           for (index = this._start; index < this._end; index++) {
               ch = this._in.valueAt(index);
+              //check for high or low surrogate,
+              // if high surrogate find low surrogate, if no low surrogate throw
+              // else if low surrogate throw
+              // else you got wholecodepoint
               if (ch == CH_BS) {
                   let codepoint : number = this._read_escape_sequence(index, this._end);
-                  if(codepoint > 0xFFFF) {
-                      s += String.fromCodePoint(codepoint);
-                      throw new Error("escape sequence is outside of javascript's support range for strings(OXFFFF)");
-                  } else {
-                      s += String.fromCharCode(codepoint);
-                  }
+                  s += String.fromCharCode(codepoint);
                   index += this._esc_len;
-              } else {
+              }else if(this.isHighSurrogate(ch)){//found high surrogate
+                  let tempChar = this._in.valueAt(index + 1);
+                  if(this.isLowSurrogate(tempChar)){
+                      s += String.fromCodePoint((<StringSpan>this._in).getCodePoint(index));
+                      index++;
+                  }else{
+                      throw new Error("illegal high surrogate" + ch);
+                  }
+              }else if(this.isLowSurrogate(ch)){//found low surrogate
+                  throw new Error("illegal low surrogate: " + ch);
+              }else{
                   s += String.fromCharCode(ch);
               }
-
           }
+
           break;
       case T_CLOB2:
         for (index = this._start; index < this._end; index++) {

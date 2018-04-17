@@ -164,6 +164,10 @@ export class StringSpan extends Span {
     return this._src.charCodeAt(ii);
   }
 
+  getCodePoint(index : number) : number {
+      return this._src.codePointAt(index);
+  }
+
   line_number() : number {
     return this._line;
   }
