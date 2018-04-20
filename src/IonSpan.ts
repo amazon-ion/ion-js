@@ -63,7 +63,7 @@ export abstract class Span {
 }
 
 export class StringSpan extends Span {
-  private _src : string;
+  _src : string;
   private _pos : number;
   private _start : number;
   private _limit : number;

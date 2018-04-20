@@ -208,7 +208,7 @@ type ReadValueHelper = (ch: number, accept_operator_symbols: boolean, calling_op
 type ReadValueHelpers = {[index: number]: ReadValueHelper};
 
 export class ParserTextRaw {
-  private _in: Span;
+  private _in: StringSpan;
   private _ops: any[];
   private _value_type: any;
   private _value_null: boolean;
@@ -225,7 +225,7 @@ export class ParserTextRaw {
 
   private readonly _read_value_helper_helpers: ReadValueHelpers;
 
-  constructor(source: Span) {
+  constructor(source: StringSpan) {
     this._in         = source; // should be a span
     this._ops        = [ this._read_datagram_values ];
     this._value_type = ERROR;
@@ -619,8 +619,7 @@ export class ParserTextRaw {
     if (IonText.is_numeric_terminator(ch)) {
       this._unread(ch);
       this._value_push( T_HEXINT );
-    }
-    else {
+    } else {
       this._error( "invalid character after number" );
     }
   }
@@ -990,13 +989,13 @@ private _test_symbol_as_annotation() : boolean {
         if (s == "+inf")      n = Number.POSITIVE_INFINITY;
         else if (s == "-inf") n = Number.NEGATIVE_INFINITY;
         else if (s == "nan")  n = Number.NaN;
-        else throw new Error("can't convert to number"); 
+        else throw new Error("can't convert to number");
         break;
       default:
         throw new Error("can't convert to number");
     }
     return n;
-  }
+}
 
   booleanValue() : boolean {
     let s: string = this.get_value_as_string(T_BOOL);
@@ -1017,7 +1016,7 @@ private _test_symbol_as_annotation() : boolean {
         return ch > 0xDC00 && ch < 0xDFFF;
     }
 
-  get_value_as_string(t: number) : string {
+    get_value_as_string(t: number) : string {
     let index : number;
     let ch : number;
     let escaped : number;
@@ -1043,10 +1042,6 @@ private _test_symbol_as_annotation() : boolean {
       case T_STRING2:
           for (index = this._start; index < this._end; index++) {
               ch = this._in.valueAt(index);
-              //check for high or low surrogate,
-              // if high surrogate find low surrogate, if no low surrogate throw
-              // else if low surrogate throw
-              // else you got wholecodepoint
               if (ch == CH_BS) {
                   let codepoint : number = this._read_escape_sequence(index, this._end);
                   s += String.fromCharCode(codepoint);
@@ -1067,6 +1062,32 @@ private _test_symbol_as_annotation() : boolean {
           }
 
           break;
+        case T_STRING3:
+            acceptComments = true;
+            for(index = this._start; index < this._end; index++) {
+                ch = this._in.valueAt(index);
+                switch (ch) {
+                    case CH_BS:
+                        escaped = this._read_escape_sequence(index, this._end);
+                        if(escaped >= 0){
+                            s += String.fromCharCode(escaped);
+                        }
+                        index += this._esc_len;
+                        break;
+                    case CH_SQ:
+                        if(this.verifyTriple(index)){
+                            index = this._skip_triple_quote_gap(index, this._end, acceptComments);
+                        } else {
+                            s += String.fromCharCode(ch);
+                        }
+                        break;
+
+                    default:
+                        s += String.fromCharCode(ch);
+                        break;
+                }
+            }
+            break;
       case T_CLOB2:
         for (index = this._start; index < this._end; index++) {
           ch = this._in.valueAt(index);
@@ -1104,32 +1125,6 @@ private _test_symbol_as_annotation() : boolean {
               }
           }
           break;
-      case T_STRING3:
-          acceptComments = true;
-          for(index = this._start; index < this._end; index++) {
-              ch = this._in.valueAt(index);
-              switch (ch) {
-                  case CH_BS:
-                      escaped = this._read_escape_sequence(index, this._end);
-                      if(escaped >= 0){
-                          s += String.fromCharCode(escaped);
-                      }
-                      index += this._esc_len;
-                      break;
-                  case CH_SQ:
-                      if(this.verifyTriple(index)){
-                          index = this._skip_triple_quote_gap(index, this._end, acceptComments);
-                      } else {
-                          s += String.fromCharCode(ch);
-                      }
-                      break;
-
-                  default:
-                      s += String.fromCharCode(ch);
-                      break;
-              }
-          }
-        break;
       default:
         this._error("can't get this value as a string");
         break;
