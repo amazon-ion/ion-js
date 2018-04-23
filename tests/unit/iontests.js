@@ -227,6 +227,8 @@ define(['intern', 'intern!object', 'intern/dojo/node!fs', 'intern/dojo/node!path
                     }
                 } else if (next.container && !reader.isNull()) {
                     reader.stepIn();
+                } else {
+                    reader.value();
                 }
             }
         }
@@ -308,8 +310,8 @@ define(['intern', 'intern!object', 'intern/dojo/node!fs', 'intern/dojo/node!path
             badSuite[file] = makeBadTest(file);
         }
 
-        registerSuite(goodSuite);
-        //registerSuite(badSuite);
-        registerSuite(eventStreamSuite);
+        //registerSuite(goodSuite);
+        registerSuite(badSuite);
+        //registerSuite(eventStreamSuite);
     }
 );

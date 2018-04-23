@@ -1019,9 +1019,7 @@ private _test_symbol_as_annotation() : boolean {
         return ch > 0xDC00 && ch < 0xDFFF;
     }
 
-    private
-
-    get_value_as_string(t: number) : string {
+    private get_value_as_string(t: number) : string {
     let index : number;
     let ch : number;
     let escaped : number;
