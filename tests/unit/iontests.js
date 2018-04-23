@@ -117,6 +117,7 @@ define(['intern', 'intern!object', 'intern/dojo/node!fs', 'intern/dojo/node!path
             'good/timestamp/timestamp2011-02.10n',
             'good/timestamp/timestamp2011.10n',
             'good/equivs/systemSymbols.ion',//IVM
+            'good/intBigSize512.ion', //IVM
             'bad/boolWithInvalidLength_2.10n',
             'bad/boolWithInvalidLength_1.10n',
             'bad/emptyAnnotatedInt.10n',

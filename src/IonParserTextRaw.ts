@@ -618,6 +618,7 @@ export class ParserTextRaw {
     }
     if (IonText.is_numeric_terminator(ch)) {
       this._unread(ch);
+      this._end = this._in.position();
       this._value_push( T_HEXINT );
     } else {
       this._error( "invalid character after number" );
@@ -982,8 +983,10 @@ private _test_symbol_as_annotation() : boolean {
     switch (this._curr) {
       case T_INT:
       case T_HEXINT:
+        n = parseInt(s);
+        break;
       case T_FLOAT:
-        n = Number(s);
+        n = parseFloat(s);
         break;
       case T_FLOAT_SPECIAL:
         if (s == "+inf")      n = Number.POSITIVE_INFINITY;
