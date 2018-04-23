@@ -1016,6 +1016,8 @@ private _test_symbol_as_annotation() : boolean {
         return ch > 0xDC00 && ch < 0xDFFF;
     }
 
+    private
+
     get_value_as_string(t: number) : string {
     let index : number;
     let ch : number;
@@ -1066,25 +1068,31 @@ private _test_symbol_as_annotation() : boolean {
             acceptComments = true;
             for(index = this._start; index < this._end; index++) {
                 ch = this._in.valueAt(index);
-                switch (ch) {
-                    case CH_BS:
-                        escaped = this._read_escape_sequence(index, this._end);
-                        if(escaped >= 0){
-                            s += String.fromCharCode(escaped);
-                        }
-                        index += this._esc_len;
-                        break;
-                    case CH_SQ:
-                        if(this.verifyTriple(index)){
-                            index = this._skip_triple_quote_gap(index, this._end, acceptComments);
-                        } else {
-                            s += String.fromCharCode(ch);
-                        }
-                        break;
-
-                    default:
+                if(ch === CH_BS) {
+                    escaped = this._read_escape_sequence(index, this._end);
+                    if (escaped >= 0) {
+                        s += String.fromCharCode(escaped);
+                    }
+                    index += this._esc_len;
+                } else if(ch === CH_SQ) {
+                    if (this.verifyTriple(index)) {
+                        index = this._skip_triple_quote_gap(index, this._end, acceptComments);
+                    } else {
                         s += String.fromCharCode(ch);
-                        break;
+                    }
+
+                } else if(this.isHighSurrogate(ch)) {
+                    let tempChar = this._in.valueAt(index + 1);
+                    if(this.isLowSurrogate(tempChar)){
+                        s += String.fromCodePoint((<StringSpan>this._in).getCodePoint(index));
+                        index++;
+                    } else {
+                        throw new Error("illegal high surrogate" + ch);
+                    }
+                } else if(this.isLowSurrogate(ch)) {//found low surrogate
+                    throw new Error("illegal low surrogate: " + ch);
+                } else {
+                    s += String.fromCharCode(ch);
                 }
             }
             break;
@@ -1103,23 +1111,22 @@ private _test_symbol_as_annotation() : boolean {
           acceptComments = false;
           for(index = this._start; index < this._end; index++) {
               ch = this._in.valueAt(index);
-              switch (ch) {
-                  case CH_BS:
-                      escaped = this.readClobEscapes(index, this._end);
-                      if(escaped >= 0){
-                          s += String.fromCharCode(escaped);
-                      }
-                      index += this._esc_len;
-                      break;
-                  case CH_SQ:
-                      if(this.verifyTriple(index)){
-                          index = this._skip_triple_quote_gap(index, this._end, acceptComments);
-                      } else {
-                          s += String.fromCharCode(ch);
-                      }
-                      break;
+              if(ch === CH_BS) {
+                  escaped = this.readClobEscapes(index, this._end);
+                  if (escaped >= 0) {
+                      s += String.fromCharCode(escaped);
+                  }
+                  index += this._esc_len;
+                  break;
+              }else if ( ch ===CH_SQ) {
+                  if (this.verifyTriple(index)) {
+                      index = this._skip_triple_quote_gap(index, this._end, acceptComments);
+                  } else {
+                      s += String.fromCharCode(ch);
+                  }
+                  break;
 
-                  default:
+              }else{
                       s += String.fromCharCode(ch);
                       break;
               }
