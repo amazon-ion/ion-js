@@ -1056,12 +1056,12 @@ private _test_symbol_as_annotation() : boolean {
                         if(this.isLowSurrogate(tempChar)){
                             s += ch + tempChar;
                             index++;
-                        }else{
+                        } else{
                             throw new Error("illegal high surrogate" + ch);
                         }
-                    }else if(this.isLowSurrogate(ch)){
+                    } else if(this.isLowSurrogate(ch)){
                         throw new Error("illegal low surrogate: " + ch);
-                    }else{
+                    } else{
                         s += String.fromCharCode(ch);
                     }
                 }
@@ -1085,10 +1085,10 @@ private _test_symbol_as_annotation() : boolean {
                         if(this.isLowSurrogate(tempChar)){
                             s += ch + tempChar;
                             index++;
-                        }else{
+                        } else{
                             throw new Error("illegal high surrogate" + ch);
                         }
-                    }else if(this.isLowSurrogate(ch)){
+                    } else if(this.isLowSurrogate(ch)){
                         throw new Error("illegal low surrogate: " + ch);
                     } else if(ch === CH_SQ) {
                         if (this.verifyTriple(index)) {
@@ -1124,14 +1124,14 @@ private _test_symbol_as_annotation() : boolean {
                         }
                         index += this._esc_len;
                         break;
-                    }else if ( ch ===CH_SQ) {
+                    } else if ( ch ===CH_SQ) {
                         if (this.verifyTriple(index)) {
                             index = this._skip_triple_quote_gap(index, this._end, acceptComments);
                         } else {
                             s += String.fromCharCode(ch);
                         }
                         break;
-                    }else{
+                    } else{
                         s += String.fromCharCode(ch);
                         break;
                     }
