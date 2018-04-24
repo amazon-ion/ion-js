@@ -982,8 +982,10 @@ private _test_symbol_as_annotation() : boolean {
     var n, s = this.get_value_as_string(this._curr);
     switch (this._curr) {
       case T_INT:
+        n = parseInt(s, 10);
+        break;
       case T_HEXINT:
-        n = parseInt(s);
+        n = parseInt(s, 16);
         break;
       case T_FLOAT:
         n = parseFloat(s);
@@ -1019,7 +1021,7 @@ private _test_symbol_as_annotation() : boolean {
         return ch > 0xDC00 && ch < 0xDFFF;
     }
 
-    private get_value_as_string(t: number) : string {
+    get_value_as_string(t: number) : string {
     let index : number;
     let ch : number;
     let escaped : number;
@@ -1055,10 +1057,10 @@ private _test_symbol_as_annotation() : boolean {
                       s += String.fromCodePoint((<StringSpan>this._in).getCodePoint(index));
                       index++;
                   }else{
-                      throw new Error("illegal high surrogate" + ch);
+                      throw new Error("Illegal high surrogate" + ch);
                   }
               }else if(this.isLowSurrogate(ch)){//found low surrogate
-                  throw new Error("illegal low surrogate: " + ch);
+                  throw new Error("Illegal low surrogate: " + ch);
               }else{
                   s += String.fromCharCode(ch);
               }
@@ -1083,15 +1085,16 @@ private _test_symbol_as_annotation() : boolean {
                     }
 
                 } else if(this.isHighSurrogate(ch)) {
+
                     let tempChar = this._in.valueAt(index + 1);
                     if(this.isLowSurrogate(tempChar)){
                         s += String.fromCodePoint((<StringSpan>this._in).getCodePoint(index));
                         index++;
                     } else {
-                        throw new Error("illegal high surrogate" + ch);
+                        throw new Error("Illegal high surrogate" + ch);
                     }
-                } else if(this.isLowSurrogate(ch)) {//found low surrogate
-                    throw new Error("illegal low surrogate: " + ch);
+                } else if(this.isLowSurrogate(ch)) {
+                    throw new Error("Illegal low surrogate: " + ch);
                 } else {
                     s += String.fromCharCode(ch);
                 }
