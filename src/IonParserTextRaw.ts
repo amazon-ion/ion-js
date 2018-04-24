@@ -1009,11 +1009,11 @@ private _test_symbol_as_annotation() : boolean {
   }
 
     private isHighSurrogate(ch : number) : boolean{
-        return ch > 0xD800 && ch < 0xDBFF;
+        return ch >= 0xD800 && ch <= 0xDBFF;
     }
 
     private isLowSurrogate(ch : number) : boolean{
-        return ch > 0xDC00 && ch < 0xDFFF;
+        return ch >= 0xDC00 && ch <= 0xDFFF;
     }
 
     get_value_as_string(t: number) : string {
