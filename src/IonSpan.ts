@@ -63,7 +63,7 @@ export abstract class Span {
 }
 
 export class StringSpan extends Span {
-  _src : string;
+  private _src : string;
   private _pos : number;
   private _start : number;
   private _limit : number;
@@ -85,6 +85,10 @@ export class StringSpan extends Span {
     this._start = this._pos;
     this._line_start = this._pos;
     this._old_line_start = 0;
+  }
+
+  viewSource() : string {
+      return this._src;
   }
 
   position() : number {
