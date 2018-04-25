@@ -15,7 +15,7 @@ import { BinaryReader } from "./IonBinaryReader";
 import { Catalog } from "./IonCatalog";
 import { IVM } from "./IonConstants";
 import { Reader } from "./IonReader";
-import { Span, makeSpan } from "./IonSpan";
+import { Span, makeSpan, StringSpan } from "./IonSpan";
 import { TextReader } from "./IonTextReader";
 import { InvalidArgumentError } from "./IonErrors";
 import { Writer } from "./IonWriter";
@@ -57,7 +57,7 @@ function makeBinaryReader(span: Span, options: Options) : BinaryReader {
   return new BinaryReader(span, options && options.catalog);
 }
 
-function makeTextReader(span: Span, options: Options) : TextReader {
+function makeTextReader(span: StringSpan, options: Options) : TextReader {
   return new TextReader(span, options && options.catalog);
 }
 
@@ -94,7 +94,7 @@ export function makeReader(buf: any, options: Options) : Reader {
                 : get_buf_type(inSpan);
   let reader: Reader = (stype === 'binary')
              ? makeBinaryReader(inSpan, options)
-             : makeTextReader(inSpan, options);
+             : makeTextReader(<StringSpan>inSpan, options);
   return reader;
 }
 

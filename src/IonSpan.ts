@@ -87,6 +87,10 @@ export class StringSpan extends Span {
     this._old_line_start = 0;
   }
 
+  viewSource() : string {
+      return this._src;
+  }
+
   position() : number {
     return this._pos - this._start;
   }
@@ -162,6 +166,10 @@ export class StringSpan extends Span {
   valueAt(ii: number) : number {
     if (ii < this._start || ii >= this._limit) return EOF;
     return this._src.charCodeAt(ii);
+  }
+
+  getCodePoint(index : number) : number {
+      return this._src.codePointAt(index);
   }
 
   line_number() : number {

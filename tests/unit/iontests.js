@@ -26,6 +26,9 @@ define(['intern', 'intern!object', 'intern/dojo/node!fs', 'intern/dojo/node!path
                     accumulator.push(path);
                 }
             }
+            for(let i = 0; i < accumulator.length; i++){
+                tempstr = fs.readFileSync(accumulator[i]);
+            }
         }
 
         let cwd = process.cwd();
@@ -57,8 +60,6 @@ define(['intern', 'intern!object', 'intern/dojo/node!fs', 'intern/dojo/node!path
             'good/symbolExplicitZero.10n',
             'good/symbolImplicitZero.10n',
             'good/testfile28.10n',
-            'good/equivs/utf8/stringU0001D11E.ion', //outside of javascripts supported range 0xffff
-            'good/equivs/utf8/stringUtf8.ion', //outside of javascripts supported range 0xffff
             'good/utf32.ion', //js is unable to handle values outside of usc2
             'good/utf16.ion', //js is unable to handle values outside of usc2
             'good/subfieldVarInt.ion', //IVM bug

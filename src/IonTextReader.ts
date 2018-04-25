@@ -31,7 +31,7 @@ import { LocalSymbolTable } from "./IonLocalSymbolTable";
 import { makeSymbolTable } from "./IonSymbols";
 import { ParserTextRaw } from "./IonParserTextRaw";
 import { Reader } from "./IonReader";
-import { Span } from "./IonSpan";
+import { StringSpan } from "./IonSpan";
 import { Timestamp } from "./IonTimestamp";
 
 const RAW_STRING = new IonType( -1, "raw_input", true,  false, false, false );
@@ -50,7 +50,7 @@ export class TextReader implements Reader {
   private _raw_type: number;
   private _raw: any;
 
-  constructor(source: Span, catalog: Catalog) {
+  constructor(source: StringSpan, catalog: Catalog) {
     if (!source) {
       throw new Error("a source Span is required to make a reader");
     }

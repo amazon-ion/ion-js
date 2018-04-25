@@ -208,7 +208,7 @@ type ReadValueHelper = (ch: number, accept_operator_symbols: boolean, calling_op
 type ReadValueHelpers = {[index: number]: ReadValueHelper};
 
 export class ParserTextRaw {
-  private _in: Span;
+  private _in: StringSpan;
   private _ops: any[];
   private _value_type: any;
   private _value_null: boolean;
@@ -225,7 +225,7 @@ export class ParserTextRaw {
 
   private readonly _read_value_helper_helpers: ReadValueHelpers;
 
-  constructor(source: Span) {
+  constructor(source: StringSpan) {
     this._in         = source; // should be a span
     this._ops        = [ this._read_datagram_values ];
     this._value_type = ERROR;
@@ -619,8 +619,7 @@ export class ParserTextRaw {
     if (IonText.is_numeric_terminator(ch)) {
       this._unread(ch);
       this._value_push( T_HEXINT );
-    }
-    else {
+    } else {
       this._error( "invalid character after number" );
     }
   }
@@ -990,13 +989,13 @@ private _test_symbol_as_annotation() : boolean {
         if (s == "+inf")      n = Number.POSITIVE_INFINITY;
         else if (s == "-inf") n = Number.NEGATIVE_INFINITY;
         else if (s == "nan")  n = Number.NaN;
-        else throw new Error("can't convert to number"); 
+        else throw new Error("can't convert to number");
         break;
       default:
         throw new Error("can't convert to number");
     }
     return n;
-  }
+}
 
   booleanValue() : boolean {
     let s: string = this.get_value_as_string(T_BOOL);
@@ -1009,116 +1008,141 @@ private _test_symbol_as_annotation() : boolean {
     }
   }
 
-  get_value_as_string(t: number) : string {
-    let index : number;
-    let ch : number;
-    let escaped : number;
-    let acceptComments : boolean;
-    let s : string = "";
-    switch (t) {
-      case T_NULL:
-      case T_BOOL:
-      case T_INT:
-      case T_HEXINT:
-      case T_FLOAT:
-      case T_FLOAT_SPECIAL:
-      case T_DECIMAL:
-      case T_TIMESTAMP:
-      case T_IDENTIFIER:
-      case T_OPERATOR:
-      case T_BLOB:
-        for (index = this._start; index < this._end; index++) {
-          s += String.fromCharCode(this._in.valueAt(index));
-        }
-        break;
-      case T_STRING1:
-      case T_STRING2:
-          for (index = this._start; index < this._end; index++) {
-              ch = this._in.valueAt(index);
-              if (ch == CH_BS) {
-                  let codepoint : number = this._read_escape_sequence(index, this._end);
-                  if(codepoint > 0xFFFF) {
-                      s += String.fromCodePoint(codepoint);
-                      throw new Error("escape sequence is outside of javascript's support range for strings(OXFFFF)");
-                  } else {
-                      s += String.fromCharCode(codepoint);
-                  }
-                  index += this._esc_len;
-              } else {
-                  s += String.fromCharCode(ch);
-              }
-
-          }
-          break;
-      case T_CLOB2:
-        for (index = this._start; index < this._end; index++) {
-          ch = this._in.valueAt(index);
-          if (ch == CH_BS) {
-              s += String.fromCharCode(this.readClobEscapes(index, this._end));
-              index += this._esc_len;
-          } else {
-            s += String.fromCharCode(ch);
-          }
-        }
-        break;
-      case T_CLOB3:
-          acceptComments = false;
-          for(index = this._start; index < this._end; index++) {
-              ch = this._in.valueAt(index);
-              switch (ch) {
-                  case CH_BS:
-                      escaped = this.readClobEscapes(index, this._end);
-                      if(escaped >= 0){
-                          s += String.fromCharCode(escaped);
-                      }
-                      index += this._esc_len;
-                      break;
-                  case CH_SQ:
-                      if(this.verifyTriple(index)){
-                          index = this._skip_triple_quote_gap(index, this._end, acceptComments);
-                      } else {
-                          s += String.fromCharCode(ch);
-                      }
-                      break;
-
-                  default:
-                      s += String.fromCharCode(ch);
-                      break;
-              }
-          }
-          break;
-      case T_STRING3:
-          acceptComments = true;
-          for(index = this._start; index < this._end; index++) {
-              ch = this._in.valueAt(index);
-              switch (ch) {
-                  case CH_BS:
-                      escaped = this._read_escape_sequence(index, this._end);
-                      if(escaped >= 0){
-                          s += String.fromCharCode(escaped);
-                      }
-                      index += this._esc_len;
-                      break;
-                  case CH_SQ:
-                      if(this.verifyTriple(index)){
-                          index = this._skip_triple_quote_gap(index, this._end, acceptComments);
-                      } else {
-                          s += String.fromCharCode(ch);
-                      }
-                      break;
-
-                  default:
-                      s += String.fromCharCode(ch);
-                      break;
-              }
-          }
-        break;
-      default:
-        this._error("can't get this value as a string");
-        break;
+    private isHighSurrogate(ch : number) : boolean{
+        return ch >= 0xD800 && ch <= 0xDBFF;
     }
-    return s;
-  }
+
+    private isLowSurrogate(ch : number) : boolean{
+        return ch >= 0xDC00 && ch <= 0xDFFF;
+    }
+
+    get_value_as_string(t: number) : string {
+        let index : number;
+        let ch : number;
+        let escaped : number;
+        let acceptComments : boolean;
+        let s : string = "";
+        switch (t) {
+            case T_NULL:
+            case T_BOOL:
+            case T_INT:
+            case T_HEXINT:
+            case T_FLOAT:
+            case T_FLOAT_SPECIAL:
+            case T_DECIMAL:
+            case T_TIMESTAMP:
+            case T_IDENTIFIER:
+            case T_OPERATOR:
+            case T_BLOB:
+                for (index = this._start; index < this._end; index++) {
+                    s += String.fromCharCode(this._in.valueAt(index));
+                }
+                break;
+            case T_STRING1:
+            case T_STRING2:
+                for (index = this._start; index < this._end; index++) {
+                    ch = this._in.valueAt(index);
+                    if (ch == CH_BS) {
+                        ch = this._read_escape_sequence(index, this._end);
+                        index += this._esc_len;
+                    }
+                    if(this.isHighSurrogate(ch)){
+                        index++;
+                        let tempChar = this._in.valueAt(index);
+                        if (tempChar == CH_BS) {
+                            tempChar = this._read_escape_sequence(index, this._end);
+                            index += this._esc_len;
+                        }
+                        if(this.isLowSurrogate(tempChar)){
+                            s += ch + tempChar;
+                            index++;
+                        } else{
+                            throw new Error("illegal high surrogate" + ch);
+                        }
+                    } else if(this.isLowSurrogate(ch)){
+                        throw new Error("illegal low surrogate: " + ch);
+                    } else{
+                        s += String.fromCharCode(ch);
+                    }
+                }
+
+                break;
+            case T_STRING3:
+                acceptComments = true;
+                for(index = this._start; index < this._end; index++) {
+                    ch = this._in.valueAt(index);
+                    if (ch == CH_BS) {
+                        ch = this._read_escape_sequence(index, this._end);
+                        index += this._esc_len;
+                    }
+                    if(this.isHighSurrogate(ch)){
+                        index++;
+                        let tempChar = this._in.valueAt(index);
+                        if (tempChar == CH_BS) {
+                            tempChar = this._read_escape_sequence(index, this._end);
+                            index += this._esc_len;
+                        }
+                        if(this.isLowSurrogate(tempChar)){
+                            s += ch + tempChar;
+                            index++;
+                        } else{
+                            throw new Error("illegal high surrogate" + ch);
+                        }
+                    } else if(this.isLowSurrogate(ch)){
+                        throw new Error("illegal low surrogate: " + ch);
+                    } else if(ch === CH_SQ) {
+                        if (this.verifyTriple(index)) {
+                            index = this._skip_triple_quote_gap(index, this._end, acceptComments);
+                        } else {
+                            s += String.fromCharCode(ch);
+                        }
+                    } else {
+                        s += String.fromCharCode(ch);
+                    }
+                }
+                break;
+
+            case T_CLOB2:
+                for (index = this._start; index < this._end; index++) {
+                    ch = this._in.valueAt(index);
+                    if (ch == CH_BS) {
+                        s += String.fromCharCode(this.readClobEscapes(index, this._end));
+                    index += this._esc_len;
+                    } else {
+                        s += String.fromCharCode(ch);
+                    }
+                }
+                break;
+            case T_CLOB3:
+                acceptComments = false;
+                for(index = this._start; index < this._end; index++) {
+                    ch = this._in.valueAt(index);
+                    if(ch === CH_BS) {
+                        escaped = this.readClobEscapes(index, this._end);
+                        if (escaped >= 0) {
+                            s += String.fromCharCode(escaped);
+                        }
+                        index += this._esc_len;
+                        break;
+                    } else if ( ch ===CH_SQ) {
+                        if (this.verifyTriple(index)) {
+                            index = this._skip_triple_quote_gap(index, this._end, acceptComments);
+                        } else {
+                            s += String.fromCharCode(ch);
+                        }
+                        break;
+                    } else{
+                        s += String.fromCharCode(ch);
+                        break;
+                    }
+                }
+                break;
+            default:
+                this._error("can't get this value as a string");
+                break;
+            }
+        return s;
+    }
 
   private indexWhiteSpace(index : number, acceptComments : boolean) : number {
       let ch : number = this._in.valueAt(index);
