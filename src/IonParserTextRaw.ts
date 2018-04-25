@@ -618,6 +618,7 @@ export class ParserTextRaw {
     }
     if (IonText.is_numeric_terminator(ch)) {
       this._unread(ch);
+      this._end = this._in.position();
       this._value_push( T_HEXINT );
     } else {
       this._error( "invalid character after number" );
@@ -981,9 +982,13 @@ private _test_symbol_as_annotation() : boolean {
     var n, s = this.get_value_as_string(this._curr);
     switch (this._curr) {
       case T_INT:
+        n = parseInt(s, 10);
+        break;
       case T_HEXINT:
+        n = parseInt(s, 16);
+        break;
       case T_FLOAT:
-        n = Number(s);
+        n = parseFloat(s);
         break;
       case T_FLOAT_SPECIAL:
         if (s == "+inf")      n = Number.POSITIVE_INFINITY;
@@ -1017,6 +1022,7 @@ private _test_symbol_as_annotation() : boolean {
     }
 
     get_value_as_string(t: number) : string {
+
         let index : number;
         let ch : number;
         let escaped : number;
@@ -1065,7 +1071,6 @@ private _test_symbol_as_annotation() : boolean {
                         s += String.fromCharCode(ch);
                     }
                 }
-
                 break;
             case T_STRING3:
                 acceptComments = true;
@@ -1101,7 +1106,6 @@ private _test_symbol_as_annotation() : boolean {
                     }
                 }
                 break;
-
             case T_CLOB2:
                 for (index = this._start; index < this._end; index++) {
                     ch = this._in.valueAt(index);
