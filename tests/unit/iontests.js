@@ -14,10 +14,6 @@
 define(['intern', 'intern!object', 'intern/dojo/node!fs', 'intern/dojo/node!path', 'dist/amd/es6/IonTests'],
     function(intern, registerSuite, fs, paths, ion) {
 
-        async function readFiles(accumulator){
-
-        }
-
         function findFiles(folder, accumulator) {
             let files = fs.readdirSync(folder);
             while (files.length > 0) {
@@ -33,7 +29,6 @@ define(['intern', 'intern!object', 'intern/dojo/node!fs', 'intern/dojo/node!path
             for(let i = 0; i < accumulator.length; i++){
                 tempstr = fs.readFileSync(accumulator[i]);
             }
-            readFiles(accumulator);
         }
 
         let cwd = process.cwd();
