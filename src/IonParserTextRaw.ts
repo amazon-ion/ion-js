@@ -52,13 +52,13 @@ const CH_NL =  10; // '\n'
 const CH_BS =  92; // '\\'
 const CH_FORWARD_SLASH = "/".charCodeAt(0); // 47
 const CH_AS =  42; // '*'
-const CH_SQ =  39; // '\'' 
+const CH_SQ =  39; // '\''
 const CH_DOUBLE_QUOTE = "\"".charCodeAt(0); // 34
 const CH_CM =  44; // ';'
 const CH_OP =  40; // '('
 const CH_CP =  41; // ')'
 const CH_LEFT_CURLY: number = "{".charCodeAt(0); // 123
-const CH_CC = 125; // '}' 
+const CH_CC = 125; // '}'
 const CH_OS =  91; // '['
 const CH_CS =  93; // ']'
 const CH_CL =  58; // ':'
@@ -162,7 +162,7 @@ function is_keyword(str: string) : boolean {
 }
 
 function get_hex_value(ch: number) : number {
-  switch(ch) { // quick and dirty - we need a better impl TODO 
+  switch(ch) { // quick and dirty - we need a better impl TODO
     case  48: return  0; // '0'
     case  49: return  1; // '1'
     case  50: return  2; // '2'
@@ -243,7 +243,7 @@ export class ParserTextRaw {
         40 : this._read_value_helper_paren,  // '('  == CH_OP
         91 : this._read_value_helper_square, // '['  == CH_OS
        123 : this._read_value_helper_curly, // '{'  == CH_LEFT_CURLY
-        43 : this._read_value_helper_plus,   // '+'  == CH_PS // we'll have to patch these two back in after 
+        43 : this._read_value_helper_plus,   // '+'  == CH_PS // we'll have to patch these two back in after
         45 : this._read_value_helper_minus,  // '-'  == CH_MS // we apply the operator characters fn
         39 : this._read_value_helper_single, // '\'' == CH_SQ
         34 : this._read_value_helper_double, // '\"' == CH_DQ
@@ -313,7 +313,7 @@ export class ParserTextRaw {
   }
 
   private _read_struct_values() {
-    var op = this._done_with_error, 
+    var op = this._done_with_error,
         ch = this._read_after_whitespace(true);
 
     switch (ch) {
@@ -329,7 +329,7 @@ export class ParserTextRaw {
       case CH_CC :
         this._value_push( EOF );
         return;
-      default : 
+      default :
         if (IonText.is_letter(ch)) {
           op = this._read_symbol;
         }
@@ -463,10 +463,10 @@ export class ParserTextRaw {
         this._ops.unshift( this._read_blob );
       }
     }
-    else { 
+    else {
       this._unread( ch2 );
       this._value_push( T_STRUCT );
-      this._ops.unshift( this._read_struct_values ) 
+      this._ops.unshift( this._read_struct_values )
     }
   }
 
@@ -633,7 +633,7 @@ export class ParserTextRaw {
     ch = this._read_required_digits(ch);
     return ch;
   }
- 
+
   private _read_plus_inf() {
     this._start = this._in.position();
     if (this._read() == CH_PS) {
@@ -665,7 +665,7 @@ export class ParserTextRaw {
     }
     if (IonText.is_numeric_terminator( this._peek() )) {
       this._end = this._in.position();
-      this._value_push( T_FLOAT_SPECIAL ); 
+      this._value_push( T_FLOAT_SPECIAL );
     }
     else {
       this._error( "invalid numeric terminator after 'inf'" );
@@ -686,7 +686,7 @@ export class ParserTextRaw {
       }
       ch = this._read_optional_time(ch);  // no time unless you at least include month - TODO really !?
     }
-    ch = this._read_optional_time_offset(ch); // we only allow an offset 
+    ch = this._read_optional_time_offset(ch); // we only allow an offset
     if (IonText.is_numeric_terminator(ch)) {
       this._unread(ch);
       this._end = this._in.position();
@@ -727,7 +727,7 @@ export class ParserTextRaw {
 
   private _read_symbol() : void {
     var ch;
-    this._start = this._in.position() - 1;  
+    this._start = this._in.position() - 1;
     for(;;) {
       ch = this._read();
       if (!IonText.is_letter_or_digit(ch)) break;
@@ -1111,9 +1111,11 @@ private _test_symbol_as_annotation() : boolean {
                     ch = this._in.valueAt(index);
                     if (ch == CH_BS) {
                         s += String.fromCharCode(this.readClobEscapes(index, this._end));
-                    index += this._esc_len;
-                    } else {
+                        index += this._esc_len;
+                    } else if (ch < 128){
                         s += String.fromCharCode(ch);
+                    } else {
+                        throw new Error("Non-Ascii values illegal within clob.");
                     }
                 }
                 break;
@@ -1127,17 +1129,16 @@ private _test_symbol_as_annotation() : boolean {
                             s += String.fromCharCode(escaped);
                         }
                         index += this._esc_len;
-                        break;
-                    } else if ( ch ===CH_SQ) {
+                    } else if ( ch === CH_SQ) {
                         if (this.verifyTriple(index)) {
                             index = this._skip_triple_quote_gap(index, this._end, acceptComments);
                         } else {
                             s += String.fromCharCode(ch);
                         }
-                        break;
-                    } else{
+                    } else if (ch < 128){
                         s += String.fromCharCode(ch);
-                        break;
+                    } else {
+                        throw new Error("Non-Ascii values illegal within clob.");
                     }
                 }
                 break;
@@ -1257,7 +1258,7 @@ private _test_symbol_as_annotation() : boolean {
                 this._esc_len = 3;
                 break;
             default:
-                return ch;
+                throw new Error("Invalid escape: /" + ch);
         }
         return ch;
     }

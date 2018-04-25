@@ -41,27 +41,9 @@ define(['intern', 'intern!object', 'intern/dojo/node!fs', 'intern/dojo/node!path
         findFiles(ionBadTestsPath, badAccumulator);
 
         let skipList = [
-            'bad/timestamp/timestampLenTooLarge.10n',
-            'bad/decimalLenTooLarge.10n',
-            'bad/decimalLenCauses64BitOverflow.10n',
-            'bad/decimalExpTooLarge.10n',
-            'good/clobWithDel.10n',
-            'good/clobWithNonAsciiCharacter.10n',
-            'good/clobWithNullCharacter.10n',
-            'good/decimalNegativeOneDotZero.10n',
-            'good/decimalNegativeZeroDot.10n',
-            'good/decimalNegativeZeroDotZero.10n',
-            'good/decimalOneDotZero.10n',
-            'good/equivs/timestampFractions.10n',
-            'good/intBigSize1201.10n',
-            'good/intBigSize256.10n',
-            'good/item1.10n',
             'good/non-equivs/blobs.ion',
-            'good/symbolExplicitZero.10n',
-            'good/symbolImplicitZero.10n',
-            'good/testfile28.10n',
-            'good/utf32.ion', //js is unable to handle values outside of usc2
-            'good/utf16.ion', //js is unable to handle values outside of usc2
+            'good/utf32.ion', //testing not configured to decode raw utf32
+            'good/utf16.ion', //testing not configured to decode raw utf16
             'good/subfieldVarInt.ion', //IVM bug
             'good/subfieldInt.ion', //IVM bug
             'good/nonNulls.ion', //blobs bug
@@ -91,74 +73,8 @@ define(['intern', 'intern!object', 'intern/dojo/node!fs', 'intern/dojo/node!path
             'good/equivs/bigInts.ion', //numbers unsupported by js's int or float are unsupported
             'good/equivs/strings.ion', //triplequote interaction with span and whitespace corrupts the state of the parser.
             'good/timestamp/timestamps.ion', //timestamp is not spec compliant.
-            'good/decimalZeroDot.10n', //binary',
-            'good/equivs/paddedInts.10n', //binary
-            'good/equivs/nopPadNonEmptyStruct.10n',
-            'good/equivs/paddedInts.10n',
-            'good/equivs/timestampSuperfluousOffset.10n',
-            'good/intBigSize13.10n',
-            'good/intBigSize14.10n',
-            'good/intBigSize16.10n',
-            'good/intLongMaxValuePlusOne.10n',
-            'good/intLongMinValue.10n',
-            'good/nopPadInsideStructWithNopPadThenValueNonZeroSymbolId.10n',
-            'good/nopPadInsideStructWithNopPadThenValueZeroSymbolId.10n',
-            'good/nopPadInsideStructWithValueThenNopPad.10n',
-            'good/structAnnotatedOrdered.10n',
-            'good/structOrdered.10n',
-            'good/structUnordered.10n',
-            'good/timestamp/timestamp2011-02-20.10n',
-            'good/timestamp/timestamp2011-02-20T19_30_59_100-08_00.10n',
-            'good/timestamp/timestamp2011-02.10n',
-            'good/timestamp/timestamp2011.10n',
             'good/equivs/systemSymbols.ion',//IVM
             'good/intBigSize512.ion', //IVM
-            'bad/boolWithInvalidLength_2.10n',
-            'bad/boolWithInvalidLength_1.10n',
-            'bad/emptyAnnotatedInt.10n',
-            'bad/listWithValueLargerThanSize.10n',
-            'bad/localSymbolTableWithMultipleSymbolsFields.10n',
-            'bad/minLongWithLenTooLarge.10n',
-            'bad/minLongWithLenTooSmall.10n',
-            'bad/negativeIntZero.10n',
-            'bad/negativeIntZeroLn.10n',
-            'bad/nopPadTooShort.10n',
-            'bad/nopPadWithAnnotations.10n',
-            'bad/stringLenTooLarge.10n',
-            'bad/stringWithLatinEncoding.10n',
-            'bad/structOrderedEmpty.10n',
-            'bad/annotationLengthTooShortScalar.10n',
-            'bad/annotationLengthTooShortContainer.10n',
-            'bad/annotationNested.10n',
-            'bad/timestamp/timestampHourWithoutMinute.10n',
-            'good/valuePrecededByNopPad.10n',
-            'good/valueFollowedByNopPad.10n',
-            'good/valueBetweenNopPads.10n',
-            'good/structLen15.10n',
-            'good/structLen14.10n',
-            'good/structLen13.10n',
-            'good/structEmpty.10n',
-            'good/structAnnotatedEmpty.10n',
-            'good/nullTimestamp.10n',
-            'good/nullSymbol.10n',
-            'good/nullStruct.10n',
-            'good/nullString.10n',
-            'good/nullSexp.10n',
-            'good/nullList.10n',
-            'good/nullInt3.10n',
-            'good/nullInt2.10n',
-            'good/nullFloat.10n',
-            'good/nullDecimal.10n',
-            'good/nullClob.10n',
-            'good/nullBool.10n',
-            'good/nullBlob.10n',
-            'good/null.10n',
-            'good/nopPadOneByte.10n',
-            'good/nopPadInsideEmptyStructZeroSymbolId.10n',
-            'good/nopPadInsideEmptyStructNonZeroSymbolId.10n',
-            'good/nopPad16Bytes.10n',
-            'good/emptyThreeByteNopPad.10n',
-            'good/equivs/nopPadEmptyStruct.10n',//all binary files that are failing testing are automatically added to the skiplist.
 
         ];
 
@@ -298,15 +214,19 @@ define(['intern', 'intern!object', 'intern/dojo/node!fs', 'intern/dojo/node!path
         }
 
         for (let file of goodUnskipped) {
-            goodSuite[file] = makeGoodTest(file);
-            eventStreamSuite[file] = makeEventStreamTest(file);
+            if (file.endsWith(".ion")) {
+                goodSuite[file] = makeGoodTest(file);
+                eventStreamSuite[file] = makeEventStreamTest(file);
+            }
         }
         for (let file of badUnskipped) {
-            badSuite[file] = makeBadTest(file);
+            if (file.endsWith(".ion")) {
+                badSuite[file] = makeBadTest(file);
+            }
         }
 
-        //registerSuite(goodSuite);
-        registerSuite(badSuite);
-        //registerSuite(eventStreamSuite);
+        registerSuite(goodSuite);
+        //registerSuite(badSuite);
+        registerSuite(eventStreamSuite);
     }
 );
