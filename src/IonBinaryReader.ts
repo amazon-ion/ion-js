@@ -1,16 +1,16 @@
 /*
- * Copyright 2012-2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License").
- * You may not use this file except in compliance with the License.
- * A copy of the License is located at:
- *
- *     http://aws.amazon.com/apache2.0/
- *
- * or in the "license" file accompanying this file. This file is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific
- * language governing permissions and limitations under the License.
- */
+* Copyright 2012-2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+*
+* Licensed under the Apache License, Version 2.0 (the "License").
+* You may not use this file except in compliance with the License.
+* A copy of the License is located at:
+*
+*     http://aws.amazon.com/apache2.0/
+*
+* or in the "license" file accompanying this file. This file is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific
+* language governing permissions and limitations under the License.
+*/
 
 // Binary reader.  This is a user reader built on top of
 // the IonParserBinaryRaw parser.
@@ -62,194 +62,158 @@ const TB_LIST_CLOSE    = 22;
 const TB_STRUCT_CLOSE  = 23;
 
 function get_ion_type(t: number) : IonType {
-  switch(t) {
-    case TB_NULL:          return IonTypes.NULL;
-    case TB_BOOL:          return IonTypes.BOOL;
-    case TB_INT:           return IonTypes.INT;
-    case TB_NEG_INT:       return IonTypes.INT;
-    case TB_FLOAT:         return IonTypes.FLOAT;
-    case TB_DECIMAL:       return IonTypes.DECIMAL;
-    case TB_TIMESTAMP:     return IonTypes.TIMESTAMP;
-    case TB_SYMBOL:        return IonTypes.SYMBOL;
-    case TB_STRING:        return IonTypes.STRING;
-    case TB_CLOB:          return IonTypes.CLOB;
-    case TB_BLOB:          return IonTypes.BLOB;
-    case TB_SEXP:          return IonTypes.SEXP;
-    case TB_LIST:          return IonTypes.LIST;
-    case TB_STRUCT:        return IonTypes.STRUCT;
-    default:               return undefined;
-  };
+    switch(t) {
+        case TB_NULL:          return IonTypes.NULL;
+        case TB_BOOL:          return IonTypes.BOOL;
+        case TB_INT:           return IonTypes.INT;
+        case TB_NEG_INT:       return IonTypes.INT;
+        case TB_FLOAT:         return IonTypes.FLOAT;
+        case TB_DECIMAL:       return IonTypes.DECIMAL;
+        case TB_TIMESTAMP:     return IonTypes.TIMESTAMP;
+        case TB_SYMBOL:        return IonTypes.SYMBOL;
+        case TB_STRING:        return IonTypes.STRING;
+        case TB_CLOB:          return IonTypes.CLOB;
+        case TB_BLOB:          return IonTypes.BLOB;
+        case TB_SEXP:          return IonTypes.SEXP;
+        case TB_LIST:          return IonTypes.LIST;
+        case TB_STRUCT:        return IonTypes.STRUCT;
+        default:               return undefined;
+    };
 }
 
 export class BinaryReader implements Reader {
-  private _parser: ParserBinaryRaw;
-  private _cat: Catalog;
-  private _symtab: LocalSymbolTable;
-  private _raw_type: number;
+    private _parser: ParserBinaryRaw;
+    private _cat: Catalog;
+    private _symtab: LocalSymbolTable;
+    private _type: number;
 
-  constructor(source: Span, catalog: Catalog) {
-    this._parser   = new ParserBinaryRaw(source);
-    this._cat      = catalog || new Catalog();
-    this._symtab   = defaultLocalSymbolTable();
-    this._raw_type = BOC;
-  }
-
-  next() : IonType {
-    let t: BinaryReader = this;
-    var p, rt;
-    if (t._raw_type === EOF) return undefined;
-    p = t._parser;
-    for (;;) {
-      t._raw_type = rt = p.next();
-      if (t.depth() > 0) break;
-      if (rt === TB_SYMBOL) {
-        let raw: number = p.numberValue();
-        if (raw !== IVM.sid) break;
-        t._symtab = defaultLocalSymbolTable();
-      }
-      else if (rt === TB_STRUCT) {
-        if (!p.hasAnnotations()) break;
-        if (p.getAnnotation(0) !== ion_symbol_table_sid) break;
-        t._symtab = makeSymbolTable(t._cat, t);
-      }
-      else {
-        break;
-      }
+    constructor(source: Span, catalog: Catalog) {
+        this._parser   = new ParserBinaryRaw(source);
+        this._cat      = catalog || new Catalog();
+        this._symtab   = defaultLocalSymbolTable();
+        this._type = BOC;
     }
-    return get_ion_type(rt);
-  }
 
-  stepIn() : void {
-    let t: BinaryReader = this;
-    if (!get_ion_type(t._raw_type).container) {
-      throw new Error("can't step in to a scalar value");
+    next() : IonType {
+        if (this._type === EOF) return undefined;
+        for (;;) {
+            this._type = this._parser.next();
+            if (this.depth() > 0) break;
+            if (this._type === TB_SYMBOL) {
+                let raw: number = this._parser.numberValue();
+                if (raw !== IVM.sid) break;
+                this._symtab = defaultLocalSymbolTable();
+            } else if (this._type === TB_STRUCT) {
+                if (!this._parser.hasAnnotations()) break;
+                if (this._parser.getAnnotation(0) !== ion_symbol_table_sid) break;
+                this._symtab = makeSymbolTable(this._cat, this);
+            } else {
+                break;
+            }
+        }
+        return get_ion_type(this._type);
     }
-    t._parser.stepIn();
-    t._raw_type = BOC;
-  }
 
-  stepOut() : void {
-    let t: BinaryReader = this;
-    t._parser.stepOut();
-    t._raw_type = BOC;
-  }
-
-  valueType() : IonType {
-    return get_ion_type(this._raw_type);
-  }
-
-  depth() : number {
-    return this._parser.depth();
-  }
-
-  fieldName() : string {
-    let t: BinaryReader = this;
-    var n, s;
-    n = t._parser.getFieldId();
-    s = this.getSymbolString(n)
-    return s;
-  }
-
-  hasAnnotations() : boolean {
-    return this._parser.hasAnnotations();
-  }
-
-  annotations() : string[] {//TODO binary support
-      return ["test"];
-  }
-
-  getAnnotation(index: number) : string {
-    let t: BinaryReader = this;
-    var id, n;
-    id = t._parser.getAnnotation(index);
-    n = this.getSymbolString(id);
-    return n;
-  }
-
-  isNull() : boolean {
-    let t: BinaryReader = this;
-    var is_null = (t._raw_type === TB_NULL) || t._parser.isNull();
-    return is_null;
-  }
-
-  stringValue() : string {
-    let t: BinaryReader = this;
-    var n, s, p = t._parser;
-    if (t.isNull()) {
-      s = "null";
-      if (t._raw_type != TB_NULL) {
-        s += "." + get_ion_type(t._raw_type).name;
-      }
+    stepIn() : void {
+        let t: BinaryReader = this;
+        if (!get_ion_type(t._type).container) {
+            throw new Error("can't step in to a scalar value");
+        }
+        t._parser.stepIn();
+        t._type = BOC;
     }
-    else if (get_ion_type(t._raw_type).scalar) {
-      // BLOB is a scalar by you don't want to just use the string 
-      // value otherwise all other scalars are fine as is
-      if (t._raw_type === TB_SYMBOL) {
-        n = p.numberValue();
-        s = this.getSymbolString(n);
-      }
-      else {
-        s = p.stringValue();
-      }
+
+    stepOut() : void {
+        let t: BinaryReader = this;
+        t._parser.stepOut();
+        t._type = BOC;
     }
-    return s;
-  }
 
-  numberValue() : number {
-    return this._parser.numberValue();
-  }
-
-  byteValue() : number[] {
-    return this._parser.byteValue();
-  }
-
-  ionValue() : never {
-    throw new Error("E_NOT_IMPL: ionValue");
-  }
-
-  booleanValue() : boolean {
-    return this._parser.booleanValue();
-  }
-
-  decimalValue() : Decimal {
-    return this._parser.decimalValue();
-  }
-
-  timestampValue() : Timestamp {
-    return this._parser.timestampValue();
-  }
-
-  value() : any {
-    switch(this.valueType()) {
-      case IonTypes.BLOB:
-      case IonTypes.CLOB:
-        return this.byteValue();
-      case IonTypes.BOOL:
-        return this.booleanValue();
-      case IonTypes.DECIMAL:
-        return this.decimalValue();
-      case IonTypes.FLOAT:
-      case IonTypes.INT:
-        return this.numberValue();
-      case IonTypes.STRING:
-      case IonTypes.SYMBOL:
-        return this.stringValue();
-      case IonTypes.TIMESTAMP:
-        return this.timestampValue();
-      default:
-        return undefined;
+    valueType() : IonType {
+        return get_ion_type(this._type);
     }
-  }
 
-  private getSymbolString(symbolId: number) : string {
-    let s: string = undefined;
-    if (symbolId > 0) {
-      s = this._symtab.getSymbol(symbolId);
-      if (typeof(s) == 'undefined') {
-        s = "$" + symbolId.toString();
-      }
+    depth() : number {
+        return this._parser.depth();
     }
-    return s;
-  }
+
+    fieldName() : string {
+        return this.getSymbolString(this._parser.getFieldId());
+    }
+
+    hasAnnotations() : boolean {
+        return this._parser.hasAnnotations();
+    }
+
+    annotations() : string[] {
+        return null;//TODO
+    }
+
+    getAnnotation(index: number) : string {
+        return this.getSymbolString(this._parser.getAnnotation(index));
+    }
+
+    isNull() : boolean {
+        return (this._type === TB_NULL) || this._parser.isNull();
+    }
+
+    stringValue() : string {
+        if (this.isNull()) return 'null.' + get_ion_type(this._type).name;
+        if (this._type === TB_SYMBOL) return this.getSymbolString(this._parser.numberValue());
+        return this._parser.stringValue();
+    }
+
+    numberValue() : number {
+        return this._parser.numberValue();
+    }
+
+    byteValue() : number[] {
+        return this._parser.byteValue();
+    }
+
+    ionValue() : never {
+        throw new Error("E_NOT_IMPL: ionValue");
+    }
+
+    booleanValue() : boolean {
+        return this._parser.booleanValue();
+    }
+
+    decimalValue() : Decimal {
+        return this._parser.decimalValue();
+    }
+
+    timestampValue() : Timestamp {
+        return this._parser.timestampValue();
+    }
+
+    value() : any {
+        switch(this.valueType()) {
+            case IonTypes.BLOB:
+            case IonTypes.CLOB:
+                return this.byteValue();
+            case IonTypes.BOOL:
+                return this.booleanValue();
+            case IonTypes.DECIMAL:
+                return this.decimalValue();
+            case IonTypes.FLOAT:
+            case IonTypes.INT:
+                return this.numberValue();
+            case IonTypes.STRING:
+            case IonTypes.SYMBOL:
+                return this.stringValue();
+            case IonTypes.TIMESTAMP:
+                return this.timestampValue();
+            default:
+                throw new Error('Cannot convert non scalars to string.');
+        }
+    }
+
+    private getSymbolString(symbolId: number) : string {
+        if(symbolId < 1) return null;//TODO sid0 support
+        let symbol : string = this._symtab.getSymbol(symbolId);
+        if(symbol === null) return "$" + symbolId.toString();
+        return symbol;
+    }
 }
 

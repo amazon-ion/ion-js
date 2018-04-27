@@ -214,7 +214,7 @@ define(['intern', 'intern!object', 'intern/dojo/node!fs', 'intern/dojo/node!path
         }
 
         for (let file of goodUnskipped) {
-            if (file.endsWith(".ion")) {
+            if (file.endsWith(".10n")) {
                 goodSuite[file] = makeGoodTest(file);
                 eventStreamSuite[file] = makeEventStreamTest(file);
             }
