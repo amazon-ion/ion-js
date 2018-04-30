@@ -21,7 +21,7 @@ import { IonEventType } from "./IonEvent";
 import {TypeCodes} from "./IonBinary";
 import {TextReader} from "./IonTextReader";
 import {makeReader} from "./Ion";
-import { Span } from "./IonSpan";
+import { Span, BinarySpan } from "./IonSpan";
 import {BinaryReader} from "./IonBinaryReader";
 
 export class IonEventStream {
@@ -276,7 +276,7 @@ export class IonEventStream {
                 }
 
                 case 'value_binary' : {
-                    currentEvent.set(fieldName, this.parseBinaryValue());
+                    currentEvent.set(fieldName, this.parseBinaryValue());//TODO
                     break;
                 }
 
@@ -313,6 +313,7 @@ export class IonEventStream {
         }
         let fieldname = (currentEvent.has('field_name') ? currentEvent.get('field_name') : null);
         //TODO add binary side back into the logic flow https://github.com/amzn/ion-js/issues/131
+        if(!currentEvent.get('value_text').equals(currentEvent.get('value_binary'))) throw new Error("Binary and Text are not data model equivalent.");
         return this.eventFactory.makeEvent(
             eventType,
             currentEvent.get('ion_type'),
@@ -390,7 +391,7 @@ export class IonEventStream {
     private parseBinaryValue() : any {
         //convert list of ints to array of bytes and pass the buffer to a binary reader, generate value from factory.
         //start with a null check
-        if(this.reader.isNull()) return undefined;
+        if(this.reader.isNull()) return null;
         let numBuffer : number[] = [];
         this.reader.stepIn();
         let tid : IonType = this.reader.next();
@@ -399,7 +400,7 @@ export class IonEventStream {
             tid = this.reader.next();
         }
         this.reader.stepOut();
-        let tempReader : Reader = makeReader(numBuffer, undefined);
+        let tempReader : Reader = new BinaryReader(new BinarySpan(numBuffer), undefined);
         return tempReader.value();
     }
 

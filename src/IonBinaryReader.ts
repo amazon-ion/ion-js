@@ -199,7 +199,7 @@ export class BinaryReader implements Reader {
                 return this.numberValue();
             case IonTypes.STRING:
             case IonTypes.SYMBOL:
-                return this.stringValue();
+                return this.stringValue();//TODO split string and symbol logic
             case IonTypes.TIMESTAMP:
                 return this.timestampValue();
             default:

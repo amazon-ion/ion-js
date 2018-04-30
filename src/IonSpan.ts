@@ -189,7 +189,7 @@ export class StringSpan extends Span {
   }
 }
 
-class BinarySpan extends Span {
+export class BinarySpan extends Span {
   private _src: number[];
   private _pos: number;
   private _start: number;

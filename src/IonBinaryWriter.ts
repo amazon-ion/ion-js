@@ -50,13 +50,13 @@ CLOSED,
 }
 
 /**
-* Writes out Ion values in Ion's binary format.
-*
-* This implementation caches serialized values in an in-memory tree.
-* It does not support multiple local symbol tables (aka "symbol table append").
-*
-* @see http://amzn.github.io/ion-docs/binary.html
-*/
+ * Writes out Ion values in Ion's binary format.
+ *
+ * This implementation caches serialized values in an in-memory tree.
+ * It does not support multiple local symbol tables (aka "symbol table append").
+ *
+ * @see http://amzn.github.io/ion-docs/binary.html
+ */
 export class BinaryWriter implements Writer {
 
     private readonly symbolTable: LocalSymbolTable;
@@ -680,10 +680,11 @@ class BooleanNode extends LeafNode {
 }
 
 class BytesNode extends LeafNode {
-    private readonly value: number[]
+    private readonly value: number[];
 
-    constructor(writer: LowLevelBinaryWriter, parent: Node, typeCode: TypeCodes, annotations: number[], value: number[]) {
+    constructor(writer: LowLevelBinaryWriter, parent: Node, typeCode: TypeCodes, annotations: number[], inputValue: number[]) {
         super(writer, parent, typeCode, annotations);
+        this.value = inputValue;
     }
 
     write() : void {
