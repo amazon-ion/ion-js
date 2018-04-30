@@ -145,12 +145,9 @@ export class IonEventStream {
                     break;
                 }
                 case IonEventType.CONTAINER_START : {
-                    if (actualEvent.equals(expectedEvent)) {
-                        actualIndex = actualIndex + actualEvent.ionValue.length;
-                        expectedIndex = expectedIndex + expectedEvent.ionValue.length;
-                    } else {
-                        return false;
-                    }
+                    if (!actualEvent.equals(expectedEvent)) return false;
+                    actualIndex = actualIndex + actualEvent.ionValue.length;
+                    expectedIndex = expectedIndex + expectedEvent.ionValue.length;
                     break;
                 }
                 case IonEventType.CONTAINER_END :

@@ -1,16 +1,16 @@
 /*
-* Copyright 2012-2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
-*
-* Licensed under the Apache License, Version 2.0 (the "License").
-* You may not use this file except in compliance with the License.
-* A copy of the License is located at:
-*
-*     http://aws.amazon.com/apache2.0/
-*
-* or in the "license" file accompanying this file. This file is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific
-* language governing permissions and limitations under the License.
-*/
+ * Copyright 2012-2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * A copy of the License is located at:
+ *
+ *     http://aws.amazon.com/apache2.0/
+ *
+ * or in the "license" file accompanying this file. This file is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific
+ * language governing permissions and limitations under the License.
+ */
 
 // Binary reader.  This is a user reader built on top of
 // the IonParserBinaryRaw parser.
@@ -100,8 +100,8 @@ export class BinaryReader implements Reader {
             this._type = this._parser.next();
             if (this.depth() > 0) break;
             if (this._type === TB_SYMBOL) {
-                let raw: number = this._parser.numberValue();
-                if (raw !== IVM.sid) break;
+                let sid: number = this._parser.numberValue();
+                if (sid !== IVM.sid) break;
                 this._symtab = defaultLocalSymbolTable();
             } else if (this._type === TB_STRUCT) {
                 if (!this._parser.hasAnnotations()) break;
@@ -115,18 +115,16 @@ export class BinaryReader implements Reader {
     }
 
     stepIn() : void {
-        let t: BinaryReader = this;
-        if (!get_ion_type(t._type).container) {
+        if (!get_ion_type(this._type).container) {
             throw new Error("can't step in to a scalar value");
         }
-        t._parser.stepIn();
-        t._type = BOC;
+        this._parser.stepIn();
+        this._type = BOC;
     }
 
     stepOut() : void {
-        let t: BinaryReader = this;
-        t._parser.stepOut();
-        t._type = BOC;
+        this._parser.stepOut();
+        this._type = BOC;
     }
 
     valueType() : IonType {
