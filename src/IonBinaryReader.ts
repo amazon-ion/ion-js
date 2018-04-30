@@ -86,7 +86,7 @@ export class BinaryReader implements Reader {
     private _cat: Catalog;
     private _symtab: LocalSymbolTable;
     private _type: number;
-
+//where do shared symbol tables fall into place here?
     constructor(source: Span, catalog: Catalog) {
         this._parser   = new ParserBinaryRaw(source);
         this._cat      = catalog || new Catalog();
