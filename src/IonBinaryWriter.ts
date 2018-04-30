@@ -464,8 +464,11 @@ export abstract class AbstractNode implements Node {
     private readonly annotations: number[];
     abstract getValueLength() : number;
 
-    constructor() {
-        this.annotations = [];
+    constructor(writer, parent, typeCode, annotations?) {
+        this._writer = writer;
+        this.parent = parent;
+        this._typeCode = typeCode;
+        this.annotations = this.annotations === undefined ? [] : annotations;
     }
 
     private hasAnnotations() {
@@ -647,7 +650,7 @@ class StructNode extends ContainerNode {
         }
     }
 }
-
+//These feel wrong
 export abstract class LeafNode extends AbstractNode {
     addChild(child: Node, name?: number[]) : void {
         throw new Error("Cannot add a child to a leaf node");
@@ -659,8 +662,11 @@ export abstract class LeafNode extends AbstractNode {
 }
 
 class BooleanNode extends LeafNode {
-    constructor(writer: LowLevelBinaryWriter, parent: Node, annotations: number[], private readonly value: boolean) {
+    private readonly value: boolean;
+
+    constructor(writer: LowLevelBinaryWriter, parent: Node, annotations: number[], inputValue : boolean) {
         super(writer, parent, TypeCodes.BOOL, annotations);
+        this.value = inputValue;
     }
 
     write() : void {
@@ -674,7 +680,9 @@ class BooleanNode extends LeafNode {
 }
 
 class BytesNode extends LeafNode {
-    constructor(writer: LowLevelBinaryWriter, parent: Node, typeCode: TypeCodes, annotations: number[], private readonly value: number[]) {
+    private readonly value: number[]
+
+    constructor(writer: LowLevelBinaryWriter, parent: Node, typeCode: TypeCodes, annotations: number[], value: number[]) {
         super(writer, parent, typeCode, annotations);
     }
 
@@ -690,6 +698,7 @@ class BytesNode extends LeafNode {
 }
 
 export class NullNode extends LeafNode {
+
     constructor(writer: LowLevelBinaryWriter, parent: Node, typeCode: TypeCodes, annotations: number[]) {
         super(writer, parent, typeCode, annotations);
     }
