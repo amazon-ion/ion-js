@@ -760,11 +760,12 @@ export class ParserTextRaw {
     this._value_push( T_STRING2 );
   }
 
-  private _read_string3() : void {
+  private _read_string3(recognizeComments?) : void {
+      if(recognizeComments === undefined) recognizeComments = true;
       let ch : number;
       this._unread(this._peek(""));
       // read sequence of triple quoted strings
-      for(this._start = this._in.position() + 3; this._peek("\'\'\'") !== ERROR; this._in.unread(this._read_after_whitespace(true))) {
+      for(this._start = this._in.position() + 3; this._peek("\'\'\'") !== ERROR; this._in.unread(this._read_after_whitespace(recognizeComments))) {
           for(let i : number = 0; i < 3; i++){this._read()}
           //in tripleQuotes, index content of current triple quoted string,
           //looking for more triple quotes
@@ -926,7 +927,8 @@ private _test_symbol_as_annotation() : boolean {
 
   private _read_clob_string3() : void {
     var t;
-    this._read_string3();
+    this._read_string3(false);
+    if(this._peek("}}") === ERROR) throw new Error("Malformed clob.")
     t = this._value_pop();
     if (t != T_STRING3) this._error("string expected");
     this._value_push(T_CLOB3);
