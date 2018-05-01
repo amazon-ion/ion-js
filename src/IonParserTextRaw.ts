@@ -919,6 +919,7 @@ private _test_symbol_as_annotation() : boolean {
   private _read_clob_string2() : void {
     var t;
     this._read_string2();
+      if(this._peek("}}") === ERROR) throw new Error("Malformed clob.");
     t = this._value_pop();
     if (t != T_STRING2) this._error("string expected");
     this._value_push(T_CLOB2);
@@ -928,7 +929,7 @@ private _test_symbol_as_annotation() : boolean {
   private _read_clob_string3() : void {
     var t;
     this._read_string3(false);
-    if(this._peek("}}") === ERROR) throw new Error("Malformed clob.")
+    if(this._peek("}}") === ERROR) throw new Error("Malformed clob.");
     t = this._value_pop();
     if (t != T_STRING3) this._error("string expected");
     this._value_push(T_CLOB3);
