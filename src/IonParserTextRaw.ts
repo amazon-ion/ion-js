@@ -674,8 +674,7 @@ export class ParserTextRaw {
 
     private _readTimestamp() : void {
         this._start = this._in.position();
-        this._readNDigits(4);//reads year, throws on non digits.
-        let ch = this._read();
+        let ch = this._readPastNDigits(4);//reads past year, throws on non digits.
         if (ch === CH_T) {
             this._end = this._in.position();
             this._value_push( T_TIMESTAMP );
@@ -684,8 +683,7 @@ export class ParserTextRaw {
             throw new Error("Timestamp year must be followed by '-' or 'T'.");
         }
 
-        this._readNDigits(2);//reads month, throws on non digits.
-        ch = this._read();
+        ch = this._readPastNDigits(2);//reads past month, throws on non digits.
         if (ch === CH_T) {
             this._end = this._in.position();
             this._value_push( T_TIMESTAMP );
@@ -694,8 +692,7 @@ export class ParserTextRaw {
             throw new Error("Timestamp month must be followed by '-' or 'T'.");
         }
 
-        this._readNDigits(2); //reads day, throws on non digits.
-        ch = this._read();
+        ch = this._readPastNDigits(2); //reads past day, throws on non digits.
         if (IonText.isNumericTerminator(ch)) {
             this._unread(ch);
             this._end = this._in.position();
@@ -714,14 +711,12 @@ export class ParserTextRaw {
             throw new Error("Timestamp DATE must be followed by numeric terminator or additional TIME digits.");
         }
 
-        this._readNDigits(2);//read past hour.
-        ch = this._read();
+        ch = this._readPastNDigits(2);//read past hour.
         if (ch !== CH_CL) { // :
             throw new Error("Timestamp time(hr:min) necessitates format of 00:00");
         }
 
-        this._readNDigits(2);//read minutes.
-        ch = this._read();
+        ch = this._readPastNDigits(2);//read past minutes.
         if (ch === CH_CL) { //read seconds
             ch = this._readPastNDigits(2);
             if (ch === CH_DT) { //read fractional seconds
@@ -737,8 +732,8 @@ export class ParserTextRaw {
         } else if (ch !== CH_PS && ch !== CH_MS) {
             throw new Error("Timestamps require an offset.");
         }
-        this._readNDigits(2);
-        if(this._read() !== CH_CL) throw new Error("Illegal offset.");
+        ch = this._readPastNDigits(2);
+        if(ch !== CH_CL) throw new Error("Illegal offset.");
         this._readNDigits(2);
 
         ch = this._peek();
