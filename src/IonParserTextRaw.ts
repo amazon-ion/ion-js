@@ -727,11 +727,9 @@ export class ParserTextRaw {
             if (ch === CH_DT) { //read fractional seconds
                 if(!IonText.is_digit(this._read())) throw new Error("W3C timestamp spec requires atleast one digit after decimal point." );
                 while (IonText.is_digit(ch = this._read())) {}
-                //this._unread(ch); //undo the last read so indexing lines up
             }
         }
 
-        //ch = this._read();
         if (ch === CH_Z) {
             this._end = this._in.position();
             this._value_push( T_TIMESTAMP );
