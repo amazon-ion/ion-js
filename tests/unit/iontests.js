@@ -75,6 +75,11 @@ define(['intern', 'intern!object', 'intern/dojo/node!fs', 'intern/dojo/node!path
             'good/timestamp/timestamps.ion', //timestamp is not spec compliant.
             'good/equivs/systemSymbols.ion',//IVM
             'good/intBigSize512.ion', //IVM
+            'bad/invalidVersionMarker_ion_2_0.ion', //IVM
+            'bad/invalidVersionMarker_ion_1_1.ion', //IVM
+            'bad/invalidVersionMarker_ion_1234_0.ion', //IVM
+            'bad/invalidVersionMarker_ion_0_0.ion', //IVM
+
 
         ];
 
@@ -226,7 +231,7 @@ define(['intern', 'intern!object', 'intern/dojo/node!fs', 'intern/dojo/node!path
         }
 
         registerSuite(goodSuite);
-        //registerSuite(badSuite);
+        registerSuite(badSuite);
         registerSuite(eventStreamSuite);
     }
 );

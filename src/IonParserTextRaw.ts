@@ -473,7 +473,7 @@ export class ParserTextRaw {
   private _read_value_helper_plus( ch1 : number, accept_operator_symbols: boolean, calling_op : ReadValueHelper) {
     var ch2 = this._peek("inf");
     this._unread(ch1); // in any case we'll leave this character for the next function to use
-    if (IonText.is_numeric_terminator(ch2)) {
+    if (IonText.isNumericTerminator(ch2)) {
       this._ops.unshift( this._read_plus_inf );
     }
     else if (accept_operator_symbols) {
@@ -489,7 +489,7 @@ export class ParserTextRaw {
         ch2 = this._peek();
     if (ch2 == CH_i) {
       ch2 = this._peek("inf");
-      if (IonText.is_numeric_terminator(ch2)) {
+      if (IonText.isNumericTerminator(ch2)) {
         op =  this._read_minus_inf;
       }
       else if (accept_operator_symbols) {
@@ -515,7 +515,7 @@ export class ParserTextRaw {
     var ch2 = this._peek_4_digits(ch1);
     this._unread(ch1);
     if (ch2 == CH_T || ch2 == CH_MS) {
-      this._ops.unshift( this._read_timestamp );
+      this._ops.unshift( this._readTimestamp );
     }
     else {
       this._ops.unshift( this._read_number );
@@ -590,7 +590,7 @@ export class ParserTextRaw {
       t = T_DECIMAL;
       ch = this._read_optional_digits(this._read());
     }
-    if (!IonText.is_numeric_terminator(ch)) {
+    if (!IonText.isNumericTerminator(ch)) {
       if (ch == CH_d || ch == CH_D) {
         t = T_DECIMAL;
         ch = this._read_exponent();
@@ -600,7 +600,7 @@ export class ParserTextRaw {
         ch = this._read_exponent();
       }
     }
-    if (!IonText.is_numeric_terminator(ch)) {
+    if (!IonText.isNumericTerminator(ch)) {
       this._error( "invalid character after number" );
     }
     else {
@@ -616,7 +616,7 @@ export class ParserTextRaw {
       ch = this._read(); // read the first hex digits
       ch = this._read_required_hex_digits(ch);
     }
-    if (IonText.is_numeric_terminator(ch)) {
+    if (IonText.isNumericTerminator(ch)) {
       this._unread(ch);
       this._end = this._in.position();
       this._value_push( T_HEXINT );
@@ -663,7 +663,7 @@ export class ParserTextRaw {
         return;
       }
     }
-    if (IonText.is_numeric_terminator( this._peek() )) {
+    if (IonText.isNumericTerminator( this._peek() )) {
       this._end = this._in.position();
       this._value_push( T_FLOAT_SPECIAL );
     }
@@ -672,58 +672,82 @@ export class ParserTextRaw {
     }
   }
 
-  private _read_timestamp() : void {
-    var ch;
-    this._start = this._in.position();
-    ch = this._read_N_digits( 4 );      // read year
-    if (ch == CH_T) {
-      ch = this._read();  // this is needed as we disallow yyyyThh:mm - TODO really !?
-    }
-    else if (ch == CH_MS) {
-      ch = this._read_N_digits( 2 );    // read month
-      if (ch == CH_MS) {
-        ch = this._read_N_digits( 2 );  // read day
-      }
-      ch = this._read_optional_time(ch);  // no time unless you at least include month - TODO really !?
-    }
-    ch = this._read_optional_time_offset(ch); // we only allow an offset
-    if (IonText.is_numeric_terminator(ch)) {
-      this._unread(ch);
-      this._end = this._in.position();
-      this._value_push( T_TIMESTAMP );
-    }
-    else {
-      this._error( "invalid character after timestamp" );
-    }
-  }
-
-  private _read_optional_time(ch: number) : number {
-    if (ch != CH_T) return ch; // no 'T", no time
-    ch = this._read();
-    if (!IonText.is_numeric_terminator(ch)) {
-      // then it has to be, at least hours and minutes
-      ch = this._read_hours_and_minutes(ch);
-      if (ch == CH_CL) {
-        ch = this._read_N_digits( 2 );         // seconds
-        if (ch == CH_DT) {
-          ch = this._read();
-          ch = this._read_required_digits(ch); // fractional seconds (apparently required)
+    private _readTimestamp() : void {
+        this._start = this._in.position();
+        this._readNDigits(4);//reads year, throws on non digits.
+        let ch = this._read();
+        if (ch === CH_T) {
+            this._end = this._in.position();
+            this._value_push( T_TIMESTAMP );
+            return;
+        } else if (ch !== CH_MS) {
+            throw new Error("Timestamp year must be followed by '-' or 'T'.");
         }
-      }
-    }
-    return ch;
-  }
 
-  private _read_optional_time_offset(ch: number) : number {
-    if (ch == CH_MS || ch == CH_PS) {
-      ch = this._read();
-      ch = this._read_hours_and_minutes( ch ); // of the time offset
+        this._readNDigits(2);//reads month, throws on non digits.
+        ch = this._read();
+        if (ch === CH_T) {
+            this._end = this._in.position();
+            this._value_push( T_TIMESTAMP );
+            return;
+        } else if (ch !== CH_MS) {
+            throw new Error("Timestamp month must be followed by '-' or 'T'.");
+        }
+
+        this._readNDigits(2); //reads day, throws on non digits.
+        ch = this._read();
+        if (IonText.isNumericTerminator(ch)) {
+            this._unread(ch);
+            this._end = this._in.position();
+            this._value_push( T_TIMESTAMP );
+            return;
+        } else if (ch !== CH_T) {
+            throw new Error("Timestamp day must be followed by 'T' or ' '.");
+        }
+
+        let peekChar = this._in.peek();
+        if (IonText.isNumericTerminator(peekChar)) {//checks to see if timestamp value has terminated.
+            this._end = this._in.position();
+            this._value_push( T_TIMESTAMP );
+            return;
+        } else if (!IonText.is_digit(peekChar)) {
+            throw new Error("Timestamp DATE must be followed by numeric terminator or additional TIME digits.");
+        }
+
+        this._readNDigits(2);//read past hour.
+        ch = this._read();
+        if (ch !== CH_CL) { // :
+            throw new Error("Timestamp time(hr:min) necessitates format of 00:00");
+        }
+
+        this._readNDigits(2);//read minutes.
+        ch = this._read();
+        if (ch === CH_CL) { //read seconds
+            ch = this._readPastNDigits(2);
+            if (ch === CH_DT) { //read fractional seconds
+                if(!IonText.is_digit(this._read())) throw new Error("W3C timestamp spec requires atleast one digit after decimal point." );
+                while (IonText.is_digit(ch = this._read())) {}
+                //this._unread(ch); //undo the last read so indexing lines up
+            }
+        }
+
+        //ch = this._read();
+        if (ch === CH_Z) {
+            this._end = this._in.position();
+            this._value_push( T_TIMESTAMP );
+            return;
+        } else if (ch !== CH_PS && ch !== CH_MS) {
+            throw new Error("Timestamps require an offset.");
+        }
+        this._readNDigits(2);
+        if(this._read() !== CH_CL) throw new Error("Illegal offset.");
+        this._readNDigits(2);
+
+        ch = this._peek();
+        if(!IonText.isNumericTerminator(ch)) throw new Error("Improperly formatted timestamp.");
+        this._end = this._in.position();
+        this._value_push( T_TIMESTAMP );
     }
-    else if (ch == CH_Z) {
-      ch =  this._read();
-    }
-    return ch;
-  }
 
   private _read_symbol() : void {
     var ch;
@@ -1510,18 +1534,23 @@ private _test_symbol_as_annotation() : boolean {
     return ch;
   }
 
-  private _read_N_digits(n: number) : number {
-    var ch, ii=0;
-    while ( ii < n ) {
-      ch = this._read();
-      if (!IonText.is_digit(ch)) {
-        this._error( ""+n+" digits required "+ii+" found" );
-        return ERROR;
-      }
-      ii++;
+    private _readNDigits(n: number) : number {//This is clearly bugged it reads n + 1 digits.
+        let ch : number
+        if (n <= 0) throw new Error("Cannot read a negative number of digits.");
+        while(n--) {
+            if (!IonText.is_digit(ch = this._read())) throw new Error("Expected digit, got: " + ch);
+        }
+        return ch;
     }
-    return this._read();
-  }
+
+    private _readPastNDigits(n: number) : number {//This is clearly bugged it reads n + 1 digits.
+        let ch : number
+        if (n <= 0) throw new Error("Cannot read a negative number of digits.");
+        while(n--) {
+            if (!IonText.is_digit(ch = this._read())) throw new Error("Expected digit, got: " + ch);
+        }
+        return this._read();
+    }
 
   private _read_required_hex_digits(ch: number) : number {
     if (!IonText.is_hex_digit(ch)) return ERROR;
@@ -1547,9 +1576,9 @@ private _test_symbol_as_annotation() : boolean {
 
   private _read_hours_and_minutes(ch: number) : number {
     if (!IonText.is_digit(ch)) return ERROR;
-    ch = this._read_N_digits( 1 );   // rest of hours
+    ch = this._readPastNDigits( 1 );   // rest of hours
     if (ch == CH_CL) {
-      ch = this._read_N_digits( 2 ); // minutes
+      ch = this._readPastNDigits( 2 ); // minutes
     }
     else {
       ch = ERROR; // if there are hours you have to include minutes
