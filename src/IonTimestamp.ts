@@ -37,7 +37,7 @@ import { LongInt } from "./IonLongInt";
 import { Precision } from "./IonPrecision";
 
 const MIN_SECONDS: number = 0;
-const MAX_SECONDS: number = 60;
+const MAX_SECONDS: number = 59;  //how do we approach fractional seconds?, make 6 and non inclusive?
 const MIN_MINUTE: number = 0;
 const MAX_MINUTE: number = 59;
 const MIN_HOUR: number = 0;
@@ -46,10 +46,10 @@ const MIN_DAY: number = 1;
 const MAX_DAY: number = 31;
 const MIN_MONTH: number = 1;
 const MAX_MONTH: number = 12;
-const MIN_YEAR: number = 0;
+const MIN_YEAR: number = 1;
 const MAX_YEAR: number = 9999;
-const MIN_OFFSET: number = -14*60; // minutes in timezone offset - see W3C timezone definition
-const MAX_OFFSET: number = 14*60;
+const MIN_OFFSET: number = (-23 * 60) + 59;
+const MAX_OFFSET: number = (23 * 60) + 59;
 const DAYS_PER_MONTH: number[] = [
   -1,          // months start at 1, so we fill the 0 slot
   31, 29, 31,  // jan, feb, mar
