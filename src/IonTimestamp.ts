@@ -48,7 +48,7 @@ const MIN_MONTH: number = 1;
 const MAX_MONTH: number = 12;
 const MIN_YEAR: number = 1;
 const MAX_YEAR: number = 9999;
-const MIN_OFFSET: number = (-23 * 60) + 59;
+const MIN_OFFSET: number = (-23 * 60) - 59;
 const MAX_OFFSET: number = (23 * 60) + 59;
 const DAYS_PER_MONTH: number[] = [
   -1,          // months start at 1, so we fill the 0 slot
