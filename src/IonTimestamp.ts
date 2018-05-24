@@ -465,103 +465,105 @@ export class Timestamp {
 
   static readonly NULL: Timestamp = new Timestamp(Precision.NULL);
 
-  static parse(str: string) : Timestamp {
-    var precision;
+    static parse(str: string) : Timestamp {
+        var precision;
 
-    if (str.length < 1) return Timestamp.NULL;
-    if (str.charCodeAt(0) === 110) {  // "n"
-      if (str === "null") return Timestamp.NULL;
-      if (str === "null.timestamp") return Timestamp.NULL;
-      bad_timestamp(0);
+        if (str.length < 1) return Timestamp.NULL;
+        if (str.charCodeAt(0) === 110) {  // "n"
+            if (str === "null") return Timestamp.NULL;
+            if (str === "null.timestamp") return Timestamp.NULL;
+            bad_timestamp(0);
+        }
+
+        let offset: number;
+        let year: number;
+        let month: number;
+        let day: number;
+        let hour: number;
+        let minute: number;
+        let seconds: number | Decimal;
+
+        let pos: number = 0;
+        let state: TimeParserState = timeParserStates[States.YEAR];
+        let limit: number = str.length;
+
+        let v: number;
+
+        while (pos < limit) {
+            if (isUndefined(state.len)) {
+                let digits: string = read_unknown_digits(str, pos);
+                if (digits.length === 0) {
+                    bad_timestamp(pos);
+                }
+                v = parseInt(digits, 10);
+                pos += digits.length;
+            } else if (state.len > 0) {
+                v = read_digits(str, pos, state.len);
+                if (v < 0) {
+                    bad_timestamp(pos);
+                }
+                pos = pos + state.len;
+            }
+            switch (state.f) {
+                case States.YEAR:
+                    year = v;
+                    break;
+                case States.MONTH:
+                    month = v;
+                    break;
+                case States.DAY:
+                    day = v;
+                    break;
+                case States.HOUR:
+                    hour = v;
+                    break;
+                case States.MINUTE:
+                    minute = v;
+                    break;
+                case States.SECONDS:
+                    seconds = v;
+                    break;
+                // 1234-67-89T12:45:78.dddd
+                case States.FRACTIONAL_SECONDS:
+                    const START_POSITION_OF_SECONDS = 17;
+                    seconds = Decimal.parse(str.substring(START_POSITION_OF_SECONDS, pos), false);
+                    break;
+                case States.OFFSET:
+                    break;
+                case States.OFFSET_POSITIVE:
+                    offset = v * 60;
+                    break;
+                case States.OFFSET_NEGATIVE:
+                    offset = -v * 60;
+                    break;
+                case States.OFFSET_MINUTES:
+                    offset += (offset < -0) ? -v : v;
+                    if(v >= 60) throw new Error("Minute offset " + String(v) + " above maximum or equal to : 60";
+                    break;
+                case States.OFFSET_ZULU:
+                    offset = -0.0;
+                    break;
+                default:
+                    bad_timestamp("invalid internal state");
+            }
+            if (!isUndefined(state.p)) {
+                precision = state.p;
+                if (pos >= limit) {
+                    break;
+                }
+            }
+            if (!isUndefined(state.t)) {
+                let c: string = String.fromCharCode(str.charCodeAt(pos));
+                state = timeParserStates[state.t[c]];
+                if (isUndefined(state)) {
+                    debugger;
+                    bad_timestamp(pos)
+                }
+            }
+            pos++;
+        }
+        if(offset > MAX_OFFSET) throw new Error("Offset " + String(offset) + " above maximum: " + String(MAX_OFFSET));
+        if(offset < MIN_OFFSET) throw new Error("Offset " + String(offset) + " below minimum: " + String(MIN_OFFSET));
+        return new Timestamp(precision, offset, year, month, day, hour, minute, seconds);
     }
-
-    let offset: number;
-    let year: number;
-    let month: number;
-    let day: number;
-    let hour: number;
-    let minute: number;
-    let seconds: number | Decimal;
-
-    let pos: number = 0;
-    let state: TimeParserState = timeParserStates[States.YEAR];
-    let limit: number = str.length;
-
-    let v: number;
-
-    while (pos < limit) {
-      if (isUndefined(state.len)) {
-        let digits: string = read_unknown_digits(str, pos);
-        if (digits.length === 0) {
-          bad_timestamp(pos);
-        }
-        v = parseInt(digits, 10);
-        pos += digits.length;
-      } else if (state.len > 0) {
-        v = read_digits(str, pos, state.len);
-        if (v < 0) {
-          bad_timestamp(pos);
-        }
-        pos = pos + state.len;
-      }
-      switch (state.f) {
-        case States.YEAR:
-          year = v;
-          break;
-        case States.MONTH:
-          month = v;
-          break;
-        case States.DAY:
-          day = v;
-          break;
-        case States.HOUR:
-          hour = v;
-          break;
-        case States.MINUTE:
-          minute = v;
-          break;
-        case States.SECONDS:
-          seconds = v;
-          break;
-        // 1234-67-89T12:45:78.dddd
-        case States.FRACTIONAL_SECONDS:
-          const START_POSITION_OF_SECONDS = 17;
-          seconds = Decimal.parse(str.substring(START_POSITION_OF_SECONDS, pos), false);
-          break;
-        case States.OFFSET:
-          break;
-        case States.OFFSET_POSITIVE:
-          offset = v * 60;
-          break;
-        case States.OFFSET_NEGATIVE:
-          offset = -v * 60;
-          break;
-        case States.OFFSET_MINUTES:
-          offset += (offset < -0) ? -v : v;
-          break;
-        case States.OFFSET_ZULU:
-          offset = -0.0;
-          break;
-        default:
-          bad_timestamp("invalid internal state");
-      }
-      if (!isUndefined(state.p)) {
-        precision = state.p;
-        if (pos >= limit) {
-          break;
-        }
-      }
-      if (!isUndefined(state.t)) {
-        let c: string = String.fromCharCode(str.charCodeAt(pos));
-        state = timeParserStates[state.t[c]];
-        if (isUndefined(state)) {
-          debugger;
-          bad_timestamp(pos)
-        }
-      }
-      pos++;
-    }
-    let t: Timestamp = new Timestamp(precision, offset, year, month, day, hour, minute, seconds);
-    return t;
-  }
 }
