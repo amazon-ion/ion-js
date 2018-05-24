@@ -726,6 +726,7 @@ export class ParserTextRaw {
         }
 
         if (ch === CH_Z) {
+            if(!IonText.isNumericTerminator(this._peek())) throw new Error("Illegal terminator after Zulu offset.");
             this._end = this._in.position();
             this._value_push( T_TIMESTAMP );
             return;
