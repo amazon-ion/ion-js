@@ -56,7 +56,6 @@ define(['intern', 'intern!object', 'intern/dojo/node!fs', 'intern/dojo/node!path
             'good/equivs/blobs.ion', //blobs unsupported
             'good/equivs/binaryInts.ion', //binary ints unsupported
             'good/blobs.ion', //blobs unsupported
-            'good/timestamp/equivTimeline/timestamps.ion', //timestamps are not spec compliant
             'good/testfile35.ion', //symbol table imports unsupported
             'good/testfile29.ion', //IVM unsupported
             'good/testfile26.ion', //IVM unsupported
@@ -72,7 +71,6 @@ define(['intern', 'intern!object', 'intern/dojo/node!fs', 'intern/dojo/node!path
             'good/decimalsWithUnderscores.ion', //numbers with underscores unsupported
             'good/equivs/bigInts.ion', //numbers unsupported by js's int or float are unsupported
             'good/equivs/strings.ion', //triplequote interaction with span and whitespace corrupts the state of the parser.
-            'good/timestamp/timestamps.ion', //timestamp is not spec compliant.
             'good/equivs/systemSymbols.ion',//IVM
             'good/intBigSize512.ion', //IVM
             'bad/invalidVersionMarker_ion_2_0.ion', //IVM
