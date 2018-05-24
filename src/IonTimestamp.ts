@@ -37,7 +37,7 @@ import { LongInt } from "./IonLongInt";
 import { Precision } from "./IonPrecision";
 
 const MIN_SECONDS: number = 0;
-const MAX_SECONDS: number = 59;  //how do we approach fractional seconds?, make 6 and non inclusive?
+const MAX_SECONDS: number = 60;
 const MIN_MINUTE: number = 0;
 const MAX_MINUTE: number = 59;
 const MIN_HOUR: number = 0;
