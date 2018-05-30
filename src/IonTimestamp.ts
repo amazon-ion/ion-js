@@ -538,7 +538,7 @@ export class Timestamp {
                     break;
                 case States.OFFSET_MINUTES:
                     offset += (offset < -0) ? -v : v;
-                    if(v >= 60) throw new Error("Minute offset " + String(v) + " above maximum or equal to : 60";
+                    if(v >= 60) throw new Error("Minute offset " + String(v) + " above maximum or equal to : 60");
                     break;
                 case States.OFFSET_ZULU:
                     offset = -0.0;

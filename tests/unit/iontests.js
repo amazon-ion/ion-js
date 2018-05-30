@@ -77,8 +77,6 @@ define(['intern', 'intern!object', 'intern/dojo/node!fs', 'intern/dojo/node!path
             'bad/invalidVersionMarker_ion_1_1.ion', //IVM
             'bad/invalidVersionMarker_ion_1234_0.ion', //IVM
             'bad/invalidVersionMarker_ion_0_0.ion', //IVM
-
-
         ];
 
         // For debugging, put single files in this list to have the test run only

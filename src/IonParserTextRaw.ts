@@ -126,7 +126,7 @@ export function get_ion_type(t: number) : IonType {
     case T_SEXP:          return IonTypes.SEXP;
     case T_LIST:          return IonTypes.LIST;
     case T_STRUCT:        return IonTypes.STRUCT;
-    default:              return undefined;
+    default:              throw new Error("Unknown type: " + String(t) + ".");
   }
 }
 //needs to differentiate between quoted text of 'null' and the symbol keyword null
@@ -137,7 +137,7 @@ function get_keyword_type(str: string) : number {
   if (str === "nan")   return T_FLOAT_SPECIAL;
   if (str === "+inf")  return T_FLOAT_SPECIAL;
   if (str === "-inf")  return T_FLOAT_SPECIAL;
-  return undefined;
+    throw new Error("Unknown keyword: " + str + ".");
 }
 
 function get_type_from_name(str: string) : number {
@@ -154,11 +154,11 @@ function get_type_from_name(str: string) : number {
   if (str === "sexp")      return T_SEXP;
   if (str === "list")      return T_LIST;
   if (str === "struct")    return T_STRUCT;
-  return undefined;
+  throw new Error("Unknown type: " + str + ".");
 }
 
 function is_keyword(str: string) : boolean {
-  return (get_keyword_type(str) != undefined);
+    return (str === "null") || (str === "true") || (str === "false") || (str === "nan") || (str === "+inf") || (str === "-inf");
 }
 
 function get_hex_value(ch: number) : number {
@@ -186,7 +186,7 @@ function get_hex_value(ch: number) : number {
     case  69: return 14; // 'E'
     case  70: return 15; // 'F'
   }
-  throw new Error("unexpected bad hex digit in checked data");
+  throw new Error("Unexpected bad hex digit in checked data.");
 }
 
 function is_valid_base64_length(char_length: number, trailer_length: number) : boolean {
@@ -541,13 +541,42 @@ export class ParserTextRaw {
     this._ops.unshift( this._read_string2 );
   }
 
-  private _read_value_helper_letter( ch1 : number, accept_operator_symbols: boolean, calling_op : ReadValueHelper) {
-    this._read_symbol();
-    if (this._test_symbol_as_annotation()) {
-      // this was an annoation, so we need to try again for the actual value
-      this._ops.unshift( calling_op );
+    private _read_value_helper_letter( ch1 : number, accept_operator_symbols: boolean, calling_op : ReadValueHelper) {
+        this._read_symbol();
+        let type = this._value_pop();
+        if (type != T_IDENTIFIER) throw new Error("Expecting symbol here.");
+        let symbol = this.get_value_as_string(type);
+
+        if(is_keyword(symbol)) {
+            let kwt = get_keyword_type(symbol);
+            if (kwt === T_NULL) {
+                this._value_null = true;
+                if (this._peek() === CH_DT) {
+                    this._read(); // consume the dot
+                    let ch = this._read();
+                    if (IonText.is_letter(ch) !== true) throw new Error("Expected type name after 'null.'");
+                    this._read_symbol();
+                    if (this._value_pop() !== T_IDENTIFIER) throw new Error("Expected type name after 'null.'");
+                    symbol = this.get_value_as_string(T_IDENTIFIER);
+                    kwt = get_type_from_name(symbol);
+                }
+                this._start = -1;
+                this._end = -1;
+                this._value_push(kwt);
+            }
+        } else {
+            let ch = this._read_after_whitespace(true);
+            if (ch == CH_CL && this._peek() == CH_CL) {
+                this._read(); // consume the colon character
+                this._ann.push(symbol);
+                this._ops.unshift( calling_op );
+            } else {
+                let kwt = is_keyword(symbol) ? get_keyword_type(symbol) : T_IDENTIFIER;
+                this._unread(ch);
+                this._value_push(kwt); // put the value back on the stack
+            }
+        }
     }
-  }
 
   private _read_value_helper_operator( ch1 : number, accept_operator_symbols: boolean, calling_op : ReadValueHelper) {
     if (accept_operator_symbols) {
@@ -750,8 +779,8 @@ export class ParserTextRaw {
       ch = this._read();
       if (!IonText.is_letter_or_digit(ch)) break;
     }
-    this._end = this._in.position() - 1;
     this._unread(ch);
+    this._end = this._in.position();
     this._value_push( T_IDENTIFIER );
   }
 
@@ -885,54 +914,6 @@ export class ParserTextRaw {
     return is_ann;
   }
 
-private _test_symbol_as_annotation() : boolean {
-    var s, ii, ch, kwt,
-    is_ann = true,
-    t = this._value_pop();
-    if (t != T_IDENTIFIER) this._error("expecting symbol here");
-    s = this.get_value_as_string(t);
-    kwt = get_keyword_type(s);
-    if (kwt === T_NULL) {
-        this._value_null = true;
-        is_ann = false;
-        ch = this._peek();
-        if (ch === CH_DT) {
-            this._read(); // consume the dot
-            ch = this._read();
-            if (IonText.is_letter(ch) !== true) {
-                this._error("expected type name after 'null.'");
-                return undefined;
-            }
-            this._read_symbol();
-            if (this._value_pop() != T_IDENTIFIER) {
-                this._error("expected type name after 'null.'");
-                return undefined;
-            }
-            s = this.get_value_as_string(T_IDENTIFIER);
-            kwt = get_type_from_name(s);
-        }
-        this._start = -1;
-        this._end = -1;
-        this._value_push(kwt);
-        return is_ann;
-    }
-
-    ch = this._read_after_whitespace(true);
-    if (ch == CH_CL && this._peek() == CH_CL) {
-        if (kwt != undefined) this._error("the keyword '"+s+"' can't be used as an annotation without quotes");
-        this._read(); // consume the colon character
-        this._ann.push(s);
-        is_ann = true;
-    } else {
-        // if this is a keyword, we'll just keep it's type, otherwise switch back to the generic "identifier"
-        if (kwt == undefined) kwt = T_IDENTIFIER;
-        this._unread(ch);
-        is_ann = false;
-
-        this._value_push(kwt); // put the value back on the stack
-    }
-    return is_ann;
-}
 
   private _read_clob_string2() : void {
     var t;
