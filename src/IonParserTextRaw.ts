@@ -291,8 +291,9 @@ export class ParserTextRaw {
     var ch = this._read_after_whitespace(true);
     if (ch == CH_CP) {
       this._value_push( EOF );
-    }
-    else {
+    } else if (ch === EOF){
+        throw new Error("Expected closing ).");
+    } else {
       this._unread(ch);
       this._ops.unshift( this._read_sexp_values );
       this._ops.unshift( this._read_sexp_value );
