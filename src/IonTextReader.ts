@@ -78,7 +78,7 @@ export class TextReader implements Reader {
         p = this._parser;
     while (d > 0) {
       type = p.next();
-      if (type === undefined) { // end of container
+      if (type === EOF) { // end of container
         d--;
       }
       else if (type.container) {
