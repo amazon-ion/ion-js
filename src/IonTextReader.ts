@@ -73,16 +73,15 @@ export class TextReader implements Reader {
   }
 
   skip_past_container() {
-    var type, 
-        d = 1,  // we want to have read the EOC tha matches the container we just saw
-        p = this._parser;
-    while (d > 0) {
-      type = p.next();
+    let type;
+    let d = this.depth();  // we want to have read the EOC that matches the container we just saw
+    this.stepIn();
+    while (this.depth() > d) {
+      type = this.next();
       if (type === undefined) { // end of container
-        d--;
-      }
-      else if (type.container) {
-        d++;
+          this.stepOut();
+      } else if (type.container && !this.isNull()) {
+          this.stepIn();
       }
     }
   }
