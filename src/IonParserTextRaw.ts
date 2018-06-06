@@ -563,8 +563,8 @@ export class ParserTextRaw {
                 }
                 this._start = -1;
                 this._end = -1;
-                this._value_push(kwt);
             }
+            this._value_push(kwt);
         } else {
             let ch = this._read_after_whitespace(true);
             if (ch == CH_CL && this._peek() == CH_CL) {
@@ -572,7 +572,7 @@ export class ParserTextRaw {
                 this._ann.push(symbol);
                 this._ops.unshift( calling_op );
             } else {
-                let kwt = is_keyword(symbol) ? get_keyword_type(symbol) : T_IDENTIFIER;
+                let kwt = T_IDENTIFIER;
                 this._unread(ch);
                 this._value_push(kwt); // put the value back on the stack
             }
