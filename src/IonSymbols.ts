@@ -56,7 +56,7 @@ function load_imports(reader: Reader, catalog: Catalog) : Import {
       version = 1;
     }
 
-    if (name && name != "$ion") {
+    if (name && name !== "$ion") {
       let symbolTable: SharedSymbolTable = catalog.findSpecificVersion(name, version);
       if (!symbolTable) {
         if (!maxId) {
@@ -92,23 +92,26 @@ function load_symbols(reader: Reader) : string[] {
   return symbols;
 }
 
-export function makeSymbolTable(catalog: Catalog, reader: Reader) : LocalSymbolTable {
-  let import_: Import;
-  let symbols: string[];
-  let maxId: number;
+    export function makeSymbolTable(catalog: Catalog, reader: Reader) : LocalSymbolTable {
+        let import_: Import;
+        let symbols: string[];
+        let maxId: number;
+        let foundSymbols : boolean = false;
 
-  reader.stepIn();
-  while (reader.next()) {
-    switch(reader.fieldName()) {
-      case "imports":
-        import_ = load_imports(reader, catalog);
-        break;
-      case "symbols":
-        symbols = load_symbols(reader);
-        break;
+        reader.stepIn();
+        while (reader.next()) {
+            switch(reader.fieldName()) {
+            case "imports":
+            import_ = load_imports(reader, catalog);
+            break;
+            case "symbols":
+            if(foundSymbols) throw new Error("Multiple symbol fields found.");
+            symbols = load_symbols(reader);
+            foundSymbols = true;
+            break;
+            }
+        }
+        reader.stepOut();
+
+        return new LocalSymbolTable(import_, symbols);
     }
-  }
-  reader.stepOut();
-
-  return new LocalSymbolTable(import_, symbols);
-}

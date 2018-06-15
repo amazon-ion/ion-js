@@ -110,7 +110,7 @@ export class IonEventStream {
                         default :
                             throw new Error('Unexpected IonType: ' + tempEvent.ionType.name);
                     }
-
+                    break;
                 case IonEventType.CONTAINER_END:
                     writer.endContainer();
                     break;
@@ -118,7 +118,7 @@ export class IonEventStream {
                     writer.close();
                     break;
                 case IonEventType.SYMBOL_TABLE:
-                    throw new Error("symboltables unsupported.");
+                    throw new Error("Symboltables unsupported.");
                 default:
                     throw new Error("Unexpected event type: "+ tempEvent.eventType);
 
@@ -271,10 +271,13 @@ export class IonEventStream {
 
                 case 'value_text' : {
                     let tempString : string = this.reader.stringValue();
+                    if(tempString.substr(0,5) === '$ion_') tempString = "$ion_user_value::" + tempString
                     let tempReader : Reader = makeReader(tempString, undefined);
                     tempReader.next();
+                    let tempValue = tempReader.value();
+                    let annotations = tempReader.annotations();
                     currentEvent.set('isNull', tempReader.isNull());
-                    currentEvent.set(fieldName,tempReader.value());
+                    currentEvent.set(fieldName, tempValue);
                     break;
                 }
 

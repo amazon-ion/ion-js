@@ -44,19 +44,18 @@ define(['intern', 'intern!object', 'intern/dojo/node!fs', 'intern/dojo/node!path
             'good/non-equivs/blobs.ion',
             'good/utf32.ion', //testing not configured to decode raw utf32
             'good/utf16.ion', //testing not configured to decode raw utf16
-            'good/subfieldVarInt.ion', //IVM bug
-            'good/subfieldInt.ion', //IVM bug
+            'good/subfieldVarInt.ion', //passes, but takes too long to run every build due to longint rounding.
             'good/nonNulls.ion', //blobs bug
             'good/non-equivs/nonNulls.ion', //blobs bug
             'good/lists.ion', //blobs bug
             'good/intBinary.ion', //binaryInts unsupported
             'good/intsWithUnderscores.ion', //binary ints unsupported
-            'good/intBigSize256.ion', //IVM bug
+            'good/intBigSize256.ion', //int maxsize limitation
             'good/equivs/intsWithUnderscores.ion', //binary ints unsupported
             'good/equivs/blobs.ion', //blobs unsupported
             'good/equivs/binaryInts.ion', //binary ints unsupported
             'good/blobs.ion', //blobs unsupported
-            'good/testfile35.ion', //symbol table imports unsupported
+            //'good/testfile35.ion', //symbol table imports unsupported
             'good/testfile29.ion', //IVM unsupported
             'good/testfile26.ion', //IVM unsupported
             'good/innerVersionIdentifiers.ion',//even though these are not IVM values on roundtrip the marshalling behavior treats text values as if they are top level and the IVM corrupts the reader.
@@ -71,12 +70,8 @@ define(['intern', 'intern!object', 'intern/dojo/node!fs', 'intern/dojo/node!path
             'good/decimalsWithUnderscores.ion', //numbers with underscores unsupported
             'good/equivs/bigInts.ion', //numbers unsupported by js's int or float are unsupported
             'good/equivs/strings.ion', //triplequote interaction with span and whitespace corrupts the state of the parser.
-            'good/equivs/systemSymbols.ion',//IVM
-            'good/intBigSize512.ion', //IVM
-            'bad/invalidVersionMarker_ion_2_0.ion', //IVM
-            'bad/invalidVersionMarker_ion_1_1.ion', //IVM
-            'bad/invalidVersionMarker_ion_1234_0.ion', //IVM
-            'bad/invalidVersionMarker_ion_0_0.ion', //IVM
+            'good/equivs/systemSymbols.ion',//nested IVM is treated as top level value roundtrip.
+            'good/intBigSize512.ion', //int maxsize limitation
         ];
 
         // For debugging, put single files in this list to have the test run only
@@ -179,6 +174,7 @@ define(['intern', 'intern!object', 'intern/dojo/node!fs', 'intern/dojo/node!path
         function makeEventStreamTest(path) {
             return function() {
                 let executor = function(resolve, reject) {
+                    console.log(path);
                     roundTripEventStreams(ion.makeReader(getInput(path)));
                     resolve();
                 };
@@ -201,7 +197,7 @@ define(['intern', 'intern!object', 'intern/dojo/node!fs', 'intern/dojo/node!path
             let tempStream = new ion.IonEventStream(tempReader);
             if(!eventStream.equals(tempStream)) {
                 let tempWriter = ion.makeTextWriter();
-                tempStream.write(tempWriter);
+                tempStream.writeIon(tempWriter);
                 tempWriter.close();
                 let tempBuf = tempWriter.getBytes();
                 let unequalString = "";

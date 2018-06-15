@@ -543,9 +543,11 @@ export class ParserTextRaw {
   }
 
     private _read_value_helper_letter( ch1 : number, accept_operator_symbols: boolean, calling_op : ReadValueHelper) {
+        let tempNullStart = this._start;
         this._read_symbol();
         let type = this._value_pop();
         if (type != T_IDENTIFIER) throw new Error("Expecting symbol here.");
+
         let symbol = this.get_value_as_string(type);
 
         if(is_keyword(symbol)) {
@@ -561,6 +563,7 @@ export class ParserTextRaw {
                     symbol = this.get_value_as_string(T_IDENTIFIER);
                     kwt = get_type_from_name(symbol);
                 }
+                //this._start = tempNullStart;
                 this._start = -1;
                 this._end = -1;
             }
