@@ -55,22 +55,16 @@ define(['intern', 'intern!object', 'intern/dojo/node!fs', 'intern/dojo/node!path
             'good/equivs/blobs.ion', //blobs unsupported
             'good/equivs/binaryInts.ion', //binary ints unsupported
             'good/blobs.ion', //blobs unsupported
-            //'good/testfile35.ion', //symbol table imports unsupported
-            'good/testfile29.ion', //IVM unsupported
-            'good/testfile26.ion', //IVM unsupported
-            'good/innerVersionIdentifiers.ion',//even though these are not IVM values on roundtrip the marshalling behavior treats text values as if they are top level and the IVM corrupts the reader.
-            'good/subfieldVarUInt32bit.ion', //IVM and imports unsupported
-            'good/subfieldVarUInt16bit.ion', //IVM and imports unsupported
-            'good/subfieldVarUInt15bit.ion', //IVM and imports unsupported
-            'good/subfieldVarUInt.ion', //IVM and imports unsupported
-            'good/localSymbolTableImportZeroMaxId.ion', //IVM and imports unsupported
+            'good/testfile29.ion', //blobs unsupported
+            'good/testfile26.ion', //blobs unsupported
+            'good/subfieldVarUInt32bit.ion', //passes, but takes too long to run every build due to longint rounding.
+            'good/subfieldVarUInt.ion', //passes, but takes too long to run every build due to longint rounding.
             'good/floatsWithUnderscores.ion', //numbers with underscores unsupported
             'good/equivs/floatsWithUnderscores.ion', //numbers with underscores unsupported
             'good/equivs/decimalsWithUnderscores.ion', //numbers with underscores unsupported
             'good/decimalsWithUnderscores.ion', //numbers with underscores unsupported
             'good/equivs/bigInts.ion', //numbers unsupported by js's int or float are unsupported
             'good/equivs/strings.ion', //triplequote interaction with span and whitespace corrupts the state of the parser.
-            'good/equivs/systemSymbols.ion',//nested IVM is treated as top level value roundtrip.
             'good/intBigSize512.ion', //int maxsize limitation
         ];
 
@@ -174,7 +168,6 @@ define(['intern', 'intern!object', 'intern/dojo/node!fs', 'intern/dojo/node!path
         function makeEventStreamTest(path) {
             return function() {
                 let executor = function(resolve, reject) {
-                    console.log(path);
                     roundTripEventStreams(ion.makeReader(getInput(path)));
                     resolve();
                 };
