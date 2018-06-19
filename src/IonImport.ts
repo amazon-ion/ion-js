@@ -28,58 +28,57 @@ import { SymbolIndex } from "./IonSymbolIndex";
  * @see http://amzn.github.io/ion-docs/symbols.html#imports
  */
 export class Import {
-  private readonly _offset: number;
-  private readonly _length: number;
-  private readonly index: SymbolIndex = {};
+    private readonly _offset: number;
+    private readonly _length: number;
+    private readonly index: SymbolIndex = {};
+    private readonly _parent : Import;
+    private readonly _symbolTable : SharedSymbolTable;
 
-  constructor(
-    private readonly _parent: Import,
-    private readonly _symbolTable: SharedSymbolTable,
-    length?: number
-  ) {
-    this._offset = (_parent && (_parent.offset + _parent.length)) || 1;
-    this._length = length || _symbolTable.symbols.length;
+    constructor(parent : Import, symbolTable : SharedSymbolTable, length?: number) {
+        this._parent = parent;
+        this._symbolTable = symbolTable;
+        this._offset = this.parent ? this.parent.offset + this.parent.length : 1;//this is wrong.
+        this._length = length || this.symbolTable.symbols.length;
 
-    let symbols: string[] = _symbolTable.symbols;
-    for (let i: number = 0; i < this._length; i++) {
-      this.index[symbols[i]] = this._offset + i;
-    }
-  }
-
-  getSymbol(symbolId: number) : string {
-    if (!isNullOrUndefined(this.parent)) {
-      let parentSymbol = this.parent.getSymbol(symbolId);
-      if (!isUndefined(parentSymbol)) {
-        return parentSymbol;
-      }
+        let symbols: string[] = this.symbolTable.symbols;
+        for (let i: number = 0; i < this.length; i++) {
+            this.index[symbols[i]] = this.offset + i;
+        }
     }
 
-    let index: number = symbolId - this.offset;
-    if (index < this.length) {
-      return this.symbolTable.symbols[index];
+    getSymbol(symbolId: number) : string {
+        if (!isNullOrUndefined(this.parent)) {
+            let parentSymbol = this.parent.getSymbol(symbolId);
+            if (!isUndefined(parentSymbol)) {
+                return parentSymbol;
+            }
+        }
+
+        let index: number = symbolId - this.offset;
+        if (index < this.length) {
+            return this.symbolTable.symbols[index];
+        }
+
+        return undefined;
     }
 
-    return undefined;
-  }
+    getSymbolId(symbol_: string) : number {
+        return (this.parent && this._parent.getSymbolId(symbol_)) || this.index[symbol_];
+    }
 
-  getSymbolId(symbol_: string) : number {
-    return (this.parent && this.parent.getSymbolId(symbol_))
-      || this.index[symbol_];
-  }
+    get parent() : Import {
+        return this._parent;
+    }
 
-  get parent() : Import {
-    return this._parent;
-  }
+    get offset() : number {
+        return this._offset;
+    }
 
-  get offset() : number {
-    return this._offset;
-  }
+    get length() : number {
+        return this._length;
+    }
 
-  get length() : number {
-    return this._length;
-  }
-
-  get symbolTable() : SharedSymbolTable {
-    return this._symbolTable;
-  }
+    get symbolTable() : SharedSymbolTable {
+        return this._symbolTable;
+    }
 }

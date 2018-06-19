@@ -192,31 +192,29 @@ next() {
     return this._parser.isNull();
   }
 
-  stringValue() : string {
-    var i, s, t = this;
-    this.load_raw();
-    if (t.isNull()) {
-      s = "null";
-      if (t._type != IonTypes.NULL) {
-        s += "." + t._type.name;
-      }
+    stringValue() : string {
+        this.load_raw();
+        if (this.isNull()) return (this._type === IonTypes.NULL) ? "null" : "null." + this._type.name;
+        if (this._type.scalar) {
+            // BLOB is a scalar by you don't want to just use the string
+            // value otherwise all other scalars are fine as is
+            switch(this._type) {
+                case IonTypes.BLOB:
+                    throw new Error("Blobs currently unsupported.");
+                case IonTypes.SYMBOL:
+                    if(this._raw_type === T_IDENTIFIER && (this._raw.length > 1 && this._raw.charAt(0) === '$'.charAt(0))){
+                        let tempStr = this._raw.substr(1, this._raw.length);
+                        if (+tempStr === +tempStr) return this._symtab.getSymbol(Number(tempStr));//look up sid, +str === +str is a one line is integer hack
+                    } else if (this._raw_type === T_STRING1 && (this._raw.length > 1 && this._raw.charAt(0) === '$'.charAt(0))) {
+                        let tempStr = this._raw.substr(1, this._raw.length);
+                        if (+tempStr === +tempStr) return "'" + this._raw + "'";
+                    }
+                    return this._raw;
+                default:
+                    return this._raw;
+            }
+        }
     }
-    else if (t._type.scalar) {
-      // BLOB is a scalar by you don't want to just use the string 
-      // value otherwise all other scalars are fine as is
-      if (t._type !== IonTypes.BLOB) {
-        s = t._raw;
-      }
-      else {
-        s = t._raw;   // TODO - this is a temp fix !!
-      }
-    }
-    else {
-      i = t.ionValue();
-      s = i.stringValue();
-    }
-    return s;
-  }
 
   numberValue() {
     if (!this._type.num) {
