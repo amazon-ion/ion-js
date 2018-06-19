@@ -47,6 +47,7 @@ define([
       assertSystemSymbols(symbolTable);
       try {
         symbolTable.getSymbol(10);
+        throw new Error("Expected Error.")
       } catch(e) {
           if(e.message === "Expected Error.") throw new Error("Failed to cause index Error")
       }
