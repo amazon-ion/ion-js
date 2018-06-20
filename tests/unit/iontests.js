@@ -57,14 +57,13 @@ define(['intern', 'intern!object', 'intern/dojo/node!fs', 'intern/dojo/node!path
             'good/blobs.ion', //blobs unsupported.
             'good/testfile29.ion', //blobs unsupported.
             'good/testfile26.ion', //blobs unsupported.
-            'good/subfieldVarUInt32bit.ion', //passes, but takes too long to run every build due to longint rounding.
-            'good/subfieldVarUInt.ion', //passes, but takes too long to run every build due to longint rounding.
+            'good/subfieldVarUInt32bit.ion', //passes, but takes too long to run every build.
+            'good/subfieldVarUInt.ion', //passes, but takes too long to run every build.
             'good/floatsWithUnderscores.ion', //numbers with underscores unsupported.
             'good/equivs/floatsWithUnderscores.ion', //numbers with underscores unsupported.
             'good/equivs/decimalsWithUnderscores.ion', //numbers with underscores unsupported.
             'good/decimalsWithUnderscores.ion', //numbers with underscores unsupported.
             'good/equivs/bigInts.ion', //numbers unsupported by js's int or float are unsupported.
-            //'good/equivs/strings.ion', //triplequote interaction with span and whitespace corrupts the state of the parser.
             'good/intBigSize512.ion', //int maxsize limitation.
             'good/symbolZero.ion', //no symboltoken support as of yet.
         ];
