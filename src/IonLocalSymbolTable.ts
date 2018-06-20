@@ -24,59 +24,57 @@ import { SymbolIndex } from "./IonSymbolIndex";
  * symbol table or from a shared symbol table via an import.
  */
 export class LocalSymbolTable  {
-  private offset: number;
-  private _symbols: string[] = [];
-  private index: SymbolIndex = {};
+    private offset: number;
+    private _symbols: string[] = [];
+    private index: SymbolIndex = {};
 
-  constructor(private _import: Import = getSystemSymbolTableImport(), symbols: string[] = []) {
-    this.offset = _import.offset + _import.length;
+    constructor(private _import: Import = getSystemSymbolTableImport(), symbols: string[] = []) {
+        this.offset = _import.offset + _import.length;
 
-    for (let symbol_ of symbols) {
-      this.addSymbol(symbol_);
-    }
-  }
-
-  getSymbolId(symbol_: string) : number {
-    return this._import.getSymbolId(symbol_)
-      || this.index[symbol_];
-  }
-
-  addSymbol(symbol_: string) : number {
-    let existingSymbolId = this.getSymbolId(symbol_);
-    if (!isUndefined(existingSymbolId)) {
-      return existingSymbolId;
+        for (let symbol_ of symbols) {
+            this.addSymbol(symbol_);
+        }
     }
 
-    let symbolId = this.offset + this.symbols.length;
-    this.symbols.push(symbol_);
-    this.index[symbol_] = symbolId;
-    return symbolId;
-  }
-
-  getSymbol(symbolId: number): string {
-    let importedSymbol: string = this._import.getSymbol(symbolId);
-    if (!isUndefined(importedSymbol)) {
-      return importedSymbol;
+    getSymbolId(symbol_: string) : number {
+        return this._import.getSymbolId(symbol_) || this.index[symbol_];
     }
 
-    let index = symbolId - this.offset;
-    if (index < this.symbols.length) {
-      return this.symbols[index];
+    addSymbol(symbol_: string) : number {
+        let existingSymbolId = this.getSymbolId(symbol_);
+        if (!isUndefined(existingSymbolId)) {
+            return existingSymbolId;
+        }
+
+        let symbolId = this.offset + this.symbols.length;
+        this.symbols.push(symbol_);
+        this.index[symbol_] = symbolId;
+        return symbolId;
     }
 
-    return undefined;
-  }
+    getSymbol(symbolId: number): string {
+        let importedSymbol: string = this._import.getSymbol(symbolId);
+        if (!isUndefined(importedSymbol)) {
+            return importedSymbol;
+        }
 
-  get symbols() : string[] {
-    return this._symbols;
-  }
+        let index = symbolId - this.offset;
+        if (index < this.symbols.length) {
+            return this.symbols[index];
+        }
+        return undefined;
+    }
 
-  get import() : Import {
-    return this._import;
-  }
+    get symbols() : string[] {
+        return this._symbols;
+    }
+
+    get import() : Import {
+        return this._import;
+    }
 }
 
 
 export function defaultLocalSymbolTable() : LocalSymbolTable {
-  return new LocalSymbolTable(getSystemSymbolTableImport());
+    return new LocalSymbolTable(getSystemSymbolTableImport());
 }
