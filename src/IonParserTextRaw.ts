@@ -729,7 +729,7 @@ export class ParserTextRaw {
             this._value_push( T_TIMESTAMP );
             return;
         } else if (ch !== CH_T) {
-            throw new Error("Timestamp day must be followed by 'T' or ' '.");
+            throw new Error("Timestamp day must be followed by a numeric stop character .");
         }
 
         let peekChar = this._in.peek();
@@ -743,7 +743,7 @@ export class ParserTextRaw {
 
         ch = this._readPastNDigits(2);//read past hour.
         if (ch !== CH_CL) { // :
-            throw new Error("Timestamp time(hr:min) necessitates format of 00:00");
+            throw new Error("Timestamp time(hr:min) requires format of 00:00");
         }
 
         ch = this._readPastNDigits(2);//read past minutes.
@@ -764,7 +764,7 @@ export class ParserTextRaw {
             throw new Error("Timestamps require an offset.");
         }
         ch = this._readPastNDigits(2);
-        if(ch !== CH_CL) throw new Error("Illegal offset.");
+        if(ch !== CH_CL) throw new Error("Timestamp offset(hr:min) requires format of +/-00:00.");
         this._readNDigits(2);
 
         ch = this._peek();
@@ -1510,21 +1510,17 @@ export class ParserTextRaw {
     return ch;
   }
 
-    private _readNDigits(n: number) : number {//This is clearly bugged it reads n + 1 digits.
+    private _readNDigits(n: number) : number {
         let ch : number
-        if (n <= 0) throw new Error("Cannot read a negative number of digits.");
+        if (n <= 0) throw new Error("Cannot read a lack of or negative number of digits.");
         while(n--) {
-            if (!IonText.is_digit(ch = this._read())) throw new Error("Expected digit, got: " + ch);
+            if (!IonText.is_digit(ch = this._read())) throw new Error("Expected digit, got: " + String.fromCharCode(ch));
         }
         return ch;
     }
 
     private _readPastNDigits(n: number) : number {//This is clearly bugged it reads n + 1 digits.
-        let ch : number
-        if (n <= 0) throw new Error("Cannot read a negative number of digits.");
-        while(n--) {
-            if (!IonText.is_digit(ch = this._read())) throw new Error("Expected digit, got: " + ch);
-        }
+        this._readNDigits(n);
         return this._read();
     }
 
