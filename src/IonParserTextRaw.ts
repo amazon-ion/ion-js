@@ -822,7 +822,11 @@ export class ParserTextRaw {
           //looking for more triple quotes
           while(this._peek("\'\'\'") === ERROR) {
               ch = this._read();
-              if(ch === EOF) throw new Error('Closing triple quotes not found.');
+              if (ch == CH_BS) {
+                  this._read_string_escape_sequence();
+              }
+              if (ch === EOF) throw new Error('Closing triple quotes not found.');
+              if (!is_valid_string_char(ch, true)) throw new Error("invalid character "+ch+" in string" );
             // read single quoted strings until we see the triple quoted terminator
             // if it's not a triple quote, it's just content
           }
@@ -833,7 +837,7 @@ export class ParserTextRaw {
           // the reader will parse values from the source so that it can be roundtripped.
           // eat next whitespace sequence until first non white char found.
       }
-      this._value_push( T_STRING3 );
+      this._value_push(T_STRING3);
   }
 
     private verifyTriple(entryIndex : number) : boolean {
@@ -853,10 +857,7 @@ export class ParserTextRaw {
       else if (ch == terminator) {
         break;
       }
-      else if (!is_valid_string_char(ch, allow_new_line)) {
-        this._error( "invalid character "+ch+" in string" );
-        break;
-      }
+      else if (!is_valid_string_char(ch, allow_new_line)) throw new Error("invalid character "+ch+" in string" );
     }
   }
 
@@ -1206,7 +1207,7 @@ export class ParserTextRaw {
         if (tempIndex + 2 <= end && this.verifyTriple(tempIndex)) {//index === ' index + 1 === ' index + 2 === ' and not at the end of the value
             return tempIndex + 4;//indexes us past the triple quote we just found
         } else {
-            return tempIndex;
+            return tempIndex + 1;
         }
     }
 
@@ -1270,10 +1271,7 @@ export class ParserTextRaw {
   private _read_escape_sequence(ii: number, end: number) : number {
     // actually converts the escape sequence to the code point
     var ch;
-    if (ii+1 >= end) {
-      this._error("invalid escape sequence");
-      return;
-    }
+    if (ii+1 >= end) throw new Error("Invalid escape sequence.");
     ch = this._in.valueAt(ii+1);
     this._esc_len = 1;
     switch(ch) {
@@ -1460,7 +1458,7 @@ export class ParserTextRaw {
             if (ch != expected.charCodeAt(ii)) break;
             ii++;
         }
-        if (ii == expected.length) {
+        if (ii === expected.length) {
             ch = this._peek(); // if we did match we need to read the next character
         } else {
             this._unread(ch); // if we didn't match we've read an extra character
