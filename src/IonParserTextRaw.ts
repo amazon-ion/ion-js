@@ -563,7 +563,6 @@ export class ParserTextRaw {
                     symbol = this.get_value_as_string(T_IDENTIFIER);
                     kwt = get_type_from_name(symbol);
                 }
-                //this._start = tempNullStart;
                 this._start = -1;
                 this._end = -1;
             }

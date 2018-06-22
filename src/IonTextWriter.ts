@@ -50,10 +50,10 @@ export class Context {
 }
 
 export class TextWriter implements Writer {
+    private containerContext : Context[] = [];
     getBytes(): number[] {
         return this.writeable.getBytes();
     }
-    private containerContext : Context[] = [];
 
     constructor(private readonly writeable: Writeable) {
         this.containerContext.push(new Context(undefined));

@@ -69,7 +69,6 @@ export class TextReader implements Reader {
   load_raw() {
     let t: TextReader = this;
     if (t._raw !== undefined) return;
-    //if (t.isNull()) return;
     t._raw = t._parser.get_value_as_string(t._raw_type);
     return;
   }
@@ -121,7 +120,6 @@ next() {
         if (this._raw_type === T_IDENTIFIER) {
             if (this._depth > 0) break;
             this.load_raw();
-            //if(this._raw !== "$ion_1_0") break;
             if (!this.isIVM(this._raw)) break;
             this._symtab = defaultLocalSymbolTable();
             this._raw = undefined;
