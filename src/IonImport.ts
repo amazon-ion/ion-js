@@ -37,7 +37,7 @@ export class Import {
     constructor(parent : Import, symbolTable : SharedSymbolTable, length?: number) {
         this._parent = parent;
         this._symbolTable = symbolTable;
-        this._offset = this.parent ? this.parent.offset + this.parent.length : 1;//this is wrong.
+        this._offset = this.parent ? this.parent.offset + this.parent.length : 1;
         this._length = length || this.symbolTable.symbols.length;
 
         let symbols: string[] = this.symbolTable.symbols;

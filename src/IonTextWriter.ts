@@ -381,7 +381,18 @@ export class TextWriter implements Writer {
 
     private writeSymbolToken(s: string) : void {
         if (isIdentifier(s)) {
-            this.writeUtf8(s);
+            if(s.length > 1 && s.charAt(0) === '$'.charAt(0)){
+                let tempStr = s.substr(1, s.length);
+                if (+tempStr === +tempStr) {//+str === +str is a one line is integer hack
+                    this.writeable.writeByte(CharCodes.SINGLE_QUOTE);
+                    this.writeable.writeStream(escape(s, SymbolEscapes));
+                    this.writeable.writeByte(CharCodes.SINGLE_QUOTE);
+                } else {
+                    this.writeUtf8(s);
+                }
+            } else {
+                this.writeUtf8(s);
+            }
         } else if ((!this.isTopLevel) && (this.currentContainer.containerType === TypeCodes.SEXP) && isOperator(s)) {
             this.writeUtf8(s);
         } else {

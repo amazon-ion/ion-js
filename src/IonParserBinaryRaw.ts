@@ -539,7 +539,7 @@ const MAX_BYTES_FOR_INT_IN_NUMBER = 6; // = floor(52 /* sig fig bits in number *
 const ZERO_POINT_ZERO = new Float64Array([0.0]);
 
 export class ParserBinaryRaw {
-  private buf = new ArrayBuffer(8);                   // TODO - what about threading? no.
+  private buf = new ArrayBuffer(8);
   private buf_as_bytes = new Uint8Array(this.buf);    //        we could new them locally in normal_float_to_bytes
   private buf_as_double = new Float64Array(this.buf); //        but that seems wasteful. ... hmmm
 

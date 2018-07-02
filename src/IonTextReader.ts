@@ -204,15 +204,17 @@ next() {
                 case IonTypes.SYMBOL:
                     if(this._raw_type === T_IDENTIFIER && (this._raw.length > 1 && this._raw.charAt(0) === '$'.charAt(0))){
                         let tempStr = this._raw.substr(1, this._raw.length);
-                        if (+tempStr === +tempStr) return this._symtab.getSymbol(Number(tempStr));//look up sid, +str === +str is a one line is integer hack
-                    } else if (this._raw_type === T_STRING1 && (this._raw.length > 1 && this._raw.charAt(0) === '$'.charAt(0))) {
-                        let tempStr = this._raw.substr(1, this._raw.length);
-                        if (+tempStr === +tempStr) return "'" + this._raw + "'";
+                        if (+tempStr === +tempStr) {//look up sid, +str === +str is a one line is integer hack
+                            let symbol = this._symtab.getSymbol(Number(tempStr));
+                            if(symbol === undefined) throw new Error("Unresolveable symbol ID, symboltokens unsupported.");
+                        }
                     }
                     return this._raw;
                 default:
                     return this._raw;
             }
+        } else {
+            throw new Error("Cannot create string representation of non-scalar values.");
         }
     }
 
