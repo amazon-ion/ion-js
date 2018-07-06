@@ -42,30 +42,30 @@ define(['intern', 'intern!object', 'intern/dojo/node!fs', 'intern/dojo/node!path
 
         let skipList = [
             'good/non-equivs/blobs.ion',
-            'good/utf32.ion', //testing not configured to decode raw utf32
-            'good/utf16.ion', //testing not configured to decode raw utf16
+            'good/utf32.ion', //testing not configured to decode raw utf32.
+            'good/utf16.ion', //testing not configured to decode raw utf16.
             'good/subfieldVarInt.ion', //passes, but takes too long to run every build due to longint rounding.
-            'good/nonNulls.ion', //blobs bug
-            'good/non-equivs/nonNulls.ion', //blobs bug
-            'good/lists.ion', //blobs bug
-            'good/intBinary.ion', //binaryInts unsupported
-            'good/intsWithUnderscores.ion', //binary ints unsupported
-            'good/intBigSize256.ion', //int maxsize limitation
-            'good/equivs/intsWithUnderscores.ion', //binary ints unsupported
-            'good/equivs/blobs.ion', //blobs unsupported
-            'good/equivs/binaryInts.ion', //binary ints unsupported
-            'good/blobs.ion', //blobs unsupported
-            'good/testfile29.ion', //blobs unsupported
-            'good/testfile26.ion', //blobs unsupported
-            'good/subfieldVarUInt32bit.ion', //passes, but takes too long to run every build due to longint rounding.
-            'good/subfieldVarUInt.ion', //passes, but takes too long to run every build due to longint rounding.
-            'good/floatsWithUnderscores.ion', //numbers with underscores unsupported
-            'good/equivs/floatsWithUnderscores.ion', //numbers with underscores unsupported
-            'good/equivs/decimalsWithUnderscores.ion', //numbers with underscores unsupported
-            'good/decimalsWithUnderscores.ion', //numbers with underscores unsupported
-            'good/equivs/bigInts.ion', //numbers unsupported by js's int or float are unsupported
-            'good/equivs/strings.ion', //triplequote interaction with span and whitespace corrupts the state of the parser.
-            'good/intBigSize512.ion', //int maxsize limitation
+            'good/nonNulls.ion', //blobs bug.
+            'good/non-equivs/nonNulls.ion', //blobs bug.
+            'good/lists.ion', //blobs bug.
+            'good/intBinary.ion', //binaryInts unsupported.
+            'good/intsWithUnderscores.ion', //binary ints unsupported.
+            'good/intBigSize256.ion', //int maxsize limitation.
+            'good/equivs/intsWithUnderscores.ion', //binary ints unsupported.
+            'good/equivs/blobs.ion', //blobs unsupported.
+            'good/equivs/binaryInts.ion', //binary ints unsupported.
+            'good/blobs.ion', //blobs unsupported.
+            'good/testfile29.ion', //blobs unsupported.
+            'good/testfile26.ion', //blobs unsupported.
+            'good/subfieldVarUInt32bit.ion', //passes, but takes too long to run every build.
+            'good/subfieldVarUInt.ion', //passes, but takes too long to run every build.
+            'good/floatsWithUnderscores.ion', //numbers with underscores unsupported.
+            'good/equivs/floatsWithUnderscores.ion', //numbers with underscores unsupported.
+            'good/equivs/decimalsWithUnderscores.ion', //numbers with underscores unsupported.
+            'good/decimalsWithUnderscores.ion', //numbers with underscores unsupported.
+            'good/equivs/bigInts.ion', //numbers unsupported by js's int or float are unsupported.
+            'good/intBigSize512.ion', //int maxsize limitation.
+            'good/symbolZero.ion', //no symboltoken support as of yet.
         ];
 
         // For debugging, put single files in this list to have the test run only

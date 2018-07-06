@@ -37,8 +37,7 @@ export class LocalSymbolTable  {
   }
 
   getSymbolId(symbol_: string) : number {
-    return this._import.getSymbolId(symbol_)
-      || this.index[symbol_];
+    return this._import.getSymbolId(symbol_) || this.index[symbol_];
   }
 
   addSymbol(symbol_: string) : number {
@@ -53,22 +52,27 @@ export class LocalSymbolTable  {
     return symbolId;
   }
 
-  getSymbol(symbolId: number): string {
-    let importedSymbol: string = this._import.getSymbol(symbolId);
-    if (!isUndefined(importedSymbol)) {
-      return importedSymbol;
-    }
+    getSymbol(symbolId: number): string {
+        if(symbolId > this.maxId) throw new Error("SymbolID greater than maxID.");
+        let importedSymbol: string = this.import.getSymbol(symbolId);
+        if (!isUndefined(importedSymbol)) {
+            return importedSymbol;
+        }
 
-    let index = symbolId - this.offset;
-    if (index < this.symbols.length) {
-      return this.symbols[index];
-    }
+        let index = symbolId - this.offset;
+        if (index < this.symbols.length) {
+            return this.symbols[index];
+        }
 
-    return undefined;
-  }
+        return undefined;
+    }
 
   get symbols() : string[] {
     return this._symbols;
+  }
+
+  get maxId() : number {
+      return this.offset + this._symbols.length - 1;
   }
 
   get import() : Import {
