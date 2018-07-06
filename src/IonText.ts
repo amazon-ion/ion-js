@@ -151,7 +151,7 @@ export function is_letter(ch: number) : boolean {
   return _is_letter[ch];
 }
 
-export function is_numeric_terminator(ch: number) : boolean {
+export function isNumericTerminator(ch: number) : boolean {
   if (ch == -1) return true;
   return _is_numeric_terminator[ch];
 }

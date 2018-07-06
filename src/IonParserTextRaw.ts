@@ -126,7 +126,7 @@ export function get_ion_type(t: number) : IonType {
     case T_SEXP:          return IonTypes.SEXP;
     case T_LIST:          return IonTypes.LIST;
     case T_STRUCT:        return IonTypes.STRUCT;
-    default:              return undefined;
+    default:              throw new Error("Unknown type: " + String(t) + ".");
   }
 }
 //needs to differentiate between quoted text of 'null' and the symbol keyword null
@@ -137,7 +137,7 @@ function get_keyword_type(str: string) : number {
   if (str === "nan")   return T_FLOAT_SPECIAL;
   if (str === "+inf")  return T_FLOAT_SPECIAL;
   if (str === "-inf")  return T_FLOAT_SPECIAL;
-  return undefined;
+    throw new Error("Unknown keyword: " + str + ".");
 }
 
 function get_type_from_name(str: string) : number {
@@ -154,11 +154,11 @@ function get_type_from_name(str: string) : number {
   if (str === "sexp")      return T_SEXP;
   if (str === "list")      return T_LIST;
   if (str === "struct")    return T_STRUCT;
-  return undefined;
+  throw new Error("Unknown type: " + str + ".");
 }
 
 function is_keyword(str: string) : boolean {
-  return (get_keyword_type(str) != undefined);
+    return (str === "null") || (str === "true") || (str === "false") || (str === "nan") || (str === "+inf") || (str === "-inf");
 }
 
 function get_hex_value(ch: number) : number {
@@ -186,7 +186,7 @@ function get_hex_value(ch: number) : number {
     case  69: return 14; // 'E'
     case  70: return 15; // 'F'
   }
-  throw new Error("unexpected bad hex digit in checked data");
+  throw new Error("Unexpected bad hex digit in checked data.");
 }
 
 function is_valid_base64_length(char_length: number, trailer_length: number) : boolean {
@@ -291,8 +291,9 @@ export class ParserTextRaw {
     var ch = this._read_after_whitespace(true);
     if (ch == CH_CP) {
       this._value_push( EOF );
-    }
-    else {
+    } else if (ch === EOF){
+        throw new Error("Expected closing ).");
+    } else {
       this._unread(ch);
       this._ops.unshift( this._read_sexp_values );
       this._ops.unshift( this._read_sexp_value );
@@ -473,7 +474,7 @@ export class ParserTextRaw {
   private _read_value_helper_plus( ch1 : number, accept_operator_symbols: boolean, calling_op : ReadValueHelper) {
     var ch2 = this._peek("inf");
     this._unread(ch1); // in any case we'll leave this character for the next function to use
-    if (IonText.is_numeric_terminator(ch2)) {
+    if (IonText.isNumericTerminator(ch2)) {
       this._ops.unshift( this._read_plus_inf );
     }
     else if (accept_operator_symbols) {
@@ -489,7 +490,7 @@ export class ParserTextRaw {
         ch2 = this._peek();
     if (ch2 == CH_i) {
       ch2 = this._peek("inf");
-      if (IonText.is_numeric_terminator(ch2)) {
+      if (IonText.isNumericTerminator(ch2)) {
         op =  this._read_minus_inf;
       }
       else if (accept_operator_symbols) {
@@ -515,7 +516,7 @@ export class ParserTextRaw {
     var ch2 = this._peek_4_digits(ch1);
     this._unread(ch1);
     if (ch2 == CH_T || ch2 == CH_MS) {
-      this._ops.unshift( this._read_timestamp );
+      this._ops.unshift( this._readTimestamp );
     }
     else {
       this._ops.unshift( this._read_number );
@@ -541,13 +542,44 @@ export class ParserTextRaw {
     this._ops.unshift( this._read_string2 );
   }
 
-  private _read_value_helper_letter( ch1 : number, accept_operator_symbols: boolean, calling_op : ReadValueHelper) {
-    this._read_symbol();
-    if (this._test_symbol_as_annotation()) {
-      // this was an annoation, so we need to try again for the actual value
-      this._ops.unshift( calling_op );
+    private _read_value_helper_letter( ch1 : number, accept_operator_symbols: boolean, calling_op : ReadValueHelper) {
+        let tempNullStart = this._start;
+        this._read_symbol();
+        let type = this._value_pop();
+        if (type != T_IDENTIFIER) throw new Error("Expecting symbol here.");
+
+        let symbol = this.get_value_as_string(type);
+
+        if(is_keyword(symbol)) {
+            let kwt = get_keyword_type(symbol);
+            if (kwt === T_NULL) {
+                this._value_null = true;
+                if (this._peek() === CH_DT) {
+                    this._read(); // consume the dot
+                    let ch = this._read();
+                    if (IonText.is_letter(ch) !== true) throw new Error("Expected type name after 'null.'");
+                    this._read_symbol();
+                    if (this._value_pop() !== T_IDENTIFIER) throw new Error("Expected type name after 'null.'");
+                    symbol = this.get_value_as_string(T_IDENTIFIER);
+                    kwt = get_type_from_name(symbol);
+                }
+                this._start = -1;
+                this._end = -1;
+            }
+            this._value_push(kwt);
+        } else {
+            let ch = this._read_after_whitespace(true);
+            if (ch == CH_CL && this._peek() == CH_CL) {
+                this._read(); // consume the colon character
+                this._ann.push(symbol);
+                this._ops.unshift( calling_op );
+            } else {
+                let kwt = T_IDENTIFIER;
+                this._unread(ch);
+                this._value_push(kwt); // put the value back on the stack
+            }
+        }
     }
-  }
 
   private _read_value_helper_operator( ch1 : number, accept_operator_symbols: boolean, calling_op : ReadValueHelper) {
     if (accept_operator_symbols) {
@@ -590,7 +622,7 @@ export class ParserTextRaw {
       t = T_DECIMAL;
       ch = this._read_optional_digits(this._read());
     }
-    if (!IonText.is_numeric_terminator(ch)) {
+    if (!IonText.isNumericTerminator(ch)) {
       if (ch == CH_d || ch == CH_D) {
         t = T_DECIMAL;
         ch = this._read_exponent();
@@ -600,7 +632,7 @@ export class ParserTextRaw {
         ch = this._read_exponent();
       }
     }
-    if (!IonText.is_numeric_terminator(ch)) {
+    if (!IonText.isNumericTerminator(ch)) {
       this._error( "invalid character after number" );
     }
     else {
@@ -616,7 +648,7 @@ export class ParserTextRaw {
       ch = this._read(); // read the first hex digits
       ch = this._read_required_hex_digits(ch);
     }
-    if (IonText.is_numeric_terminator(ch)) {
+    if (IonText.isNumericTerminator(ch)) {
       this._unread(ch);
       this._end = this._in.position();
       this._value_push( T_HEXINT );
@@ -663,7 +695,7 @@ export class ParserTextRaw {
         return;
       }
     }
-    if (IonText.is_numeric_terminator( this._peek() )) {
+    if (IonText.isNumericTerminator( this._peek() )) {
       this._end = this._in.position();
       this._value_push( T_FLOAT_SPECIAL );
     }
@@ -672,58 +704,76 @@ export class ParserTextRaw {
     }
   }
 
-  private _read_timestamp() : void {
-    var ch;
-    this._start = this._in.position();
-    ch = this._read_N_digits( 4 );      // read year
-    if (ch == CH_T) {
-      ch = this._read();  // this is needed as we disallow yyyyThh:mm - TODO really !?
-    }
-    else if (ch == CH_MS) {
-      ch = this._read_N_digits( 2 );    // read month
-      if (ch == CH_MS) {
-        ch = this._read_N_digits( 2 );  // read day
-      }
-      ch = this._read_optional_time(ch);  // no time unless you at least include month - TODO really !?
-    }
-    ch = this._read_optional_time_offset(ch); // we only allow an offset
-    if (IonText.is_numeric_terminator(ch)) {
-      this._unread(ch);
-      this._end = this._in.position();
-      this._value_push( T_TIMESTAMP );
-    }
-    else {
-      this._error( "invalid character after timestamp" );
-    }
-  }
-
-  private _read_optional_time(ch: number) : number {
-    if (ch != CH_T) return ch; // no 'T", no time
-    ch = this._read();
-    if (!IonText.is_numeric_terminator(ch)) {
-      // then it has to be, at least hours and minutes
-      ch = this._read_hours_and_minutes(ch);
-      if (ch == CH_CL) {
-        ch = this._read_N_digits( 2 );         // seconds
-        if (ch == CH_DT) {
-          ch = this._read();
-          ch = this._read_required_digits(ch); // fractional seconds (apparently required)
+    private _readTimestamp() : void {
+        this._start = this._in.position();
+        let ch = this._readPastNDigits(4);//reads past year, throws on non digits.
+        if (ch === CH_T) {
+            this._end = this._in.position();
+            this._value_push( T_TIMESTAMP );
+            return;
+        } else if (ch !== CH_MS) {
+            throw new Error("Timestamp year must be followed by '-' or 'T'.");
         }
-      }
-    }
-    return ch;
-  }
 
-  private _read_optional_time_offset(ch: number) : number {
-    if (ch == CH_MS || ch == CH_PS) {
-      ch = this._read();
-      ch = this._read_hours_and_minutes( ch ); // of the time offset
+        ch = this._readPastNDigits(2);//reads past month, throws on non digits.
+        if (ch === CH_T) {
+            this._end = this._in.position();
+            this._value_push( T_TIMESTAMP );
+            return;
+        } else if (ch !== CH_MS) {
+            throw new Error("Timestamp month must be followed by '-' or 'T'.");
+        }
+
+        ch = this._readPastNDigits(2); //reads past day, throws on non digits.
+        if (IonText.isNumericTerminator(ch)) {
+            this._unread(ch);
+            this._end = this._in.position();
+            this._value_push( T_TIMESTAMP );
+            return;
+        } else if (ch !== CH_T) {
+            throw new Error("Timestamp day must be followed by a numeric stop character .");
+        }
+
+        let peekChar = this._in.peek();
+        if (IonText.isNumericTerminator(peekChar)) {//checks to see if timestamp value has terminated.
+            this._end = this._in.position();
+            this._value_push( T_TIMESTAMP );
+            return;
+        } else if (!IonText.is_digit(peekChar)) {
+            throw new Error("Timestamp DATE must be followed by numeric terminator or additional TIME digits.");
+        }
+
+        ch = this._readPastNDigits(2);//read past hour.
+        if (ch !== CH_CL) { // :
+            throw new Error("Timestamp time(hr:min) requires format of 00:00");
+        }
+
+        ch = this._readPastNDigits(2);//read past minutes.
+        if (ch === CH_CL) { //read seconds
+            ch = this._readPastNDigits(2);
+            if (ch === CH_DT) { //read fractional seconds
+                if(!IonText.is_digit(this._read())) throw new Error("W3C timestamp spec requires atleast one digit after decimal point." );
+                while (IonText.is_digit(ch = this._read())) {}
+            }
+        }
+
+        if (ch === CH_Z) {
+            if(!IonText.isNumericTerminator(this._peek())) throw new Error("Illegal terminator after Zulu offset.");
+            this._end = this._in.position();
+            this._value_push( T_TIMESTAMP );
+            return;
+        } else if (ch !== CH_PS && ch !== CH_MS) {
+            throw new Error("Timestamps require an offset.");
+        }
+        ch = this._readPastNDigits(2);
+        if(ch !== CH_CL) throw new Error("Timestamp offset(hr:min) requires format of +/-00:00.");
+        this._readNDigits(2);
+
+        ch = this._peek();
+        if(!IonText.isNumericTerminator(ch)) throw new Error("Improperly formatted timestamp.");
+        this._end = this._in.position();
+        this._value_push( T_TIMESTAMP );
     }
-    else if (ch == CH_Z) {
-      ch =  this._read();
-    }
-    return ch;
-  }
 
   private _read_symbol() : void {
     var ch;
@@ -732,8 +782,8 @@ export class ParserTextRaw {
       ch = this._read();
       if (!IonText.is_letter_or_digit(ch)) break;
     }
-    this._end = this._in.position() - 1;
     this._unread(ch);
+    this._end = this._in.position();
     this._value_push( T_IDENTIFIER );
   }
 
@@ -771,7 +821,11 @@ export class ParserTextRaw {
           //looking for more triple quotes
           while(this._peek("\'\'\'") === ERROR) {
               ch = this._read();
-              if(ch === EOF) throw new Error('Closing triple quotes not found.');
+              if (ch == CH_BS) {
+                  this._read_string_escape_sequence();
+              }
+              if (ch === EOF) throw new Error('Closing triple quotes not found.');
+              if (!is_valid_string_char(ch, true)) throw new Error("invalid character "+ch+" in string" );
             // read single quoted strings until we see the triple quoted terminator
             // if it's not a triple quote, it's just content
           }
@@ -782,7 +836,7 @@ export class ParserTextRaw {
           // the reader will parse values from the source so that it can be roundtripped.
           // eat next whitespace sequence until first non white char found.
       }
-      this._value_push( T_STRING3 );
+      this._value_push(T_STRING3);
   }
 
     private verifyTriple(entryIndex : number) : boolean {
@@ -802,10 +856,7 @@ export class ParserTextRaw {
       else if (ch == terminator) {
         break;
       }
-      else if (!is_valid_string_char(ch, allow_new_line)) {
-        this._error( "invalid character "+ch+" in string" );
-        break;
-      }
+      else if (!is_valid_string_char(ch, allow_new_line)) throw new Error("invalid character "+ch+" in string" );
     }
   }
 
@@ -867,54 +918,6 @@ export class ParserTextRaw {
     return is_ann;
   }
 
-private _test_symbol_as_annotation() : boolean {
-    var s, ii, ch, kwt,
-    is_ann = true,
-    t = this._value_pop();
-    if (t != T_IDENTIFIER) this._error("expecting symbol here");
-    s = this.get_value_as_string(t);
-    kwt = get_keyword_type(s);
-    if (kwt === T_NULL) {
-        this._value_null = true;
-        is_ann = false;
-        ch = this._peek();
-        if (ch === CH_DT) {
-            this._read(); // consume the dot
-            ch = this._read();
-            if (IonText.is_letter(ch) !== true) {
-                this._error("expected type name after 'null.'");
-                return undefined;
-            }
-            this._read_symbol();
-            if (this._value_pop() != T_IDENTIFIER) {
-                this._error("expected type name after 'null.'");
-                return undefined;
-            }
-            s = this.get_value_as_string(T_IDENTIFIER);
-            kwt = get_type_from_name(s);
-        }
-        this._start = -1;
-        this._end = -1;
-        this._value_push(kwt);
-        return is_ann;
-    }
-
-    ch = this._read_after_whitespace(true);
-    if (ch == CH_CL && this._peek() == CH_CL) {
-        if (kwt != undefined) this._error("the keyword '"+s+"' can't be used as an annotation without quotes");
-        this._read(); // consume the colon character
-        this._ann.push(s);
-        is_ann = true;
-    } else {
-        // if this is a keyword, we'll just keep it's type, otherwise switch back to the generic "identifier"
-        if (kwt == undefined) kwt = T_IDENTIFIER;
-        this._unread(ch);
-        is_ann = false;
-
-        this._value_push(kwt); // put the value back on the stack
-    }
-    return is_ann;
-}
 
   private _read_clob_string2() : void {
     var t;
@@ -1203,7 +1206,7 @@ private _test_symbol_as_annotation() : boolean {
         if (tempIndex + 2 <= end && this.verifyTriple(tempIndex)) {//index === ' index + 1 === ' index + 2 === ' and not at the end of the value
             return tempIndex + 4;//indexes us past the triple quote we just found
         } else {
-            return tempIndex;
+            return tempIndex + 1;
         }
     }
 
@@ -1267,10 +1270,7 @@ private _test_symbol_as_annotation() : boolean {
   private _read_escape_sequence(ii: number, end: number) : number {
     // actually converts the escape sequence to the code point
     var ch;
-    if (ii+1 >= end) {
-      this._error("invalid escape sequence");
-      return;
-    }
+    if (ii+1 >= end) throw new Error("Invalid escape sequence.");
     ch = this._in.valueAt(ii+1);
     this._esc_len = 1;
     switch(ch) {
@@ -1457,7 +1457,7 @@ private _test_symbol_as_annotation() : boolean {
             if (ch != expected.charCodeAt(ii)) break;
             ii++;
         }
-        if (ii == expected.length) {
+        if (ii === expected.length) {
             ch = this._peek(); // if we did match we need to read the next character
         } else {
             this._unread(ch); // if we didn't match we've read an extra character
@@ -1510,18 +1510,19 @@ private _test_symbol_as_annotation() : boolean {
     return ch;
   }
 
-  private _read_N_digits(n: number) : number {
-    var ch, ii=0;
-    while ( ii < n ) {
-      ch = this._read();
-      if (!IonText.is_digit(ch)) {
-        this._error( ""+n+" digits required "+ii+" found" );
-        return ERROR;
-      }
-      ii++;
+    private _readNDigits(n: number) : number {
+        let ch : number
+        if (n <= 0) throw new Error("Cannot read a lack of or negative number of digits.");
+        while(n--) {
+            if (!IonText.is_digit(ch = this._read())) throw new Error("Expected digit, got: " + String.fromCharCode(ch));
+        }
+        return ch;
     }
-    return this._read();
-  }
+
+    private _readPastNDigits(n: number) : number {//This is clearly bugged it reads n + 1 digits.
+        this._readNDigits(n);
+        return this._read();
+    }
 
   private _read_required_hex_digits(ch: number) : number {
     if (!IonText.is_hex_digit(ch)) return ERROR;
@@ -1547,9 +1548,9 @@ private _test_symbol_as_annotation() : boolean {
 
   private _read_hours_and_minutes(ch: number) : number {
     if (!IonText.is_digit(ch)) return ERROR;
-    ch = this._read_N_digits( 1 );   // rest of hours
+    ch = this._readPastNDigits( 1 );   // rest of hours
     if (ch == CH_CL) {
-      ch = this._read_N_digits( 2 ); // minutes
+      ch = this._readPastNDigits( 2 ); // minutes
     }
     else {
       ch = ERROR; // if there are hours you have to include minutes

@@ -147,6 +147,7 @@ abstract class AbstractIonEvent implements IonEvent {
     }
 
     writeBinaryValue(writer : Writer) : void {
+        /*
         let tempBinaryWriter = new BinaryWriter(defaultLocalSymbolTable(), new Writeable());
         this.writeIonValue(tempBinaryWriter);
         tempBinaryWriter.close();
@@ -155,6 +156,9 @@ abstract class AbstractIonEvent implements IonEvent {
         for(var i = 0; i < binaryBuffer.length; i++){
             writer.writeInt(binaryBuffer[i]);
         }
+         */
+        writer.writeList();
+        writer.writeInt(0);
         writer.endContainer();
     }
 
@@ -306,11 +310,12 @@ class IonDecimalEvent extends AbstractIonEvent {
 
 class IonSymbolEvent extends AbstractIonEvent {
     constructor(eventType : IonEventType, ionType : IonType, fieldName : string, annotations : string[], depth : number, ionValue : string){
+        //if(ionValue === '$ion_1_0') ionValue = "$ion_user_value::" + ionValue;
         super(eventType , ionType, fieldName, annotations, depth, ionValue);
     }
     valueEquals(expected : IonSymbolEvent) : boolean {
         if(expected.constructor.name !== IonSymbolEvent.name) return false;
-        return this.ionValue.name === expected.ionValue.name;//will need to change when symboltokens are introduced.
+        return this.ionValue === expected.ionValue;//will need to change when symboltokens are introduced.
     }
     writeIonValue(writer : Writer) : void{
         writer.writeSymbol(this.ionValue.toString());//if symboltokens text is unknown we will need to write out symboltable
