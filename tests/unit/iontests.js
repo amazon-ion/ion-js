@@ -42,41 +42,30 @@ define(['intern', 'intern!object', 'intern/dojo/node!fs', 'intern/dojo/node!path
 
         let skipList = [
             'good/non-equivs/blobs.ion',
-            'good/utf32.ion', //testing not configured to decode raw utf32
-            'good/utf16.ion', //testing not configured to decode raw utf16
-            'good/subfieldVarInt.ion', //IVM bug
-            'good/subfieldInt.ion', //IVM bug
-            'good/nonNulls.ion', //blobs bug
-            'good/non-equivs/nonNulls.ion', //blobs bug
-            'good/lists.ion', //blobs bug
-            'good/intBinary.ion', //binaryInts unsupported
-            'good/intsWithUnderscores.ion', //binary ints unsupported
-            'good/intBigSize256.ion', //IVM bug
-            'good/equivs/intsWithUnderscores.ion', //binary ints unsupported
-            'good/equivs/blobs.ion', //blobs unsupported
-            'good/equivs/binaryInts.ion', //binary ints unsupported
-            'good/blobs.ion', //blobs unsupported
-            'good/testfile35.ion', //symbol table imports unsupported
-            'good/testfile29.ion', //IVM unsupported
-            'good/testfile26.ion', //IVM unsupported
-            'good/innerVersionIdentifiers.ion',//even though these are not IVM values on roundtrip the marshalling behavior treats text values as if they are top level and the IVM corrupts the reader.
-            'good/subfieldVarUInt32bit.ion', //IVM and imports unsupported
-            'good/subfieldVarUInt16bit.ion', //IVM and imports unsupported
-            'good/subfieldVarUInt15bit.ion', //IVM and imports unsupported
-            'good/subfieldVarUInt.ion', //IVM and imports unsupported
-            'good/localSymbolTableImportZeroMaxId.ion', //IVM and imports unsupported
-            'good/floatsWithUnderscores.ion', //numbers with underscores unsupported
-            'good/equivs/floatsWithUnderscores.ion', //numbers with underscores unsupported
-            'good/equivs/decimalsWithUnderscores.ion', //numbers with underscores unsupported
-            'good/decimalsWithUnderscores.ion', //numbers with underscores unsupported
-            'good/equivs/bigInts.ion', //numbers unsupported by js's int or float are unsupported
-            'good/equivs/strings.ion', //triplequote interaction with span and whitespace corrupts the state of the parser.
-            'good/equivs/systemSymbols.ion',//IVM
-            'good/intBigSize512.ion', //IVM
-            'bad/invalidVersionMarker_ion_2_0.ion', //IVM
-            'bad/invalidVersionMarker_ion_1_1.ion', //IVM
-            'bad/invalidVersionMarker_ion_1234_0.ion', //IVM
-            'bad/invalidVersionMarker_ion_0_0.ion', //IVM
+            'good/utf32.ion', //testing not configured to decode raw utf32.
+            'good/utf16.ion', //testing not configured to decode raw utf16.
+            'good/subfieldVarInt.ion', //passes, but takes too long to run every build due to longint rounding.
+            'good/nonNulls.ion', //blobs bug.
+            'good/non-equivs/nonNulls.ion', //blobs bug.
+            'good/lists.ion', //blobs bug.
+            'good/intBinary.ion', //binaryInts unsupported.
+            'good/intsWithUnderscores.ion', //binary ints unsupported.
+            'good/intBigSize256.ion', //int maxsize limitation.
+            'good/equivs/intsWithUnderscores.ion', //binary ints unsupported.
+            'good/equivs/blobs.ion', //blobs unsupported.
+            'good/equivs/binaryInts.ion', //binary ints unsupported.
+            'good/blobs.ion', //blobs unsupported.
+            'good/testfile29.ion', //blobs unsupported.
+            'good/testfile26.ion', //blobs unsupported.
+            'good/subfieldVarUInt32bit.ion', //passes, but takes too long to run every build.
+            'good/subfieldVarUInt.ion', //passes, but takes too long to run every build.
+            'good/floatsWithUnderscores.ion', //numbers with underscores unsupported.
+            'good/equivs/floatsWithUnderscores.ion', //numbers with underscores unsupported.
+            'good/equivs/decimalsWithUnderscores.ion', //numbers with underscores unsupported.
+            'good/decimalsWithUnderscores.ion', //numbers with underscores unsupported.
+            'good/equivs/bigInts.ion', //numbers unsupported by js's int or float are unsupported.
+            'good/intBigSize512.ion', //int maxsize limitation.
+            'good/symbolZero.ion', //no symboltoken support as of yet.
         ];
 
         // For debugging, put single files in this list to have the test run only
@@ -201,7 +190,7 @@ define(['intern', 'intern!object', 'intern/dojo/node!fs', 'intern/dojo/node!path
             let tempStream = new ion.IonEventStream(tempReader);
             if(!eventStream.equals(tempStream)) {
                 let tempWriter = ion.makeTextWriter();
-                tempStream.write(tempWriter);
+                tempStream.writeIon(tempWriter);
                 tempWriter.close();
                 let tempBuf = tempWriter.getBytes();
                 let unequalString = "";

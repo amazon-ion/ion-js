@@ -33,12 +33,14 @@ import { ParserTextRaw } from "./IonParserTextRaw";
 import { Reader } from "./IonReader";
 import { StringSpan } from "./IonSpan";
 import { Timestamp } from "./IonTimestamp";
+import {is_digit} from "./IonText";
 
 const RAW_STRING = new IonType( -1, "raw_input", true,  false, false, false );
 
 const BEGINNING_OF_CONTAINER = -2; // cloned from IonParserTextRaw
 const EOF = -1;
 const T_IDENTIFIER = 9;
+const T_STRING1 = 11;
 const T_STRUCT = 19;
 
 export class TextReader implements Reader {
@@ -57,7 +59,7 @@ export class TextReader implements Reader {
 
     this._parser   = new ParserTextRaw(source);
     this._depth    = 0;
-    this._cat      = catalog;
+    this._cat      = catalog ? catalog : new Catalog();
     this._symtab   = defaultLocalSymbolTable();
     this._type     = undefined;
     this._raw_type = undefined;
@@ -67,7 +69,6 @@ export class TextReader implements Reader {
   load_raw() {
     let t: TextReader = this;
     if (t._raw !== undefined) return;
-    if (t.isNull()) return;
     t._raw = t._parser.get_value_as_string(t._raw_type);
     return;
   }
@@ -87,41 +88,61 @@ export class TextReader implements Reader {
     }
   }
 
-  next() {
-    this._raw = undefined;
-    if (this._raw_type === EOF) {
-      return undefined;
+    isIVM(input : string) : boolean {
+        if(this.depth() > 0) return false;
+        if(input.length < 6 || this.annotations().length > 0) return false;
+        let prefix = "$ion_";
+        for(let i = 0; i < prefix.length; i++){
+            if(prefix.charAt(i) !== input.charAt(i)) return false;
+        }
+        if(input !== "$ion_1_0") throw new Error("Only ion version 1.0 is supported.");
+        return true;
     }
 
-    let should_skip: boolean =
-      this._raw_type !== BEGINNING_OF_CONTAINER
-      && !this.isNull()
-      && this._type
-      && this._type.container;
-    if (should_skip) {
-      this.skip_past_container();
+    isLikeIVM() : boolean {
+      return false;
     }
+
+next() {
+    this._raw = undefined;
+    if (this._raw_type === EOF) return undefined;
+
+    let should_skip: boolean =
+    this._raw_type !== BEGINNING_OF_CONTAINER
+    && !this.isNull()
+    && this._type
+    && this._type.container;
+    if (should_skip) this.skip_past_container();
 
     let p: ParserTextRaw = this._parser;
     for (;;) {
-      this._raw_type = p.next();
-      if (this._depth > 0) break;
-      if (this._raw_type === T_IDENTIFIER) {
-        this.load_raw();
-        if (this._raw !== IVM.text) break;
-        this._symtab = defaultLocalSymbolTable();
-      }
-      else if (this._raw_type === T_STRUCT) {
-        if (p.annotations().length !== 1) break;
-        if (p.annotations()[0] != ion_symbol_table) break;
-        this._symtab = makeSymbolTable(this._cat, this);
-      }
-      else {
-        break;
-      }
+        this._raw_type = p.next();
+        if (this._raw_type === T_IDENTIFIER) {
+            if (this._depth > 0) break;
+            this.load_raw();
+            if (!this.isIVM(this._raw)) break;
+            this._symtab = defaultLocalSymbolTable();
+            this._raw = undefined;
+            this._raw_type = undefined;
+        }else if (this._raw_type === T_STRING1) {
+            if (this._depth > 0) break;
+            this.load_raw();
+            if (this._raw !== "$ion_1_0") break;
+            this._raw = undefined;
+            this._raw_type = undefined;
+        } else if (this._raw_type === T_STRUCT) {
+            if (p.annotations().length !== 1) break;
+            if (p.annotations()[0] != ion_symbol_table) break;
+            this._type = get_ion_type(this._raw_type);
+            this._symtab = makeSymbolTable(this._cat, this);
+            this._raw = undefined;
+            this._raw_type = undefined;
+        } else {
+            break;
+        }
     }
 
-    // for system value (IVM's and symbol table's) we continue 
+    // for system value (IVM's and symbol table's) we continue
     // around this
     this._type = get_ion_type(this._raw_type);
     return this._type;
@@ -169,31 +190,31 @@ export class TextReader implements Reader {
     return this._parser.isNull();
   }
 
-  stringValue() : string {
-    var i, s, t = this;
-    this.load_raw();
-    if (t.isNull()) {
-      s = "null";
-      if (t._type != IonTypes.NULL) {
-        s += "." + t._type.name;
-      }
+    stringValue() : string {
+        this.load_raw();
+        if (this.isNull()) return (this._type === IonTypes.NULL) ? "null" : "null." + this._type.name;
+        if (this._type.scalar) {
+            // BLOB is a scalar by you don't want to just use the string
+            // value otherwise all other scalars are fine as is
+            switch(this._type) {
+                case IonTypes.BLOB:
+                    throw new Error("Blobs currently unsupported.");
+                case IonTypes.SYMBOL:
+                    if(this._raw_type === T_IDENTIFIER && (this._raw.length > 1 && this._raw.charAt(0) === '$'.charAt(0))){
+                        let tempStr = this._raw.substr(1, this._raw.length);
+                        if (+tempStr === +tempStr) {//look up sid, +str === +str is a one line is integer hack
+                            let symbol = this._symtab.getSymbol(Number(tempStr));
+                            if(symbol === undefined) throw new Error("Unresolveable symbol ID, symboltokens unsupported.");
+                        }
+                    }
+                    return this._raw;
+                default:
+                    return this._raw;
+            }
+        } else {
+            throw new Error("Cannot create string representation of non-scalar values.");
+        }
     }
-    else if (t._type.scalar) {
-      // BLOB is a scalar by you don't want to just use the string 
-      // value otherwise all other scalars are fine as is
-      if (t._type !== IonTypes.BLOB) {
-        s = t._raw;
-      }
-      else {
-        s = t._raw;   // TODO - this is a temp fix !!
-      }
-    }
-    else {
-      i = t.ionValue();
-      s = i.stringValue();
-    }
-    return s;
-  }
 
   numberValue() {
     if (!this._type.num) {

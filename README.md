@@ -43,9 +43,9 @@ is unsupported at this time.
 | bool      | yes      | no      |   none |
 | int | yes      | no      |    underscores, binaryints, bigints |
 | float | yes      | no      |    underscores |
-| decimal | yes      | no      |    none |
-| timestamp | yes      | no      |    offsets/max values non spec-compliant |
-| string | yes      | no      |    values outside of ucs2, whitespace escapes between triplequotes |
+| decimal | yes      | no      |    large fractions are slow roundtrip |
+| timestamp | yes      | no      |    fractional seconds are slow on large fractions |
+| string | yes      | no      |    none |
 | symbol | yes      | no      |    sid0, no symboltokens |
 | blob | no      | no      |    broken |
 | clob | yes      | no      |    backed by string |
@@ -53,8 +53,8 @@ is unsupported at this time.
 | list | yes      | no      |    none |
 | sexp | yes      | no      |    none |
 | annotations | yes      | no      |    none |
-| local symbol tables | no      | no      |    IVM corrupts the parser |
-| shared symbol tables | no      | no      |    not implemented |
+| local symbol tables | yes      | no      |    none |
+| shared symbol tables | yes      | no      |    none |
 
 | Github Issues |
 |:-------------|
