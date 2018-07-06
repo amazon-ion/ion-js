@@ -251,6 +251,7 @@ export class TextWriter implements Writer {
     }
 
     writeStruct(annotations?: string[], isNull?: boolean) : void {
+        if(annotations !== undefined && annotations[0] === '$ion_symbol_table' && this.depth() === 0) throw new Error("Unable to alter symbol table context, it allows invalid ion to be written.");
         this.writeContainer(TypeCodes.STRUCT, CharCodes.LEFT_BRACE, annotations, isNull);
     }
 
