@@ -117,7 +117,7 @@ export class LongInt {
       return LongInt._is_zero_bytes(this.b);
     }
     if (!isNullOrUndefined(this.d)) {
-      return this.d == '0';
+      return this.d === '0';
     }
     return undefined;
   }

@@ -32,7 +32,7 @@ import { makeSymbolTable } from "./IonSymbols";
 import { ParserBinaryRaw } from "./IonParserBinaryRaw";
 import { Reader } from "./IonReader";
 import { SharedSymbolTable } from "./IonSharedSymbolTable";
-import { BinarySpan } from "./IonSpan";
+import { Span } from "./IonSpan";
 import { Timestamp } from "./IonTimestamp";
 
 const RAW_STRING = new IonType( -1, "raw_input", true,  false, false, false );
@@ -87,7 +87,7 @@ export class BinaryReader implements Reader {
   private _symtab: LocalSymbolTable;
   private _raw_type: number;
 
-  constructor(source: BinarySpan, catalog: Catalog) {
+  constructor(source: Span, catalog: Catalog) {
     this._parser   = new ParserBinaryRaw(source);
     this._cat      = catalog || new Catalog();
     this._symtab   = defaultLocalSymbolTable();
@@ -154,6 +154,10 @@ export class BinaryReader implements Reader {
     return this._parser.hasAnnotations();
   }
 
+  annotations() : string[] {//TODO binary support
+      return ["test"];
+  }
+
   getAnnotation(index: number) : string {
     let t: BinaryReader = this;
     var id, n;
@@ -178,7 +182,7 @@ export class BinaryReader implements Reader {
       }
     }
     else if (get_ion_type(t._raw_type).scalar) {
-      // BLOB is a scalar by you don't want to just use the string
+      // BLOB is a scalar by you don't want to just use the string 
       // value otherwise all other scalars are fine as is
       if (t._raw_type === TB_SYMBOL) {
         n = p.numberValue();
@@ -248,3 +252,4 @@ export class BinaryReader implements Reader {
     return s;
   }
 }
+

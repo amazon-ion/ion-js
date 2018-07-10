@@ -11,7 +11,7 @@ before_script:
 script: 
   - npm run release
 after_success:
-  - 'if [ "$TRAVIS_BRANCH" == "master" -a "$TRAVIS_PULL_REQUEST" == "false" ]; then npm run semantic-release; fi'
+  - 'if [ "$TRAVIS_BRANCH" == "master" -a "$TRAVIS_PULL_REQUEST" == "false" ]; then exit 0; fi'
   - 'if [ "$TRAVIS_BRANCH" != "master" ]; then exit 0; fi'
 branches:
   except:

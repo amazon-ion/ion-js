@@ -374,7 +374,7 @@ export class BinaryWriter implements Writer {
       return [];
     }
 
-    let writeable: Writeable = new Writeable(annotations.length);
+    let writeable: Writeable = new Writeable();
     let writer: LowLevelBinaryWriter = new LowLevelBinaryWriter(writeable);
     for (let annotation of annotations) {
       let symbolId: number = this.symbolTable.addSymbol(annotation);

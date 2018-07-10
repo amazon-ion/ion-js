@@ -29,6 +29,9 @@
         var writeable = new ionTest.Writeable();
         var writer = new ionTextWriter.TextWriter(writeable);
         instructions(writer);
+        while(!writer.isTopLevel){
+            writer.endContainer();
+        }
         writer.close();
         var actual = writeable.getBytes();
         var errorMessage = String.fromCharCode.apply(null, actual) + " != " + expected;
@@ -110,8 +113,6 @@
     writerTest('Writes clob escapes',
       writer => writer.writeClob([0x00, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x22, 0x27, 0x2f, 0x3f, 0x5c]),
       '{{"\\0\\a\\b\\t\\n\\v\\f\\r\\"\\\'\\/\\?\\\\"}}');
-    badWriterTest('Rejects clob with non-ASCII character',
-      writer => writer.writeClob([128]));
 
     // Decimals
 
@@ -123,7 +124,7 @@
 
     decimalTest('Writes positive decimal', '123.456', '123.456');
     decimalTest('Writes negative decimal', '-123.456', '-123.456');
-    decimalTest('Writes integer decimal', '123456', '123456');
+    decimalTest('Writes integer decimal', '123456.', '123456.');
     decimalTest('Mantissa-only decimal has leading zero', '123456d-6', '0.123456');
     writerTest('Writes null decimal using null',
       writer => writer.writeDecimal(null),
@@ -142,7 +143,7 @@
 
     writerTest('Writes 32-bit float',
       writer => writer.writeFloat32(8.125),
-      '8.125');
+      '8.125e0');
     writerTest('Writes null 32-bit float using null',
       writer => writer.writeFloat32(null),
       'null.float');
@@ -151,10 +152,10 @@
       'null.float');
     writerTest('Writes 32-bit float with annotations',
       writer => writer.writeFloat32(8.125, ['foo', 'bar']),
-      'foo::bar::8.125');
+      'foo::bar::8.125e0');
     writerTest('Writes negative 32-bit float',
       writer => writer.writeFloat32(-8.125),
-      '-8.125');
+      '-8.125e0');
 
     // Ints
 
@@ -306,7 +307,7 @@
 
     timestampTest('Writes year timestamp', '2017T', '2017T');
     timestampTest('Writes month timestamp', '2017-02T', '2017-02T');
-    timestampTest('Writes day timestamp', '2017-02-01', '2017-02-01');
+    timestampTest('Writes day timestamp', '2017-02-01', '2017-02-01T');
     timestampTest('Writes hour and minute timestamp', '2017-02-01T22:38', '2017-02-01T22:38Z');
     timestampTest('Writes whole second timestamp', '2017-02-01T22:38:43', '2017-02-01T22:38:43Z');
     timestampTest('Writes fractional second timestamp', '2017-02-01T22:38:43.125', '2017-02-01T22:38:43.125Z');

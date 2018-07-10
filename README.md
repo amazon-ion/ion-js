@@ -22,8 +22,8 @@
 
 # About 
 
-Ion-JS is a JavaScript library for [Ion](https://amzn.github.io/ion-docs/) -- this is currently alpha software and is subject to change. The library allows for reading/writing Ion 
-data from within JavaScript code. 
+Ion-JS is a Javascript library for [Ion](https://amzn.github.io/ion-docs/). The library allows for reading/writing Ion 
+data from within Javascript code. 
 
 For more information on Ion have a look at the [Ion Specification](https://amzn.github.io/ion-docs/spec.html) as well as some of the other Ion language specific libraries such as 
 
@@ -31,6 +31,38 @@ For more information on Ion have a look at the [Ion Specification](https://amzn.
 * [Ion Java](https://github.com/amzn/ion-java)
 * [Ion Python](https://github.com/amzn/ion-python)
 
+# Master Specification Support
+The current release on master branch  <a title="npm-version" href="https://www.npmjs.com/package/ion-js"><img src="https://img.shields.io/npm/v/ion-js.svg"/></a> 
+is beta supported at this time.
+
+| Types        | IonText | IonBinary | Limitations  |
+|:-------------:|:-------------:|:-------------:|:-------------:|
+| null      | yes | no      | none |
+| bool      | yes      | no      |   none |
+| int | yes      | no      |    underscores, binaryints, bigints |
+| float | yes      | no      |    underscores |
+| decimal | yes      | no      |    large fractions are slow roundtrip |
+| timestamp | yes      | no      |    fractional seconds are slow on large fractions |
+| string | yes      | no      |    none |
+| symbol | yes      | no      |    sid0, no symboltokens |
+| blob | no      | no      |    broken |
+| clob | yes      | no      |    backed by string |
+| struct | yes      | no      |    none |
+| list | yes      | no      |    none |
+| sexp | yes      | no      |    none |
+| annotations | yes      | no      |    none |
+| local symbol tables | yes      | no      |    none |
+| shared symbol tables | yes      | no      |    user marshals symboltables into the catalog themselves |
+
+| Github Issues |
+|:-------------|
+| [SymbolTokens](https://github.com/amzn/ion-js/issues/121) |
+| [IVM](https://github.com/amzn/ion-js/issues/122) |
+| [Numbers](https://github.com/amzn/ion-js/issues/123) |
+| [Utf8/32/64](https://github.com/amzn/ion-js/issues/124) |
+| [Blobs](https://github.com/amzn/ion-js/issues/125) |
+| [Triplequotes](https://github.com/amzn/ion-js/issues/126) |
+| [Binary](https://github.com/amzn/ion-js/issues/131) |
 
 # Use
 
@@ -42,7 +74,7 @@ You can use ion-js either as a Node.js module or inside an html page.
     ```
     npm install --save-dev ion-js
     ```
-1. Use the library to read/write ion data. Here is an example that reads Ion data from a JavaScript string
+1. Use the library to read/write ion data. Here is an example that reads Ion data from a Javascript string
     ```javascript
     var ionJs = require("ion-js")
 

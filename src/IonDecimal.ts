@@ -84,42 +84,36 @@ export class Decimal {
     return this.stringValue();
   }
 
-  stringValue(): string {
-    if (this.isNull()) {
-      return "null.decimal";
-    }
-
-    let s: number = this._exponent;
-    let image: string = this._value.digits();
-
-    if (s < 0) {
-      // negative shift - prefix decimal point this may require leading zero's
-      if (image.length < s + 1) {
-        for (let i : number = s + 1 - image.length; i > 0; i--) {
-          image = "0" + image;
+    stringValue(): string {
+        if (this.isNull()) {
+            return "null.decimal";
         }
-      }
-      let decimal_location: number = image.length + s;
-      if (decimal_location === 0) {
-        image = '0.' + image;
-      } else {
-        image = image.substr(0, decimal_location) + "." + image.substr(decimal_location);
-      }
-    }
-    else if (s > 0) {
-      // positive shift, 
-      if (image.length > 1) {
-        s = s + image.length - 1;
-        image = image.substr(0, 1) + "." + image.substr(1);
-      }
-      image = image + "d" + s.toString();
-    }
 
-    if (this.isNegative()) {
-      image = "-" + image;
+        let exponent: number = this._exponent;
+        let coefficient: string = this._value.digits();
+        let significantDigits : number = coefficient.length;
+        let result : string = '';
+        //digits returns an integer coefficient with an exponent that shifts it back to its original state
+        if (exponent < 0) {
+            // negative shift - prefix decimal point this may require leading zero's
+            let adjustedExponent : number = significantDigits - 1 + exponent;
+            if(adjustedExponent >= 0){
+                let decimalIndex : number = significantDigits + exponent;
+                result = coefficient.slice(0, decimalIndex) + '.' + coefficient.slice(decimalIndex);
+            }else if(adjustedExponent >= -6){//adapted from http://speleotrove.com/decimal/daconvs.html
+                result = '0.00000'.slice(0, (2 - exponent) - significantDigits) + coefficient;
+            }else{
+                result = coefficient + '.d' + exponent;
+            }
+        } else if (exponent > 0) {
+            // positive shift
+            result = coefficient + '.d' + exponent;
+        } else if(exponent === 0) {
+            result = coefficient + ".";
+        }
+        if (this.isNegative()) result = '-' + result;
+        return result;
     }
-    return image;
-  }
 
   isNull() : boolean {
     var isnull = (this._value === undefined);
@@ -134,7 +128,11 @@ export class Decimal {
     return this._exponent;
   }
 
-  static parse(str: string) : Decimal {
+  equals(expected : Decimal) : boolean {
+      return this.getExponent() === expected.getExponent() && this.isNegative() === expected.isNegative() && this.getDigits().numberValue() === expected.getDigits().numberValue();
+  }
+
+  static parse(str: string, stripLeadingZeroes : boolean = true) : Decimal {
     let index: number = 0;
     let exponent: number = 0;
     let c: number;
@@ -154,7 +152,7 @@ export class Decimal {
 
     let digits: string = Decimal.readDigits(str, index);
     index += digits.length;
-    digits = Decimal.stripLeadingZeroes(digits);
+    if(stripLeadingZeroes) digits = Decimal.stripLeadingZeroes(digits);
 
     if (index === str.length) {
       let trimmedDigits: string = Decimal.stripTrailingZeroes(digits);

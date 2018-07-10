@@ -32,21 +32,21 @@ define([
       assert.isFalse(decimal.isNegative());
     }
 
-    suite['Parses -1'] = function() {
-      var decimal = ion.Decimal.parse("-1");
+    suite['Parses -1.'] = function() {
+      var decimal = ion.Decimal.parse("-1.");
       assert.equal(decimal.getExponent(), 0);
       assert.equal(decimal.getDigits().digits(), "1");
       assert.deepEqual(decimal.getDigits().byteValue(), [1]);
-      assert.equal(decimal.stringValue(), "-1");
+      assert.equal(decimal.stringValue(), "-1.");
       assert.isTrue(decimal.isNegative());
     }
 
-    suite['Parses 123456000'] = function() {
+    suite['Parses 123456000.'] = function() {
       var decimal = ion.Decimal.parse("123456000");
       assert.equal(decimal.getExponent(), 3);
       assert.equal(decimal.getDigits().digits(), "123456");
       assert.deepEqual(decimal.getDigits().byteValue(), [0x01, 0xe2, 0x40]);
-      assert.equal(decimal.stringValue(), "1.23456d8");
+      assert.equal(decimal.stringValue(), "123456.d3");
       assert.isFalse(decimal.isNegative());
     }
 

@@ -45,7 +45,12 @@ define([
     suite['Imports system symbol table by default'] = function() {
       var symbolTable = ion.defaultLocalSymbolTable();
       assertSystemSymbols(symbolTable);
-      assert.isUndefined(symbolTable.getSymbol(10));
+      try {
+        symbolTable.getSymbol(10);
+        throw new Error("Expected Error.")
+      } catch(e) {
+          if(e.message === "Expected Error.") throw new Error("Failed to cause index Error")
+      }
     }
 
     suite['Imports are added in order'] = function() {
@@ -57,7 +62,13 @@ define([
       var symbolTable = new ion.LocalSymbolTable(import2);
 
       assert.isDefined(symbolTable.getSymbol(13));
-      assert.isUndefined(symbolTable.getSymbol(14));
+      try{
+          symbolTable.getSymbol(14);
+          throw new Error("Expected Error.")
+      } catch(e) {
+          if(e.message === "Expected Error.") throw new Error("Failed to cause index Error")
+      }
+
 
       assertSystemSymbols(symbolTable);
       assert.equal(symbolTable.getSymbolId('a'), 10);
@@ -81,7 +92,12 @@ define([
       assert.equal(symbolTable.getSymbolId('d'), 13);
       assert.equal(symbolTable.getSymbolId('e'), 14);
       assert.equal(symbolTable.getSymbolId('f'), 15);
-      assert.isUndefined(symbolTable.getSymbol(16));
+      try{
+          symbolTable.getSymbol(16);
+          throw new Error("Expected Error.")
+      } catch(e) {
+          if(e.message === "Expected Error.") throw new Error("Failed to cause index Error")
+      }
     }
 
     suite['Maxid less than symbol table length restricts imports'] = function() {
@@ -93,7 +109,12 @@ define([
       var symbolTable = new ion.LocalSymbolTable(import2, ['e', 'f']);
 
       assert.isDefined(symbolTable.getSymbol(13));
-      assert.isUndefined(symbolTable.getSymbol(14));
+      try{
+          symbolTable.getSymbol(14);
+          throw new Error("Expected Error.")
+      } catch(e) {
+          if(e.message === "Expected Error.") throw new Error("Failed to cause index Error")
+      }
 
       assertSystemSymbols(symbolTable);
       assert.equal(symbolTable.getSymbolId('a'), 10);
@@ -113,7 +134,13 @@ define([
       var symbolTable = new ion.LocalSymbolTable(import2, ['e', 'f']);
 
       assert.isDefined(symbolTable.getSymbol(17));
-      assert.isUndefined(symbolTable.getSymbol(18));
+      try {
+          symbolTable.getSymbol(18);
+          throw new Error("Expected Error.")
+      } catch(e) {
+          if(e.message === "Expected Error.") throw new Error("Failed to cause index Error")
+      }
+
 
       assertSystemSymbols(symbolTable);
       assert.equal(symbolTable.getSymbolId('a'), 10);

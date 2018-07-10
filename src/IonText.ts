@@ -33,7 +33,7 @@ const _escapeStrings = {
 };
 
 function _make_bool_array(str: string) : boolean[] {
-  let i = str.length
+  let i = str.length;
   let a: boolean[] = [];
   a[128] = false;
   while (i > 0) {
@@ -47,9 +47,8 @@ const _is_base64_char = _make_bool_array("+/0123456789abcdefghijklmnopqrstuvwxyz
 const _is_hex_digit = _make_bool_array("0123456789abcdefABCDEF");
 const _is_letter: boolean[] = _make_bool_array("_$abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ");
 const _is_letter_or_digit = _make_bool_array("_$0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ");
-const _is_numeric_terminator: boolean[] = _make_bool_array("{}[](),\"\'\ \t\n\r\u000c");
+const _is_numeric_terminator: boolean[] = _make_bool_array("{}[](),\"\'\ \t\n\r\v\u000c");
 const _is_operator_char = _make_bool_array("!#%&*+-./;<=>?@^`|~");
-const _is_single_operator_char = _make_bool_array("()[],.;?^`~");
 const _is_whitespace = _make_bool_array(" \t\r\n\u000b\u000c");
 const isIdentifierArray: boolean[] = _make_bool_array("_$0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ");
 
@@ -63,7 +62,7 @@ export function asAscii(s: any) : string {
     s = "undefined::null";
   }
   else if (typeof s == 'number') {
-    s = String.fromCharCode(s);
+    s = ""+s;
   }
   else if (typeof s != 'string') {
     var esc = nextEscape(s, s.length);
@@ -143,7 +142,7 @@ export function toHex(c: number, len: number) : string {
   }
   if (s.length < len) {
     s = "000000000" + s; // TODO: 9 0's, 9 > max len expected (but what about bigger than that?)
-    s = s.substring(s.length - len, s.length);
+    s = s.substring(s.length - len, s.length); 
   }
   return s;
 }
@@ -152,7 +151,7 @@ export function is_letter(ch: number) : boolean {
   return _is_letter[ch];
 }
 
-export function is_numeric_terminator(ch: number) : boolean {
+export function isNumericTerminator(ch: number) : boolean {
   if (ch == -1) return true;
   return _is_numeric_terminator[ch];
 }
@@ -163,10 +162,6 @@ export function is_letter_or_digit(ch: number) : boolean {
 
 export function is_operator_char(ch: number) : boolean {
   return _is_operator_char[ch];
-}
-
-export function is_single_operator_char(ch: number) : boolean {
-  return _is_single_operator_char[ch];
 }
 
 export function is_whitespace(ch: number) : boolean {
@@ -253,16 +248,16 @@ export enum CharCodes {
   FORWARD_SLASH = 0x2f,
   QUESTION_MARK = 0x3f,
   BACKSLASH = 0x5c,
-  LEFT_PARENTHESIS = '('.charCodeAt(0),
-  RIGHT_PARENTHESIS = ')'.charCodeAt(0),
-  LEFT_BRACE = '{'.charCodeAt(0),
-  RIGHT_BRACE = '}'.charCodeAt(0),
-  LEFT_BRACKET = '['.charCodeAt(0),
-  RIGHT_BRACKET = ']'.charCodeAt(0),
-  COMMA = ','.charCodeAt(0),
-  SPACE = ' '.charCodeAt(0),
-  LOWERCASE_U = 'u'.charCodeAt(0),
-  COLON = ':'.charCodeAt(0),
+  LEFT_PARENTHESIS = 0x28,
+  RIGHT_PARENTHESIS = 0x29,
+  LEFT_BRACE = 0x7b,
+  RIGHT_BRACE = 0x7d,
+  LEFT_BRACKET = 0x5b,
+  RIGHT_BRACKET = 0x5d,
+  COMMA = 0x2c,
+  SPACE = 0x20,
+  LOWERCASE_U = 0x75,
+  COLON = 0x3a,
 }
 
 export interface EscapeIndex {
@@ -324,7 +319,7 @@ CommonEscapes[CharCodes.HORIZONTAL_TAB] = backslashEscape('t');
 CommonEscapes[CharCodes.LINE_FEED] = backslashEscape('n');
 CommonEscapes[CharCodes.VERTICAL_TAB] = backslashEscape('v');
 CommonEscapes[CharCodes.FORM_FEED] = backslashEscape('f');
-CommonEscapes[CharCodes.CARRIAGE_RETURN] = backslashEscape['r'];
+CommonEscapes[CharCodes.CARRIAGE_RETURN] = backslashEscape('r');
 CommonEscapes[CharCodes.BACKSLASH] = backslashEscape('\\');
 
 export let StringEscapes : EscapeIndex = Object['assign']({}, CommonEscapes);

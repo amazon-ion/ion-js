@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -11,78 +11,99 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-define([
-    'intern',
-    'intern!object',
-    'intern/chai!assert',
-    'dist/amd/es6/IonTests',
-  ],
-  function(intern, registerSuite, assert, ion) {
+ define(
+  function(require) {
+    const registerSuite = require('intern!object');
+    const assert = require('intern/chai!assert');
+    const ion = require('dist/amd/es6/Ion');
 
     var suite = {
-      name: 'Text reader'
+      name: 'Text Reader'
     };
 
-    suite['skipOverStruct'] = function() {
-      var reader = ion.makeReader("{key1:value1} {key2:value2} 123");
-      assert.equal(reader.next(), ion.IonTypes.STRUCT);
-      assert.equal(reader.next(), ion.IonTypes.STRUCT);
-      assert.equal(reader.next(), ion.IonTypes.INT);
+    suite['Read string value'] = function() {
+      var ionToRead = "\"string\"";
+      var ionReader = ion.makeReader(ionToRead);
+      ionReader.next();
+
+      assert.equal(ionReader.value(), "string");
     };
 
-    suite['skipOverNestedStruct'] = function() {
-      var reader = ion.makeReader("{nested:{foo:bar}, number:123}");
-      reader.next();
-      reader.stepIn();
-      assert.equal(reader.next(), ion.IonTypes.STRUCT);
-      assert.equal(reader.next(), ion.IonTypes.INT);
-      reader.stepOut();
+    suite['Read boolean value'] = function() {
+      var ionToRead = "true";
+      var ionReader = ion.makeReader(ionToRead);
+      ionReader.next();
+
+      assert.equal(ionReader.value(), true);
     };
 
-    suite['skipOverListAndSexp'] = function() {
-      var reader = ion.makeReader("[a, b, c] (d e f) 123");
-      assert.equal(reader.next(), ion.IonTypes.LIST);
-      assert.equal(reader.next(), ion.IonTypes.SEXP);
-      assert.equal(reader.next(), ion.IonTypes.INT);
+    suite['Read boolean value in struct'] = function() {
+      var ionToRead = "{ a: false }";
+      var ionReader = ion.makeReader(ionToRead);
+      ionReader.next();
+      ionReader.stepIn();
+      ionReader.next();
+
+      assert.equal(ionReader.value(), false);
     };
 
-    suite['numberValueForInt'] = function() {
-        var reader = ion.makeReader("1");
-        assert.equal(reader.next(), ion.IonTypes.INT);
-        assert.equal(reader.numberValue(), 1);
+    suite['Parse through struct'] = function() {
+      var ionToRead = "{ key : \"string\" }";
+      var ionReader = ion.makeReader(ionToRead);
+      ionReader.next();
+
+      assert.equal(ion.IonTypes.STRUCT, ionReader.valueType());
+
+      ionReader.stepIn(); // Step into the base struct.
+      ionReader.next();
+
+      assert.equal(ionReader.fieldName(), "key");
+      assert.equal(ionReader.value(), "string");
     };
 
-    suite['numberValueForFloat'] = function() {
-        var reader = ion.makeReader("15e-1");
-        assert.equal(reader.next(), ion.IonTypes.FLOAT);
-        assert.equal(reader.numberValue(), 1.5);
+    suite['Parse through struct can skip over container'] = function() {
+      var ionToRead = "{ a: { key1 : \"string1\" }, b: { key2 : \"string2\" } }";
+      var ionReader = ion.makeReader(ionToRead);
+      ionReader.next();
+
+      assert.equal(ion.IonTypes.STRUCT, ionReader.valueType());
+
+      ionReader.stepIn(); // Step into the base struct.
+      ionReader.next();
+
+      assert.equal(ionReader.fieldName(), "a");
+
+      ionReader.next();
+
+      assert.equal(ionReader.fieldName(), "b");
+
+      ionReader.stepIn(); // Step into the "b" struct.
+      ionReader.next();
+
+      assert.equal(ionReader.fieldName(), "key2");
+      assert.equal(ionReader.value(), "string2");
     };
 
-    suite['numberValueForHexInt'] = function() {
-        var reader = ion.makeReader("0x1234");
-        assert.equal(reader.next(), ion.IonTypes.INT);
-        assert.equal(reader.numberValue(), 0x1234);
-    };
+    suite['Parse through struct can skip over nested containers'] = function() {
+      var ionToRead = "{ outerkey1 : { innerkey1 : {a1: \"a1\", b1: \"b1\"} }, outerkey2 : { innerkey2 : {a2: \"a2\", b2: \"b2\"} } }";
+      var ionReader = ion.makeReader(ionToRead);
+      ionReader.next();
 
-    suite['numberValueForInf'] = function() {
-        var reader = ion.makeReader("+inf");
-        assert.equal(reader.next(), ion.IonTypes.FLOAT);
-        assert(!isFinite(reader.numberValue()));
-    };
+      assert.equal(ion.IonTypes.STRUCT, ionReader.valueType());
 
-    suite['numberValueInStruct'] = function() {
-        var reader = ion.makeReader("{num:1}");
-        reader.next();
-        reader.stepIn();
-        assert.equal(reader.next(), ion.IonTypes.INT);
-        assert.equal(reader.numberValue(), 1);
-        reader.stepOut();
-    };
+      ionReader.stepIn(); // Step into the base struct.
+      ionReader.next();
 
-    suite['booleanValue'] = function() {
-        var reader = ion.makeReader("true");
-        assert.equal(reader.next(), ion.IonTypes.BOOL);
-        assert.equal(reader.booleanValue(), true);
+      assert.equal(ionReader.fieldName(), "outerkey1");
+
+      ionReader.next();
+
+      assert.equal(ionReader.fieldName(), "outerkey2");
+
+      ionReader.stepIn(); // Step into the "b" struct.
+      ionReader.next();
+
+      assert.equal(ionReader.fieldName(), "innerkey2");
     };
 
     registerSuite(suite);
