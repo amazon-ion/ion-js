@@ -33,9 +33,7 @@ For more information on Ion have a look at the [Ion Specification](https://amzn.
 
 # Master Specification Support
 The current release on master branch  <a title="npm-version" href="https://www.npmjs.com/package/ion-js"><img src="https://img.shields.io/npm/v/ion-js.svg"/></a> 
-is unsupported at this time.
-
-# Development Specification Support
+is beta supported at this time.
 
 | Types        | IonText | IonBinary | Limitations  |
 |:-------------:|:-------------:|:-------------:|:-------------:|
@@ -54,7 +52,7 @@ is unsupported at this time.
 | sexp | yes      | no      |    none |
 | annotations | yes      | no      |    none |
 | local symbol tables | yes      | no      |    none |
-| shared symbol tables | yes      | no      |    none |
+| shared symbol tables | yes      | no      |    user marshals symboltables into the catalog themselves |
 
 | Github Issues |
 |:-------------|
