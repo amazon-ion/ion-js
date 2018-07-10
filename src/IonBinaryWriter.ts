@@ -70,9 +70,9 @@ export class BinaryWriter implements Writer {
   private state: States = States.VALUE;
 
   constructor(symbolTable: LocalSymbolTable, writeable: Writeable) {
-    throw new Error("Binary currently unsupported.");
     this.symbolTable = symbolTable;
     this.writer = new LowLevelBinaryWriter(writeable);
+    throw new Error("Binary currently unsupported.");
   }
 
   writeBlob(value: number[], annotations?: string[]) : void {
