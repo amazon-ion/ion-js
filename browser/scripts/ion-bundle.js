@@ -1,4 +1,4 @@
-(function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.ion = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+(function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.ion = f()}})(function(){var define,module,exports;return (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -6,6 +6,7 @@ var IonBinaryReader_1 = require("./IonBinaryReader");
 var IonConstants_1 = require("./IonConstants");
 var IonSpan_1 = require("./IonSpan");
 var IonTextReader_1 = require("./IonTextReader");
+var IonErrors_1 = require("./IonErrors");
 var IonTextWriter_1 = require("./IonTextWriter");
 var IonWriteable_1 = require("./IonWriteable");
 var IonBinaryWriter_1 = require("./IonBinaryWriter");
@@ -16,24 +17,30 @@ var e = {
     msg: "error"
 };
 function get_buf_type(buf) {
-    var firstByte = typeof buf === 'string' ? buf.charCodeAt(0) : buf[0];
+    var firstByte = buf.valueAt(0);
     return firstByte === IonConstants_1.IVM.binary[0] ? 'binary' : 'text';
 }
 function makeBinaryReader(span, options) {
     return new IonBinaryReader_1.BinaryReader(span, options && options.catalog);
 }
 function makeTextReader(span, options) {
-    return new IonTextReader_1.TextReader(span, options && options.catalog, options && options.raw_tokens);
+    return new IonTextReader_1.TextReader(span, options && options.catalog);
 }
-function makeTextTokenizer(source) {
-    var span = new IonSpan_1.StringSpan(source);
-    var reader = new IonTextReader_1.TextReader(span, undefined, true);
-    return reader.raw_parser();
+function asSpan(buf) {
+    try {
+        return IonSpan_1.makeSpan(buf);
+    } catch (e) {
+        if (e instanceof IonErrors_1.InvalidArgumentError) {
+            throw new Error("Invalid argument, expected \'string\' value found:  " + buf);
+        } else {
+            throw e;
+        }
+    }
 }
-exports.makeTextTokenizer = makeTextTokenizer;
 function makeReader(buf, options) {
-    var stype = options && isSourceType(options.sourceType) ? options.sourceType : get_buf_type(buf);
-    var reader = stype === 'binary' ? makeBinaryReader(new IonSpan_1.BinarySpan(buf), options) : makeTextReader(new IonSpan_1.StringSpan(buf), options);
+    var inSpan = asSpan(buf);
+    var stype = options && isSourceType(options.sourceType) ? options.sourceType : get_buf_type(inSpan);
+    var reader = stype === 'binary' ? makeBinaryReader(inSpan, options) : makeTextReader(inSpan, options);
     return reader;
 }
 exports.makeReader = makeReader;
@@ -68,11 +75,11 @@ var IonText_1 = require("./IonText");
 exports.toBase64 = IonText_1.toBase64;
 var IonBinary_1 = require("./IonBinary");
 exports.TypeCodes = IonBinary_1.TypeCodes;
-var IonParserTextRaw_1 = require("./IonParserTextRaw");
-exports.getIonType = IonParserTextRaw_1.getIonType;
+var IonEventStream_1 = require("./IonEventStream");
+exports.IonEventStream = IonEventStream_1.IonEventStream;
 
 
-},{"./IonBinary":2,"./IonBinaryReader":3,"./IonBinaryWriter":4,"./IonCatalog":5,"./IonConstants":6,"./IonDecimal":7,"./IonLocalSymbolTable":9,"./IonParserTextRaw":13,"./IonPrecision":14,"./IonSharedSymbolTable":15,"./IonSpan":16,"./IonText":20,"./IonTextReader":21,"./IonTextWriter":22,"./IonTimestamp":23,"./IonTypes":25,"./IonWriteable":28}],2:[function(require,module,exports){
+},{"./IonBinary":2,"./IonBinaryReader":3,"./IonBinaryWriter":4,"./IonCatalog":5,"./IonConstants":6,"./IonDecimal":7,"./IonErrors":8,"./IonEventStream":10,"./IonLocalSymbolTable":12,"./IonPrecision":17,"./IonSharedSymbolTable":18,"./IonSpan":19,"./IonText":23,"./IonTextReader":24,"./IonTextWriter":25,"./IonTimestamp":26,"./IonTypes":28,"./IonWriteable":31}],2:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -276,6 +283,11 @@ var BinaryReader = function () {
             return this._parser.hasAnnotations();
         }
     }, {
+        key: "annotations",
+        value: function annotations() {
+            return ["test"];
+        }
+    }, {
         key: "getAnnotation",
         value: function getAnnotation(index) {
             var t = this;
@@ -385,7 +397,7 @@ var BinaryReader = function () {
 exports.BinaryReader = BinaryReader;
 
 
-},{"./IonCatalog":5,"./IonConstants":6,"./IonLocalSymbolTable":9,"./IonParserBinaryRaw":12,"./IonSymbols":18,"./IonType":24,"./IonTypes":25,"babel-runtime/helpers/classCallCheck":38,"babel-runtime/helpers/createClass":39}],4:[function(require,module,exports){
+},{"./IonCatalog":5,"./IonConstants":6,"./IonLocalSymbolTable":12,"./IonParserBinaryRaw":15,"./IonSymbols":21,"./IonType":27,"./IonTypes":28,"babel-runtime/helpers/classCallCheck":42,"babel-runtime/helpers/createClass":43}],4:[function(require,module,exports){
 "use strict";
 
 var _get2 = require("babel-runtime/helpers/get");
@@ -755,7 +767,7 @@ var BinaryWriter = function () {
             if (!annotations || annotations.length === 0) {
                 return [];
             }
-            var writeable = new IonWriteable_1.Writeable(annotations.length);
+            var writeable = new IonWriteable_1.Writeable();
             var writer = new IonLowLevelBinaryWriter_1.LowLevelBinaryWriter(writeable);
             var _iteratorNormalCompletion = true;
             var _didIteratorError = false;
@@ -1353,7 +1365,7 @@ var NullNode = function (_LeafNode3) {
 exports.NullNode = NullNode;
 
 
-},{"./IonBinary":2,"./IonDecimal":7,"./IonLongInt":10,"./IonLowLevelBinaryWriter":11,"./IonPrecision":14,"./IonUnicode":26,"./IonUtilities":27,"./IonWriteable":28,"babel-runtime/core-js/get-iterator":29,"babel-runtime/core-js/object/get-prototype-of":34,"babel-runtime/helpers/classCallCheck":38,"babel-runtime/helpers/createClass":39,"babel-runtime/helpers/get":41,"babel-runtime/helpers/inherits":42,"babel-runtime/helpers/possibleConstructorReturn":43}],5:[function(require,module,exports){
+},{"./IonBinary":2,"./IonDecimal":7,"./IonLongInt":13,"./IonLowLevelBinaryWriter":14,"./IonPrecision":17,"./IonUnicode":29,"./IonUtilities":30,"./IonWriteable":31,"babel-runtime/core-js/get-iterator":32,"babel-runtime/core-js/object/get-prototype-of":38,"babel-runtime/helpers/classCallCheck":42,"babel-runtime/helpers/createClass":43,"babel-runtime/helpers/get":45,"babel-runtime/helpers/inherits":46,"babel-runtime/helpers/possibleConstructorReturn":47}],5:[function(require,module,exports){
 "use strict";
 
 var _classCallCheck2 = require("babel-runtime/helpers/classCallCheck");
@@ -1410,7 +1422,7 @@ var Catalog = function () {
 exports.Catalog = Catalog;
 
 
-},{"./IonSystemSymbolTable":19,"./IonUtilities":27,"babel-runtime/helpers/classCallCheck":38,"babel-runtime/helpers/createClass":39}],6:[function(require,module,exports){
+},{"./IonSystemSymbolTable":22,"./IonUtilities":30,"babel-runtime/helpers/classCallCheck":42,"babel-runtime/helpers/createClass":43}],6:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -1496,31 +1508,27 @@ var Decimal = function () {
             if (this.isNull()) {
                 return "null.decimal";
             }
-            var s = this._exponent;
-            var image = this._value.digits();
-            if (s < 0) {
-                if (image.length < s + 1) {
-                    for (var i = s + 1 - image.length; i > 0; i--) {
-                        image = "0" + image;
-                    }
-                }
-                var decimal_location = image.length + s;
-                if (decimal_location === 0) {
-                    image = '0.' + image;
+            var exponent = this._exponent;
+            var coefficient = this._value.digits();
+            var significantDigits = coefficient.length;
+            var result = '';
+            if (exponent < 0) {
+                var adjustedExponent = significantDigits - 1 + exponent;
+                if (adjustedExponent >= 0) {
+                    var decimalIndex = significantDigits + exponent;
+                    result = coefficient.slice(0, decimalIndex) + '.' + coefficient.slice(decimalIndex);
+                } else if (adjustedExponent >= -6) {
+                    result = '0.00000'.slice(0, 2 - exponent - significantDigits) + coefficient;
                 } else {
-                    image = image.substr(0, decimal_location) + "." + image.substr(decimal_location);
+                    result = coefficient + '.d' + exponent;
                 }
-            } else if (s > 0) {
-                if (image.length > 1) {
-                    s = s + image.length - 1;
-                    image = image.substr(0, 1) + "." + image.substr(1);
-                }
-                image = image + "d" + s.toString();
+            } else if (exponent > 0) {
+                result = coefficient + '.d' + exponent;
+            } else if (exponent === 0) {
+                result = coefficient + ".";
             }
-            if (this.isNegative()) {
-                image = "-" + image;
-            }
-            return image;
+            if (this.isNegative()) result = '-' + result;
+            return result;
         }
     }, {
         key: "isNull",
@@ -1538,9 +1546,16 @@ var Decimal = function () {
         value: function getExponent() {
             return this._exponent;
         }
+    }, {
+        key: "equals",
+        value: function equals(expected) {
+            return this.getExponent() === expected.getExponent() && this.isNegative() === expected.isNegative() && this.getDigits().numberValue() === expected.getDigits().numberValue();
+        }
     }], [{
         key: "parse",
         value: function parse(str) {
+            var stripLeadingZeroes = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
+
             var index = 0;
             var exponent = 0;
             var c = void 0;
@@ -1558,7 +1573,7 @@ var Decimal = function () {
             }
             var digits = Decimal.readDigits(str, index);
             index += digits.length;
-            digits = Decimal.stripLeadingZeroes(digits);
+            if (stripLeadingZeroes) digits = Decimal.stripLeadingZeroes(digits);
             if (index === str.length) {
                 var trimmedDigits = Decimal.stripTrailingZeroes(digits);
                 exponent += digits.length - trimmedDigits.length;
@@ -1652,7 +1667,1021 @@ Decimal.ZERO = new Decimal(IonLongInt_1.LongInt.ZERO, 0);
 exports.Decimal = Decimal;
 
 
-},{"./IonLongInt":10,"./IonText":20,"babel-runtime/helpers/classCallCheck":38,"babel-runtime/helpers/createClass":39}],8:[function(require,module,exports){
+},{"./IonLongInt":13,"./IonText":23,"babel-runtime/helpers/classCallCheck":42,"babel-runtime/helpers/createClass":43}],8:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+
+
+},{}],9:[function(require,module,exports){
+"use strict";
+
+var _getPrototypeOf = require("babel-runtime/core-js/object/get-prototype-of");
+
+var _getPrototypeOf2 = _interopRequireDefault(_getPrototypeOf);
+
+var _possibleConstructorReturn2 = require("babel-runtime/helpers/possibleConstructorReturn");
+
+var _possibleConstructorReturn3 = _interopRequireDefault(_possibleConstructorReturn2);
+
+var _inherits2 = require("babel-runtime/helpers/inherits");
+
+var _inherits3 = _interopRequireDefault(_inherits2);
+
+var _classCallCheck2 = require("babel-runtime/helpers/classCallCheck");
+
+var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
+
+var _createClass2 = require("babel-runtime/helpers/createClass");
+
+var _createClass3 = _interopRequireDefault(_createClass2);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var IonTypes_1 = require("./IonTypes");
+var IonBinary_1 = require("./IonBinary");
+var IonTextWriter_1 = require("./IonTextWriter");
+var IonWriteable_1 = require("./IonWriteable");
+var IonEventType;
+(function (IonEventType) {
+    IonEventType[IonEventType["SCALAR"] = 0] = "SCALAR";
+    IonEventType[IonEventType["CONTAINER_START"] = 1] = "CONTAINER_START";
+    IonEventType[IonEventType["CONTAINER_END"] = 2] = "CONTAINER_END";
+    IonEventType[IonEventType["SYMBOL_TABLE"] = 3] = "SYMBOL_TABLE";
+    IonEventType[IonEventType["STREAM_END"] = 4] = "STREAM_END";
+})(IonEventType = exports.IonEventType || (exports.IonEventType = {}));
+
+var AbstractIonEvent = function () {
+    function AbstractIonEvent(eventType, ionType, fieldName, annotations, depth, ionValue) {
+        (0, _classCallCheck3.default)(this, AbstractIonEvent);
+
+        this.eventType = eventType;
+        this.ionType = ionType;
+        this.fieldName = fieldName;
+        this.annotations = annotations;
+        this.depth = depth;
+        this.ionValue = ionValue;
+    }
+
+    (0, _createClass3.default)(AbstractIonEvent, [{
+        key: "write",
+        value: function write(writer) {
+            writer.writeStruct();
+            writer.writeFieldName('event_type');
+            writer.writeSymbol(IonEventType[this.eventType]);
+            if (this.ionType !== null) {
+                writer.writeFieldName('ion_type');
+                writer.writeSymbol(this.ionType.name);
+            }
+            if (this.fieldName !== null && this.fieldName !== undefined) {
+                writer.writeFieldName('field_name');
+                writer.writeString(this.fieldName);
+            }
+            if (this.annotations !== null) {
+                writer.writeFieldName('annotations');
+                this.writeAnnotations(writer);
+            }
+            if (this.eventType === IonEventType.SCALAR) {
+                this.writeValues(writer);
+            }
+            writer.writeFieldName('depth');
+            writer.writeInt(this.depth);
+            writer.endContainer();
+        }
+    }, {
+        key: "writeAnnotations",
+        value: function writeAnnotations(writer) {
+            if (this.annotations === undefined) {
+                writer.writeNull(IonBinary_1.TypeCodes.LIST);
+                return;
+            }
+            writer.writeList();
+            for (var i = 0; i < this.annotations.length; i++) {
+                writer.writeString(this.annotations[i]);
+            }
+            writer.endContainer();
+        }
+    }, {
+        key: "writeSymbolToken",
+        value: function writeSymbolToken(writer, text) {
+            writer.writeSymbol(text);
+        }
+    }, {
+        key: "writeImportDescriptor",
+        value: function writeImportDescriptor(writer) {
+            writer.writeNull(IonBinary_1.TypeCodes.STRUCT);
+        }
+    }, {
+        key: "writeValues",
+        value: function writeValues(writer) {
+            if (this.eventType === IonEventType.SCALAR) {
+                writer.writeFieldName('value_text');
+                this.writeTextValue(writer);
+                writer.writeFieldName('value_binary');
+                this.writeBinaryValue(writer);
+            }
+        }
+    }, {
+        key: "writeTextValue",
+        value: function writeTextValue(writer) {
+            var tempTextWriter = new IonTextWriter_1.TextWriter(new IonWriteable_1.Writeable());
+            this.writeIonValue(tempTextWriter);
+            var numBuffer = tempTextWriter.getBytes();
+            var stringValue = "";
+            for (var i = 0; i < numBuffer.length; i++) {
+                stringValue = stringValue + String.fromCharCode(numBuffer[i]);
+            }
+            writer.writeString(stringValue);
+        }
+    }, {
+        key: "writeBinaryValue",
+        value: function writeBinaryValue(writer) {
+            writer.writeList();
+            writer.writeInt(0);
+            writer.endContainer();
+        }
+    }, {
+        key: "equals",
+        value: function equals(expected) {
+            return this.eventType === expected.eventType && this.ionType === expected.ionType && this.fieldName === expected.fieldName && this.depth === expected.depth && this.annotationEquals(expected.annotations) && this.valueEquals(expected);
+        }
+    }, {
+        key: "annotationEquals",
+        value: function annotationEquals(expectedAnnotations) {
+            if (this.annotations === expectedAnnotations) return true;
+            if (this.annotations.length !== expectedAnnotations.length) return false;
+            for (var i = 0; i < this.annotations.length; i++) {
+                if (this.annotations[i] !== expectedAnnotations[i]) return false;
+            }
+            return true;
+        }
+    }]);
+    return AbstractIonEvent;
+}();
+
+var IonEventFactory = function () {
+    function IonEventFactory() {
+        (0, _classCallCheck3.default)(this, IonEventFactory);
+    }
+
+    (0, _createClass3.default)(IonEventFactory, [{
+        key: "makeEvent",
+        value: function makeEvent(eventType, ionType, fieldName, depth, annotations, isNull, value) {
+            if (isNull) {
+                return new IonNullEvent(eventType, ionType, fieldName, annotations, depth);
+            }
+            switch (eventType) {
+                case IonEventType.SCALAR:
+                case IonEventType.CONTAINER_START:
+                    switch (ionType) {
+                        case IonTypes_1.IonTypes.BOOL:
+                            {
+                                return new IonBoolEvent(eventType, ionType, fieldName, annotations, depth, value);
+                            }
+                        case IonTypes_1.IonTypes.INT:
+                            {
+                                return new IonIntEvent(eventType, ionType, fieldName, annotations, depth, value);
+                            }
+                        case IonTypes_1.IonTypes.FLOAT:
+                            {
+                                return new IonFloatEvent(eventType, ionType, fieldName, annotations, depth, value);
+                            }
+                        case IonTypes_1.IonTypes.DECIMAL:
+                            {
+                                return new IonDecimalEvent(eventType, ionType, fieldName, annotations, depth, value);
+                            }
+                        case IonTypes_1.IonTypes.SYMBOL:
+                            {
+                                return new IonSymbolEvent(eventType, ionType, fieldName, annotations, depth, value);
+                            }
+                        case IonTypes_1.IonTypes.STRING:
+                            {
+                                return new IonStringEvent(eventType, ionType, fieldName, annotations, depth, value);
+                            }
+                        case IonTypes_1.IonTypes.TIMESTAMP:
+                            {
+                                return new IonTimestampEvent(eventType, ionType, fieldName, annotations, depth, value);
+                            }
+                        case IonTypes_1.IonTypes.BLOB:
+                            {
+                                return new IonBlobEvent(eventType, ionType, fieldName, annotations, depth, value);
+                            }
+                        case IonTypes_1.IonTypes.CLOB:
+                            {
+                                return new IonClobEvent(eventType, ionType, fieldName, annotations, depth, value);
+                            }
+                        case IonTypes_1.IonTypes.LIST:
+                            {
+                                return new IonListEvent(eventType, ionType, fieldName, annotations, depth);
+                            }
+                        case IonTypes_1.IonTypes.SEXP:
+                            {
+                                return new IonSexpEvent(eventType, ionType, fieldName, annotations, depth);
+                            }
+                        case IonTypes_1.IonTypes.STRUCT:
+                            {
+                                return new IonStructEvent(eventType, ionType, fieldName, annotations, depth);
+                            }
+                        default:
+                            {
+                                throw new Error("IonType " + ionType.name + " unexpected.");
+                            }
+                    }
+                case IonEventType.SYMBOL_TABLE:
+                    throw new Error("symbol tables unsupported.");
+                case IonEventType.CONTAINER_END:
+                case IonEventType.STREAM_END:
+                    return new IonEndEvent(eventType, null, null, null, depth);
+            }
+        }
+    }]);
+    return IonEventFactory;
+}();
+
+exports.IonEventFactory = IonEventFactory;
+
+var IonNullEvent = function (_AbstractIonEvent) {
+    (0, _inherits3.default)(IonNullEvent, _AbstractIonEvent);
+
+    function IonNullEvent(eventType, ionType, fieldName, annotations, depth) {
+        (0, _classCallCheck3.default)(this, IonNullEvent);
+        return (0, _possibleConstructorReturn3.default)(this, (IonNullEvent.__proto__ || (0, _getPrototypeOf2.default)(IonNullEvent)).call(this, eventType, ionType, fieldName, annotations, depth, null));
+    }
+
+    (0, _createClass3.default)(IonNullEvent, [{
+        key: "valueEquals",
+        value: function valueEquals(expected) {
+            return expected.constructor.name === IonNullEvent.name && this.ionValue === expected.ionValue;
+        }
+    }, {
+        key: "writeIonValue",
+        value: function writeIonValue(writer) {
+            writer.writeNull(this.ionType.bid);
+        }
+    }]);
+    return IonNullEvent;
+}(AbstractIonEvent);
+
+var IonIntEvent = function (_AbstractIonEvent2) {
+    (0, _inherits3.default)(IonIntEvent, _AbstractIonEvent2);
+
+    function IonIntEvent(eventType, ionType, fieldName, annotations, depth, ionValue) {
+        (0, _classCallCheck3.default)(this, IonIntEvent);
+        return (0, _possibleConstructorReturn3.default)(this, (IonIntEvent.__proto__ || (0, _getPrototypeOf2.default)(IonIntEvent)).call(this, eventType, ionType, fieldName, annotations, depth, ionValue));
+    }
+
+    (0, _createClass3.default)(IonIntEvent, [{
+        key: "valueEquals",
+        value: function valueEquals(expected) {
+            return expected.constructor.name === IonIntEvent.name && this.ionValue === expected.ionValue;
+        }
+    }, {
+        key: "writeIonValue",
+        value: function writeIonValue(writer) {
+            writer.writeInt(this.ionValue);
+        }
+    }]);
+    return IonIntEvent;
+}(AbstractIonEvent);
+
+var IonBoolEvent = function (_AbstractIonEvent3) {
+    (0, _inherits3.default)(IonBoolEvent, _AbstractIonEvent3);
+
+    function IonBoolEvent(eventType, ionType, fieldName, annotations, depth, ionValue) {
+        (0, _classCallCheck3.default)(this, IonBoolEvent);
+        return (0, _possibleConstructorReturn3.default)(this, (IonBoolEvent.__proto__ || (0, _getPrototypeOf2.default)(IonBoolEvent)).call(this, eventType, ionType, fieldName, annotations, depth, ionValue));
+    }
+
+    (0, _createClass3.default)(IonBoolEvent, [{
+        key: "valueEquals",
+        value: function valueEquals(expected) {
+            return expected.constructor.name === IonBoolEvent.name && this.ionValue === expected.ionValue;
+        }
+    }, {
+        key: "writeIonValue",
+        value: function writeIonValue(writer) {
+            writer.writeBoolean(this.ionValue);
+        }
+    }]);
+    return IonBoolEvent;
+}(AbstractIonEvent);
+
+var IonFloatEvent = function (_AbstractIonEvent4) {
+    (0, _inherits3.default)(IonFloatEvent, _AbstractIonEvent4);
+
+    function IonFloatEvent(eventType, ionType, fieldName, annotations, depth, ionValue) {
+        (0, _classCallCheck3.default)(this, IonFloatEvent);
+        return (0, _possibleConstructorReturn3.default)(this, (IonFloatEvent.__proto__ || (0, _getPrototypeOf2.default)(IonFloatEvent)).call(this, eventType, ionType, fieldName, annotations, depth, ionValue));
+    }
+
+    (0, _createClass3.default)(IonFloatEvent, [{
+        key: "valueEquals",
+        value: function valueEquals(expected) {
+            if (isNaN(this.ionValue) && isNaN(expected.ionValue)) return true;
+            return expected.constructor.name === IonFloatEvent.name && this.ionValue === expected.ionValue;
+        }
+    }, {
+        key: "writeIonValue",
+        value: function writeIonValue(writer) {
+            writer.writeFloat64(this.ionValue);
+        }
+    }]);
+    return IonFloatEvent;
+}(AbstractIonEvent);
+
+var IonDecimalEvent = function (_AbstractIonEvent5) {
+    (0, _inherits3.default)(IonDecimalEvent, _AbstractIonEvent5);
+
+    function IonDecimalEvent(eventType, ionType, fieldName, annotations, depth, ionValue) {
+        (0, _classCallCheck3.default)(this, IonDecimalEvent);
+        return (0, _possibleConstructorReturn3.default)(this, (IonDecimalEvent.__proto__ || (0, _getPrototypeOf2.default)(IonDecimalEvent)).call(this, eventType, ionType, fieldName, annotations, depth, ionValue));
+    }
+
+    (0, _createClass3.default)(IonDecimalEvent, [{
+        key: "valueEquals",
+        value: function valueEquals(expected) {
+            return expected.constructor.name === IonDecimalEvent.name && this.ionValue.equals(expected.ionValue);
+        }
+    }, {
+        key: "writeIonValue",
+        value: function writeIonValue(writer) {
+            writer.writeDecimal(this.ionValue);
+        }
+    }]);
+    return IonDecimalEvent;
+}(AbstractIonEvent);
+
+var IonSymbolEvent = function (_AbstractIonEvent6) {
+    (0, _inherits3.default)(IonSymbolEvent, _AbstractIonEvent6);
+
+    function IonSymbolEvent(eventType, ionType, fieldName, annotations, depth, ionValue) {
+        (0, _classCallCheck3.default)(this, IonSymbolEvent);
+        return (0, _possibleConstructorReturn3.default)(this, (IonSymbolEvent.__proto__ || (0, _getPrototypeOf2.default)(IonSymbolEvent)).call(this, eventType, ionType, fieldName, annotations, depth, ionValue));
+    }
+
+    (0, _createClass3.default)(IonSymbolEvent, [{
+        key: "valueEquals",
+        value: function valueEquals(expected) {
+            if (expected.constructor.name !== IonSymbolEvent.name) return false;
+            return this.ionValue === expected.ionValue;
+        }
+    }, {
+        key: "writeIonValue",
+        value: function writeIonValue(writer) {
+            writer.writeSymbol(this.ionValue.toString());
+        }
+    }]);
+    return IonSymbolEvent;
+}(AbstractIonEvent);
+
+var IonStringEvent = function (_AbstractIonEvent7) {
+    (0, _inherits3.default)(IonStringEvent, _AbstractIonEvent7);
+
+    function IonStringEvent(eventType, ionType, fieldName, annotations, depth, ionValue) {
+        (0, _classCallCheck3.default)(this, IonStringEvent);
+        return (0, _possibleConstructorReturn3.default)(this, (IonStringEvent.__proto__ || (0, _getPrototypeOf2.default)(IonStringEvent)).call(this, eventType, ionType, fieldName, annotations, depth, ionValue));
+    }
+
+    (0, _createClass3.default)(IonStringEvent, [{
+        key: "valueEquals",
+        value: function valueEquals(expected) {
+            if (expected.constructor.name !== IonStringEvent.name) return false;
+            return this.ionValue === expected.ionValue;
+        }
+    }, {
+        key: "writeIonValue",
+        value: function writeIonValue(writer) {
+            writer.writeString(this.ionValue);
+        }
+    }]);
+    return IonStringEvent;
+}(AbstractIonEvent);
+
+var IonTimestampEvent = function (_AbstractIonEvent8) {
+    (0, _inherits3.default)(IonTimestampEvent, _AbstractIonEvent8);
+
+    function IonTimestampEvent(eventType, ionType, fieldName, annotations, depth, ionValue) {
+        (0, _classCallCheck3.default)(this, IonTimestampEvent);
+        return (0, _possibleConstructorReturn3.default)(this, (IonTimestampEvent.__proto__ || (0, _getPrototypeOf2.default)(IonTimestampEvent)).call(this, eventType, ionType, fieldName, annotations, depth, ionValue));
+    }
+
+    (0, _createClass3.default)(IonTimestampEvent, [{
+        key: "valueEquals",
+        value: function valueEquals(expected) {
+            if (expected.constructor.name !== IonTimestampEvent.name) return false;
+            return this.ionValue.equals(expected.ionValue);
+        }
+    }, {
+        key: "writeIonValue",
+        value: function writeIonValue(writer) {
+            writer.writeTimestamp(this.ionValue);
+        }
+    }]);
+    return IonTimestampEvent;
+}(AbstractIonEvent);
+
+var IonBlobEvent = function (_AbstractIonEvent9) {
+    (0, _inherits3.default)(IonBlobEvent, _AbstractIonEvent9);
+
+    function IonBlobEvent(eventType, ionType, fieldName, annotations, depth, ionValue) {
+        (0, _classCallCheck3.default)(this, IonBlobEvent);
+        return (0, _possibleConstructorReturn3.default)(this, (IonBlobEvent.__proto__ || (0, _getPrototypeOf2.default)(IonBlobEvent)).call(this, eventType, ionType, fieldName, annotations, depth, ionValue));
+    }
+
+    (0, _createClass3.default)(IonBlobEvent, [{
+        key: "valueEquals",
+        value: function valueEquals(expected) {
+            return this.ionValue === expected.ionValue;
+        }
+    }, {
+        key: "writeIonValue",
+        value: function writeIonValue(writer) {
+            var tempBuf = [];
+            for (var i = 0; i < this.ionValue.length; i++) {
+                tempBuf.push(this.ionValue.charCodeAt(i));
+            }
+            writer.writeBlob(tempBuf);
+        }
+    }]);
+    return IonBlobEvent;
+}(AbstractIonEvent);
+
+var IonClobEvent = function (_AbstractIonEvent10) {
+    (0, _inherits3.default)(IonClobEvent, _AbstractIonEvent10);
+
+    function IonClobEvent(eventType, ionType, fieldName, annotations, depth, ionValue) {
+        (0, _classCallCheck3.default)(this, IonClobEvent);
+        return (0, _possibleConstructorReturn3.default)(this, (IonClobEvent.__proto__ || (0, _getPrototypeOf2.default)(IonClobEvent)).call(this, eventType, ionType, fieldName, annotations, depth, ionValue));
+    }
+
+    (0, _createClass3.default)(IonClobEvent, [{
+        key: "valueEquals",
+        value: function valueEquals(expected) {
+            return this.ionValue === expected.ionValue;
+        }
+    }, {
+        key: "writeIonValue",
+        value: function writeIonValue(writer) {
+            var tempBuf = [];
+            for (var i = 0; i < this.ionValue.length; i++) {
+                tempBuf.push(this.ionValue.charCodeAt(i));
+            }
+            writer.writeClob(tempBuf);
+        }
+    }]);
+    return IonClobEvent;
+}(AbstractIonEvent);
+
+var AbsIonContainerEvent = function (_AbstractIonEvent11) {
+    (0, _inherits3.default)(AbsIonContainerEvent, _AbstractIonEvent11);
+
+    function AbsIonContainerEvent(eventType, ionType, fieldName, annotations, depth) {
+        (0, _classCallCheck3.default)(this, AbsIonContainerEvent);
+        return (0, _possibleConstructorReturn3.default)(this, (AbsIonContainerEvent.__proto__ || (0, _getPrototypeOf2.default)(AbsIonContainerEvent)).call(this, eventType, ionType, fieldName, annotations, depth, null));
+    }
+
+    (0, _createClass3.default)(AbsIonContainerEvent, [{
+        key: "writeIonValue",
+        value: function writeIonValue(writer) {}
+    }]);
+    return AbsIonContainerEvent;
+}(AbstractIonEvent);
+
+var IonStructEvent = function (_AbsIonContainerEvent) {
+    (0, _inherits3.default)(IonStructEvent, _AbsIonContainerEvent);
+
+    function IonStructEvent(eventType, ionType, fieldName, annotations, depth) {
+        (0, _classCallCheck3.default)(this, IonStructEvent);
+        return (0, _possibleConstructorReturn3.default)(this, (IonStructEvent.__proto__ || (0, _getPrototypeOf2.default)(IonStructEvent)).call(this, eventType, ionType, fieldName, annotations, depth));
+    }
+
+    (0, _createClass3.default)(IonStructEvent, [{
+        key: "valueEquals",
+        value: function valueEquals(expected) {
+            if (expected.constructor.name !== IonStructEvent.name) return false;
+            return this.structsEqual(this.ionValue, expected.ionValue) && this.structsEqual(expected.ionValue, this.ionValue);
+        }
+    }, {
+        key: "structsEqual",
+        value: function structsEqual(actualEvents, expectedEvents) {
+            var matchFound = true;
+            var paired = new Array(expectedEvents.length);
+            for (var i = 0; matchFound && i < actualEvents.length; i++) {
+                matchFound = false;
+                for (var j = 0; !matchFound && j < expectedEvents.length; j++) {
+                    if (!paired[j]) {
+                        matchFound = actualEvents[i].equals(expectedEvents[j]);
+                        paired[j] = matchFound;
+                    }
+                }
+            }
+            return matchFound;
+        }
+    }]);
+    return IonStructEvent;
+}(AbsIonContainerEvent);
+
+var IonListEvent = function (_AbsIonContainerEvent2) {
+    (0, _inherits3.default)(IonListEvent, _AbsIonContainerEvent2);
+
+    function IonListEvent(eventType, ionType, fieldName, annotations, depth) {
+        (0, _classCallCheck3.default)(this, IonListEvent);
+        return (0, _possibleConstructorReturn3.default)(this, (IonListEvent.__proto__ || (0, _getPrototypeOf2.default)(IonListEvent)).call(this, eventType, ionType, fieldName, annotations, depth));
+    }
+
+    (0, _createClass3.default)(IonListEvent, [{
+        key: "valueEquals",
+        value: function valueEquals(expected) {
+            if (this.ionValue.length !== expected.ionValue.length) return false;
+            for (var i = 0; i < this.ionValue.length; i++) {
+                if (!this.ionValue[i].equals(expected.ionValue[i])) {
+                    return false;
+                }
+            }
+            return true;
+        }
+    }]);
+    return IonListEvent;
+}(AbsIonContainerEvent);
+
+var IonSexpEvent = function (_AbsIonContainerEvent3) {
+    (0, _inherits3.default)(IonSexpEvent, _AbsIonContainerEvent3);
+
+    function IonSexpEvent(eventType, ionType, fieldName, annotations, depth) {
+        (0, _classCallCheck3.default)(this, IonSexpEvent);
+        return (0, _possibleConstructorReturn3.default)(this, (IonSexpEvent.__proto__ || (0, _getPrototypeOf2.default)(IonSexpEvent)).call(this, eventType, ionType, fieldName, annotations, depth));
+    }
+
+    (0, _createClass3.default)(IonSexpEvent, [{
+        key: "valueEquals",
+        value: function valueEquals(expected) {
+            for (var i = 0; i < this.ionValue.length; i++) {
+                if (!this.ionValue[i].equals(expected.ionValue[i])) {
+                    return false;
+                }
+            }
+            return true;
+        }
+    }]);
+    return IonSexpEvent;
+}(AbsIonContainerEvent);
+
+var IonEndEvent = function (_AbstractIonEvent12) {
+    (0, _inherits3.default)(IonEndEvent, _AbstractIonEvent12);
+
+    function IonEndEvent(eventType, ionType, fieldName, annotations, depth) {
+        (0, _classCallCheck3.default)(this, IonEndEvent);
+        return (0, _possibleConstructorReturn3.default)(this, (IonEndEvent.__proto__ || (0, _getPrototypeOf2.default)(IonEndEvent)).call(this, eventType, ionType, fieldName, annotations, depth, undefined));
+    }
+
+    (0, _createClass3.default)(IonEndEvent, [{
+        key: "valueEquals",
+        value: function valueEquals(expected) {
+            return this.ionValue === expected.ionValue;
+        }
+    }, {
+        key: "writeIonValue",
+        value: function writeIonValue(writer) {}
+    }]);
+    return IonEndEvent;
+}(AbstractIonEvent);
+
+
+},{"./IonBinary":2,"./IonTextWriter":25,"./IonTypes":28,"./IonWriteable":31,"babel-runtime/core-js/object/get-prototype-of":38,"babel-runtime/helpers/classCallCheck":42,"babel-runtime/helpers/createClass":43,"babel-runtime/helpers/inherits":46,"babel-runtime/helpers/possibleConstructorReturn":47}],10:[function(require,module,exports){
+"use strict";
+
+var _map = require("babel-runtime/core-js/map");
+
+var _map2 = _interopRequireDefault(_map);
+
+var _classCallCheck2 = require("babel-runtime/helpers/classCallCheck");
+
+var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
+
+var _createClass2 = require("babel-runtime/helpers/createClass");
+
+var _createClass3 = _interopRequireDefault(_createClass2);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var IonEvent_1 = require("./IonEvent");
+var IonTypes_1 = require("./IonTypes");
+var IonEvent_2 = require("./IonEvent");
+var Ion_1 = require("./Ion");
+
+var IonEventStream = function () {
+    function IonEventStream(reader) {
+        (0, _classCallCheck3.default)(this, IonEventStream);
+
+        this.eventStream = [];
+        this.reader = reader;
+        this.eventFactory = new IonEvent_1.IonEventFactory();
+        this.generateStream();
+    }
+
+    (0, _createClass3.default)(IonEventStream, [{
+        key: "writeEventStream",
+        value: function writeEventStream(writer) {
+            writer.writeSymbol("ion_event_stream");
+            for (var i = 0; i < this.eventStream.length; i++) {
+                this.eventStream[i].write(writer);
+            }
+        }
+    }, {
+        key: "writeIon",
+        value: function writeIon(writer) {
+            var tempBuf = void 0;
+            var tempEvent = void 0;
+            for (var indice = 0; indice < this.eventStream.length; indice++) {
+                tempEvent = this.eventStream[indice];
+                if (tempEvent.fieldName !== null) {
+                    writer.writeFieldName(tempEvent.fieldName);
+                }
+                switch (tempEvent.eventType) {
+                    case IonEvent_2.IonEventType.SCALAR:
+                        switch (tempEvent.ionType) {
+                            case IonTypes_1.IonTypes.BOOL:
+                                writer.writeBoolean(tempEvent.ionValue, tempEvent.annotations);
+                                break;
+                            case IonTypes_1.IonTypes.STRING:
+                                writer.writeString(tempEvent.ionValue, tempEvent.annotations);
+                                break;
+                            case IonTypes_1.IonTypes.SYMBOL:
+                                writer.writeSymbol(tempEvent.ionValue, tempEvent.annotations);
+                                break;
+                            case IonTypes_1.IonTypes.INT:
+                                writer.writeInt(tempEvent.ionValue, tempEvent.annotations);
+                                break;
+                            case IonTypes_1.IonTypes.DECIMAL:
+                                writer.writeDecimal(tempEvent.ionValue, tempEvent.annotations);
+                                break;
+                            case IonTypes_1.IonTypes.FLOAT:
+                                writer.writeFloat32(tempEvent.ionValue, tempEvent.annotations);
+                                break;
+                            case IonTypes_1.IonTypes.NULL:
+                                writer.writeNull(tempEvent.ionType.bid, tempEvent.annotations);
+                                break;
+                            case IonTypes_1.IonTypes.TIMESTAMP:
+                                break;
+                            case IonTypes_1.IonTypes.CLOB:
+                                tempBuf = [];
+                                for (var i = 0; i < tempEvent.ionValue.length; i++) {
+                                    tempBuf.push(tempEvent.ionValue.charCodeAt(i));
+                                }
+                                writer.writeClob(tempBuf, tempEvent.annotations);
+                                break;
+                            case IonTypes_1.IonTypes.BLOB:
+                                tempBuf = [];
+                                for (var _i = 0; _i < tempEvent.ionValue.length; _i++) {
+                                    tempBuf.push(tempEvent.ionValue.charCodeAt(_i));
+                                }
+                                writer.writeBlob(tempBuf, tempEvent.annotations);
+                                break;
+                            default:
+                                throw new Error("unexpected type: " + tempEvent.ionType.name);
+                        }
+                        break;
+                    case IonEvent_2.IonEventType.CONTAINER_START:
+                        switch (tempEvent.ionType) {
+                            case IonTypes_1.IonTypes.STRUCT:
+                                writer.writeStruct(tempEvent.annotations, false);
+                                break;
+                            case IonTypes_1.IonTypes.LIST:
+                                writer.writeList(tempEvent.annotations, false);
+                                break;
+                            case IonTypes_1.IonTypes.SEXP:
+                                writer.writeSexp(tempEvent.annotations, false);
+                                break;
+                            default:
+                                throw new Error('Unexpected IonType: ' + tempEvent.ionType.name);
+                        }
+                        break;
+                    case IonEvent_2.IonEventType.CONTAINER_END:
+                        writer.endContainer();
+                        break;
+                    case IonEvent_2.IonEventType.STREAM_END:
+                        writer.close();
+                        break;
+                    case IonEvent_2.IonEventType.SYMBOL_TABLE:
+                        throw new Error("Symboltables unsupported.");
+                    default:
+                        throw new Error("Unexpected event type: " + tempEvent.eventType);
+                }
+            }
+        }
+    }, {
+        key: "getEvents",
+        value: function getEvents() {
+            return this.eventStream;
+        }
+    }, {
+        key: "equals",
+        value: function equals(expected) {
+            var actualIndex = 0;
+            var expectedIndex = 0;
+            while (actualIndex < this.eventStream.length && expectedIndex < expected.eventStream.length) {
+                var actualEvent = this.eventStream[actualIndex];
+                var expectedEvent = expected.eventStream[expectedIndex];
+                if (actualEvent.eventType === IonEvent_2.IonEventType.SYMBOL_TABLE) actualIndex++;
+                if (expectedEvent.eventType === IonEvent_2.IonEventType.SYMBOL_TABLE) expectedIndex++;
+                if (actualEvent.eventType === IonEvent_2.IonEventType.SYMBOL_TABLE || expectedEvent.eventType === IonEvent_2.IonEventType.SYMBOL_TABLE) continue;
+                switch (actualEvent.eventType) {
+                    case IonEvent_2.IonEventType.SCALAR:
+                        {
+                            if (!actualEvent.equals(expectedEvent)) return false;
+                            break;
+                        }
+                    case IonEvent_2.IonEventType.CONTAINER_START:
+                        {
+                            if (actualEvent.equals(expectedEvent)) {
+                                actualIndex = actualIndex + actualEvent.ionValue.length;
+                                expectedIndex = expectedIndex + expectedEvent.ionValue.length;
+                            } else {
+                                return false;
+                            }
+                            break;
+                        }
+                    case IonEvent_2.IonEventType.CONTAINER_END:
+                    case IonEvent_2.IonEventType.STREAM_END:
+                        {
+                            break;
+                        }
+                    default:
+                        {
+                            throw new Error("Unexpected event type: " + actualEvent.eventType);
+                        }
+                }
+                actualIndex++;
+                expectedIndex++;
+            }
+            return true;
+        }
+    }, {
+        key: "generateStream",
+        value: function generateStream() {
+            var tid = this.reader.next();
+            if (tid === IonTypes_1.IonTypes.SYMBOL && this.reader.stringValue() === "ion_event_stream") {
+                this.marshalStream();
+                return;
+            }
+            var currentContainer = [];
+            var currentContainerIndex = [];
+            while (true) {
+                if (this.reader.isNull()) {
+                    this.eventStream.push(this.eventFactory.makeEvent(IonEvent_2.IonEventType.SCALAR, tid, this.reader.fieldName(), this.reader.depth(), this.reader.annotations(), true, this.reader.value()));
+                } else {
+                    switch (tid) {
+                        case IonTypes_1.IonTypes.LIST:
+                        case IonTypes_1.IonTypes.SEXP:
+                        case IonTypes_1.IonTypes.STRUCT:
+                            {
+                                var containerEvent = this.eventFactory.makeEvent(IonEvent_2.IonEventType.CONTAINER_START, tid, this.reader.fieldName(), this.reader.depth(), this.reader.annotations(), false, null);
+                                this.eventStream.push(containerEvent);
+                                currentContainer.push(containerEvent);
+                                currentContainerIndex.push(this.eventStream.length);
+                                this.reader.stepIn();
+                                break;
+                            }
+                        case undefined:
+                            {
+                                if (this.reader.depth() === 0) {
+                                    this.eventStream.push(this.eventFactory.makeEvent(IonEvent_2.IonEventType.STREAM_END, IonTypes_1.IonTypes.NULL, null, this.reader.depth(), undefined, false, undefined));
+                                    return;
+                                } else {
+                                    this.reader.stepOut();
+                                    this.closeContainer(currentContainer.pop(), currentContainerIndex.pop());
+                                }
+                                break;
+                            }
+                        default:
+                            {
+                                this.eventStream.push(this.eventFactory.makeEvent(IonEvent_2.IonEventType.SCALAR, tid, this.reader.fieldName(), this.reader.depth(), this.reader.annotations(), false, this.reader.value()));
+                                break;
+                            }
+                    }
+                }
+                tid = this.reader.next();
+            }
+        }
+    }, {
+        key: "closeContainer",
+        value: function closeContainer(thisContainer, thisContainerIndex) {
+            this.eventStream.push(this.eventFactory.makeEvent(IonEvent_2.IonEventType.CONTAINER_END, thisContainer.ionType, null, thisContainer.depth, null, false, null));
+            thisContainer.ionValue = this.eventStream.slice(thisContainerIndex, this.eventStream.length);
+        }
+    }, {
+        key: "marshalStream",
+        value: function marshalStream() {
+            this.eventStream = [];
+            var currentContainer = [];
+            var currentContainerIndex = [];
+            for (var tid = this.reader.next(); tid === IonTypes_1.IonTypes.STRUCT; tid = this.reader.next()) {
+                this.reader.stepIn();
+                var tempEvent = this.marshalEvent();
+                if (tempEvent.eventType === IonEvent_2.IonEventType.CONTAINER_START) {
+                    currentContainer.push(tempEvent);
+                    this.eventStream.push(tempEvent);
+                    currentContainerIndex.push(this.eventStream.length);
+                } else if (tempEvent.eventType === IonEvent_2.IonEventType.CONTAINER_END) {
+                    this.closeContainer(currentContainer.pop(), currentContainerIndex.pop());
+                } else if (tempEvent.eventType === IonEvent_2.IonEventType.SCALAR || tempEvent.eventType === IonEvent_2.IonEventType.STREAM_END) {
+                    this.eventStream.push(tempEvent);
+                } else {
+                    throw new Error('Unexpected eventType: ' + tempEvent.eventType);
+                }
+                this.reader.stepOut();
+            }
+        }
+    }, {
+        key: "marshalEvent",
+        value: function marshalEvent() {
+            var currentEvent = new _map2.default();
+            var tid = void 0;
+            for (tid = this.reader.next(); tid !== undefined; tid = this.reader.next()) {
+                var fieldName = this.reader.fieldName();
+                if (currentEvent.has(fieldName)) {
+                    throw new Error('Repeated event field: ' + fieldName);
+                }
+                switch (fieldName) {
+                    case 'event_type':
+                        {
+                            currentEvent.set(fieldName, this.reader.stringValue());
+                            break;
+                        }
+                    case 'ion_type':
+                        {
+                            currentEvent.set(fieldName, this.parseIonType());
+                            break;
+                        }
+                    case 'field_name':
+                        {
+                            currentEvent.set(fieldName, this.reader.stringValue());
+                            break;
+                        }
+                    case 'annotations':
+                        {
+                            currentEvent.set(fieldName, this.parseAnnotations());
+                            break;
+                        }
+                    case 'value_text':
+                        {
+                            var tempString = this.reader.stringValue();
+                            if (tempString.substr(0, 5) === '$ion_') tempString = "$ion_user_value::" + tempString;
+                            var tempReader = Ion_1.makeReader(tempString, undefined);
+                            tempReader.next();
+                            var tempValue = tempReader.value();
+                            var annotations = tempReader.annotations();
+                            currentEvent.set('isNull', tempReader.isNull());
+                            currentEvent.set(fieldName, tempValue);
+                            break;
+                        }
+                    case 'value_binary':
+                        {
+                            currentEvent.set(fieldName, this.parseBinaryValue());
+                            break;
+                        }
+                    case 'imports':
+                        {
+                            currentEvent.set(fieldName, this.parseImports());
+                            break;
+                        }
+                    case 'depth':
+                        {
+                            currentEvent.set(fieldName, this.reader.numberValue());
+                            break;
+                        }
+                    default:
+                        throw new Error('Unexpected event field: ' + fieldName);
+                }
+            }
+            var eventType = void 0;
+            switch (currentEvent.get('event_type')) {
+                case 'CONTAINER_START':
+                    eventType = IonEvent_2.IonEventType.CONTAINER_START;
+                    break;
+                case 'STREAM_END':
+                    eventType = IonEvent_2.IonEventType.STREAM_END;
+                    break;
+                case 'CONTAINER_END':
+                    eventType = IonEvent_2.IonEventType.CONTAINER_END;
+                    break;
+                case 'SCALAR':
+                    eventType = IonEvent_2.IonEventType.SCALAR;
+                    break;
+                case 'SYMBOL_TABLE':
+                    throw new Error('Symbol tables unsupported');
+            }
+            var fieldname = currentEvent.has('field_name') ? currentEvent.get('field_name') : null;
+            return this.eventFactory.makeEvent(eventType, currentEvent.get('ion_type'), fieldname, currentEvent.get('depth'), currentEvent.get('annotations'), currentEvent.get('isNull'), currentEvent.get('value_text'));
+        }
+    }, {
+        key: "parseIonType",
+        value: function parseIonType() {
+            var input = this.reader.stringValue().toLowerCase();
+            switch (input) {
+                case 'null':
+                    {
+                        return IonTypes_1.IonTypes.NULL;
+                    }
+                case 'bool':
+                    {
+                        return IonTypes_1.IonTypes.BOOL;
+                    }
+                case 'int':
+                    {
+                        return IonTypes_1.IonTypes.INT;
+                    }
+                case 'float':
+                    {
+                        return IonTypes_1.IonTypes.FLOAT;
+                    }
+                case 'decimal':
+                    {
+                        return IonTypes_1.IonTypes.DECIMAL;
+                    }
+                case 'timestamp':
+                    {
+                        return IonTypes_1.IonTypes.TIMESTAMP;
+                    }
+                case 'symbol':
+                    {
+                        return IonTypes_1.IonTypes.SYMBOL;
+                    }
+                case 'string':
+                    {
+                        return IonTypes_1.IonTypes.STRING;
+                    }
+                case 'clob':
+                    {
+                        return IonTypes_1.IonTypes.CLOB;
+                    }
+                case 'blob':
+                    {
+                        return IonTypes_1.IonTypes.BLOB;
+                    }
+                case 'list':
+                    {
+                        return IonTypes_1.IonTypes.LIST;
+                    }
+                case 'sexp':
+                    {
+                        return IonTypes_1.IonTypes.SEXP;
+                    }
+                case 'struct':
+                    {
+                        return IonTypes_1.IonTypes.STRUCT;
+                    }
+                default:
+                    {
+                        throw new Error('unexpected type: ' + input);
+                    }
+            }
+        }
+    }, {
+        key: "parseAnnotations",
+        value: function parseAnnotations() {
+            var annotations = [];
+            if (this.reader.isNull()) {
+                return annotations;
+            } else {
+                this.reader.stepIn();
+                for (var tid = this.reader.next(); tid !== undefined; tid = this.reader.next()) {
+                    annotations.push(this.reader.value());
+                }
+                this.reader.stepOut();
+                return annotations;
+            }
+        }
+    }, {
+        key: "parseBinaryValue",
+        value: function parseBinaryValue() {
+            if (this.reader.isNull()) return undefined;
+            var numBuffer = [];
+            this.reader.stepIn();
+            var tid = this.reader.next();
+            while (tid) {
+                numBuffer.push(this.reader.numberValue());
+                tid = this.reader.next();
+            }
+            this.reader.stepOut();
+            var tempReader = Ion_1.makeReader(numBuffer, undefined);
+            return tempReader.value();
+        }
+    }, {
+        key: "parseImports",
+        value: function parseImports() {
+            return this.reader.value();
+        }
+    }]);
+    return IonEventStream;
+}();
+
+exports.IonEventStream = IonEventStream;
+
+
+},{"./Ion":1,"./IonEvent":9,"./IonTypes":28,"babel-runtime/core-js/map":33,"babel-runtime/helpers/classCallCheck":42,"babel-runtime/helpers/createClass":43}],11:[function(require,module,exports){
 "use strict";
 
 var _classCallCheck2 = require("babel-runtime/helpers/classCallCheck");
@@ -1670,17 +2699,17 @@ var IonUtilities_1 = require("./IonUtilities");
 var IonUtilities_2 = require("./IonUtilities");
 
 var Import = function () {
-    function Import(_parent, _symbolTable, length) {
+    function Import(parent, symbolTable, length) {
         (0, _classCallCheck3.default)(this, Import);
 
-        this._parent = _parent;
-        this._symbolTable = _symbolTable;
         this.index = {};
-        this._offset = _parent && _parent.offset + _parent.length || 1;
-        this._length = length || _symbolTable.symbols.length;
-        var symbols = _symbolTable.symbols;
-        for (var i = 0; i < this._length; i++) {
-            this.index[symbols[i]] = this._offset + i;
+        this._parent = parent;
+        this._symbolTable = symbolTable;
+        this._offset = this.parent ? this.parent.offset + this.parent.length : 1;
+        this._length = length || this.symbolTable.symbols.length;
+        var symbols = this.symbolTable.symbols;
+        for (var i = 0; i < this.length; i++) {
+            this.index[symbols[i]] = this.offset + i;
         }
     }
 
@@ -1702,7 +2731,7 @@ var Import = function () {
     }, {
         key: "getSymbolId",
         value: function getSymbolId(symbol_) {
-            return this.parent && this.parent.getSymbolId(symbol_) || this.index[symbol_];
+            return this.parent && this._parent.getSymbolId(symbol_) || this.index[symbol_];
         }
     }, {
         key: "parent",
@@ -1731,7 +2760,7 @@ var Import = function () {
 exports.Import = Import;
 
 
-},{"./IonUtilities":27,"babel-runtime/helpers/classCallCheck":38,"babel-runtime/helpers/createClass":39}],9:[function(require,module,exports){
+},{"./IonUtilities":30,"babel-runtime/helpers/classCallCheck":42,"babel-runtime/helpers/createClass":43}],12:[function(require,module,exports){
 "use strict";
 
 var _getIterator2 = require("babel-runtime/core-js/get-iterator");
@@ -1809,7 +2838,8 @@ var LocalSymbolTable = function () {
     }, {
         key: "getSymbol",
         value: function getSymbol(symbolId) {
-            var importedSymbol = this._import.getSymbol(symbolId);
+            if (symbolId > this.maxId) throw new Error("SymbolID greater than maxID.");
+            var importedSymbol = this.import.getSymbol(symbolId);
             if (!IonUtilities_1.isUndefined(importedSymbol)) {
                 return importedSymbol;
             }
@@ -1823,6 +2853,11 @@ var LocalSymbolTable = function () {
         key: "symbols",
         get: function get() {
             return this._symbols;
+        }
+    }, {
+        key: "maxId",
+        get: function get() {
+            return this.offset + this._symbols.length - 1;
         }
     }, {
         key: "import",
@@ -1840,7 +2875,7 @@ function defaultLocalSymbolTable() {
 exports.defaultLocalSymbolTable = defaultLocalSymbolTable;
 
 
-},{"./IonSystemSymbolTable":19,"./IonUtilities":27,"babel-runtime/core-js/get-iterator":29,"babel-runtime/helpers/classCallCheck":38,"babel-runtime/helpers/createClass":39}],10:[function(require,module,exports){
+},{"./IonSystemSymbolTable":22,"./IonUtilities":30,"babel-runtime/core-js/get-iterator":32,"babel-runtime/helpers/classCallCheck":42,"babel-runtime/helpers/createClass":43}],13:[function(require,module,exports){
 "use strict";
 
 var _classCallCheck2 = require("babel-runtime/helpers/classCallCheck");
@@ -1880,7 +2915,7 @@ var LongInt = function () {
                 return LongInt._is_zero_bytes(this.b);
             }
             if (!IonUtilities_1.isNullOrUndefined(this.d)) {
-                return this.d == '0';
+                return this.d === '0';
             }
             return undefined;
         }
@@ -2184,7 +3219,7 @@ LongInt._is_zero_bytes = function (bytes) {
 exports.LongInt = LongInt;
 
 
-},{"./IonText":20,"./IonUtilities":27,"babel-runtime/helpers/classCallCheck":38,"babel-runtime/helpers/createClass":39}],11:[function(require,module,exports){
+},{"./IonText":23,"./IonUtilities":30,"babel-runtime/helpers/classCallCheck":42,"babel-runtime/helpers/createClass":43}],14:[function(require,module,exports){
 "use strict";
 
 var _classCallCheck2 = require("babel-runtime/helpers/classCallCheck");
@@ -2208,7 +3243,7 @@ var LowLevelBinaryWriter = function () {
 
         this.numberBuffer = new Array(10);
         if (IonUtilities_1.isNumber(writeableOrLength)) {
-            this.writeable = new IonWriteable_1.Writeable(writeableOrLength, 0);
+            this.writeable = new IonWriteable_1.Writeable();
         } else {
             this.writeable = writeableOrLength;
         }
@@ -2350,7 +3385,7 @@ var LowLevelBinaryWriter = function () {
 exports.LowLevelBinaryWriter = LowLevelBinaryWriter;
 
 
-},{"./IonUtilities":27,"./IonWriteable":28,"babel-runtime/helpers/classCallCheck":38,"babel-runtime/helpers/createClass":39}],12:[function(require,module,exports){
+},{"./IonUtilities":30,"./IonWriteable":31,"babel-runtime/helpers/classCallCheck":42,"babel-runtime/helpers/createClass":43}],15:[function(require,module,exports){
 "use strict";
 
 var _classCallCheck2 = require("babel-runtime/helpers/classCallCheck");
@@ -3210,12 +4245,8 @@ var ParserBinaryRaw = function () {
 exports.ParserBinaryRaw = ParserBinaryRaw;
 
 
-},{"./IonBinary":2,"./IonConstants":6,"./IonDecimal":7,"./IonLongInt":10,"./IonPrecision":14,"./IonTimestamp":23,"./IonTypes":25,"babel-runtime/helpers/classCallCheck":38,"babel-runtime/helpers/createClass":39}],13:[function(require,module,exports){
+},{"./IonBinary":2,"./IonConstants":6,"./IonDecimal":7,"./IonLongInt":13,"./IonPrecision":17,"./IonTimestamp":26,"./IonTypes":28,"babel-runtime/helpers/classCallCheck":42,"babel-runtime/helpers/createClass":43}],16:[function(require,module,exports){
 "use strict";
-
-var _extends2 = require("babel-runtime/helpers/extends");
-
-var _extends3 = _interopRequireDefault(_extends2);
 
 var _classCallCheck2 = require("babel-runtime/helpers/classCallCheck");
 
@@ -3230,6 +4261,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 Object.defineProperty(exports, "__esModule", { value: true });
 var IonText = require("./IonText");
 var IonTypes_1 = require("./IonTypes");
+var IonText_1 = require("./IonText");
 var EOF = -1;
 var ERROR = -2;
 var T_NULL = 1;
@@ -3303,7 +4335,7 @@ var ESC_u = 117;
 var ESC_U = 85;
 var empty_array = [];
 var INF = [CH_i, CH_n, CH_f];
-function getIonType(t) {
+function get_ion_type(t) {
     switch (t) {
         case EOF:
             return undefined;
@@ -3348,10 +4380,10 @@ function getIonType(t) {
         case T_STRUCT:
             return IonTypes_1.IonTypes.STRUCT;
         default:
-            return undefined;
+            throw new Error("Unknown type: " + String(t) + ".");
     }
 }
-exports.getIonType = getIonType;
+exports.get_ion_type = get_ion_type;
 function get_keyword_type(str) {
     if (str === "null") return T_NULL;
     if (str === "true") return T_BOOL;
@@ -3359,7 +4391,7 @@ function get_keyword_type(str) {
     if (str === "nan") return T_FLOAT_SPECIAL;
     if (str === "+inf") return T_FLOAT_SPECIAL;
     if (str === "-inf") return T_FLOAT_SPECIAL;
-    return undefined;
+    throw new Error("Unknown keyword: " + str + ".");
 }
 function get_type_from_name(str) {
     if (str === "null") return T_NULL;
@@ -3369,16 +4401,16 @@ function get_type_from_name(str) {
     if (str === "decimal") return T_DECIMAL;
     if (str === "timestamp") return T_TIMESTAMP;
     if (str === "symbol") return T_IDENTIFIER;
-    if (str === "string") return T_STRING1;
+    if (str === "string") return T_STRING2;
     if (str === "clob") return T_CLOB2;
     if (str === "blob") return T_BLOB;
     if (str === "sexp") return T_SEXP;
     if (str === "list") return T_LIST;
     if (str === "struct") return T_STRUCT;
-    return undefined;
+    throw new Error("Unknown type: " + str + ".");
 }
 function is_keyword(str) {
-    return get_keyword_type(str) != undefined;
+    return str === "null" || str === "true" || str === "false" || str === "nan" || str === "+inf" || str === "-inf";
 }
 function get_hex_value(ch) {
     switch (ch) {
@@ -3427,7 +4459,7 @@ function get_hex_value(ch) {
         case 70:
             return 15;
     }
-    throw new Error("unexpected bad hex digit in checked data");
+    throw new Error("Unexpected bad hex digit in checked data.");
 }
 function is_valid_base64_length(char_length, trailer_length) {
     if (trailer_length > 2) return false;
@@ -3443,7 +4475,7 @@ function is_valid_string_char(ch, allow_new_line) {
 }
 
 var ParserTextRaw = function () {
-    function ParserTextRaw(source, raw_tokens_only) {
+    function ParserTextRaw(source) {
         (0, _classCallCheck3.default)(this, ParserTextRaw);
 
         this._read_value_helper_minus = function (ch1, accept_operator_symbols, calling_op) {
@@ -3451,7 +4483,7 @@ var ParserTextRaw = function () {
                 ch2 = this._peek();
             if (ch2 == CH_i) {
                 ch2 = this._peek("inf");
-                if (ch2 != ERROR) {
+                if (IonText.isNumericTerminator(ch2)) {
                     op = this._read_minus_inf;
                 } else if (accept_operator_symbols) {
                     op = this._read_operator_symbol;
@@ -3470,61 +4502,51 @@ var ParserTextRaw = function () {
         };
         this._read_string_helper = function (terminator, allow_new_line) {
             var ch;
+            this._start = this._in.position();
             for (;;) {
                 ch = this._read();
                 if (ch == CH_BS) {
                     this._read_string_escape_sequence();
                 } else if (ch == terminator) {
                     break;
-                } else if (!is_valid_string_char(ch, allow_new_line)) {
-                    this._error("invalid character in string: " + String.fromCharCode(ch));
-                    break;
-                }
+                } else if (!is_valid_string_char(ch, allow_new_line)) throw new Error("invalid character " + ch + " in string");
             }
         };
         this._in = source;
-        this._raw = raw_tokens_only;
-        if (raw_tokens_only) {
-            this._ops = [this._read_token];
-        } else {
-            this._ops = [this._read_datagram_values];
-        }
+        this._ops = [this._read_datagram_values];
         this._value_type = ERROR;
         this._value = [];
         this._start = -1;
         this._end = -1;
         this._esc_len = -1;
         this._curr = EOF;
-        this._ann = empty_array;
+        this._ann = [];
         this._msg = "";
-        function remap(map) {
-            var ret = {};
-            for (var s in map) {
-                var val = map[s];
-                for (var i = 0; i < s.length; i++) {
-                    ret[s.charCodeAt(i)] = val;
-                }
+        this._fieldname = null;
+        var helpers = {
+            40: this._read_value_helper_paren,
+            91: this._read_value_helper_square,
+            123: this._read_value_helper_curly,
+            43: this._read_value_helper_plus,
+            45: this._read_value_helper_minus,
+            39: this._read_value_helper_single,
+            34: this._read_value_helper_double
+        };
+        var set_helper = function set_helper(str, fn) {
+            var i = str.length,
+                ch;
+            while (i > 0) {
+                i--;
+                ch = str.charCodeAt(i);
+                helpers[ch] = fn;
             }
-            return ret;
-        }
-        var helpers = remap({
-            "0123456789": this._read_value_helper_digit,
-            "_$abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ": this._read_value_helper_letter,
-            "!#%&*./;<=>?@^`|~": this._read_value_helper_operator,
-            "+": this._read_value_helper_plus,
-            "-": this._read_value_helper_minus,
-            "'": this._read_value_helper_single,
-            '"': this._read_value_helper_double,
-            '{': this._read_value_helper_curly
-        });
-        this._read_value_helper_helpers = (0, _extends3.default)({}, helpers, remap({
-            '(': this._read_value_helper_paren,
-            '[': this._read_value_helper_square
-        }));
-        this._read_token_helper_helpers = (0, _extends3.default)({}, helpers, remap({
-            ':': this._read_token_helper_colon,
-            '()[]};,': this._read_value_helper_operator
-        }));
+        };
+        set_helper("0123456789", this._read_value_helper_digit);
+        set_helper("_$abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ", this._read_value_helper_letter);
+        set_helper("!#%&*+-./;<=>?@^`|~", this._read_value_helper_operator);
+        helpers[CH_PS] = this._read_value_helper_plus;
+        helpers[CH_MS] = this._read_value_helper_minus;
+        this._read_value_helper_helpers = helpers;
     }
 
     (0, _createClass3.default)(ParserTextRaw, [{
@@ -3536,26 +4558,6 @@ var ParserTextRaw = function () {
         key: "annotations",
         value: function annotations() {
             return this._ann;
-        }
-    }, {
-        key: "start",
-        value: function start() {
-            return this._start;
-        }
-    }, {
-        key: "end",
-        value: function end() {
-            return this._end;
-        }
-    }, {
-        key: "locator",
-        value: function locator(start) {
-            return this._in.locator(start);
-        }
-    }, {
-        key: "error_line",
-        value: function error_line(start, end) {
-            return this._in.error_line(start, end);
         }
     }, {
         key: "_read_datagram_values",
@@ -3574,6 +4576,8 @@ var ParserTextRaw = function () {
             var ch = this._read_after_whitespace(true);
             if (ch == CH_CP) {
                 this._value_push(EOF);
+            } else if (ch === EOF) {
+                throw new Error("Expected closing ).");
             } else {
                 this._unread(ch);
                 this._ops.unshift(this._read_sexp_values);
@@ -3665,6 +4669,11 @@ var ParserTextRaw = function () {
             }
         }
     }, {
+        key: "clearFieldName",
+        value: function clearFieldName() {
+            this._fieldname = null;
+        }
+    }, {
         key: "_load_field_name",
         value: function _load_field_name() {
             var v = this._value_pop(),
@@ -3672,7 +4681,7 @@ var ParserTextRaw = function () {
             switch (v) {
                 case T_IDENTIFIER:
                     if (is_keyword(s)) {
-                        this._tok_error("can't use '" + s + "' as a fieldname without quotes");
+                        this._error("can't use '" + s + "' as a fieldname without quotes");
                         break;
                     }
                 case T_STRING1:
@@ -3681,7 +4690,7 @@ var ParserTextRaw = function () {
                     this._fieldname = s;
                     break;
                 default:
-                    this._tok_error("invalid fieldname");
+                    this._error("invalid fieldname");
                     break;
             }
         }
@@ -3705,22 +4714,6 @@ var ParserTextRaw = function () {
                 var fn = this._read_value_helper_helpers[ch];
                 if (fn != undefined) {
                     fn.call(this, ch, accept_operator_symbols, calling_op);
-                } else {
-                    this._error("unexpected character '" + IonText.asAscii(ch) + "'");
-                }
-            }
-        }
-    }, {
-        key: "_read_token",
-        value: function _read_token() {
-            var ch = this._read_after_whitespace(true);
-            if (ch == EOF) {
-                this._read_value_helper_EOF(ch, true, this._read_token);
-            } else {
-                this._start = this._in.position() - 1;
-                var fn = this._read_token_helper_helpers[ch];
-                if (fn != undefined) {
-                    fn.call(this, ch, true, this._read_token);
                 } else {
                     this._error("unexpected character '" + IonText.asAscii(ch) + "'");
                 }
@@ -3760,13 +4753,8 @@ var ParserTextRaw = function () {
                 }
             } else {
                 this._unread(ch2);
-                if (this._raw) {
-                    this._end = this._in.position();
-                    this._value_push(T_OPERATOR);
-                } else {
-                    this._value_push(T_STRUCT);
-                    this._ops.unshift(this._read_struct_values);
-                }
+                this._value_push(T_STRUCT);
+                this._ops.unshift(this._read_struct_values);
             }
         }
     }, {
@@ -3774,12 +4762,11 @@ var ParserTextRaw = function () {
         value: function _read_value_helper_plus(ch1, accept_operator_symbols, calling_op) {
             var ch2 = this._peek("inf");
             this._unread(ch1);
-            if (ch2 != ERROR) {
+            if (IonText.isNumericTerminator(ch2)) {
                 this._ops.unshift(this._read_plus_inf);
             } else if (accept_operator_symbols) {
                 this._ops.unshift(this._read_operator_symbol);
             } else {
-                this._read();
                 this._error("unexpected '+'");
             }
         }
@@ -3789,7 +4776,7 @@ var ParserTextRaw = function () {
             var ch2 = this._peek_4_digits(ch1);
             this._unread(ch1);
             if (ch2 == CH_T || ch2 == CH_MS) {
-                this._ops.unshift(this._read_timestamp);
+                this._ops.unshift(this._readTimestamp);
             } else {
                 this._ops.unshift(this._read_number);
             }
@@ -3800,12 +4787,13 @@ var ParserTextRaw = function () {
             var op;
             if (this._peek("\'\'") != ERROR) {
                 op = this._read_string3;
+                op.call(this);
             } else {
                 op = this._read_string1;
-            }
-            op.call(this);
-            if (!this._raw && this._test_string_as_annotation(op)) {
-                this._ops.unshift(calling_op);
+                op.call(this);
+                if (this._test_string_as_annotation(op)) {
+                    this._ops.unshift(calling_op);
+                }
             }
         }
     }, {
@@ -3816,12 +4804,38 @@ var ParserTextRaw = function () {
     }, {
         key: "_read_value_helper_letter",
         value: function _read_value_helper_letter(ch1, accept_operator_symbols, calling_op) {
+            var tempNullStart = this._start;
             this._read_symbol();
-            if (this._raw) {
-                this._check_for_special_symbol();
+            var type = this._value_pop();
+            if (type != T_IDENTIFIER) throw new Error("Expecting symbol here.");
+            var symbol = this.get_value_as_string(type);
+            if (is_keyword(symbol)) {
+                var kwt = get_keyword_type(symbol);
+                if (kwt === T_NULL) {
+                    this._value_null = true;
+                    if (this._peek() === CH_DT) {
+                        this._read();
+                        var ch = this._read();
+                        if (IonText.is_letter(ch) !== true) throw new Error("Expected type name after 'null.'");
+                        this._read_symbol();
+                        if (this._value_pop() !== T_IDENTIFIER) throw new Error("Expected type name after 'null.'");
+                        symbol = this.get_value_as_string(T_IDENTIFIER);
+                        kwt = get_type_from_name(symbol);
+                    }
+                    this._start = -1;
+                    this._end = -1;
+                }
+                this._value_push(kwt);
             } else {
-                if (this._test_symbol_as_annotation()) {
+                var _ch = this._read_after_whitespace(true);
+                if (_ch == CH_CL && this._peek() == CH_CL) {
+                    this._read();
+                    this._ann.push(symbol);
                     this._ops.unshift(calling_op);
+                } else {
+                    var _kwt = T_IDENTIFIER;
+                    this._unread(_ch);
+                    this._value_push(_kwt);
                 }
             }
         }
@@ -3829,25 +4843,11 @@ var ParserTextRaw = function () {
         key: "_read_value_helper_operator",
         value: function _read_value_helper_operator(ch1, accept_operator_symbols, calling_op) {
             if (accept_operator_symbols) {
-                if (IonText.is_single_operator_char(ch1)) {
-                    this._end = this._in.position();
-                    this._value_push(T_OPERATOR);
-                } else {
-                    this._ops.unshift(this._read_operator_symbol);
-                }
+                this._unread(ch1);
+                this._ops.unshift(this._read_operator_symbol);
             } else {
                 this._error("unexpected operator character");
             }
-        }
-    }, {
-        key: "_read_token_helper_colon",
-        value: function _read_token_helper_colon(ch1, accept_operator_symbols, calling_op) {
-            var ch = this._peek();
-            if (ch == CH_CL) {
-                this._read();
-            }
-            this._end = this._in.position();
-            this._value_push(T_OPERATOR);
         }
     }, {
         key: "_done",
@@ -3874,7 +4874,7 @@ var ParserTextRaw = function () {
                     return;
                 }
                 if (IonText.is_digit(ch)) {
-                    this._error("leading zeroes are not allowed");
+                    this._error("leading zero's are not allowed");
                 }
                 ch = CH_0;
             }
@@ -3884,7 +4884,7 @@ var ParserTextRaw = function () {
                 t = T_DECIMAL;
                 ch = this._read_optional_digits(this._read());
             }
-            if (!IonText.is_numeric_terminator(ch)) {
+            if (!IonText.isNumericTerminator(ch)) {
                 if (ch == CH_d || ch == CH_D) {
                     t = T_DECIMAL;
                     ch = this._read_exponent();
@@ -3893,7 +4893,7 @@ var ParserTextRaw = function () {
                     ch = this._read_exponent();
                 }
             }
-            if (!this._raw && !IonText.is_numeric_terminator(ch)) {
+            if (!IonText.isNumericTerminator(ch)) {
                 this._error("invalid character after number");
             } else {
                 this._unread(ch);
@@ -3909,7 +4909,7 @@ var ParserTextRaw = function () {
                 ch = this._read();
                 ch = this._read_required_hex_digits(ch);
             }
-            if (this._raw || IonText.is_numeric_terminator(ch)) {
+            if (IonText.isNumericTerminator(ch)) {
                 this._unread(ch);
                 this._end = this._in.position();
                 this._value_push(T_HEXINT);
@@ -3930,6 +4930,7 @@ var ParserTextRaw = function () {
     }, {
         key: "_read_plus_inf",
         value: function _read_plus_inf() {
+            this._start = this._in.position();
             if (this._read() == CH_PS) {
                 this._read_inf_helper();
             } else {
@@ -3939,6 +4940,7 @@ var ParserTextRaw = function () {
     }, {
         key: "_read_minus_inf",
         value: function _read_minus_inf() {
+            this._start = this._in.position();
             if (this._read() == CH_MS) {
                 this._read_inf_helper();
             } else {
@@ -3956,70 +4958,77 @@ var ParserTextRaw = function () {
                     return;
                 }
             }
-            if (this._raw || IonText.is_numeric_terminator(this._peek())) {
+            if (IonText.isNumericTerminator(this._peek())) {
                 this._end = this._in.position();
-                this._start = this._end - 4;
                 this._value_push(T_FLOAT_SPECIAL);
             } else {
-                this._read();
                 this._error("invalid numeric terminator after 'inf'");
             }
         }
     }, {
-        key: "_read_timestamp",
-        value: function _read_timestamp() {
-            var ch;
+        key: "_readTimestamp",
+        value: function _readTimestamp() {
             this._start = this._in.position();
-            ch = this._read_N_digits(4);
-            if (ch == CH_T) {
-                ch = this._read();
-            } else if (ch == CH_MS) {
-                ch = this._read_N_digits(2);
-                if (ch == CH_MS) {
-                    ch = this._read_N_digits(2);
+            var ch = this._readPastNDigits(4);
+            if (ch === CH_T) {
+                this._end = this._in.position();
+                this._value_push(T_TIMESTAMP);
+                return;
+            } else if (ch !== CH_MS) {
+                throw new Error("Timestamp year must be followed by '-' or 'T'.");
+            }
+            ch = this._readPastNDigits(2);
+            if (ch === CH_T) {
+                this._end = this._in.position();
+                this._value_push(T_TIMESTAMP);
+                return;
+            } else if (ch !== CH_MS) {
+                throw new Error("Timestamp month must be followed by '-' or 'T'.");
+            }
+            ch = this._readPastNDigits(2);
+            if (IonText.isNumericTerminator(ch)) {
+                this._unread(ch);
+                this._end = this._in.position();
+                this._value_push(T_TIMESTAMP);
+                return;
+            } else if (ch !== CH_T) {
+                throw new Error("Timestamp day must be followed by a numeric stop character .");
+            }
+            var peekChar = this._in.peek();
+            if (IonText.isNumericTerminator(peekChar)) {
+                this._end = this._in.position();
+                this._value_push(T_TIMESTAMP);
+                return;
+            } else if (!IonText.is_digit(peekChar)) {
+                throw new Error("Timestamp DATE must be followed by numeric terminator or additional TIME digits.");
+            }
+            ch = this._readPastNDigits(2);
+            if (ch !== CH_CL) {
+                throw new Error("Timestamp time(hr:min) requires format of 00:00");
+            }
+            ch = this._readPastNDigits(2);
+            if (ch === CH_CL) {
+                ch = this._readPastNDigits(2);
+                if (ch === CH_DT) {
+                    if (!IonText.is_digit(this._read())) throw new Error("W3C timestamp spec requires atleast one digit after decimal point.");
+                    while (IonText.is_digit(ch = this._read())) {}
                 }
-                ch = this._read_optional_time(ch);
             }
-            if (ch === ERROR) {
-                this._error("Invalid 'time' portion of timestamp");
-            } else {
-                ch = this._read_optional_time_offset(ch);
-                if (this._raw || IonText.is_numeric_terminator(ch)) {
-                    this._unread(ch);
-                    this._end = this._in.position();
-                    this._value_push(T_TIMESTAMP);
-                } else {
-                    this._error("invalid character after timestamp");
-                }
+            if (ch === CH_Z) {
+                if (!IonText.isNumericTerminator(this._peek())) throw new Error("Illegal terminator after Zulu offset.");
+                this._end = this._in.position();
+                this._value_push(T_TIMESTAMP);
+                return;
+            } else if (ch !== CH_PS && ch !== CH_MS) {
+                throw new Error("Timestamps require an offset.");
             }
-        }
-    }, {
-        key: "_read_optional_time",
-        value: function _read_optional_time(ch) {
-            if (ch != CH_T) return ch;
-            ch = this._read();
-            if (IonText.is_digit(ch)) {
-                ch = this._read_hours_and_minutes(ch);
-                if (ch == CH_CL) {
-                    ch = this._read_N_digits(2);
-                    if (ch == CH_DT) {
-                        ch = this._read();
-                        ch = this._read_required_digits(ch);
-                    }
-                }
-            }
-            return ch;
-        }
-    }, {
-        key: "_read_optional_time_offset",
-        value: function _read_optional_time_offset(ch) {
-            if (ch == CH_MS || ch == CH_PS) {
-                ch = this._read();
-                ch = this._read_hours_and_minutes(ch);
-            } else if (ch == CH_Z) {
-                ch = this._read();
-            }
-            return ch;
+            ch = this._readPastNDigits(2);
+            if (ch !== CH_CL) throw new Error("Timestamp offset(hr:min) requires format of +/-00:00.");
+            this._readNDigits(2);
+            ch = this._peek();
+            if (!IonText.isNumericTerminator(ch)) throw new Error("Improperly formatted timestamp.");
+            this._end = this._in.position();
+            this._value_push(T_TIMESTAMP);
         }
     }, {
         key: "_read_symbol",
@@ -4030,8 +5039,8 @@ var ParserTextRaw = function () {
                 ch = this._read();
                 if (!IonText.is_letter_or_digit(ch)) break;
             }
-            this._end = this._in.position() - 1;
             this._unread(ch);
+            this._end = this._in.position();
             this._value_push(T_IDENTIFIER);
         }
     }, {
@@ -4040,56 +5049,55 @@ var ParserTextRaw = function () {
             var ch;
             for (;;) {
                 ch = this._read();
-                if (!IonText.is_operator_char(ch) || IonText.is_single_operator_char(ch)) {
-                    this._unread(ch);
-                    break;
-                }
+                if (!IonText.is_operator_char(ch)) break;
             }
-            this._end = this._in.position();
+            this._end = this._in.position() - 1;
+            this._unread(ch);
             this._value_push(T_OPERATOR);
         }
     }, {
         key: "_read_string1",
         value: function _read_string1() {
             this._read_string_helper(CH_SQ, false);
-            this._end = this._in.position();
+            this._end = this._in.position() - 1;
             this._value_push(T_STRING1);
         }
     }, {
         key: "_read_string2",
         value: function _read_string2() {
             this._read_string_helper(CH_DOUBLE_QUOTE, false);
-            this._end = this._in.position();
+            this._end = this._in.position() - 1;
             this._value_push(T_STRING2);
         }
     }, {
         key: "_read_string3",
-        value: function _read_string3() {
-            var ch;
-            this._start = this._in.position() - 1;
-            if (this._read() != CH_SQ || this._read() != CH_SQ) {
-                this._error("expected triple quote");
-            }
-            for (;;) {
-                for (;;) {
-                    this._read_string_helper(CH_SQ, true);
-                    if (this._read() == CH_SQ && this._read() == CH_SQ) {
-                        break;
+        value: function _read_string3(recognizeComments) {
+            if (recognizeComments === undefined) recognizeComments = true;
+            var ch = void 0;
+            this._unread(this._peek(""));
+            for (this._start = this._in.position() + 3; this._peek("\'\'\'") !== ERROR; this._in.unread(this._read_after_whitespace(recognizeComments))) {
+                for (var i = 0; i < 3; i++) {
+                    this._read();
+                }
+                while (this._peek("\'\'\'") === ERROR) {
+                    ch = this._read();
+                    if (ch == CH_BS) {
+                        this._read_string_escape_sequence();
                     }
+                    if (ch === EOF) throw new Error('Closing triple quotes not found.');
+                    if (!is_valid_string_char(ch, true)) throw new Error("invalid character " + ch + " in string");
                 }
-                ch = this._read_after_whitespace(true);
-                if (ch != CH_SQ) {
-                    this._unread(ch);
-                    break;
+                this._end = this._in.position();
+                for (var _i = 0; _i < 3; _i++) {
+                    this._read();
                 }
-                if (this._peek("\'\'") == ERROR) {
-                    break;
-                }
-                this._read();
-                this._read();
             }
-            this._end = this._in.position();
             this._value_push(T_STRING3);
+        }
+    }, {
+        key: "verifyTriple",
+        value: function verifyTriple(entryIndex) {
+            return this._in.valueAt(entryIndex) === CH_SQ && this._in.valueAt(entryIndex + 1) === CH_SQ && this._in.valueAt(entryIndex + 2) === CH_SQ;
         }
     }, {
         key: "_read_string_escape_sequence",
@@ -4128,7 +5136,7 @@ var ParserTextRaw = function () {
                     this._unread(ch);
                     break;
                 default:
-                    this._error("unexpected character after escape slash");
+                    this._error('unexpected character: ' + ch + ' after escape slash');
             }
         }
     }, {
@@ -4153,127 +5161,24 @@ var ParserTextRaw = function () {
             return is_ann;
         }
     }, {
-        key: "_test_symbol_as_annotation",
-        value: function _test_symbol_as_annotation() {
-            var s,
-                ii,
-                ch,
-                kwt,
-                is_ann = true,
-                t = this._value_pop();
-            if (t != T_IDENTIFIER) this._error("expecting symbol here");
-            s = this.get_value_as_string(t);
-            kwt = get_keyword_type(s);
-            var ch2 = this._peek();
-            ch = this._read_after_whitespace(true);
-            if (ch == CH_CL && this._peek() == CH_CL) {
-                if (kwt != undefined) this._error("the keyword '" + s + "' can't be used as an annotation without quotes");
-                this._read();
-                this._ann.push(s);
-                is_ann = true;
-            } else {
-                if (kwt == undefined) kwt = T_IDENTIFIER;
-                this._unread(ch);
-                is_ann = false;
-                if (kwt === T_NULL) {
-                    this._value_null = true;
-                    if (ch2 === CH_DT) {
-                        this._read();
-                        ch = this._read();
-                        if (IonText.is_letter(ch) !== true) {
-                            this._error("expected type name after 'null.'");
-                            return undefined;
-                        }
-                        this._read_symbol();
-                        if (this._value_pop() != T_IDENTIFIER) {
-                            this._tok_error("expected type name after 'null.'");
-                            return undefined;
-                        }
-                        s = this.get_value_as_string(T_IDENTIFIER);
-                        kwt = get_type_from_name(s);
-                        if (kwt === undefined) {
-                            this._tok_error("expected type name after 'null.'");
-                            return undefined;
-                        }
-                    }
-                    this._start = -1;
-                    this._end = -1;
-                }
-                this._value_push(kwt);
-            }
-            return is_ann;
-        }
-    }, {
-        key: "_check_for_special_symbol",
-        value: function _check_for_special_symbol() {
-            var s,
-                ii,
-                ch,
-                kwt,
-                is_ann = true,
-                t = this._value_pop();
-            if (t != T_IDENTIFIER) this._tok_error("expecting symbol here");
-            s = this.get_value_as_string(t);
-            kwt = get_keyword_type(s);
-            if (kwt === T_NULL) {
-                this._value_null = true;
-                ch = this._peek();
-                if (ch === CH_DT) {
-                    this._read();
-                    ch = this._read();
-                    if (IonText.is_letter(ch) !== true) {
-                        this._error("expected type name after 'null.'");
-                        return;
-                    }
-                    var save_start = this._start;
-                    this._read_symbol();
-                    if (this._value_pop() != T_IDENTIFIER) {
-                        this._error("expected type name after 'null.'");
-                        return;
-                    }
-                    s = this.get_value_as_string(T_IDENTIFIER);
-                    kwt = get_type_from_name(s);
-                    if (kwt === undefined) {
-                        this._error("expected type name after 'null.'");
-                        return;
-                    }
-                    this._start = save_start;
-                    this._end = this._in.position();
-                }
-                this._value_push(T_NULL);
-            } else if (kwt === T_BOOL) {
-                this._value_push(T_BOOL);
-            } else if (kwt === T_FLOAT_SPECIAL) {
-                this._value_push(T_FLOAT_SPECIAL);
-            } else {
-                this._value_push(T_IDENTIFIER);
-            }
-        }
-    }, {
         key: "_read_clob_string2",
         value: function _read_clob_string2() {
             var t;
-            var save_start = this._start;
             this._read_string2();
             t = this._value_pop();
             if (t != T_STRING2) this._error("string expected");
-            this._start = save_start;
             this._value_push(T_CLOB2);
-            this._read_close_double_brace();
-            this._end = this._in.position();
+            this._ops.unshift(this._read_close_double_brace);
         }
     }, {
         key: "_read_clob_string3",
         value: function _read_clob_string3() {
             var t;
-            var save_start = this._start;
-            this._read_string3();
+            this._read_string3(false);
             t = this._value_pop();
             if (t != T_STRING3) this._error("string expected");
-            this._start = save_start;
             this._value_push(T_CLOB3);
-            this._read_close_double_brace();
-            this._end = this._in.position();
+            this._ops.unshift(this._read_close_double_brace);
         }
     }, {
         key: "_read_blob",
@@ -4299,7 +5204,7 @@ var ParserTextRaw = function () {
                 if (!is_valid_base64_length(base64_chars, trailers)) {
                     this._error("invalid base64 value");
                 } else {
-                    this._end = this._in.position();
+                    this._end = this._in.position() - 1;
                     this._value_push(T_BLOB);
                 }
             }
@@ -4313,7 +5218,7 @@ var ParserTextRaw = function () {
     }, {
         key: "_read_close_double_brace",
         value: function _read_close_double_brace() {
-            var ch = this._read_after_whitespace(true);
+            var ch = this._read_after_whitespace(false);
             if (ch != CH_CC || this._read() != CH_CC) {
                 this._error("expected '}}'");
             }
@@ -4330,9 +5235,13 @@ var ParserTextRaw = function () {
                 s = this.get_value_as_string(this._curr);
             switch (this._curr) {
                 case T_INT:
+                    n = parseInt(s, 10);
+                    break;
                 case T_HEXINT:
+                    n = parseInt(s, 16);
+                    break;
                 case T_FLOAT:
-                    n = Number(s);
+                    n = parseFloat(s);
                     break;
                 case T_FLOAT_SPECIAL:
                     if (s == "+inf") n = Number.POSITIVE_INFINITY;else if (s == "-inf") n = Number.NEGATIVE_INFINITY;else if (s == "nan") n = Number.NaN;else throw new Error("can't convert to number");
@@ -4345,9 +5254,6 @@ var ParserTextRaw = function () {
     }, {
         key: "booleanValue",
         value: function booleanValue() {
-            if (this._curr !== T_BOOL) {
-                return undefined;
-            }
             var s = this.get_value_as_string(T_BOOL);
             if (s == "true") {
                 return true;
@@ -4358,18 +5264,23 @@ var ParserTextRaw = function () {
             }
         }
     }, {
-        key: "get_raw_token",
-        value: function get_raw_token() {
-            return this.get_value_as_string(T_BLOB);
+        key: "isHighSurrogate",
+        value: function isHighSurrogate(ch) {
+            return ch >= 0xD800 && ch <= 0xDBFF;
+        }
+    }, {
+        key: "isLowSurrogate",
+        value: function isLowSurrogate(ch) {
+            return ch >= 0xDC00 && ch <= 0xDFFF;
         }
     }, {
         key: "get_value_as_string",
         value: function get_value_as_string(t) {
-            var start,
-                end,
-                ii,
-                ch,
-                s = "";
+            var index = void 0;
+            var ch = void 0;
+            var escaped = void 0;
+            var acceptComments = void 0;
+            var s = "";
             switch (t) {
                 case T_NULL:
                 case T_BOOL:
@@ -4382,34 +5293,107 @@ var ParserTextRaw = function () {
                 case T_IDENTIFIER:
                 case T_OPERATOR:
                 case T_BLOB:
-                    for (ii = this._start; ii < this._end; ii++) {
-                        s += String.fromCharCode(this._in.valueAt(ii));
+                    for (index = this._start; index < this._end; index++) {
+                        s += String.fromCharCode(this._in.valueAt(index));
                     }
                     break;
                 case T_STRING1:
                 case T_STRING2:
-                    s = this._get_string2(this._start, this._end);
-                    break;
-                case T_CLOB2:
-                    start = this._start + 2;
-                    while (IonText.is_whitespace(this._in.valueAt(start))) {
-                        start++;
-                    }end = this._end - 2;
-                    while (end > start && IonText.is_whitespace(this._in.valueAt(end - 1))) {
-                        end--;
-                    }s = this._get_string2(start, end);
-                    break;
-                case T_CLOB3:
-                    start = this._start + 2;
-                    while (IonText.is_whitespace(this._in.valueAt(start))) {
-                        start++;
-                    }end = this._end - 2;
-                    while (end > start && IonText.is_whitespace(this._in.valueAt(end - 1))) {
-                        end--;
-                    }s = this._get_string3(start, end);
+                    for (index = this._start; index < this._end; index++) {
+                        ch = this._in.valueAt(index);
+                        if (ch == CH_BS) {
+                            ch = this._read_escape_sequence(index, this._end);
+                            index += this._esc_len;
+                        }
+                        if (this.isHighSurrogate(ch)) {
+                            index++;
+                            var tempChar = this._in.valueAt(index);
+                            if (tempChar == CH_BS) {
+                                tempChar = this._read_escape_sequence(index, this._end);
+                                index += this._esc_len;
+                            }
+                            if (this.isLowSurrogate(tempChar)) {
+                                s += ch + tempChar;
+                                index++;
+                            } else {
+                                throw new Error("illegal high surrogate" + ch);
+                            }
+                        } else if (this.isLowSurrogate(ch)) {
+                            throw new Error("illegal low surrogate: " + ch);
+                        } else {
+                            s += String.fromCharCode(ch);
+                        }
+                    }
                     break;
                 case T_STRING3:
-                    s = this._get_string3(this._start, this._end);
+                    acceptComments = true;
+                    for (index = this._start; index < this._end; index++) {
+                        ch = this._in.valueAt(index);
+                        if (ch == CH_BS) {
+                            ch = this._read_escape_sequence(index, this._end);
+                            index += this._esc_len;
+                        }
+                        if (this.isHighSurrogate(ch)) {
+                            index++;
+                            var _tempChar = this._in.valueAt(index);
+                            if (_tempChar == CH_BS) {
+                                _tempChar = this._read_escape_sequence(index, this._end);
+                                index += this._esc_len;
+                            }
+                            if (this.isLowSurrogate(_tempChar)) {
+                                s += ch + _tempChar;
+                                index++;
+                            } else {
+                                throw new Error("illegal high surrogate" + ch);
+                            }
+                        } else if (this.isLowSurrogate(ch)) {
+                            throw new Error("illegal low surrogate: " + ch);
+                        } else if (ch === CH_SQ) {
+                            if (this.verifyTriple(index)) {
+                                index = this._skip_triple_quote_gap(index, this._end, acceptComments);
+                            } else {
+                                s += String.fromCharCode(ch);
+                            }
+                        } else {
+                            s += String.fromCharCode(ch);
+                        }
+                    }
+                    break;
+                case T_CLOB2:
+                    for (index = this._start; index < this._end; index++) {
+                        ch = this._in.valueAt(index);
+                        if (ch == CH_BS) {
+                            s += String.fromCharCode(this.readClobEscapes(index, this._end));
+                            index += this._esc_len;
+                        } else if (ch < 128) {
+                            s += String.fromCharCode(ch);
+                        } else {
+                            throw new Error("Non-Ascii values illegal within clob.");
+                        }
+                    }
+                    break;
+                case T_CLOB3:
+                    acceptComments = false;
+                    for (index = this._start; index < this._end; index++) {
+                        ch = this._in.valueAt(index);
+                        if (ch === CH_BS) {
+                            escaped = this.readClobEscapes(index, this._end);
+                            if (escaped >= 0) {
+                                s += String.fromCharCode(escaped);
+                            }
+                            index += this._esc_len;
+                        } else if (ch === CH_SQ) {
+                            if (this.verifyTriple(index)) {
+                                index = this._skip_triple_quote_gap(index, this._end, acceptComments);
+                            } else {
+                                s += String.fromCharCode(ch);
+                            }
+                        } else if (ch < 128) {
+                            s += String.fromCharCode(ch);
+                        } else {
+                            throw new Error("Non-Ascii values illegal within clob.");
+                        }
+                    }
                     break;
                 default:
                     this._error("can't get this value as a string");
@@ -4418,86 +5402,127 @@ var ParserTextRaw = function () {
             return s;
         }
     }, {
-        key: "_get_string2",
-        value: function _get_string2(start, end) {
-            start++;
-            end--;
-            var s = "";
-            for (var ii = start; ii < end; ii++) {
-                var ch = this._in.valueAt(ii);
-                if (ch == CH_BS) {
-                    s += String.fromCharCode(this._read_escape_sequence(ii, this._end));
-                    ii += this._esc_len;
-                } else {
-                    s += String.fromCharCode(ch);
+        key: "indexWhiteSpace",
+        value: function indexWhiteSpace(index, acceptComments) {
+            var ch = this._in.valueAt(index);
+            if (!acceptComments) {
+                for (; IonText_1.is_whitespace(ch); ch = this._in.valueAt(index++)) {}
+            } else {
+                for (; IonText_1.is_whitespace(ch) || ch === CH_FORWARD_SLASH; ch = this._in.valueAt(index++)) {
+                    if (ch === CH_FORWARD_SLASH) {
+                        ch = this._in.valueAt(index++);
+                        switch (ch) {
+                            case CH_FORWARD_SLASH:
+                                index = this.indexToNewLine(index);
+                                break;
+                            case CH_AS:
+                                index = this.indexToCloseComment(index);
+                                break;
+                            default:
+                                index--;
+                                break;
+                        }
+                    }
                 }
             }
-            return s;
+            return index;
         }
     }, {
-        key: "_get_string3",
-        value: function _get_string3(start, end) {
-            var s = "";
-            var ii = 0;
-            start += 3;
-            end -= 3;
-            for (ii = start; ii < end; ii++) {
-                var ch = this._in.valueAt(ii);
-                if (ch == CH_SQ) {
-                    if (ii + 2 < end && this._in.valueAt(ii + 1) == CH_SQ && this._in.valueAt(ii + 2) == CH_SQ) {
-                        ii = this._skip_triple_quote_gap(ii, end);
-                    } else {
-                        s += "\'";
+        key: "indexToNewLine",
+        value: function indexToNewLine(index) {
+            var ch = this._in.valueAt(index);
+            while (ch !== EOF && ch !== CH_NL) {
+                if (ch === CH_CR) {
+                    if (this._in.valueAt(index + 1) !== CH_NL) {
+                        return index;
                     }
-                } else if (ch == CH_BS) {
-                    s += String.fromCharCode(this._read_escape_sequence(ii, end));
-                    ii += this._esc_len;
-                } else {
-                    s += String.fromCharCode(ch);
                 }
+                ch = this._in.valueAt(index++);
             }
-            return s;
+            return index;
+        }
+    }, {
+        key: "indexToCloseComment",
+        value: function indexToCloseComment(index) {
+            while (this._in.valueAt(index) !== CH_AS && this._in.valueAt(index + 1) !== CH_FORWARD_SLASH) {
+                index++;
+            }
+            return index;
         }
     }, {
         key: "_skip_triple_quote_gap",
-        value: function _skip_triple_quote_gap(ii, end) {
-            ii += 3;
-            while (ii < end) {
-                var ch = this._in.valueAt(ii);
-                if (IonText.is_whitespace(ch)) {
-                    ii++;
-                } else if (ch == CH_SQ && ii + 2 < end && this._in.valueAt(ii + 1) == CH_SQ && this._in.valueAt(ii + 1) == CH_SQ) {
-                    return ii + 2;
-                } else if (ch == CH_FORWARD_SLASH && ii + 1 < end && this._in.valueAt(ii + 1) == CH_FORWARD_SLASH) {
-                    ii += 2;
-                    while (ii < end) {
-                        ch = this._in.valueAt(ii++);
-                        if (ch == CH_NL) break;
-                    }
-                } else if (ch == CH_FORWARD_SLASH && ii + 1 < end && this._in.valueAt(ii + 1) == CH_AS) {
-                    ii += 2;
-                    while (ii < end) {
-                        ch = this._in.valueAt(ii++);
-                        if (ch == CH_AS && ii < end && this._in.valueAt(ii) == CH_FORWARD_SLASH) {
-                            ii++;
-                            break;
-                        }
-                    }
-                } else {
-                    this._errorAt("unexpected character: " + String.fromCharCode(ch), ii, ii + 1);
-                    break;
-                }
+        value: function _skip_triple_quote_gap(entryIndex, end, acceptComments) {
+            var tempIndex = entryIndex + 3;
+            var ch = this._in.valueAt(tempIndex);
+            tempIndex = this.indexWhiteSpace(tempIndex, acceptComments);
+            if (tempIndex + 2 <= end && this.verifyTriple(tempIndex)) {
+                return tempIndex + 4;
+            } else {
+                return tempIndex + 1;
             }
-            return ii;
         }
     }, {
-        key: "_read_escape_sequence",
-        value: function _read_escape_sequence(ii, end) {
+        key: "readClobEscapes",
+        value: function readClobEscapes(ii, end) {
             var ch;
             if (ii + 1 >= end) {
                 this._error("invalid escape sequence");
                 return;
             }
+            ch = this._in.valueAt(ii + 1);
+            this._esc_len = 1;
+            switch (ch) {
+                case ESC_0:
+                    return 0;
+                case ESC_a:
+                    return 7;
+                case ESC_b:
+                    return 8;
+                case ESC_t:
+                    return 9;
+                case ESC_nl:
+                    return 10;
+                case ESC_ff:
+                    return 12;
+                case ESC_cr:
+                    return 13;
+                case ESC_v:
+                    return 11;
+                case ESC_dq:
+                    return 34;
+                case ESC_sq:
+                    return 39;
+                case ESC_qm:
+                    return 63;
+                case ESC_bs:
+                    return 92;
+                case ESC_fs:
+                    return 47;
+                case ESC_nl2:
+                    return -1;
+                case ESC_nl3:
+                    if (ii + 3 < end && this._in.valueAt(ii + 3) == CH_NL) {
+                        this._esc_len = 2;
+                    }
+                    return IonText.ESCAPED_NEWLINE;
+                case ESC_x:
+                    if (ii + 3 >= end) {
+                        this._error("invalid escape sequence");
+                        return;
+                    }
+                    ch = this._get_N_hexdigits(ii + 2, ii + 4);
+                    this._esc_len = 3;
+                    break;
+                default:
+                    throw new Error("Invalid escape: /" + ch);
+            }
+            return ch;
+        }
+    }, {
+        key: "_read_escape_sequence",
+        value: function _read_escape_sequence(ii, end) {
+            var ch;
+            if (ii + 1 >= end) throw new Error("Invalid escape sequence.");
             ch = this._in.valueAt(ii + 1);
             this._esc_len = 1;
             switch (ch) {
@@ -4561,7 +5586,7 @@ var ParserTextRaw = function () {
                 default:
                     this._error("unexpected character after escape slash");
             }
-            return;
+            return ch;
         }
     }, {
         key: "_get_N_hexdigits",
@@ -4593,9 +5618,8 @@ var ParserTextRaw = function () {
     }, {
         key: "next",
         value: function next() {
-            if (this._raw) {
-                this._ops = [this._read_token];
-            }
+            this.clearFieldName();
+            this._ann = [];
             if (this._value_type === ERROR) {
                 this._run();
             }
@@ -4681,7 +5705,7 @@ var ParserTextRaw = function () {
     }, {
         key: "_read_after_whitespace",
         value: function _read_after_whitespace(recognize_comments) {
-            var ch;
+            var ch = void 0;
             if (recognize_comments) {
                 ch = this._read_skipping_comments();
                 while (IonText.is_whitespace(ch)) {
@@ -4701,16 +5725,14 @@ var ParserTextRaw = function () {
             var ch,
                 ii = 0;
             if (expected === undefined || expected.length < 1) {
-                ch = this._read();
-                this._unread(ch);
-                return ch;
+                return this._in.valueAt(this._in.position());
             }
             while (ii < expected.length) {
                 ch = this._read();
                 if (ch != expected.charCodeAt(ii)) break;
                 ii++;
             }
-            if (ii == expected.length) {
+            if (ii === expected.length) {
                 ch = this._peek();
             } else {
                 this._unread(ch);
@@ -4770,18 +5792,19 @@ var ParserTextRaw = function () {
             return ch;
         }
     }, {
-        key: "_read_N_digits",
-        value: function _read_N_digits(n) {
-            var ch,
-                ii = 0;
-            while (ii < n) {
-                ch = this._read();
-                if (!IonText.is_digit(ch)) {
-                    this._error("" + n + " digits required " + ii + " found");
-                    return ERROR;
-                }
-                ii++;
+        key: "_readNDigits",
+        value: function _readNDigits(n) {
+            var ch = void 0;
+            if (n <= 0) throw new Error("Cannot read a lack of or negative number of digits.");
+            while (n--) {
+                if (!IonText.is_digit(ch = this._read())) throw new Error("Expected digit, got: " + String.fromCharCode(ch));
             }
+            return ch;
+        }
+    }, {
+        key: "_readPastNDigits",
+        value: function _readPastNDigits(n) {
+            this._readNDigits(n);
             return this._read();
         }
     }, {
@@ -4813,30 +5836,32 @@ var ParserTextRaw = function () {
         key: "_read_hours_and_minutes",
         value: function _read_hours_and_minutes(ch) {
             if (!IonText.is_digit(ch)) return ERROR;
-            ch = this._read_N_digits(1);
+            ch = this._readPastNDigits(1);
             if (ch == CH_CL) {
-                ch = this._read_N_digits(2);
+                ch = this._readPastNDigits(2);
             } else {
                 ch = ERROR;
             }
             return ch;
         }
     }, {
+        key: "_check_for_keywords",
+        value: function _check_for_keywords() {
+            var len,
+                s,
+                v = this._value_pop();
+            if (v == T_IDENTIFIER) {
+                len = this._end - this._start;
+                if (len >= 3 && len <= 5) {
+                    s = this.get_value_as_string(v);
+                    v = get_keyword_type(s);
+                }
+            }
+            this._value_push(v);
+        }
+    }, {
         key: "_error",
         value: function _error(msg) {
-            var pos = this._in.position();
-            this._errorAt(msg, pos - 1, pos);
-        }
-    }, {
-        key: "_tok_error",
-        value: function _tok_error(msg) {
-            this._errorAt(msg, this._start, this._end);
-        }
-    }, {
-        key: "_errorAt",
-        value: function _errorAt(msg, start, end) {
-            var locator = this.locator(start);
-            msg = msg + " at line " + locator[0] + ", column " + locator[1] + ":\n" + this.error_line(start, end).join('\n');
             this._ops.unshift(this._done_with_error);
             this._error_msg = msg;
         }
@@ -4847,7 +5872,7 @@ var ParserTextRaw = function () {
 exports.ParserTextRaw = ParserTextRaw;
 
 
-},{"./IonText":20,"./IonTypes":25,"babel-runtime/helpers/classCallCheck":38,"babel-runtime/helpers/createClass":39,"babel-runtime/helpers/extends":40}],14:[function(require,module,exports){
+},{"./IonText":23,"./IonTypes":28,"babel-runtime/helpers/classCallCheck":42,"babel-runtime/helpers/createClass":43}],17:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -4863,7 +5888,7 @@ var Precision;
 })(Precision = exports.Precision || (exports.Precision = {}));
 
 
-},{}],15:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 "use strict";
 
 var _classCallCheck2 = require("babel-runtime/helpers/classCallCheck");
@@ -4888,6 +5913,19 @@ var SharedSymbolTable = function () {
     }
 
     (0, _createClass3.default)(SharedSymbolTable, [{
+        key: "getSymbol",
+        value: function getSymbol(id) {
+            return this._symbols[id];
+        }
+    }, {
+        key: "getSymbolId",
+        value: function getSymbolId(symbol) {
+            for (var i = 0; i < this._symbols.length; i++) {
+                if (symbol === this._symbols[i]) return i;
+            }
+            return undefined;
+        }
+    }, {
         key: "name",
         get: function get() {
             return this._name;
@@ -4909,8 +5947,24 @@ var SharedSymbolTable = function () {
 exports.SharedSymbolTable = SharedSymbolTable;
 
 
-},{"babel-runtime/helpers/classCallCheck":38,"babel-runtime/helpers/createClass":39}],16:[function(require,module,exports){
+},{"babel-runtime/helpers/classCallCheck":42,"babel-runtime/helpers/createClass":43}],19:[function(require,module,exports){
 "use strict";
+
+var _typeof2 = require("babel-runtime/helpers/typeof");
+
+var _typeof3 = _interopRequireDefault(_typeof2);
+
+var _getPrototypeOf = require("babel-runtime/core-js/object/get-prototype-of");
+
+var _getPrototypeOf2 = _interopRequireDefault(_getPrototypeOf);
+
+var _possibleConstructorReturn2 = require("babel-runtime/helpers/possibleConstructorReturn");
+
+var _possibleConstructorReturn3 = _interopRequireDefault(_possibleConstructorReturn2);
+
+var _inherits2 = require("babel-runtime/helpers/inherits");
+
+var _inherits3 = _interopRequireDefault(_inherits2);
 
 var _classCallCheck2 = require("babel-runtime/helpers/classCallCheck");
 
@@ -4924,31 +5978,69 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 Object.defineProperty(exports, "__esModule", { value: true });
 var IonConstants_1 = require("./IonConstants");
+var IonErrors_1 = require("./IonErrors");
+var SPAN_TYPE_STRING = 0;
+var SPAN_TYPE_BINARY = 1;
+var SPAN_TYPE_SUB_FLAG = 2;
+var SPAN_TYPE_SUB_STRING = SPAN_TYPE_SUB_FLAG | SPAN_TYPE_STRING;
+var SPAN_TYPE_SUB_BINARY = SPAN_TYPE_SUB_FLAG | SPAN_TYPE_BINARY;
 var MAX_POS = 1024 * 1024 * 1024;
 var LINE_FEED = 10;
-var CARRIAGE_RETURN = 13;
+var CARRAIGE_RETURN = 13;
 var DEBUG_FLAG = true;
 
-var StringSpan = function () {
+var Span = function () {
+    function Span(_type) {
+        (0, _classCallCheck3.default)(this, Span);
+
+        this._type = _type;
+    }
+
+    (0, _createClass3.default)(Span, [{
+        key: "write",
+        value: function write(b) {
+            throw new Error("not implemented");
+        }
+    }], [{
+        key: "error",
+        value: function error() {
+            throw new Error("span error");
+        }
+    }]);
+    return Span;
+}();
+
+exports.Span = Span;
+
+var StringSpan = function (_Span) {
+    (0, _inherits3.default)(StringSpan, _Span);
+
     function StringSpan(src, start, len) {
         (0, _classCallCheck3.default)(this, StringSpan);
 
-        this._line = 1;
-        this._src = src;
-        this._pos = 0;
-        this._limit = src.length;
-        if (start !== undefined) {
-            this._pos = start;
-            if (len !== undefined) {
-                this._limit = start + len;
+        var _this = (0, _possibleConstructorReturn3.default)(this, (StringSpan.__proto__ || (0, _getPrototypeOf2.default)(StringSpan)).call(this, SPAN_TYPE_STRING));
+
+        _this._line = 1;
+        _this._src = src;
+        _this._limit = src.length;
+        if (typeof start !== 'undefined') {
+            _this._pos = start;
+            if (typeof len !== 'undefined') {
+                _this._limit = start + len;
             }
         }
-        this._start = this._pos;
-        this._line_start = this._pos;
-        this._old_line_start = 0;
+        _this._start = _this._pos;
+        _this._line_start = _this._pos;
+        _this._old_line_start = 0;
+        return _this;
     }
 
     (0, _createClass3.default)(StringSpan, [{
+        key: "viewSource",
+        value: function viewSource() {
+            return this._src;
+        }
+    }, {
         key: "position",
         value: function position() {
             return this._pos - this._start;
@@ -4980,7 +6072,7 @@ var StringSpan = function () {
                 return IonConstants_1.EOF;
             }
             ch = this._src.charCodeAt(this._pos);
-            if (ch === CARRIAGE_RETURN) {
+            if (ch === CARRAIGE_RETURN) {
                 if (this.peek() != LINE_FEED) {
                     this._inc_line();
                 }
@@ -5000,17 +6092,17 @@ var StringSpan = function () {
     }, {
         key: "unread",
         value: function unread(ch) {
-            if (this._pos <= this._start) throw new Error("span error");
+            if (this._pos <= this._start) Span.error();
             this._pos--;
             if (ch < 0) {
-                if (this.is_empty() != true) throw new Error("span error");
+                if (this.is_empty() != true) Span.error();
                 return;
             }
             if (this._pos == this._line_start) {
                 this._line_start = this._old_line_start;
                 this._line--;
             }
-            if (ch != this.peek()) throw new Error("span error");
+            if (ch != this.peek()) Span.error();
         }
     }, {
         key: "peek",
@@ -5032,54 +6124,19 @@ var StringSpan = function () {
             return this._src.charCodeAt(ii);
         }
     }, {
-        key: "charAt",
-        value: function charAt(ii) {
-            if (ii < this._start || ii >= this._limit) return "";
-            return this._src[ii];
+        key: "getCodePoint",
+        value: function getCodePoint(index) {
+            return this._src.codePointAt(index);
+        }
+    }, {
+        key: "line_number",
+        value: function line_number() {
+            return this._line;
         }
     }, {
         key: "offset",
         value: function offset() {
             return this._pos - this._line_start;
-        }
-    }, {
-        key: "locator",
-        value: function locator(pos) {
-            var line = 1,
-                column = 1;
-            for (var i = 0; i < pos; i++) {
-                var ch = this.valueAt(i);
-                if (ch == LINE_FEED) {
-                    line++;
-                    column = 1;
-                } else {
-                    column++;
-                }
-            }
-            return [line, column];
-        }
-    }, {
-        key: "error_line",
-        value: function error_line(start, end) {
-            var line_start = start;
-            while (line_start > 0 && this.valueAt(line_start - 1) != LINE_FEED) {
-                line_start--;
-            }
-            var line_end = end;
-            while (line_end < this._limit && this.valueAt(line_end) != LINE_FEED) {
-                line_end++;
-            }
-            var str = "";
-            for (var x = line_start; x < line_end; x++) {
-                str += this.charAt(x);
-            }
-            var pointer = "";
-            for (var y = line_start; y < start; y++) {
-                pointer += " ";
-            }
-            for (; y < end; y++) {
-                pointer += "^";
-            }return [str, pointer];
         }
     }, {
         key: "clone",
@@ -5092,34 +6149,29 @@ var StringSpan = function () {
         }
     }]);
     return StringSpan;
-}();
+}(Span);
 
 exports.StringSpan = StringSpan;
 
-var BinarySpan = function () {
+var BinarySpan = function (_Span2) {
+    (0, _inherits3.default)(BinarySpan, _Span2);
+
     function BinarySpan(src, start, len) {
         (0, _classCallCheck3.default)(this, BinarySpan);
 
-        this._src = src;
-        this._limit = src.length;
-        this._start = start || 0;
-        if (len !== undefined) {
-            this._limit = start + len;
+        var _this2 = (0, _possibleConstructorReturn3.default)(this, (BinarySpan.__proto__ || (0, _getPrototypeOf2.default)(BinarySpan)).call(this, SPAN_TYPE_BINARY));
+
+        _this2._src = src;
+        _this2._limit = src.length;
+        _this2._start = start || 0;
+        if (typeof len !== 'undefined') {
+            _this2._limit = start + len;
         }
-        this._pos = this._start;
+        _this2._pos = _this2._start;
+        return _this2;
     }
 
     (0, _createClass3.default)(BinarySpan, [{
-        key: "error_line",
-        value: function error_line(start, end) {
-            throw new Error("not implemented on binary spans");
-        }
-    }, {
-        key: "locator",
-        value: function locator(pos) {
-            throw new Error("not implemented on binary spans");
-        }
-    }, {
         key: "position",
         value: function position() {
             return this._pos - this._start;
@@ -5142,6 +6194,7 @@ var BinarySpan = function () {
     }, {
         key: "next",
         value: function next() {
+            var b;
             if (this.is_empty()) {
                 if (this._pos > MAX_POS) {
                     throw new Error("span position is out of bounds");
@@ -5149,18 +6202,19 @@ var BinarySpan = function () {
                 this._pos++;
                 return IonConstants_1.EOF;
             }
-            var b = this._src[this._pos];
+            b = this._src[this._pos];
             this._pos++;
             return b & 0xFF;
         }
     }, {
         key: "unread",
         value: function unread(b) {
-            if (this._pos <= this._start) throw new Error("span error");
+            if (this._pos <= this._start) Span.error();
             this._pos--;
             if (b == IonConstants_1.EOF) {
-                if (this.is_empty() == false) throw new Error("span error");
+                if (this.is_empty() == false) Span.error();
             }
+            if (b != this.peek()) Span.error();
         }
     }, {
         key: "peek",
@@ -5191,19 +6245,40 @@ var BinarySpan = function () {
             }
             return new BinarySpan(this._src, this._pos + start, actual_len);
         }
-    }, {
-        key: "write",
-        value: function write(b) {
-            throw new Error("not implemented");
-        }
     }]);
     return BinarySpan;
-}();
+}(Span);
 
-exports.BinarySpan = BinarySpan;
+function makeSpan(src, start, len) {
+    if (src instanceof Span) {
+        return src;
+    }
+    if (typeof start === 'undefined') {
+        start = 0;
+    }
+    if (typeof len === 'undefined') {
+        len = src.length;
+    }
+    var span = undefined;
+    var src_type = typeof src === "undefined" ? "undefined" : (0, _typeof3.default)(src);
+    if (src_type === 'undefined') {
+        throw new IonErrors_1.InvalidArgumentError("Given \'undefined\' as input");
+    } else if (src_type === 'string') {
+        span = new StringSpan(src, start, len);
+    } else if (src_type === 'object') {
+        if (typeof src.isSpan === 'undefined') {
+            span = new BinarySpan(src, start, len);
+        }
+    }
+    if (span === undefined) {
+        throw new IonErrors_1.InvalidArgumentError("invalid span source");
+    }
+    return span;
+}
+exports.makeSpan = makeSpan;
 
 
-},{"./IonConstants":6,"babel-runtime/helpers/classCallCheck":38,"babel-runtime/helpers/createClass":39}],17:[function(require,module,exports){
+},{"./IonConstants":6,"./IonErrors":8,"babel-runtime/core-js/object/get-prototype-of":38,"babel-runtime/helpers/classCallCheck":42,"babel-runtime/helpers/createClass":43,"babel-runtime/helpers/inherits":46,"babel-runtime/helpers/possibleConstructorReturn":47,"babel-runtime/helpers/typeof":48}],20:[function(require,module,exports){
 "use strict";
 
 var _getPrototypeOf = require("babel-runtime/core-js/object/get-prototype-of");
@@ -5241,7 +6316,7 @@ var SubstituteSymbolTable = function (_IonSharedSymbolTable) {
 exports.SubstituteSymbolTable = SubstituteSymbolTable;
 
 
-},{"./IonSharedSymbolTable":15,"babel-runtime/core-js/object/get-prototype-of":34,"babel-runtime/helpers/classCallCheck":38,"babel-runtime/helpers/inherits":42,"babel-runtime/helpers/possibleConstructorReturn":43}],18:[function(require,module,exports){
+},{"./IonSharedSymbolTable":18,"babel-runtime/core-js/object/get-prototype-of":38,"babel-runtime/helpers/classCallCheck":42,"babel-runtime/helpers/inherits":46,"babel-runtime/helpers/possibleConstructorReturn":47}],21:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -5272,13 +6347,13 @@ function load_imports(reader, catalog) {
                     maxId = reader.numberValue();
             }
         }
-        if (version < 1) {
+        if (version === undefined) {
             version = 1;
-        }
-        if (name && name != "$ion") {
+        } else if (version < 1) throw new Error("Version numbers cannot be less than 1.");
+        if (name && name !== "$ion") {
             var symbolTable = catalog.findSpecificVersion(name, version);
             if (!symbolTable) {
-                if (!maxId) {
+                if (maxId === undefined) {
                     throw new Error("No exact match found when trying to import symbol table " + name + " version " + version);
                 } else {
                     symbolTable = catalog.findLatestVersion(name);
@@ -5307,14 +6382,20 @@ function makeSymbolTable(catalog, reader) {
     var import_ = void 0;
     var symbols = void 0;
     var maxId = void 0;
+    var foundSymbols = false;
+    var foundImports = false;
     reader.stepIn();
     while (reader.next()) {
         switch (reader.fieldName()) {
             case "imports":
+                if (foundImports) throw new Error("Multiple import fields found.");
                 import_ = load_imports(reader, catalog);
+                foundImports = true;
                 break;
             case "symbols":
+                if (foundSymbols) throw new Error("Multiple symbol fields found.");
                 symbols = load_symbols(reader);
+                foundSymbols = true;
                 break;
         }
     }
@@ -5324,7 +6405,7 @@ function makeSymbolTable(catalog, reader) {
 exports.makeSymbolTable = makeSymbolTable;
 
 
-},{"./IonImport":8,"./IonLocalSymbolTable":9,"./IonSubstituteSymbolTable":17,"./IonSystemSymbolTable":19}],19:[function(require,module,exports){
+},{"./IonImport":11,"./IonLocalSymbolTable":12,"./IonSubstituteSymbolTable":20,"./IonSystemSymbolTable":22}],22:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -5341,7 +6422,7 @@ function getSystemSymbolTableImport() {
 exports.getSystemSymbolTableImport = getSystemSymbolTableImport;
 
 
-},{"./IonImport":8,"./IonSharedSymbolTable":15}],20:[function(require,module,exports){
+},{"./IonImport":11,"./IonSharedSymbolTable":18}],23:[function(require,module,exports){
 "use strict";
 
 var _regenerator = require("babel-runtime/regenerator");
@@ -5388,9 +6469,8 @@ var _is_base64_char = _make_bool_array("+/0123456789abcdefghijklmnopqrstuvwxyzAB
 var _is_hex_digit = _make_bool_array("0123456789abcdefABCDEF");
 var _is_letter = _make_bool_array("_$abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ");
 var _is_letter_or_digit = _make_bool_array("_$0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ");
-var _is_numeric_terminator = _make_bool_array("{}[](),\"' \t\n\r\f");
+var _is_numeric_terminator = _make_bool_array("{}[](),\"' \t\n\r\x0B\f");
 var _is_operator_char = _make_bool_array("!#%&*+-./;<=>?@^`|~");
-var _is_single_operator_char = _make_bool_array("()[],.;?^`~");
 var _is_whitespace = _make_bool_array(" \t\r\n\x0B\f");
 var isIdentifierArray = _make_bool_array("_$0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ");
 function is_digit(ch) {
@@ -5402,7 +6482,7 @@ function asAscii(s) {
     if (typeof s === 'undefined') {
         s = "undefined::null";
     } else if (typeof s == 'number') {
-        s = String.fromCharCode(s);
+        s = "" + s;
     } else if (typeof s != 'string') {
         var esc = nextEscape(s, s.length);
         if (esc >= 0) {
@@ -5492,11 +6572,11 @@ function is_letter(ch) {
     return _is_letter[ch];
 }
 exports.is_letter = is_letter;
-function is_numeric_terminator(ch) {
+function isNumericTerminator(ch) {
     if (ch == -1) return true;
     return _is_numeric_terminator[ch];
 }
-exports.is_numeric_terminator = is_numeric_terminator;
+exports.isNumericTerminator = isNumericTerminator;
 function is_letter_or_digit(ch) {
     return _is_letter_or_digit[ch];
 }
@@ -5505,10 +6585,6 @@ function is_operator_char(ch) {
     return _is_operator_char[ch];
 }
 exports.is_operator_char = is_operator_char;
-function is_single_operator_char(ch) {
-    return _is_single_operator_char[ch];
-}
-exports.is_single_operator_char = is_single_operator_char;
 function is_whitespace(ch) {
     if (ch > 32) return false;
     if (ch == this.WHITESPACE_COMMENT1) return true;
@@ -5583,16 +6659,16 @@ var CharCodes;
     CharCodes[CharCodes["FORWARD_SLASH"] = 47] = "FORWARD_SLASH";
     CharCodes[CharCodes["QUESTION_MARK"] = 63] = "QUESTION_MARK";
     CharCodes[CharCodes["BACKSLASH"] = 92] = "BACKSLASH";
-    CharCodes[CharCodes["LEFT_PARENTHESIS"] = '('.charCodeAt(0)] = "LEFT_PARENTHESIS";
-    CharCodes[CharCodes["RIGHT_PARENTHESIS"] = ')'.charCodeAt(0)] = "RIGHT_PARENTHESIS";
-    CharCodes[CharCodes["LEFT_BRACE"] = '{'.charCodeAt(0)] = "LEFT_BRACE";
-    CharCodes[CharCodes["RIGHT_BRACE"] = '}'.charCodeAt(0)] = "RIGHT_BRACE";
-    CharCodes[CharCodes["LEFT_BRACKET"] = '['.charCodeAt(0)] = "LEFT_BRACKET";
-    CharCodes[CharCodes["RIGHT_BRACKET"] = ']'.charCodeAt(0)] = "RIGHT_BRACKET";
-    CharCodes[CharCodes["COMMA"] = ','.charCodeAt(0)] = "COMMA";
-    CharCodes[CharCodes["SPACE"] = ' '.charCodeAt(0)] = "SPACE";
-    CharCodes[CharCodes["LOWERCASE_U"] = 'u'.charCodeAt(0)] = "LOWERCASE_U";
-    CharCodes[CharCodes["COLON"] = ':'.charCodeAt(0)] = "COLON";
+    CharCodes[CharCodes["LEFT_PARENTHESIS"] = 40] = "LEFT_PARENTHESIS";
+    CharCodes[CharCodes["RIGHT_PARENTHESIS"] = 41] = "RIGHT_PARENTHESIS";
+    CharCodes[CharCodes["LEFT_BRACE"] = 123] = "LEFT_BRACE";
+    CharCodes[CharCodes["RIGHT_BRACE"] = 125] = "RIGHT_BRACE";
+    CharCodes[CharCodes["LEFT_BRACKET"] = 91] = "LEFT_BRACKET";
+    CharCodes[CharCodes["RIGHT_BRACKET"] = 93] = "RIGHT_BRACKET";
+    CharCodes[CharCodes["COMMA"] = 44] = "COMMA";
+    CharCodes[CharCodes["SPACE"] = 32] = "SPACE";
+    CharCodes[CharCodes["LOWERCASE_U"] = 117] = "LOWERCASE_U";
+    CharCodes[CharCodes["COLON"] = 58] = "COLON";
 })(CharCodes = exports.CharCodes || (exports.CharCodes = {}));
 function backslashEscape(s) {
     return [CharCodes.BACKSLASH, s.charCodeAt(0)];
@@ -5644,7 +6720,7 @@ CommonEscapes[CharCodes.HORIZONTAL_TAB] = backslashEscape('t');
 CommonEscapes[CharCodes.LINE_FEED] = backslashEscape('n');
 CommonEscapes[CharCodes.VERTICAL_TAB] = backslashEscape('v');
 CommonEscapes[CharCodes.FORM_FEED] = backslashEscape('f');
-CommonEscapes[CharCodes.CARRIAGE_RETURN] = backslashEscape['r'];
+CommonEscapes[CharCodes.CARRIAGE_RETURN] = backslashEscape('r');
 CommonEscapes[CharCodes.BACKSLASH] = backslashEscape('\\');
 exports.StringEscapes = (0, _extends3.default)({}, CommonEscapes);
 exports.StringEscapes[CharCodes.DOUBLE_QUOTE] = backslashEscape('"');
@@ -5737,7 +6813,7 @@ function escape(s, escapes) {
 exports.escape = escape;
 
 
-},{"./IonUtilities":27,"babel-runtime/helpers/extends":40,"babel-runtime/regenerator":45}],21:[function(require,module,exports){
+},{"./IonUtilities":30,"babel-runtime/helpers/extends":44,"babel-runtime/regenerator":49}],24:[function(require,module,exports){
 "use strict";
 
 var _classCallCheck2 = require("babel-runtime/helpers/classCallCheck");
@@ -5751,30 +6827,33 @@ var _createClass3 = _interopRequireDefault(_createClass2);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 Object.defineProperty(exports, "__esModule", { value: true });
+var IonCatalog_1 = require("./IonCatalog");
+var IonDecimal_1 = require("./IonDecimal");
 var IonLocalSymbolTable_1 = require("./IonLocalSymbolTable");
 var IonParserTextRaw_1 = require("./IonParserTextRaw");
 var IonSymbols_1 = require("./IonSymbols");
 var IonType_1 = require("./IonType");
 var IonTypes_1 = require("./IonTypes");
-var IonConstants_1 = require("./IonConstants");
 var IonSymbols_2 = require("./IonSymbols");
 var IonParserTextRaw_2 = require("./IonParserTextRaw");
+var IonTimestamp_1 = require("./IonTimestamp");
 var RAW_STRING = new IonType_1.IonType(-1, "raw_input", true, false, false, false);
 var BEGINNING_OF_CONTAINER = -2;
 var EOF = -1;
 var T_IDENTIFIER = 9;
+var T_STRING1 = 11;
 var T_STRUCT = 19;
 
 var TextReader = function () {
-    function TextReader(source, catalog, raw_tokens) {
+    function TextReader(source, catalog) {
         (0, _classCallCheck3.default)(this, TextReader);
 
         if (!source) {
             throw new Error("a source Span is required to make a reader");
         }
-        this._parser = new IonParserTextRaw_2.ParserTextRaw(source, raw_tokens);
+        this._parser = new IonParserTextRaw_2.ParserTextRaw(source);
         this._depth = 0;
-        this._cat = catalog;
+        this._cat = catalog ? catalog : new IonCatalog_1.Catalog();
         this._symtab = IonLocalSymbolTable_1.defaultLocalSymbolTable();
         this._type = undefined;
         this._raw_type = undefined;
@@ -5786,53 +6865,76 @@ var TextReader = function () {
         value: function load_raw() {
             var t = this;
             if (t._raw !== undefined) return;
-            if (t.isNull()) return;
             t._raw = t._parser.get_value_as_string(t._raw_type);
             return;
         }
     }, {
         key: "skip_past_container",
         value: function skip_past_container() {
-            var type,
-                d = 1,
-                p = this._parser;
-            while (d > 0) {
-                type = p.next();
-                if (type === EOF) {
-                    d--;
-                } else if (type.container) {
-                    d++;
+            var type = void 0;
+            var d = this.depth();
+            this.stepIn();
+            while (this.depth() > d) {
+                type = this.next();
+                if (type === undefined) {
+                    this.stepOut();
+                } else if (type.container && !this.isNull()) {
+                    this.stepIn();
                 }
             }
+        }
+    }, {
+        key: "isIVM",
+        value: function isIVM(input) {
+            if (this.depth() > 0) return false;
+            if (input.length < 6 || this.annotations().length > 0) return false;
+            var prefix = "$ion_";
+            for (var i = 0; i < prefix.length; i++) {
+                if (prefix.charAt(i) !== input.charAt(i)) return false;
+            }
+            if (input !== "$ion_1_0") throw new Error("Only ion version 1.0 is supported.");
+            return true;
+        }
+    }, {
+        key: "isLikeIVM",
+        value: function isLikeIVM() {
+            return false;
         }
     }, {
         key: "next",
         value: function next() {
             this._raw = undefined;
-            if (this._raw_type === EOF) {
-                return undefined;
-            }
+            if (this._raw_type === EOF) return undefined;
             var should_skip = this._raw_type !== BEGINNING_OF_CONTAINER && !this.isNull() && this._type && this._type.container;
-            if (should_skip) {
-                this.skip_past_container();
-            }
+            if (should_skip) this.skip_past_container();
             var p = this._parser;
             for (;;) {
                 this._raw_type = p.next();
-                if (this._depth > 0) break;
                 if (this._raw_type === T_IDENTIFIER) {
+                    if (this._depth > 0) break;
                     this.load_raw();
-                    if (this._raw != IonConstants_1.IVM.text) break;
+                    if (!this.isIVM(this._raw)) break;
                     this._symtab = IonLocalSymbolTable_1.defaultLocalSymbolTable();
+                    this._raw = undefined;
+                    this._raw_type = undefined;
+                } else if (this._raw_type === T_STRING1) {
+                    if (this._depth > 0) break;
+                    this.load_raw();
+                    if (this._raw !== "$ion_1_0") break;
+                    this._raw = undefined;
+                    this._raw_type = undefined;
                 } else if (this._raw_type === T_STRUCT) {
                     if (p.annotations().length !== 1) break;
                     if (p.annotations()[0] != IonSymbols_1.ion_symbol_table) break;
+                    this._type = IonParserTextRaw_1.get_ion_type(this._raw_type);
                     this._symtab = IonSymbols_2.makeSymbolTable(this._cat, this);
+                    this._raw = undefined;
+                    this._raw_type = undefined;
                 } else {
                     break;
                 }
             }
-            this._type = IonParserTextRaw_1.getIonType(this._raw_type);
+            this._type = IonParserTextRaw_1.get_ion_type(this._raw_type);
             return this._type;
         }
     }, {
@@ -5844,18 +6946,19 @@ var TextReader = function () {
             if (this.isNull()) {
                 throw new Error("Can't step into a null container");
             }
+            this._parser.clearFieldName();
             this._raw_type = BEGINNING_OF_CONTAINER;
             this._depth++;
         }
     }, {
         key: "stepOut",
         value: function stepOut() {
-            var t = this;
-            while (t._raw_type != EOF) {
-                t.next();
+            this._parser.clearFieldName();
+            while (this._raw_type != EOF) {
+                this.next();
             }
-            t._raw_type = undefined;
-            t._depth--;
+            this._raw_type = undefined;
+            this._depth--;
         }
     }, {
         key: "valueType",
@@ -5886,26 +6989,27 @@ var TextReader = function () {
     }, {
         key: "stringValue",
         value: function stringValue() {
-            var i,
-                s,
-                t = this;
             this.load_raw();
-            if (t.isNull()) {
-                s = "null";
-                if (t._type != IonTypes_1.IonTypes.NULL) {
-                    s += "." + t._type.name;
-                }
-            } else if (t._type.scalar) {
-                if (t._type !== IonTypes_1.IonTypes.BLOB) {
-                    s = t._raw;
-                } else {
-                    s = t._raw;
+            if (this.isNull()) return this._type === IonTypes_1.IonTypes.NULL ? "null" : "null." + this._type.name;
+            if (this._type.scalar) {
+                switch (this._type) {
+                    case IonTypes_1.IonTypes.BLOB:
+                        throw new Error("Blobs currently unsupported.");
+                    case IonTypes_1.IonTypes.SYMBOL:
+                        if (this._raw_type === T_IDENTIFIER && this._raw.length > 1 && this._raw.charAt(0) === '$'.charAt(0)) {
+                            var tempStr = this._raw.substr(1, this._raw.length);
+                            if (+tempStr === +tempStr) {
+                                var symbol = this._symtab.getSymbol(Number(tempStr));
+                                if (symbol === undefined) throw new Error("Unresolveable symbol ID, symboltokens unsupported.");
+                            }
+                        }
+                        return this._raw;
+                    default:
+                        return this._raw;
                 }
             } else {
-                i = t.ionValue();
-                s = i.stringValue();
+                throw new Error("Cannot create string representation of non-scalar values.");
             }
-            return s;
         }
     }, {
         key: "numberValue",
@@ -5931,27 +7035,63 @@ var TextReader = function () {
     }, {
         key: "decimalValue",
         value: function decimalValue() {
-            throw new Error("E_NOT_IMPL: decimalValue");
+            return IonDecimal_1.Decimal.parse(this.stringValue());
         }
     }, {
         key: "timestampValue",
         value: function timestampValue() {
-            throw new Error("E_NOT_IMPL: timestampValue");
+            return IonTimestamp_1.Timestamp.parse(this.stringValue());
         }
     }, {
         key: "value",
         value: function value() {
-            throw new Error("E_NOT_IMPL: value");
+            switch (this._type) {
+                case IonTypes_1.IonTypes.BOOL:
+                    {
+                        return this.booleanValue();
+                    }
+                case IonTypes_1.IonTypes.INT:
+                    {
+                        return this.numberValue();
+                    }
+                case IonTypes_1.IonTypes.FLOAT:
+                    {
+                        return this.numberValue();
+                    }
+                case IonTypes_1.IonTypes.DECIMAL:
+                    {
+                        return this.decimalValue();
+                    }
+                case IonTypes_1.IonTypes.SYMBOL:
+                    {
+                        return this.stringValue();
+                    }
+                case IonTypes_1.IonTypes.STRING:
+                    {
+                        return this.stringValue();
+                    }
+                case IonTypes_1.IonTypes.TIMESTAMP:
+                    {
+                        return this.timestampValue();
+                    }
+                case IonTypes_1.IonTypes.CLOB:
+                    {
+                        return this.stringValue();
+                    }
+                case IonTypes_1.IonTypes.BLOB:
+                    {
+                        return this.stringValue();
+                    }
+                default:
+                    {
+                        return undefined;
+                    }
+            }
         }
     }, {
         key: "ionValue",
         value: function ionValue() {
             throw new Error("E_NOT_IMPL: ionValue");
-        }
-    }, {
-        key: "raw_parser",
-        value: function raw_parser() {
-            return this._parser;
         }
     }]);
     return TextReader;
@@ -5960,20 +7100,20 @@ var TextReader = function () {
 exports.TextReader = TextReader;
 
 
-},{"./IonConstants":6,"./IonLocalSymbolTable":9,"./IonParserTextRaw":13,"./IonSymbols":18,"./IonType":24,"./IonTypes":25,"babel-runtime/helpers/classCallCheck":38,"babel-runtime/helpers/createClass":39}],22:[function(require,module,exports){
+},{"./IonCatalog":5,"./IonDecimal":7,"./IonLocalSymbolTable":12,"./IonParserTextRaw":16,"./IonSymbols":21,"./IonTimestamp":26,"./IonType":27,"./IonTypes":28,"babel-runtime/helpers/classCallCheck":42,"babel-runtime/helpers/createClass":43}],25:[function(require,module,exports){
 "use strict";
 
 var _getIterator2 = require("babel-runtime/core-js/get-iterator");
 
 var _getIterator3 = _interopRequireDefault(_getIterator2);
 
-var _classCallCheck2 = require("babel-runtime/helpers/classCallCheck");
-
-var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
-
 var _createClass2 = require("babel-runtime/helpers/createClass");
 
 var _createClass3 = _interopRequireDefault(_createClass2);
+
+var _classCallCheck2 = require("babel-runtime/helpers/classCallCheck");
+
+var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -5981,13 +7121,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var IonText_1 = require("./IonText");
 var IonText_2 = require("./IonText");
 var IonUnicode_1 = require("./IonUnicode");
-var IonUnicode_2 = require("./IonUnicode");
 var IonText_3 = require("./IonText");
 var IonText_4 = require("./IonText");
 var IonUtilities_1 = require("./IonUtilities");
 var IonText_5 = require("./IonText");
 var IonUtilities_2 = require("./IonUtilities");
-var IonUtilities_3 = require("./IonUtilities");
 var IonText_6 = require("./IonText");
 var IonText_7 = require("./IonText");
 var IonText_8 = require("./IonText");
@@ -5996,18 +7134,25 @@ var State;
 (function (State) {
     State[State["VALUE"] = 0] = "VALUE";
     State[State["STRUCT_FIELD"] = 1] = "STRUCT_FIELD";
-    State[State["STRUCT_VALUE"] = 2] = "STRUCT_VALUE";
-})(State || (State = {}));
+})(State = exports.State || (exports.State = {}));
+
+var Context = function Context(myType) {
+    (0, _classCallCheck3.default)(this, Context);
+
+    this.state = myType === IonBinary_1.TypeCodes.STRUCT ? State.STRUCT_FIELD : State.VALUE;
+    this.clean = true;
+    this.containerType = myType;
+};
+
+exports.Context = Context;
 
 var TextWriter = function () {
     function TextWriter(writeable) {
         (0, _classCallCheck3.default)(this, TextWriter);
 
         this.writeable = writeable;
-        this.state = State.VALUE;
-        this.isFirstValue = true;
-        this.isFirstValueInContainer = false;
-        this.containers = [];
+        this.containerContext = [];
+        this.containerContext.push(new Context(undefined));
     }
 
     (0, _createClass3.default)(TextWriter, [{
@@ -6041,18 +7186,30 @@ var TextWriter = function () {
             var _this3 = this;
 
             this.writeValue(IonBinary_1.TypeCodes.CLOB, value, annotations, function (value) {
+                var hexStr = void 0;
                 _this3.writeUtf8('{{');
                 _this3.writeUtf8('"');
                 for (var i = 0; i < value.length; i++) {
                     var c = value[i];
-                    if (c >= 128) {
-                        throw new Error("Illegal clob character " + c + " at index " + i);
-                    }
-                    var _escape = IonText_2.ClobEscapes[c];
-                    if (IonUtilities_2.isUndefined(_escape)) {
-                        _this3.writeable.writeByte(c);
+                    if (c > 127 && c < 256) {
+                        hexStr = "\\x" + c.toString(16);
+                        for (var j = 0; j < hexStr.length; j++) {
+                            _this3.writeable.writeByte(hexStr.charCodeAt(j));
+                        }
                     } else {
-                        _this3.writeable.writeBytes(_escape);
+                        var _escape = IonText_2.ClobEscapes[c];
+                        if (IonUtilities_2.isUndefined(_escape)) {
+                            if (c < 32) {
+                                hexStr = "\\x" + c.toString(16);
+                                for (var _j = 0; _j < hexStr.length; _j++) {
+                                    _this3.writeable.writeByte(hexStr.charCodeAt(_j));
+                                }
+                            } else {
+                                _this3.writeable.writeByte(c);
+                            }
+                        } else {
+                            _this3.writeable.writeBytes(_escape);
+                        }
                     }
                 }
                 _this3.writeUtf8('"');
@@ -6071,26 +7228,39 @@ var TextWriter = function () {
     }, {
         key: "writeFieldName",
         value: function writeFieldName(fieldName) {
-            if (this.isTopLevel || this.currentContainer !== IonBinary_1.TypeCodes.STRUCT) {
+            if (this.currentContainer.containerType !== IonBinary_1.TypeCodes.STRUCT) {
                 throw new Error("Cannot write field name outside of a struct");
             }
-            if (this.state !== State.STRUCT_FIELD) {
+            if (this.currentContainer.state !== State.STRUCT_FIELD) {
                 throw new Error("Expecting a struct value");
             }
-            if (!this.isFirstValueInContainer) {
+            if (!this.currentContainer.clean) {
                 this.writeable.writeByte(IonText_1.CharCodes.COMMA);
             }
             this.writeSymbolToken(fieldName);
             this.writeable.writeByte(IonText_1.CharCodes.COLON);
-            this.state = State.STRUCT_VALUE;
+            this.currentContainer.state = State.VALUE;
         }
     }, {
         key: "writeFloat32",
         value: function writeFloat32(value, annotations) {
             var _this5 = this;
 
+            var tempVal = value;
+            if (value === Number.POSITIVE_INFINITY) {
+                tempVal = "+inf";
+            } else if (value === Number.NEGATIVE_INFINITY) {
+                tempVal = "-inf";
+            } else if (isNaN(value)) {
+                tempVal = "nan";
+            } else if (tempVal !== null && tempVal !== undefined) {
+                tempVal = tempVal.toExponential();
+                if (tempVal.charAt(tempVal.length - 2) === '+') {
+                    tempVal = tempVal.slice(0, tempVal.length - 2) + tempVal.charAt(tempVal.length - 1);
+                }
+            }
             this.writeValue(IonBinary_1.TypeCodes.FLOAT, value, annotations, function (value) {
-                _this5.writeUtf8(value.toString(10));
+                _this5.writeUtf8(tempVal);
             });
         }
     }, {
@@ -6098,8 +7268,21 @@ var TextWriter = function () {
         value: function writeFloat64(value, annotations) {
             var _this6 = this;
 
+            var tempVal = value;
+            if (value === Number.POSITIVE_INFINITY) {
+                tempVal = "+inf";
+            } else if (value === Number.NEGATIVE_INFINITY) {
+                tempVal = "-inf";
+            } else if (value === Number.NaN) {
+                tempVal = "nan";
+            } else if (tempVal !== null && tempVal !== undefined) {
+                tempVal = tempVal.toExponential();
+                if (tempVal.charAt(tempVal.length - 2) === '+') {
+                    tempVal = tempVal.slice(0, tempVal.length - 2) + tempVal.charAt(tempVal.length - 1);
+                }
+            }
             this.writeValue(IonBinary_1.TypeCodes.FLOAT, value, annotations, function (value) {
-                _this6.writeUtf8(value.toString(10));
+                _this6.writeUtf8(tempVal);
             });
         }
     }, {
@@ -6107,7 +7290,8 @@ var TextWriter = function () {
         value: function writeInt(value, annotations) {
             var _this7 = this;
 
-            this.writeValue(value >= 0 ? IonBinary_1.TypeCodes.POSITIVE_INT : IonBinary_1.TypeCodes.NEGATIVE_INT, value, annotations, function (value) {
+            var typeCode = value >= 0 ? IonBinary_1.TypeCodes.POSITIVE_INT : IonBinary_1.TypeCodes.NEGATIVE_INT;
+            this.writeValue(typeCode, value, annotations, function (value) {
                 _this7.writeUtf8(value.toString(10));
             });
         }
@@ -6167,6 +7351,7 @@ var TextWriter = function () {
                     throw new Error("Cannot write null for type " + type_);
             }
             this.writeUtf8("null." + s);
+            if (this.currentContainer.containerType === IonBinary_1.TypeCodes.STRUCT) this.currentContainer.state = State.STRUCT_FIELD;
         }
     }, {
         key: "writeSexp",
@@ -6180,15 +7365,15 @@ var TextWriter = function () {
 
             this.writeValue(IonBinary_1.TypeCodes.STRING, value, annotations, function (value) {
                 _this8.writeable.writeByte(IonText_1.CharCodes.DOUBLE_QUOTE);
-                _this8.writeable.writeStream(IonUnicode_2.encodeUtf8Stream(IonText_3.escape(value, IonText_6.StringEscapes)));
+                _this8.writeable.writeStream(IonText_3.escape(value, IonText_6.StringEscapes));
                 _this8.writeable.writeByte(IonText_1.CharCodes.DOUBLE_QUOTE);
             });
         }
     }, {
         key: "writeStruct",
         value: function writeStruct(annotations, isNull) {
+            if (annotations !== undefined && annotations[0] === '$ion_symbol_table' && this.depth() === 0) throw new Error("Unable to alter symbol table context, it allows invalid ion to be written.");
             this.writeContainer(IonBinary_1.TypeCodes.STRUCT, IonText_1.CharCodes.LEFT_BRACE, annotations, isNull);
-            this.state = State.STRUCT_FIELD;
         }
     }, {
         key: "writeSymbol",
@@ -6211,13 +7396,13 @@ var TextWriter = function () {
     }, {
         key: "endContainer",
         value: function endContainer() {
-            if (this.isTopLevel) {
+            var currentContainer = this.containerContext.pop();
+            if (!currentContainer || !currentContainer.containerType) {
                 throw new Error("Can't step out when not in a container");
-            } else if (this.state === State.STRUCT_VALUE) {
+            } else if (currentContainer.containerType === IonBinary_1.TypeCodes.STRUCT && currentContainer.state === State.VALUE) {
                 throw new Error("Expecting a struct value");
             }
-            var container = this.containers.pop();
-            switch (container) {
+            switch (currentContainer.containerType) {
                 case IonBinary_1.TypeCodes.LIST:
                     this.writeable.writeByte(IonText_1.CharCodes.RIGHT_BRACKET);
                     break;
@@ -6227,27 +7412,21 @@ var TextWriter = function () {
                 case IonBinary_1.TypeCodes.STRUCT:
                     this.writeable.writeByte(IonText_1.CharCodes.RIGHT_BRACE);
                     break;
-            }
-            if (!this.isTopLevel) {
-                if (this.currentContainer === IonBinary_1.TypeCodes.STRUCT) {
-                    this.state = State.STRUCT_FIELD;
-                }
-                this.isFirstValueInContainer = false;
+                default:
+                    throw new Error("Unexpected container TypeCode");
             }
         }
     }, {
         key: "close",
         value: function close() {
-            while (!this.isTopLevel) {
-                this.endContainer();
+            if (!this.isTopLevel) {
+                throw new Error("Writer was not at the top level, call closeContainer in the future.");
             }
         }
     }, {
         key: "writeValue",
         value: function writeValue(typeCode, value, annotations, serialize) {
-            if (this.state === State.STRUCT_FIELD) {
-                throw new Error("Expecting a struct field");
-            }
+            if (this.currentContainer.state === State.STRUCT_FIELD) throw new Error("Expecting a struct field");
             if (IonUtilities_1.isNullOrUndefined(value)) {
                 this.writeNull(typeCode, annotations);
                 return;
@@ -6255,9 +7434,7 @@ var TextWriter = function () {
             this.handleSeparator();
             this.writeAnnotations(annotations);
             serialize(value);
-            if (this.state === State.STRUCT_VALUE) {
-                this.state = State.STRUCT_FIELD;
-            }
+            if (this.currentContainer.containerType === IonBinary_1.TypeCodes.STRUCT) this.currentContainer.state = State.STRUCT_FIELD;
         }
     }, {
         key: "writeContainer",
@@ -6265,6 +7442,9 @@ var TextWriter = function () {
             if (isNull) {
                 this.writeNull(typeCode, annotations);
                 return;
+            }
+            if (this.currentContainer.containerType === IonBinary_1.TypeCodes.STRUCT && this.currentContainer.state === State.VALUE) {
+                this.currentContainer.state = State.STRUCT_FIELD;
             }
             this.handleSeparator();
             this.writeAnnotations(annotations);
@@ -6275,22 +7455,23 @@ var TextWriter = function () {
         key: "handleSeparator",
         value: function handleSeparator() {
             if (this.isTopLevel) {
-                if (this.isFirstValue) {
-                    this.isFirstValue = false;
+                if (this.currentContainer.clean) {
+                    this.currentContainer.clean = false;
                 } else {
                     this.writeable.writeByte(IonText_1.CharCodes.LINE_FEED);
                 }
             } else {
-                if (this.isFirstValueInContainer) {
-                    this.isFirstValueInContainer = false;
+                if (this.currentContainer.clean) {
+                    this.currentContainer.clean = false;
                 } else {
-                    switch (this.currentContainer) {
+                    switch (this.currentContainer.containerType) {
                         case IonBinary_1.TypeCodes.LIST:
                             this.writeable.writeByte(IonText_1.CharCodes.COMMA);
                             break;
                         case IonBinary_1.TypeCodes.SEXP:
                             this.writeable.writeByte(IonText_1.CharCodes.SPACE);
                             break;
+                        default:
                     }
                 }
             }
@@ -6333,33 +7514,48 @@ var TextWriter = function () {
             }
         }
     }, {
+        key: "depth",
+        value: function depth() {
+            return this.containerContext.length - 1;
+        }
+    }, {
         key: "stepIn",
         value: function stepIn(container) {
-            this.containers.push(container);
-            this.isFirstValueInContainer = true;
+            this.containerContext.push(new Context(container));
         }
     }, {
         key: "writeSymbolToken",
         value: function writeSymbolToken(s) {
             if (IonText_4.isIdentifier(s)) {
-                this.writeUtf8(s);
-            } else if (!this.isTopLevel && this.currentContainer === IonBinary_1.TypeCodes.SEXP && IonText_5.isOperator(s)) {
+                if (s.length > 1 && s.charAt(0) === '$'.charAt(0)) {
+                    var tempStr = s.substr(1, s.length);
+                    if (+tempStr === +tempStr) {
+                        this.writeable.writeByte(IonText_1.CharCodes.SINGLE_QUOTE);
+                        this.writeable.writeStream(IonText_3.escape(s, IonText_7.SymbolEscapes));
+                        this.writeable.writeByte(IonText_1.CharCodes.SINGLE_QUOTE);
+                    } else {
+                        this.writeUtf8(s);
+                    }
+                } else {
+                    this.writeUtf8(s);
+                }
+            } else if (!this.isTopLevel && this.currentContainer.containerType === IonBinary_1.TypeCodes.SEXP && IonText_5.isOperator(s)) {
                 this.writeUtf8(s);
             } else {
                 this.writeable.writeByte(IonText_1.CharCodes.SINGLE_QUOTE);
-                this.writeable.writeStream(IonUnicode_2.encodeUtf8Stream(IonText_3.escape(s, IonText_7.SymbolEscapes)));
+                this.writeable.writeStream(IonText_3.escape(s, IonText_7.SymbolEscapes));
                 this.writeable.writeByte(IonText_1.CharCodes.SINGLE_QUOTE);
             }
         }
     }, {
         key: "isTopLevel",
         get: function get() {
-            return this.containers.length === 0;
+            return this.depth() === 0;
         }
     }, {
         key: "currentContainer",
         get: function get() {
-            return IonUtilities_3.last(this.containers);
+            return this.containerContext[this.depth()];
         }
     }]);
     return TextWriter;
@@ -6368,7 +7564,7 @@ var TextWriter = function () {
 exports.TextWriter = TextWriter;
 
 
-},{"./IonBinary":2,"./IonText":20,"./IonUnicode":26,"./IonUtilities":27,"babel-runtime/core-js/get-iterator":29,"babel-runtime/helpers/classCallCheck":38,"babel-runtime/helpers/createClass":39}],23:[function(require,module,exports){
+},{"./IonBinary":2,"./IonText":23,"./IonUnicode":29,"./IonUtilities":30,"babel-runtime/core-js/get-iterator":32,"babel-runtime/helpers/classCallCheck":42,"babel-runtime/helpers/createClass":43}],26:[function(require,module,exports){
 "use strict";
 
 var _classCallCheck2 = require("babel-runtime/helpers/classCallCheck");
@@ -6398,10 +7594,10 @@ var MIN_DAY = 1;
 var MAX_DAY = 31;
 var MIN_MONTH = 1;
 var MAX_MONTH = 12;
-var MIN_YEAR = 0;
+var MIN_YEAR = 1;
 var MAX_YEAR = 9999;
-var MIN_OFFSET = -14 * 60;
-var MAX_OFFSET = 14 * 60;
+var MIN_OFFSET = -23 * 60 - 59;
+var MAX_OFFSET = 23 * 60 + 59;
 var DAYS_PER_MONTH = [-1, 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 var States;
 (function (States) {
@@ -6690,6 +7886,30 @@ var Timestamp = function () {
             return n;
         }
     }, {
+        key: "equals",
+        value: function equals(expected) {
+            return this.getPrecision() === expected.getPrecision() && this.offset === expected.offset && this.dataModelEquals(expected);
+        }
+    }, {
+        key: "dataModelEquals",
+        value: function dataModelEquals(expected) {
+            switch (this.precision) {
+                case IonPrecision_1.Precision.NULL:
+                    return expected.precision === IonPrecision_1.Precision.NULL;
+                case IonPrecision_1.Precision.SECONDS:
+                    if (!this.seconds.equals(expected.seconds)) return false;
+                case IonPrecision_1.Precision.HOUR_AND_MINUTE:
+                    if (this.minute !== expected.minute || this.hour !== expected.hour) return false;
+                case IonPrecision_1.Precision.DAY:
+                    if (this.day !== expected.day) return false;
+                case IonPrecision_1.Precision.MONTH:
+                    if (this.month !== expected.month) return false;
+                case IonPrecision_1.Precision.YEAR:
+                    if (this.year !== expected.year) return false;
+            }
+            return true;
+        }
+    }, {
         key: "stringValue",
         value: function stringValue() {
             var image = void 0;
@@ -6701,11 +7921,13 @@ var Timestamp = function () {
                     return "null.timestamp";
                 case IonPrecision_1.Precision.SECONDS:
                     image = t.seconds.toString();
+                    if (image.charAt(1) === '.') image = "0" + image;
+                    if (image.charAt(image.length - 1) === '.') image = image.slice(0, image.length - 1);
                 case IonPrecision_1.Precision.HOUR_AND_MINUTE:
                     image = _to_2_digits(t.minute) + (image ? ":" + image : "");
                     image = _to_2_digits(t.hour) + (image ? ":" + image : "");
                 case IonPrecision_1.Precision.DAY:
-                    image = _to_2_digits(t.day) + (image ? "T" + image : "");
+                    image = _to_2_digits(t.day) + (image ? "T" + image : "T");
                 case IonPrecision_1.Precision.MONTH:
                     image = _to_2_digits(t.month) + (image ? "-" + image : "");
                 case IonPrecision_1.Precision.YEAR:
@@ -6846,7 +8068,7 @@ var Timestamp = function () {
                         break;
                     case States.FRACTIONAL_SECONDS:
                         var START_POSITION_OF_SECONDS = 17;
-                        seconds = IonDecimal_1.Decimal.parse(str.substring(START_POSITION_OF_SECONDS, pos));
+                        seconds = IonDecimal_1.Decimal.parse(str.substring(START_POSITION_OF_SECONDS, pos), false);
                         break;
                     case States.OFFSET:
                         break;
@@ -6858,6 +8080,7 @@ var Timestamp = function () {
                         break;
                     case States.OFFSET_MINUTES:
                         offset += offset < -0 ? -v : v;
+                        if (v >= 60) throw new Error("Minute offset " + String(v) + " above maximum or equal to : 60");
                         break;
                     case States.OFFSET_ZULU:
                         offset = -0.0;
@@ -6881,8 +8104,9 @@ var Timestamp = function () {
                 }
                 pos++;
             }
-            var t = new Timestamp(precision, offset, year, month, day, hour, minute, seconds);
-            return t;
+            if (offset > MAX_OFFSET) throw new Error("Offset " + String(offset) + " above maximum: " + String(MAX_OFFSET));
+            if (offset < MIN_OFFSET) throw new Error("Offset " + String(offset) + " below minimum: " + String(MIN_OFFSET));
+            return new Timestamp(precision, offset, year, month, day, hour, minute, seconds);
         }
     }]);
     return Timestamp;
@@ -6892,7 +8116,7 @@ Timestamp.NULL = new Timestamp(IonPrecision_1.Precision.NULL);
 exports.Timestamp = Timestamp;
 
 
-},{"./IonDecimal":7,"./IonLongInt":10,"./IonPrecision":14,"./IonUtilities":27,"babel-runtime/helpers/classCallCheck":38,"babel-runtime/helpers/createClass":39}],24:[function(require,module,exports){
+},{"./IonDecimal":7,"./IonLongInt":13,"./IonPrecision":17,"./IonUtilities":30,"babel-runtime/helpers/classCallCheck":42,"babel-runtime/helpers/createClass":43}],27:[function(require,module,exports){
 "use strict";
 
 var _classCallCheck2 = require("babel-runtime/helpers/classCallCheck");
@@ -6917,7 +8141,7 @@ var IonType = function IonType(bid, name, scalar, lob, num, container) {
 exports.IonType = IonType;
 
 
-},{"babel-runtime/helpers/classCallCheck":38}],25:[function(require,module,exports){
+},{"babel-runtime/helpers/classCallCheck":42}],28:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -6941,7 +8165,7 @@ exports.IonTypes = {
 };
 
 
-},{"./IonType":24}],26:[function(require,module,exports){
+},{"./IonType":27}],29:[function(require,module,exports){
 "use strict";
 
 var _regenerator = require("babel-runtime/regenerator");
@@ -6969,7 +8193,7 @@ function isHighSurrogate(charCode) {
     return charCode >= HIGH_SURROGATE_OFFSET && charCode < LOW_SURROGATE_OFFSET;
 }
 function encodeUtf8(s) {
-    var writeable = new IonWriteable_1.Writeable(s.length, s.length);
+    var writeable = new IonWriteable_1.Writeable();
     var _iteratorNormalCompletion = true;
     var _didIteratorError = false;
     var _iteratorError = undefined;
@@ -7246,7 +8470,7 @@ function charCodes(s) {
 }
 
 
-},{"./IonWriteable":28,"babel-runtime/core-js/get-iterator":29,"babel-runtime/regenerator":45}],27:[function(require,module,exports){
+},{"./IonWriteable":31,"babel-runtime/core-js/get-iterator":32,"babel-runtime/regenerator":49}],30:[function(require,module,exports){
 "use strict";
 
 var _getIterator2 = require("babel-runtime/core-js/get-iterator");
@@ -7314,7 +8538,7 @@ function max(array, comparator) {
 exports.max = max;
 
 
-},{"babel-runtime/core-js/get-iterator":29}],28:[function(require,module,exports){
+},{"babel-runtime/core-js/get-iterator":32}],31:[function(require,module,exports){
 "use strict";
 
 var _getIterator2 = require("babel-runtime/core-js/get-iterator");
@@ -7333,34 +8557,19 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 Object.defineProperty(exports, "__esModule", { value: true });
 var IonUtilities_1 = require("./IonUtilities");
-var IonUtilities_2 = require("./IonUtilities");
 var DEFAULT_BUFFER_SIZE = 4096;
 
 var Writeable = function () {
     function Writeable() {
-        var bufferInitialSize = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : DEFAULT_BUFFER_SIZE;
-        var bufferGrowthSize = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : DEFAULT_BUFFER_SIZE;
         (0, _classCallCheck3.default)(this, Writeable);
 
-        this.bufferGrowthSize = bufferGrowthSize;
-        this.buffers = [new Array(bufferInitialSize)];
-        this.index = 0;
-        this.written = 0;
+        this.buffer = [];
     }
 
     (0, _createClass3.default)(Writeable, [{
         key: "writeByte",
         value: function writeByte(b) {
-            if (this.capacity() === 0) {
-                this.allocate();
-                IonUtilities_2.last(this.buffers)[0] = b;
-                this.index = 1;
-                this.written += 1;
-            } else {
-                IonUtilities_2.last(this.buffers)[this.index] = b;
-                this.index += 1;
-                this.written += 1;
-            }
+            this.buffer.push(b);
         }
     }, {
         key: "writeBytes",
@@ -7371,20 +8580,8 @@ var Writeable = function () {
             if (IonUtilities_1.isUndefined(length)) {
                 length = b.length - offset;
             }
-            var remaining = length;
-            while (remaining > 0) {
-                if (this.capacity() == 0) {
-                    this.allocate();
-                    this.index = 0;
-                }
-                var buffer = IonUtilities_2.last(this.buffers);
-                var limit = Math.min(remaining, this.capacity());
-                for (var i = 0; i < limit; i++) {
-                    buffer[this.index + i] = b[offset + i];
-                }
-                remaining -= limit;
-                this.index += limit;
-                this.written += limit;
+            for (var i = offset; i < b.length; i++) {
+                this.buffer.push(b[i]);
             }
         }
     }, {
@@ -7416,37 +8613,9 @@ var Writeable = function () {
             }
         }
     }, {
-        key: "capacity",
-        value: function capacity() {
-            return IonUtilities_2.last(this.buffers).length - this.index;
-        }
-    }, {
-        key: "allocate",
-        value: function allocate() {
-            if (this.bufferGrowthSize === 0) {
-                "Cannot allocate additional capacity in a fixed-size writeable";
-            }
-            this.buffers.push(new Array(this.bufferGrowthSize));
-        }
-    }, {
         key: "getBytes",
         value: function getBytes() {
-            var singleFullBuffer = this.buffers.length == 1 && this.index == IonUtilities_2.last(this.buffers).length;
-            if (singleFullBuffer) {
-                return IonUtilities_2.last(this.buffers);
-            }
-            var result = new Array(this.written);
-            var offset = 0;
-            for (var i = 0; i < this.buffers.length; i++) {
-                var buffer = this.buffers[i];
-                var limit = Math.min(this.written - offset, buffer.length);
-                for (var j = 0; j < limit; j++) {
-                    result[offset++] = buffer[j];
-                }
-            }
-            this.buffers = [result];
-            this.index = this.written;
-            return result;
+            return this.buffer;
         }
     }]);
     return Writeable;
@@ -7455,25 +8624,27 @@ var Writeable = function () {
 exports.Writeable = Writeable;
 
 
-},{"./IonUtilities":27,"babel-runtime/core-js/get-iterator":29,"babel-runtime/helpers/classCallCheck":38,"babel-runtime/helpers/createClass":39}],29:[function(require,module,exports){
+},{"./IonUtilities":30,"babel-runtime/core-js/get-iterator":32,"babel-runtime/helpers/classCallCheck":42,"babel-runtime/helpers/createClass":43}],32:[function(require,module,exports){
 module.exports = { "default": require("core-js/library/fn/get-iterator"), __esModule: true };
-},{"core-js/library/fn/get-iterator":46}],30:[function(require,module,exports){
+},{"core-js/library/fn/get-iterator":50}],33:[function(require,module,exports){
+module.exports = { "default": require("core-js/library/fn/map"), __esModule: true };
+},{"core-js/library/fn/map":51}],34:[function(require,module,exports){
 module.exports = { "default": require("core-js/library/fn/object/assign"), __esModule: true };
-},{"core-js/library/fn/object/assign":47}],31:[function(require,module,exports){
+},{"core-js/library/fn/object/assign":52}],35:[function(require,module,exports){
 module.exports = { "default": require("core-js/library/fn/object/create"), __esModule: true };
-},{"core-js/library/fn/object/create":48}],32:[function(require,module,exports){
+},{"core-js/library/fn/object/create":53}],36:[function(require,module,exports){
 module.exports = { "default": require("core-js/library/fn/object/define-property"), __esModule: true };
-},{"core-js/library/fn/object/define-property":49}],33:[function(require,module,exports){
+},{"core-js/library/fn/object/define-property":54}],37:[function(require,module,exports){
 module.exports = { "default": require("core-js/library/fn/object/get-own-property-descriptor"), __esModule: true };
-},{"core-js/library/fn/object/get-own-property-descriptor":50}],34:[function(require,module,exports){
+},{"core-js/library/fn/object/get-own-property-descriptor":55}],38:[function(require,module,exports){
 module.exports = { "default": require("core-js/library/fn/object/get-prototype-of"), __esModule: true };
-},{"core-js/library/fn/object/get-prototype-of":51}],35:[function(require,module,exports){
+},{"core-js/library/fn/object/get-prototype-of":56}],39:[function(require,module,exports){
 module.exports = { "default": require("core-js/library/fn/object/set-prototype-of"), __esModule: true };
-},{"core-js/library/fn/object/set-prototype-of":52}],36:[function(require,module,exports){
+},{"core-js/library/fn/object/set-prototype-of":57}],40:[function(require,module,exports){
 module.exports = { "default": require("core-js/library/fn/symbol"), __esModule: true };
-},{"core-js/library/fn/symbol":53}],37:[function(require,module,exports){
+},{"core-js/library/fn/symbol":58}],41:[function(require,module,exports){
 module.exports = { "default": require("core-js/library/fn/symbol/iterator"), __esModule: true };
-},{"core-js/library/fn/symbol/iterator":54}],38:[function(require,module,exports){
+},{"core-js/library/fn/symbol/iterator":59}],42:[function(require,module,exports){
 "use strict";
 
 exports.__esModule = true;
@@ -7483,7 +8654,7 @@ exports.default = function (instance, Constructor) {
     throw new TypeError("Cannot call a class as a function");
   }
 };
-},{}],39:[function(require,module,exports){
+},{}],43:[function(require,module,exports){
 "use strict";
 
 exports.__esModule = true;
@@ -7511,7 +8682,7 @@ exports.default = function () {
     return Constructor;
   };
 }();
-},{"../core-js/object/define-property":32}],40:[function(require,module,exports){
+},{"../core-js/object/define-property":36}],44:[function(require,module,exports){
 "use strict";
 
 exports.__esModule = true;
@@ -7535,7 +8706,7 @@ exports.default = _assign2.default || function (target) {
 
   return target;
 };
-},{"../core-js/object/assign":30}],41:[function(require,module,exports){
+},{"../core-js/object/assign":34}],45:[function(require,module,exports){
 "use strict";
 
 exports.__esModule = true;
@@ -7574,7 +8745,7 @@ exports.default = function get(object, property, receiver) {
     return getter.call(receiver);
   }
 };
-},{"../core-js/object/get-own-property-descriptor":33,"../core-js/object/get-prototype-of":34}],42:[function(require,module,exports){
+},{"../core-js/object/get-own-property-descriptor":37,"../core-js/object/get-prototype-of":38}],46:[function(require,module,exports){
 "use strict";
 
 exports.__esModule = true;
@@ -7608,7 +8779,7 @@ exports.default = function (subClass, superClass) {
   });
   if (superClass) _setPrototypeOf2.default ? (0, _setPrototypeOf2.default)(subClass, superClass) : subClass.__proto__ = superClass;
 };
-},{"../core-js/object/create":31,"../core-js/object/set-prototype-of":35,"../helpers/typeof":44}],43:[function(require,module,exports){
+},{"../core-js/object/create":35,"../core-js/object/set-prototype-of":39,"../helpers/typeof":48}],47:[function(require,module,exports){
 "use strict";
 
 exports.__esModule = true;
@@ -7626,7 +8797,7 @@ exports.default = function (self, call) {
 
   return call && ((typeof call === "undefined" ? "undefined" : (0, _typeof3.default)(call)) === "object" || typeof call === "function") ? call : self;
 };
-},{"../helpers/typeof":44}],44:[function(require,module,exports){
+},{"../helpers/typeof":48}],48:[function(require,module,exports){
 "use strict";
 
 exports.__esModule = true;
@@ -7648,76 +8819,102 @@ exports.default = typeof _symbol2.default === "function" && _typeof(_iterator2.d
 } : function (obj) {
   return obj && typeof _symbol2.default === "function" && obj.constructor === _symbol2.default && obj !== _symbol2.default.prototype ? "symbol" : typeof obj === "undefined" ? "undefined" : _typeof(obj);
 };
-},{"../core-js/symbol":36,"../core-js/symbol/iterator":37}],45:[function(require,module,exports){
+},{"../core-js/symbol":40,"../core-js/symbol/iterator":41}],49:[function(require,module,exports){
 module.exports = require("regenerator-runtime");
 
-},{"regenerator-runtime":129}],46:[function(require,module,exports){
+},{"regenerator-runtime":154}],50:[function(require,module,exports){
 require('../modules/web.dom.iterable');
 require('../modules/es6.string.iterator');
 module.exports = require('../modules/core.get-iterator');
 
-},{"../modules/core.get-iterator":115,"../modules/es6.string.iterator":124,"../modules/web.dom.iterable":128}],47:[function(require,module,exports){
+},{"../modules/core.get-iterator":136,"../modules/es6.string.iterator":146,"../modules/web.dom.iterable":153}],51:[function(require,module,exports){
+require('../modules/es6.object.to-string');
+require('../modules/es6.string.iterator');
+require('../modules/web.dom.iterable');
+require('../modules/es6.map');
+require('../modules/es7.map.to-json');
+require('../modules/es7.map.of');
+require('../modules/es7.map.from');
+module.exports = require('../modules/_core').Map;
+
+},{"../modules/_core":74,"../modules/es6.map":138,"../modules/es6.object.to-string":145,"../modules/es6.string.iterator":146,"../modules/es7.map.from":148,"../modules/es7.map.of":149,"../modules/es7.map.to-json":150,"../modules/web.dom.iterable":153}],52:[function(require,module,exports){
 require('../../modules/es6.object.assign');
 module.exports = require('../../modules/_core').Object.assign;
 
-},{"../../modules/_core":61,"../../modules/es6.object.assign":117}],48:[function(require,module,exports){
+},{"../../modules/_core":74,"../../modules/es6.object.assign":139}],53:[function(require,module,exports){
 require('../../modules/es6.object.create');
 var $Object = require('../../modules/_core').Object;
 module.exports = function create(P, D) {
   return $Object.create(P, D);
 };
 
-},{"../../modules/_core":61,"../../modules/es6.object.create":118}],49:[function(require,module,exports){
+},{"../../modules/_core":74,"../../modules/es6.object.create":140}],54:[function(require,module,exports){
 require('../../modules/es6.object.define-property');
 var $Object = require('../../modules/_core').Object;
 module.exports = function defineProperty(it, key, desc) {
   return $Object.defineProperty(it, key, desc);
 };
 
-},{"../../modules/_core":61,"../../modules/es6.object.define-property":119}],50:[function(require,module,exports){
+},{"../../modules/_core":74,"../../modules/es6.object.define-property":141}],55:[function(require,module,exports){
 require('../../modules/es6.object.get-own-property-descriptor');
 var $Object = require('../../modules/_core').Object;
 module.exports = function getOwnPropertyDescriptor(it, key) {
   return $Object.getOwnPropertyDescriptor(it, key);
 };
 
-},{"../../modules/_core":61,"../../modules/es6.object.get-own-property-descriptor":120}],51:[function(require,module,exports){
+},{"../../modules/_core":74,"../../modules/es6.object.get-own-property-descriptor":142}],56:[function(require,module,exports){
 require('../../modules/es6.object.get-prototype-of');
 module.exports = require('../../modules/_core').Object.getPrototypeOf;
 
-},{"../../modules/_core":61,"../../modules/es6.object.get-prototype-of":121}],52:[function(require,module,exports){
+},{"../../modules/_core":74,"../../modules/es6.object.get-prototype-of":143}],57:[function(require,module,exports){
 require('../../modules/es6.object.set-prototype-of');
 module.exports = require('../../modules/_core').Object.setPrototypeOf;
 
-},{"../../modules/_core":61,"../../modules/es6.object.set-prototype-of":122}],53:[function(require,module,exports){
+},{"../../modules/_core":74,"../../modules/es6.object.set-prototype-of":144}],58:[function(require,module,exports){
 require('../../modules/es6.symbol');
 require('../../modules/es6.object.to-string');
 require('../../modules/es7.symbol.async-iterator');
 require('../../modules/es7.symbol.observable');
 module.exports = require('../../modules/_core').Symbol;
 
-},{"../../modules/_core":61,"../../modules/es6.object.to-string":123,"../../modules/es6.symbol":125,"../../modules/es7.symbol.async-iterator":126,"../../modules/es7.symbol.observable":127}],54:[function(require,module,exports){
+},{"../../modules/_core":74,"../../modules/es6.object.to-string":145,"../../modules/es6.symbol":147,"../../modules/es7.symbol.async-iterator":151,"../../modules/es7.symbol.observable":152}],59:[function(require,module,exports){
 require('../../modules/es6.string.iterator');
 require('../../modules/web.dom.iterable');
 module.exports = require('../../modules/_wks-ext').f('iterator');
 
-},{"../../modules/_wks-ext":112,"../../modules/es6.string.iterator":124,"../../modules/web.dom.iterable":128}],55:[function(require,module,exports){
+},{"../../modules/_wks-ext":133,"../../modules/es6.string.iterator":146,"../../modules/web.dom.iterable":153}],60:[function(require,module,exports){
 module.exports = function (it) {
   if (typeof it != 'function') throw TypeError(it + ' is not a function!');
   return it;
 };
 
-},{}],56:[function(require,module,exports){
+},{}],61:[function(require,module,exports){
 module.exports = function () { /* empty */ };
 
-},{}],57:[function(require,module,exports){
+},{}],62:[function(require,module,exports){
+module.exports = function (it, Constructor, name, forbiddenField) {
+  if (!(it instanceof Constructor) || (forbiddenField !== undefined && forbiddenField in it)) {
+    throw TypeError(name + ': incorrect invocation!');
+  } return it;
+};
+
+},{}],63:[function(require,module,exports){
 var isObject = require('./_is-object');
 module.exports = function (it) {
   if (!isObject(it)) throw TypeError(it + ' is not an object!');
   return it;
 };
 
-},{"./_is-object":77}],58:[function(require,module,exports){
+},{"./_is-object":92}],64:[function(require,module,exports){
+var forOf = require('./_for-of');
+
+module.exports = function (iter, ITERATOR) {
+  var result = [];
+  forOf(iter, false, result.push, result, ITERATOR);
+  return result;
+};
+
+},{"./_for-of":83}],65:[function(require,module,exports){
 // false -> Array#indexOf
 // true  -> Array#includes
 var toIObject = require('./_to-iobject');
@@ -7742,7 +8939,79 @@ module.exports = function (IS_INCLUDES) {
   };
 };
 
-},{"./_to-absolute-index":104,"./_to-iobject":106,"./_to-length":107}],59:[function(require,module,exports){
+},{"./_to-absolute-index":124,"./_to-iobject":126,"./_to-length":127}],66:[function(require,module,exports){
+// 0 -> Array#forEach
+// 1 -> Array#map
+// 2 -> Array#filter
+// 3 -> Array#some
+// 4 -> Array#every
+// 5 -> Array#find
+// 6 -> Array#findIndex
+var ctx = require('./_ctx');
+var IObject = require('./_iobject');
+var toObject = require('./_to-object');
+var toLength = require('./_to-length');
+var asc = require('./_array-species-create');
+module.exports = function (TYPE, $create) {
+  var IS_MAP = TYPE == 1;
+  var IS_FILTER = TYPE == 2;
+  var IS_SOME = TYPE == 3;
+  var IS_EVERY = TYPE == 4;
+  var IS_FIND_INDEX = TYPE == 6;
+  var NO_HOLES = TYPE == 5 || IS_FIND_INDEX;
+  var create = $create || asc;
+  return function ($this, callbackfn, that) {
+    var O = toObject($this);
+    var self = IObject(O);
+    var f = ctx(callbackfn, that, 3);
+    var length = toLength(self.length);
+    var index = 0;
+    var result = IS_MAP ? create($this, length) : IS_FILTER ? create($this, 0) : undefined;
+    var val, res;
+    for (;length > index; index++) if (NO_HOLES || index in self) {
+      val = self[index];
+      res = f(val, index, O);
+      if (TYPE) {
+        if (IS_MAP) result[index] = res;   // map
+        else if (res) switch (TYPE) {
+          case 3: return true;             // some
+          case 5: return val;              // find
+          case 6: return index;            // findIndex
+          case 2: result.push(val);        // filter
+        } else if (IS_EVERY) return false; // every
+      }
+    }
+    return IS_FIND_INDEX ? -1 : IS_SOME || IS_EVERY ? IS_EVERY : result;
+  };
+};
+
+},{"./_array-species-create":68,"./_ctx":75,"./_iobject":89,"./_to-length":127,"./_to-object":128}],67:[function(require,module,exports){
+var isObject = require('./_is-object');
+var isArray = require('./_is-array');
+var SPECIES = require('./_wks')('species');
+
+module.exports = function (original) {
+  var C;
+  if (isArray(original)) {
+    C = original.constructor;
+    // cross-realm fallback
+    if (typeof C == 'function' && (C === Array || isArray(C.prototype))) C = undefined;
+    if (isObject(C)) {
+      C = C[SPECIES];
+      if (C === null) C = undefined;
+    }
+  } return C === undefined ? Array : C;
+};
+
+},{"./_is-array":91,"./_is-object":92,"./_wks":134}],68:[function(require,module,exports){
+// 9.4.2.3 ArraySpeciesCreate(originalArray, length)
+var speciesConstructor = require('./_array-species-constructor');
+
+module.exports = function (original, length) {
+  return new (speciesConstructor(original))(length);
+};
+
+},{"./_array-species-constructor":67}],69:[function(require,module,exports){
 // getting tag from 19.1.3.6 Object.prototype.toString()
 var cof = require('./_cof');
 var TAG = require('./_wks')('toStringTag');
@@ -7767,18 +9036,236 @@ module.exports = function (it) {
     : (B = cof(O)) == 'Object' && typeof O.callee == 'function' ? 'Arguments' : B;
 };
 
-},{"./_cof":60,"./_wks":113}],60:[function(require,module,exports){
+},{"./_cof":70,"./_wks":134}],70:[function(require,module,exports){
 var toString = {}.toString;
 
 module.exports = function (it) {
   return toString.call(it).slice(8, -1);
 };
 
-},{}],61:[function(require,module,exports){
+},{}],71:[function(require,module,exports){
+'use strict';
+var dP = require('./_object-dp').f;
+var create = require('./_object-create');
+var redefineAll = require('./_redefine-all');
+var ctx = require('./_ctx');
+var anInstance = require('./_an-instance');
+var forOf = require('./_for-of');
+var $iterDefine = require('./_iter-define');
+var step = require('./_iter-step');
+var setSpecies = require('./_set-species');
+var DESCRIPTORS = require('./_descriptors');
+var fastKey = require('./_meta').fastKey;
+var validate = require('./_validate-collection');
+var SIZE = DESCRIPTORS ? '_s' : 'size';
+
+var getEntry = function (that, key) {
+  // fast case
+  var index = fastKey(key);
+  var entry;
+  if (index !== 'F') return that._i[index];
+  // frozen object case
+  for (entry = that._f; entry; entry = entry.n) {
+    if (entry.k == key) return entry;
+  }
+};
+
+module.exports = {
+  getConstructor: function (wrapper, NAME, IS_MAP, ADDER) {
+    var C = wrapper(function (that, iterable) {
+      anInstance(that, C, NAME, '_i');
+      that._t = NAME;         // collection type
+      that._i = create(null); // index
+      that._f = undefined;    // first entry
+      that._l = undefined;    // last entry
+      that[SIZE] = 0;         // size
+      if (iterable != undefined) forOf(iterable, IS_MAP, that[ADDER], that);
+    });
+    redefineAll(C.prototype, {
+      // 23.1.3.1 Map.prototype.clear()
+      // 23.2.3.2 Set.prototype.clear()
+      clear: function clear() {
+        for (var that = validate(this, NAME), data = that._i, entry = that._f; entry; entry = entry.n) {
+          entry.r = true;
+          if (entry.p) entry.p = entry.p.n = undefined;
+          delete data[entry.i];
+        }
+        that._f = that._l = undefined;
+        that[SIZE] = 0;
+      },
+      // 23.1.3.3 Map.prototype.delete(key)
+      // 23.2.3.4 Set.prototype.delete(value)
+      'delete': function (key) {
+        var that = validate(this, NAME);
+        var entry = getEntry(that, key);
+        if (entry) {
+          var next = entry.n;
+          var prev = entry.p;
+          delete that._i[entry.i];
+          entry.r = true;
+          if (prev) prev.n = next;
+          if (next) next.p = prev;
+          if (that._f == entry) that._f = next;
+          if (that._l == entry) that._l = prev;
+          that[SIZE]--;
+        } return !!entry;
+      },
+      // 23.2.3.6 Set.prototype.forEach(callbackfn, thisArg = undefined)
+      // 23.1.3.5 Map.prototype.forEach(callbackfn, thisArg = undefined)
+      forEach: function forEach(callbackfn /* , that = undefined */) {
+        validate(this, NAME);
+        var f = ctx(callbackfn, arguments.length > 1 ? arguments[1] : undefined, 3);
+        var entry;
+        while (entry = entry ? entry.n : this._f) {
+          f(entry.v, entry.k, this);
+          // revert to the last existing entry
+          while (entry && entry.r) entry = entry.p;
+        }
+      },
+      // 23.1.3.7 Map.prototype.has(key)
+      // 23.2.3.7 Set.prototype.has(value)
+      has: function has(key) {
+        return !!getEntry(validate(this, NAME), key);
+      }
+    });
+    if (DESCRIPTORS) dP(C.prototype, 'size', {
+      get: function () {
+        return validate(this, NAME)[SIZE];
+      }
+    });
+    return C;
+  },
+  def: function (that, key, value) {
+    var entry = getEntry(that, key);
+    var prev, index;
+    // change existing entry
+    if (entry) {
+      entry.v = value;
+    // create new entry
+    } else {
+      that._l = entry = {
+        i: index = fastKey(key, true), // <- index
+        k: key,                        // <- key
+        v: value,                      // <- value
+        p: prev = that._l,             // <- previous entry
+        n: undefined,                  // <- next entry
+        r: false                       // <- removed
+      };
+      if (!that._f) that._f = entry;
+      if (prev) prev.n = entry;
+      that[SIZE]++;
+      // add to index
+      if (index !== 'F') that._i[index] = entry;
+    } return that;
+  },
+  getEntry: getEntry,
+  setStrong: function (C, NAME, IS_MAP) {
+    // add .keys, .values, .entries, [@@iterator]
+    // 23.1.3.4, 23.1.3.8, 23.1.3.11, 23.1.3.12, 23.2.3.5, 23.2.3.8, 23.2.3.10, 23.2.3.11
+    $iterDefine(C, NAME, function (iterated, kind) {
+      this._t = validate(iterated, NAME); // target
+      this._k = kind;                     // kind
+      this._l = undefined;                // previous
+    }, function () {
+      var that = this;
+      var kind = that._k;
+      var entry = that._l;
+      // revert to the last existing entry
+      while (entry && entry.r) entry = entry.p;
+      // get next entry
+      if (!that._t || !(that._l = entry = entry ? entry.n : that._t._f)) {
+        // or finish the iteration
+        that._t = undefined;
+        return step(1);
+      }
+      // return step by kind
+      if (kind == 'keys') return step(0, entry.k);
+      if (kind == 'values') return step(0, entry.v);
+      return step(0, [entry.k, entry.v]);
+    }, IS_MAP ? 'entries' : 'values', !IS_MAP, true);
+
+    // add [@@species], 23.1.2.2, 23.2.2.2
+    setSpecies(NAME);
+  }
+};
+
+},{"./_an-instance":62,"./_ctx":75,"./_descriptors":77,"./_for-of":83,"./_iter-define":95,"./_iter-step":96,"./_meta":99,"./_object-create":101,"./_object-dp":102,"./_redefine-all":114,"./_set-species":119,"./_validate-collection":131}],72:[function(require,module,exports){
+// https://github.com/DavidBruant/Map-Set.prototype.toJSON
+var classof = require('./_classof');
+var from = require('./_array-from-iterable');
+module.exports = function (NAME) {
+  return function toJSON() {
+    if (classof(this) != NAME) throw TypeError(NAME + "#toJSON isn't generic");
+    return from(this);
+  };
+};
+
+},{"./_array-from-iterable":64,"./_classof":69}],73:[function(require,module,exports){
+'use strict';
+var global = require('./_global');
+var $export = require('./_export');
+var meta = require('./_meta');
+var fails = require('./_fails');
+var hide = require('./_hide');
+var redefineAll = require('./_redefine-all');
+var forOf = require('./_for-of');
+var anInstance = require('./_an-instance');
+var isObject = require('./_is-object');
+var setToStringTag = require('./_set-to-string-tag');
+var dP = require('./_object-dp').f;
+var each = require('./_array-methods')(0);
+var DESCRIPTORS = require('./_descriptors');
+
+module.exports = function (NAME, wrapper, methods, common, IS_MAP, IS_WEAK) {
+  var Base = global[NAME];
+  var C = Base;
+  var ADDER = IS_MAP ? 'set' : 'add';
+  var proto = C && C.prototype;
+  var O = {};
+  if (!DESCRIPTORS || typeof C != 'function' || !(IS_WEAK || proto.forEach && !fails(function () {
+    new C().entries().next();
+  }))) {
+    // create collection constructor
+    C = common.getConstructor(wrapper, NAME, IS_MAP, ADDER);
+    redefineAll(C.prototype, methods);
+    meta.NEED = true;
+  } else {
+    C = wrapper(function (target, iterable) {
+      anInstance(target, C, NAME, '_c');
+      target._c = new Base();
+      if (iterable != undefined) forOf(iterable, IS_MAP, target[ADDER], target);
+    });
+    each('add,clear,delete,forEach,get,has,set,keys,values,entries,toJSON'.split(','), function (KEY) {
+      var IS_ADDER = KEY == 'add' || KEY == 'set';
+      if (KEY in proto && !(IS_WEAK && KEY == 'clear')) hide(C.prototype, KEY, function (a, b) {
+        anInstance(this, C, KEY);
+        if (!IS_ADDER && IS_WEAK && !isObject(a)) return KEY == 'get' ? undefined : false;
+        var result = this._c[KEY](a === 0 ? 0 : a, b);
+        return IS_ADDER ? this : result;
+      });
+    });
+    IS_WEAK || dP(C.prototype, 'size', {
+      get: function () {
+        return this._c.size;
+      }
+    });
+  }
+
+  setToStringTag(C, NAME);
+
+  O[NAME] = C;
+  $export($export.G + $export.W + $export.F, O);
+
+  if (!IS_WEAK) common.setStrong(C, NAME, IS_MAP);
+
+  return C;
+};
+
+},{"./_an-instance":62,"./_array-methods":66,"./_descriptors":77,"./_export":81,"./_fails":82,"./_for-of":83,"./_global":84,"./_hide":86,"./_is-object":92,"./_meta":99,"./_object-dp":102,"./_redefine-all":114,"./_set-to-string-tag":120}],74:[function(require,module,exports){
 var core = module.exports = { version: '2.5.1' };
 if (typeof __e == 'number') __e = core; // eslint-disable-line no-undef
 
-},{}],62:[function(require,module,exports){
+},{}],75:[function(require,module,exports){
 // optional / simple context binding
 var aFunction = require('./_a-function');
 module.exports = function (fn, that, length) {
@@ -7800,20 +9287,20 @@ module.exports = function (fn, that, length) {
   };
 };
 
-},{"./_a-function":55}],63:[function(require,module,exports){
+},{"./_a-function":60}],76:[function(require,module,exports){
 // 7.2.1 RequireObjectCoercible(argument)
 module.exports = function (it) {
   if (it == undefined) throw TypeError("Can't call method on  " + it);
   return it;
 };
 
-},{}],64:[function(require,module,exports){
+},{}],77:[function(require,module,exports){
 // Thank's IE8 for his funny defineProperty
 module.exports = !require('./_fails')(function () {
   return Object.defineProperty({}, 'a', { get: function () { return 7; } }).a != 7;
 });
 
-},{"./_fails":69}],65:[function(require,module,exports){
+},{"./_fails":82}],78:[function(require,module,exports){
 var isObject = require('./_is-object');
 var document = require('./_global').document;
 // typeof document.createElement is 'object' in old IE
@@ -7822,13 +9309,13 @@ module.exports = function (it) {
   return is ? document.createElement(it) : {};
 };
 
-},{"./_global":70,"./_is-object":77}],66:[function(require,module,exports){
+},{"./_global":84,"./_is-object":92}],79:[function(require,module,exports){
 // IE 8- don't enum bug keys
 module.exports = (
   'constructor,hasOwnProperty,isPrototypeOf,propertyIsEnumerable,toLocaleString,toString,valueOf'
 ).split(',');
 
-},{}],67:[function(require,module,exports){
+},{}],80:[function(require,module,exports){
 // all enumerable object keys, includes symbols
 var getKeys = require('./_object-keys');
 var gOPS = require('./_object-gops');
@@ -7845,7 +9332,7 @@ module.exports = function (it) {
   } return result;
 };
 
-},{"./_object-gops":91,"./_object-keys":94,"./_object-pie":95}],68:[function(require,module,exports){
+},{"./_object-gops":107,"./_object-keys":110,"./_object-pie":111}],81:[function(require,module,exports){
 var global = require('./_global');
 var core = require('./_core');
 var ctx = require('./_ctx');
@@ -7908,7 +9395,7 @@ $export.U = 64;  // safe
 $export.R = 128; // real proto method for `library`
 module.exports = $export;
 
-},{"./_core":61,"./_ctx":62,"./_global":70,"./_hide":72}],69:[function(require,module,exports){
+},{"./_core":74,"./_ctx":75,"./_global":84,"./_hide":86}],82:[function(require,module,exports){
 module.exports = function (exec) {
   try {
     return !!exec();
@@ -7917,7 +9404,34 @@ module.exports = function (exec) {
   }
 };
 
-},{}],70:[function(require,module,exports){
+},{}],83:[function(require,module,exports){
+var ctx = require('./_ctx');
+var call = require('./_iter-call');
+var isArrayIter = require('./_is-array-iter');
+var anObject = require('./_an-object');
+var toLength = require('./_to-length');
+var getIterFn = require('./core.get-iterator-method');
+var BREAK = {};
+var RETURN = {};
+var exports = module.exports = function (iterable, entries, fn, that, ITERATOR) {
+  var iterFn = ITERATOR ? function () { return iterable; } : getIterFn(iterable);
+  var f = ctx(fn, that, entries ? 2 : 1);
+  var index = 0;
+  var length, step, iterator, result;
+  if (typeof iterFn != 'function') throw TypeError(iterable + ' is not iterable!');
+  // fast case for arrays with default iterator
+  if (isArrayIter(iterFn)) for (length = toLength(iterable.length); length > index; index++) {
+    result = entries ? f(anObject(step = iterable[index])[0], step[1]) : f(iterable[index]);
+    if (result === BREAK || result === RETURN) return result;
+  } else for (iterator = iterFn.call(iterable); !(step = iterator.next()).done;) {
+    result = call(iterator, f, step.value, entries);
+    if (result === BREAK || result === RETURN) return result;
+  }
+};
+exports.BREAK = BREAK;
+exports.RETURN = RETURN;
+
+},{"./_an-object":63,"./_ctx":75,"./_is-array-iter":90,"./_iter-call":93,"./_to-length":127,"./core.get-iterator-method":135}],84:[function(require,module,exports){
 // https://github.com/zloirock/core-js/issues/86#issuecomment-115759028
 var global = module.exports = typeof window != 'undefined' && window.Math == Math
   ? window : typeof self != 'undefined' && self.Math == Math ? self
@@ -7925,13 +9439,13 @@ var global = module.exports = typeof window != 'undefined' && window.Math == Mat
   : Function('return this')();
 if (typeof __g == 'number') __g = global; // eslint-disable-line no-undef
 
-},{}],71:[function(require,module,exports){
+},{}],85:[function(require,module,exports){
 var hasOwnProperty = {}.hasOwnProperty;
 module.exports = function (it, key) {
   return hasOwnProperty.call(it, key);
 };
 
-},{}],72:[function(require,module,exports){
+},{}],86:[function(require,module,exports){
 var dP = require('./_object-dp');
 var createDesc = require('./_property-desc');
 module.exports = require('./_descriptors') ? function (object, key, value) {
@@ -7941,16 +9455,16 @@ module.exports = require('./_descriptors') ? function (object, key, value) {
   return object;
 };
 
-},{"./_descriptors":64,"./_object-dp":86,"./_property-desc":97}],73:[function(require,module,exports){
+},{"./_descriptors":77,"./_object-dp":102,"./_property-desc":113}],87:[function(require,module,exports){
 var document = require('./_global').document;
 module.exports = document && document.documentElement;
 
-},{"./_global":70}],74:[function(require,module,exports){
+},{"./_global":84}],88:[function(require,module,exports){
 module.exports = !require('./_descriptors') && !require('./_fails')(function () {
   return Object.defineProperty(require('./_dom-create')('div'), 'a', { get: function () { return 7; } }).a != 7;
 });
 
-},{"./_descriptors":64,"./_dom-create":65,"./_fails":69}],75:[function(require,module,exports){
+},{"./_descriptors":77,"./_dom-create":78,"./_fails":82}],89:[function(require,module,exports){
 // fallback for non-array-like ES3 and non-enumerable old V8 strings
 var cof = require('./_cof');
 // eslint-disable-next-line no-prototype-builtins
@@ -7958,19 +9472,43 @@ module.exports = Object('z').propertyIsEnumerable(0) ? Object : function (it) {
   return cof(it) == 'String' ? it.split('') : Object(it);
 };
 
-},{"./_cof":60}],76:[function(require,module,exports){
+},{"./_cof":70}],90:[function(require,module,exports){
+// check on default Array iterator
+var Iterators = require('./_iterators');
+var ITERATOR = require('./_wks')('iterator');
+var ArrayProto = Array.prototype;
+
+module.exports = function (it) {
+  return it !== undefined && (Iterators.Array === it || ArrayProto[ITERATOR] === it);
+};
+
+},{"./_iterators":97,"./_wks":134}],91:[function(require,module,exports){
 // 7.2.2 IsArray(argument)
 var cof = require('./_cof');
 module.exports = Array.isArray || function isArray(arg) {
   return cof(arg) == 'Array';
 };
 
-},{"./_cof":60}],77:[function(require,module,exports){
+},{"./_cof":70}],92:[function(require,module,exports){
 module.exports = function (it) {
   return typeof it === 'object' ? it !== null : typeof it === 'function';
 };
 
-},{}],78:[function(require,module,exports){
+},{}],93:[function(require,module,exports){
+// call something on iterator step with safe closing on error
+var anObject = require('./_an-object');
+module.exports = function (iterator, fn, value, entries) {
+  try {
+    return entries ? fn(anObject(value)[0], value[1]) : fn(value);
+  // 7.4.6 IteratorClose(iterator, completion)
+  } catch (e) {
+    var ret = iterator['return'];
+    if (ret !== undefined) anObject(ret.call(iterator));
+    throw e;
+  }
+};
+
+},{"./_an-object":63}],94:[function(require,module,exports){
 'use strict';
 var create = require('./_object-create');
 var descriptor = require('./_property-desc');
@@ -7985,7 +9523,7 @@ module.exports = function (Constructor, NAME, next) {
   setToStringTag(Constructor, NAME + ' Iterator');
 };
 
-},{"./_hide":72,"./_object-create":85,"./_property-desc":97,"./_set-to-string-tag":100,"./_wks":113}],79:[function(require,module,exports){
+},{"./_hide":86,"./_object-create":101,"./_property-desc":113,"./_set-to-string-tag":120,"./_wks":134}],95:[function(require,module,exports){
 'use strict';
 var LIBRARY = require('./_library');
 var $export = require('./_export');
@@ -8057,18 +9595,18 @@ module.exports = function (Base, NAME, Constructor, next, DEFAULT, IS_SET, FORCE
   return methods;
 };
 
-},{"./_export":68,"./_has":71,"./_hide":72,"./_iter-create":78,"./_iterators":81,"./_library":82,"./_object-gpo":92,"./_redefine":98,"./_set-to-string-tag":100,"./_wks":113}],80:[function(require,module,exports){
+},{"./_export":81,"./_has":85,"./_hide":86,"./_iter-create":94,"./_iterators":97,"./_library":98,"./_object-gpo":108,"./_redefine":115,"./_set-to-string-tag":120,"./_wks":134}],96:[function(require,module,exports){
 module.exports = function (done, value) {
   return { value: value, done: !!done };
 };
 
-},{}],81:[function(require,module,exports){
+},{}],97:[function(require,module,exports){
 module.exports = {};
 
-},{}],82:[function(require,module,exports){
+},{}],98:[function(require,module,exports){
 module.exports = true;
 
-},{}],83:[function(require,module,exports){
+},{}],99:[function(require,module,exports){
 var META = require('./_uid')('meta');
 var isObject = require('./_is-object');
 var has = require('./_has');
@@ -8123,7 +9661,7 @@ var meta = module.exports = {
   onFreeze: onFreeze
 };
 
-},{"./_fails":69,"./_has":71,"./_is-object":77,"./_object-dp":86,"./_uid":110}],84:[function(require,module,exports){
+},{"./_fails":82,"./_has":85,"./_is-object":92,"./_object-dp":102,"./_uid":130}],100:[function(require,module,exports){
 'use strict';
 // 19.1.2.1 Object.assign(target, source, ...)
 var getKeys = require('./_object-keys');
@@ -8159,7 +9697,7 @@ module.exports = !$assign || require('./_fails')(function () {
   } return T;
 } : $assign;
 
-},{"./_fails":69,"./_iobject":75,"./_object-gops":91,"./_object-keys":94,"./_object-pie":95,"./_to-object":108}],85:[function(require,module,exports){
+},{"./_fails":82,"./_iobject":89,"./_object-gops":107,"./_object-keys":110,"./_object-pie":111,"./_to-object":128}],101:[function(require,module,exports){
 // 19.1.2.2 / 15.2.3.5 Object.create(O [, Properties])
 var anObject = require('./_an-object');
 var dPs = require('./_object-dps');
@@ -8202,7 +9740,7 @@ module.exports = Object.create || function create(O, Properties) {
   return Properties === undefined ? result : dPs(result, Properties);
 };
 
-},{"./_an-object":57,"./_dom-create":65,"./_enum-bug-keys":66,"./_html":73,"./_object-dps":87,"./_shared-key":101}],86:[function(require,module,exports){
+},{"./_an-object":63,"./_dom-create":78,"./_enum-bug-keys":79,"./_html":87,"./_object-dps":103,"./_shared-key":121}],102:[function(require,module,exports){
 var anObject = require('./_an-object');
 var IE8_DOM_DEFINE = require('./_ie8-dom-define');
 var toPrimitive = require('./_to-primitive');
@@ -8220,7 +9758,7 @@ exports.f = require('./_descriptors') ? Object.defineProperty : function defineP
   return O;
 };
 
-},{"./_an-object":57,"./_descriptors":64,"./_ie8-dom-define":74,"./_to-primitive":109}],87:[function(require,module,exports){
+},{"./_an-object":63,"./_descriptors":77,"./_ie8-dom-define":88,"./_to-primitive":129}],103:[function(require,module,exports){
 var dP = require('./_object-dp');
 var anObject = require('./_an-object');
 var getKeys = require('./_object-keys');
@@ -8235,7 +9773,7 @@ module.exports = require('./_descriptors') ? Object.defineProperties : function 
   return O;
 };
 
-},{"./_an-object":57,"./_descriptors":64,"./_object-dp":86,"./_object-keys":94}],88:[function(require,module,exports){
+},{"./_an-object":63,"./_descriptors":77,"./_object-dp":102,"./_object-keys":110}],104:[function(require,module,exports){
 var pIE = require('./_object-pie');
 var createDesc = require('./_property-desc');
 var toIObject = require('./_to-iobject');
@@ -8253,7 +9791,7 @@ exports.f = require('./_descriptors') ? gOPD : function getOwnPropertyDescriptor
   if (has(O, P)) return createDesc(!pIE.f.call(O, P), O[P]);
 };
 
-},{"./_descriptors":64,"./_has":71,"./_ie8-dom-define":74,"./_object-pie":95,"./_property-desc":97,"./_to-iobject":106,"./_to-primitive":109}],89:[function(require,module,exports){
+},{"./_descriptors":77,"./_has":85,"./_ie8-dom-define":88,"./_object-pie":111,"./_property-desc":113,"./_to-iobject":126,"./_to-primitive":129}],105:[function(require,module,exports){
 // fallback for IE11 buggy Object.getOwnPropertyNames with iframe and window
 var toIObject = require('./_to-iobject');
 var gOPN = require('./_object-gopn').f;
@@ -8274,7 +9812,7 @@ module.exports.f = function getOwnPropertyNames(it) {
   return windowNames && toString.call(it) == '[object Window]' ? getWindowNames(it) : gOPN(toIObject(it));
 };
 
-},{"./_object-gopn":90,"./_to-iobject":106}],90:[function(require,module,exports){
+},{"./_object-gopn":106,"./_to-iobject":126}],106:[function(require,module,exports){
 // 19.1.2.7 / 15.2.3.4 Object.getOwnPropertyNames(O)
 var $keys = require('./_object-keys-internal');
 var hiddenKeys = require('./_enum-bug-keys').concat('length', 'prototype');
@@ -8283,10 +9821,10 @@ exports.f = Object.getOwnPropertyNames || function getOwnPropertyNames(O) {
   return $keys(O, hiddenKeys);
 };
 
-},{"./_enum-bug-keys":66,"./_object-keys-internal":93}],91:[function(require,module,exports){
+},{"./_enum-bug-keys":79,"./_object-keys-internal":109}],107:[function(require,module,exports){
 exports.f = Object.getOwnPropertySymbols;
 
-},{}],92:[function(require,module,exports){
+},{}],108:[function(require,module,exports){
 // 19.1.2.9 / 15.2.3.2 Object.getPrototypeOf(O)
 var has = require('./_has');
 var toObject = require('./_to-object');
@@ -8301,7 +9839,7 @@ module.exports = Object.getPrototypeOf || function (O) {
   } return O instanceof Object ? ObjectProto : null;
 };
 
-},{"./_has":71,"./_shared-key":101,"./_to-object":108}],93:[function(require,module,exports){
+},{"./_has":85,"./_shared-key":121,"./_to-object":128}],109:[function(require,module,exports){
 var has = require('./_has');
 var toIObject = require('./_to-iobject');
 var arrayIndexOf = require('./_array-includes')(false);
@@ -8320,7 +9858,7 @@ module.exports = function (object, names) {
   return result;
 };
 
-},{"./_array-includes":58,"./_has":71,"./_shared-key":101,"./_to-iobject":106}],94:[function(require,module,exports){
+},{"./_array-includes":65,"./_has":85,"./_shared-key":121,"./_to-iobject":126}],110:[function(require,module,exports){
 // 19.1.2.14 / 15.2.3.14 Object.keys(O)
 var $keys = require('./_object-keys-internal');
 var enumBugKeys = require('./_enum-bug-keys');
@@ -8329,10 +9867,10 @@ module.exports = Object.keys || function keys(O) {
   return $keys(O, enumBugKeys);
 };
 
-},{"./_enum-bug-keys":66,"./_object-keys-internal":93}],95:[function(require,module,exports){
+},{"./_enum-bug-keys":79,"./_object-keys-internal":109}],111:[function(require,module,exports){
 exports.f = {}.propertyIsEnumerable;
 
-},{}],96:[function(require,module,exports){
+},{}],112:[function(require,module,exports){
 // most Object methods by ES6 should accept primitives
 var $export = require('./_export');
 var core = require('./_core');
@@ -8344,7 +9882,7 @@ module.exports = function (KEY, exec) {
   $export($export.S + $export.F * fails(function () { fn(1); }), 'Object', exp);
 };
 
-},{"./_core":61,"./_export":68,"./_fails":69}],97:[function(require,module,exports){
+},{"./_core":74,"./_export":81,"./_fails":82}],113:[function(require,module,exports){
 module.exports = function (bitmap, value) {
   return {
     enumerable: !(bitmap & 1),
@@ -8354,10 +9892,63 @@ module.exports = function (bitmap, value) {
   };
 };
 
-},{}],98:[function(require,module,exports){
+},{}],114:[function(require,module,exports){
+var hide = require('./_hide');
+module.exports = function (target, src, safe) {
+  for (var key in src) {
+    if (safe && target[key]) target[key] = src[key];
+    else hide(target, key, src[key]);
+  } return target;
+};
+
+},{"./_hide":86}],115:[function(require,module,exports){
 module.exports = require('./_hide');
 
-},{"./_hide":72}],99:[function(require,module,exports){
+},{"./_hide":86}],116:[function(require,module,exports){
+'use strict';
+// https://tc39.github.io/proposal-setmap-offrom/
+var $export = require('./_export');
+var aFunction = require('./_a-function');
+var ctx = require('./_ctx');
+var forOf = require('./_for-of');
+
+module.exports = function (COLLECTION) {
+  $export($export.S, COLLECTION, { from: function from(source /* , mapFn, thisArg */) {
+    var mapFn = arguments[1];
+    var mapping, A, n, cb;
+    aFunction(this);
+    mapping = mapFn !== undefined;
+    if (mapping) aFunction(mapFn);
+    if (source == undefined) return new this();
+    A = [];
+    if (mapping) {
+      n = 0;
+      cb = ctx(mapFn, arguments[2], 2);
+      forOf(source, false, function (nextItem) {
+        A.push(cb(nextItem, n++));
+      });
+    } else {
+      forOf(source, false, A.push, A);
+    }
+    return new this(A);
+  } });
+};
+
+},{"./_a-function":60,"./_ctx":75,"./_export":81,"./_for-of":83}],117:[function(require,module,exports){
+'use strict';
+// https://tc39.github.io/proposal-setmap-offrom/
+var $export = require('./_export');
+
+module.exports = function (COLLECTION) {
+  $export($export.S, COLLECTION, { of: function of() {
+    var length = arguments.length;
+    var A = Array(length);
+    while (length--) A[length] = arguments[length];
+    return new this(A);
+  } });
+};
+
+},{"./_export":81}],118:[function(require,module,exports){
 // Works with __proto__ only. Old v8 can't work with null proto objects.
 /* eslint-disable no-proto */
 var isObject = require('./_is-object');
@@ -8384,7 +9975,23 @@ module.exports = {
   check: check
 };
 
-},{"./_an-object":57,"./_ctx":62,"./_is-object":77,"./_object-gopd":88}],100:[function(require,module,exports){
+},{"./_an-object":63,"./_ctx":75,"./_is-object":92,"./_object-gopd":104}],119:[function(require,module,exports){
+'use strict';
+var global = require('./_global');
+var core = require('./_core');
+var dP = require('./_object-dp');
+var DESCRIPTORS = require('./_descriptors');
+var SPECIES = require('./_wks')('species');
+
+module.exports = function (KEY) {
+  var C = typeof core[KEY] == 'function' ? core[KEY] : global[KEY];
+  if (DESCRIPTORS && C && !C[SPECIES]) dP.f(C, SPECIES, {
+    configurable: true,
+    get: function () { return this; }
+  });
+};
+
+},{"./_core":74,"./_descriptors":77,"./_global":84,"./_object-dp":102,"./_wks":134}],120:[function(require,module,exports){
 var def = require('./_object-dp').f;
 var has = require('./_has');
 var TAG = require('./_wks')('toStringTag');
@@ -8393,14 +10000,14 @@ module.exports = function (it, tag, stat) {
   if (it && !has(it = stat ? it : it.prototype, TAG)) def(it, TAG, { configurable: true, value: tag });
 };
 
-},{"./_has":71,"./_object-dp":86,"./_wks":113}],101:[function(require,module,exports){
+},{"./_has":85,"./_object-dp":102,"./_wks":134}],121:[function(require,module,exports){
 var shared = require('./_shared')('keys');
 var uid = require('./_uid');
 module.exports = function (key) {
   return shared[key] || (shared[key] = uid(key));
 };
 
-},{"./_shared":102,"./_uid":110}],102:[function(require,module,exports){
+},{"./_shared":122,"./_uid":130}],122:[function(require,module,exports){
 var global = require('./_global');
 var SHARED = '__core-js_shared__';
 var store = global[SHARED] || (global[SHARED] = {});
@@ -8408,7 +10015,7 @@ module.exports = function (key) {
   return store[key] || (store[key] = {});
 };
 
-},{"./_global":70}],103:[function(require,module,exports){
+},{"./_global":84}],123:[function(require,module,exports){
 var toInteger = require('./_to-integer');
 var defined = require('./_defined');
 // true  -> String#at
@@ -8427,7 +10034,7 @@ module.exports = function (TO_STRING) {
   };
 };
 
-},{"./_defined":63,"./_to-integer":105}],104:[function(require,module,exports){
+},{"./_defined":76,"./_to-integer":125}],124:[function(require,module,exports){
 var toInteger = require('./_to-integer');
 var max = Math.max;
 var min = Math.min;
@@ -8436,7 +10043,7 @@ module.exports = function (index, length) {
   return index < 0 ? max(index + length, 0) : min(index, length);
 };
 
-},{"./_to-integer":105}],105:[function(require,module,exports){
+},{"./_to-integer":125}],125:[function(require,module,exports){
 // 7.1.4 ToInteger
 var ceil = Math.ceil;
 var floor = Math.floor;
@@ -8444,7 +10051,7 @@ module.exports = function (it) {
   return isNaN(it = +it) ? 0 : (it > 0 ? floor : ceil)(it);
 };
 
-},{}],106:[function(require,module,exports){
+},{}],126:[function(require,module,exports){
 // to indexed object, toObject with fallback for non-array-like ES3 strings
 var IObject = require('./_iobject');
 var defined = require('./_defined');
@@ -8452,7 +10059,7 @@ module.exports = function (it) {
   return IObject(defined(it));
 };
 
-},{"./_defined":63,"./_iobject":75}],107:[function(require,module,exports){
+},{"./_defined":76,"./_iobject":89}],127:[function(require,module,exports){
 // 7.1.15 ToLength
 var toInteger = require('./_to-integer');
 var min = Math.min;
@@ -8460,14 +10067,14 @@ module.exports = function (it) {
   return it > 0 ? min(toInteger(it), 0x1fffffffffffff) : 0; // pow(2, 53) - 1 == 9007199254740991
 };
 
-},{"./_to-integer":105}],108:[function(require,module,exports){
+},{"./_to-integer":125}],128:[function(require,module,exports){
 // 7.1.13 ToObject(argument)
 var defined = require('./_defined');
 module.exports = function (it) {
   return Object(defined(it));
 };
 
-},{"./_defined":63}],109:[function(require,module,exports){
+},{"./_defined":76}],129:[function(require,module,exports){
 // 7.1.1 ToPrimitive(input [, PreferredType])
 var isObject = require('./_is-object');
 // instead of the ES6 spec version, we didn't implement @@toPrimitive case
@@ -8481,14 +10088,21 @@ module.exports = function (it, S) {
   throw TypeError("Can't convert object to primitive value");
 };
 
-},{"./_is-object":77}],110:[function(require,module,exports){
+},{"./_is-object":92}],130:[function(require,module,exports){
 var id = 0;
 var px = Math.random();
 module.exports = function (key) {
   return 'Symbol('.concat(key === undefined ? '' : key, ')_', (++id + px).toString(36));
 };
 
-},{}],111:[function(require,module,exports){
+},{}],131:[function(require,module,exports){
+var isObject = require('./_is-object');
+module.exports = function (it, TYPE) {
+  if (!isObject(it) || it._t !== TYPE) throw TypeError('Incompatible receiver, ' + TYPE + ' required!');
+  return it;
+};
+
+},{"./_is-object":92}],132:[function(require,module,exports){
 var global = require('./_global');
 var core = require('./_core');
 var LIBRARY = require('./_library');
@@ -8499,10 +10113,10 @@ module.exports = function (name) {
   if (name.charAt(0) != '_' && !(name in $Symbol)) defineProperty($Symbol, name, { value: wksExt.f(name) });
 };
 
-},{"./_core":61,"./_global":70,"./_library":82,"./_object-dp":86,"./_wks-ext":112}],112:[function(require,module,exports){
+},{"./_core":74,"./_global":84,"./_library":98,"./_object-dp":102,"./_wks-ext":133}],133:[function(require,module,exports){
 exports.f = require('./_wks');
 
-},{"./_wks":113}],113:[function(require,module,exports){
+},{"./_wks":134}],134:[function(require,module,exports){
 var store = require('./_shared')('wks');
 var uid = require('./_uid');
 var Symbol = require('./_global').Symbol;
@@ -8515,7 +10129,7 @@ var $exports = module.exports = function (name) {
 
 $exports.store = store;
 
-},{"./_global":70,"./_shared":102,"./_uid":110}],114:[function(require,module,exports){
+},{"./_global":84,"./_shared":122,"./_uid":130}],135:[function(require,module,exports){
 var classof = require('./_classof');
 var ITERATOR = require('./_wks')('iterator');
 var Iterators = require('./_iterators');
@@ -8525,7 +10139,7 @@ module.exports = require('./_core').getIteratorMethod = function (it) {
     || Iterators[classof(it)];
 };
 
-},{"./_classof":59,"./_core":61,"./_iterators":81,"./_wks":113}],115:[function(require,module,exports){
+},{"./_classof":69,"./_core":74,"./_iterators":97,"./_wks":134}],136:[function(require,module,exports){
 var anObject = require('./_an-object');
 var get = require('./core.get-iterator-method');
 module.exports = require('./_core').getIterator = function (it) {
@@ -8534,7 +10148,7 @@ module.exports = require('./_core').getIterator = function (it) {
   return anObject(iterFn.call(it));
 };
 
-},{"./_an-object":57,"./_core":61,"./core.get-iterator-method":114}],116:[function(require,module,exports){
+},{"./_an-object":63,"./_core":74,"./core.get-iterator-method":135}],137:[function(require,module,exports){
 'use strict';
 var addToUnscopables = require('./_add-to-unscopables');
 var step = require('./_iter-step');
@@ -8570,23 +10184,44 @@ addToUnscopables('keys');
 addToUnscopables('values');
 addToUnscopables('entries');
 
-},{"./_add-to-unscopables":56,"./_iter-define":79,"./_iter-step":80,"./_iterators":81,"./_to-iobject":106}],117:[function(require,module,exports){
+},{"./_add-to-unscopables":61,"./_iter-define":95,"./_iter-step":96,"./_iterators":97,"./_to-iobject":126}],138:[function(require,module,exports){
+'use strict';
+var strong = require('./_collection-strong');
+var validate = require('./_validate-collection');
+var MAP = 'Map';
+
+// 23.1 Map Objects
+module.exports = require('./_collection')(MAP, function (get) {
+  return function Map() { return get(this, arguments.length > 0 ? arguments[0] : undefined); };
+}, {
+  // 23.1.3.6 Map.prototype.get(key)
+  get: function get(key) {
+    var entry = strong.getEntry(validate(this, MAP), key);
+    return entry && entry.v;
+  },
+  // 23.1.3.9 Map.prototype.set(key, value)
+  set: function set(key, value) {
+    return strong.def(validate(this, MAP), key === 0 ? 0 : key, value);
+  }
+}, strong, true);
+
+},{"./_collection":73,"./_collection-strong":71,"./_validate-collection":131}],139:[function(require,module,exports){
 // 19.1.3.1 Object.assign(target, source)
 var $export = require('./_export');
 
 $export($export.S + $export.F, 'Object', { assign: require('./_object-assign') });
 
-},{"./_export":68,"./_object-assign":84}],118:[function(require,module,exports){
+},{"./_export":81,"./_object-assign":100}],140:[function(require,module,exports){
 var $export = require('./_export');
 // 19.1.2.2 / 15.2.3.5 Object.create(O [, Properties])
 $export($export.S, 'Object', { create: require('./_object-create') });
 
-},{"./_export":68,"./_object-create":85}],119:[function(require,module,exports){
+},{"./_export":81,"./_object-create":101}],141:[function(require,module,exports){
 var $export = require('./_export');
 // 19.1.2.4 / 15.2.3.6 Object.defineProperty(O, P, Attributes)
 $export($export.S + $export.F * !require('./_descriptors'), 'Object', { defineProperty: require('./_object-dp').f });
 
-},{"./_descriptors":64,"./_export":68,"./_object-dp":86}],120:[function(require,module,exports){
+},{"./_descriptors":77,"./_export":81,"./_object-dp":102}],142:[function(require,module,exports){
 // 19.1.2.6 Object.getOwnPropertyDescriptor(O, P)
 var toIObject = require('./_to-iobject');
 var $getOwnPropertyDescriptor = require('./_object-gopd').f;
@@ -8597,7 +10232,7 @@ require('./_object-sap')('getOwnPropertyDescriptor', function () {
   };
 });
 
-},{"./_object-gopd":88,"./_object-sap":96,"./_to-iobject":106}],121:[function(require,module,exports){
+},{"./_object-gopd":104,"./_object-sap":112,"./_to-iobject":126}],143:[function(require,module,exports){
 // 19.1.2.9 Object.getPrototypeOf(O)
 var toObject = require('./_to-object');
 var $getPrototypeOf = require('./_object-gpo');
@@ -8608,14 +10243,14 @@ require('./_object-sap')('getPrototypeOf', function () {
   };
 });
 
-},{"./_object-gpo":92,"./_object-sap":96,"./_to-object":108}],122:[function(require,module,exports){
+},{"./_object-gpo":108,"./_object-sap":112,"./_to-object":128}],144:[function(require,module,exports){
 // 19.1.3.19 Object.setPrototypeOf(O, proto)
 var $export = require('./_export');
 $export($export.S, 'Object', { setPrototypeOf: require('./_set-proto').set });
 
-},{"./_export":68,"./_set-proto":99}],123:[function(require,module,exports){
+},{"./_export":81,"./_set-proto":118}],145:[function(require,module,exports){
 
-},{}],124:[function(require,module,exports){
+},{}],146:[function(require,module,exports){
 'use strict';
 var $at = require('./_string-at')(true);
 
@@ -8634,7 +10269,7 @@ require('./_iter-define')(String, 'String', function (iterated) {
   return { value: point, done: false };
 });
 
-},{"./_iter-define":79,"./_string-at":103}],125:[function(require,module,exports){
+},{"./_iter-define":95,"./_string-at":123}],147:[function(require,module,exports){
 'use strict';
 // ECMAScript 6 symbols shim
 var global = require('./_global');
@@ -8870,13 +10505,27 @@ setToStringTag(Math, 'Math', true);
 // 24.3.3 JSON[@@toStringTag]
 setToStringTag(global.JSON, 'JSON', true);
 
-},{"./_an-object":57,"./_descriptors":64,"./_enum-keys":67,"./_export":68,"./_fails":69,"./_global":70,"./_has":71,"./_hide":72,"./_is-array":76,"./_library":82,"./_meta":83,"./_object-create":85,"./_object-dp":86,"./_object-gopd":88,"./_object-gopn":90,"./_object-gopn-ext":89,"./_object-gops":91,"./_object-keys":94,"./_object-pie":95,"./_property-desc":97,"./_redefine":98,"./_set-to-string-tag":100,"./_shared":102,"./_to-iobject":106,"./_to-primitive":109,"./_uid":110,"./_wks":113,"./_wks-define":111,"./_wks-ext":112}],126:[function(require,module,exports){
+},{"./_an-object":63,"./_descriptors":77,"./_enum-keys":80,"./_export":81,"./_fails":82,"./_global":84,"./_has":85,"./_hide":86,"./_is-array":91,"./_library":98,"./_meta":99,"./_object-create":101,"./_object-dp":102,"./_object-gopd":104,"./_object-gopn":106,"./_object-gopn-ext":105,"./_object-gops":107,"./_object-keys":110,"./_object-pie":111,"./_property-desc":113,"./_redefine":115,"./_set-to-string-tag":120,"./_shared":122,"./_to-iobject":126,"./_to-primitive":129,"./_uid":130,"./_wks":134,"./_wks-define":132,"./_wks-ext":133}],148:[function(require,module,exports){
+// https://tc39.github.io/proposal-setmap-offrom/#sec-map.from
+require('./_set-collection-from')('Map');
+
+},{"./_set-collection-from":116}],149:[function(require,module,exports){
+// https://tc39.github.io/proposal-setmap-offrom/#sec-map.of
+require('./_set-collection-of')('Map');
+
+},{"./_set-collection-of":117}],150:[function(require,module,exports){
+// https://github.com/DavidBruant/Map-Set.prototype.toJSON
+var $export = require('./_export');
+
+$export($export.P + $export.R, 'Map', { toJSON: require('./_collection-to-json')('Map') });
+
+},{"./_collection-to-json":72,"./_export":81}],151:[function(require,module,exports){
 require('./_wks-define')('asyncIterator');
 
-},{"./_wks-define":111}],127:[function(require,module,exports){
+},{"./_wks-define":132}],152:[function(require,module,exports){
 require('./_wks-define')('observable');
 
-},{"./_wks-define":111}],128:[function(require,module,exports){
+},{"./_wks-define":132}],153:[function(require,module,exports){
 require('./es6.array.iterator');
 var global = require('./_global');
 var hide = require('./_hide');
@@ -8897,7 +10546,7 @@ for (var i = 0; i < DOMIterables.length; i++) {
   Iterators[NAME] = Iterators.Array;
 }
 
-},{"./_global":70,"./_hide":72,"./_iterators":81,"./_wks":113,"./es6.array.iterator":116}],129:[function(require,module,exports){
+},{"./_global":84,"./_hide":86,"./_iterators":97,"./_wks":134,"./es6.array.iterator":137}],154:[function(require,module,exports){
 // This method of obtaining a reference to the global object needs to be
 // kept identical to the way it is obtained in runtime.js
 var g = (function() { return this })() || Function("return this")();
@@ -8927,7 +10576,7 @@ if (hadRuntime) {
   }
 }
 
-},{"./runtime":130}],130:[function(require,module,exports){
+},{"./runtime":155}],155:[function(require,module,exports){
 /**
  * Copyright (c) 2014, Facebook, Inc.
  * All rights reserved.
