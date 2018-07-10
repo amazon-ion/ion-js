@@ -88,6 +88,7 @@ export class BinaryReader implements Reader {
   private _raw_type: number;
 
   constructor(source: Span, catalog: Catalog) {
+    throw new Error("Binary is unsupported at this time.");
     this._parser   = new ParserBinaryRaw(source);
     this._cat      = catalog || new Catalog();
     this._symtab   = defaultLocalSymbolTable();
