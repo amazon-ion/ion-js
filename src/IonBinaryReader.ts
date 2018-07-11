@@ -92,7 +92,6 @@ export class BinaryReader implements Reader {
     this._cat      = catalog || new Catalog();
     this._symtab   = defaultLocalSymbolTable();
     this._raw_type = BOC;
-    throw new Error("Binary is unsupported at this time.");
   }
 
   next() : IonType {

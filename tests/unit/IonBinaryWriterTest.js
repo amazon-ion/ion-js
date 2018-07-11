@@ -845,6 +845,6 @@ define([
       assert.deepEqual(bytes, [0xe3, 0x81, 0x8a, 0xbf]);
     }
 
-    //registerSuite(suite);
+    registerSuite(suite);
   }
 );

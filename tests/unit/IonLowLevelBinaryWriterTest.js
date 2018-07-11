@@ -183,6 +183,6 @@ define([
     sizeOfUnsignedIntTest(65535, 2);
     sizeOfUnsignedIntTest(65536, 3);
 
-    //registerSuite(suite);
+    registerSuite(suite);
   }
 );

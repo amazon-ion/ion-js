@@ -72,7 +72,6 @@ export class BinaryWriter implements Writer {
   constructor(symbolTable: LocalSymbolTable, writeable: Writeable) {
     this.symbolTable = symbolTable;
     this.writer = new LowLevelBinaryWriter(writeable);
-    throw new Error("Binary currently unsupported.");
   }
 
   writeBlob(value: number[], annotations?: string[]) : void {
