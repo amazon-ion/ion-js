@@ -274,9 +274,8 @@ export class IonEventStream {
                     if(tempString.substr(0,5) === '$ion_') tempString = "$ion_user_value::" + tempString
                     let tempReader : Reader = makeReader(tempString, undefined);
                     tempReader.next();
-                    let tempValue = tempReader.value();
-                    let annotations = tempReader.annotations();
                     currentEvent.set('isNull', tempReader.isNull());
+                    let tempValue = tempReader.value();
                     currentEvent.set(fieldName, tempValue);
                     break;
                 }
@@ -397,7 +396,7 @@ export class IonEventStream {
     private parseBinaryValue() : any {
         //convert list of ints to array of bytes and pass the buffer to a binary reader, generate value from factory.
         //start with a null check
-        if(this.reader.isNull()) return undefined;
+        if(this.reader.isNull()) return null;
         let numBuffer : number[] = [];
         this.reader.stepIn();
         let tid : IonType = this.reader.next();
@@ -407,6 +406,7 @@ export class IonEventStream {
         }
         this.reader.stepOut();
         let tempReader : Reader = makeReader(numBuffer, undefined);
+        tempReader.next();
         return tempReader.value();
     }
 
