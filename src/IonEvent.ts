@@ -147,7 +147,6 @@ abstract class AbstractIonEvent implements IonEvent {
     }
 
     writeBinaryValue(writer : Writer) : void {
-        /*
         let tempBinaryWriter = new BinaryWriter(defaultLocalSymbolTable(), new Writeable());
         this.writeIonValue(tempBinaryWriter);
         tempBinaryWriter.close();
@@ -156,9 +155,6 @@ abstract class AbstractIonEvent implements IonEvent {
         for(var i = 0; i < binaryBuffer.length; i++){
             writer.writeInt(binaryBuffer[i]);
         }
-         */
-        writer.writeList();
-        writer.writeInt(0);
         writer.endContainer();
     }
 

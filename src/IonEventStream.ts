@@ -318,7 +318,8 @@ export class IonEventStream {
                 throw new Error('Symbol tables unsupported');
         }
         let fieldname = (currentEvent.has('field_name') ? currentEvent.get('field_name') : null);
-        //TODO add binary side back into the logic flow https://github.com/amzn/ion-js/issues/131
+        if(currentEvent.get('value_text') !== currentEvent.get('value_binary')) throw new Error(`${currentEvent.get('value_text')} does not equal ${currentEvent.get('value_binary')}`);
+
         return this.eventFactory.makeEvent(
             eventType,
             currentEvent.get('ion_type'),

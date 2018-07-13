@@ -288,7 +288,7 @@ export class ParserTextRaw {
   }
 
   private _read_sexp_values() {
-    var ch = this._read_after_whitespace(true);
+    let ch = this._read_after_whitespace(true);
     if (ch == CH_CP) {
       this._value_push( EOF );
     } else if (ch === EOF){
@@ -789,6 +789,7 @@ export class ParserTextRaw {
 
   private _read_operator_symbol() : void {
     var ch;
+    this._start = this._in.position();
     for(;;) {
       ch = this._read();
       if (!IonText.is_operator_char(ch))  break;
