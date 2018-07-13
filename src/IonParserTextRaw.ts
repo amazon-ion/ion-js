@@ -789,6 +789,7 @@ export class ParserTextRaw {
 
   private _read_operator_symbol() : void {
     var ch;
+    this._start = this._in.position();
     for(;;) {
       ch = this._read();
       if (!IonText.is_operator_char(ch))  break;
