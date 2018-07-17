@@ -237,7 +237,7 @@ export class BinaryReader implements Reader {
       case IonTypes.TIMESTAMP:
         return this.timestampValue();
       default:
-        return undefined;
+        throw new Error('Unexpected type:' + this.valueType());
     }
   }
 

@@ -984,6 +984,7 @@ export class ParserTextRaw {
   }
 
   numberValue() : number {
+    if(this.isNull()) return null;
     var n, s = this.get_value_as_string(this._curr);
     switch (this._curr) {
       case T_INT:

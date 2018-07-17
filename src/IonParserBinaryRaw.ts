@@ -857,23 +857,21 @@ export class ParserBinaryRaw {
   numberValue() : number {
     var n = undefined, 
         t = this;
-    if (!t.isNull()) {
-      t.load_value();
-      switch(t._raw_type) {
+    if (t.isNull()) return null;
+    t.load_value();
+    switch(t._raw_type) {
         case IonBinary.TB_INT:
         case IonBinary.TB_NEG_INT:
         case IonBinary.TB_FLOAT:
         case IonBinary.TB_SYMBOL:
-          n = t._curr;
+          return t._curr;
           break;
         case IonBinary.TB_DECIMAL:
-          n = t._curr.getNumber();
+          return t._curr.getNumber();
           break;
-        default: 
+        default:
           break; // return undefined or ION.error("can't convert to number");
-      }
     }
-    return n;
   }
 
   stringValue() : string {
@@ -933,23 +931,17 @@ export class ParserBinaryRaw {
   }
 
   decimalValue() : Decimal {
-    var n = undefined, 
-        t = this;
-    if (!t.isNull() && t._raw_type === IonBinary.TB_DECIMAL) {
-      t.load_value();
-      n = t._curr;
-    }
-    return n;
+    if(this._raw_type !== IonBinary.TB_DECIMAL) throw new Error('Value not of type decimal.')
+    if (this.isNull()) return null;
+    this.load_value();
+    return this._curr;
   }
 
   timestampValue() : Timestamp {
-    var n = undefined, 
-        t = this;
-    if (!t.isNull() && t._raw_type === IonBinary.TB_TIMESTAMP) {
-      t.load_value();
-      n = t._curr;
-    }
-    return n;
+    if(this._raw_type !== IonBinary.TB_TIMESTAMP) throw new Error('Value not of type timestamp.')
+    if (this.isNull()) return null;
+    this.load_value();
+    return this._curr;
   }
 
   byteValue() : number[] {

@@ -274,8 +274,8 @@ export class IonEventStream {
                     if(tempString.substr(0,5) === '$ion_') tempString = "$ion_user_value::" + tempString
                     let tempReader : Reader = makeReader(tempString, undefined);
                     tempReader.next();
-                    currentEvent.set('isNull', tempReader.isNull());
                     let tempValue = tempReader.value();
+                    currentEvent.set('isNull', tempReader.isNull());
                     currentEvent.set(fieldName, tempValue);
                     break;
                 }

@@ -234,10 +234,12 @@ next() {
   }
 
     decimalValue() : Decimal {
+        if(this.isNull()) return null;
         return Decimal.parse(this.stringValue());
     }
 
     timestampValue() : Timestamp {
+        if(this.isNull()) return null;
         return Timestamp.parse(this.stringValue());
     }
 

@@ -49,6 +49,7 @@ define(['intern', 'intern!object', 'intern/dojo/node!fs', 'intern/dojo/node!path
             'good/non-equivs/nonNulls.ion', //blobs bug.
             'good/lists.ion', //blobs bug.
             'good/intBinary.ion', //binaryInts unsupported.
+            'good/integer_values.ion', //binary ints unsupported.
             'good/intsWithUnderscores.ion', //binary ints unsupported.
             'good/intBigSize256.ion', //int maxsize limitation.
             'good/equivs/intsWithUnderscores.ion', //binary ints unsupported.
