@@ -51,7 +51,7 @@ export class Context {
 
 export class TextWriter implements Writer {
     private containerContext : Context[] = [];
-    getBytes(): number[] {
+    getBytes(): Uint8Array {
         return this.writeable.getBytes();
     }
 
@@ -62,7 +62,7 @@ export class TextWriter implements Writer {
     writeBlob(value: number[], annotations?: string[]) : void {
         this.writeValue(TypeCodes.BLOB, value, annotations, (value: number[]) => {
             this.writeUtf8('{{');
-            this.writeable.writeBytes(encodeUtf8(toBase64(value)));
+            this.writeable.writeBytes(new Uint8Array(encodeUtf8(toBase64(value))));
             this.writeUtf8('}}');
         });
     }
@@ -97,7 +97,7 @@ export class TextWriter implements Writer {
                             this.writeable.writeByte(c);
                         }
                     } else {
-                        this.writeable.writeBytes(escape);
+                        this.writeable.writeBytes(new Uint8Array(escape));
                     }
                 }
             }
@@ -350,7 +350,9 @@ export class TextWriter implements Writer {
     }
 
     private writeUtf8(s: string) : void {
-        this.writeable.writeBytes(encodeUtf8(s));
+        for(let byte of encodeUtf8(s)){
+            this.writeable.writeByte(byte);
+        }
     }
 
     private writeAnnotations(annotations: string[]) : void {

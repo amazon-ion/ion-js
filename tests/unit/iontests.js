@@ -169,6 +169,7 @@ define(['intern', 'intern!object', 'intern/dojo/node!fs', 'intern/dojo/node!path
         function makeEventStreamTest(path) {
             return function() {
                 let executor = function(resolve, reject) {
+                    console.log(path);
                     roundTripEventStreams(ion.makeReader(getInput(path)));
                     resolve();
                 };

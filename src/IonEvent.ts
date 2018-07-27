@@ -371,10 +371,10 @@ class IonClobEvent extends AbstractIonEvent {
     valueEquals(expected : IonClobEvent) : boolean {
         return this.ionValue === expected.ionValue;
     }
-    writeIonValue(writer : Writer) : void {//TODO needs to be backed by number[] https://github.com/amzn/ion-js/issues/127
+    writeIonValue(writer : Writer) : void {
         let tempBuf = [];
         for (let i = 0; i < this.ionValue.length; i++) {
-            tempBuf.push(this.ionValue.charCodeAt(i));
+            tempBuf.push(this.ionValue[i]);
         }
         writer.writeClob(tempBuf);
     }

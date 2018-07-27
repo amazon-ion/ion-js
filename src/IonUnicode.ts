@@ -32,10 +32,11 @@ function isHighSurrogate(charCode: number) : boolean {
 
 export function encodeUtf8(s: string) : number[] {
     let writeable: Writeable = new Writeable();
+    // @ts-ignore
     for (let b of encodeUtf8Stream(charCodes(s))) {
         writeable.writeByte(b);
     }
-    return writeable.getBytes();
+    return Array.prototype.slice.call(writeable.getBytes());
 }
 
 export function *encodeUtf8Stream(it: IterableIterator<number>)  : IterableIterator<number> {
@@ -46,6 +47,7 @@ export function *encodeUtf8Stream(it: IterableIterator<number>)  : IterableItera
             codePoint = pushback;
             pushback = -1;
         } else {
+            // @ts-ignore
             let r: IteratorResult<number> = it.next();
             if (r.done) {
                 return;
@@ -64,6 +66,7 @@ export function *encodeUtf8Stream(it: IterableIterator<number>)  : IterableItera
             yield 0x80 | ((codePoint >>> 6) & SIX_BIT_MASK);
             yield 0x80 | (codePoint & SIX_BIT_MASK);
         } else if (codePoint < LOW_SURROGATE_OFFSET) { // 16 bits, high surrogate
+            // @ts-ignore
             let r2: IteratorResult<number> = it.next();
             if (r2.done) {
                 yield 0xE0 | (codePoint >>> 12);

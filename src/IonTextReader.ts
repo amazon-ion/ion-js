@@ -222,8 +222,25 @@ next() {
     return this._parser.numberValue();
   }
 
-  byteValue() : number[] {
-    throw new Error("E_NOT_IMPL: byteValue");
+  byteValue() : Uint8Array {
+    this.load_raw();
+    if(this.isNull()) return null;
+    switch(this._type){
+        case IonTypes.CLOB : {
+            let length = this._raw.length;
+            let data = new Uint8Array(length);
+            for(let i = 0; i < this._raw.length; i++){
+                data[i] = this._raw.charCodeAt(i);
+            }
+            return data;
+        }
+        case IonTypes.BLOB : {
+            throw new Error("Blobs currently unsupported.");
+        }
+        default:
+            throw new Error(this._type.name + ".byteValue() is not supported.");
+    }
+    return null;
   }
 
   booleanValue() {
@@ -267,10 +284,10 @@ next() {
                 return this.timestampValue();
             }
             case IonTypes.CLOB : {
-                return this.stringValue();
+                return this.byteValue();
             }
             case IonTypes.BLOB : {
-                return this.stringValue();
+                return this.byteValue();
             }
             default : {
                 return undefined;

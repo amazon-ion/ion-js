@@ -199,8 +199,8 @@ export class BinaryReader implements Reader {
     return this._parser.numberValue();
   }
 
-  byteValue() : number[] {
-    return this._parser.byteValue();
+  byteValue() : Uint8Array {
+    return new Uint8Array(this._parser.byteValue());
   }
 
   ionValue() : never {

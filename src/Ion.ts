@@ -80,7 +80,7 @@ function asSpan(buf: any) : Span {
 }
 
 /**
- * Create an Ion Reader object from a buffer `buf` and `options`.
+ * Create an Ion Reader object from a currentBuffer `buf` and `options`.
  *
  *
  * @param buf the Ion data to be used by the reader. Typically a string.

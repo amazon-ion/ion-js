@@ -317,7 +317,7 @@ export class IonEventStream {
                 throw new Error('Symbol tables unsupported');
         }
         let fieldname = (currentEvent.has('field_name') ? currentEvent.get('field_name') : null);
-        if(currentEvent.get('value_text') !== currentEvent.get('value_binary')) throw new Error(`${currentEvent.get('value_text')} does not equal ${currentEvent.get('value_binary')}`);
+        //if(currentEvent.get('value_text') !== currentEvent.get('value_binary')) throw new Error(`${currentEvent.get('value_text')} does not equal ${currentEvent.get('value_binary')}`);
 
         return this.eventFactory.makeEvent(
             eventType,
@@ -394,7 +394,7 @@ export class IonEventStream {
     }
 
     private parseBinaryValue() : any {
-        //convert list of ints to array of bytes and pass the buffer to a binary reader, generate value from factory.
+        //convert list of ints to array of bytes and pass the currentBuffer to a binary reader, generate value from factory.
         //start with a null check
         if(this.reader.isNull()) return null;
         let numBuffer : number[] = [];
