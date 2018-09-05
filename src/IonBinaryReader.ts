@@ -87,37 +87,30 @@ export class BinaryReader implements Reader {
   private _symtab: LocalSymbolTable;
   private _raw_type: number;
 
-  constructor(source: Span, catalog: Catalog) {
+  constructor(source: Span, catalog?: Catalog) {
     this._parser   = new ParserBinaryRaw(source);
-    this._cat      = catalog || new Catalog();
+    this._cat      = catalog ? catalog : new Catalog();
     this._symtab   = defaultLocalSymbolTable();
     this._raw_type = BOC;
   }
 
-  next() : IonType {
-    let t: BinaryReader = this;
-    var p, rt;
-    if (t._raw_type === EOF) return undefined;
-    p = t._parser;
-    for (;;) {
-      t._raw_type = rt = p.next();
-      if (t.depth() > 0) break;
-      if (rt === TB_SYMBOL) {
-        let raw: number = p.numberValue();
-        if (raw !== IVM.sid) break;
-        t._symtab = defaultLocalSymbolTable();
-      }
-      else if (rt === TB_STRUCT) {
-        if (!p.hasAnnotations()) break;
-        if (p.getAnnotation(0) !== ion_symbol_table_sid) break;
-        t._symtab = makeSymbolTable(t._cat, t);
-      }
-      else {
-        break;
-      }
+    next() : IonType {
+        if (this._raw_type === EOF) return undefined;
+        for (this._raw_type = this._parser.next(); this.depth() === 0; this._raw_type = this._parser.next()) {
+            if (this._raw_type === TB_SYMBOL) {
+                let raw: number = this._parser.numberValue();
+                if (raw !== IVM.sid) break;
+                this._symtab = defaultLocalSymbolTable();
+            } else if (this._raw_type === TB_STRUCT) {
+                if (!this._parser.hasAnnotations()) break;
+                if (this._parser.getAnnotation(0) !== ion_symbol_table_sid) break;
+                this._symtab = makeSymbolTable(this._cat, this);
+            } else {
+                break;
+            }
+        }
+        return get_ion_type(this._raw_type);
     }
-    return get_ion_type(rt);
-  }
 
   stepIn() : void {
     let t: BinaryReader = this;
@@ -155,7 +148,7 @@ export class BinaryReader implements Reader {
   }
 
   annotations() : string[] {//TODO binary support
-      return ["test"];
+      return this._parser.getAnnotations();
   }
 
   getAnnotation(index: number) : string {
@@ -185,7 +178,7 @@ export class BinaryReader implements Reader {
       // BLOB is a scalar by you don't want to just use the string 
       // value otherwise all other scalars are fine as is
       if (t._raw_type === TB_SYMBOL) {
-        n = p.numberValue();
+        n = p.numberValue();//this is returning null.
         s = this.getSymbolString(n);
       }
       else {
@@ -220,7 +213,10 @@ export class BinaryReader implements Reader {
   }
 
   value() : any {
+    if(this.isNull()) return null;
     switch(this.valueType()) {
+      case IonTypes.NULL:
+        return null;
       case IonTypes.BLOB:
       case IonTypes.CLOB:
         return this.byteValue();
@@ -242,7 +238,7 @@ export class BinaryReader implements Reader {
   }
 
   private getSymbolString(symbolId: number) : string {
-    let s: string = undefined;
+    let s: string = null;
     if (symbolId > 0) {
       s = this._symtab.getSymbol(symbolId);
       if (typeof(s) == 'undefined') {

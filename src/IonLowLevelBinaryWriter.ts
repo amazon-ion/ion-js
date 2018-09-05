@@ -28,7 +28,7 @@ export class LowLevelBinaryWriter {
     }
 
 
-  writeSignedInt(originalValue: number) : void {//this is incorrect.
+  writeSignedInt(originalValue: number) : void {//TODO this should flip to different modes based on the length calculation because bit shifting will drop to 32 bits.
     let length = LowLevelBinaryWriter.getSignedIntSize(originalValue);
     let value: number = Math.abs(originalValue);
     let tempBuf = new Uint8Array(length);
@@ -39,36 +39,25 @@ export class LowLevelBinaryWriter {
       value >>>= 8;
     }
 
-    tempBuf[--i] = value;
-
-    // Padding
-    let bytesWritten: number = tempBuf.length - i;
-    for (let j: number = 0; j < length - bytesWritten; j++) {
-      tempBuf[--i] = 0;
-    }
+    tempBuf[--i] = value & 0xFF;
 
     // Sign bit
-    if (originalValue < 0) tempBuf[i] |= 0x80;
+    if (originalValue < 0) tempBuf[0] |= 0x80;
 
     this.writeable.writeBytes(tempBuf);
   }
 
   writeUnsignedInt(originalValue: number) : void {
-    length = LowLevelBinaryWriter.getUnsignedIntSize(originalValue);
+    let length = LowLevelBinaryWriter.getUnsignedIntSize(originalValue);
     let tempBuf = new Uint8Array(length);
+
 
     let value: number = originalValue;
     let i: number = tempBuf.length;
 
     while (value > 0) {
-      tempBuf[--i] = value & 0xFF;
+      tempBuf[--i] = value;
       value >>>= 8;
-    }
-
-    // Padding
-    let bytesWritten: number = tempBuf.length - i;
-    for (let j: number = 0; j < length - bytesWritten; j++) {
-      tempBuf[--i] = 0;
     }
 
     this.writeable.writeBytes(tempBuf);
@@ -128,8 +117,10 @@ export class LowLevelBinaryWriter {
 
   static getSignedIntSize(value : number) : number {
       if (value === 0) return 1;
-      let numberOfBits = Math.floor(Math['log2'](value));
+      let absValue = Math.abs(value);
+      let numberOfBits = Math.floor(Math['log2'](absValue));
       let numberOfBytes = Math.ceil(numberOfBits / 8);
+      if(numberOfBits % 8 === 0) numberOfBytes++;
       return numberOfBytes;
   }
 

@@ -40,10 +40,12 @@
             }
         }
 
-        writeBytes(buf : Uint8Array, offset: number = 0, length? : number): void {
-            let writeLength = length ? (buf.length - length) - offset : buf.length - offset;
+        writeBytes(buf : Uint8Array, offset?: number, length? : number): void {
+            if(offset === undefined) offset = 0;
+
+            let writeLength = length !== undefined ? (Math.min(buf.length - offset, length)): buf.length - offset;
             if (writeLength < (this.currentBuffer.length - this.index) - 1) {
-                this.currentBuffer.set(buf.subarray(offset, length), this.index);
+                this.currentBuffer.set(buf.subarray(offset, offset + writeLength), this.index);
                 this.index += writeLength;
             } else {
                 this.buffers[this.buffers.length - 1] = this.currentBuffer.slice(0,this.index);
@@ -51,13 +53,6 @@
                 this.buffers.push(new Uint8Array(this.bufferSize));
                 this.clean = false;
                 this.index = 0;
-            }
-        }
-
-        writeStream(it : IterableIterator<number>) {
-            // @ts-ignore
-            for (let byte of it) {
-                this.writeByte(byte);
             }
         }
 

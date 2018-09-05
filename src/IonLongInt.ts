@@ -33,53 +33,35 @@ import { is_digit } from "./IonText";
 import { isNullOrUndefined } from "./IonUtilities";
 
 export class LongInt {
-  private static readonly zero_bytes: number[] = [0];
+  private static readonly zero_bytes: Uint8Array = new Uint8Array(1);
   private static readonly zero_string = "0";
   private static readonly byte_base   = 256;
   private static readonly byte_mask   = 0xff;
   private static readonly byte_shift  = 8;
   private static readonly string_base = 10;
-  private static readonly char_plus   = '+'.charCodeAt(0);
-  private static readonly char_minus  = '-'.charCodeAt(0);
-  private static readonly char_zero   = '0'.charCodeAt(0);
-  private static readonly char_little_n = 'n'.charCodeAt(0);
+  private static readonly char_plus   = 0x2b;
+  private static readonly char_minus  = 0x2d;
+  private static readonly char_zero   = 0x30;
+  private static readonly char_little_n = 0x6e;
 
   static NULL: LongInt = new LongInt(undefined, undefined, 0);
   static ZERO: LongInt = new LongInt(LongInt.zero_string, LongInt.zero_bytes, 0);
 
-  private s: number;
-  private d: string;
-  private b: number[];
+  private s : number;
+  private d : string;
+  private b : Uint8Array;
 
-  constructor(str: string, bytes: number[], signum: number) {
+  constructor(str: string, bytes: Uint8Array, signum: number) {
     this.s = signum;
     this.d = str;
     this.b = bytes;
-  }
-
-  private static _make_zero_array(len: number) : number[] {
-    let bytes = [];
-    for (let ii = len; ii > 0; ) {
-      ii--;
-      bytes[ii] = 0;
-    }
-    return bytes;
-  }
-
-  private static _make_copy(bytes: number[]) : number[] {
-    let copy = [];
-    for (let idx = bytes.length; idx > 0; ) {
-      idx--;
-      copy[idx] = bytes[idx];
-    }
-    return copy;
   }
 
   isNull() : boolean {
     return (this.b === undefined && this.d === undefined);
   }
 
-  private static _div_d(bytes: number[], digit: number) {
+  private static _div_d(bytes: Uint8Array, digit: number) {
     // destructive in place divide by digit
     // returns the remainder if any (or 0)
     let tmp: number;
@@ -127,14 +109,15 @@ export class LongInt {
   }
 
   private _d() : void { // forces creation of base 10 string
-    var dec, str, bytes, len, dg, src, dst;
+    var dec, str, len, dg, src, dst;
     if (isNullOrUndefined(this.d)) {
       if (this.isZero()) {
         this.d = LongInt.zero_string;
       } else {
-        bytes = LongInt._make_copy(this.b); // make a copy
+        let bytes = new Uint8Array(this.b.length);
+        bytes.set(this.b); // make a copy
         len = bytes.length;
-        dec = LongInt._make_zero_array(len * 3);
+        dec = new Uint8Array(len * 3);
         dst = 0;
         for (;;) {
           if (LongInt._is_zero_bytes(bytes)) break;
@@ -153,7 +136,7 @@ export class LongInt {
     }
   }
 
-  private static _add(bytes: number[], v: number) : void {
+  private static _add(bytes: Uint8Array, v: number) : void {
     var l = bytes.length, dst, c, t;
     if (v >= LongInt.byte_base) {
       throw new Error("_add can't add " + v + ", max is one base " + LongInt.byte_base + " digit");
@@ -170,7 +153,7 @@ export class LongInt {
     }
   }
 
-  private static _mult(bytes: number[], v: number) : void {
+  private static _mult(bytes: Uint8Array, v: number) : void {
     var l = bytes.length, dst, c, t;
     if (v >= LongInt.byte_base) {
       throw new Error("_mult can't add " + v + ", max is one base " + LongInt.byte_base + " digit");
@@ -196,7 +179,7 @@ export class LongInt {
 
       let dec: string = this.d;
       let len: number = dec.length;
-      let bytes: number[] = LongInt._make_zero_array(len);
+      let bytes: Uint8Array = new Uint8Array(len);
       let src: number = 0;
       for (;;) {
         let dg: number = dec.charCodeAt(src) - LongInt.char_zero;
@@ -236,12 +219,12 @@ export class LongInt {
     if (this.isNull()) {
       return undefined;
     }
-    this._d();
+    if(!this.d) this._d();
     return ((this.s < 0) ? "-" : "") + this.d;
   }
 
   digits() : string {  // used by decimal
-    this._d();
+    if(!this.d) this._d();
     return this.d;
   }
 
@@ -249,23 +232,23 @@ export class LongInt {
     return this.toString();
   }
 
-  byteValue() : number[] {
-    if (this.isNull()) {
-      return undefined;
+    byteValue() : Uint8Array {
+        if (this.isNull()) {
+            return undefined;
+        }
+        this._b();
+        //TODO need to address sign !!!
+        let temp = new Uint8Array(this.b.length);
+        temp.set(this.b)
+        return temp;
     }
-    this._b();
-    // need to address sign !!!
-    return LongInt._make_copy(this.b);
-  }
 
   signum() : number {
     return this.s;
   }
 
   static parse(str: string) : LongInt {
-    var t, ii, 
-      signum = 1, 
-      dec = str.trim();
+    var ii, sign = 1, dec = str.trim();
 
     switch(dec.charCodeAt(0)) {
     case LongInt.char_little_n:
@@ -273,10 +256,10 @@ export class LongInt {
         throw new Error("invalid integer format");
       }
       dec = undefined;
-      signum = 0;
+      sign = 0;
       break;
     case LongInt.char_minus:
-      signum = -1;
+      sign = -1;
       // fall through to plus, then to default
     case LongInt.char_plus:
       dec = dec.slice(1);
@@ -298,25 +281,11 @@ export class LongInt {
         throw new Error("invalid integer");
       }
     }
-    t = new LongInt(dec, undefined, signum);
-    return t;
+    return new LongInt(dec, undefined, sign);
   }
 
-  static fromBytes(bytes: number[], signum: number) : LongInt {
-    var t, ii, len = bytes.length;
-    // input array is in order of high to low
-    for (ii=0; ii < len; ii++) {
-      if (bytes[ii] !== 0) break;
-    }
-    if (ii >= len) {
-      if (signum === 1) signum = 0; // we don't convert a -0, just a +something
-      bytes = LongInt.zero_bytes;
-    }
-    else {
-      bytes = bytes.slice(ii);
-    }
-    t = new LongInt(undefined, bytes, signum);
-    return t;
+  static fromBytes(bytes: Uint8Array, sign: number) : LongInt {
+    return new LongInt(undefined, bytes, sign);
   }
 
   static fromNumber(n: number) : LongInt {
@@ -339,7 +308,6 @@ export class LongInt {
       n = Math.floor(n);
       d = n.toString();
     }
-    t = new LongInt(d, undefined, signum);
-    return t;
+    return new LongInt(d, undefined, signum);
   }
 }

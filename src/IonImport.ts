@@ -47,9 +47,10 @@ export class Import {
     }
 
     getSymbol(symbolId: number) : string {
-        if (!isNullOrUndefined(this.parent)) {
+        if(this.parent === undefined) throw new Error("Illegal parent state.");
+        if (this.parent !== null) {
             let parentSymbol = this.parent.getSymbol(symbolId);
-            if (!isUndefined(parentSymbol)) {
+            if (parentSymbol) {
                 return parentSymbol;
             }
         }
@@ -58,8 +59,6 @@ export class Import {
         if (index < this.length) {
             return this.symbolTable.symbols[index];
         }
-
-        return undefined;
     }
 
     getSymbolId(symbol_: string) : number {

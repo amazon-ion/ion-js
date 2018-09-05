@@ -398,8 +398,7 @@ export class ParserTextRaw {
     switch (v) {
     case T_IDENTIFIER:
       if (is_keyword(s)) {
-        this._error( "can't use '"+s+"' as a fieldname without quotes");
-        break;
+        throw new Error( "Can't use '"+s+"' as a fieldname without quotes");
       }
     case T_STRING1:
     case T_STRING2:
@@ -1149,8 +1148,7 @@ export class ParserTextRaw {
                 }
                 break;
             default:
-                this._error("can't get this value as a string");
-                break;
+                throw new Error("can't get this value as a string");
             }
         return s;
     }

@@ -66,7 +66,7 @@ export class BinaryWriter implements Writer {
 
   private datagram: Node[] = [];
   private containers: Node[] = [];
-  private fieldName: number[];
+  private fieldName: Uint8Array;
   private state: States = States.VALUE;
 
   constructor(symbolTable: LocalSymbolTable, writeable: Writeable) {
@@ -74,15 +74,13 @@ export class BinaryWriter implements Writer {
     this.writer = new LowLevelBinaryWriter(writeable);
   }
 
-  writeBlob(value: number[], annotations?: string[]) : void {
+  writeBlob(value: Uint8Array, annotations?: string[]) : void {
     this.checkWriteValue();
     if (isNullOrUndefined(value)) {
       this.writeNull(TypeCodes.BLOB, annotations);
       return;
     }
-
-    let symbolIds: number[] = this.encodeAnnotations(annotations);
-    this.addNode(new BytesNode(this.writer, this.getCurrentContainer(), TypeCodes.BLOB, symbolIds, Array.prototype.slice.call(value)));
+    this.addNode(new BytesNode(this.writer, this.getCurrentContainer(), TypeCodes.BLOB, this.encodeAnnotations(annotations), value));
   }
 
   writeBoolean(value: boolean, annotations?: string[]) : void {
@@ -92,19 +90,17 @@ export class BinaryWriter implements Writer {
       return;
     }
 
-    let symbolIds: number[] = this.encodeAnnotations(annotations);
-    this.addNode(new BooleanNode(this.writer, this.getCurrentContainer(), symbolIds, value));
+    this.addNode(new BooleanNode(this.writer, this.getCurrentContainer(), this.encodeAnnotations(annotations), value));
   }
 
-  writeClob(value: number[], annotations?: string[]) : void {
+  writeClob(value: Uint8Array, annotations?: string[]) : void {
     this.checkWriteValue();
     if (isNullOrUndefined(value)) {
-      this.writeNull(TypeCodes.CLOB, annotations);
+      this.writeNull(TypeCodes.CLOB, annotations);//TODO this is wrong
       return;
     }
 
-    let symbolIds: number[] = this.encodeAnnotations(annotations);
-    this.addNode(new BytesNode(this.writer, this.getCurrentContainer(), TypeCodes.CLOB, symbolIds, Array.prototype.slice.call(value)));
+    this.addNode(new BytesNode(this.writer, this.getCurrentContainer(), TypeCodes.CLOB, this.encodeAnnotations(annotations), value));
   }
 
   writeDecimal(value: Decimal | string, annotations?: string[]) : void {
@@ -118,33 +114,31 @@ export class BinaryWriter implements Writer {
       value = Decimal.parse(value);
     }
 
-    let symbolIds: number[] = this.encodeAnnotations(annotations);
     let isPositiveZero: boolean = value.isZero() && !value.isNegative();
     if (isPositiveZero) {
       // Special case per the spec: http://amzn.github.io/ion-docs/binary.html#decimal
-      this.addNode(new BytesNode(this.writer, this.getCurrentContainer(), TypeCodes.DECIMAL, symbolIds, new Uint8Array(0)));
+      this.addNode(new BytesNode(this.writer, this.getCurrentContainer(), TypeCodes.DECIMAL, this.encodeAnnotations(annotations), new Uint8Array(0)));
       return;
     }
 
     let exponent: number = value.getExponent();
-    let digits: number[] = value.getDigits().byteValue();
+    let digits: Uint8Array = value.getDigits().byteValue();
     if (value.isNegative()) {
       if (digits.length > 0) {
-        let signBitInUse: boolean = (digits[0] & 0x80) > 0;
-        if (signBitInUse) {
-          digits.unshift(0x80);
+        if (digits[0] & 0x80) {
+          digits.subarray(1, digits.length);
         } else {
           digits[0] |= 0x80;
         }
       } else {
-        digits = [0x80]; // Sign bit set, zero value
+        digits = new Uint8Array([0x80]); // Sign bit set, zero value
       }
     }
 
     let writer: LowLevelBinaryWriter = new LowLevelBinaryWriter(new Writeable(LowLevelBinaryWriter.getVariableLengthSignedIntSize(exponent) + digits.length));
     writer.writeVariableLengthSignedInt(exponent);
     writer.writeBytes(new Uint8Array(digits));
-    this.addNode(new BytesNode(this.writer, this.getCurrentContainer(), TypeCodes.DECIMAL, symbolIds, writer.getBytes()));
+    this.addNode(new BytesNode(this.writer, this.getCurrentContainer(), TypeCodes.DECIMAL, this.encodeAnnotations(annotations), writer.getBytes()));
   }
 
   writeFloat32(value: number, annotations?: string[]) : void {
@@ -154,7 +148,6 @@ export class BinaryWriter implements Writer {
       return;
     }
 
-    let symbolIds: number[] = this.encodeAnnotations(annotations);
     let bytes: Uint8Array;
     if (value === 0) {
       bytes = new Uint8Array(0);
@@ -164,7 +157,7 @@ export class BinaryWriter implements Writer {
       dataview.setFloat32(0, value, false);
       bytes = new Uint8Array(buffer);
     }
-    this.addNode(new BytesNode(this.writer, this.getCurrentContainer(), TypeCodes.FLOAT, symbolIds, bytes));
+    this.addNode(new BytesNode(this.writer, this.getCurrentContainer(), TypeCodes.FLOAT, this.encodeAnnotations(annotations), bytes));
   }
 
   writeFloat64(value: number, annotations?: string[]) : void {
@@ -174,7 +167,6 @@ export class BinaryWriter implements Writer {
       return;
     }
 
-    let symbolIds: number[] = this.encodeAnnotations(annotations);
     let bytes: Uint8Array;
     if (value === 0) {
       bytes = new Uint8Array(0);
@@ -184,7 +176,7 @@ export class BinaryWriter implements Writer {
       dataview.setFloat64(0, value, false);
       bytes = new Uint8Array(buffer);
     }
-    this.addNode(new BytesNode(this.writer, this.getCurrentContainer(), TypeCodes.FLOAT, symbolIds, bytes));
+    this.addNode(new BytesNode(this.writer, this.getCurrentContainer(), TypeCodes.FLOAT, this.encodeAnnotations(annotations), bytes));
   }
 
   writeInt(value: number, annotations?: string[]) : void {
@@ -194,7 +186,6 @@ export class BinaryWriter implements Writer {
       return;
     }
 
-    let symbolIds: number[] = this.encodeAnnotations(annotations);
     let typeCode: TypeCodes;
     let bytes: Uint8Array;
     if (value === 0) {
@@ -211,7 +202,7 @@ export class BinaryWriter implements Writer {
       writer.writeUnsignedInt(Math.abs(value));
       bytes = writer.getBytes();
     }
-    this.addNode(new BytesNode(this.writer, this.getCurrentContainer(), typeCode, symbolIds, bytes));
+    this.addNode(new BytesNode(this.writer, this.getCurrentContainer(), typeCode, this.encodeAnnotations(annotations), bytes));
   }
 
   writeList(annotations?: string[], isNull: boolean = false) : void {
@@ -221,14 +212,12 @@ export class BinaryWriter implements Writer {
       return;
     }
 
-    let symbolIds: number[] = this.encodeAnnotations(annotations);
-    this.addNode(new SequenceNode(this.writer, this.getCurrentContainer(), TypeCodes.LIST, symbolIds));
+    this.addNode(new SequenceNode(this.writer, this.getCurrentContainer(), TypeCodes.LIST, this.encodeAnnotations(annotations)));
   }
 
   writeNull(type_: TypeCodes = TypeCodes.NULL, annotations?: string[]) {
     this.checkWriteValue();
-    let symbolIds: number[] = this.encodeAnnotations(annotations);
-    this.addNode(new NullNode(this.writer, this.getCurrentContainer(), type_, symbolIds));
+    this.addNode(new NullNode(this.writer, this.getCurrentContainer(), type_, this.encodeAnnotations(annotations)));
   }
 
   writeSexp(annotations?: string[], isNull: boolean = false) : void {
@@ -238,8 +227,7 @@ export class BinaryWriter implements Writer {
       return;
     }
 
-    let symbolIds: number[] = this.encodeAnnotations(annotations);
-    this.addNode(new SequenceNode(this.writer, this.getCurrentContainer(), TypeCodes.SEXP, symbolIds));
+    this.addNode(new SequenceNode(this.writer, this.getCurrentContainer(), TypeCodes.SEXP, this.encodeAnnotations(annotations)));
   }
 
   writeString(value: string, annotations?: string[]) : void {
@@ -249,8 +237,7 @@ export class BinaryWriter implements Writer {
       return;
     }
 
-    let symbolIds: number[] = this.encodeAnnotations(annotations);
-    this.addNode(new BytesNode(this.writer, this.getCurrentContainer(), TypeCodes.STRING, symbolIds, new Uint8Array(encodeUtf8(value))));
+    this.addNode(new BytesNode(this.writer, this.getCurrentContainer(), TypeCodes.STRING, this.encodeAnnotations(annotations), encodeUtf8(value)));
   }
 
   writeStruct(annotations?: string[], isNull: boolean = false) : void {
@@ -260,24 +247,20 @@ export class BinaryWriter implements Writer {
       return;
     }
 
-    let symbolIds: number[] = this.encodeAnnotations(annotations);
-    this.addNode(new StructNode(this.writer, this.getCurrentContainer(), symbolIds));
-
+    this.addNode(new StructNode(this.writer, this.getCurrentContainer(), this.encodeAnnotations(annotations)));
     this.state = States.STRUCT_FIELD;
   }
 
   writeSymbol(value: string, annotations?: string[]) : void {
     this.checkWriteValue();
-    if (isNullOrUndefined(value)) {
-      this.writeNull(TypeCodes.SYMBOL, annotations);
-      return;
+    if (value === null) {
+        this.writeNull(TypeCodes.SYMBOL, annotations);
+    } else {
+        let symbolId: number = this.symbolTable.addSymbol(value);
+        let writer: LowLevelBinaryWriter = new LowLevelBinaryWriter(new Writeable(LowLevelBinaryWriter.getUnsignedIntSize(symbolId)));
+        writer.writeUnsignedInt(symbolId);
+        this.addNode(new BytesNode(this.writer, this.getCurrentContainer(), TypeCodes.SYMBOL, this.encodeAnnotations(annotations), writer.getBytes()));
     }
-
-    let symbolIds: number[] = this.encodeAnnotations(annotations);
-    let symbolId: number = this.symbolTable.addSymbol(value);
-    let writer: LowLevelBinaryWriter = new LowLevelBinaryWriter(new Writeable(LowLevelBinaryWriter.getUnsignedIntSize(symbolId)));
-    writer.writeUnsignedInt(symbolId);
-    this.addNode(new BytesNode(this.writer, this.getCurrentContainer(), TypeCodes.SYMBOL, symbolIds, Array.prototype.slice.call(writer.getBytes())));
   }
 
   writeTimestamp(value: Timestamp, annotations?: string[]) : void {
@@ -287,7 +270,6 @@ export class BinaryWriter implements Writer {
       return;
     }
 
-    let symbolIds: number[] = this.encodeAnnotations(annotations);
     let writer: LowLevelBinaryWriter = new LowLevelBinaryWriter(new Writeable(12));
     writer.writeVariableLengthSignedInt(value.getOffset());
     writer.writeVariableLengthUnsignedInt(value.getZuluYear());
@@ -316,19 +298,12 @@ export class BinaryWriter implements Writer {
         // Exponent
         writer.writeVariableLengthSignedInt(exponent);
 
-        // Mantissa is the value to the right of the decimal
-        let mantissa: number[] = LongInt.parse(decimalString.slice(numberOfCharacteristicDigits)).byteValue();
-        let isLeftmostBitSet: boolean = (mantissa[0] & 0x80) > 0;
-        if (isLeftmostBitSet) {
-          mantissa.unshift(0);
-        }
-
-        writer.writeBytes(new Uint8Array(mantissa));
+        writer.writeSignedInt(parseInt(decimalString.slice(numberOfCharacteristicDigits)));
       } else { // Whole number of seconds
         writer.writeVariableLengthUnsignedInt(seconds.numberValue());
       }
     }
-    this.addNode(new BytesNode(this.writer, this.getCurrentContainer(), TypeCodes.TIMESTAMP, symbolIds, Array.prototype.slice.call(writer.getBytes())));
+    this.addNode(new BytesNode(this.writer, this.getCurrentContainer(), TypeCodes.TIMESTAMP, this.encodeAnnotations(annotations), writer.getBytes()));
   }
 
   endContainer() {
@@ -366,9 +341,9 @@ export class BinaryWriter implements Writer {
     this.state = States.STRUCT_VALUE;
   }
 
-  private encodeAnnotations(annotations: string[]) : number[] {
+  private encodeAnnotations(annotations: string[]) : Uint8Array {
     if (!annotations || annotations.length === 0) {
-      return [];
+      return new Uint8Array(0);
     }
 
     let writeable: Writeable = new Writeable();
@@ -377,7 +352,7 @@ export class BinaryWriter implements Writer {
       let symbolId: number = this.symbolTable.addSymbol(annotation);
       writer.writeVariableLengthUnsignedInt(symbolId);
     }
-    return Array['from'](writeable.getBytes());
+    return writeable.getBytes();
   }
 
   private isTopLevel() : boolean {
@@ -480,7 +455,7 @@ export class BinaryWriter implements Writer {
 
 export interface Node {
   isContainer(): boolean;
-  addChild(child: Node, name?: number[]): void;
+  addChild(child: Node, name?: Uint8Array): void;
   write() : void;
   getLength() : number;
 }
@@ -490,7 +465,7 @@ export abstract class AbstractNode implements Node {
     private readonly _writer: LowLevelBinaryWriter,
     private readonly parent: Node,
     private readonly _typeCode: TypeCodes,
-    private readonly annotations: number[] = []
+    private readonly annotations: Uint8Array
   ) {}
 
   private hasAnnotations() {
@@ -573,13 +548,13 @@ export abstract class AbstractNode implements Node {
 
   abstract isContainer() : boolean;
 
-  abstract addChild(child: Node, name?: number[]) : void;
+  abstract addChild(child: Node, name?: Uint8Array) : void;
 
   abstract write() : void;
 }
 
 abstract class ContainerNode extends AbstractNode {
-  protected constructor(writer: LowLevelBinaryWriter, parent: Node, typeCode: TypeCodes, annotations: number[]) {
+  protected constructor(writer: LowLevelBinaryWriter, parent: Node, typeCode: TypeCodes, annotations: Uint8Array) {
     super(writer, parent, typeCode, annotations);
   }
 
@@ -592,11 +567,11 @@ class SequenceNode extends ContainerNode {
   private children: Node[] = [];
   private length: number;
 
-  constructor(writer: LowLevelBinaryWriter, parent: Node, typeCode: TypeCodes, annotations: number[]) {
+  constructor(writer: LowLevelBinaryWriter, parent: Node, typeCode: TypeCodes, annotations: Uint8Array) {
     super(writer, parent, typeCode, annotations);
   }
 
-  addChild(child: Node, name?: number[]): void {
+  addChild(child: Node, name?: Uint8Array): void {
     this.children.push(child);
   }
 
@@ -625,7 +600,7 @@ class SequenceNode extends ContainerNode {
 }
 
 interface Field {
-  name: number[];
+  name: Uint8Array;
   value: Node;
 }
 
@@ -633,11 +608,11 @@ class StructNode extends ContainerNode {
   private fields: Field[] = [];
   private length: number;
 
-  constructor(writer: LowLevelBinaryWriter, parent: Node, annotations: number[]) {
+  constructor(writer: LowLevelBinaryWriter, parent: Node, annotations: Uint8Array) {
     super(writer, parent, TypeCodes.STRUCT, annotations);
   }
 
-  addChild(child: Node, fieldName?: number[]) : void {
+  addChild(child: Node, fieldName?: Uint8Array) : void {
     if (isNullOrUndefined(fieldName)) {
       throw new Error("Cannot add a value to a struct without a field name");
     }
@@ -671,7 +646,7 @@ class StructNode extends ContainerNode {
 }
 
 export abstract class LeafNode extends AbstractNode {
-  addChild(child: Node, name?: number[]) : void {
+  addChild(child: Node, name?: Uint8Array) : void {
     throw new Error("Cannot add a child to a leaf node");
   }
 
@@ -681,7 +656,7 @@ export abstract class LeafNode extends AbstractNode {
 }
 
 class BooleanNode extends LeafNode {
-  constructor(writer: LowLevelBinaryWriter, parent: Node, annotations: number[], private readonly value: boolean) {
+  constructor(writer: LowLevelBinaryWriter, parent: Node, annotations: Uint8Array, private readonly value: boolean) {
     super(writer, parent, TypeCodes.BOOL, annotations);
   }
 
@@ -696,7 +671,7 @@ class BooleanNode extends LeafNode {
 }
 
 class BytesNode extends LeafNode {
-  constructor(writer: LowLevelBinaryWriter, parent: Node, typeCode: TypeCodes, annotations: number[], private readonly value: Uint8Array) {
+  constructor(writer: LowLevelBinaryWriter, parent: Node, typeCode: TypeCodes, annotations: Uint8Array, private readonly value: Uint8Array) {
     super(writer, parent, typeCode, annotations);
   }
 
@@ -712,7 +687,7 @@ class BytesNode extends LeafNode {
 }
 
 export class NullNode extends LeafNode {
-  constructor(writer: LowLevelBinaryWriter, parent: Node, typeCode: TypeCodes, annotations: number[]) {
+  constructor(writer: LowLevelBinaryWriter, parent: Node, typeCode: TypeCodes, annotations: Uint8Array) {
     super(writer, parent, typeCode, annotations);
   }
 

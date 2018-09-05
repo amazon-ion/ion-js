@@ -33,7 +33,8 @@ import { ParserTextRaw } from "./IonParserTextRaw";
 import { Reader } from "./IonReader";
 import { StringSpan } from "./IonSpan";
 import { Timestamp } from "./IonTimestamp";
-import {is_digit} from "./IonText";
+import { fromBase64 } from "./IonText";
+import { is_digit } from "./IonText";
 
 const RAW_STRING = new IonType( -1, "raw_input", true,  false, false, false );
 
@@ -52,7 +53,7 @@ export class TextReader implements Reader {
   private _raw_type: number;
   private _raw: any;
 
-  constructor(source: StringSpan, catalog: Catalog) {
+  constructor(source: StringSpan, catalog?: Catalog) {
     if (!source) {
       throw new Error("a source Span is required to make a reader");
     }
@@ -197,7 +198,7 @@ next() {
             // value otherwise all other scalars are fine as is
             switch(this._type) {
                 case IonTypes.BLOB:
-                    throw new Error("Blobs currently unsupported.");
+                    return this._raw;
                 case IonTypes.SYMBOL:
                     if(this._raw_type === T_IDENTIFIER && (this._raw.length > 1 && this._raw.charAt(0) === '$'.charAt(0))){
                         let tempStr = this._raw.substr(1, this._raw.length);
@@ -235,12 +236,11 @@ next() {
             return data;
         }
         case IonTypes.BLOB : {
-            throw new Error("Blobs currently unsupported.");
+            return fromBase64(this._raw);
         }
         default:
             throw new Error(this._type.name + ".byteValue() is not supported.");
     }
-    return null;
   }
 
   booleanValue() {
@@ -262,6 +262,8 @@ next() {
 
     value() {
         switch(this._type) {
+            case IonTypes.NULL :
+                return null;
             case IonTypes.BOOL : {
                 return this.booleanValue();
             }

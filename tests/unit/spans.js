@@ -24,7 +24,7 @@ define([
     };
 
     suite['null valueAt'] = function() {
-      var span = ionSpan.makeSpan("null");
+      var span = new ionSpan.StringSpan("null");
       assert.equal('n'.charCodeAt(0), span.valueAt(0));
       assert.equal('u'.charCodeAt(0), span.valueAt(1));
       assert.equal('l'.charCodeAt(0), span.valueAt(2));
@@ -33,7 +33,7 @@ define([
     };
 
     suite['null next'] = function() {
-      var span = ionSpan.makeSpan("null");
+      var span = new ionSpan.StringSpan("null");
       assert.equal('n'.charCodeAt(0), span.next());
       assert.equal('u'.charCodeAt(0), span.next());
       assert.equal('l'.charCodeAt(0), span.next());
@@ -43,13 +43,13 @@ define([
 
     suite['Buffer initial position'] = function() {
       var buffer = Buffer.from("null");
-      var span = ionSpan.makeSpan(buffer);
+      var span = new ionSpan.StringSpan(buffer);
       assert.equal(0, span.position());
     };
-    
+    /*
     suite['makeSpan - Span input'] = function() {
-      let spanIn = ionSpan.makeSpan("{ hello: \"world\"}");
-      let actual = ionSpan.makeSpan(spanIn);
+      let spanIn = new StringSpan("{ hello: \"world\"}");
+      let actual = new StringSpan(spanIn);
       assert.strictEqual(actual, spanIn, 'a span input to makeSpan should return the input untouched')
     };
   
@@ -58,7 +58,7 @@ define([
       let actual = ionSpan.makeSpan(spanIn);
       assert.strictEqual(actual, spanIn, 'a span input to makeSpan should return the input untouched')
     };
-
+    */ //these have no value
     registerSuite(suite);
   }
 );
