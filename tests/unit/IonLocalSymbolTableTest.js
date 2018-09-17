@@ -25,8 +25,8 @@ define([
 
     var defaultCatalog = function() {
       var catalog = new ion.Catalog();
-      catalog.addSymbolTable(new ion.SharedSymbolTable('foo', 1, ['a', 'b']));
-      catalog.addSymbolTable(new ion.SharedSymbolTable('bar', 1, ['c', 'd']));
+      catalog.add(new ion.SharedSymbolTable('foo', 1, ['a', 'b']));
+      catalog.add(new ion.SharedSymbolTable('bar', 1, ['c', 'd']));
       return catalog;
     };
 
@@ -56,8 +56,8 @@ define([
     suite['Imports are added in order'] = function() {
       var catalog = defaultCatalog();
 
-      var import1 = new ion.Import(ion.getSystemSymbolTableImport(), catalog.findSpecificVersion('foo', 1));
-      var import2 = new ion.Import(import1, catalog.findSpecificVersion('bar', 1));
+      var import1 = new ion.Import(ion.getSystemSymbolTableImport(), catalog.getVersion('foo', 1));
+      var import2 = new ion.Import(import1, catalog.getVersion('bar', 1));
 
       var symbolTable = new ion.LocalSymbolTable(import2);
 
@@ -80,8 +80,8 @@ define([
     suite['Local symbols are added last'] = function() {
       var catalog = defaultCatalog();
 
-      var import1 = new ion.Import(ion.getSystemSymbolTableImport(), catalog.findSpecificVersion('foo', 1));
-      var import2 = new ion.Import(import1, catalog.findSpecificVersion('bar', 1));
+      var import1 = new ion.Import(ion.getSystemSymbolTableImport(), catalog.getVersion('foo', 1));
+      var import2 = new ion.Import(import1, catalog.getVersion('bar', 1));
 
       var symbolTable = new ion.LocalSymbolTable(import2, ['e', 'f']);
 
@@ -103,8 +103,8 @@ define([
     suite['Maxid less than symbol table length restricts imports'] = function() {
       var catalog = defaultCatalog();
 
-      var import1 = new ion.Import(ion.getSystemSymbolTableImport(), catalog.findSpecificVersion('foo', 1), 1);
-      var import2 = new ion.Import(import1, catalog.findSpecificVersion('bar', 1), 1);
+      var import1 = new ion.Import(ion.getSystemSymbolTableImport(), catalog.getVersion('foo', 1), 1);
+      var import2 = new ion.Import(import1, catalog.getVersion('bar', 1), 1);
 
       var symbolTable = new ion.LocalSymbolTable(import2, ['e', 'f']);
 
@@ -128,8 +128,8 @@ define([
     suite['Maxid greater than symbol table length extends imports'] = function() {
       var catalog = defaultCatalog();
 
-      var import1 = new ion.Import(ion.getSystemSymbolTableImport(), catalog.findSpecificVersion('foo', 1), 3);
-      var import2 = new ion.Import(import1, catalog.findSpecificVersion('bar', 1), 3);
+      var import1 = new ion.Import(ion.getSystemSymbolTableImport(), catalog.getVersion('foo', 1), 3);
+      var import2 = new ion.Import(import1, catalog.getVersion('bar', 1), 3);
 
       var symbolTable = new ion.LocalSymbolTable(import2, ['e', 'f']);
 

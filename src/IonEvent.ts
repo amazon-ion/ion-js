@@ -243,7 +243,7 @@ class IonNullEvent extends AbstractIonEvent {
 
     }
     valueEquals(expected : IonNullEvent) : boolean {
-        return expected.constructor.name === IonNullEvent.name && this.ionValue === expected.ionValue;
+        return expected instanceof IonNullEvent && this.ionValue === expected.ionValue;
     }
     writeIonValue(writer : Writer) : void {
         writer.writeNull(this.ionType.bid);
@@ -256,7 +256,7 @@ class IonIntEvent extends AbstractIonEvent {
 
     }
     valueEquals(expected : IonIntEvent) : boolean {
-        return expected.constructor.name === IonIntEvent.name && this.ionValue === expected.ionValue;
+        return expected instanceof IonIntEvent && this.ionValue === expected.ionValue;
     }
     writeIonValue(writer : Writer) : void {
         writer.writeInt(this.ionValue);
@@ -283,7 +283,7 @@ class IonFloatEvent extends AbstractIonEvent {
     }
     valueEquals(expected : IonFloatEvent) : boolean {
         if(isNaN(this.ionValue) && isNaN(expected.ionValue)) return true;
-        return expected.constructor.name === IonFloatEvent.name &&  this.ionValue === expected.ionValue;
+        return expected instanceof IonFloatEvent &&  this.ionValue === expected.ionValue;
     }
     writeIonValue(writer : Writer) : void {
         writer.writeFloat64(this.ionValue);
@@ -296,7 +296,7 @@ class IonDecimalEvent extends AbstractIonEvent {
 
     }
     valueEquals(expected : IonDecimalEvent) : boolean {
-        return expected.constructor.name === IonDecimalEvent.name && this.ionValue.equals(expected.ionValue);
+        return expected instanceof IonDecimalEvent && this.ionValue.equals(expected.ionValue);
     }
     writeIonValue(writer : Writer) : void {
         writer.writeDecimal(this.ionValue);
@@ -309,8 +309,7 @@ class IonSymbolEvent extends AbstractIonEvent {
         super(eventType , ionType, fieldName, annotations, depth, ionValue);
     }
     valueEquals(expected : IonSymbolEvent) : boolean {
-        if(expected instanceof IonSymbolEvent) return false;
-        return this.ionValue === expected.ionValue;//will need to change when symboltokens are introduced.
+        return expected instanceof IonSymbolEvent && this.ionValue === expected.ionValue;//will need to change when symboltokens are introduced.
     }
     writeIonValue(writer : Writer) : void{
         writer.writeSymbol(this.ionValue.toString());//if symboltokens text is unknown we will need to write out symboltable
@@ -324,8 +323,7 @@ class IonStringEvent extends AbstractIonEvent {
 
     }
     valueEquals(expected : IonStringEvent) : boolean {
-        if(expected instanceof IonSymbolEvent) return false;
-        return this.ionValue === expected.ionValue;
+        return expected instanceof IonSymbolEvent && this.ionValue === expected.ionValue;
     }
     writeIonValue(writer : Writer) : void {
         writer.writeString(this.ionValue);
@@ -339,8 +337,7 @@ class IonTimestampEvent extends AbstractIonEvent {
 
     }
     valueEquals(expected : IonTimestampEvent) : boolean {
-        if(expected.constructor.name !== IonTimestampEvent.name) return false;
-        return this.ionValue.equals(expected.ionValue);
+        return expected instanceof IonTimestampEvent && this.ionValue.equals(expected.ionValue);
     }
     writeIonValue(writer : Writer) : void {
         writer.writeTimestamp(this.ionValue);
@@ -352,13 +349,14 @@ class IonBlobEvent extends AbstractIonEvent {
         super(eventType , ionType, fieldName, annotations, depth, ionValue);
     }
     valueEquals(expected : IonBlobEvent) : boolean {
+        if(!(expected instanceof IonBlobEvent)) return false;
         if(this.ionValue.length !== expected.ionValue.length) return false;
         for(let i = 0; i < this.ionValue.length; i++){
             if(this.ionValue[i] !== expected.ionValue[i]) return false;
         }
         return true;
     }
-    writeIonValue(writer : Writer) : void {//TODO needs to be backed by number[] https://github.com/amzn/ion-js/issues/127
+    writeIonValue(writer : Writer) : void {
         writer.writeBlob(this.ionValue);
     }
 }
@@ -367,8 +365,8 @@ class IonClobEvent extends AbstractIonEvent {
     constructor(eventType : IonEventType, ionType : IonType, fieldName : string, annotations : string[], depth : number, ionValue : Uint8Array){
         super(eventType , ionType, fieldName, annotations, depth, ionValue);
     }
-    valueEquals(expected : IonClobEvent) : boolean {
-        if(this.ionValue.length !== expected.ionValue.length) return false;
+    valueEquals(expected : IonClobEvent) : boolean {//can there be byte padding?
+        if(!(expected instanceof IonClobEvent)) return false;
         for(let i = 0; i < this.ionValue.length; i++){
             if(this.ionValue[i] !== expected.ionValue[i]) return false;
         }
@@ -398,8 +396,7 @@ class IonStructEvent extends AbsIonContainerEvent {//no embed support as of yet.
     }
     //two way equivalence between the structEvents, they must have the exact same number of equivalent elements.
     valueEquals(expected : IonStructEvent) : boolean {
-        if(expected.constructor.name !== IonStructEvent.name) return false;
-        return this.structsEqual(this.ionValue, expected.ionValue) && this.structsEqual(expected.ionValue, this.ionValue);
+        return expected instanceof IonTimestampEvent && this.structsEqual(this.ionValue, expected.ionValue) && this.structsEqual(expected.ionValue, this.ionValue);
     }
 
     //for each actual ionEvent, searches for an equivalent expected ionEvent,

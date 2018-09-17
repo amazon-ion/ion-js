@@ -14,14 +14,10 @@
 import { Catalog } from "./IonCatalog";
 import { getSystemSymbolTableImport } from "./IonSystemSymbolTable";
 import { Import } from "./IonImport";
-import { IonType } from "./IonType";
-import { isUndefined } from "./IonUtilities";
 import { LocalSymbolTable } from "./IonLocalSymbolTable";
 import { Reader } from "./IonReader";
 import { SharedSymbolTable } from "./IonSharedSymbolTable";
 import { SubstituteSymbolTable } from "./IonSubstituteSymbolTable";
-import { Symbol } from "./IonSymbol";
-import { SymbolIndex } from "./IonSymbolIndex";
 
 export const ion_symbol_table = "$ion_symbol_table";
 export const ion_symbol_table_sid = 3;
@@ -57,12 +53,12 @@ function load_imports(reader: Reader, catalog: Catalog) : Import {
     }
 
     if (name && name !== "$ion") {
-      let symbolTable: SharedSymbolTable = catalog.findSpecificVersion(name, version);
+      let symbolTable: SharedSymbolTable = catalog.getVersion(name, version);
       if (!symbolTable) {
         if (maxId === undefined) {
           throw new Error(`No exact match found when trying to import symbol table ${name} version ${version}`);
         } else {
-          symbolTable = catalog.findLatestVersion(name);
+          symbolTable = catalog.getTable(name);
         }
       }
 

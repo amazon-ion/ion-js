@@ -14,10 +14,6 @@
 import { Decimal } from "./IonDecimal";
 import { encodeUtf8 } from "./IonUnicode";
 import { Import } from "./IonImport";
-import { isNullOrUndefined } from "./IonUtilities";
-import { isString } from "./IonUtilities";
-import { isUndefined } from "./IonUtilities";
-import { last } from "./IonUtilities";
 import { LocalSymbolTable } from "./IonLocalSymbolTable";
 import { LongInt } from "./IonLongInt";
 import { LowLevelBinaryWriter } from "./IonLowLevelBinaryWriter";
@@ -76,7 +72,7 @@ export class BinaryWriter implements Writer {
 
   writeBlob(value: Uint8Array, annotations?: string[]) : void {
     this.checkWriteValue();
-    if (isNullOrUndefined(value)) {
+    if (value === null || value === undefined) {
       this.writeNull(TypeCodes.BLOB, annotations);
       return;
     }
@@ -85,7 +81,7 @@ export class BinaryWriter implements Writer {
 
   writeBoolean(value: boolean, annotations?: string[]) : void {
     this.checkWriteValue();
-    if (isNullOrUndefined(value)) {
+    if (value === null || value === undefined) {
       this.writeNull(TypeCodes.BOOL, annotations);
       return;
     }
@@ -95,7 +91,7 @@ export class BinaryWriter implements Writer {
 
   writeClob(value: Uint8Array, annotations?: string[]) : void {
     this.checkWriteValue();
-    if (isNullOrUndefined(value)) {
+    if (value === null || value === undefined) {
       this.writeNull(TypeCodes.CLOB, annotations);//TODO this is wrong
       return;
     }
@@ -105,14 +101,12 @@ export class BinaryWriter implements Writer {
 
   writeDecimal(value: Decimal | string, annotations?: string[]) : void {
     this.checkWriteValue();
-    if (isNullOrUndefined(value)) {
+    if (value === null || value === undefined) {
       this.writeNull(TypeCodes.DECIMAL, annotations);
       return;
     }
 
-    if (isString(value)) {
-      value = Decimal.parse(value);
-    }
+    if (typeof value == 'string') value = Decimal.parse(value);
 
     let isPositiveZero: boolean = value.isZero() && !value.isNegative();
     if (isPositiveZero) {
@@ -143,7 +137,7 @@ export class BinaryWriter implements Writer {
 
   writeFloat32(value: number, annotations?: string[]) : void {
     this.checkWriteValue();
-    if (isNullOrUndefined(value)) {
+    if (value === null || value === undefined) {
       this.writeNull(TypeCodes.FLOAT, annotations);
       return;
     }
@@ -162,7 +156,7 @@ export class BinaryWriter implements Writer {
 
   writeFloat64(value: number, annotations?: string[]) : void {
     this.checkWriteValue();
-    if (isNullOrUndefined(value)) {
+    if (value === null || value === undefined) {
       this.writeNull(TypeCodes.FLOAT, annotations);
       return;
     }
@@ -181,7 +175,7 @@ export class BinaryWriter implements Writer {
 
   writeInt(value: number, annotations?: string[]) : void {
     this.checkWriteValue();
-    if (isNullOrUndefined(value)) {
+    if (value === null || value === undefined) {
       this.writeNull(TypeCodes.POSITIVE_INT, annotations);
       return;
     }
@@ -232,7 +226,7 @@ export class BinaryWriter implements Writer {
 
   writeString(value: string, annotations?: string[]) : void {
     this.checkWriteValue();
-    if (isNullOrUndefined(value)) {
+    if (value === null || value === undefined) {
       this.writeNull(TypeCodes.STRING, annotations);
       return;
     }
@@ -265,7 +259,7 @@ export class BinaryWriter implements Writer {
 
   writeTimestamp(value: Timestamp, annotations?: string[]) : void {
     this.checkWriteValue();
-    if (isNullOrUndefined(value)) {
+    if (value === null || value === undefined) {
       this.writeNull(TypeCodes.TIMESTAMP, annotations);
       return;
     }
@@ -360,7 +354,7 @@ export class BinaryWriter implements Writer {
   }
 
   private getCurrentContainer() : Node {
-    return last(this.containers);
+    return this.containers[this.containers.length - 1];
   }
 
   private addNode(node: Node) : void {
@@ -427,7 +421,7 @@ export class BinaryWriter implements Writer {
       this.writeFieldName('symbols');
       this.writeList();
       for (let symbol_ of this.symbolTable.symbols) {
-        if (!isUndefined(symbol_)) {
+        if (symbol_ !== undefined) {//TODO investigate if this needs more error handling.
           this.writeString(symbol_);
         }
       }
@@ -592,7 +586,7 @@ class SequenceNode extends ContainerNode {
   }
 
   getLength() : number {
-    if (isUndefined(this.length)) {
+    if (this.length === undefined) {
       this.length = super.getLength();
     }
     return this.length;
@@ -613,9 +607,7 @@ class StructNode extends ContainerNode {
   }
 
   addChild(child: Node, fieldName?: Uint8Array) : void {
-    if (isNullOrUndefined(fieldName)) {
-      throw new Error("Cannot add a value to a struct without a field name");
-    }
+    if (fieldName === null || fieldName === undefined) throw new Error("Cannot add a value to a struct without a field name");
     this.fields.push({name: fieldName, value: child});
   }
 
@@ -629,7 +621,7 @@ class StructNode extends ContainerNode {
   }
 
   getLength() : number {
-    if (isUndefined(this.length)) {
+    if (this.length) {
       this.length = super.getLength();
     }
     return this.length;

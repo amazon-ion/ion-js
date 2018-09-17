@@ -13,7 +13,6 @@
  */
 
 import { EOF } from "./IonConstants";
-import { InvalidArgumentError } from "./IonErrors"
 
 const SPAN_TYPE_STRING = 0;
 const SPAN_TYPE_BINARY = 1;

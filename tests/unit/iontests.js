@@ -188,9 +188,8 @@ define(['intern', 'intern!object', 'intern/dojo/node!fs', 'intern/dojo/node!path
             streams.push(new ion.IonEventStream(new ion.makeReader(eventTextWriter.getBytes())));
             let eventBinaryWriter = ion.makeBinaryWriter();
             streams[0].writeIon(eventBinaryWriter);
-            streams.push(new ion.IonEventStream(new ion.makeReader(eventTextWriter.getBytes())));
+            streams.push(new ion.IonEventStream(new ion.makeReader(eventBinaryWriter.getBytes())));
             return streams;
-
         }
 
         function roundTripEventStreams(reader) {

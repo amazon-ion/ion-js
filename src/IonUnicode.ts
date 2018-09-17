@@ -17,9 +17,9 @@
 * @see http://www.unicode.org/versions/Unicode5.0.0/
 */
 export function encodeUtf8(s: string) : Uint8Array {
-    var i = 0, bytes = new Uint8Array(s.length * 4);
-    for (var ci = 0; ci < s.length; ci++) {
-        var c = s.charCodeAt(ci);
+    let i = 0, bytes = new Uint8Array(s.length * 4), c;
+    for (let ci = 0; ci < s.length; ci++) {
+        c = s.charCodeAt(ci);
         if (c < 128) {
             bytes[i++] = c;
             continue;
@@ -30,7 +30,7 @@ export function encodeUtf8(s: string) : Uint8Array {
             if (c > 0xd7ff && c < 0xdc00) {
                 if (++ci >= s.length)
                     throw new Error('UTF-8 encode: incomplete surrogate pair');
-                var c2 = s.charCodeAt(ci);
+                let c2 = s.charCodeAt(ci);
                 if (c2 < 0xdc00 || c2 > 0xdfff)
                     throw new Error('UTF-8 encode: second surrogate character 0x' + c2.toString(16) + ' at index ' + ci + ' out of range');
                 c = 0x10000 + ((c & 0x03ff) << 10) + (c2 & 0x03ff);
@@ -45,9 +45,9 @@ export function encodeUtf8(s: string) : Uint8Array {
 }
 
 export function decodeUtf8(bytes: Uint8Array) : string {
-    var i = 0, s = '';
+    let i = 0, s = '', c;
     while (i < bytes.length) {
-        var c = bytes[i++];
+        c = bytes[i++];
         if (c > 127) {
             if (c > 191 && c < 224) {
                 if (i >= bytes.length)

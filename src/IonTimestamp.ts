@@ -30,11 +30,9 @@
 //    undefined, empty or a null image it returns the timestamp NULL.
 
 import { Decimal } from "./IonDecimal";
-import { isNumber } from "./IonUtilities";
-import { isString } from "./IonUtilities";
-import { isUndefined } from "./IonUtilities";
 import { LongInt } from "./IonLongInt";
 import { Precision } from "./IonPrecision";
+import { isDigit } from "./IonText"
 
 const MIN_SECONDS: number = 0;
 const MAX_SECONDS: number = 60;
@@ -174,10 +172,10 @@ function to_4_digits(v: number) : string {
   }
 }
 
-function read_unknown_digits(str: string, pos: number) : string {
+function read_unknown_digits(str: string, pos: number) : string {//TODO this seems incorrect
   let i: number = pos;
   for (; i < str.length; i++) {
-    if (!isNumber(parseInt(str[i], 10))) {
+    if (!isDigit(str.charCodeAt(i))) {
       break;
     }
   }
@@ -235,13 +233,6 @@ const SECONDS_AT_EPOCH_START: number = (function() {
   return d;
 })();
 
-function bad_timestamp(m: any) : never {
-  if (isNumber(m)) {
-    m = "invalid format for timestamp at offset " + m;
-  }
-  throw new Error(m);
-}
-
 export class Timestamp {
   private seconds: Decimal;
 
@@ -255,11 +246,11 @@ export class Timestamp {
     private minute: number = 0,
     seconds: number | string | Decimal = 0
   ) {
-    if (isNumber(seconds) && Math.floor(seconds) === seconds) {
+    if (typeof seconds === 'number' && Math.floor(seconds) === seconds) {
       // we allow whole number seconds to be specified as a number
       // in which case we convert it to a decimal value
       this.seconds = new Decimal(LongInt.fromNumber(seconds), 0);
-    } else if (isString(seconds)) {
+    } else if (typeof seconds === 'string') {
       this.seconds = Decimal.parse(seconds);
     } else {
       this.seconds = <Decimal>seconds;
@@ -402,8 +393,8 @@ export class Timestamp {
 
     // hours : minute (for offset)
     let o: number = t.offset;
-    if (t.precision > Precision.DAY || isUndefined(o)) {  // TODO: is this right?
-      if (isUndefined(o) || (o === -0.0)) {
+    if (t.precision > Precision.DAY || o === undefined) {  // TODO: is this right?
+      if (o === undefined || o === -0.0) {
         image = image + "Z";
       } else {
         if (o < 0) {
@@ -472,7 +463,7 @@ export class Timestamp {
         if (str.charCodeAt(0) === 110) {  // "n"
             if (str === "null") return Timestamp.NULL;
             if (str === "null.timestamp") return Timestamp.NULL;
-            bad_timestamp(0);
+            throw new Error("Illegal timestamp: " + str);
         }
 
         let offset: number;
@@ -490,18 +481,14 @@ export class Timestamp {
         let v: number;
 
         while (pos < limit) {
-            if (isUndefined(state.len)) {
+            if (state.len === undefined) {
                 let digits: string = read_unknown_digits(str, pos);
-                if (digits.length === 0) {
-                    bad_timestamp(pos);
-                }
+                if (digits.length === 0) throw new Error("No digits found at pos: " + pos);
                 v = parseInt(digits, 10);
                 pos += digits.length;
             } else if (state.len > 0) {
                 v = read_digits(str, pos, state.len);
-                if (v < 0) {
-                    bad_timestamp(pos);
-                }
+                if (v < 0) throw new Error("Non digit value found at pos " + pos);
                 pos = pos + state.len;
             }
             switch (state.f) {
@@ -544,21 +531,18 @@ export class Timestamp {
                     offset = -0.0;
                     break;
                 default:
-                    bad_timestamp("invalid internal state");
+                    throw new Error("invalid internal state");
             }
-            if (!isUndefined(state.p)) {
+            if (state.p !== undefined) {
                 precision = state.p;
                 if (pos >= limit) {
                     break;
                 }
             }
-            if (!isUndefined(state.t)) {
+            if (state.t !== undefined) {
                 let c: string = String.fromCharCode(str.charCodeAt(pos));
                 state = timeParserStates[state.t[c]];
-                if (isUndefined(state)) {
-                    debugger;
-                    bad_timestamp(pos)
-                }
+                if (state === undefined) throw new Error("State was not set pos:" + pos );
             }
             pos++;
         }

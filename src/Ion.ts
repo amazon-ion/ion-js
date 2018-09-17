@@ -17,7 +17,6 @@ import { IVM } from "./IonConstants";
 import { Reader } from "./IonReader";
 import { StringSpan, BinarySpan } from "./IonSpan";
 import { TextReader } from "./IonTextReader";
-import { InvalidArgumentError } from "./IonErrors";
 import { Writer } from "./IonWriter";
 import { TextWriter } from "./IonTextWriter";
 import { Writeable } from "./IonWriteable";

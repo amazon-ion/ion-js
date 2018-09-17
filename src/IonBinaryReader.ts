@@ -32,7 +32,7 @@ import { makeSymbolTable } from "./IonSymbols";
 import { ParserBinaryRaw } from "./IonParserBinaryRaw";
 import { Reader } from "./IonReader";
 import { SharedSymbolTable } from "./IonSharedSymbolTable";
-import { Span } from "./IonSpan";
+import { BinarySpan } from "./IonSpan";
 import { Timestamp } from "./IonTimestamp";
 
 const RAW_STRING = new IonType( -1, "raw_input", true,  false, false, false );
@@ -87,7 +87,7 @@ export class BinaryReader implements Reader {
   private _symtab: LocalSymbolTable;
   private _raw_type: number;
 
-  constructor(source: Span, catalog?: Catalog) {
+  constructor(source: BinarySpan, catalog?: Catalog) {
     this._parser   = new ParserBinaryRaw(source);
     this._cat      = catalog ? catalog : new Catalog();
     this._symtab   = defaultLocalSymbolTable();

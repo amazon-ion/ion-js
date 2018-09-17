@@ -11,19 +11,10 @@
 * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific
 * language governing permissions and limitations under the License.
 */
-import { CharCodes } from "./IonText";
-import { ClobEscapes } from "./IonText";
 import { Decimal } from "./IonDecimal";
 import { encodeUtf8 } from "./IonUnicode";
-import { escape } from "./IonText";
-import { isIdentifier } from "./IonText";
-import { isNullOrUndefined } from "./IonUtilities";
-import { isOperator } from "./IonText";
-import { isUndefined } from "./IonUtilities";
-import { StringEscapes } from "./IonText";
-import { SymbolEscapes } from "./IonText";
+import { escape, toBase64, StringEscapes, SymbolEscapes, isIdentifier, isOperator, CharCodes, ClobEscapes } from "./IonText";
 import { Timestamp } from "./IonTimestamp";
-import { toBase64 } from "./IonText";
 import { TypeCodes } from "./IonBinary";
 import { Writeable } from "./IonWriteable";
 import { Writer } from "./IonWriter";
@@ -82,7 +73,7 @@ export class TextWriter implements Writer {
                     }
                 } else {
                     let escape: number[] = ClobEscapes[c];
-                    if (isUndefined(escape)) {
+                    if (escape === undefined) {
                         if(c < 32){
                             hexStr = "\\x" + c.toString(16);
                             for(let j = 0; j < hexStr.length; j++){
@@ -290,7 +281,7 @@ export class TextWriter implements Writer {
 
     private writeValue<T>(typeCode: TypeCodes, value: T, annotations: string[], serialize: Serializer<T>) {
         if (this.currentContainer.state === State.STRUCT_FIELD) throw new Error("Expecting a struct field");
-        if (isNullOrUndefined(value)) {
+        if (value === null || value === undefined) {
             this.writeNull(typeCode, annotations);
             return;
         }
@@ -346,10 +337,7 @@ export class TextWriter implements Writer {
     }
 
     private writeAnnotations(annotations: string[]) : void {
-        if (isNullOrUndefined(annotations)) {
-            return;
-        }
-
+        if (annotations === null || annotations === undefined) return;
         for (let annotation of annotations) {
             this.writeSymbolToken(annotation);
             this.writeUtf8('::');

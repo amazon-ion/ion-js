@@ -13,8 +13,6 @@
  */
 import { getSystemSymbolTableImport } from "./IonSystemSymbolTable";
 import { Import } from "./IonImport";
-import { isNullOrUndefined } from "./IonUtilities";
-import { isUndefined } from "./IonUtilities";
 import { SymbolIndex } from "./IonSymbolIndex";
 
 

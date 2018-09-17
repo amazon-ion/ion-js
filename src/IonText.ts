@@ -11,7 +11,6 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-import { isUndefined } from "./IonUtilities";
 
 export const WHITESPACE_COMMENT1 = -2;
 export const WHITESPACE_COMMENT2 = -3;
@@ -288,15 +287,15 @@ ClobEscapes[CharCodes.FORWARD_SLASH] = backslashEscape("/");
 ClobEscapes[CharCodes.QUESTION_MARK] = backslashEscape("?");
 ClobEscapes[CharCodes.BACKSLASH] = backslashEscape("\\");
 
-function unicodeEscapes(escapes: EscapeIndex, start: number, end?: number) {
-  if (isUndefined(end)) {
-    escapes[start] = unicodeEscape(start);
-  } else {
-    for (let i: number = start; i < end; i++) {
-      escapes[i] = unicodeEscape(i);
+    function unicodeEscapes(escapes: EscapeIndex, start: number, end?: number) {
+        if (end === undefined) {
+            escapes[start] = unicodeEscape(start);
+        } else {
+            for (let i: number = start; i < end; i++) {
+                escapes[i] = unicodeEscape(i);
+            }
+        }
     }
-  }
-}
 
 let CommonEscapes : EscapeIndex = {};
 CommonEscapes[CharCodes.NULL] = backslashEscape('0');
@@ -339,6 +338,10 @@ export function isOperator(s: string) : boolean {
     }
   }
   return true;
+}
+
+export function isDigit(charCode : number) {
+    return charCode < 58 && charCode > 47;
 }
 
 export function escape(input: string, escapes: EscapeIndex) : string {

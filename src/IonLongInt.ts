@@ -30,7 +30,6 @@
 //      ION.LongInt.ZERO
 
 import { is_digit } from "./IonText";
-import { isNullOrUndefined } from "./IonUtilities";
 
 export class LongInt {
   private static readonly zero_bytes: Uint8Array = new Uint8Array(1);
@@ -95,10 +94,10 @@ export class LongInt {
   isZero() : boolean {
     if (this.isNull()) return false;
     if (this.s === 0) return true;
-    if (!isNullOrUndefined(this.b)) {
+    if (this.b !== null && this.b !== undefined) {
       return LongInt._is_zero_bytes(this.b);
     }
-    if (!isNullOrUndefined(this.d)) {
+    if (this.d !== null && this.d !== undefined) {
       return this.d === '0';
     }
     return undefined;
@@ -110,7 +109,7 @@ export class LongInt {
 
   private _d() : void { // forces creation of base 10 string
     var dec, str, len, dg, src, dst;
-    if (isNullOrUndefined(this.d)) {
+    if (this.d === null || this.d === undefined) {
       if (this.isZero()) {
         this.d = LongInt.zero_string;
       } else {
@@ -171,7 +170,7 @@ export class LongInt {
   }
 
   private _b() : void { // forces creation of base 256 byte array
-    if (isNullOrUndefined(this.b)) {
+    if (this.b === null  || this.b === undefined) {
       if (this.isZero()) {
         this.b = LongInt.zero_bytes;
         return;

@@ -175,18 +175,14 @@ export class ParserBinaryRaw {
     }
 
     private read_var_signed_int() : number {
-        var b, v = 0,
-            shift = 6,      // the first byte has only 6 bits so if we shift it we shift 6 (7 after than)
-            is_neg = false;
+        var b, v = 0, shift = 6, is_neg = false;
 
-        b = this._in.next();
-        if ((b & 0x40) !== 0) {
-            b = (b & (0x3f | 0x80));  // clears the sign bit
+        let byte = this._in.next();
+        if ((byte & 0x40) !== 0) {
+            byte = byte & 0xBF;  // clears the sign bit
             is_neg = true;
         }
-
-        // shift in all but the last byte (we've already read the first)
-        while ((b & 0x80) === 0) {
+        while ((byte & 0x80) === 0) {
             v = (v << shift);
             shift = 7;              // make sure we get all 7 bits for the 2nd and later bytes
             v = v | (b & 0x7f);
@@ -734,7 +730,7 @@ export class ParserBinaryRaw {
     return this._curr;
   }
 
-  byteValue() : number[] {
+  byteValue() : Uint8Array {
     var bytes = undefined, t = this;
 
     switch(t._raw_type) {
