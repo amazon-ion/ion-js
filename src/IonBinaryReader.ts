@@ -193,7 +193,7 @@ export class BinaryReader implements Reader {
   }
 
   byteValue() : Uint8Array {
-    return new Uint8Array(this._parser.byteValue());
+    return this._parser.byteValue();
   }
 
   ionValue() : never {

@@ -77,6 +77,7 @@ export class IonEventStream {
                             writer.writeNull(tempEvent.ionType.bid, tempEvent.annotations);
                             break;
                         case IonTypes.TIMESTAMP :
+                            writer.writeTimestamp(tempEvent.ionValue, tempEvent.annotations);
                             break;
                         case IonTypes.CLOB :
                             writer.writeClob(tempEvent.ionValue, tempEvent.annotations);

@@ -219,7 +219,6 @@ export class BinarySpan extends Span {
   }
 
   next(): number {
-    var b;
     if (this.is_empty()) {
       if (this._pos > MAX_POS) {
         throw new Error("span position is out of bounds");

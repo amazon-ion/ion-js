@@ -238,7 +238,7 @@ export class Timestamp {
 
   constructor(
     private precision: Precision = Precision.NULL,
-    private offset: number = 0,
+    private offset: number = -0.0,
     private year: number = 0,
     private month: number = 0,
     private day: number = 0,

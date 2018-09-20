@@ -167,9 +167,10 @@ export class ParserBinaryRaw {
 
     private read_var_unsigned_int() : number {
         let tempInt = 0;
-        for(let byte = this._in.next(); (byte & 0x80) === 0; byte = this._in.next()){
+        let byte = this._in.next();
+        for(tempInt = byte & 0x7F; (byte & 0x80) === 0; byte = this._in.next()) {
             if(byte === EOF) throw new Error("EOF found in variable length unsigned int.");
-            tempInt = (tempInt << 7) | (this._in.next() & 0x7f)
+            tempInt = (tempInt << 7) | (this._in.next() & 0x7F);
         }
         return tempInt;
     }
@@ -338,8 +339,7 @@ export class ParserBinaryRaw {
 
         if (this._len < 1) {
             precision = Precision.NULL
-        }
-        else {
+        } else {
             pos = this._in.position();
             end = pos + this._len;
             offset = this.read_var_signed_int();
@@ -554,21 +554,18 @@ export class ParserBinaryRaw {
     }
 
   next() : any {
-    var rt, t = this;
-    if (t._curr === undefined && t._len > 0) {
-      t._in.skip(t._len);
+    if (this._curr === undefined && this._len > 0) {
+      this._in.skip(this._len);
+    } else {
+      this.clear_value();
     }
-    else {
-      t.clear_value();
-    }
-    if (t._in_struct) {
-      t._fid = this.read_var_unsigned_int();
-      if (t._fid === undefined) {
+    if (this._in_struct) {
+      this._fid = this.read_var_unsigned_int();
+      if (this._fid === undefined) {
         return undefined;
       }
     }
-    rt = t.load_next();
-    return rt;
+    return this.load_next();
   }
 
   stepIn() {
@@ -730,21 +727,17 @@ export class ParserBinaryRaw {
     return this._curr;
   }
 
-  byteValue() : Uint8Array {
-    var bytes = undefined, t = this;
-
-    switch(t._raw_type) {
-      case IonBinary.TB_CLOB:
-      case IonBinary.TB_BLOB:
-        if (t.isNull()) break;
-        t.load_value();
-        bytes = t._curr;
-        break;
-      default: 
-        break;
+    byteValue() : Uint8Array {
+        switch(this._raw_type) {
+            case IonBinary.TB_CLOB:
+            case IonBinary.TB_BLOB:
+                if (this.isNull()) break;
+                this.load_value();
+                return this._curr;
+            default:
+                throw new Error(this._raw_type + " does not support byteValue API.");
+        }
     }
-    return bytes;
-  }
 
   booleanValue() : boolean {
     if (this._raw_type === IonBinary.TB_BOOL) {

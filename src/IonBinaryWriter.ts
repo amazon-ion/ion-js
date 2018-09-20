@@ -264,7 +264,7 @@ export class BinaryWriter implements Writer {
       return;
     }
 
-    let writer: LowLevelBinaryWriter = new LowLevelBinaryWriter(new Writeable(12));
+    let writer: LowLevelBinaryWriter = new LowLevelBinaryWriter(new Writeable(12));//where does the 12 come from
     writer.writeVariableLengthSignedInt(value.getOffset());
     writer.writeVariableLengthUnsignedInt(value.getZuluYear());
     if (value.getPrecision() >= Precision.MONTH) {
