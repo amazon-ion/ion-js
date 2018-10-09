@@ -266,19 +266,19 @@ export class BinaryWriter implements Writer {
 
     let writer: LowLevelBinaryWriter = new LowLevelBinaryWriter(new Writeable(12));//where does the 12 come from
     writer.writeVariableLengthSignedInt(value.getOffset());
-    writer.writeVariableLengthUnsignedInt(value.getZuluYear());
+    writer.writeVariableLengthUnsignedInt(value.date.getUTCFullYear());
     if (value.getPrecision() >= Precision.MONTH) {
-      writer.writeVariableLengthUnsignedInt(value.getZuluMonth());
+      writer.writeVariableLengthUnsignedInt(value.date.getUTCMonth() + 1);
     }
     if (value.getPrecision() >= Precision.DAY) {
-      writer.writeVariableLengthUnsignedInt(value.getZuluDay());
+      writer.writeVariableLengthUnsignedInt(value.date.getUTCDate());
     }
     if (value.getPrecision() >= Precision.HOUR_AND_MINUTE) {
-      writer.writeVariableLengthUnsignedInt(value.getZuluHour());
-      writer.writeVariableLengthUnsignedInt(value.getZuluMinute());
+      writer.writeVariableLengthUnsignedInt(value.date.getUTCHours());
+      writer.writeVariableLengthUnsignedInt(value.date.getUTCMinutes());
     }
     if (value.getPrecision() >= Precision.SECONDS) {
-      let seconds: Decimal = value.getZuluSeconds();
+      let seconds: Decimal = value.seconds;
       let exponent: number = seconds.getExponent();
 
       if (exponent < 0) { // Fractional number of seconds {

@@ -166,8 +166,7 @@ export class ParserBinaryRaw {
   }
 
     private read_var_unsigned_int() : number {
-        let tempInt = 0;
-        let byte = this._in.next();
+        let tempInt, byte = this._in.next();
         for(tempInt = byte & 0x7F; (byte & 0x80) === 0; byte = this._in.next()) {
             if(byte === EOF) throw new Error("EOF found in variable length unsigned int.");
             tempInt = (tempInt << 7) | (this._in.next() & 0x7F);
@@ -176,7 +175,7 @@ export class ParserBinaryRaw {
     }
 
     private read_var_signed_int() : number {
-        var b, v = 0, shift = 6, is_neg = false;
+        let v = 0, shift = 6, is_neg = false;
 
         let byte = this._in.next();
         if ((byte & 0x40) !== 0) {
@@ -186,16 +185,16 @@ export class ParserBinaryRaw {
         while ((byte & 0x80) === 0) {
             v = (v << shift);
             shift = 7;              // make sure we get all 7 bits for the 2nd and later bytes
-            v = v | (b & 0x7f);
-            b = this._in.next();
+            v = v | (byte & 0x7f);
+            byte = this._in.next();
         }
         // if we run off the end the bytes will all by EOF, so we can just check once
-        if (b === EOF) undefined;
+        if (byte === EOF) undefined;
 
         if (shift > 0) {
             v = (v << shift);
         }
-        v = v | (b & 0x7f);
+        v = v | (byte & 0x7f);
 
         // now we put the sign on, if it's needed
         if (is_neg) v = - v;
@@ -225,38 +224,6 @@ export class ParserBinaryRaw {
 
     private read_var_signed_longint() : LongInt {
         return this.readVarInt(true);
-    }
-
-    private read_signed_int() : number {
-        var v = 0, b, is_neg = false;
-
-        // they have to tell us the length
-        if (this._len < 1) return 0;
-
-        // the first byte get special treatment since it holds the sign
-        b = this._in.next();
-        this._len--; // we count the bytes as we read them
-        if ((b & 0x80) !== 0) {
-            b = (b & 0x7f);
-            is_neg = true;
-        }
-        v = (b & 0xff);
-
-        // shift in all but the last byte (we've already read the first)
-        while (this._len > 0) {
-            b = this._in.next();
-            this._len--;
-            v = v << 8;
-            v = v | (b & 0xff);
-        }
-
-        // if we run off the end the bytes will all by EOF, so we can just check once
-        if (b === EOF) return undefined;
-
-        // now we put the sign on, if it's needed
-        if (is_neg) v = - v;
-
-        return v;
     }
 
     private read_signed_longint() : LongInt {
@@ -323,8 +290,8 @@ export class ParserBinaryRaw {
         var pos, digits, exp, d;
 
         // so it's a normal value
-        pos = this._in.position();
-        exp = this.read_var_signed_longint();
+        pos = this._in.position();//what is this...
+        exp = this.read_var_signed_int();
         digits = this.read_signed_longint();
         d = new Decimal(digits, exp);
 
@@ -332,48 +299,28 @@ export class ParserBinaryRaw {
     }
 
     private read_timestamp_value() : Timestamp {
-        var v, pos, end,
-            precision, offset,
-            year, month, day,
-            hour, minutes, seconds;
-
+        let offset = null;
+        let timeArray = [null, null, null, null, null, null];
+        let precision = 0;
         if (this._len < 1) {
             precision = Precision.NULL
         } else {
-            pos = this._in.position();
-            end = pos + this._len;
+            let end = this._in.position() + this._len;
             offset = this.read_var_signed_int();
-
-            for (;;) {
-                year = this.read_var_unsigned_int();
-                precision = Precision.YEAR;
-                if (this._in.position() >= end) break;
-
-                month = this.read_var_unsigned_int();
-                precision = Precision.MONTH;
-                if (this._in.position() >= end) break;
-
-                day = this.read_var_unsigned_int();
-                precision = Precision.DAY;
-                if (this._in.position() >= end) break;
-
-                hour = this.read_var_unsigned_int();
-                precision = Precision.HOUR_AND_MINUTE;
-                if (this._in.position() >= end) break;
-
-                minutes = this.read_var_unsigned_int();
-                if (this._in.position() >= end) break;
-
-                seconds = this.read_var_unsigned_int();
-                precision = Precision.SECONDS;
-                if (this._in.position() >= end) break;
-
-                seconds += this.read_decimal_value();
-                break;
+            while(this._in.position() < end) {
+                if(precision  === Precision.SECONDS) {
+                    let second = this.read_var_unsigned_int();
+                    let exp = this.read_var_signed_int();
+                    let coef = this.read_signed_longint();
+                    let decimal = new Decimal(coef, exp);
+                    //timeArray[precision] = decimal.add();
+                } else {
+                    timeArray[precision] = this.read_var_unsigned_int();
+                    precision++;
+                }
             }
         }
-        v = new Timestamp(precision, offset, year, month, day, hour, minutes, seconds);
-        return v;
+        return new Timestamp(precision, offset, timeArray[0], timeArray[1], timeArray[2], timeArray[3], timeArray[4], timeArray[5]);
     }
 
     private read_string_value() : string {

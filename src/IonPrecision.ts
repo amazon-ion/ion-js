@@ -15,7 +15,6 @@
  * Enum for Ion Timestamp precision
  */
 export enum Precision {
-  EMPTY = -1,
   NULL = 0,
   YEAR = 1,
   MONTH = 2,

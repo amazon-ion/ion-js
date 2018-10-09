@@ -41,6 +41,7 @@
 import { is_digit } from "./IonText";
 import { LongInt } from "./IonLongInt";
 
+
 export class Decimal {
   public static readonly NULL: Decimal = new Decimal(undefined, undefined);
   public static readonly ZERO: Decimal = new Decimal(LongInt.ZERO, 0);

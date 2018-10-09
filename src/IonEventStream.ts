@@ -163,7 +163,7 @@ export class IonEventStream {
 
     private generateStream() : void {
         let tid : IonType = this.reader.next();
-        if(tid === IonTypes.SYMBOL && this.reader.stringValue() === "ion_event_stream"){
+        if(tid === IonTypes.SYMBOL && this.reader.stringValue() === "ion_event_stream") {
             this.marshalStream();
             return;
         }
