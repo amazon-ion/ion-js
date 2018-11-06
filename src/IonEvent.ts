@@ -136,7 +136,7 @@ abstract class AbstractIonEvent implements IonEvent {
     }
 
     writeTextValue(writer : Writer) : void {
-        let tempTextWriter = new TextWriter(new Writeable());
+        let tempTextWriter = new TextWriter(new Writeable(), 0);
         this.writeIonValue(tempTextWriter);
         const numBuffer = tempTextWriter.getBytes();
         let stringValue : string = "";
