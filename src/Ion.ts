@@ -108,8 +108,8 @@ function isSourceType(val) : boolean {
  *
  * @returns {TextWriter}
  */
-export function makeTextWriter() : Writer {
-  return new TextWriter(new Writeable());
+export function makeTextWriter(indentSize?: number) : Writer {
+  return new TextWriter(new Writeable(), indentSize || 0);
 }
 
 

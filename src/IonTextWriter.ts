@@ -51,11 +51,12 @@ export class Context {
 
 export class TextWriter implements Writer {
     private containerContext : Context[] = [];
+    private indentCount : number = 0;
     getBytes(): number[] {
         return this.writeable.getBytes();
     }
 
-    constructor(private readonly writeable: Writeable) {
+    constructor(private readonly writeable: Writeable, private readonly indentSize: number) {
         this.containerContext.push(new Context(undefined));
     }
 
@@ -129,8 +130,10 @@ export class TextWriter implements Writer {
 
         if (!this.currentContainer.clean) {
             this.writeable.writeByte(CharCodes.COMMA);
+            this.writePrettyNewLineIfNeeded(0);
         }
 
+        this.writePrettyIndentIfNeeded(0);
         this.writeSymbolToken(fieldName);
         this.writeable.writeByte(CharCodes.COLON);
 
@@ -186,8 +189,17 @@ export class TextWriter implements Writer {
         this.writeContainer(TypeCodes.LIST, CharCodes.LEFT_BRACKET, annotations, isNull);
     }
 
+    writeTypelessNull(annotations?: string[]) {
+        this.handleSeparator();
+        this.writePrettyValueIfNeeded();
+        this.writeAnnotations(annotations);
+        this.writeUtf8("null");
+        if (this.currentContainer.containerType === TypeCodes.STRUCT) this.currentContainer.state = State.STRUCT_FIELD;
+    }
+
     writeNull(type_: TypeCodes, annotations?: string[]) : void {
         this.handleSeparator();
+        this.writePrettyValueIfNeeded();
         this.writeAnnotations(annotations);
         let s: string;
         switch (type_) {
@@ -257,7 +269,7 @@ export class TextWriter implements Writer {
 
     writeSymbol(value: string, annotations?: string[]) : void {
         this.writeValue(TypeCodes.SYMBOL, value, annotations, (value: string) => {
-            this.writeSymbolToken(value);
+            this.writeSymbolValue(value);
         });
     }
 
@@ -275,6 +287,10 @@ export class TextWriter implements Writer {
             throw new Error("Expecting a struct value");
         }
 
+        if (!currentContainer.clean) {
+            this.writePrettyNewLineIfNeeded(0);
+        }
+        this.writePrettyIndentIfNeeded(-1);
         switch (currentContainer.containerType) {
             case TypeCodes.LIST:
                 this.writeable.writeByte(CharCodes.RIGHT_BRACKET);
@@ -304,6 +320,7 @@ export class TextWriter implements Writer {
         }
 
         this.handleSeparator();
+        this.writePrettyValueIfNeeded();
         this.writeAnnotations(annotations);
         serialize(value);
 
@@ -319,8 +336,10 @@ export class TextWriter implements Writer {
             this.currentContainer.state = State.STRUCT_FIELD;
         }
         this.handleSeparator();
+        this.writePrettyValueIfNeeded();
         this.writeAnnotations(annotations);
         this.writeable.writeByte(openingCharacter);
+        this.writePrettyNewLineIfNeeded(1);
         this.stepIn(typeCode);
     }
 
@@ -338,9 +357,11 @@ export class TextWriter implements Writer {
                 switch (this.currentContainer.containerType) {
                     case TypeCodes.LIST:
                         this.writeable.writeByte(CharCodes.COMMA);
+                        this.writePrettyNewLineIfNeeded(0);
                         break;
                     case TypeCodes.SEXP:
                         this.writeable.writeByte(CharCodes.SPACE);
+                        this.writePrettyNewLineIfNeeded(0);
                         break;
                     default:
                         //no op
@@ -381,6 +402,17 @@ export class TextWriter implements Writer {
     }
 
     private writeSymbolToken(s: string) : void {
+        if (s === 'null' || s === 'true' || s === 'false') {
+            this.writeable.writeByte(CharCodes.SINGLE_QUOTE);
+            this.writeUtf8(s);
+            this.writeable.writeByte(CharCodes.SINGLE_QUOTE);
+        }
+        else {
+            this.writeSymbolValue(s);
+        }
+    }
+
+    private writeSymbolValue(s: string) : void {
         if (isIdentifier(s)) {
             if(s.length > 1 && s.charAt(0) === '$'.charAt(0)){
                 let tempStr = s.substr(1, s.length);
@@ -400,6 +432,26 @@ export class TextWriter implements Writer {
             this.writeable.writeByte(CharCodes.SINGLE_QUOTE);
             this.writeable.writeStream(escape(s, SymbolEscapes));
             this.writeable.writeByte(CharCodes.SINGLE_QUOTE);
+        }
+    }
+
+    private writePrettyValueIfNeeded() : void {
+        if(!this.isTopLevel && this.currentContainer.containerType && this.currentContainer.containerType !== TypeCodes.STRUCT){
+            this.writePrettyIndentIfNeeded(0);
+        }
+    }
+    private writePrettyNewLineIfNeeded(incrementValue: number) : void {
+        this.indentCount = this.indentCount + incrementValue;
+        if(this.indentSize && this.indentSize > 0){
+            this.writeable.writeByte(CharCodes.LINE_FEED);
+        }
+    }
+    private writePrettyIndentIfNeeded(incrementValue: number) : void {
+        this.indentCount = this.indentCount + incrementValue;
+        if(this.indentSize && this.indentSize > 0){
+            for(var i = 0; i < (this.indentCount*this.indentSize); i++ ){
+                this.writeable.writeByte(CharCodes.SPACE);
+            }
         }
     }
 }
