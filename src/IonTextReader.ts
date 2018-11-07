@@ -176,9 +176,19 @@ next() {
     return this._depth;
   }
 
-  fieldName() : string {
-    return this._parser.fieldName();
-  }
+    fieldName() : string {
+        let str = this._parser.fieldName();
+        let raw_type = this._parser.fieldNameType();
+        if(raw_type === T_IDENTIFIER && (str.length > 1 && str.charAt(0) === '$'.charAt(0))) {
+            let tempStr = str.substr(1, this._raw.length);
+            if (+tempStr === +tempStr) {//look up sid, +str === +str is a one line is integer hack
+                let symbol = this._symtab.getSymbol(Number(tempStr));
+                if(symbol === undefined) throw new Error("Unresolveable symbol ID, symboltokens unsupported.");
+                return symbol;
+            }
+        }
+        return str;
+    }
 
   annotations() : string[] {
     return this._parser.annotations();
@@ -204,6 +214,7 @@ next() {
                         if (+tempStr === +tempStr) {//look up sid, +str === +str is a one line is integer hack
                             let symbol = this._symtab.getSymbol(Number(tempStr));
                             if(symbol === undefined) throw new Error("Unresolveable symbol ID, symboltokens unsupported.");
+                            return symbol;
                         }
                     }
                     return this._raw;
