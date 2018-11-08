@@ -180,7 +180,7 @@ next() {
         let str = this._parser.fieldName();
         let raw_type = this._parser.fieldNameType();
         if(raw_type === T_IDENTIFIER && (str.length > 1 && str.charAt(0) === '$'.charAt(0))) {
-            let tempStr = str.substr(1, this._raw.length);
+            let tempStr = str.substr(1, str.length);
             if (+tempStr === +tempStr) {//look up sid, +str === +str is a one line is integer hack
                 let symbol = this._symtab.getSymbol(Number(tempStr));
                 if(symbol === undefined) throw new Error("Unresolveable symbol ID, symboltokens unsupported.");
