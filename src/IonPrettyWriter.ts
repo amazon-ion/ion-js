@@ -11,7 +11,7 @@ type Serializer<T> = (value: T) => void;
  */
 export class PrettyWriter extends TextWriter {
     private indentCount : number = 0;
-    constructor(writeable: Writeable, private readonly indentSize : number = 0) { super(writeable);}
+    constructor(writeable: Writeable, private readonly indentSize : number = 2) { super(writeable);}
 
     private writePrettyValue() : void {
         if(!this.isTopLevel && this.currentContainer.containerType && this.currentContainer.containerType !== TypeCodes.STRUCT){
