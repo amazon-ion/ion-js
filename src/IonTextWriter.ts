@@ -50,13 +50,12 @@ export class Context {
 }
 
 export class TextWriter implements Writer {
-    private containerContext : Context[] = [];
-    private indentCount : number = 0;
+    protected containerContext : Context[] = [];
     getBytes(): number[] {
         return this.writeable.getBytes();
     }
 
-    constructor(private readonly writeable: Writeable, private readonly indentSize = 0) {
+    constructor(protected readonly writeable: Writeable) {
         this.containerContext.push(new Context(undefined));
     }
 
@@ -130,10 +129,8 @@ export class TextWriter implements Writer {
 
         if (!this.currentContainer.clean) {
             this.writeable.writeByte(CharCodes.COMMA);
-            this.writePrettyNewLineIfNeeded(0);
         }
 
-        this.writePrettyIndentIfNeeded(0);
         this.writeSymbolToken(fieldName);
         this.writeable.writeByte(CharCodes.COLON);
 
@@ -191,7 +188,6 @@ export class TextWriter implements Writer {
 
     writeNull(type_: TypeCodes, annotations?: string[]) : void {
         this.handleSeparator();
-        this.writePrettyValueIfNeeded();
         this.writeAnnotations(annotations);
         let s: string;
         switch (type_) {
@@ -278,11 +274,6 @@ export class TextWriter implements Writer {
         } else if (currentContainer.containerType === TypeCodes.STRUCT && currentContainer.state === State.VALUE) {
             throw new Error("Expecting a struct value");
         }
-
-        if (!currentContainer.clean) {
-            this.writePrettyNewLineIfNeeded(0);
-        }
-        this.writePrettyIndentIfNeeded(-1);
         switch (currentContainer.containerType) {
             case TypeCodes.LIST:
                 this.writeable.writeByte(CharCodes.RIGHT_BRACKET);
@@ -304,22 +295,19 @@ export class TextWriter implements Writer {
         }
     }
 
-    private writeValue<T>(typeCode: TypeCodes, value: T, annotations: string[], serialize: Serializer<T>) {
+    protected writeValue<T>(typeCode: TypeCodes, value: T, annotations: string[], serialize: Serializer<T>) {
         if (this.currentContainer.state === State.STRUCT_FIELD) throw new Error("Expecting a struct field");
         if (isNullOrUndefined(value)) {
             this.writeNull(typeCode, annotations);
             return;
         }
-
         this.handleSeparator();
-        this.writePrettyValueIfNeeded();
         this.writeAnnotations(annotations);
         serialize(value);
-
         if (this.currentContainer.containerType === TypeCodes.STRUCT) this.currentContainer.state = State.STRUCT_FIELD;
     }
 
-    private writeContainer(typeCode: TypeCodes, openingCharacter: number, annotations?: string[], isNull?: boolean) : void {
+    protected writeContainer(typeCode: TypeCodes, openingCharacter: number, annotations?: string[], isNull?: boolean) : void {
         if (isNull) {
             this.writeNull(typeCode, annotations);
             return;
@@ -328,14 +316,12 @@ export class TextWriter implements Writer {
             this.currentContainer.state = State.STRUCT_FIELD;
         }
         this.handleSeparator();
-        this.writePrettyValueIfNeeded();
         this.writeAnnotations(annotations);
         this.writeable.writeByte(openingCharacter);
-        this.writePrettyNewLineIfNeeded(1);
         this.stepIn(typeCode);
     }
 
-    private handleSeparator() : void {
+    protected handleSeparator() : void {
         if (this.isTopLevel) {
             if (this.currentContainer.clean) {
                 this.currentContainer.clean = false;
@@ -349,11 +335,9 @@ export class TextWriter implements Writer {
                 switch (this.currentContainer.containerType) {
                     case TypeCodes.LIST:
                         this.writeable.writeByte(CharCodes.COMMA);
-                        this.writePrettyNewLineIfNeeded(0);
                         break;
                     case TypeCodes.SEXP:
                         this.writeable.writeByte(CharCodes.SPACE);
-                        this.writePrettyNewLineIfNeeded(0);
                         break;
                     default:
                         //no op
@@ -362,11 +346,11 @@ export class TextWriter implements Writer {
         }
     }
 
-    private writeUtf8(s: string) : void {
+    protected writeUtf8(s: string) : void {
         this.writeable.writeBytes(encodeUtf8(s));
     }
 
-    private writeAnnotations(annotations: string[]) : void {
+    protected writeAnnotations(annotations: string[]) : void {
         if (isNullOrUndefined(annotations)) {
             return;
         }
@@ -381,7 +365,7 @@ export class TextWriter implements Writer {
         return this.depth() === 0;
     }
 
-    private get currentContainer() : Context {
+    protected get currentContainer() : Context {
         return this.containerContext[this.depth()];
     }
 
@@ -389,11 +373,11 @@ export class TextWriter implements Writer {
         return this.containerContext.length - 1;
     }
 
-    private stepIn(container: TypeCodes) : void {
+    protected stepIn(container: TypeCodes) : void {
         this.containerContext.push(new Context(container));
     }
 
-    private writeSymbolToken(s: string) : void {
+    protected writeSymbolToken(s: string) : void {
         if (isIdentifier(s)) {
             if(s.length > 1 && s.charAt(0) === '$'.charAt(0)){
                 let tempStr = s.substr(1, s.length);
@@ -413,26 +397,6 @@ export class TextWriter implements Writer {
             this.writeable.writeByte(CharCodes.SINGLE_QUOTE);
             this.writeable.writeStream(escape(s, SymbolEscapes));
             this.writeable.writeByte(CharCodes.SINGLE_QUOTE);
-        }
-    }
-
-    private writePrettyValueIfNeeded() : void {
-        if(!this.isTopLevel && this.currentContainer.containerType && this.currentContainer.containerType !== TypeCodes.STRUCT){
-            this.writePrettyIndentIfNeeded(0);
-        }
-    }
-    private writePrettyNewLineIfNeeded(incrementValue: number) : void {
-        this.indentCount = this.indentCount + incrementValue;
-        if(this.indentSize && this.indentSize > 0){
-            this.writeable.writeByte(CharCodes.LINE_FEED);
-        }
-    }
-    private writePrettyIndentIfNeeded(incrementValue: number) : void {
-        this.indentCount = this.indentCount + incrementValue;
-        if(this.indentSize && this.indentSize > 0){
-            for(var i = 0; i < (this.indentCount*this.indentSize); i++ ){
-                this.writeable.writeByte(CharCodes.SPACE);
-            }
         }
     }
 }
