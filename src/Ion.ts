@@ -20,7 +20,7 @@ import { TextReader } from "./IonTextReader";
 import { InvalidArgumentError } from "./IonErrors";
 import { Writer } from "./IonWriter";
 import { TextWriter } from "./IonTextWriter";
-import { PrettyWriter } from "./IonPrettyWriter";
+import { PrettyTextWriter } from "./IonPrettyTextWriter";
 import { Writeable } from "./IonWriteable";
 import { BinaryWriter } from "./IonBinaryWriter";
 import { LocalSymbolTable, defaultLocalSymbolTable } from "./IonLocalSymbolTable";
@@ -114,7 +114,7 @@ export function makeTextWriter() : Writer {
 }
 
 export function makePrettyWriter(indentSize?: number) : Writer {
-    return new PrettyWriter(new Writeable(), indentSize);
+    return new PrettyTextWriter(new Writeable(), indentSize);
 }
 
 

@@ -285,8 +285,7 @@ export class ParserTextRaw {
     var ch = this._peek();
     if (ch == EOF) {
       this._value_push( EOF );
-    }
-    else {
+    } else {
       // these get put in the ops list in reverse order
       this._ops.unshift( this._read_datagram_values );
       this._ops.unshift( this._read_value );

@@ -1,15 +1,28 @@
+/*
+ * Copyright 2012-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * A copy of the License is located at:
+ *
+ *     http://aws.amazon.com/apache2.0/
+ *
+ * or in the "license" file accompanying this file. This file is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific
+ * language governing permissions and limitations under the License.
+ */
 
-import {State, TextWriter} from "./IonTextWriter";
-import {Writeable} from "./IonWriteable";
-import {TypeCodes} from "./IonBinary";
-import {CharCodes} from "./IonText";
-import {isNullOrUndefined} from "./IonUtilities";
+import { State, TextWriter } from "./IonTextWriter";
+import { Writeable } from "./IonWriteable";
+import { TypeCodes } from "./IonBinary";
+import { CharCodes } from "./IonText";
+import { isNullOrUndefined } from "./IonUtilities";
 type Serializer<T> = (value: T) => void;
 /*
  * This class and functionality carry no guarantees of correctness or support.
  * Do not rely on this functionality for more than front end formatting.
  */
-export class PrettyWriter extends TextWriter {
+export class PrettyTextWriter extends TextWriter {
     private indentCount : number = 0;
     constructor(writeable: Writeable, private readonly indentSize : number = 2) { super(writeable);}
 
