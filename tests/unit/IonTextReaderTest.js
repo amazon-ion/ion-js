@@ -47,6 +47,25 @@
       assert.equal(ionReader.value(), false);
     };
 
+      suite['resolves symbol IDs'] = function() {
+          let ionToRead = `$ion_symbol_table::{ symbols:[ "rock", "paper", "scissors" ]}{ $5: $6, $10: $11, $12: 'taco' }`;
+          let ionReader = ion.makeReader(ionToRead);
+          ionReader.next();
+          ionReader.stepIn();
+          ionReader.next();
+          assert.equal(ionReader.fieldName(), 'version');
+          assert.equal(ionReader.value(), 'imports');
+          ionReader.next();
+          assert.equal(ionReader.fieldName(), "rock");
+          assert.equal(ionReader.value(), "paper");
+          ionReader.next();
+          assert.equal(ionReader.fieldName(), "scissors");
+          assert.equal(ionReader.value(), 'taco');
+          ionReader.next();
+          ionReader.stepOut();
+          //assert.equal(ionReader.value(), false);
+      };
+
     suite['Parse through struct'] = function() {
       var ionToRead = "{ key : \"string\" }";
       var ionReader = ion.makeReader(ionToRead);

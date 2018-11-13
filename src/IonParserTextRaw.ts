@@ -222,6 +222,7 @@ export class ParserTextRaw {
   private _msg: string;
   private _error_msg: string;
   private _fieldname: string;
+  private _fieldnameType: number;
 
   private readonly _read_value_helper_helpers: ReadValueHelpers;
 
@@ -237,6 +238,7 @@ export class ParserTextRaw {
     this._ann        = [];
     this._msg        = "";
     this._fieldname  = null;
+    this._fieldnameType = null;
 
     let helpers: ReadValueHelpers = {
     //  -1 : this._read_value_helper_EOF,    //      == EOF
@@ -271,6 +273,10 @@ export class ParserTextRaw {
     return this._fieldname;
   }
 
+  fieldNameType() : number {
+      return this._fieldnameType;
+  }
+
   annotations() : string[] {
     return this._ann;
   }
@@ -279,8 +285,7 @@ export class ParserTextRaw {
     var ch = this._peek();
     if (ch == EOF) {
       this._value_push( EOF );
-    }
-    else {
+    } else {
       // these get put in the ops list in reverse order
       this._ops.unshift( this._read_datagram_values );
       this._ops.unshift( this._read_value );
@@ -390,27 +395,25 @@ export class ParserTextRaw {
 
   clearFieldName() : void {
       this._fieldname = null;
+      this._fieldnameType = null;
   }
 
-  private _load_field_name() {
-    var v = this._value_pop(),
-        s = this.get_value_as_string(v);
-    switch (v) {
-    case T_IDENTIFIER:
-      if (is_keyword(s)) {
-        this._error( "can't use '"+s+"' as a fieldname without quotes");
-        break;
-      }
-    case T_STRING1:
-    case T_STRING2:
-    case T_STRING3:
-      this._fieldname = s;
-      break;
-    default:
-      this._error( "invalid fieldname" );
-      break;
+    private _load_field_name() {
+        this._fieldnameType = this._value_pop();
+        let s = this.get_value_as_string(this._fieldnameType);
+
+        switch (this._fieldnameType) {
+            case T_IDENTIFIER:
+            if (is_keyword(s)) throw new Error( "can't use '" + s + "' as a fieldname without quotes");
+            case T_STRING1:
+            case T_STRING2:
+            case T_STRING3:
+                this._fieldname = s;
+                break;
+            default:
+                throw new Error( "invalid fieldname" + s );
+        }
     }
-  }
 
   private _read_value() : void {
     this._read_value_helper(false, this._read_value);

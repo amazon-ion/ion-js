@@ -50,12 +50,12 @@ export class Context {
 }
 
 export class TextWriter implements Writer {
-    private containerContext : Context[] = [];
+    protected containerContext : Context[] = [];
     getBytes(): number[] {
         return this.writeable.getBytes();
     }
 
-    constructor(private readonly writeable: Writeable) {
+    constructor(protected readonly writeable: Writeable) {
         this.containerContext.push(new Context(undefined));
     }
 
@@ -274,7 +274,6 @@ export class TextWriter implements Writer {
         } else if (currentContainer.containerType === TypeCodes.STRUCT && currentContainer.state === State.VALUE) {
             throw new Error("Expecting a struct value");
         }
-
         switch (currentContainer.containerType) {
             case TypeCodes.LIST:
                 this.writeable.writeByte(CharCodes.RIGHT_BRACKET);
@@ -296,21 +295,19 @@ export class TextWriter implements Writer {
         }
     }
 
-    private writeValue<T>(typeCode: TypeCodes, value: T, annotations: string[], serialize: Serializer<T>) {
+    protected writeValue<T>(typeCode: TypeCodes, value: T, annotations: string[], serialize: Serializer<T>) {
         if (this.currentContainer.state === State.STRUCT_FIELD) throw new Error("Expecting a struct field");
         if (isNullOrUndefined(value)) {
             this.writeNull(typeCode, annotations);
             return;
         }
-
         this.handleSeparator();
         this.writeAnnotations(annotations);
         serialize(value);
-
         if (this.currentContainer.containerType === TypeCodes.STRUCT) this.currentContainer.state = State.STRUCT_FIELD;
     }
 
-    private writeContainer(typeCode: TypeCodes, openingCharacter: number, annotations?: string[], isNull?: boolean) : void {
+    protected writeContainer(typeCode: TypeCodes, openingCharacter: number, annotations?: string[], isNull?: boolean) : void {
         if (isNull) {
             this.writeNull(typeCode, annotations);
             return;
@@ -324,7 +321,7 @@ export class TextWriter implements Writer {
         this.stepIn(typeCode);
     }
 
-    private handleSeparator() : void {
+    protected handleSeparator() : void {
         if (this.isTopLevel) {
             if (this.currentContainer.clean) {
                 this.currentContainer.clean = false;
@@ -349,11 +346,11 @@ export class TextWriter implements Writer {
         }
     }
 
-    private writeUtf8(s: string) : void {
+    protected writeUtf8(s: string) : void {
         this.writeable.writeBytes(encodeUtf8(s));
     }
 
-    private writeAnnotations(annotations: string[]) : void {
+    protected writeAnnotations(annotations: string[]) : void {
         if (isNullOrUndefined(annotations)) {
             return;
         }
@@ -368,7 +365,7 @@ export class TextWriter implements Writer {
         return this.depth() === 0;
     }
 
-    private get currentContainer() : Context {
+    protected get currentContainer() : Context {
         return this.containerContext[this.depth()];
     }
 
@@ -376,11 +373,11 @@ export class TextWriter implements Writer {
         return this.containerContext.length - 1;
     }
 
-    private stepIn(container: TypeCodes) : void {
+    protected stepIn(container: TypeCodes) : void {
         this.containerContext.push(new Context(container));
     }
 
-    private writeSymbolToken(s: string) : void {
+    protected writeSymbolToken(s: string) : void {
         if (isIdentifier(s)) {
             if(s.length > 1 && s.charAt(0) === '$'.charAt(0)){
                 let tempStr = s.substr(1, s.length);

@@ -13,32 +13,50 @@
  */
  define(
   function(require) {
-    const registerSuite = require('intern!object');
-    const assert = require('intern/chai!assert');
-    const ion = require('dist/amd/es6/Ion');
-    const ionTextWriter = require('dist/amd/es6/IonTextWriter');
-    const ionUnicode = require('dist/amd/es6/IonUnicode');
-    const ionTest = require('dist/amd/es6/IonTests')
+      const registerSuite = require('intern!object');
+      const assert = require('intern/chai!assert');
+      const ion = require('dist/amd/es6/Ion');
+      const ionTextWriter = require('dist/amd/es6/IonTextWriter');
+      const ionUnicode = require('dist/amd/es6/IonUnicode');
+      const ionTest = require('dist/amd/es6/IonTests')
 
     var suite = {
       name: 'Text Writer'
     };
 
-    var writerTest = function(name, instructions, expected) {
-      suite[name] = function() {
-        var writeable = new ionTest.Writeable();
-        var writer = new ionTextWriter.TextWriter(writeable);
-        instructions(writer);
-        while(!writer.isTopLevel){
-            writer.endContainer();
-        }
-        writer.close();
-        var actual = writeable.getBytes();
-        var errorMessage = String.fromCharCode.apply(null, actual) + " != " + expected;
-        var encodedExpected = ionUnicode.encodeUtf8(expected);
-        assert.deepEqual(actual, encodedExpected, errorMessage);
+      var writerTest = function(name, instructions, expected) {
+          suite[name] = function() {
+              var writeable = new ionTest.Writeable();
+              var writer = new ionTextWriter.TextWriter(writeable);
+              instructions(writer);
+              while(!writer.isTopLevel){
+                  writer.endContainer();
+              }
+              writer.close();
+              var actual = writeable.getBytes();
+              var errorMessage = String.fromCharCode.apply(null, actual) + " != " + expected;
+              var encodedExpected = ionUnicode.encodeUtf8(expected);
+              assert.deepEqual(actual, encodedExpected, errorMessage);
+          }
       }
-    }
+
+      var prettyTest = function(name, instructions, expected) {
+          suite[name] = function() {
+              let writer = new ion.makePrettyWriter(2);
+              instructions(writer);
+              while(!writer.isTopLevel){
+                  writer.endContainer();
+              }
+              writer.close();
+              let buf = writer.getBytes();
+              let str = '';
+              for(let i = 0; i < buf.length; i++){
+                  str += String.fromCharCode(buf[i]);
+              }
+              let msg = str + " != " + expected;
+              assert.deepEqual(str, expected, msg);
+          }
+      }
 
     var badWriterTest = function(name, instructions) {
       var test = function() {
@@ -177,28 +195,37 @@
 
     // Lists
 
-    writerTest('Writes empty list',
-      writer => writer.writeList(),
-      '[]');
-    writerTest('Writes empty list with annotations',
-      writer => writer.writeList(['foo', 'bar']),
-      'foo::bar::[]');
-    writerTest('Writes nested empty lists',
-      writer => { writer.writeList(); writer.writeList(); writer.writeList() },
-      '[[[]]]');
-    writerTest('Writes list with multiple values',
-      writer => { writer.writeList(); writer.writeSymbol('$'); writer.writeSymbol('%') },
-      "[$,'%']");
-    writerTest('Writes nested lists with multiple values',
-      writer => {
-        writer.writeList();
-        writer.writeSymbol('foo');
-        writer.writeSymbol('bar');
-        writer.writeList();
-        writer.writeSymbol('baz');
-        writer.writeSymbol('qux');
-      },
-      '[foo,bar,[baz,qux]]');
+      writerTest('Writes empty list',
+          writer => writer.writeList(),
+          '[]');
+      writerTest('Writes empty list with annotations',
+          writer => writer.writeList(['foo', 'bar']),
+          'foo::bar::[]');
+      writerTest('Writes nested empty lists',
+          writer => { writer.writeList(); writer.writeList(); writer.writeList() },
+          '[[[]]]');
+      writerTest('Writes list with multiple values',
+          writer => { writer.writeList(); writer.writeSymbol('$'); writer.writeSymbol('%') },
+          "[$,'%']");
+      writerTest('Writes nested lists with multiple values',
+          writer => {
+              writer.writeList();
+              writer.writeSymbol('foo');
+              writer.writeSymbol('bar');
+              writer.writeList();
+              writer.writeSymbol('baz');
+              writer.writeSymbol('qux');
+          },
+          '[foo,bar,[baz,qux]]');
+
+      // Nulls
+
+      writerTest('Writes null',
+          writer => writer.writeNull(ion.TypeCodes.NULL),
+          'null.null');
+      writerTest('Writes null with annotations',
+          writer => writer.writeNull(ion.TypeCodes.NULL, ['foo', 'bar']),
+          'foo::bar::null.null');
 
     // Nulls
 
@@ -211,31 +238,31 @@
 
     // S-Expressions
 
-    writerTest('Writes empty sexp',
-      writer => writer.writeSexp(),
-      '()');
-    writerTest('Writes null sexp',
-      writer => writer.writeNull(ion.TypeCodes.SEXP),
-      'null.sexp');
-    writerTest('Writes empty sexp with annotations',
-      writer => writer.writeSexp(['foo', 'bar']),
-      'foo::bar::()');
-    writerTest('Writes sexp with adjacent operators',
-      writer => {
-        writer.writeSexp();
-        writer.writeSymbol('+');
-        writer.writeSymbol('-');
-        writer.writeSymbol('/');
-      },
-      '(+ - /)');
-    writerTest('Writes sexp with expression',
-      writer => {
-        writer.writeSexp();
-        writer.writeSymbol('x');
-        writer.writeSymbol('+');
-        writer.writeSymbol('y');
-      },
-      '(x + y)');
+      writerTest('Writes empty sexp',
+          writer => writer.writeSexp(),
+          '()');
+      writerTest('Writes null sexp',
+          writer => writer.writeNull(ion.TypeCodes.SEXP),
+          'null.sexp');
+      writerTest('Writes empty sexp with annotations',
+          writer => writer.writeSexp(['foo', 'bar']),
+          'foo::bar::()');
+      writerTest('Writes sexp with adjacent operators',
+          writer => {
+              writer.writeSexp();
+              writer.writeSymbol('+');
+              writer.writeSymbol('-');
+              writer.writeSymbol('/');
+          },
+          '(+ - /)');
+      writerTest('Writes sexp with expression',
+          writer => {
+              writer.writeSexp();
+              writer.writeSymbol('x');
+              writer.writeSymbol('+');
+              writer.writeSymbol('y');
+          },
+          '(x + y)');
 
     // Strings
 
@@ -251,36 +278,36 @@
 
     // Structs
 
-    writerTest('Writes empty struct',
-      writer => writer.writeStruct(),
-      '{}');
-    writerTest('Writes nested structs',
-      writer => {
-        writer.writeStruct();
-        writer.writeFieldName('foo');
-        writer.writeStruct();
-        writer.endContainer();
-        writer.writeFieldName('bar');
-        writer.writeStruct();
-      },
-      '{foo:{},bar:{}}');
-    writerTest('Writes struct with non-identifier field name and annotation',
-      writer => {
-        writer.writeStruct(['1foo']);
-        writer.writeFieldName('123');
-        writer.writeStruct(['2bar']);
-     },
-     "'1foo'::{'123':'2bar'::{}}");
-    badWriterTest('Cannot write field name at top level',
-      writer => writer.writeFieldName('foo'));
-    badWriterTest('Cannot write field name inside non-struct',
-      writer => { writer.writeList(); writer.writeFieldName('foo') });
-    badWriterTest('Cannot write two adjacent field names',
-      writer => { writer.writeStruct(); writer.writeFieldName('foo'); writer.writeFieldName('foo') });
-    badWriterTest('Cannot write value without field name',
-      writer => { writer.writeStruct(); writer.writeSymbol('foo') });
-    badWriterTest('Cannot end struct with missing field value',
-      writer => { writer.writeStruct(); writer.writeFieldName('foo'); writer.endContainer() });
+      writerTest('Writes empty struct',
+          writer => writer.writeStruct(),
+          '{}');
+      writerTest('Writes nested structs',
+          writer => {
+              writer.writeStruct();
+              writer.writeFieldName('foo');
+              writer.writeStruct();
+              writer.endContainer();
+              writer.writeFieldName('bar');
+              writer.writeStruct();
+          },
+          '{foo:{},bar:{}}');
+      writerTest('Writes struct with non-identifier field name and annotation',
+          writer => {
+              writer.writeStruct(['1foo']);
+              writer.writeFieldName('123');
+              writer.writeStruct(['2bar']);
+          },
+          "'1foo'::{'123':'2bar'::{}}");
+      badWriterTest('Cannot write field name at top level',
+          writer => writer.writeFieldName('foo'));
+      badWriterTest('Cannot write field name inside non-struct',
+          writer => { writer.writeList(); writer.writeFieldName('foo') });
+      badWriterTest('Cannot write two adjacent field names',
+          writer => { writer.writeStruct(); writer.writeFieldName('foo'); writer.writeFieldName('foo') });
+      badWriterTest('Cannot write value without field name',
+          writer => { writer.writeStruct(); writer.writeSymbol('foo') });
+      badWriterTest('Cannot end struct with missing field value',
+          writer => { writer.writeStruct(); writer.writeFieldName('foo'); writer.endContainer() });
 
     // Symbols
 
@@ -318,18 +345,86 @@
 
     // Datagrams
 
-    writerTest('Writes two top-level symbols',
-      writer => { writer.writeSymbol('a'); writer.writeSymbol('b') },
-      'a\nb');
-    writerTest('Writes two top-level lists',
-      writer => { writer.writeList(); writer.endContainer(); writer.writeList() },
-      '[]\n[]');
-    writerTest('Writes two top-level lists with annotations',
-      writer => { writer.writeList(['foo']); writer.endContainer(); writer.writeList(['bar']) },
-      'foo::[]\nbar::[]');
-    writerTest('Writes two top-level structs',
-      writer => { writer.writeStruct(); writer.endContainer(); writer.writeStruct() },
-      '{}\n{}');
+      writerTest('Writes two top-level symbols',
+          writer => { writer.writeSymbol('a'); writer.writeSymbol('b') },
+          'a\nb');
+      writerTest('Writes two top-level lists',
+          writer => { writer.writeList(); writer.endContainer(); writer.writeList() },
+          '[]\n[]');
+      writerTest('Writes two top-level lists with annotations',
+          writer => { writer.writeList(['foo']); writer.endContainer(); writer.writeList(['bar']) },
+          'foo::[]\nbar::[]');
+      writerTest('Writes two top-level structs',
+          writer => { writer.writeStruct(); writer.endContainer(); writer.writeStruct() },
+          '{}\n{}');
+
+    // PrettyPrint
+    prettyTest('Writes composite pretty ion',
+      writer => {
+        writer.writeStruct(['a1']);
+        writer.writeFieldName('int');
+        writer.writeInt(123, ['a3']);
+        writer.writeFieldName('string');
+        writer.writeString('string', ['a4']);
+        writer.writeFieldName('symbol');
+        writer.writeSymbol('symbol', ['a5']);
+        writer.writeFieldName('symbol');
+        writer.writeNull(ion.TypeCodes.SYMBOL);
+        writer.writeFieldName('timestamp');
+        writer.writeTimestamp(ion.Timestamp.parse('2017-04-03T00:00:00.000Z'), ['a8']);
+        writer.writeFieldName('decimal');
+        writer.writeDecimal(ion.Decimal.parse('1.2'), ['a9']);
+        writer.writeFieldName('struct');
+        writer.writeStruct(['a10']);
+        writer.writeFieldName('symbol');
+        writer.writeSymbol('symbol', ['a11']);
+        writer.endContainer();
+        writer.writeFieldName('list');
+        writer.writeList(['a12']);
+        writer.writeInt(123, ['a14']);
+        writer.writeString('string', ['a15']);
+        writer.writeSymbol('symbol', ['a16']);
+        writer.writeTimestamp(ion.Timestamp.parse('2017-04-03T00:00:00.000Z'), ['a19']);
+        writer.writeDecimal(ion.Decimal.parse('1.2'), ['a20']);
+        writer.writeStruct(['a21']);
+        writer.endContainer();
+        writer.writeList(['a22']);
+        writer.endContainer();
+        writer.endContainer();
+        writer.writeFieldName('sexp');
+        writer.writeSexp(['a23']);
+        writer.writeNull(ion.TypeCodes.SYMBOL, ['a24']);
+        writer.writeNull(ion.TypeCodes.STRING, ['a25']);
+        writer.writeNull(ion.TypeCodes.NULL, ['a26']);
+        writer.endContainer();
+      },
+        `a1::{
+  int:a3::123,
+  string:a4::"string",
+  symbol:a5::symbol,
+  symbol:null.symbol,
+  timestamp:a8::2017-04-03T00:00:00.000Z,
+  decimal:a9::1.2,
+  struct:a10::{
+    symbol:a11::symbol
+  },
+  list:a12::[
+    a14::123,
+    a15::"string",
+    a16::symbol,
+    a19::2017-04-03T00:00:00.000Z,
+    a20::1.2,
+    a21::{
+    },
+    a22::[
+    ]
+  ],
+  sexp:a23::(
+    a24::null.symbol 
+    a25::null.string 
+    a26::null.null
+  )
+}`);
 
     registerSuite(suite);
   }
