@@ -282,7 +282,7 @@ export class BinaryWriter implements Writer {
       let exponent: number = seconds.getExponent();
 
       if (exponent < 0) { // Fractional number of seconds {
-        let decimalString: string = seconds.getDigits().stringValue();
+        let decimalString: string = seconds.getDigits().toString();
         let numberOfCharacteristicDigits: number = decimalString.length + exponent;
 
         // Characteristic is the value to the left of the decimal

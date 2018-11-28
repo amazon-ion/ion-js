@@ -66,32 +66,31 @@ module.exports = function(grunt) {
     },
     ts: {
       'amd-es6-debug': {
-        src: ['src/**/*.ts'],
+        src: ['src/**/*.ts', 'src/BigInteger.js'],
         outDir: 'dist/amd/es6',
         options: {
           target: "es6",
           module: "amd",
-          declaration: true,
-          sourceMap: true  // generate .map files for debugging
+          allowJs: true
         }
       },
- 
+
       'amd-es6': {
-        src: ['src/**/*.ts'],
+        src: ['src/**/*.ts', 'src/BigInteger.js'],
         outDir: 'dist/amd/es6',
         options: {
           target: "es6",
           module: "amd",
-          declaration: true,
+          allowJs: true
         }
       },
       'commonjs-es6': {
-        src: ['src/**/*.ts'],
+        src: ['src/**/*.ts', 'src/BigInteger.js'],
         outDir: 'dist/commonjs/es6',
         options: {
           target: "es6",
           module: "commonjs",
-          declaration: true
+          allowJs: true
         }
       }
     },
@@ -124,14 +123,14 @@ module.exports = function(grunt) {
         sourceMap: true, 
         presets: ['es2015']
       },
-      dist: { 
-        files: [{ 
-          'expand': true, 
+      dist: {
+        files: [{
+          'expand': true,
           cwd: 'dist/amd/es6',
-          'src': ['*.js'], 
-          'dest': 'dist/amd/es5/', 
+          'src': ['*.js'],
+          'dest': 'dist/amd/es5/',
           'ext': '.js',
-        }], 
+        }],
       },
     },
     /**
@@ -205,7 +204,7 @@ module.exports = function(grunt) {
   grunt.registerTask('trans:browser', ['browserify:prod', 'uglify']); // browserify (assumes 'build' was run)
   grunt.registerTask('build:cjs', ['ts:commonjs-es6']);
   grunt.registerTask('build:amd', ['ts:amd-es6']);
-  grunt.registerTask('build:amd:debug', ['ts:amd-es6-debug']); 
+  grunt.registerTask('build:amd:debug', ['ts:amd-es6-debug']);
   grunt.registerTask('build', ['clean', 'build:amd', 'build:cjs','trans:browser', 'copy:all']);
 
 

@@ -91,7 +91,7 @@ export class Decimal {
         }
 
         let exponent: number = this._exponent;
-        let coefficient: string = this._value.digits();
+        let coefficient: string = this._value.toString();
         let significantDigits : number = coefficient.length;
         let result : string = '';
         //digits returns an integer coefficient with an exponent that shifts it back to its original state
@@ -158,7 +158,7 @@ export class Decimal {
     if (index === str.length) {
       let trimmedDigits: string = Decimal.stripTrailingZeroes(digits);
       exponent += digits.length - trimmedDigits.length;
-      return new Decimal(new LongInt(trimmedDigits, null, isNegative? -1: 1), exponent);
+      return new Decimal(new LongInt(trimmedDigits, isNegative? -1: 1), exponent);
     }
 
     let hasDecimal: boolean = false;
@@ -179,7 +179,7 @@ export class Decimal {
     }
 
     if (index === str.length) {
-      return new Decimal(new LongInt(digits, null, isNegative? -1 : 1), exponent);
+      return new Decimal(new LongInt(digits, isNegative? -1 : 1), exponent);
     }
 
     c = str.charCodeAt(index);
@@ -210,7 +210,7 @@ export class Decimal {
       throw new Error(`Invalid decimal ${str}`);
     }
 
-    let decimal: Decimal = new Decimal(new LongInt(digits, null, isNegative ? -1 : 1), exponent);
+    let decimal: Decimal = new Decimal(new LongInt(digits, isNegative ? -1 : 1), exponent);
     return decimal;
   }
 

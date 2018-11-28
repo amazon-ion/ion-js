@@ -205,6 +205,7 @@ next() {
                         if (+tempStr === +tempStr) {//look up sid, +str === +str is a one line is integer hack
                             let symbol = this._symtab.getSymbol(Number(tempStr));
                             if(symbol === undefined) throw new Error("Unresolveable symbol ID, symboltokens unsupported.");
+                            return symbol;
                         }
                     }
                     return this._raw;

@@ -227,23 +227,14 @@ export class ParserBinaryRaw {
     }
 
     private read_signed_longint() : LongInt {
-        let v = new Uint8Array(this._len), b, signum = 1;
-
-        // they have to tell us the length
-        if (this._len < 1) return LongInt.ZERO;
-
+        if (this._len < 1) return new LongInt(0);
+        let v = new Uint8Array(this._len);
+        let initial = this._in.next();
+        let signum = initial & 0x80 ? -1 : 1;
+        v[0] = initial & 0x7f;
         // shift in all but the last byte (we've already read the first)
-        for(let i = 0; i < this._len; i++){
+        for(let i = 1; i < this._len; i++){
             v[i] = this._in.next();
-        }
-
-        // if we run off the end the bytes will all by EOF, so we can just check once
-        if (b === EOF) undefined;
-
-        // check the sign
-        if (v[0] & 0x80) {
-            signum = -1;
-            v[0] = v[0] & 0x7f; // remove the sign bit, we don't need it any longer
         }
 
         return LongInt.fromBytes(v, signum);
