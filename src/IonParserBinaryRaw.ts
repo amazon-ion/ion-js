@@ -202,7 +202,7 @@ export class ParserBinaryRaw {
         return v;
     }
 
-    private readVarInt(signed : boolean){
+    private readVarInt(signed : boolean) {
         let buf = [];
         let sign = 1;
         let byte = 0;

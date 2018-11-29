@@ -30,35 +30,56 @@ export class LongInt {
     }
 
     public uIntBytes() : Uint8Array {
-        return null;
+        return new Uint8Array(this.int.toArray(256).value);
     }
 
     public intBytes() : Uint8Array {
-        return null;
+        let array =  this.int.toArray(256).value;
+        if(array[0] > 127) {
+            array[0] -= 0x80;
+            array.splice(0, 0, 1);
+        }
+        if(this.int.isNegative()) array[0] += 0x80;
+        return new Uint8Array(array);
     }
 
     public varIntBytes() : Uint8Array {
-        return null;
+        let array =  this.int.toArray(128).value;
+        if(array[0] > 0x20) {
+            array[0] -= 0x80;
+            array.splice(0, 0, 1);
+        }
+        if(this.int.isNegative()) array[0] += 0x40;
+        array[array.length - 1] += 0x80;
+        return new Uint8Array(array);
     }
 
     public varUIntBytes() : Uint8Array {
-        return null;
+        let buf = new Uint8Array(this.int.toArray(128).value);
+        buf[buf.length - 1] += 0x80;
+        return buf;
     }
 
-    public fromUIntBytes() : Uint8Array {
-      return null;
+    public fromUIntBytes(bytes : Uint8Array) : LongInt {
+        return new LongInt(bigInt.fromArray([].slice.call(bytes), 256, false);
     }
 
-    public fromIntBytes() : Uint8Array {
-        return null;
+    public fromIntBytes(bytes : Uint8Array) : LongInt {
+        let isNegative = (bytes[0] & 0x80) > 0;
+        bytes[0] &= 0x7F;
+        return new LongInt(bigInt.fromArray([].slice.call(bytes), 256, isNegative));
     }
 
-    public fromVarIntBytes() : Uint8Array {
-        return null;
+    public fromVarIntBytes(bytes : Uint8Array) : LongInt {
+        let isNegative = (bytes[0] & 0x40) > 0;
+        bytes[bytes.length - 1] &= 0x7F;
+        bytes[0] &= 0xBF;
+        return new LongInt(bigInt.fromArray([].slice.call(bytes), 128, isNegative));
     }
 
-    public fromVarUIntBytes() : Uint8Array {
-        return null;
+    public fromVarUIntBytes(bytes : Uint8Array) : LongInt {
+        bytes[bytes.length - 1] &= 0x7F;
+        return new LongInt(bigInt.fromArray([].slice.call(bytes), 128, false));
     }
 
     isZero() : boolean {
@@ -66,6 +87,11 @@ export class LongInt {
     }
 
     public add(num : number | LongInt) : LongInt {
+        if(num instanceof LongInt) return new LongInt(this.int.add(num.int));
+        return new LongInt(this.int.add(num));
+    }
+
+    public subtract(num : number | LongInt) : LongInt {
         if(num instanceof LongInt) return new LongInt(this.int.add(num.int));
         return new LongInt(this.int.add(num));
     }
