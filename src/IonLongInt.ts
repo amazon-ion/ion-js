@@ -60,26 +60,20 @@ export class LongInt {
         return buf;
     }
 
-    public fromUIntBytes(bytes : Uint8Array) : LongInt {
-        return new LongInt(bigInt.fromArray([].slice.call(bytes), 256, false);
+    public static fromUIntBytes(bytes : number[]) : LongInt {
+        return new LongInt(bigInt.fromArray(bytes, 256, false));
     }
 
-    public fromIntBytes(bytes : Uint8Array) : LongInt {
-        let isNegative = (bytes[0] & 0x80) > 0;
-        bytes[0] &= 0x7F;
-        return new LongInt(bigInt.fromArray([].slice.call(bytes), 256, isNegative));
+    public static fromIntBytes(bytes : number[], isNegative : boolean) : LongInt {
+        return new LongInt(bigInt.fromArray(bytes, 256, isNegative));
     }
 
-    public fromVarIntBytes(bytes : Uint8Array) : LongInt {
-        let isNegative = (bytes[0] & 0x40) > 0;
-        bytes[bytes.length - 1] &= 0x7F;
-        bytes[0] &= 0xBF;
-        return new LongInt(bigInt.fromArray([].slice.call(bytes), 128, isNegative));
+    public static fromVarIntBytes(bytes : number[], isNegative : boolean) : LongInt {
+        return new LongInt(bigInt.fromArray(bytes, 128, isNegative));
     }
 
-    public fromVarUIntBytes(bytes : Uint8Array) : LongInt {
-        bytes[bytes.length - 1] &= 0x7F;
-        return new LongInt(bigInt.fromArray([].slice.call(bytes), 128, false));
+    public static fromVarUIntBytes(bytes : number[]) : LongInt {
+        return new LongInt(bigInt.fromArray(bytes, 128, false));
     }
 
     isZero() : boolean {
