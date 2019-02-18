@@ -990,24 +990,18 @@ export class ParserTextRaw {
     var n, s = this.get_value_as_string(this._curr);
     switch (this._curr) {
       case T_INT:
-        n = parseInt(s, 10);
-        break;
+          return parseInt(s, 10);
       case T_HEXINT:
-        n = parseInt(s, 16);
-        break;
+          return parseInt(s, 16);
       case T_FLOAT:
-        n = parseFloat(s);
-        break;
+          return Number(s);
       case T_FLOAT_SPECIAL:
-        if (s == "+inf")      n = Number.POSITIVE_INFINITY;
-        else if (s == "-inf") n = Number.NEGATIVE_INFINITY;
-        else if (s == "nan")  n = Number.NaN;
-        else throw new Error("can't convert to number");
-        break;
+        if (s == "+inf")      return Number.POSITIVE_INFINITY;
+        else if (s == "-inf") return Number.NEGATIVE_INFINITY;
+        else if (s == "nan")  return Number.NaN;
       default:
         throw new Error("can't convert to number");
     }
-    return n;
 }
 
   booleanValue() : boolean {
