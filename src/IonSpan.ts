@@ -20,7 +20,7 @@ const SPAN_TYPE_SUB_FLAG = 2;
 const SPAN_TYPE_SUB_STRING = SPAN_TYPE_SUB_FLAG | SPAN_TYPE_STRING;
 const SPAN_TYPE_SUB_BINARY = SPAN_TYPE_SUB_FLAG | SPAN_TYPE_BINARY;
 
-const MAX_POS = 1024*1024*1024; // 1 gig 
+const MAX_POS = 1024*1024*1024; // 1 gig
 const LINE_FEED = 10;
 const CARRAIGE_RETURN = 13;
 const DEBUG_FLAG = true;
@@ -220,10 +220,6 @@ export class BinarySpan extends Span {
 
   next(): number {
     if (this.is_empty()) {
-      if (this._pos > MAX_POS) {
-        throw new Error("span position is out of bounds");
-      }
-      this._pos++;
       return EOF;
     }
     return this._src[this._pos++];
@@ -257,9 +253,7 @@ export class BinarySpan extends Span {
 
   skip(dist: number) : void {
     this._pos += dist;
-    if (this._pos > this._limit) {
-      this._pos = this._limit;
-    }
+    if (this._pos > this._limit) throw new Error("Skipped over end of source.");
   }
 
   valueAt(ii: number) : number {
@@ -267,7 +261,7 @@ export class BinarySpan extends Span {
     return (this._src[ii]);
   }
 
-  clone(start: number, len: number) : BinarySpan {
+  clone(start: number, len: number) : BinarySpan {//this doesn't make sense
     return new BinarySpan(this._src.subarray(this._pos));
   }
 }

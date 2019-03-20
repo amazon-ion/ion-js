@@ -257,7 +257,7 @@ export class Timestamp {
             if(seconds === undefined || seconds === null) throw new Error("Seconds and precision in illegal state.");
             if (typeof seconds === 'number') {
                 if(Math.floor(seconds) !== seconds) throw new Error("Fractional timestamp seconds must be supplied in Decimal format.");
-                this.seconds = new Decimal(LongInt.fromNumber(seconds), 0);
+                this.seconds = new Decimal(new LongInt(seconds), 0);
             } else if (typeof seconds === 'string') {
                 this.seconds = Decimal.parse(seconds);
             } else {
@@ -527,7 +527,7 @@ export class Timestamp {
                     break;
                 case States.FRACTIONAL_SECONDS:
                     const START_POSITION_OF_SECONDS = 17;
-                    seconds = Decimal.parse(str.substring(START_POSITION_OF_SECONDS, pos), false);
+                    seconds = Decimal.parse(str.substring(START_POSITION_OF_SECONDS, pos));
                     break;
                 case States.OFFSET:
                     break;

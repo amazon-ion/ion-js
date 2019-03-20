@@ -25,6 +25,8 @@ import { LocalSymbolTable, defaultLocalSymbolTable } from "./IonLocalSymbolTable
 import { IonEventStream } from "./IonEventStream";
 import { decodeUtf8 } from "./IonUnicode";
 
+
+
 const e = {
   name: "IonError",
   where: undefined,
@@ -109,4 +111,3 @@ export { toBase64 } from "./IonText";
 export { TypeCodes } from "./IonBinary";
 export { IonEventStream } from "./IonEventStream";
 export { decodeUtf8 } from "./IonUnicode";
-

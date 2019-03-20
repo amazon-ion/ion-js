@@ -80,6 +80,10 @@ export class LongInt {
         return this.int.isZero();
     }
 
+    negate() : void {
+        this.int.negate();
+    }
+
     public add(num : number | LongInt) : LongInt {
         if(num instanceof LongInt) return new LongInt(this.int.add(num.int));
         return new LongInt(this.int.add(num));

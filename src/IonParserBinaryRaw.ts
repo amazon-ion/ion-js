@@ -88,25 +88,16 @@ function get_ion_type(rt : number) : IonType {
 const TS_SHIFT =      5;
 const TS_MASK =    0x1f;
 
-function validate_ts(ts) {
-    if (DEBUG_FLAG) {
-        if (typeof ts !== 'number' || ts < 0 || ts > 0x30000000) throw new Error("Debug fail - encode_type_stack");// just a big size limit, 30 bits in keeping with the V8 optimization point for local ints
-    }
-}
-
 function encode_type_stack(type_, len) {
     var ts = (len << TS_SHIFT) | (type_ & TS_MASK);
-    validate_ts(ts);
     return ts;
 }
 
 function decode_type_stack_type(ts) {
-    validate_ts(ts);
     return ts & TS_MASK;
 }
 
 function decode_type_stack_len(ts) {
-    validate_ts(ts);
     return ts >>> TS_SHIFT;
 }
 
@@ -166,10 +157,13 @@ export class ParserBinaryRaw {
 
     private readVarUnsignedInt() : number {
         let tempInt, byte = this._in.next();
+        let bits = 0;
         for(tempInt = byte & 0x7F; (byte & 0x80) === 0; byte = this._in.next()) {
             if(byte === EOF) throw new Error("EOF found in variable length unsigned int.");
-            tempInt = (tempInt << 7) | (this._in.next() & 0x7F);
+            tempInt = (tempInt << 7) | (byte & 0x7F);
+            bits += 7;
         }
+        if(bits > 32) throw new Error("Values larger than 32 bits need to be marshalled using LongInt")
         return tempInt;
     }
 
@@ -187,12 +181,12 @@ export class ParserBinaryRaw {
             v |= byte;
             bits += 7;
         }
-        if(bits > 32) throw new Error("Values larger than 32 bits need to be marshalled using LongInt")
+        if(bits > 32) throw new Error("Values larger than 32 bits need to be marshalled using LongInt");
         // now we put the sign on, if it's needed
         return isNegative? -v : v;
     }
 
-    private readVarLongInt(signed : boolean) : LongInt {
+    private readVarLongInt() : LongInt {
         let bytes = [];
         let byte = this._in.next();
         let isNegative = (byte & 0x40) !== 0;
@@ -207,17 +201,15 @@ export class ParserBinaryRaw {
         return LongInt.fromVarIntBytes(bytes, isNegative);
     }
 
-    private readVarSignedLongint() : LongInt {
-        return this.readVarLongInt(true);
-    }
-
-    private readSignedLongInt() : LongInt {
+    private readLongInt() : LongInt {
         if (this._len - this._in.position() < 1) return new LongInt(0);
-
-        return LongInt.fromVarIntBytes(this._in.chunk(this. - this._in.position()));
+        let bytes : Uint8Array = this._in.view(this._in.position(), );
+        let sign = (bytes[0] & 0x10) != 0;
+        bytes[0] &= 0x7F;
+        return LongInt.fromIntBytes(Array.prototype.slice.call(bytes), sign);
     }
 
-    private read_unsigned_int() : number {
+    private readUnsignedInt() : number {
         var v = 0, b;
 
         // they have to tell us the length
@@ -237,21 +229,8 @@ export class ParserBinaryRaw {
         return v;
     }
 
-    private readUnsignedLongInt(signum: number) : LongInt {
-
-        // they have to tell us the length
-        if (this._len < 1) throw new Error("no length supplied");
-        let v = new Uint8Array(this._len);
-
-        // shift in all but the last byte (we've already read the first)
-        for(let i = 0; i < this._len; i++){
-            v[i] = this._in.next();
-        }
-
-        // if we run off the end the bytes will all by EOF, so we can just check once
-        if (v[this._len - 1] === EOF) return undefined;
-
-        return LongInt.fromBytes(v, signum);
+    private readUnsignedLongInt() : LongInt {
+        return LongInt.fromUIntBytes(Array.prototype.slice.call(this._in.view(this._len)));
     }
 
     private read_decimal_value() : Decimal {
@@ -260,7 +239,7 @@ export class ParserBinaryRaw {
         // so it's a normal value
         pos = this._in.position();//what is this...
         exp = this.readVarSignedInt();
-        digits = this.readSignedLongInt();
+        digits = this.readLongInt();
         d = new Decimal(digits, exp);
 
         return d;
@@ -279,7 +258,7 @@ export class ParserBinaryRaw {
                 if(precision  === Precision.SECONDS) {
                     let second = this.readVarUnsignedInt();
                     let exp = this.readVarSignedInt();
-                    let coef = this.readSignedLongInt();
+                    let coef = this.readLongInt();
                     let decimal = new Decimal(coef, exp);
                     //timeArray[precision] = decimal.add();
                 } else {
@@ -298,7 +277,7 @@ export class ParserBinaryRaw {
     private clear_value() : void {
         this._raw_type = EOF;
         this._curr     = undefined;
-        this._a        = empty_array;
+        this._a = empty_array;
         this._as       = -1;
         this._null     = false;
         this._fid      = -1;
@@ -344,7 +323,7 @@ export class ParserBinaryRaw {
             return undefined;
         }
         tb  = t._in.next();
-        rt = high_nibble(tb);
+        rt = high_nibble(tb);//load type
         t.load_length(tb);
         if (rt === IonBinary.TB_ANNOTATION) {
             if (t._len < 1 && t.depth() === 0) {
@@ -418,18 +397,20 @@ export class ParserBinaryRaw {
                 if (this._len === 0) {
                     this._curr = 0;
                 } else if (this._len <= 4) {//32 bits of representation after shifts
-                    this._curr = this.read_unsigned_int();
+                    this._curr = this.readUnsignedInt();
                 } else {
-                    this._curr = this.readUnsignedLongInt(1);
+                    this._curr = this.readUnsignedLongInt();
                 }
                 break;
             case IonBinary.TB_NEG_INT:
                 if (this._len === 0) {
                     this._curr = 0;
                 } else if (this._len <= 4) {//32 bits of representation after shifts
-                    this._curr = -this.read_unsigned_int();
+                    this._curr = -this.readUnsignedInt();
                 } else {
-                    this._curr = this.readUnsignedLongInt(-1);
+                    let temp : LongInt = this.readUnsignedLongInt();
+                    temp.negate();
+                    this._curr = temp;
                 }
                 break;
             case IonBinary.TB_FLOAT:
@@ -461,7 +442,7 @@ export class ParserBinaryRaw {
         }
     }
 
-    next() : any {
+    next() : any {//this is some garbage ass code
         if (this._curr === undefined && this._len > 0) {
             this._in.skip(this._len);
         } else {
@@ -469,9 +450,6 @@ export class ParserBinaryRaw {
         }
         if (this._in_struct) {
             this._fid = this.readVarUnsignedInt();
-            if (this._fid === undefined) {
-                return undefined;
-            }
         }
         return this.load_next();
     }

@@ -297,8 +297,4 @@ next() {
             }
         }
     }
-
-  ionValue() {
-    throw new Error("E_NOT_IMPL: ionValue");
-  }
 }

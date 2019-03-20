@@ -116,22 +116,11 @@ export class BinaryWriter implements Writer {
     }
 
     let exponent: number = value.getExponent();
-    let digits: Uint8Array = value.getDigits().byteValue();
-    if (value.isNegative()) {
-      if (digits.length > 0) {
-        if (digits[0] & 0x80) {
-          digits.subarray(1, digits.length);
-        } else {
-          digits[0] |= 0x80;
-        }
-      } else {
-        digits = new Uint8Array([0x80]); // Sign bit set, zero value
-      }
-    }
+    let digits: Uint8Array = value.getDigits().intBytes();
 
     let writer: LowLevelBinaryWriter = new LowLevelBinaryWriter(new Writeable(LowLevelBinaryWriter.getVariableLengthSignedIntSize(exponent) + digits.length));
     writer.writeVariableLengthSignedInt(exponent);
-    writer.writeBytes(new Uint8Array(digits));
+    writer.writeBytes(digits);
     this.addNode(new BytesNode(this.writer, this.getCurrentContainer(), TypeCodes.DECIMAL, this.encodeAnnotations(annotations), writer.getBytes()));
   }
 
@@ -286,7 +275,7 @@ export class BinaryWriter implements Writer {
         let numberOfCharacteristicDigits: number = decimalString.length + exponent;
 
         // Characteristic is the value to the left of the decimal
-        let characteristic = LongInt.parse(decimalString.slice(0, numberOfCharacteristicDigits)).numberValue();
+        let characteristic = new LongInt(decimalString.slice(0, numberOfCharacteristicDigits)).numberValue();
         writer.writeVariableLengthUnsignedInt(characteristic);
 
         // Exponent

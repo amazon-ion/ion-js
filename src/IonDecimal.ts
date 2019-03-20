@@ -43,206 +43,82 @@ import { LongInt } from "./IonLongInt";
 
 
 export class Decimal {
-  public static readonly NULL: Decimal = new Decimal(undefined, undefined);
-  public static readonly ZERO: Decimal = new Decimal(LongInt.ZERO, 0);
+    public static readonly NULL: Decimal = new Decimal(undefined, undefined);
+    public static readonly ZERO: Decimal = new Decimal(new LongInt(0), 0);
 
-  constructor(private _value: LongInt, private _exponent: number) {}
+    constructor(private _value: LongInt, private _exponent: number) {}
 
-  isZero() : boolean {
-    if (this.isNull()) return false;
-    return this._value.isZero();
-  }
-
-  isNegative() : boolean {
-    return this._value.signum() === -1;
-  }
-
-  isNegativeZero() : boolean {
-    return this.isZero() && this.isNegative();
-  }
-
-  isZeroZero() : boolean {
-    if (this.isZero()) {
-      // TODO - is this right? negative scale is valid decimal places
-      if (this._exponent >= -1) {
-        return (this._value.signum() >= 0);
-      }
+    isZero() : boolean {
+        if (this.isNull()) return false;
+        return this._value.isZero();
     }
-    return false;
-  }
 
-  numberValue(): number {
-      var n = this._value.numberValue();
-      n = n * Math.pow(10, this._exponent);
-      return n;
-  }
+    isNegative() : boolean {
+        return this._value.signum() === -1;
+    }
 
-  getNumber() : number {
-    return this.numberValue();
-  }
+    isNegativeZero() : boolean {
+        return this.isZero() && this.isNegative();
+    }
 
-  toString() : string {
-    return this.stringValue();
-  }
+    isZeroZero() : boolean {
+        if (this.isZero()) {
+          // TODO - is this right? negative scale is valid decimal places
+          if (this._exponent >= -1) {
+            return (this._value.signum() >= 0);
+          }
+        }
+        return false;
+    }
+
+    numberValue(): number {
+        return this._value.numberValue() * Math.pow(10, this._exponent);
+    }
+
+    getNumber() : number {
+        return this.numberValue();
+    }
+
+    toString() : string {
+        return this.stringValue();
+    }
 
     stringValue(): string {
-        if (this.isNull()) {
-            return "null.decimal";
+        if (this.isNull()) return "null.decimal";
+        return this._value.toString() + 'd' + this._exponent;
+    }
+
+    isNull() : boolean {
+        return this._value === undefined;
+    }
+
+    getDigits() : LongInt {
+        return this._value;
+    }
+
+    getExponent() : number {
+        return this._exponent;
+    }
+
+    equals(expected : Decimal) : boolean {
+        return this.getExponent() === expected.getExponent() && this.isNegative() === expected.isNegative() && this.getDigits().numberValue() === expected.getDigits().numberValue();
+    }
+
+    static parse(str: string) : Decimal {
+        let exponent = 0;
+        if (str === 'null' || str === 'null.decimal') return Decimal.NULL;
+        let d = str.match('[d|D]');
+        let f  = str.match('.');
+        let exponentDelimiterIndex = str.length - 1;
+        if(d) {
+            exponent = Number(str.substring(d.index + 1, str.length - 1));
+            exponentDelimiterIndex = d.index - 1;
         }
-
-        let exponent: number = this._exponent;
-        let coefficient: string = this._value.toString();
-        let significantDigits : number = coefficient.length;
-        let result : string = '';
-        //digits returns an integer coefficient with an exponent that shifts it back to its original state
-        if (exponent < 0) {
-            // negative shift - prefix decimal point this may require leading zero's
-            let adjustedExponent : number = significantDigits - 1 + exponent;
-            if(adjustedExponent >= 0){
-                let decimalIndex : number = significantDigits + exponent;
-                result = coefficient.slice(0, decimalIndex) + '.' + coefficient.slice(decimalIndex);
-            }else if(adjustedExponent >= -6){//adapted from http://speleotrove.com/decimal/daconvs.html
-                result = '0.00000'.slice(0, (2 - exponent) - significantDigits) + coefficient;
-            }else{
-                result = coefficient + '.d' + exponent;
-            }
-        } else if (exponent > 0) {
-            // positive shift
-            result = coefficient + '.d' + exponent;
-        } else if(exponent === 0) {
-            result = coefficient + ".";
+        if(f) {
+            let exponentShift = d ? (d.index - 1) - f.index : (str.length - 1) - f.index;
+            return new Decimal(new LongInt(str.substring(0, f.index - 1) +  str.substring(f.index + 1, exponentDelimiterIndex)), exponent - exponentShift);
+        } else {
+            return new Decimal(new LongInt(str.substring(0,  exponentDelimiterIndex)), exponent);
         }
-        if (this.isNegative()) result = '-' + result;
-        return result;
     }
-
-  isNull() : boolean {
-    var isnull = (this._value === undefined);
-    return isnull;
-  }
-
-  getDigits() : LongInt {
-    return this._value;
-  }
-
-  getExponent() : number {
-    return this._exponent;
-  }
-
-  equals(expected : Decimal) : boolean {
-      return this.getExponent() === expected.getExponent() && this.isNegative() === expected.isNegative() && this.getDigits().numberValue() === expected.getDigits().numberValue();
-  }
-
-  static parse(str: string, stripLeadingZeroes : boolean = true) : Decimal {
-    let index: number = 0;
-    let exponent: number = 0;
-    let c: number;
-    let isNegative: boolean = false;
-
-    c = str.charCodeAt(index);
-    if (c === '+'.charCodeAt(0)) {
-      index++;
-    } else if (c === '-'.charCodeAt(0)) {
-      isNegative = true;
-      index++;
-    } else if (c === 'n'.charCodeAt(0)) {
-      if (str == 'null' || str == 'null.decimal') {
-        return Decimal.NULL;
-      } 
-    }
-
-    let digits: string = Decimal.readDigits(str, index);
-    index += digits.length;
-    if(stripLeadingZeroes) digits = Decimal.stripLeadingZeroes(digits);
-
-    if (index === str.length) {
-      let trimmedDigits: string = Decimal.stripTrailingZeroes(digits);
-      exponent += digits.length - trimmedDigits.length;
-      return new Decimal(new LongInt(trimmedDigits, isNegative? -1: 1), exponent);
-    }
-
-    let hasDecimal: boolean = false;
-    c = str.charCodeAt(index);
-    if (c === '.'.charCodeAt(0)) {
-      hasDecimal = true;
-      index++;
-      let mantissaDigits: string = Decimal.readDigits(str, index);
-      index += mantissaDigits.length;
-      exponent -= mantissaDigits.length;
-      digits = digits.concat(mantissaDigits);
-    }
-
-    if (!hasDecimal) {
-      let trimmedDigits: string = Decimal.stripTrailingZeroes(digits);
-      exponent += digits.length - trimmedDigits.length;
-      digits = trimmedDigits;
-    }
-
-    if (index === str.length) {
-      return new Decimal(new LongInt(digits, isNegative? -1 : 1), exponent);
-    }
-
-    c = str.charCodeAt(index);
-    if (c !== 'd'.charCodeAt(0) && c !== 'D'.charCodeAt(0)) {
-      throw new Error(`Invalid decimal ${str}`);
-    }
-    index++;
-
-    let isExplicitExponentNegative: boolean = false;
-    c = str.charCodeAt(index);
-    if (c === '+'.charCodeAt(0)) {
-      index++;
-    } else if (c === '-'.charCodeAt(0)) {
-      isExplicitExponentNegative = true;
-      index++;
-    }
-
-    let explicitExponentDigits: string = Decimal.readDigits(str, index);
-    let explicitExponent = parseInt(explicitExponentDigits, 10);
-    if (isExplicitExponentNegative) {
-      explicitExponent = -explicitExponent;
-    }
-    exponent += explicitExponent;
-    index += explicitExponentDigits.length;
-
-    if (index !== str.length) {
-      // Did not consume the entire string so it must be invalid
-      throw new Error(`Invalid decimal ${str}`);
-    }
-
-    let decimal: Decimal = new Decimal(new LongInt(digits, isNegative ? -1 : 1), exponent);
-    return decimal;
-  }
-
-  private static readDigits(s: string, offset: number) : string {
-    let digits: number = 0;
-    for (let i: number = offset; i < s.length; i++) {
-      if (is_digit(s.charCodeAt(i))) {
-        digits++;
-      } else {
-        break;
-      }
-    }
-    return s.slice(offset, offset + digits);
-  }
-
-  private static stripLeadingZeroes(s: string) : string {
-    let i: number = 0;
-    for (; i < s.length - 1; i++) {
-      if (s.charCodeAt(i) !== '0'.charCodeAt(0)) {
-        break;
-      }
-    }
-    return (i > 0) ? s.slice(i) : s;
-  }
-
-  private static stripTrailingZeroes(s: string) : string {
-    let i: number = s.length - 1;
-    for (; i >= 1; i--) {
-      if (s.charCodeAt(i) !== '0'.charCodeAt(0)) {
-        break;
-      }
-    }
-    return (i < s.length - 1) ? s.slice(0, i + 1) : s;
-  }
 }
