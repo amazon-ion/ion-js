@@ -108,7 +108,7 @@ export class Decimal {
         let exponent = 0;
         if (str === 'null' || str === 'null.decimal') return Decimal.NULL;
         let d = str.match('[d|D]');
-        let f  = str.match('.');
+        let f  = str.match('\\.');
         let exponentDelimiterIndex = str.length - 1;
         if(d) {
             exponent = Number(str.substring(d.index + 1, str.length - 1));
