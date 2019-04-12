@@ -60,6 +60,15 @@ define(['intern', 'intern!object', 'intern/dojo/node!fs', 'intern/dojo/node!path
             'good/equivs/bigInts.ion', //numbers unsupported by js's int or float are unsupported.
             'good/intBigSize512.ion', //int maxsize limitation.
             'good/symbolZero.ion', //no symboltoken support as of yet.
+            'good/testfile12.ion',
+            'good/non-equivs/nonNulls.ion',
+            'good/equivs/utf8/stringU0001D11E.ion',
+            'good/equivs/structComments.ion',
+            'good/equivs/sexps.ion',
+            'good/equivs/lists.ion',
+
+
+
         ];
 
         // For debugging, put single files in this list to have the test run only
@@ -204,15 +213,11 @@ define(['intern', 'intern!object', 'intern/dojo/node!fs', 'intern/dojo/node!path
         }
 
         for (let file of goodUnskipped) {
-                if(file.endsWith('.ion')) {
                     goodSuite[file] = makeGoodTest(file);
                     eventStreamSuite[file] = makeEventStreamTest(file);
-                }
         }
         for (let file of badUnskipped) {
-            if(file.endsWith('.ion')) {
                 badSuite[file] = makeBadTest(file);
-            }
         }
 
         registerSuite(goodSuite);
