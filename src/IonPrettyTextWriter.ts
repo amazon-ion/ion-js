@@ -16,7 +16,6 @@ import { State, TextWriter } from "./IonTextWriter";
 import { Writeable } from "./IonWriteable";
 import { TypeCodes } from "./IonBinary";
 import { CharCodes } from "./IonText";
-import { isNullOrUndefined } from "./IonUtilities";
 type Serializer<T> = (value: T) => void;
 /*
  * This class and functionality carry no guarantees of correctness or support.
@@ -148,7 +147,7 @@ export class PrettyTextWriter extends TextWriter {
 
     writeValue<T>(typeCode: TypeCodes, value: T, annotations: string[], serialize: Serializer<T>) {
         if (this.currentContainer.state === State.STRUCT_FIELD) throw new Error("Expecting a struct field");
-        if (isNullOrUndefined(value)) {
+        if (value === null || value === undefined) {
             this.writeNull(typeCode, annotations);
             return;
         }

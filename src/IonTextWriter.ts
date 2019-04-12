@@ -40,7 +40,7 @@ export class Context {
 
 export class TextWriter implements Writer {
 
-    private containerContext : Context[];
+    protected containerContext : Context[];
 
     getBytes(): Uint8Array {
         return this.writeable.getBytes();
@@ -332,11 +332,11 @@ export class TextWriter implements Writer {
     }
 
 
-    private writeUtf8(s: string) : void {
+    protected writeUtf8(s: string) : void {
             this.writeable.writeBytes(encodeUtf8(s));
     }
 
-    private writeAnnotations(annotations: string[]) : void {
+    protected writeAnnotations(annotations: string[]) : void {
         if (annotations === null || annotations === undefined) return;
         for (let annotation of annotations) {
             this.writeSymbolToken(annotation);
