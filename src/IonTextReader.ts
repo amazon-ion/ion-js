@@ -33,7 +33,8 @@ import { ParserTextRaw } from "./IonParserTextRaw";
 import { Reader } from "./IonReader";
 import { StringSpan } from "./IonSpan";
 import { Timestamp } from "./IonTimestamp";
-import {is_digit} from "./IonText";
+import { fromBase64 } from "./IonText";
+import { is_digit } from "./IonText";
 
 const RAW_STRING = new IonType( -1, "raw_input", true,  false, false, false );
 
@@ -52,7 +53,7 @@ export class TextReader implements Reader {
   private _raw_type: number;
   private _raw: any;
 
-  constructor(source: StringSpan, catalog: Catalog) {
+  constructor(source: StringSpan, catalog?: Catalog) {
     if (!source) {
       throw new Error("a source Span is required to make a reader");
     }
@@ -207,7 +208,7 @@ next() {
             // value otherwise all other scalars are fine as is
             switch(this._type) {
                 case IonTypes.BLOB:
-                    throw new Error("Blobs currently unsupported.");
+                    return this._raw;
                 case IonTypes.SYMBOL:
                     if(this._raw_type === T_IDENTIFIER && (this._raw.length > 1 && this._raw.charAt(0) === '$'.charAt(0))){
                         let tempStr = this._raw.substr(1, this._raw.length);
@@ -233,8 +234,24 @@ next() {
     return this._parser.numberValue();
   }
 
-  byteValue() : number[] {
-    throw new Error("E_NOT_IMPL: byteValue");
+  byteValue() : Uint8Array {
+    this.load_raw();
+    if(this.isNull()) return null;
+    switch(this._type){
+        case IonTypes.CLOB : {
+            let length = this._raw.length;
+            let data = new Uint8Array(length);
+            for(let i = 0; i < this._raw.length; i++){
+                data[i] = this._raw.charCodeAt(i);
+            }
+            return data;
+        }
+        case IonTypes.BLOB : {
+            return fromBase64(this._raw);
+        }
+        default:
+            throw new Error(this._type.name + ".byteValue() is not supported.");
+    }
   }
 
   booleanValue() {
@@ -245,15 +262,19 @@ next() {
   }
 
     decimalValue() : Decimal {
+        if(this.isNull()) return null;
         return Decimal.parse(this.stringValue());
     }
 
     timestampValue() : Timestamp {
+        if(this.isNull()) return null;
         return Timestamp.parse(this.stringValue());
     }
 
     value() {
         switch(this._type) {
+            case IonTypes.NULL :
+                return null;
             case IonTypes.BOOL : {
                 return this.booleanValue();
             }
@@ -276,18 +297,14 @@ next() {
                 return this.timestampValue();
             }
             case IonTypes.CLOB : {
-                return this.stringValue();
+                return this.byteValue();
             }
             case IonTypes.BLOB : {
-                return this.stringValue();
+                return this.byteValue();
             }
             default : {
                 return undefined;
             }
         }
     }
-
-  ionValue() {
-    throw new Error("E_NOT_IMPL: ionValue");
-  }
 }

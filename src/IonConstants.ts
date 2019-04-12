@@ -15,6 +15,6 @@ export const EOF = -1;
 
 export const IVM = {
   text: "$ion_1_0",
-  binary: [ 224 /*0xE0*/, 1 /*0x01*/, 0 /*0x00*/, 234 /*0xEA*/ ],
+  binary: new Uint8Array([ 0xE0, 0x01, 0x00, 0xEA ]),
   sid : 3
 }

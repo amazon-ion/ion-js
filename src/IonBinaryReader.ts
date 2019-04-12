@@ -32,13 +32,13 @@ import { makeSymbolTable } from "./IonSymbols";
 import { ParserBinaryRaw } from "./IonParserBinaryRaw";
 import { Reader } from "./IonReader";
 import { SharedSymbolTable } from "./IonSharedSymbolTable";
-import { Span } from "./IonSpan";
+import { BinarySpan } from "./IonSpan";
 import { Timestamp } from "./IonTimestamp";
 
 const RAW_STRING = new IonType( -1, "raw_input", true,  false, false, false );
 
 const ERROR            = -3;
-const BOC              = -2;
+const BOC              = -2;//beginning of container?
 const EOF              = -1;
 const TB_NULL          =  0;
 const TB_BOOL          =  1;
@@ -56,7 +56,6 @@ const TB_LIST          = 12;
 const TB_STRUCT        = 13;
 const TB_ANNOTATION    = 14;
 const TB_UNUSED__      = 15;
-const TB_DATAGRAM      = 20;   // fake type of the top level
 const TB_SEXP_CLOSE    = 21;
 const TB_LIST_CLOSE    = 22;
 const TB_STRUCT_CLOSE  = 23;
@@ -87,52 +86,40 @@ export class BinaryReader implements Reader {
   private _symtab: LocalSymbolTable;
   private _raw_type: number;
 
-  constructor(source: Span, catalog: Catalog) {
+  constructor(source: BinarySpan, catalog?: Catalog) {
     this._parser   = new ParserBinaryRaw(source);
-    this._cat      = catalog || new Catalog();
+    this._cat      = catalog ? catalog : new Catalog();
     this._symtab   = defaultLocalSymbolTable();
     this._raw_type = BOC;
-    throw new Error("Binary is unsupported at this time.");
   }
 
-  next() : IonType {
-    let t: BinaryReader = this;
-    var p, rt;
-    if (t._raw_type === EOF) return undefined;
-    p = t._parser;
-    for (;;) {
-      t._raw_type = rt = p.next();
-      if (t.depth() > 0) break;
-      if (rt === TB_SYMBOL) {
-        let raw: number = p.numberValue();
-        if (raw !== IVM.sid) break;
-        t._symtab = defaultLocalSymbolTable();
-      }
-      else if (rt === TB_STRUCT) {
-        if (!p.hasAnnotations()) break;
-        if (p.getAnnotation(0) !== ion_symbol_table_sid) break;
-        t._symtab = makeSymbolTable(t._cat, t);
-      }
-      else {
-        break;
-      }
+    next() : IonType {
+        if (this._raw_type === EOF) return undefined;
+        for (this._raw_type = this._parser.next(); this.depth() === 0; this._raw_type = this._parser.next()) {
+            if (this._raw_type === TB_SYMBOL) {
+                let raw: number = this._parser.numberValue();
+                if (raw !== IVM.sid) break;
+                this._symtab = defaultLocalSymbolTable();
+            } else if (this._raw_type === TB_STRUCT) {
+                if (!this._parser.hasAnnotations()) break;
+                if (this._parser.getAnnotation(0) !== ion_symbol_table_sid) break;
+                this._symtab = makeSymbolTable(this._cat, this);
+            } else {
+                break;
+            }
+        }
+        return get_ion_type(this._raw_type);
     }
-    return get_ion_type(rt);
-  }
 
   stepIn() : void {
-    let t: BinaryReader = this;
-    if (!get_ion_type(t._raw_type).container) {
-      throw new Error("can't step in to a scalar value");
-    }
-    t._parser.stepIn();
-    t._raw_type = BOC;
+    if (!get_ion_type(this._raw_type).container) throw new Error("Can't step in to a scalar value");
+    this._parser.stepIn();
+    this._raw_type = BOC;
   }
 
   stepOut() : void {
-    let t: BinaryReader = this;
-    t._parser.stepOut();
-    t._raw_type = BOC;
+    this._parser.stepOut();
+    this._raw_type = BOC;
   }
 
   valueType() : IonType {
@@ -144,11 +131,7 @@ export class BinaryReader implements Reader {
   }
 
   fieldName() : string {
-    let t: BinaryReader = this;
-    var n, s;
-    n = t._parser.getFieldId();
-    s = this.getSymbolString(n)
-    return s;
+    return this.getSymbolString(this._parser.getFieldId())
   }
 
   hasAnnotations() : boolean {
@@ -156,7 +139,7 @@ export class BinaryReader implements Reader {
   }
 
   annotations() : string[] {//TODO binary support
-      return ["test"];
+      return this._parser.getAnnotations();
   }
 
   getAnnotation(index: number) : string {
@@ -186,7 +169,7 @@ export class BinaryReader implements Reader {
       // BLOB is a scalar by you don't want to just use the string 
       // value otherwise all other scalars are fine as is
       if (t._raw_type === TB_SYMBOL) {
-        n = p.numberValue();
+        n = p.numberValue();//this is returning null.
         s = this.getSymbolString(n);
       }
       else {
@@ -200,12 +183,8 @@ export class BinaryReader implements Reader {
     return this._parser.numberValue();
   }
 
-  byteValue() : number[] {
+  byteValue() : Uint8Array {
     return this._parser.byteValue();
-  }
-
-  ionValue() : never {
-    throw new Error("E_NOT_IMPL: ionValue");
   }
 
   booleanValue() : boolean {
@@ -221,7 +200,10 @@ export class BinaryReader implements Reader {
   }
 
   value() : any {
+    if(this.isNull()) return null;
     switch(this.valueType()) {
+      case IonTypes.NULL:
+        return null;
       case IonTypes.BLOB:
       case IonTypes.CLOB:
         return this.byteValue();
@@ -238,12 +220,12 @@ export class BinaryReader implements Reader {
       case IonTypes.TIMESTAMP:
         return this.timestampValue();
       default:
-        return undefined;
+        throw new Error('Unexpected type:' + this.valueType());
     }
   }
 
   private getSymbolString(symbolId: number) : string {
-    let s: string = undefined;
+    let s: string = null;
     if (symbolId > 0) {
       s = this._symtab.getSymbol(symbolId);
       if (typeof(s) == 'undefined') {

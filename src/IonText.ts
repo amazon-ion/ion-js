@@ -11,7 +11,6 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-import { isUndefined } from "./IonUtilities";
 
 export const WHITESPACE_COMMENT1 = -2;
 export const WHITESPACE_COMMENT2 = -3;
@@ -180,58 +179,46 @@ export function is_hex_digit(ch: number) : boolean {
   return _is_hex_digit[ch];
 }
 
-let BASE64: string = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-let BASE64_PADDING = "=";
+const base64chars = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z','0','1','2','3','4','5','6','7','8','9','+','/'];
+const base64inv = {'0':52,'1':53,'2':54,'3':55,'4':56,'5':57,'6':58,'7':59,'8':60,'9':61,'A':0,'B':1,'C':2,'D':3,'E':4,'F':5,'G':6,'H':7,'I':8,'J':9,'K':10,'L':11,'M':12,'N':13,'O':14,'P':15,'Q':16,'R':17,'S':18,'T':19,'U':20,'V':21,'W':22,'X':23,'Y':24,'Z':25,'a':26,'b':27,'c':28,'d':29,'e':30,'f':31,'g':32,'h':33,'i':34,'j':35,'k':36,'l':37,'m':38,'n':39,'o':40,'p':41,'q':42,'r':43,'s':44,'t':45,'u':46,'v':47,'w':48,'x':49,'y':50,'z':51,'+':62,'/':63};
 
-const TWO_BIT_MASK: number = 0x3;
-const FOUR_BIT_MASK: number = 0xF;
-const SIX_BIT_MASK: number = 0x3F;
+export function fromBase64(str: string) : Uint8Array {
+    let pad = 0;
+    for (let i = str.length - 1; str.charAt(i) == '='; i--) {
+            pad++;
+    }
+    let buf = new Uint8Array(str.length * 3 / 4 - pad);
+    for (let i = 0; i < str.length - pad; i += 4) {
+        const c0 = base64inv[str.charAt(i)], c1 = base64inv[str.charAt(i + 1)], c2 = base64inv[str.charAt(i + 2)], c3 = base64inv[str.charAt(i + 3)];
+        buf[i * 3 / 4] = c0 << 2 & 255 | c1 >>> 4;
+        if (i + 2 < str.length - pad) {
+            buf[i * 3 / 4 + 1] = c1 << 4 & 255 | c2 >>> 2;
+            if (i + 3 < str.length - pad) {
+                buf[i * 3 / 4 + 2] = c2 << 6 & 255 | c3;
+            }
+        }
+    }
+    return buf;
+}
 
-export function toBase64(value: number[]) {
-  let result: string = "";
-
-  let i: number = 0;
-  for (; i < value.length - 2; i += 3) {
-    let octet1 = value[i];
-    let octet2 = value[i + 1];
-    let octet3 = value[i + 2];
-
-    let index1 = (octet1 >>> 2) & SIX_BIT_MASK;
-    let index2 = ((octet1 & TWO_BIT_MASK) << 4) | ((octet2 >>> 4) & FOUR_BIT_MASK);
-    let index3 = ((octet2 & FOUR_BIT_MASK) << 2) | ((octet3 >>> 6) & TWO_BIT_MASK);
-    let index4 = octet3 & SIX_BIT_MASK;
-
-    result += BASE64[index1];
-    result += BASE64[index2];
-    result += BASE64[index3];
-    result += BASE64[index4];
-  }
-
-  if ((value.length - i) === 2) {
-    let octet1 = value[i];
-    let octet2 = value[i + 1];
-
-    let index1 = (octet1 >>> 2) & SIX_BIT_MASK;
-    let index2 = ((octet1 & TWO_BIT_MASK) << 4) | ((octet2 >>> 4) & FOUR_BIT_MASK);
-    let index3 = (octet2 & FOUR_BIT_MASK) << 2;
-
-    result += BASE64[index1];
-    result += BASE64[index2];
-    result += BASE64[index3];
-    result += BASE64_PADDING;
-  } else if ((value.length - i) === 1) {
-    let octet1 = value[i];
-
-    let index1 = (octet1 >>> 2) & SIX_BIT_MASK;
-    let index2 = (octet1 & TWO_BIT_MASK) << 4;
-
-    result += BASE64[index1]
-    result += BASE64[index2]
-    result += BASE64_PADDING;
-    result += BASE64_PADDING;
-  }
-
-  return result;
+export function toBase64(buf: Uint8Array) {
+    let str = new Array(Math.ceil(buf.length * 4 / 3));
+    for (let i = 0; i < buf.length; i += 3) {
+        const b0 = buf[i], b1 = buf[i + 1], b2 = buf[i + 2], b3 = buf[i + 3];
+        str[i * 4 / 3] = base64chars[b0 >>> 2];
+        str[i * 4 / 3 + 1] =  base64chars[b0 << 4 & 63 | (b1 || 0) >>> 4];
+        if (i + 1 < buf.length) {
+            str[i * 4 / 3 + 2] = base64chars[b1 << 2 & 63 | (b2 || 0) >>> 6];
+            if (i + 2 < buf.length) {
+                str[i * 4 / 3 + 3] = base64chars[b2 & 63];
+            } else {
+                return str.join('') + '=';
+            }
+        } else {
+            return str.join('') + '==';
+        }
+    }
+    return str.join('');
 }
 
 export enum CharCodes {
@@ -300,15 +287,15 @@ ClobEscapes[CharCodes.FORWARD_SLASH] = backslashEscape("/");
 ClobEscapes[CharCodes.QUESTION_MARK] = backslashEscape("?");
 ClobEscapes[CharCodes.BACKSLASH] = backslashEscape("\\");
 
-function unicodeEscapes(escapes: EscapeIndex, start: number, end?: number) {
-  if (isUndefined(end)) {
-    escapes[start] = unicodeEscape(start);
-  } else {
-    for (let i: number = start; i < end; i++) {
-      escapes[i] = unicodeEscape(i);
+    function unicodeEscapes(escapes: EscapeIndex, start: number, end?: number) {
+        if (end === undefined) {
+            escapes[start] = unicodeEscape(start);
+        } else {
+            for (let i: number = start; i < end; i++) {
+                escapes[i] = unicodeEscape(i);
+            }
+        }
     }
-  }
-}
 
 let CommonEscapes : EscapeIndex = {};
 CommonEscapes[CharCodes.NULL] = backslashEscape('0');
@@ -353,16 +340,27 @@ export function isOperator(s: string) : boolean {
   return true;
 }
 
-export function *escape(s: string, escapes: EscapeIndex) : IterableIterator<number> {
-  for (let i = 0; i < s.length; i++) {
-    let charCode: number = s.charCodeAt(i);
-    let escape: number[] = escapes[charCode];
-    if (!isUndefined(escape)) {
-      for (let j = 0; j < escape.length; j++) {
-        yield escape[j];
-      }
-    } else {
-      yield charCode;
+export function isDigit(charCode : number) {
+    return charCode < 58 && charCode > 47;
+}
+
+export function escape(input: string, escapes: EscapeIndex) : string {
+    let escapedString = '';
+    let escapeSeq = '';
+    let charCode: number;
+    let escape: number[];
+    let lastIndex = 0;
+    for (let i = 0; i < input.length; i++) {
+        charCode = input.charCodeAt(i);
+        escape = escapes[charCode];
+        if (escape !== undefined) {
+            for (let j = 0; j < escape.length; j++) {
+                escapeSeq += String.fromCharCode(escape[j]);//TODO this is slow we are going to need to replace this with just the string eventually instead of using the charcode crap.
+            }
+            escapedString += input.slice(lastIndex, i) + escapeSeq;
+            lastIndex = i + 1;
+            escapeSeq = '';
+        }
     }
-  }
+    return escapedString + input.slice(lastIndex, input.length);
 }

@@ -19,9 +19,9 @@ import { TypeCodes } from "./IonBinary";
  * Writes values in the Ion text or binary formats.
  */
 export interface Writer {
-  writeBlob(value: number[], annotations?: string[]) : void;
+  writeBlob(value: Uint8Array, annotations?: string[]) : void;
   writeBoolean(value: boolean, annotations?: string[]) : void;
-  writeClob(value: number[], annotations?: string[]) : void;
+  writeClob(value: Uint8Array, annotations?: string[]) : void;
   writeDecimal(value: Decimal, annotations?: string[]) : void;
   writeFieldName(fieldName: string) : void;
   writeFloat32(value: number, annotations?: string[]) : void;
@@ -34,7 +34,7 @@ export interface Writer {
   writeStruct(annotations?: string[], isNull?: boolean) : void;
   writeSymbol(value: string, annotations?: string[]) : void;
   writeTimestamp(value: Timestamp, annotations?: string[]) : void;
-  getBytes(): number[];
+  getBytes(): Uint8Array;
 
   close() : void;
   endContainer() : void;

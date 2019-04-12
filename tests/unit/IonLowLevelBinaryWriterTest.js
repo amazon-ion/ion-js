@@ -27,55 +27,47 @@ define([
         return new ion.LowLevelBinaryWriter(writeable);
     }
 
-    var writeUnsignedIntTest = function(value, length, expected, exception) {
-      var testName = 'Write unsigned int ' + value.toString() + ' with length ' + length.toString();
+    var writeUnsignedIntTest = function(value, expected, exception) {
+      var testName = 'Write unsigned int ' + value.toString();
       var test = function() {
         var writeable = new ion.Writeable();
         var writer = createWriter(writeable);
-        writer.writeUnsignedInt(value, length);
+        writer.writeUnsignedInt(value);
         var actual = writeable.getBytes();
-        assert.deepEqual(actual, expected);
+        assert.deepEqual(actual, new Uint8Array(expected));
       };
       suite[testName] = exception
         ? function() { assert.throws(test, Error); }
         : test;
     };
 
-    writeUnsignedIntTest(0, 1, [0]);
-    writeUnsignedIntTest(0, 2, [0, 0]);
-    writeUnsignedIntTest(255, 1, [255]);
-    writeUnsignedIntTest(255, 2, [0, 255]);
-    writeUnsignedIntTest(256, 2, [1, 0]);
-    writeUnsignedIntTest(256, 1, undefined, true);
+    writeUnsignedIntTest(0, [0]);
+    writeUnsignedIntTest(255, [255]);
+    writeUnsignedIntTest(256, [1, 0]);
+    writeUnsignedIntTest(256, null, true);
 
-    var writeSignedIntTest = function(value, length, expected, exception) {
-      var testName = 'Write signed int ' + value.toString() + ' with length ' + length.toString();
+    var writeSignedIntTest = function(value, expected, exception) {
+      var testName = 'Write signed int ' + value.toString();
       var test = function() {
         var writeable = new ion.Writeable();
         var writer = createWriter(writeable);
-        writer.writeSignedInt(value, length);
+        writer.writeSignedInt(value);
         var actual = writeable.getBytes();
-        assert.deepEqual(actual, expected);
+        assert.deepEqual(actual, new Uint8Array(expected));
       };
-      suite[testName] = exception
-        ? function() { assert.throws(test, Error); }
-        : test;
+      suite[testName] = exception ? function() { assert.throws(test, Error); } : test;
     }
 
-    writeSignedIntTest(0, 1, [0]);
-    writeSignedIntTest(0, 2, [0, 0]);
-    writeSignedIntTest(-1, 1, [0x81]);
-    writeSignedIntTest(-1, 2, [0x80, 0x01]);
-    writeSignedIntTest(1, 1, [1]);
-    writeSignedIntTest(1, 2, [0, 1]);
-    writeSignedIntTest(-127, 1, [0xFF]);
-    writeSignedIntTest(-127, 3, [0x80, 0x00, 0x7F]);
-    writeSignedIntTest(127, 1, [0x7F]);
-    writeSignedIntTest(-128, 2, [0x80, 0x80]);
-    writeSignedIntTest(-128, 1, undefined, true);
-    writeSignedIntTest(128, 2, [0x00, 0x80]);
-    writeSignedIntTest(-256, 2, [0x81, 0x00]);
-    writeSignedIntTest(256, 2, [0x01, 0x00]);
+    writeSignedIntTest(0, [0]);
+    writeSignedIntTest(-1, [0x81]);
+    writeSignedIntTest(1, [1]);
+    writeSignedIntTest(-127, [0xFF]);
+    writeSignedIntTest(127, [0x7F]);
+    writeSignedIntTest(-128, [0x80, 0x80]);
+    writeSignedIntTest(-128, undefined, true);
+    writeSignedIntTest(128, [0x80]);
+    writeSignedIntTest(-256, [0x81, 0x00]);
+    writeSignedIntTest(256, [0x01, 0x00]);
 
     var writeVariableLengthUnsignedIntTest = function(value, expected) {
       var testName = 'Write variable length unsigned int ' + value.toString();
@@ -84,7 +76,7 @@ define([
         var writer = createWriter(writeable);
         writer.writeVariableLengthUnsignedInt(value, writeable);
         var actual = writeable.getBytes();
-        assert.deepEqual(actual, expected);
+        assert.deepEqual(actual, new Uint8Array(expected));
       };
     }
 
@@ -104,7 +96,7 @@ define([
         var writer = createWriter(writeable);
         writer.writeVariableLengthSignedInt(value, writeable);
         var actual = writeable.getBytes();
-        assert.deepEqual(actual, expected);
+        assert.deepEqual(actual, new Uint8Array(expected));
       };
       suite[testName] = exception
         ? function() { assert.throws(test, Error); }
@@ -183,6 +175,6 @@ define([
     sizeOfUnsignedIntTest(65535, 2);
     sizeOfUnsignedIntTest(65536, 3);
 
-    //registerSuite(suite);
+    registerSuite(suite);
   }
 );

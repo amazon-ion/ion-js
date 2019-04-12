@@ -13,6 +13,9 @@
  */
 define(['intern', 'intern!object', 'intern/dojo/node!fs', 'intern/dojo/node!path', 'dist/amd/es6/IonTests'],
     function(intern, registerSuite, fs, paths, ion) {
+        //const { spawn } = require('child_process');
+        //We really want this to be a script that clones and builds iontestharness
+        //
 
         function findFiles(folder, accumulator) {
             let files = fs.readdirSync(folder);
@@ -41,22 +44,13 @@ define(['intern', 'intern!object', 'intern/dojo/node!fs', 'intern/dojo/node!path
         findFiles(ionBadTestsPath, badAccumulator);
 
         let skipList = [
-            'good/non-equivs/blobs.ion',
-            'good/utf32.ion', //testing not configured to decode raw utf32.
-            'good/utf16.ion', //testing not configured to decode raw utf16.
             'good/subfieldVarInt.ion', //passes, but takes too long to run every build due to longint rounding.
-            'good/nonNulls.ion', //blobs bug.
-            'good/non-equivs/nonNulls.ion', //blobs bug.
-            'good/lists.ion', //blobs bug.
             'good/intBinary.ion', //binaryInts unsupported.
+            'good/integer_values.ion', //binary ints unsupported.
             'good/intsWithUnderscores.ion', //binary ints unsupported.
             'good/intBigSize256.ion', //int maxsize limitation.
             'good/equivs/intsWithUnderscores.ion', //binary ints unsupported.
-            'good/equivs/blobs.ion', //blobs unsupported.
             'good/equivs/binaryInts.ion', //binary ints unsupported.
-            'good/blobs.ion', //blobs unsupported.
-            'good/testfile29.ion', //blobs unsupported.
-            'good/testfile26.ion', //blobs unsupported.
             'good/subfieldVarUInt32bit.ion', //passes, but takes too long to run every build.
             'good/subfieldVarUInt.ion', //passes, but takes too long to run every build.
             'good/floatsWithUnderscores.ion', //numbers with underscores unsupported.
@@ -118,7 +112,7 @@ define(['intern', 'intern!object', 'intern/dojo/node!fs', 'intern/dojo/node!path
         function exhaust(reader) {
             for (;;) {
                 let next = reader.next();
-                if (typeof(next) === 'undefined') {
+                if (typeof(next) === 'undefined') {//should this be null?
                     if (reader.depth() > 0) {
                         // End of container
                         reader.stepOut();
@@ -168,6 +162,7 @@ define(['intern', 'intern!object', 'intern/dojo/node!fs', 'intern/dojo/node!path
         function makeEventStreamTest(path) {
             return function() {
                 let executor = function(resolve, reject) {
+                    console.log(path);
                     roundTripEventStreams(ion.makeReader(getInput(path)));
                     resolve();
                 };
@@ -176,41 +171,46 @@ define(['intern', 'intern!object', 'intern/dojo/node!fs', 'intern/dojo/node!path
             }
         }
 
-        function roundTripEventStreams(reader){
-            let eventStream = new ion.IonEventStream(reader);
-            let writer = ion.makeTextWriter();
-            eventStream.writeEventStream(writer);
-            writer.close();
-            let buf = writer.getBytes();
-            let tempString = '';
-            for(let i = 0; i < buf.length; i++){
-                tempString = tempString + String.fromCharCode(buf[i]);
-            }
-            let tempReader = new ion.makeReader(tempString);
-            let tempStream = new ion.IonEventStream(tempReader);
-            if(!eventStream.equals(tempStream)) {
-                let tempWriter = ion.makeTextWriter();
-                tempStream.writeIon(tempWriter);
-                tempWriter.close();
-                let tempBuf = tempWriter.getBytes();
-                let unequalString = "";
-                for(let i = 0; i < buf.length; i++){
-                    unequalString = unequalString + String.fromCharCode(buf[i]);
+        function getStreams(reader) {
+            let streams = [];
+            streams.push(new ion.IonEventStream(reader));
+            let eventWriter = ion.makeTextWriter();
+            streams[0].writeEventStream(eventWriter);
+            eventWriter.close();
+            streams.push(new ion.IonEventStream(new ion.makeReader(eventWriter.getBytes())));
+            let textWriter = ion.makeTextWriter();
+            streams[0].writeIon(textWriter);
+            streams.push(new ion.IonEventStream(new ion.makeReader(textWriter.getBytes())));
+            let binaryWriter = ion.makeBinaryWriter();
+            streams[0].writeIon(binaryWriter);
+            streams.push(new ion.IonEventStream(new ion.makeReader(binaryWriter.getBytes())));
+            let eventTextWriter = ion.makeTextWriter();
+            streams[0].writeIon(eventTextWriter);
+            streams.push(new ion.IonEventStream(new ion.makeReader(eventTextWriter.getBytes())));
+            let eventBinaryWriter = ion.makeBinaryWriter();
+            streams[0].writeIon(eventBinaryWriter);
+            streams.push(new ion.IonEventStream(new ion.makeReader(eventBinaryWriter.getBytes())));
+            return streams;
+        }
+
+        function roundTripEventStreams(reader) {
+            let streams = getStreams(reader);
+            //streams.push()
+            for(let i = 0;  i < streams.length - 1; i++){
+                for(let j = 0; j < streams.length; j++){
+                    if(!streams[i].equals(streams[(j + i) % streams.length])) throw new Error("Streams unequal.");
                 }
-                throw new Error('Round tripped stream was unequal: ' + tempString + '\n vs: ' + unequalString);
             }
-
-
         }
 
         for (let file of goodUnskipped) {
-            if (file.endsWith(".ion")) {
-                goodSuite[file] = makeGoodTest(file);
-                eventStreamSuite[file] = makeEventStreamTest(file);
-            }
+                if(file.endsWith('.ion')) {
+                    goodSuite[file] = makeGoodTest(file);
+                    eventStreamSuite[file] = makeEventStreamTest(file);
+                }
         }
         for (let file of badUnskipped) {
-            if (file.endsWith(".ion")) {
+            if(file.endsWith('.ion')) {
                 badSuite[file] = makeBadTest(file);
             }
         }
@@ -220,3 +220,5 @@ define(['intern', 'intern!object', 'intern/dojo/node!fs', 'intern/dojo/node!path
         registerSuite(eventStreamSuite);
     }
 );
+
+

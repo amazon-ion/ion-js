@@ -51,6 +51,6 @@ define([
       assert.equal(timestamp.toString(), timestampValue.toString());
     }
 
-    //registerSuite(suite);
+    registerSuite(suite);
   }
 );

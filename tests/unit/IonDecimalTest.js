@@ -27,7 +27,7 @@ define([
       var decimal = ion.Decimal.parse("56.789");
       assert.equal(decimal.getExponent(), -3);
       assert.equal(decimal.getDigits().digits(), "56789");
-      assert.deepEqual(decimal.getDigits().byteValue(), [0xdd, 0xd5]);
+      assert.deepEqual(decimal.getDigits().byteValue(), new Uint8Array([0xdd, 0xd5]));
       assert.equal(decimal.stringValue(), "56.789");
       assert.isFalse(decimal.isNegative());
     }
@@ -36,7 +36,7 @@ define([
       var decimal = ion.Decimal.parse("-1.");
       assert.equal(decimal.getExponent(), 0);
       assert.equal(decimal.getDigits().digits(), "1");
-      assert.deepEqual(decimal.getDigits().byteValue(), [1]);
+      assert.deepEqual(decimal.getDigits().byteValue(), new Uint8Array([1]));
       assert.equal(decimal.stringValue(), "-1.");
       assert.isTrue(decimal.isNegative());
     }
@@ -45,7 +45,7 @@ define([
       var decimal = ion.Decimal.parse("123456000");
       assert.equal(decimal.getExponent(), 3);
       assert.equal(decimal.getDigits().digits(), "123456");
-      assert.deepEqual(decimal.getDigits().byteValue(), [0x01, 0xe2, 0x40]);
+      assert.deepEqual(decimal.getDigits().byteValue(), new Uint8Array([0x01, 0xe2, 0x40]));
       assert.equal(decimal.stringValue(), "123456.d3");
       assert.isFalse(decimal.isNegative());
     }

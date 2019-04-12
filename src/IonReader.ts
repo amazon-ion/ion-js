@@ -21,7 +21,7 @@ import { Timestamp } from "./IonTimestamp";
  */
 export interface Reader {
   booleanValue: () => boolean;
-  byteValue: () => number[];
+  byteValue: () => Uint8Array;
   decimalValue: () => Decimal;
   depth: () => number;
   fieldName: () => string;

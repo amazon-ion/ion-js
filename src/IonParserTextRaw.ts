@@ -293,7 +293,7 @@ export class ParserTextRaw {
   }
 
   private _read_sexp_values() {
-    var ch = this._read_after_whitespace(true);
+    let ch = this._read_after_whitespace(true);
     if (ch == CH_CP) {
       this._value_push( EOF );
     } else if (ch === EOF){
@@ -942,32 +942,25 @@ export class ParserTextRaw {
   }
 
   private _read_blob() : void {
-    var ch, base64_chars = 0, trailers = 0;
-    for (;;) {
-      ch = this._read()
+    let ch, base64_chars = 0, trailers = 0;
+    this._start = this._in.position();//is this going to be accurate where is the start being set that leads to this value?
+    while(true) {
+      ch = this._read();
       if (IonText.is_base64_char(ch)) {
-        base64_chars++;
-      }
-      else if (!IonText.is_whitespace(ch)) {
-        break;
+          base64_chars++;
+          this._end = this._in.position();
+      } else if(!IonText.is_whitespace(ch)) {
+          break;
       }
     }
     while (ch == CH_EQ) {
-      trailers++
+      trailers++;
       ch = this._read_after_whitespace(false);
     }
-    if (ch != CH_CC || this._read() != CH_CC) {
-      this._error("invalid blob");
-    }
-    else {
-      if (!is_valid_base64_length(base64_chars, trailers)) {
-        this._error( "invalid base64 value" );
-      }
-      else {
-        this._end = this._in.position() - 1;
-        this._value_push( T_BLOB );
-      }
-    }
+    if (ch != CH_CC || this._read() != CH_CC) throw new Error("Invalid blob");
+    if (!is_valid_base64_length(base64_chars, trailers)) throw new Error( "Invalid base64 value" );
+
+    this._value_push( T_BLOB );
   }
 
   private _read_comma() : void {
@@ -987,6 +980,7 @@ export class ParserTextRaw {
   }
 
   numberValue() : number {
+    if(this.isNull()) return null;
     var n, s = this.get_value_as_string(this._curr);
     switch (this._curr) {
       case T_INT:
@@ -1145,8 +1139,7 @@ export class ParserTextRaw {
                 }
                 break;
             default:
-                this._error("can't get this value as a string");
-                break;
+                throw new Error("can't get this value as a string");
             }
         return s;
     }

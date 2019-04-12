@@ -71,26 +71,19 @@ export class IonEventStream {
                             writer.writeDecimal(tempEvent.ionValue, tempEvent.annotations);
                             break;
                         case IonTypes.FLOAT :
-                            writer.writeFloat32(tempEvent.ionValue, tempEvent.annotations);
+                            writer.writeFloat64(tempEvent.ionValue, tempEvent.annotations);
                             break;
                         case IonTypes.NULL :
                             writer.writeNull(tempEvent.ionType.bid, tempEvent.annotations);
                             break;
                         case IonTypes.TIMESTAMP :
+                            writer.writeTimestamp(tempEvent.ionValue, tempEvent.annotations);
                             break;
                         case IonTypes.CLOB :
-                            tempBuf = [];
-                            for(let i = 0; i < tempEvent.ionValue.length; i++){
-                                tempBuf.push(tempEvent.ionValue.charCodeAt(i))
-                            }
-                            writer.writeClob(tempBuf, tempEvent.annotations);
+                            writer.writeClob(tempEvent.ionValue, tempEvent.annotations);
                             break;
                         case IonTypes.BLOB :
-                            tempBuf = [];
-                            for(let i = 0; i < tempEvent.ionValue.length; i++){
-                                tempBuf.push(tempEvent.ionValue.charCodeAt(i))
-                            }
-                            writer.writeBlob(tempBuf, tempEvent.annotations);
+                            writer.writeBlob(tempEvent.ionValue, tempEvent.annotations);
                             break;
                         default :
                             throw new Error("unexpected type: " + tempEvent.ionType.name);
@@ -170,7 +163,7 @@ export class IonEventStream {
 
     private generateStream() : void {
         let tid : IonType = this.reader.next();
-        if(tid === IonTypes.SYMBOL && this.reader.stringValue() === "ion_event_stream"){
+        if(tid === IonTypes.SYMBOL && this.reader.stringValue() === "ion_event_stream") {
             this.marshalStream();
             return;
         }
@@ -240,32 +233,30 @@ export class IonEventStream {
     }
 
     private marshalEvent() : IonEvent {
-        let currentEvent : Map<string, any> = new Map<string, any>();
+        let currentEvent = {};
         let tid : IonType;
         for(tid = this.reader.next(); tid !== undefined; tid = this.reader.next()) {
 
             let fieldName = this.reader.fieldName();
-            if (currentEvent.has(fieldName)) {
-                throw new Error('Repeated event field: ' + fieldName);
-            }
+            if (currentEvent[fieldName] !== undefined) throw new Error('Repeated event field: ' + fieldName);
             switch (fieldName) {
                 case 'event_type' : {
-                    currentEvent.set(fieldName, this.reader.stringValue());
+                    currentEvent[fieldName] = this.reader.stringValue();
                     break;
                 }
 
                 case 'ion_type' : {
-                    currentEvent.set(fieldName, this.parseIonType());
+                    currentEvent[fieldName] = this.parseIonType();
                     break;
                 }
 
                 case 'field_name' : {
-                    currentEvent.set(fieldName, this.reader.stringValue());
+                    currentEvent[fieldName] = this.reader.stringValue();
                     break;
                 }
 
                 case 'annotations' : {
-                    currentEvent.set(fieldName, this.parseAnnotations());
+                    currentEvent[fieldName] = this.parseAnnotations();
                     break;
                 }
 
@@ -275,24 +266,23 @@ export class IonEventStream {
                     let tempReader : Reader = makeReader(tempString, undefined);
                     tempReader.next();
                     let tempValue = tempReader.value();
-                    let annotations = tempReader.annotations();
-                    currentEvent.set('isNull', tempReader.isNull());
-                    currentEvent.set(fieldName, tempValue);
+                    currentEvent['isNull'] =  tempReader.isNull();
+                    currentEvent[fieldName] = tempValue;
                     break;
                 }
 
                 case 'value_binary' : {
-                    currentEvent.set(fieldName, this.parseBinaryValue());
+                    currentEvent[fieldName] = this.parseBinaryValue();
                     break;
                 }
 
                 case 'imports' : {
-                    currentEvent.set(fieldName, this.parseImports());
+                    currentEvent[fieldName] = this.parseImports();
                     break;
                 }
 
                 case 'depth' : {
-                    currentEvent.set(fieldName, this.reader.numberValue());
+                    currentEvent[fieldName] = this.reader.numberValue();
                     break;
                 }
 
@@ -301,7 +291,7 @@ export class IonEventStream {
             }
         }
         let eventType : IonEventType;
-        switch(currentEvent.get('event_type')){
+        switch(currentEvent['event_type']){
             case 'CONTAINER_START' :
                 eventType = IonEventType.CONTAINER_START;
                 break;
@@ -317,16 +307,17 @@ export class IonEventStream {
             case 'SYMBOL_TABLE' :
                 throw new Error('Symbol tables unsupported');
         }
-        let fieldname = (currentEvent.has('field_name') ? currentEvent.get('field_name') : null);
-        //TODO add binary side back into the logic flow https://github.com/amzn/ion-js/issues/131
+        let fieldname = (currentEvent['field_name'] !== undefined ? currentEvent['field_name'] : null);
+        //if(currentEvent.get('value_text') !== currentEvent.get('value_binary')) throw new Error(`${currentEvent.get('value_text')} does not equal ${currentEvent.get('value_binary')}`);
+
         return this.eventFactory.makeEvent(
             eventType,
-            currentEvent.get('ion_type'),
+            currentEvent['ion_type'],
             fieldname,
-            currentEvent.get('depth'),
-            currentEvent.get('annotations'),
-            currentEvent.get('isNull'),
-            currentEvent.get('value_text')
+            currentEvent['depth'],
+            currentEvent['annotations'],
+            currentEvent['isNull'],
+            currentEvent['value_text']
         );
     }
 
@@ -373,7 +364,7 @@ export class IonEventStream {
                 return IonTypes.STRUCT;
             }
             default : {
-                throw new Error('unexpected type: ' + input);
+                throw new Error('i: ' + input);
             }
 
         }
@@ -394,9 +385,9 @@ export class IonEventStream {
     }
 
     private parseBinaryValue() : any {
-        //convert list of ints to array of bytes and pass the buffer to a binary reader, generate value from factory.
+        //convert list of ints to array of bytes and pass the currentBuffer to a binary reader, generate value from factory.
         //start with a null check
-        if(this.reader.isNull()) return undefined;
+        if(this.reader.isNull()) return null;
         let numBuffer : number[] = [];
         this.reader.stepIn();
         let tid : IonType = this.reader.next();
@@ -406,6 +397,7 @@ export class IonEventStream {
         }
         this.reader.stepOut();
         let tempReader : Reader = makeReader(numBuffer, undefined);
+        tempReader.next();
         return tempReader.value();
     }
 

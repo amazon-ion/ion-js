@@ -11,21 +11,10 @@
 * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific
 * language governing permissions and limitations under the License.
 */
-import { CharCodes } from "./IonText";
-import { ClobEscapes } from "./IonText";
 import { Decimal } from "./IonDecimal";
 import { encodeUtf8 } from "./IonUnicode";
-import { encodeUtf8Stream } from "./IonUnicode";
-import { escape } from "./IonText";
-import { isIdentifier } from "./IonText";
-import { isNullOrUndefined } from "./IonUtilities";
-import { isOperator } from "./IonText";
-import { isUndefined } from "./IonUtilities";
-import { last } from "./IonUtilities";
-import { StringEscapes } from "./IonText";
-import { SymbolEscapes } from "./IonText";
+import { escape, toBase64, StringEscapes, SymbolEscapes, isIdentifier, isOperator, CharCodes, ClobEscapes } from "./IonText";
 import { Timestamp } from "./IonTimestamp";
-import { toBase64 } from "./IonText";
 import { TypeCodes } from "./IonBinary";
 import { Writeable } from "./IonWriteable";
 import { Writer } from "./IonWriter";
@@ -50,20 +39,20 @@ export class Context {
 }
 
 export class TextWriter implements Writer {
-    protected containerContext : Context[] = [];
-    getBytes(): number[] {
+
+    private containerContext : Context[];
+
+    getBytes(): Uint8Array {
         return this.writeable.getBytes();
     }
 
     constructor(protected readonly writeable: Writeable) {
-        this.containerContext.push(new Context(undefined));
+        this.containerContext = [new Context(undefined)];
     }
 
-    writeBlob(value: number[], annotations?: string[]) : void {
-        this.writeValue(TypeCodes.BLOB, value, annotations, (value: number[]) => {
-            this.writeUtf8('{{');
-            this.writeable.writeBytes(encodeUtf8(toBase64(value)));
-            this.writeUtf8('}}');
+    writeBlob(value: Uint8Array, annotations?: string[]) : void {
+        this.writeValue(TypeCodes.BLOB, value, annotations, (value: Uint8Array) => {
+            this.writeable.writeBytes(encodeUtf8('{{' + toBase64(value) + '}}'));
         });
     }
 
@@ -73,11 +62,10 @@ export class TextWriter implements Writer {
         });
     }
 
-    writeClob(value: number[], annotations?: string[]) : void {
-        this.writeValue(TypeCodes.CLOB, value, annotations, (value: number[]) => {
+    writeClob(value: Uint8Array, annotations?: string[]) : void {
+        this.writeValue(TypeCodes.CLOB, value, annotations, (value: Uint8Array) => {
             let hexStr : string;
-            this.writeUtf8('{{');
-            this.writeUtf8('"');
+            this.writeUtf8('{{"');
             for (let i : number = 0; i < value.length; i++) {
                 let c : number = value[i];
                 if (c > 127 && c < 256) {
@@ -87,7 +75,7 @@ export class TextWriter implements Writer {
                     }
                 } else {
                     let escape: number[] = ClobEscapes[c];
-                    if (isUndefined(escape)) {
+                    if (escape === undefined) {
                         if(c < 32){
                             hexStr = "\\x" + c.toString(16);
                             for(let j = 0; j < hexStr.length; j++){
@@ -97,12 +85,11 @@ export class TextWriter implements Writer {
                             this.writeable.writeByte(c);
                         }
                     } else {
-                        this.writeable.writeBytes(escape);
+                        this.writeable.writeBytes(new Uint8Array(escape));
                     }
                 }
             }
-            this.writeUtf8('"');
-            this.writeUtf8('}}');
+            this.writeUtf8('"}}');
         });
     }
 
@@ -244,9 +231,7 @@ export class TextWriter implements Writer {
 
     writeString(value: string, annotations?: string[]) : void {
         this.writeValue(TypeCodes.STRING, value, annotations, (value: string) => {
-            this.writeable.writeByte(CharCodes.DOUBLE_QUOTE);
-            this.writeable.writeStream(escape(value, StringEscapes));
-            this.writeable.writeByte(CharCodes.DOUBLE_QUOTE);
+            this.writeable.writeBytes(encodeUtf8('"' + escape(value, StringEscapes) + '"'));
         });
     }
 
@@ -297,7 +282,7 @@ export class TextWriter implements Writer {
 
     protected writeValue<T>(typeCode: TypeCodes, value: T, annotations: string[], serialize: Serializer<T>) {
         if (this.currentContainer.state === State.STRUCT_FIELD) throw new Error("Expecting a struct field");
-        if (isNullOrUndefined(value)) {
+        if (value === null || value === undefined) {
             this.writeNull(typeCode, annotations);
             return;
         }
@@ -346,15 +331,13 @@ export class TextWriter implements Writer {
         }
     }
 
-    protected writeUtf8(s: string) : void {
-        this.writeable.writeBytes(encodeUtf8(s));
+
+    private writeUtf8(s: string) : void {
+            this.writeable.writeBytes(encodeUtf8(s));
     }
 
-    protected writeAnnotations(annotations: string[]) : void {
-        if (isNullOrUndefined(annotations)) {
-            return;
-        }
-
+    private writeAnnotations(annotations: string[]) : void {
+        if (annotations === null || annotations === undefined) return;
         for (let annotation of annotations) {
             this.writeSymbolToken(annotation);
             this.writeUtf8('::');
@@ -382,9 +365,7 @@ export class TextWriter implements Writer {
             if(s.length > 1 && s.charAt(0) === '$'.charAt(0)){
                 let tempStr = s.substr(1, s.length);
                 if (+tempStr === +tempStr) {//+str === +str is a one line is integer hack
-                    this.writeable.writeByte(CharCodes.SINGLE_QUOTE);
-                    this.writeable.writeStream(escape(s, SymbolEscapes));
-                    this.writeable.writeByte(CharCodes.SINGLE_QUOTE);
+                    this.writeable.writeBytes(encodeUtf8("'" + escape(s, SymbolEscapes) + "'"));
                 } else {
                     this.writeUtf8(s);
                 }
@@ -394,9 +375,7 @@ export class TextWriter implements Writer {
         } else if ((!this.isTopLevel) && (this.currentContainer.containerType === TypeCodes.SEXP) && isOperator(s)) {
             this.writeUtf8(s);
         } else {
-            this.writeable.writeByte(CharCodes.SINGLE_QUOTE);
-            this.writeable.writeStream(escape(s, SymbolEscapes));
-            this.writeable.writeByte(CharCodes.SINGLE_QUOTE);
+            this.writeable.writeBytes(encodeUtf8("'" + escape(s, SymbolEscapes) + "'"));
         }
     }
 }

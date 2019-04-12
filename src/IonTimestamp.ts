@@ -29,12 +29,10 @@
 //    The parse function returns a newly minted timestamp. If the string is
 //    undefined, empty or a null image it returns the timestamp NULL.
 
-import { Decimal } from "./IonDecimal";
-import { isNumber } from "./IonUtilities";
-import { isString } from "./IonUtilities";
-import { isUndefined } from "./IonUtilities";
-import { LongInt } from "./IonLongInt";
-import { Precision } from "./IonPrecision";
+import {Decimal} from "./IonDecimal";
+import {LongInt} from "./IonLongInt";
+import {Precision} from "./IonPrecision";
+import {isDigit} from "./IonText"
 
 const MIN_SECONDS: number = 0;
 const MAX_SECONDS: number = 60;
@@ -174,10 +172,10 @@ function to_4_digits(v: number) : string {
   }
 }
 
-function read_unknown_digits(str: string, pos: number) : string {
+function read_unknown_digits(str: string, pos: number) : string {//TODO this seems incorrect
   let i: number = pos;
   for (; i < str.length; i++) {
-    if (!isNumber(parseInt(str[i], 10))) {
+    if (!isDigit(str.charCodeAt(i))) {
       break;
     }
   }
@@ -235,38 +233,82 @@ const SECONDS_AT_EPOCH_START: number = (function() {
   return d;
 })();
 
-function bad_timestamp(m: any) : never {
-  if (isNumber(m)) {
-    m = "invalid format for timestamp at offset " + m;
-  }
-  throw new Error(m);
-}
-
 export class Timestamp {
-  private seconds: Decimal;
+    readonly precision : Precision;
+    readonly offset : number;
+    readonly year : number;
+    readonly month : number;
+    readonly day : number;
+    readonly hour : number;
+    readonly minute : number;
+    readonly seconds : Decimal;
+    readonly date : Date;
+    /*
+    readonly utcYear : number;
+    readonly utcMonth : number;
+    readonly utcDay : number;
+    readonly utcHour : number;
+    readonly utcMinute : number;
+    */
 
-  constructor(
-    private precision: Precision = Precision.NULL,
-    private offset: number = 0,
-    private year: number = 0,
-    private month: number = 0,
-    private day: number = 0,
-    private hour: number = 0,
-    private minute: number = 0,
-    seconds: number | string | Decimal = 0
-  ) {
-    if (isNumber(seconds) && Math.floor(seconds) === seconds) {
-      // we allow whole number seconds to be specified as a number
-      // in which case we convert it to a decimal value
-      this.seconds = new Decimal(LongInt.fromNumber(seconds), 0);
-    } else if (isString(seconds)) {
-      this.seconds = Decimal.parse(seconds);
-    } else {
-      this.seconds = <Decimal>seconds;
+
+    constructor(precision, offset, year, month, day, hour, minute, seconds) {
+        if(precision === Precision.SECONDS){
+            if(seconds === undefined || seconds === null) throw new Error("Seconds and precision in illegal state.");
+            if (typeof seconds === 'number') {
+                if(Math.floor(seconds) !== seconds) throw new Error("Fractional timestamp seconds must be supplied in Decimal format.");
+                this.seconds = new Decimal(new LongInt(seconds), 0);
+            } else if (typeof seconds === 'string') {
+                this.seconds = Decimal.parse(seconds);
+            } else {
+                this.seconds = seconds;
+            }
+        }
+        this.precision = precision;
+        this.offset = offset;
+        this.year = year;
+        this.month = month;
+        this.day = day;
+        this.hour = hour;
+        this.minute = minute;
+        this.checkValid();
+        this.date = new Date(Date.UTC(this.year, (this.precision === Precision.YEAR ? 0 : this.month - 1), this.day, this.hour, this.minute, null, null) - (this.offset * 60000));
+        /*
+        let shiftHours = Math.floor(this.offset / 60);
+        let shiftMinute = this.offset - (shiftHours * 60);
+        this.utcMinute = this.minute - shiftMinute;
+        if(this.utcMinute < MIN_MINUTE) {
+            this.utcMinute = MAX_MINUTE - (this.utcMinute + MIN_MINUTE);
+            shiftHours--;
+        } else if(this.utcMinute > MAX_MINUTE) {
+            this.utcMinute = MIN_MINUTE + (this.utcMinute - MAX_MINUTE);
+            shiftHours++;
+        }
+        this.utcHour = this.hour - shiftHours;
+        let shiftDays = 0;
+        if(this.utcHour < MIN_HOUR) {
+            this.utcHour = MAX_HOUR - (this.utcHour + MIN_HOUR);
+            shiftDays--;
+        } else if(this.utcHour > MAX_HOUR) {
+            this.utcHour = MIN_HOUR + (this.utcHour - MAX_HOUR);
+            shiftDays++;
+        }
+        this.utcDay = this.day - shiftDays;
+        if(this.utcDay < MIN_DAY) {
+            this.utcMonth = this.month - 1;
+            if(this.utcMonth < MIN_MONTH) {
+                this.utcMonth = MAX_MONTH;
+                this.utcDay = DAYS_PER_MONTH[MAX_MONTH];
+            }
+            this.utcDay = DAYS_PER_MONTH[this.utcMonth];
+        } else if(this.utcDay > DAYS_PER_MONTH[this.month]) {
+            this.utcMonth = this.month - 1;
+            this.utcHour = MIN_HOUR + (this.utcHour - MAX_HOUR);
+        } else {
+
+        }
+        */
     }
-
-    this.checkValid();
-  }
 
   private checkValid() : void {
     if (this.precision === Precision.NULL) {
@@ -319,33 +361,6 @@ export class Timestamp {
         }
       }
     }
-  }
-
-  getEpochMilliseconds() : number {
-    let n: number = 0;
-    switch (this.precision) {
-      case Precision.NULL:
-        return undefined;
-      case Precision.SECONDS:
-        n += this.seconds.getNumber(); 
-      case Precision.HOUR_AND_MINUTE:
-        n += this.minute * SECS_PER_MIN;
-        n += this.hour * SECS_PER_HOUR;
-      case Precision.DAY:
-        n += (this.day - 1) * SECS_PER_DAY;
-      case Precision.MONTH:
-        n += days_to_start_of_month(this.month, this.year) * SECS_PER_DAY;
-      case Precision.YEAR:
-        n += days_to_start_of_year(this.year) * SECS_PER_DAY;
-    }
-
-    // adjust back the offset to get GMT
-    n -= this.offset * 60;
-    // back up for the epoch
-    n -= SECONDS_AT_EPOCH_START;
-    // we did say milliseconds
-    n *= 1000;
-    return n;
   }
 
   equals(expected : Timestamp) : boolean {//TODO implement instant equals https://github.com/amzn/ion-js/issues/132
@@ -402,8 +417,8 @@ export class Timestamp {
 
     // hours : minute (for offset)
     let o: number = t.offset;
-    if (t.precision > Precision.DAY || isUndefined(o)) {  // TODO: is this right?
-      if (isUndefined(o) || (o === -0.0)) {
+    if (t.precision > Precision.DAY || o === undefined) {  // TODO: is this right?
+      if (o === undefined || o === -0.0) {
         image = image + "Z";
       } else {
         if (o < 0) {
@@ -419,10 +434,6 @@ export class Timestamp {
     return image;
   }
 
-  numberValue() : number {
-    return this.getEpochMilliseconds();
-  }
-
   toString() : string {
     return this.stringValue();
   }
@@ -431,39 +442,34 @@ export class Timestamp {
     return (this.precision === Precision.NULL);
   }
 
-  getZuluYear() : number {
-    return (this.precision >= Precision.YEAR) ? this.year : undefined;
-  }
-
-  getZuluMonth() : number {
-    return (this.precision >= Precision.MONTH) ? this.month : undefined;
-  }
-
-  getZuluDay() : number {
-    return (this.precision >= Precision.DAY) ? this.day : undefined;
-  }
-
-  getZuluHour() : number {
-    return (this.precision >= Precision.HOUR_AND_MINUTE) ? this.hour : undefined;
-  }
-
-  getZuluMinute() : number {
-    return (this.precision >= Precision.HOUR_AND_MINUTE) ? this.minute : undefined;
-  }
-
-  getZuluSeconds() : Decimal {
-    return (this.precision >= Precision.SECONDS) ? this.seconds : undefined;
-  }
-
   getOffset() : number {
-    return (this.precision > Precision.NULL) ? this.offset : undefined;
+    return (this.precision > Precision.NULL) ? this.offset : null;
   }
 
   getPrecision() : Precision {
     return this.precision;
   }
 
-  static readonly NULL: Timestamp = new Timestamp(Precision.NULL);
+    public getDate() : Date {
+        let offsetShift = this.offset*60000, seconds = null, ms = null;
+        if(this.precision === Precision.SECONDS) {
+            let fraction = this.seconds.numberValue();
+            seconds = Math.floor(fraction);
+            ms = fraction - seconds;
+        }
+        let date = new Date(Date.UTC(this.year, (this.precision === Precision.YEAR ? 0 : this.month - 1), this.day, this.hour, this.minute, seconds, ms) - offsetShift);
+        //The Ion specification allows year only precision, Javascript's Date does not, Ion has infinite precision decimal seconds whereas Javascript's Date rounds to milliseconds.
+        //We have opted to allow users to generate Date objects within try catch statements so they can handle the specification differences as they see fit.
+        //This is a one way lossy translation for user utility, do not use a Date to roundtrip data or expect any support for lossiness within the Date class and its APIs.
+        if(this.precision === Precision.YEAR || this.precision === Precision.SECONDS) {
+            let error =  new Error(this.precision === Precision.YEAR ? "Year" : "Seconds");
+            error['date'] = date;
+            throw error;
+        }
+        return date;
+    }
+
+  static readonly NULL: Timestamp = new Timestamp(Precision.NULL, null, null, null, null, null, null, null);
 
     static parse(str: string) : Timestamp {
         var precision;
@@ -472,16 +478,16 @@ export class Timestamp {
         if (str.charCodeAt(0) === 110) {  // "n"
             if (str === "null") return Timestamp.NULL;
             if (str === "null.timestamp") return Timestamp.NULL;
-            bad_timestamp(0);
+            throw new Error("Illegal timestamp: " + str);
         }
 
-        let offset: number;
-        let year: number;
-        let month: number;
-        let day: number;
-        let hour: number;
-        let minute: number;
-        let seconds: number | Decimal;
+        let offset: number = -0.0;
+        let year: number = null;
+        let month: number = null;
+        let day: number = null;
+        let hour: number = null;
+        let minute: number = null;
+        let seconds: number | Decimal = null;
 
         let pos: number = 0;
         let state: TimeParserState = timeParserStates[States.YEAR];
@@ -490,18 +496,14 @@ export class Timestamp {
         let v: number;
 
         while (pos < limit) {
-            if (isUndefined(state.len)) {
+            if (state.len === undefined) {
                 let digits: string = read_unknown_digits(str, pos);
-                if (digits.length === 0) {
-                    bad_timestamp(pos);
-                }
+                if (digits.length === 0) throw new Error("No digits found at pos: " + pos);
                 v = parseInt(digits, 10);
                 pos += digits.length;
             } else if (state.len > 0) {
                 v = read_digits(str, pos, state.len);
-                if (v < 0) {
-                    bad_timestamp(pos);
-                }
+                if (v < 0) throw new Error("Non digit value found at pos " + pos);
                 pos = pos + state.len;
             }
             switch (state.f) {
@@ -523,10 +525,9 @@ export class Timestamp {
                 case States.SECONDS:
                     seconds = v;
                     break;
-                // 1234-67-89T12:45:78.dddd
                 case States.FRACTIONAL_SECONDS:
                     const START_POSITION_OF_SECONDS = 17;
-                    seconds = Decimal.parse(str.substring(START_POSITION_OF_SECONDS, pos), false);
+                    seconds = Decimal.parse(str.substring(START_POSITION_OF_SECONDS, pos));
                     break;
                 case States.OFFSET:
                     break;
@@ -544,21 +545,18 @@ export class Timestamp {
                     offset = -0.0;
                     break;
                 default:
-                    bad_timestamp("invalid internal state");
+                    throw new Error("invalid internal state");
             }
-            if (!isUndefined(state.p)) {
+            if (state.p !== undefined) {
                 precision = state.p;
                 if (pos >= limit) {
                     break;
                 }
             }
-            if (!isUndefined(state.t)) {
+            if (state.t !== undefined) {
                 let c: string = String.fromCharCode(str.charCodeAt(pos));
                 state = timeParserStates[state.t[c]];
-                if (isUndefined(state)) {
-                    debugger;
-                    bad_timestamp(pos)
-                }
+                if (state === undefined) throw new Error("State was not set pos:" + pos );
             }
             pos++;
         }
