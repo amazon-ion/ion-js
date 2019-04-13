@@ -66,31 +66,31 @@ module.exports = function(grunt) {
     },
     ts: {
       'amd-es6-debug': {
-        src: ['src/**/*.ts', 'src/BigInteger.js'],
+        src: ['src/**/*.ts'],
         outDir: 'dist/amd/es6',
         options: {
           target: "es6",
           module: "amd",
-          allowJs: true
+          declaration: true
         }
       },
 
       'amd-es6': {
-        src: ['src/**/*.ts', 'src/BigInteger.js'],
+        src: ['src/**/*.ts'],
         outDir: 'dist/amd/es6',
         options: {
           target: "es6",
           module: "amd",
-          allowJs: true
+          declaration: true
         }
       },
       'commonjs-es6': {
-        src: ['src/**/*.ts', 'src/BigInteger.js'],
+        src: ['src/**/*.ts'],
         outDir: 'dist/commonjs/es6',
         options: {
           target: "es6",
           module: "commonjs",
-          allowJs: true
+          declaration: true
         }
       }
     },
@@ -114,6 +114,18 @@ module.exports = function(grunt) {
           { expand: true,
             src: ['browser/**'],
             dest: 'docs/',
+          }
+        ]
+      }, 
+      bigInt: {
+        files: [
+          {
+            src: ['BigInteger.js','./src/BigInteger.d.ts'],
+            dest: 'dist/commonjs/es6/'
+          },
+          {
+            src: ['BigInteger.js','./src/BigInteger.d.ts'],
+            dest: 'dist/amd/es6/'
           }
         ]
       }
@@ -205,8 +217,7 @@ module.exports = function(grunt) {
   grunt.registerTask('build:cjs', ['ts:commonjs-es6']);
   grunt.registerTask('build:amd', ['ts:amd-es6']);
   grunt.registerTask('build:amd:debug', ['ts:amd-es6-debug']);
-  grunt.registerTask('build', ['clean', 'build:amd', 'build:cjs','trans:browser', 'copy:all']);
-
+  grunt.registerTask('build', ['clean', 'build:amd', 'build:cjs', 'copy:bigInt', 'trans:browser', 'copy:all']);
 
   // Tests
   grunt.registerTask('test', ['build', 'intern:es6']);     // build and test
