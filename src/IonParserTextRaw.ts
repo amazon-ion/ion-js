@@ -137,7 +137,7 @@ function get_keyword_type(str: string) : number {
   if (str === "nan")   return T_FLOAT_SPECIAL;
   if (str === "+inf")  return T_FLOAT_SPECIAL;
   if (str === "-inf")  return T_FLOAT_SPECIAL;
-    throw new Error("Unknown keyword: " + str + ".");
+  throw new Error("Unknown keyword: " + str + ".");
 }
 
 function get_type_from_name(str: string) : number {
@@ -158,7 +158,7 @@ function get_type_from_name(str: string) : number {
 }
 
 function is_keyword(str: string) : boolean {
-    return (str === "null") || (str === "true") || (str === "false") || (str === "nan") || (str === "+inf") || (str === "-inf");
+  return (str === "null") || (str === "true") || (str === "false") || (str === "nan") || (str === "+inf") || (str === "-inf");
 }
 
 function get_hex_value(ch: number) : number {
@@ -222,7 +222,6 @@ export class ParserTextRaw {
   private _msg: string;
   private _error_msg: string;
   private _fieldname: string;
-  private _fieldnameType: number;
 
   private readonly _read_value_helper_helpers: ReadValueHelpers;
 
@@ -238,17 +237,16 @@ export class ParserTextRaw {
     this._ann        = [];
     this._msg        = "";
     this._fieldname  = null;
-    this._fieldnameType = null;
 
     let helpers: ReadValueHelpers = {
-    //  -1 : this._read_value_helper_EOF,    //      == EOF
-        40 : this._read_value_helper_paren,  // '('  == CH_OP
-        91 : this._read_value_helper_square, // '['  == CH_OS
-       123 : this._read_value_helper_curly, // '{'  == CH_LEFT_CURLY
-        43 : this._read_value_helper_plus,   // '+'  == CH_PS // we'll have to patch these two back in after
-        45 : this._read_value_helper_minus,  // '-'  == CH_MS // we apply the operator characters fn
-        39 : this._read_value_helper_single, // '\'' == CH_SQ
-        34 : this._read_value_helper_double, // '\"' == CH_DQ
+      //  -1 : this._read_value_helper_EOF,    //      == EOF
+      40 : this._read_value_helper_paren,  // '('  == CH_OP
+      91 : this._read_value_helper_square, // '['  == CH_OS
+      123 : this._read_value_helper_curly, // '{'  == CH_LEFT_CURLY
+      43 : this._read_value_helper_plus,   // '+'  == CH_PS // we'll have to patch these two back in after
+      45 : this._read_value_helper_minus,  // '-'  == CH_MS // we apply the operator characters fn
+      39 : this._read_value_helper_single, // '\'' == CH_SQ
+      34 : this._read_value_helper_double, // '\"' == CH_DQ
     };
     let set_helper = function(str: string, fn: ReadValueHelper) {
       var i = str.length, ch;
@@ -273,10 +271,6 @@ export class ParserTextRaw {
     return this._fieldname;
   }
 
-  fieldNameType() : number {
-      return this._fieldnameType;
-  }
-
   annotations() : string[] {
     return this._ann;
   }
@@ -285,7 +279,8 @@ export class ParserTextRaw {
     var ch = this._peek();
     if (ch == EOF) {
       this._value_push( EOF );
-    } else {
+    }
+    else {
       // these get put in the ops list in reverse order
       this._ops.unshift( this._read_datagram_values );
       this._ops.unshift( this._read_value );
@@ -297,7 +292,7 @@ export class ParserTextRaw {
     if (ch == CH_CP) {
       this._value_push( EOF );
     } else if (ch === EOF){
-        throw new Error("Expected closing ).");
+      throw new Error("Expected closing ).");
     } else {
       this._unread(ch);
       this._ops.unshift( this._read_sexp_values );
@@ -355,23 +350,23 @@ export class ParserTextRaw {
     }
   }
 
-    private _read_list_comma() : void {
-        var ch = this._read_after_whitespace(true);
-        if (ch == CH_CM) {
-            ch = this._read_after_whitespace(true);
-            if (ch == CH_CS) {
-                this._value_push( EOF );
-            } else {
-                this._unread(ch);
-                this._ops.unshift( this._read_list_comma );
-                this._ops.unshift( this._read_value );
-            }
-        } else if (ch == CH_CS) {
-            this._value_push( EOF );
-        } else {
-            this._error("expected ',' or ']'");
-        }
+  private _read_list_comma() : void {
+    var ch = this._read_after_whitespace(true);
+    if (ch == CH_CM) {
+      ch = this._read_after_whitespace(true);
+      if (ch == CH_CS) {
+        this._value_push( EOF );
+      } else {
+        this._unread(ch);
+        this._ops.unshift( this._read_list_comma );
+        this._ops.unshift( this._read_value );
+      }
+    } else if (ch == CH_CS) {
+      this._value_push( EOF );
+    } else {
+      this._error("expected ',' or ']'");
     }
+  }
 
   private _read_struct_comma() : void {
     var ch = this._read_after_whitespace(true);
@@ -394,26 +389,27 @@ export class ParserTextRaw {
   }
 
   clearFieldName() : void {
-      this._fieldname = null;
-      this._fieldnameType = null;
+    this._fieldname = null;
   }
 
-    private _load_field_name() {
-        this._fieldnameType = this._value_pop();
-        let s = this.get_value_as_string(this._fieldnameType);
-
-        switch (this._fieldnameType) {
-            case T_IDENTIFIER:
-            if (is_keyword(s)) throw new Error( "can't use '" + s + "' as a fieldname without quotes");
-            case T_STRING1:
-            case T_STRING2:
-            case T_STRING3:
-                this._fieldname = s;
-                break;
-            default:
-                throw new Error( "invalid fieldname" + s );
+  private _load_field_name() {
+    var v = this._value_pop(),
+        s = this.get_value_as_string(v);
+    switch (v) {
+      case T_IDENTIFIER:
+        if (is_keyword(s)) {
+          throw new Error( "Can't use '"+s+"' as a fieldname without quotes");
         }
+      case T_STRING1:
+      case T_STRING2:
+      case T_STRING3:
+        this._fieldname = s;
+        break;
+      default:
+        this._error( "invalid fieldname" );
+        break;
     }
+  }
 
   private _read_value() : void {
     this._read_value_helper(false, this._read_value);
@@ -481,7 +477,7 @@ export class ParserTextRaw {
       this._ops.unshift( this._read_plus_inf );
     }
     else if (accept_operator_symbols) {
-          this._ops.unshift( this._read_operator_symbol );
+      this._ops.unshift( this._read_operator_symbol );
     }
     else {
       this._error("unexpected '+'");
@@ -526,63 +522,63 @@ export class ParserTextRaw {
     }
   }
 
-    private _read_value_helper_single( ch1 : number, accept_operator_symbols: boolean, calling_op : ReadValueHelper) {
-        var op;
-        if (this._peek("\'\'") != ERROR) {
-            op = this._read_string3;
-            op.call(this);
-        } else {
-            op = this._read_string1;
-            op.call(this);
-            if (this._test_string_as_annotation(op)) {
-                // this was an annotation, so we need to try again for the actual value
-                this._ops.unshift( calling_op );
-            }
-        }
+  private _read_value_helper_single( ch1 : number, accept_operator_symbols: boolean, calling_op : ReadValueHelper) {
+    var op;
+    if (this._peek("\'\'") != ERROR) {
+      op = this._read_string3;
+      op.call(this);
+    } else {
+      op = this._read_string1;
+      op.call(this);
+      if (this._test_string_as_annotation(op)) {
+        // this was an annotation, so we need to try again for the actual value
+        this._ops.unshift( calling_op );
+      }
     }
+  }
 
   private _read_value_helper_double( ch1 : number, accept_operator_symbols: boolean, calling_op : ReadValueHelper) {
     this._ops.unshift( this._read_string2 );
   }
 
-    private _read_value_helper_letter( ch1 : number, accept_operator_symbols: boolean, calling_op : ReadValueHelper) {
-        let tempNullStart = this._start;
-        this._read_symbol();
-        let type = this._value_pop();
-        if (type != T_IDENTIFIER) throw new Error("Expecting symbol here.");
+  private _read_value_helper_letter( ch1 : number, accept_operator_symbols: boolean, calling_op : ReadValueHelper) {
+    let tempNullStart = this._start;
+    this._read_symbol();
+    let type = this._value_pop();
+    if (type != T_IDENTIFIER) throw new Error("Expecting symbol here.");
 
-        let symbol = this.get_value_as_string(type);
+    let symbol = this.get_value_as_string(type);
 
-        if(is_keyword(symbol)) {
-            let kwt = get_keyword_type(symbol);
-            if (kwt === T_NULL) {
-                this._value_null = true;
-                if (this._peek() === CH_DT) {
-                    this._read(); // consume the dot
-                    let ch = this._read();
-                    if (IonText.is_letter(ch) !== true) throw new Error("Expected type name after 'null.'");
-                    this._read_symbol();
-                    if (this._value_pop() !== T_IDENTIFIER) throw new Error("Expected type name after 'null.'");
-                    symbol = this.get_value_as_string(T_IDENTIFIER);
-                    kwt = get_type_from_name(symbol);
-                }
-                this._start = -1;
-                this._end = -1;
-            }
-            this._value_push(kwt);
-        } else {
-            let ch = this._read_after_whitespace(true);
-            if (ch == CH_CL && this._peek() == CH_CL) {
-                this._read(); // consume the colon character
-                this._ann.push(symbol);
-                this._ops.unshift( calling_op );
-            } else {
-                let kwt = T_IDENTIFIER;
-                this._unread(ch);
-                this._value_push(kwt); // put the value back on the stack
-            }
+    if(is_keyword(symbol)) {
+      let kwt = get_keyword_type(symbol);
+      if (kwt === T_NULL) {
+        this._value_null = true;
+        if (this._peek() === CH_DT) {
+          this._read(); // consume the dot
+          let ch = this._read();
+          if (IonText.is_letter(ch) !== true) throw new Error("Expected type name after 'null.'");
+          this._read_symbol();
+          if (this._value_pop() !== T_IDENTIFIER) throw new Error("Expected type name after 'null.'");
+          symbol = this.get_value_as_string(T_IDENTIFIER);
+          kwt = get_type_from_name(symbol);
         }
+        this._start = -1;
+        this._end = -1;
+      }
+      this._value_push(kwt);
+    } else {
+      let ch = this._read_after_whitespace(true);
+      if (ch == CH_CL && this._peek() == CH_CL) {
+        this._read(); // consume the colon character
+        this._ann.push(symbol);
+        this._ops.unshift( calling_op );
+      } else {
+        let kwt = T_IDENTIFIER;
+        this._unread(ch);
+        this._value_push(kwt); // put the value back on the stack
+      }
     }
+  }
 
   private _read_value_helper_operator( ch1 : number, accept_operator_symbols: boolean, calling_op : ReadValueHelper) {
     if (accept_operator_symbols) {
@@ -590,7 +586,7 @@ export class ParserTextRaw {
       this._ops.unshift( this._read_operator_symbol );
     }
     else {
-       this._error( "unexpected operator character" );
+      this._error( "unexpected operator character" );
     }
   }
 
@@ -672,7 +668,7 @@ export class ParserTextRaw {
   private _read_plus_inf() {
     this._start = this._in.position();
     if (this._read() == CH_PS) {
-     this._read_inf_helper();
+      this._read_inf_helper();
     }
     else {
       this._error( "expected +inf" );
@@ -682,7 +678,7 @@ export class ParserTextRaw {
   private _read_minus_inf() {
     this._start = this._in.position();
     if (this._read() == CH_MS) {
-     this._read_inf_helper();
+      this._read_inf_helper();
     }
     else {
       this._error( "expected -inf" );
@@ -707,76 +703,76 @@ export class ParserTextRaw {
     }
   }
 
-    private _readTimestamp() : void {
-        this._start = this._in.position();
-        let ch = this._readPastNDigits(4);//reads past year, throws on non digits.
-        if (ch === CH_T) {
-            this._end = this._in.position();
-            this._value_push( T_TIMESTAMP );
-            return;
-        } else if (ch !== CH_MS) {
-            throw new Error("Timestamp year must be followed by '-' or 'T'.");
-        }
-
-        ch = this._readPastNDigits(2);//reads past month, throws on non digits.
-        if (ch === CH_T) {
-            this._end = this._in.position();
-            this._value_push( T_TIMESTAMP );
-            return;
-        } else if (ch !== CH_MS) {
-            throw new Error("Timestamp month must be followed by '-' or 'T'.");
-        }
-
-        ch = this._readPastNDigits(2); //reads past day, throws on non digits.
-        if (IonText.isNumericTerminator(ch)) {
-            this._unread(ch);
-            this._end = this._in.position();
-            this._value_push( T_TIMESTAMP );
-            return;
-        } else if (ch !== CH_T) {
-            throw new Error("Timestamp day must be followed by a numeric stop character .");
-        }
-
-        let peekChar = this._in.peek();
-        if (IonText.isNumericTerminator(peekChar)) {//checks to see if timestamp value has terminated.
-            this._end = this._in.position();
-            this._value_push( T_TIMESTAMP );
-            return;
-        } else if (!IonText.is_digit(peekChar)) {
-            throw new Error("Timestamp DATE must be followed by numeric terminator or additional TIME digits.");
-        }
-
-        ch = this._readPastNDigits(2);//read past hour.
-        if (ch !== CH_CL) { // :
-            throw new Error("Timestamp time(hr:min) requires format of 00:00");
-        }
-
-        ch = this._readPastNDigits(2);//read past minutes.
-        if (ch === CH_CL) { //read seconds
-            ch = this._readPastNDigits(2);
-            if (ch === CH_DT) { //read fractional seconds
-                if(!IonText.is_digit(this._read())) throw new Error("W3C timestamp spec requires atleast one digit after decimal point." );
-                while (IonText.is_digit(ch = this._read())) {}
-            }
-        }
-
-        if (ch === CH_Z) {
-            if(!IonText.isNumericTerminator(this._peek())) throw new Error("Illegal terminator after Zulu offset.");
-            this._end = this._in.position();
-            this._value_push( T_TIMESTAMP );
-            return;
-        } else if (ch !== CH_PS && ch !== CH_MS) {
-            throw new Error("Timestamps require an offset.");
-        }
-        ch = this._readPastNDigits(2);
-        if(ch !== CH_CL) throw new Error("Timestamp offset(hr:min) requires format of +/-00:00.");
-        this._readNDigits(2);
-
-        ch = this._peek();
-        if(!IonText.isNumericTerminator(ch)) throw new Error("Improperly formatted timestamp.");
-        this._end = this._in.position();
-        this._value_push( T_TIMESTAMP );
+  private _readTimestamp() : void {
+    this._start = this._in.position();
+    let ch = this._readPastNDigits(4);//reads past year, throws on non digits.
+    if (ch === CH_T) {
+      this._end = this._in.position();
+      this._value_push( T_TIMESTAMP );
+      return;
+    } else if (ch !== CH_MS) {
+      throw new Error("Timestamp year must be followed by '-' or 'T'.");
     }
+
+    ch = this._readPastNDigits(2);//reads past month, throws on non digits.
+    if (ch === CH_T) {
+      this._end = this._in.position();
+      this._value_push( T_TIMESTAMP );
+      return;
+    } else if (ch !== CH_MS) {
+      throw new Error("Timestamp month must be followed by '-' or 'T'.");
+    }
+
+    ch = this._readPastNDigits(2); //reads past day, throws on non digits.
+    if (IonText.isNumericTerminator(ch)) {
+      this._unread(ch);
+      this._end = this._in.position();
+      this._value_push( T_TIMESTAMP );
+      return;
+    } else if (ch !== CH_T) {
+      throw new Error("Timestamp day must be followed by a numeric stop character .");
+    }
+
+    let peekChar = this._in.peek();
+    if (IonText.isNumericTerminator(peekChar)) {//checks to see if timestamp value has terminated.
+      this._end = this._in.position();
+      this._value_push( T_TIMESTAMP );
+      return;
+    } else if (!IonText.is_digit(peekChar)) {
+      throw new Error("Timestamp DATE must be followed by numeric terminator or additional TIME digits.");
+    }
+
+    ch = this._readPastNDigits(2);//read past hour.
+    if (ch !== CH_CL) { // :
+      throw new Error("Timestamp time(hr:min) requires format of 00:00");
+    }
+
+    ch = this._readPastNDigits(2);//read past minutes.
+    if (ch === CH_CL) { //read seconds
+      ch = this._readPastNDigits(2);
+      if (ch === CH_DT) { //read fractional seconds
+        if(!IonText.is_digit(this._read())) throw new Error("W3C timestamp spec requires atleast one digit after decimal point." );
+        while (IonText.is_digit(ch = this._read())) {}
+      }
+    }
+
+    if (ch === CH_Z) {
+      if(!IonText.isNumericTerminator(this._peek())) throw new Error("Illegal terminator after Zulu offset.");
+      this._end = this._in.position();
+      this._value_push( T_TIMESTAMP );
+      return;
+    } else if (ch !== CH_PS && ch !== CH_MS) {
+      throw new Error("Timestamps require an offset.");
+    }
+    ch = this._readPastNDigits(2);
+    if(ch !== CH_CL) throw new Error("Timestamp offset(hr:min) requires format of +/-00:00.");
+    this._readNDigits(2);
+
+    ch = this._peek();
+    if(!IonText.isNumericTerminator(ch)) throw new Error("Improperly formatted timestamp.");
+    this._end = this._in.position();
+    this._value_push( T_TIMESTAMP );
+  }
 
   private _read_symbol() : void {
     var ch;
@@ -815,39 +811,39 @@ export class ParserTextRaw {
   }
 
   private _read_string3(recognizeComments?) : void {
-      if(recognizeComments === undefined) recognizeComments = true;
-      let ch : number;
-      this._unread(this._peek(""));
-      // read sequence of triple quoted strings
-      for(this._start = this._in.position() + 3; this._peek("\'\'\'") !== ERROR; this._in.unread(this._read_after_whitespace(recognizeComments))) {
-          for(let i : number = 0; i < 3; i++){this._read()}
-          //in tripleQuotes, index content of current triple quoted string,
-          //looking for more triple quotes
-          while(this._peek("\'\'\'") === ERROR) {
-              ch = this._read();
-              if (ch == CH_BS) {
-                  this._read_string_escape_sequence();
-              }
-              if (ch === EOF) throw new Error('Closing triple quotes not found.');
-              if (!is_valid_string_char(ch, true)) throw new Error("invalid character "+ch+" in string" );
-            // read single quoted strings until we see the triple quoted terminator
-            // if it's not a triple quote, it's just content
-          }
-          //mark the possible end of the series of triplequotes, set the end of the value, it will reset later if further triple quotes are found after indexing through whitespace.
-          this._end = this._in.position();
-          //Index past the triple quote.
-          for(let i : number = 0; i < 3; i++){this._read()}
-          // the reader will parse values from the source so that it can be roundtripped.
-          // eat next whitespace sequence until first non white char found.
+    if(recognizeComments === undefined) recognizeComments = true;
+    let ch : number;
+    this._unread(this._peek(""));
+    // read sequence of triple quoted strings
+    for(this._start = this._in.position() + 3; this._peek("\'\'\'") !== ERROR; this._in.unread(this._read_after_whitespace(recognizeComments))) {
+      for(let i : number = 0; i < 3; i++){this._read()}
+      //in tripleQuotes, index content of current triple quoted string,
+      //looking for more triple quotes
+      while(this._peek("\'\'\'") === ERROR) {
+        ch = this._read();
+        if (ch == CH_BS) {
+          this._read_string_escape_sequence();
+        }
+        if (ch === EOF) throw new Error('Closing triple quotes not found.');
+        if (!is_valid_string_char(ch, true)) throw new Error("invalid character "+ch+" in string" );
+        // read single quoted strings until we see the triple quoted terminator
+        // if it's not a triple quote, it's just content
       }
-      this._value_push(T_STRING3);
+      //mark the possible end of the series of triplequotes, set the end of the value, it will reset later if further triple quotes are found after indexing through whitespace.
+      this._end = this._in.position();
+      //Index past the triple quote.
+      for(let i : number = 0; i < 3; i++){this._read()}
+      // the reader will parse values from the source so that it can be roundtripped.
+      // eat next whitespace sequence until first non white char found.
+    }
+    this._value_push(T_STRING3);
   }
 
-    private verifyTriple(entryIndex : number) : boolean {
-        return this._in.valueAt(entryIndex) === CH_SQ &&
-            this._in.valueAt(entryIndex + 1) === CH_SQ &&
-            this._in.valueAt(entryIndex + 2) === CH_SQ;
-    }
+  private verifyTriple(entryIndex : number) : boolean {
+    return this._in.valueAt(entryIndex) === CH_SQ &&
+        this._in.valueAt(entryIndex + 1) === CH_SQ &&
+        this._in.valueAt(entryIndex + 2) === CH_SQ;
+  }
 
   private _read_string_helper = function(terminator: number, allow_new_line: boolean) : void {
     var ch;
@@ -855,7 +851,7 @@ export class ParserTextRaw {
     for (;;) {
       ch = this._read();
       if (ch == CH_BS) {
-          this._read_string_escape_sequence();
+        this._read_string_escape_sequence();
       }
       else if (ch == terminator) {
         break;
@@ -947,10 +943,10 @@ export class ParserTextRaw {
     while(true) {
       ch = this._read();
       if (IonText.is_base64_char(ch)) {
-          base64_chars++;
-          this._end = this._in.position();
+        base64_chars++;
+        this._end = this._in.position();
       } else if(!IonText.is_whitespace(ch)) {
-          break;
+        break;
       }
     }
     while (ch == CH_EQ) {
@@ -984,19 +980,25 @@ export class ParserTextRaw {
     var n, s = this.get_value_as_string(this._curr);
     switch (this._curr) {
       case T_INT:
-          return parseInt(s, 10);
+        n = parseInt(s, 10);
+        break;
       case T_HEXINT:
-          return parseInt(s, 16);
+        n = parseInt(s, 16);
+        break;
       case T_FLOAT:
-          return Number(s);
+        n = parseFloat(s);
+        break;
       case T_FLOAT_SPECIAL:
-        if (s == "+inf")      return Number.POSITIVE_INFINITY;
-        else if (s == "-inf") return Number.NEGATIVE_INFINITY;
-        else if (s == "nan")  return Number.NaN;
+        if (s == "+inf")      n = Number.POSITIVE_INFINITY;
+        else if (s == "-inf") n = Number.NEGATIVE_INFINITY;
+        else if (s == "nan")  n = Number.NaN;
+        else throw new Error("can't convert to number");
+        break;
       default:
         throw new Error("can't convert to number");
     }
-}
+    return n;
+  }
 
   booleanValue() : boolean {
     let s: string = this.get_value_as_string(T_BOOL);
@@ -1009,254 +1011,254 @@ export class ParserTextRaw {
     }
   }
 
-    private isHighSurrogate(ch : number) : boolean{
-        return ch >= 0xD800 && ch <= 0xDBFF;
-    }
+  private isHighSurrogate(ch : number) : boolean{
+    return ch >= 0xD800 && ch <= 0xDBFF;
+  }
 
-    private isLowSurrogate(ch : number) : boolean{
-        return ch >= 0xDC00 && ch <= 0xDFFF;
-    }
+  private isLowSurrogate(ch : number) : boolean{
+    return ch >= 0xDC00 && ch <= 0xDFFF;
+  }
 
-    get_value_as_string(t: number) : string {
+  get_value_as_string(t: number) : string {
 
-        let index : number;
-        let ch : number;
-        let escaped : number;
-        let acceptComments : boolean;
-        let s : string = "";
-        switch (t) {
-            case T_NULL:
-            case T_BOOL:
-            case T_INT:
-            case T_HEXINT:
-            case T_FLOAT:
-            case T_FLOAT_SPECIAL:
-            case T_DECIMAL:
-            case T_TIMESTAMP:
-            case T_IDENTIFIER:
-            case T_OPERATOR:
-            case T_BLOB:
-                for (index = this._start; index < this._end; index++) {
-                    s += String.fromCharCode(this._in.valueAt(index));
-                }
-                break;
-            case T_STRING1:
-            case T_STRING2:
-                for (index = this._start; index < this._end; index++) {
-                    ch = this._in.valueAt(index);
-                    if (ch == CH_BS) {
-                        ch = this._read_escape_sequence(index, this._end);
-                        index += this._esc_len;
-                    }
-                    if(this.isHighSurrogate(ch)){
-                        index++;
-                        let tempChar = this._in.valueAt(index);
-                        if (tempChar == CH_BS) {
-                            tempChar = this._read_escape_sequence(index, this._end);
-                            index += this._esc_len;
-                        }
-                        if(this.isLowSurrogate(tempChar)){
-                            s += ch + tempChar;
-                            index++;
-                        } else{
-                            throw new Error("illegal high surrogate" + ch);
-                        }
-                    } else if(this.isLowSurrogate(ch)){
-                        throw new Error("illegal low surrogate: " + ch);
-                    } else{
-                        s += String.fromCharCode(ch);
-                    }
-                }
-                break;
-            case T_STRING3:
-                acceptComments = true;
-                for(index = this._start; index < this._end; index++) {
-                    ch = this._in.valueAt(index);
-                    if (ch == CH_BS) {
-                        ch = this._read_escape_sequence(index, this._end);
-                        index += this._esc_len;
-                    }
-                    if(this.isHighSurrogate(ch)){
-                        index++;
-                        let tempChar = this._in.valueAt(index);
-                        if (tempChar == CH_BS) {
-                            tempChar = this._read_escape_sequence(index, this._end);
-                            index += this._esc_len;
-                        }
-                        if(this.isLowSurrogate(tempChar)){
-                            s += ch + tempChar;
-                            index++;
-                        } else{
-                            throw new Error("illegal high surrogate" + ch);
-                        }
-                    } else if(this.isLowSurrogate(ch)){
-                        throw new Error("illegal low surrogate: " + ch);
-                    } else if(ch === CH_SQ) {
-                        if (this.verifyTriple(index)) {
-                            index = this._skip_triple_quote_gap(index, this._end, acceptComments);
-                        } else {
-                            s += String.fromCharCode(ch);
-                        }
-                    } else {
-                        s += String.fromCharCode(ch);
-                    }
-                }
-                break;
-            case T_CLOB2:
-                for (index = this._start; index < this._end; index++) {
-                    ch = this._in.valueAt(index);
-                    if (ch == CH_BS) {
-                        s += String.fromCharCode(this.readClobEscapes(index, this._end));
-                        index += this._esc_len;
-                    } else if (ch < 128){
-                        s += String.fromCharCode(ch);
-                    } else {
-                        throw new Error("Non-Ascii values illegal within clob.");
-                    }
-                }
-                break;
-            case T_CLOB3:
-                acceptComments = false;
-                for(index = this._start; index < this._end; index++) {
-                    ch = this._in.valueAt(index);
-                    if(ch === CH_BS) {
-                        escaped = this.readClobEscapes(index, this._end);
-                        if (escaped >= 0) {
-                            s += String.fromCharCode(escaped);
-                        }
-                        index += this._esc_len;
-                    } else if ( ch === CH_SQ) {
-                        if (this.verifyTriple(index)) {
-                            index = this._skip_triple_quote_gap(index, this._end, acceptComments);
-                        } else {
-                            s += String.fromCharCode(ch);
-                        }
-                    } else if (ch < 128){
-                        s += String.fromCharCode(ch);
-                    } else {
-                        throw new Error("Non-Ascii values illegal within clob.");
-                    }
-                }
-                break;
-            default:
-                throw new Error("can't get this value as a string");
+    let index : number;
+    let ch : number;
+    let escaped : number;
+    let acceptComments : boolean;
+    let s : string = "";
+    switch (t) {
+      case T_NULL:
+      case T_BOOL:
+      case T_INT:
+      case T_HEXINT:
+      case T_FLOAT:
+      case T_FLOAT_SPECIAL:
+      case T_DECIMAL:
+      case T_TIMESTAMP:
+      case T_IDENTIFIER:
+      case T_OPERATOR:
+      case T_BLOB:
+        for (index = this._start; index < this._end; index++) {
+          s += String.fromCharCode(this._in.valueAt(index));
+        }
+        break;
+      case T_STRING1:
+      case T_STRING2:
+        for (index = this._start; index < this._end; index++) {
+          ch = this._in.valueAt(index);
+          if (ch == CH_BS) {
+            ch = this._read_escape_sequence(index, this._end);
+            index += this._esc_len;
+          }
+          if(this.isHighSurrogate(ch)){
+            index++;
+            let tempChar = this._in.valueAt(index);
+            if (tempChar == CH_BS) {
+              tempChar = this._read_escape_sequence(index, this._end);
+              index += this._esc_len;
             }
-        return s;
+            if(this.isLowSurrogate(tempChar)){
+              s += ch + tempChar;
+              index++;
+            } else{
+              throw new Error("illegal high surrogate" + ch);
+            }
+          } else if(this.isLowSurrogate(ch)){
+            throw new Error("illegal low surrogate: " + ch);
+          } else{
+            s += String.fromCharCode(ch);
+          }
+        }
+        break;
+      case T_STRING3:
+        acceptComments = true;
+        for(index = this._start; index < this._end; index++) {
+          ch = this._in.valueAt(index);
+          if (ch == CH_BS) {
+            ch = this._read_escape_sequence(index, this._end);
+            index += this._esc_len;
+          }
+          if(this.isHighSurrogate(ch)){
+            index++;
+            let tempChar = this._in.valueAt(index);
+            if (tempChar == CH_BS) {
+              tempChar = this._read_escape_sequence(index, this._end);
+              index += this._esc_len;
+            }
+            if(this.isLowSurrogate(tempChar)){
+              s += ch + tempChar;
+              index++;
+            } else{
+              throw new Error("illegal high surrogate" + ch);
+            }
+          } else if(this.isLowSurrogate(ch)){
+            throw new Error("illegal low surrogate: " + ch);
+          } else if(ch === CH_SQ) {
+            if (this.verifyTriple(index)) {
+              index = this._skip_triple_quote_gap(index, this._end, acceptComments);
+            } else {
+              s += String.fromCharCode(ch);
+            }
+          } else {
+            s += String.fromCharCode(ch);
+          }
+        }
+        break;
+      case T_CLOB2:
+        for (index = this._start; index < this._end; index++) {
+          ch = this._in.valueAt(index);
+          if (ch == CH_BS) {
+            s += String.fromCharCode(this.readClobEscapes(index, this._end));
+            index += this._esc_len;
+          } else if (ch < 128){
+            s += String.fromCharCode(ch);
+          } else {
+            throw new Error("Non-Ascii values illegal within clob.");
+          }
+        }
+        break;
+      case T_CLOB3:
+        acceptComments = false;
+        for(index = this._start; index < this._end; index++) {
+          ch = this._in.valueAt(index);
+          if(ch === CH_BS) {
+            escaped = this.readClobEscapes(index, this._end);
+            if (escaped >= 0) {
+              s += String.fromCharCode(escaped);
+            }
+            index += this._esc_len;
+          } else if ( ch === CH_SQ) {
+            if (this.verifyTriple(index)) {
+              index = this._skip_triple_quote_gap(index, this._end, acceptComments);
+            } else {
+              s += String.fromCharCode(ch);
+            }
+          } else if (ch < 128){
+            s += String.fromCharCode(ch);
+          } else {
+            throw new Error("Non-Ascii values illegal within clob.");
+          }
+        }
+        break;
+      default:
+        throw new Error("can't get this value as a string");
     }
+    return s;
+  }
 
   private indexWhiteSpace(index : number, acceptComments : boolean) : number {
-      let ch : number = this._in.valueAt(index);
-      if(!acceptComments){
-          for(; is_whitespace(ch); ch = this._in.valueAt(index++)){}
-      } else {
-          for(;is_whitespace(ch) || ch === CH_FORWARD_SLASH;ch = this._in.valueAt(index++)){
-              if (ch === CH_FORWARD_SLASH) {
-                  ch = this._in.valueAt(index++);
-                  switch (ch) {
-                      case CH_FORWARD_SLASH:
-                          index = this.indexToNewLine(index);
-                          break;
-                      case CH_AS:
-                          index = this.indexToCloseComment(index);
-                          break;
-                      default:
-                          index--;
-                          break;
-                  }
-              }
+    let ch : number = this._in.valueAt(index);
+    if(!acceptComments){
+      for(; is_whitespace(ch); ch = this._in.valueAt(index++)){}
+    } else {
+      for(;is_whitespace(ch) || ch === CH_FORWARD_SLASH;ch = this._in.valueAt(index++)){
+        if (ch === CH_FORWARD_SLASH) {
+          ch = this._in.valueAt(index++);
+          switch (ch) {
+            case CH_FORWARD_SLASH:
+              index = this.indexToNewLine(index);
+              break;
+            case CH_AS:
+              index = this.indexToCloseComment(index);
+              break;
+            default:
+              index--;
+              break;
           }
+        }
       }
-      return index;
+    }
+    return index;
   }
 
   private indexToNewLine(index : number){
-      let ch : number = this._in.valueAt(index);
-      while(ch !== EOF && ch !== CH_NL){
-          if (ch === CH_CR) {
-              if (this._in.valueAt(index + 1) !== CH_NL){
-                  return index;
-              }
-          }
-          ch = this._in.valueAt(index++);
+    let ch : number = this._in.valueAt(index);
+    while(ch !== EOF && ch !== CH_NL){
+      if (ch === CH_CR) {
+        if (this._in.valueAt(index + 1) !== CH_NL){
+          return index;
+        }
       }
-      return index;
+      ch = this._in.valueAt(index++);
+    }
+    return index;
   }
 
   private indexToCloseComment(index : number) : number{
-        while(this._in.valueAt(index) !== CH_AS && this._in.valueAt(index + 1) !== CH_FORWARD_SLASH){
-            index++;
-        }
+    while(this._in.valueAt(index) !== CH_AS && this._in.valueAt(index + 1) !== CH_FORWARD_SLASH){
+      index++;
+    }
     return index;
   }
 
 
-    private _skip_triple_quote_gap(entryIndex: number, end: number, acceptComments: boolean) : number {
-        let tempIndex : number = entryIndex + 3;
-        let ch: number = this._in.valueAt(tempIndex);
-        tempIndex = this.indexWhiteSpace(tempIndex, acceptComments);
-        if (tempIndex + 2 <= end && this.verifyTriple(tempIndex)) {//index === ' index + 1 === ' index + 2 === ' and not at the end of the value
-            return tempIndex + 4;//indexes us past the triple quote we just found
-        } else {
-            return tempIndex + 1;
-        }
+  private _skip_triple_quote_gap(entryIndex: number, end: number, acceptComments: boolean) : number {
+    let tempIndex : number = entryIndex + 3;
+    let ch: number = this._in.valueAt(tempIndex);
+    tempIndex = this.indexWhiteSpace(tempIndex, acceptComments);
+    if (tempIndex + 2 <= end && this.verifyTriple(tempIndex)) {//index === ' index + 1 === ' index + 2 === ' and not at the end of the value
+      return tempIndex + 4;//indexes us past the triple quote we just found
+    } else {
+      return tempIndex + 1;
     }
+  }
 
-    private readClobEscapes(ii: number, end: number) : number {
-        // actually converts the escape sequence to a byte
-        var ch;
-        if (ii + 1 >= end) {
-            this._error("invalid escape sequence");
-            return;
-        }
-        ch = this._in.valueAt(ii + 1);
-        this._esc_len = 1;
-        switch (ch) {
-            case ESC_0:
-                return 0; // =  48, //  values['0']  = 0;       //    \0  alert NUL
-            case ESC_a:
-                return 7; // =  97, //  values['a']  = 7;       //    \a  alert BEL
-            case ESC_b:
-                return 8; // =  98, //  values['b']  = 8;       //    \b  backspace BS
-            case ESC_t:
-                return 9; // = 116, //  values['t']  = 9;       //    \t  horizontal tab HT
-            case ESC_nl:
-                return 10; // = 110, //  values['n']  = '\n';    //    \ n  linefeed LF
-            case ESC_ff:
-                return 12;  // = 102, //  values['f']  = 0x0c;    //    \f  form feed FF
-            case ESC_cr:
-                return 13; // = 114, //  values['r']  = '\r';    //    \ r  carriage return CR
-            case ESC_v:
-                return 11; // = 118, //  values['v']  = 0x0b;    //    \v  vertical tab VT
-            case ESC_dq:
-                return 34; // =  34, //  values['"']  = '"';     //    \"  double quote
-            case ESC_sq:
-                return 39; // =  39, //  values['\''] = '\'';    //    \'  single quote
-            case ESC_qm:
-                return 63; // =  63, //  values['?']  = '?';     //    \\?  question mark
-            case ESC_bs:
-                return 92; // =  92, //  values['\\'] = '\\';    //    \\  backslash
-            case ESC_fs:
-                return 47; // =  47, //  values['/']  = '/';     //    \/  forward slash nothing  \NL  escaped NL expands to nothing
-            case ESC_nl2:
-                return -1; // =  10, //  values['\n'] = ESCAPE_REMOVES_NEWLINE;  // slash-new line the new line eater
-            case ESC_nl3: // =  13, //  values['\r'] = ESCAPE_REMOVES_NEWLINE2;  // slash-new line the new line eater
-                if (ii + 3 < end && this._in.valueAt(ii + 3) == CH_NL) {
-                    this._esc_len = 2;
-                }
-                return IonText.ESCAPED_NEWLINE;
-            case ESC_x: // = CH_x, //  values['x'] = ESCAPE_HEX; //    any  \xHH  2-digit hexadecimal unicode character equivalent to \ u00HH
-                if (ii + 3 >= end) {
-                    this._error("invalid escape sequence");
-                    return;
-                }
-                ch = this._get_N_hexdigits(ii + 2, ii + 4);
-                this._esc_len = 3;
-                break;
-            default:
-                throw new Error("Invalid escape: /" + ch);
-        }
-        return ch;
+  private readClobEscapes(ii: number, end: number) : number {
+    // actually converts the escape sequence to a byte
+    var ch;
+    if (ii + 1 >= end) {
+      this._error("invalid escape sequence");
+      return;
     }
+    ch = this._in.valueAt(ii + 1);
+    this._esc_len = 1;
+    switch (ch) {
+      case ESC_0:
+        return 0; // =  48, //  values['0']  = 0;       //    \0  alert NUL
+      case ESC_a:
+        return 7; // =  97, //  values['a']  = 7;       //    \a  alert BEL
+      case ESC_b:
+        return 8; // =  98, //  values['b']  = 8;       //    \b  backspace BS
+      case ESC_t:
+        return 9; // = 116, //  values['t']  = 9;       //    \t  horizontal tab HT
+      case ESC_nl:
+        return 10; // = 110, //  values['n']  = '\n';    //    \ n  linefeed LF
+      case ESC_ff:
+        return 12;  // = 102, //  values['f']  = 0x0c;    //    \f  form feed FF
+      case ESC_cr:
+        return 13; // = 114, //  values['r']  = '\r';    //    \ r  carriage return CR
+      case ESC_v:
+        return 11; // = 118, //  values['v']  = 0x0b;    //    \v  vertical tab VT
+      case ESC_dq:
+        return 34; // =  34, //  values['"']  = '"';     //    \"  double quote
+      case ESC_sq:
+        return 39; // =  39, //  values['\''] = '\'';    //    \'  single quote
+      case ESC_qm:
+        return 63; // =  63, //  values['?']  = '?';     //    \\?  question mark
+      case ESC_bs:
+        return 92; // =  92, //  values['\\'] = '\\';    //    \\  backslash
+      case ESC_fs:
+        return 47; // =  47, //  values['/']  = '/';     //    \/  forward slash nothing  \NL  escaped NL expands to nothing
+      case ESC_nl2:
+        return -1; // =  10, //  values['\n'] = ESCAPE_REMOVES_NEWLINE;  // slash-new line the new line eater
+      case ESC_nl3: // =  13, //  values['\r'] = ESCAPE_REMOVES_NEWLINE2;  // slash-new line the new line eater
+        if (ii + 3 < end && this._in.valueAt(ii + 3) == CH_NL) {
+          this._esc_len = 2;
+        }
+        return IonText.ESCAPED_NEWLINE;
+      case ESC_x: // = CH_x, //  values['x'] = ESCAPE_HEX; //    any  \xHH  2-digit hexadecimal unicode character equivalent to \ u00HH
+        if (ii + 3 >= end) {
+          this._error("invalid escape sequence");
+          return;
+        }
+        ch = this._get_N_hexdigits(ii + 2, ii + 4);
+        this._esc_len = 3;
+        break;
+      default:
+        throw new Error("Invalid escape: /" + ch);
+    }
+    return ch;
+  }
 
   private _read_escape_sequence(ii: number, end: number) : number {
     // actually converts the escape sequence to the code point
@@ -1337,26 +1339,26 @@ export class ParserTextRaw {
     return t;
   }
 
-    next(): number {
-        this.clearFieldName();
-        this._ann = [];
-        if (this._value_type === ERROR) {
-            this._run();
-        }
-        this._curr = this._value_pop();
-
-        let t: number;
-        if (this._curr === ERROR) {
-            this._value.push(ERROR);
-            t = undefined;
-        } else {
-            t = this._curr;
-        }
-
-        this._curr_null = this._value_null;
-        this._value_null = false;
-        return t;
+  next(): number {
+    this.clearFieldName();
+    this._ann = [];
+    if (this._value_type === ERROR) {
+      this._run();
     }
+    this._curr = this._value_pop();
+
+    let t: number;
+    if (this._curr === ERROR) {
+      this._value.push(ERROR);
+      t = undefined;
+    } else {
+      t = this._curr;
+    }
+
+    this._curr_null = this._value_null;
+    this._value_null = false;
+    return t;
+  }
 
   private _run() {
     var op;
@@ -1421,45 +1423,45 @@ export class ParserTextRaw {
     this._in.unread(ch);
   }
 
-    private _read_after_whitespace(recognize_comments: boolean) {
-        let ch;
-        if (recognize_comments) {
-            ch = this._read_skipping_comments();
-            while (IonText.is_whitespace(ch)) {
-                ch = this._read_skipping_comments();
-            }
-        } else {
-            ch = this._read();
-            while (IonText.is_whitespace(ch)) {
-                ch = this._read();
-            }
-        }
-        return ch;
+  private _read_after_whitespace(recognize_comments: boolean) {
+    let ch;
+    if (recognize_comments) {
+      ch = this._read_skipping_comments();
+      while (IonText.is_whitespace(ch)) {
+        ch = this._read_skipping_comments();
+      }
+    } else {
+      ch = this._read();
+      while (IonText.is_whitespace(ch)) {
+        ch = this._read();
+      }
     }
+    return ch;
+  }
 
-    //peek does not work with the different types of string input.
-    private _peek(expected?: string) : number {
-        var ch, ii=0;
-        if (expected === undefined || expected.length < 1) {
-            return this._in.valueAt(this._in.position());
-        }
-        while (ii<expected.length) {
-            ch = this._read();
-            if (ch != expected.charCodeAt(ii)) break;
-            ii++;
-        }
-        if (ii === expected.length) {
-            ch = this._peek(); // if we did match we need to read the next character
-        } else {
-            this._unread(ch); // if we didn't match we've read an extra character
-            ch = ERROR;
-        }
-        while (ii > 0) { // unread whatever matched
-            ii--;
-            this._unread(expected.charCodeAt(ii));
-        }
-        return ch;
+  //peek does not work with the different types of string input.
+  private _peek(expected?: string) : number {
+    var ch, ii=0;
+    if (expected === undefined || expected.length < 1) {
+      return this._in.valueAt(this._in.position());
     }
+    while (ii<expected.length) {
+      ch = this._read();
+      if (ch != expected.charCodeAt(ii)) break;
+      ii++;
+    }
+    if (ii === expected.length) {
+      ch = this._peek(); // if we did match we need to read the next character
+    } else {
+      this._unread(ch); // if we didn't match we've read an extra character
+      ch = ERROR;
+    }
+    while (ii > 0) { // unread whatever matched
+      ii--;
+      this._unread(expected.charCodeAt(ii));
+    }
+    return ch;
+  }
 
   private _peek_after_whitespace(recognize_comments: boolean) : number {
     var ch = this._read_after_whitespace(recognize_comments);
@@ -1501,19 +1503,19 @@ export class ParserTextRaw {
     return ch;
   }
 
-    private _readNDigits(n: number) : number {
-        let ch : number
-        if (n <= 0) throw new Error("Cannot read a lack of or negative number of digits.");
-        while(n--) {
-            if (!IonText.is_digit(ch = this._read())) throw new Error("Expected digit, got: " + String.fromCharCode(ch));
-        }
-        return ch;
+  private _readNDigits(n: number) : number {
+    let ch : number
+    if (n <= 0) throw new Error("Cannot read a lack of or negative number of digits.");
+    while(n--) {
+      if (!IonText.is_digit(ch = this._read())) throw new Error("Expected digit, got: " + String.fromCharCode(ch));
     }
+    return ch;
+  }
 
-    private _readPastNDigits(n: number) : number {//This is clearly bugged it reads n + 1 digits.
-        this._readNDigits(n);
-        return this._read();
-    }
+  private _readPastNDigits(n: number) : number {//This is clearly bugged it reads n + 1 digits.
+    this._readNDigits(n);
+    return this._read();
+  }
 
   private _read_required_hex_digits(ch: number) : number {
     if (!IonText.is_hex_digit(ch)) return ERROR;
