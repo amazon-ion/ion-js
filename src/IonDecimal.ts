@@ -116,7 +116,7 @@ export class Decimal {
         }
         if(f) {
             let exponentShift = d ? (d.index - 1) - f.index : (str.length - 1) - f.index;
-            return new Decimal(new LongInt(str.substring(0, f.index - 1) +  str.substring(f.index + 1, exponentDelimiterIndex)), exponent - exponentShift);
+            return new Decimal(new LongInt(str.substring(0, f.index) +  str.substring(f.index + 1, exponentDelimiterIndex + 1)), exponent - exponentShift);
         } else {
             return new Decimal(new LongInt(str.substring(0,  exponentDelimiterIndex)), exponent);
         }

@@ -271,8 +271,10 @@ export class Timestamp {
         this.day = day;
         this.hour = hour;
         this.minute = minute;
+        let s = this.seconds !== undefined ? Math.trunc(this.seconds.numberValue()) : null;
+        let ms = this.seconds !== undefined ? Math.round(this.seconds.numberValue() % 1 * 1000) : null;
         this.checkValid();
-        this.date = new Date(Date.UTC(this.year, (this.precision === Precision.YEAR ? 0 : this.month - 1), this.day, this.hour, this.minute, null, null) - (this.offset * 60000));
+        this.date = new Date(Date.UTC(this.year, (this.precision === Precision.YEAR ? 0 : this.month - 1), this.day, this.hour, this.minute, s, ms) - (this.offset * 60000));
         /*
         let shiftHours = Math.floor(this.offset / 60);
         let shiftMinute = this.offset - (shiftHours * 60);
