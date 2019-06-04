@@ -206,7 +206,7 @@ define(['intern', 'intern!object', 'intern/dojo/node!fs', 'intern/dojo/node!path
             let streams = getStreams(reader);
             //streams.push()
             for(let i = 0;  i < streams.length - 1; i++){
-                for(let j = 0; j < streams.length; j++){
+                for(let j = i; j < streams.length; j++){
                     if(!streams[i].equals(streams[(j + i) % streams.length])) throw new Error("Streams unequal.");
                 }
             }

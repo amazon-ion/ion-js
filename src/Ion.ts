@@ -104,6 +104,8 @@ export function makeBinaryWriter(localSymbolTable : LocalSymbolTable = defaultLo
   return new BinaryWriter(localSymbolTable, new Writeable());
 }
 
+export { Reader } from "./IonReader";
+export { Writer } from "./IonWriter";
 export { BinaryWriter } from "./IonBinaryWriter";
 export { Catalog } from "./IonCatalog";
 export { Decimal } from "./IonDecimal";
