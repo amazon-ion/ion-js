@@ -43,7 +43,8 @@ import { SharedSymbolTable } from "./IonSharedSymbolTable";
             let tables : SharedSymbolTable[] = this.symbolTables[name];
             if(!tables) return null;
             let table = tables[version];
-            return table? table: tables[tables.length];
+            if(!table) table = tables[tables.length];
+            return table? table : null;
         }
 
         getTable(name: string) : SharedSymbolTable {

@@ -37,16 +37,16 @@ define([
       assert.strictEqual(version3, match);
     }
 
-    suite['Find specific version returns undefined if specific version not found'] = function() {
+    suite['Find specific version returns null if specific version not found'] = function() {
       var version1 = new ion.SharedSymbolTable('foo', 1, ['a']);
       var catalog = new ion.Catalog();
       catalog.add(version1);
-      assert.isUndefined(catalog.getVersion('foo', 2));
+      assert.isNull(catalog.getVersion('foo', 2));
     }
 
-    suite['Find specific version returns undefined if any version not found'] = function() {
+    suite['Find specific version returns null if any version not found'] = function() {
       var catalog = new ion.Catalog();
-      assert.isUndefined(catalog.getVersion('foo', 2));
+      assert.isNull(catalog.getVersion('foo', 2));
     }
 
     suite['Finds latest version'] = function() {
@@ -63,9 +63,9 @@ define([
       assert.strictEqual(4, match.version);
     }
 
-    suite['Find latest version returns undefined if no version exists'] = function() {
+    suite['Find latest version returns null if no version exists'] = function() {
       var catalog = new ion.Catalog();
-      assert.isUndefined(catalog.getTable('foo'));
+      assert.isNull(catalog.getTable('foo'));
     }
 
     suite['Adding same symbol table twice overwrites original entry'] = function() {
