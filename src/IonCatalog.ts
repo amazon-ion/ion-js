@@ -40,9 +40,10 @@ import { SharedSymbolTable } from "./IonSharedSymbolTable";
         }
 
         getVersion(name: string, version: number) : SharedSymbolTable {
-            let table : SharedSymbolTable = this.symbolTables[name][version];
-            if (table === undefined) return null;
-            return table;
+            let tables : SharedSymbolTable[] = this.symbolTables[name];
+            if(!tables) return null;
+            let table = tables[version];
+            return table? table: tables[tables.length];
         }
 
         getTable(name: string) : SharedSymbolTable {
