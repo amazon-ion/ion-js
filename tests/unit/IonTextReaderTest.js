@@ -125,6 +125,39 @@
       assert.equal(ionReader.fieldName(), "innerkey2");
     };
 
+      suite['Accept IVM like symbols and throw on IVMs except $ion_1_0'] = function() {
+          let ionToRead = "$ion_1_0 $ion_schema_1_0";
+          let ionReader = ion.makeReader(ionToRead);
+          try {
+              ionReader.next();
+              ionReader.next();
+          } catch(error) {
+              throw new Error("Allowable IVM like symbol threw an error ");
+          }
+          ionToRead = "$ion_2_0";
+          ionReader = ion.makeReader(ionToRead);
+          try {
+              ionReader.next();
+          }catch(error) {
+              ionToRead = "$ion_1_999";
+              ionReader = ion.makeReader(ionToRead);
+              try {
+                  ionReader.next();
+              } catch(error) {
+                  ionToRead = "$ion_999_0";
+                  ionReader = ion.makeReader(ionToRead);
+                  try {
+                      ionReader.next();
+                  } catch(error) {
+                      return true;
+                  }
+                  throw new Error("Unsupported IVM symbol did not throw an error ");
+              }
+              throw new Error("Unsupported IVM symbol did not throw an error ");
+          }
+          throw new Error("Unsupported IVM symbol did not throw an error ");
+      };
+
     registerSuite(suite);
   }
 );

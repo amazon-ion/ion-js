@@ -89,28 +89,28 @@ export class TextReader implements Reader {
   }
 
     isIVM(input : string) : boolean {
-        if(this.depth() > 0) return false;
-        if(input.length < 6 || this.annotations().length > 0) return false;
+        if (this.depth() > 0) return false;
+        if (input.length < 6 || this.annotations().length > 0) return false;
         let prefix = "$ion_";
         let i = 0;
 
-        while(i < prefix.length){
-            if(prefix.charAt(i) !== input.charAt(i)) return false;
+        while (i < prefix.length) {
+            if (prefix.charAt(i) !== input.charAt(i)) return false;
             i++;
         }
         let tempChar;
-        while(input.charAt(i) != '_'){
+        while (input.charAt(i) != '_') {
             tempChar = input.charAt(i);
-            if(tempChar < '0' || tempChar > '9') return false;
+            if (tempChar < '0' || tempChar > '9') return false;
             i++;
         }
         i++;
-        while(i < input.length){
+        while (i < input.length) {
             tempChar = input.charAt(i);
-            if(tempChar < '0' || tempChar > '9') return false;
+            if (tempChar < '0' || tempChar > '9') return false;
             i++;
         }
-        if(input !== "$ion_1_0") throw new Error("Only ion version 1.0 is supported.");
+        if (input !== "$ion_1_0") throw new Error("Only ion version 1.0 is supported.");
         return true;
     }
 
