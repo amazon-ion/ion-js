@@ -132,7 +132,7 @@
               ionReader.next();
               ionReader.next();
           } catch(error) {
-              throw new Error("Allowable IVM like symbol threw an error ");
+              throw new Error("Allowable IVM like symbol threw an error " + error);
           }
           ionToRead = "$ion_2_0";
           ionReader = ion.makeReader(ionToRead);
@@ -151,11 +151,11 @@
                   } catch(error) {
                       return true;
                   }
-                  throw new Error("Unsupported IVM symbol did not throw an error ");
+                  throw new Error("Unsupported IVM symbol did not throw an error.");
               }
-              throw new Error("Unsupported IVM symbol did not throw an error ");
+              throw new Error("Unsupported IVM symbol did not throw an error.");
           }
-          throw new Error("Unsupported IVM symbol did not throw an error ");
+          throw new Error("Unsupported IVM symbol did not throw an error.");
       };
 
     registerSuite(suite);
