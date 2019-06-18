@@ -98,19 +98,19 @@ export class TextReader implements Reader {
             if (prefix.charAt(i) !== input.charAt(i)) return false;
             i++;
         }
-        let tempChar;
-        while (input.charAt(i) != '_') {
-            tempChar = input.charAt(i);
+
+        while (i < input.length && input.charAt(i) != '_') {
+            let tempChar = input.charAt(i);
             if (tempChar < '0' || tempChar > '9') return false;
             i++;
         }
         i++;
-        while (i < input.length) {
-            tempChar = input.charAt(i);
+        while (i < input.length && i < input.length) {
+            let tempChar = input.charAt(i);
             if (tempChar < '0' || tempChar > '9') return false;
             i++;
         }
-        if (input !== "$ion_1_0") throw new Error("Only ion version 1.0 is supported.");
+        if (input !== "$ion_1_0") throw new Error("Only Ion version 1.0 is supported.");
         return true;
     }
 
