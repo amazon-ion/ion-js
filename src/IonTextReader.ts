@@ -94,7 +94,7 @@ export class TextReader implements Reader {
         let prefix = "$ion_";
         let i = 0;
 
-        while (i < input.length && i < prefix.length) {
+        while (i < prefix.length) {
             if (prefix.charAt(i) !== input.charAt(i)) return false;
             i++;
         }
