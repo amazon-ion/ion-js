@@ -100,14 +100,15 @@ export class TextReader implements Reader {
         }
 
         while (i < input.length && input.charAt(i) != '_') {
-            let tempChar = input.charAt(i);
-            if (tempChar < '0' || tempChar > '9') return false;
+            let ch = input.charAt(i);
+            if (ch < '0' || ch > '9') return false;
             i++;
         }
         i++;
+
         while (i < input.length) {
-            let tempChar = input.charAt(i);
-            if (tempChar < '0' || tempChar > '9') return false;
+            let ch = input.charAt(i);
+            if (ch < '0' || ch > '9') return false;
             i++;
         }
         if (input !== "$ion_1_0") throw new Error("Only Ion version 1.0 is supported.");
