@@ -137,8 +137,8 @@
               }
           }
 
-          for(let i = 0; i < shouldFail.length; i++) {
-              let ionReader = ion.makeReader(shouldFail[i]);
+          for(let input in shouldFail) {
+              let ionReader = ion.makeReader(input);
               let caughtError = false;
               try {
                   while (ionReader.next() !== undefined) {}
