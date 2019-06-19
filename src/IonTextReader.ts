@@ -90,8 +90,10 @@ export class TextReader implements Reader {
 
     isIVM(input : string) : boolean {
         if (this.depth() > 0) return false;
-        if (input.length < 6 || this.annotations().length > 0) return false;
-        let prefix = "$ion_";
+        const ivm = "$ion_1_0";
+        const prefix = "$ion_";
+        if (input.length < ivm.length || this.annotations().length > 0) return false;
+
         let i = 0;
 
         while (i < prefix.length) {
@@ -111,7 +113,7 @@ export class TextReader implements Reader {
             if (ch < '0' || ch > '9') return false;
             i++;
         }
-        if (input !== "$ion_1_0") throw new Error("Only Ion version 1.0 is supported.");
+        if (input !== ivm) throw new Error("Only Ion version 1.0 is supported.");
         return true;
     }
 

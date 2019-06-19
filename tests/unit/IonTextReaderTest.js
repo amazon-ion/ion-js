@@ -126,38 +126,28 @@
     };
 
       suite['Accept IVM like symbols and throw on IVMs except $ion_1_0'] = function() {
-          let ionToRead = "$ion_1_0 $ion_schema_1_0";
-          let ionReader = ion.makeReader(ionToRead);
-          try {
-              ionReader.next();
-              ionReader.next();
-          } catch(error) {
-              throw new Error("Allowable IVM like symbol threw an error " + error);
-          }
-          ionToRead = "$ion_2_0";
-          ionReader = ion.makeReader(ionToRead);
-          try {
-              ionReader.next();
-          }catch(error) {
-              ionToRead = "$ion_1_999";
-              ionReader = ion.makeReader(ionToRead);
+          let shouldPass = ["$ion_1_0", "$ion_schema_1_0", "$ion_1", "$ion_1_a", "$ion_", "ion_1_"];
+          let shouldFail = ["$ion_2_0", "$ion_1_999", "$ion_999_0", "$ion_1_1", "$ion_1_00"];
+          for(let input in shouldPass) {
+              let ionReader = ion.makeReader(input);
               try {
-                  ionReader.next();
+                  while (ionReader.next() !== undefined) {}
               } catch(error) {
-                  ionToRead = "$ion_999_0";
-                  ionReader = ion.makeReader(ionToRead);
-                  try {
-                      ionReader.next();
-                  } catch(error) {
-                      return true;
-                  }
-                  throw new Error("Unsupported IVM symbol did not throw an error.");
+                  throw new Error("Allowable IVM like symbol threw an error " + error);
               }
-              throw new Error("Unsupported IVM symbol did not throw an error.");
           }
-          throw new Error("Unsupported IVM symbol did not throw an error.");
-      };
 
+          for(let i = 0; i < shouldFail.length; i++) {
+              let ionReader = ion.makeReader(shouldFail[i]);
+              let caughtError = false;
+              try {
+                  while (ionReader.next() !== undefined) {}
+              } catch(error) {
+                caughtError = true;
+              }
+              if(!caughtError) throw new Error("Unsupported IVM symbol did not throw an error.");
+          }
+      };
     registerSuite(suite);
   }
 );
