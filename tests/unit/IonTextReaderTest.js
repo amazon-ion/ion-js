@@ -135,7 +135,7 @@ define(
                 try {
                     while (ionReader.next() !== undefined) {}
                 } catch(error) {
-                    throw new Error(`Allowable IVM like symbol ${input} threw an error g ` + error);
+                    throw new Error(`Allowable IVM like symbol ${input} threw an error: ${error.message}.`);
                 }
             }
 
@@ -147,7 +147,7 @@ define(
                     throw new Error(`Unsupported IVM symbol ${input} did not throw an error.`);
                 } catch(error) {
                      if (error.message !== "Only Ion version 1.0 is supported.") {
-                         throw new Error(`input: ${input} threw an unexpected error: ${error.message}`);
+                         throw new Error(`input: ${input} threw an unexpected error: ${error.message}.`);
                      }
                 }
             }
