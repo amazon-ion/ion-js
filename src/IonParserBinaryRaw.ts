@@ -156,15 +156,19 @@ export class ParserBinaryRaw {
     }
 
     private readVarUnsignedInt() : number {
-        let tempInt, byte = this._in.next();
-        let bits = 0;
-        for(tempInt = byte & 0x7F; (byte & 0x80) === 0; byte = this._in.next()) {
-            if(byte === EOF) throw new Error("EOF found in variable length unsigned int.");
-            tempInt = (tempInt << 7) | (byte & 0x7F);
-            bits += 7;
+        let numberOfBits = 0;
+        let byte;
+        let magnitude = 0;
+
+        while (true) {
+            byte = this._in.next();
+            magnitude = (magnitude << 7) | (byte & 0x7F);
+            numberOfBits += 7;
+            if (byte & 0x80) break;
         }
-        if(bits > 32) throw new Error("Values larger than 32 bits need to be marshalled using LongInt")
-        return tempInt;
+
+        if(numberOfBits > 32) throw new Error("Values larger than 32 bits need to be marshalled using LongInt")
+        return magnitude;
     }
 
     private readVarSignedInt() : number {
