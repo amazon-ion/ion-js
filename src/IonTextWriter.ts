@@ -18,6 +18,7 @@ import { Timestamp } from "./IonTimestamp";
 import { TypeCodes } from "./IonBinary";
 import { Writeable } from "./IonWriteable";
 import { Writer } from "./IonWriter";
+import { is_keyword } from "./IonParserTextRaw";
 
 type Serializer<T> = (value: T) => void;
 
@@ -370,7 +371,11 @@ export class TextWriter implements Writer {
                     this.writeUtf8(s);
                 }
             } else {
-                this.writeUtf8(s);
+                if (is_keyword(s)) {
+                    this.writeable.writeBytes(encodeUtf8("'" + escape(s, SymbolEscapes) + "'"));
+                } else {
+                    this.writeUtf8(s);
+                }
             }
         } else if ((!this.isTopLevel) && (this.currentContainer.containerType === TypeCodes.SEXP) && isOperator(s)) {
             this.writeUtf8(s);

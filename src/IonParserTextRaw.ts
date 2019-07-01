@@ -157,7 +157,7 @@ function get_type_from_name(str: string) : number {
   throw new Error("Unknown type: " + str + ".");
 }
 
-function is_keyword(str: string) : boolean {
+export function is_keyword(str: string) : boolean {
     return (str === "null") || (str === "true") || (str === "false") || (str === "nan") || (str === "+inf") || (str === "-inf");
 }
 
