@@ -9,7 +9,7 @@
  <a title="semantic-release" href="https://github.com/amzn/ion-js/releases"><img src="https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg?style=flat-square"/></a>
 </p>
 
-# Table of Contents 
+# Table of Contents
 
 * [About](#about)
 * [Use](#use)
@@ -20,19 +20,19 @@
 * [License](#license)
 * [Links](#links)
 
-# About 
+# About
 
-Ion-JS is a Javascript library for [Ion](https://amzn.github.io/ion-docs/). The library allows for reading/writing Ion 
-data from within Javascript code. 
+Ion-JS is a Javascript library for [Ion](https://amzn.github.io/ion-docs/). The library allows for reading/writing Ion
+data from within Javascript code.
 
-For more information on Ion have a look at the [Ion Specification](https://amzn.github.io/ion-docs/spec.html) as well as some of the other Ion language specific libraries such as 
+For more information on Ion have a look at the [Ion Specification](https://amzn.github.io/ion-docs/spec.html) as well as some of the other Ion language specific libraries such as
 
 * [Ion C](https://github.com/amzn/ion-c)
 * [Ion Java](https://github.com/amzn/ion-java)
 * [Ion Python](https://github.com/amzn/ion-python)
 
 # Master Specification Support
-The current release on master branch  <a title="npm-version" href="https://www.npmjs.com/package/ion-js"><img src="https://img.shields.io/npm/v/ion-js.svg"/></a> 
+The current release on master branch  <a title="npm-version" href="https://www.npmjs.com/package/ion-js"><img src="https://img.shields.io/npm/v/ion-js.svg"/></a>
 is beta supported at this time.
 
 | Types        | IonText | IonBinary | Limitations  |
@@ -66,7 +66,7 @@ is beta supported at this time.
 
 # Use
 
-You can use ion-js either as a Node.js module or inside an html page. 
+You can use ion-js either as a Node.js module or inside an html page.
 
 ## NPM
 
@@ -78,26 +78,29 @@ You can use ion-js either as a Node.js module or inside an html page.
     ```javascript
     var ionJs = require("ion-js")
 
-    var ionData = "{ hello: \"Ion\" }"; 
-    var ionReader = ionJs.makeReader(ionData); 
-    ionReader.next(); 
-    ionReader.stepIn(); 
-    ionReader.next(); 
-    var hello = ionReader.fieldName(); 
-    var ion = ionReader.stringValue(); 
-    ionReader.stepOut(); 
+    var ionData = "{ hello: \"Ion\" }";
+    var ionReader = ionJs.makeReader(ionData);
+    ionReader.next();
+    ionReader.stepIn();
+    ionReader.next();
+    var hello = ionReader.fieldName();
+    var ion = ionReader.stringValue();
+    ionReader.stepOut();
     console.log(ion.concat(", ").concat(hello));
     ```
-    [Try it yourself](https://npm.runkit.com/ion-js). 
+
+**Warning:** RunKit has an old version of ion-js and the APIs have changed considerably since them. Please
+[install `ion-js` locally using NPM](https://github.com/amzn/ion-js/#npm) to try it out. For status
+updates, refer to this [issue](https://github.com/amzn/ion-js/issues/201).
 
 ## Browser
 
-You can include the Ion-js bundle (ES5 compatible) using the URLs 
+You can include the Ion-js bundle (ES5 compatible) using the URLs
 
 * [ion-bundle.min.js](https://amzn.github.io/ion-js/browser/scripts/ion-bundle.min.js)
 * [ion-bundle.js](https://amzn.github.io/ion-js/browser/scripts/ion-bundle.js)
 
-These will create and initialize `window.ion` which has the exact API as our `npm` package. Here is an example 
+These will create and initialize `window.ion` which has the same exact API as our `npm` package. Here is an example
 
 ```html
 <html>
@@ -110,7 +113,7 @@ These will create and initialize `window.ion` which has the exact API as our `np
 </html>
 ```
 
-## API 
+## API
 
 [Ion JS API](https://amzn.github.io/ion-js/api/)
 
@@ -126,7 +129,7 @@ These will create and initialize `window.ion` which has the exact API as our `np
 
 * [Ion](https://amzn.github.io/ion-docs/)
 * [Ion Specification](https://amzn.github.io/ion-docs/spec.html)
-* [Ion Cookbook](https://amzn.github.io/ion-docs/cookbook.html) uses the Java library for its examples. 
+* [Ion Cookbook](https://amzn.github.io/ion-docs/cookbook.html) uses the Java library for its examples.
 * [Ion C](https://github.com/amzn/ion-c)
 * [Ion Java](https://github.com/amzn/ion-java)
 * [Ion Python](https://github.com/amzn/ion-python)
