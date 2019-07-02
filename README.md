@@ -89,8 +89,9 @@ You can use ion-js either as a Node.js module or inside an html page.
     console.log(ion.concat(", ").concat(hello));
     ```
 
-    **Warning:** RunKit has an old version of ion-js and the APIs have change considerably since them. Please
-    install it locally using NPM to try it out, [issue](https://github.com/amzn/ion-js/issues/201) tracking this problem
+**Warning:** RunKit has an old version of ion-js and the APIs have changed considerably since them. Please
+[install `ion-js` locally using NPM](https://github.com/amzn/ion-js/#npm) to try it out. For status
+updates, refer to this [issue](https://github.com/amzn/ion-js/issues/201).
 
 ## Browser
 
@@ -99,7 +100,7 @@ You can include the Ion-js bundle (ES5 compatible) using the URLs
 * [ion-bundle.min.js](https://amzn.github.io/ion-js/browser/scripts/ion-bundle.min.js)
 * [ion-bundle.js](https://amzn.github.io/ion-js/browser/scripts/ion-bundle.js)
 
-These will create and initialize `window.ion` which has the exact API as our `npm` package. Here is an example
+These will create and initialize `window.ion` which has the same exact API as our `npm` package. Here is an example
 
 ```html
 <html>
