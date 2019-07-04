@@ -155,13 +155,13 @@ export class ParserBinaryRaw {
         }
     }
 
-    private readVarUnsignedInt() : number {
+    static readVarUnsignedFrom(input: BinarySpan) : number {
         let numberOfBits = 0;
         let byte;
         let magnitude = 0;
 
         while (true) {
-            byte = this._in.next();
+            byte = input.next();
             magnitude = (magnitude << 7) | (byte & 0x7F);
             numberOfBits += 7;
             if (byte & 0x80) break;
@@ -169,6 +169,10 @@ export class ParserBinaryRaw {
 
         if(numberOfBits > 32) throw new Error("Values larger than 32 bits need to be marshalled using LongInt")
         return magnitude;
+    }
+
+    private readVarUnsignedInt() : number {
+        return ParserBinaryRaw.readVarUnsignedFrom(this._in);
     }
 
     private readVarSignedInt() : number {
@@ -213,28 +217,40 @@ export class ParserBinaryRaw {
         return LongInt.fromIntBytes(Array.prototype.slice.call(bytes), sign);
     }
 
-    private readUnsignedInt() : number {
-        var v = 0, b;
+    static readUnsignedIntFrom(input: BinarySpan, numberOfBytes: number) {
+        let value = 0, bytesRead = 0, byte;
+        if (numberOfBytes < 1)
+            return 0;
 
-        // they have to tell us the length
-        if (this._len < 1) return 0;
-
-        // shift in all but the last byte (we've already read the first)
-        while (this._len > 0) {
-            b = this._in.next();
-            this._len--;
-            v = v << 8;
-            v = v | (b & 0xff);
+        while (bytesRead < numberOfBytes) {
+            byte = input.next();
+            bytesRead++;
+            value = value << 8;
+            value = value | (byte & 0xff);
         }
 
-        // if we run off the end the bytes will all by EOF, so we can just check once
-        if (b === EOF) undefined;
+        // We overflowed
+        if (value < 0) {
+            throw new Error("Attempted to read an unsigned int that was larger than 31 bits."
+                + " Use readUnsignedLongIntFrom instead. UInt size: " + numberOfBytes + ", value: " + value
+            );
+        }
+        // Fewer bytes than the required `numberOfBytes` were available in the input
+        if (byte === EOF)
+            return undefined;
+        return value;
+    }
 
-        return v;
+    private readUnsignedInt() : number {
+        return ParserBinaryRaw.readUnsignedIntFrom(this._in, this._len);
+    }
+
+    static readUnsignedLongIntFrom(input: BinarySpan, numberOfBytes: number) : LongInt {
+        return LongInt.fromUIntBytes(Array.prototype.slice.call(input.view(numberOfBytes)));
     }
 
     private readUnsignedLongInt() : LongInt {
-        return LongInt.fromUIntBytes(Array.prototype.slice.call(this._in.view(this._len)));
+        return ParserBinaryRaw.readUnsignedLongIntFrom(this._in, this._len);
     }
 
     private read_decimal_value() : Decimal {

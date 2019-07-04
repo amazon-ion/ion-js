@@ -21,3 +21,5 @@ export { LocalSymbolTable } from './IonLocalSymbolTable';
 export { LowLevelBinaryWriter } from './IonLowLevelBinaryWriter';
 export { NullNode } from './IonBinaryWriter';
 export { BinaryWriter } from "./IonBinaryWriter";
+export { ParserBinaryRaw } from "./IonParserBinaryRaw";
+export { BinarySpan } from "./IonSpan";
