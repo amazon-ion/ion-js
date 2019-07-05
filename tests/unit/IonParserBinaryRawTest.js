@@ -31,10 +31,10 @@ define([
           : test;
     }
 
-    let readUnsignedIntTest = function(bytes, expected, throwsException) {
-      let testName = throwsException
-          ? 'Throw an exception while reading unsigned int ' + expected + ' from bytes: ' + bytes
-          : 'Read unsigned int ' + expected + ' from bytes: ' + bytes;
+    // The base test function called by the more specific flavors below.
+    // Creates a test which will attempt to read the `expected` unsigned int from the provided input bytes, handling
+    // any anticipated exceptions.
+    let readUnsignedIntTest = function(testName, bytes, expected, throwsException) {
       let test = function() {
         let binarySpan = new ion.BinarySpan(new Uint8Array(bytes));
         let actual = ion.ParserBinaryRaw.readUnsignedIntFrom(binarySpan, bytes.length);
@@ -43,25 +43,72 @@ define([
       registerTest(testName, test, throwsException);
     }
 
+    // Should read the `expected` unsigned int value from the provided input bytes.
+    // Will fail if an exception is thrown or if the value that's read from the bytes is not equal to `expected`.
+    let readUnsignedInt = function(bytes, expected) {
+      let testName = 'Read unsigned int ' + expected + ' from bytes: ' + bytes;
+      let testThrows = false;
+      readUnsignedIntTest(testName, bytes, expected, testThrows);
+    }
+
+    // Should detect that overflow has occurred while reading and throw an exception.
+    // Will fail if no exception is thrown.
+    let overflowWhileReadingUnsignedInt = function(bytes, expected) {
+      let testName = 'Overflow while attempting to read the value ' + expected + ' from the bytes: ' + bytes;
+      let testThrows = true;
+      readUnsignedIntTest(testName, bytes, expected, testThrows);
+    }
+
+    // Should detect that there is insufficient data available to read the requested value.
+    // Will fail if no exception is thrown.
+    let eofWhileReadingUnsignedInt = function(bytes, expected) {
+      let testName = 'Encountered EOF while attempting to read the value ' + expected + ' from the bytes: ' + bytes;
+      let testThrows = true;
+      readUnsignedIntTest(testName, bytes, expected, testThrows);
+    }
+
+    // Returns the largest unsigned integer value that can be stored in `numberOfBits` bits.
+    let maxValueForBits = function(numberOfBits) {
+      return Math.pow(2, numberOfBits) - 1;
+    }
+
+    // Returns the largest unsigned integer value that can be stored in `numberOfBytes` bytes.
+    let maxValueForBytes = function(numberOfBytes) {
+      return maxValueForBits(numberOfBytes * 8);
+    }
+
+    // Returns an array containing `numberOfBytes` bytes with value of 0xFF.
+    let maxValueByteArray = function(numberOfBytes) {
+      let data = [];
+      for(let m = 0; m < numberOfBytes; m++) {
+        data.push(0xFF);
+      }
+      return data;
+    }
+
     // Expected to pass
-    readUnsignedIntTest([0x00], 0);
-    readUnsignedIntTest([0x01], 1);
-    readUnsignedIntTest([0x0F], 15);
-    readUnsignedIntTest([0x00, 0x00], 0);
-    readUnsignedIntTest([0xFF,], Math.pow(2, 8) - 1);
-    readUnsignedIntTest([0xFF, 0xFF], Math.pow(2, 16) - 1);
-    readUnsignedIntTest([0xFF, 0xFF, 0xFF], Math.pow(2, 24) - 1);
-    readUnsignedIntTest([0x7F, 0xFF, 0xFF, 0xFF], Math.pow(2, 31) - 1);
+    readUnsignedInt([0x00], 0);
+    readUnsignedInt([0x01], 1);
+    readUnsignedInt([0x0F], 15);
+    readUnsignedInt([0x00, 0x00], 0);
+    readUnsignedInt(maxValueByteArray(1), maxValueForBytes(1));
+    readUnsignedInt(maxValueByteArray(2), maxValueForBytes(2));
+    readUnsignedInt(maxValueByteArray(3), maxValueForBytes(3));
+    readUnsignedInt([0x7F, 0xFF, 0xFF, 0xFF], maxValueForBits(31));
 
-    // Expected to fail
-    readUnsignedIntTest([], 1, true); // No input data
-    readUnsignedIntTest([0xFF, 0xFF, 0xFF, 0xFF], Math.pow(2, 32) - 1, true);
-    readUnsignedIntTest([0xFF, 0xFF, 0xFF, 0xFF, 0xFF], Math.pow(2, 40) - 1, true);
+    // Test reading unsigned ints requiring 4-10 bytes.
+    // Expected to fail.
+    for (let numberOfBytes = 4; numberOfBytes <= 10; numberOfBytes++) {
+      overflowWhileReadingUnsignedInt(maxValueByteArray(numberOfBytes), maxValueForBytes(numberOfBytes));
+    }
 
-    let readUnsignedLongIntTest = function(bytes, expected, throwsException) {
-      let testName = throwsException
-          ? 'Throw an exception while reading unsigned long int ' + expected + ' from bytes: ' + bytes
-          : 'Read unsigned long int ' + expected + ' from bytes: ' + bytes;
+    eofWhileReadingUnsignedInt([], 1);
+    eofWhileReadingUnsignedInt(maxValueByteArray(1), maxValueForBytes(2));
+    eofWhileReadingUnsignedInt(maxValueByteArray(2), maxValueForBytes(3));
+
+    let readUnsignedLongInt = function(bytes, expected, throwsException) {
+      let testName = 'Read unsigned long int ' + expected + ' from bytes: ' + bytes;
+      let testThrows = false;
       let test = function() {
         let binarySpan = new ion.BinarySpan(new Uint8Array(bytes));
         let actual = ion.ParserBinaryRaw.readUnsignedLongIntFrom(binarySpan, bytes.length);
@@ -70,11 +117,11 @@ define([
       registerTest(testName, test, throwsException);
     }
 
-    readUnsignedLongIntTest([0xFF, 0xFF, 0xFF, 0xFF, 0xFF], Math.pow(2, 40) - 1);
-    readUnsignedLongIntTest([0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF], Math.pow(2, 48) - 1);
-    readUnsignedLongIntTest([0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF], Math.pow(2, 56) - 1);
-    readUnsignedLongIntTest([0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF], Math.pow(2, 64) - 1);
-    readUnsignedLongIntTest([0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF], Math.pow(2, 72) - 1);
+    // Test reading unsigned ints requiring 4-10 bytes.
+    // Expected to pass.
+    for (let numberOfBytes = 4; numberOfBytes <= 10; numberOfBytes++) {
+      readUnsignedLongInt(maxValueByteArray(numberOfBytes), maxValueForBytes(numberOfBytes));
+    }
 
     registerSuite(suite);
   }

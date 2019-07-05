@@ -230,14 +230,16 @@ export class ParserBinaryRaw {
         }
 
         // We overflowed
-        if (value < 0) {
+        if (numberOfBytes > 4 || value < 0) {
             throw new Error("Attempted to read an unsigned int that was larger than 31 bits."
                 + " Use readUnsignedLongIntFrom instead. UInt size: " + numberOfBytes + ", value: " + value
             );
         }
         // Fewer bytes than the required `numberOfBytes` were available in the input
-        if (byte === EOF)
-            return undefined;
+        if (byte === EOF) {
+            throw new Error("Ran out of data while reading a " + numberOfBytes + "-byte unsigned int.");
+        }
+
         return value;
     }
 
