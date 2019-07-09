@@ -31,6 +31,12 @@ define([
           : test;
     }
 
+    /**
+     * UInt
+     *
+     * Spec: http://amzn.github.io/ion-docs/docs/binary.html#uint-and-int-fields
+     */
+
     // The base test function called by the more specific flavors below.
     // Creates a test which will attempt to read the `expected` unsigned int from the provided input bytes, handling
     // any anticipated exceptions.
@@ -122,6 +128,59 @@ define([
     for (let numberOfBytes = 4; numberOfBytes <= 10; numberOfBytes++) {
       readUnsignedLongInt(maxValueByteArray(numberOfBytes), maxValueForBytes(numberOfBytes));
     }
+
+    /**
+     * Int
+     *
+     * Spec: http://amzn.github.io/ion-docs/docs/binary.html#uint-and-int-fields
+     */
+
+    // The base test function called by the more specific flavors below.
+    // Creates a test which will attempt to read the `expected` signed int from the provided input bytes, handling
+    // any anticipated exceptions.
+    let readSignedIntTest = function(testName, bytes, expected, throwsException) {
+      let test = function() {
+        let binarySpan = new ion.BinarySpan(new Uint8Array(bytes));
+        let actual = ion.ParserBinaryRaw.readSignedIntFrom(binarySpan, bytes.length).numberValue();
+        assert.equal(actual, expected)
+      }
+      registerTest(testName, test, throwsException);
+    }
+
+    // Should read the `expected` signed int value from the provided input bytes.
+    // Will fail if an exception is thrown or if the value that's read from the bytes is not equal to `expected`.
+    let readSignedInt = function(bytes, expected) {
+      let testName = 'Read signed int ' + expected + ' from bytes: ' + bytes;
+      let testThrows = false;
+      readSignedIntTest(testName, bytes, expected, testThrows);
+    }
+
+    readSignedInt([0x00], 0);
+    readSignedInt([0x80], 0);
+
+    readSignedInt([0x01], 1);
+    readSignedInt([0x81], -1);
+
+    readSignedInt([0x00, 0x01], 1);
+    readSignedInt([0x80, 0x01], -1);
+
+    readSignedInt([0x04], 4);
+    readSignedInt([0x84], -4);
+
+    readSignedInt([0xFF], -127);
+    readSignedInt([0x7F], 127);
+
+    readSignedInt([0x7F, 0xFF], maxValueForBits(15));
+    readSignedInt([0xFF, 0xFF], -1 * maxValueForBits(15));
+
+    readSignedInt([0x7F, 0xFF, 0xFF], maxValueForBits(23));
+    readSignedInt([0xFF, 0xFF, 0xFF], -1 * maxValueForBits(23));
+
+    readSignedInt([0x7F, 0xFF, 0xFF, 0xFF], maxValueForBits(31));
+    readSignedInt([0xFF, 0xFF, 0xFF, 0xFF], -1 * maxValueForBits(31));
+
+    readSignedInt([0x7F, 0xFF, 0xFF, 0xFF, 0xFF], maxValueForBits(39));
+    readSignedInt([0xFF, 0xFF, 0xFF, 0xFF, 0xFF], -1 * maxValueForBits(39));
 
     registerSuite(suite);
   }
