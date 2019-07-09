@@ -209,15 +209,22 @@ export class ParserBinaryRaw {
         return LongInt.fromVarIntBytes(bytes, isNegative);
     }
 
-    private readLongInt() : LongInt {
-        if (this._len - this._in.position() < 1) return new LongInt(0);
-        let bytes : Uint8Array = this._in.view(this._in.position(), );
-        let sign = (bytes[0] & 0x10) != 0;
-        bytes[0] &= 0x7F;
-        return LongInt.fromIntBytes(Array.prototype.slice.call(bytes), sign);
+    static readSignedIntFrom(input: BinarySpan, numberOfBytes: number) : LongInt {
+        if (numberOfBytes == 0) {
+            return new LongInt(0);
+        }
+        let bytes: Uint8Array = input.view(numberOfBytes);
+        let isNegative = (bytes[0] & 0x80) == 0x80;
+        let numbers = Array.prototype.slice.call(bytes);
+        numbers[0] = bytes[0] & 0x7F;
+        return LongInt.fromIntBytes(numbers, isNegative);
     }
 
-    static readUnsignedIntFrom(input: BinarySpan, numberOfBytes: number) {
+    private readSignedInt() : LongInt {
+        return ParserBinaryRaw.readSignedIntFrom(this._in, this._len);
+    }
+
+    static readUnsignedIntFrom(input: BinarySpan, numberOfBytes: number) : number {
         let value = 0, bytesRead = 0, byte;
         if (numberOfBytes < 1)
             return 0;
@@ -261,7 +268,7 @@ export class ParserBinaryRaw {
         // so it's a normal value
         pos = this._in.position();//what is this...
         exp = this.readVarSignedInt();
-        digits = this.readLongInt();
+        digits = this.readSignedInt();
         d = new Decimal(digits, exp);
 
         return d;
@@ -280,7 +287,7 @@ export class ParserBinaryRaw {
                 if(precision  === Precision.SECONDS) {
                     let second = this.readVarUnsignedInt();
                     let exp = this.readVarSignedInt();
-                    let coef = this.readLongInt();
+                    let coef = this.readSignedInt();
                     let decimal = new Decimal(coef, exp);
                     //timeArray[precision] = decimal.add();
                 } else {
