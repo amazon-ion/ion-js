@@ -182,6 +182,120 @@ define([
     readSignedInt([0x7F, 0xFF, 0xFF, 0xFF, 0xFF], maxValueForBits(39));
     readSignedInt([0xFF, 0xFF, 0xFF, 0xFF, 0xFF], -1 * maxValueForBits(39));
 
+    /**
+     * VarUInt
+     *
+     * Spec: http://amzn.github.io/ion-docs/docs/binary.html#varuint-and-varint-fields
+     */
+
+    // The base test function called by the more specific flavors below.
+    // Creates a test which will attempt to read the `expected` VarUInt from the provided input bytes, handling
+    // any anticipated exceptions.
+    let readVarUnsignedIntTest = function(testName, bytes, expected, throwsException) {
+      let test = function() {
+        let binarySpan = new ion.BinarySpan(new Uint8Array(bytes));
+        let actual = ion.ParserBinaryRaw.readVarUnsignedIntFrom(binarySpan);
+        assert.equal(actual, expected)
+      }
+      registerTest(testName, test, throwsException);
+    }
+
+    // Should read the `expected` VarUInt value from the provided input bytes.
+    // Will fail if an exception is thrown or if the value that's read from the bytes is not equal to `expected`.
+    let readVarUnsignedInt = function(bytes, expected) {
+      let testName = 'Read var unsigned int ' + expected + ' from bytes: ' + bytes;
+      let testThrows = false;
+      readVarUnsignedIntTest(testName, bytes, expected, testThrows);
+    }
+
+    // Should detect that overflow has occurred while reading and throw an exception.
+    // Will fail if no exception is thrown.
+    let overflowWhileReadingVarUnsignedInt = function(bytes, expected) {
+      let testName = 'Overflow while attempting to read var unsigned int ' + expected + ' from the bytes: ' + bytes;
+      let testThrows = true;
+      readVarUnsignedIntTest(testName, bytes, expected, testThrows);
+    }
+
+    // Test all values that can be encoded in a single byte
+    for (let byte = 0; byte <= 0x7F; byte++) {
+        readVarUnsignedInt([byte | 0x80], byte);
+    }
+
+    readVarUnsignedInt([0x80], 0);
+    readVarUnsignedInt([0x00, 0x81], 1);
+    readVarUnsignedInt([0x00, 0x00, 0x81], 1);
+    readVarUnsignedInt([0x00, 0x00, 0x00, 0x81], 1);
+
+    readVarUnsignedInt([0x0E, 0xEB], 1899);
+    readVarUnsignedInt([0x0E, 0xEC], 1900);
+
+    overflowWhileReadingVarUnsignedInt([0x1F, 0x7F, 0x7F, 0x7F, 0xFF], maxValueForBits(33));
+    overflowWhileReadingVarUnsignedInt([0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0xFF], maxValueForBits(42));
+
+    /**
+     * VarInt
+     *
+     * Spec: http://amzn.github.io/ion-docs/docs/binary.html#varuint-and-varint-fields
+     */
+
+    // The base test function called by the more specific flavors below.
+    // Creates a test which will attempt to read the `expected` VarUInt from the provided input bytes, handling
+    // any anticipated exceptions.
+    let readVarSignedIntTest = function(testName, bytes, expected, throwsException) {
+      let test = function() {
+        let binarySpan = new ion.BinarySpan(new Uint8Array(bytes));
+        let actual = ion.ParserBinaryRaw.readVarSignedIntFrom(binarySpan);
+        assert.equal(actual, expected)
+      }
+      registerTest(testName, test, throwsException);
+    }
+
+    // Should read the `expected` VarUInt value from the provided input bytes.
+    // Will fail if an exception is thrown or if the value that's read from the bytes is not equal to `expected`.
+    let readVarSignedInt = function(bytes, expected) {
+      let testName = 'Read var signed int ' + expected + ' from bytes: ' + bytes;
+      let testThrows = false;
+      readVarSignedIntTest(testName, bytes, expected, testThrows);
+    }
+
+    // Should detect that overflow has occurred while reading and throw an exception.
+    // Will fail if no exception is thrown.
+    let overflowWhileReadingVarSignedInt = function(bytes, expected) {
+      let testName = 'Overflow while attempting to read var signed int value ' + expected + ' from the bytes: ' + bytes;
+      let testThrows = true;
+      readVarSignedIntTest(testName, bytes, expected, testThrows);
+    }
+
+    // Test all positive values that can be encoded in a single byte
+    for (let byte = 0; byte <= 0x3F; byte++) {
+      readVarSignedInt([byte | 0x80], byte);
+    }
+
+    // Test all negative values that can be encoded in a single byte
+    for (let byte = 0; byte <= 0x3F; byte++) {
+      readVarSignedInt([byte | 0xC0], -byte);
+    }
+
+    readVarSignedInt([0x80], 0);
+    readVarSignedInt([0xC0], -0); // Not forbidden by the spec
+    readVarSignedInt([0x81], 1);
+    readVarSignedInt([0xC1], -1);
+    readVarSignedInt([0x00, 0x81], 1);
+    readVarSignedInt([0x40, 0x81], -1);
+
+    readVarSignedInt([0x0E, 0xEB], 1899);
+    readVarSignedInt([0x4E, 0xEB], -1899);
+    readVarSignedInt([0x0E, 0xEC], 1900);
+    readVarSignedInt([0x4E, 0xEC], -1900);
+
+    readVarSignedInt([0x00, 0x00, 0x81], 1);
+    readVarSignedInt([0x00, 0x00, 0x00, 0x81], 1);
+    readVarSignedInt([0x3F, 0x7F, 0x7F, 0xFF], maxValueForBits(27));
+    readVarSignedInt([0x7F, 0x7F, 0x7F, 0xFF], -maxValueForBits(27));
+
+    overflowWhileReadingVarSignedInt([0x1F, 0x7F, 0x7F, 0x7F, 0xFF], maxValueForBits(33));
+    overflowWhileReadingVarSignedInt([0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0xFF], -maxValueForBits(42));
+
     registerSuite(suite);
   }
 );
