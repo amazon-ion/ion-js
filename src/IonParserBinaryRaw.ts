@@ -155,7 +155,7 @@ export class ParserBinaryRaw {
         }
     }
 
-    static readVarUnsignedFrom(input: BinarySpan) : number {
+    private static readVarUnsignedFrom(input: BinarySpan) : number {
         let numberOfBits = 0;
         let byte;
         let magnitude = 0;
@@ -209,7 +209,7 @@ export class ParserBinaryRaw {
         return LongInt.fromVarIntBytes(bytes, isNegative);
     }
 
-    static readSignedIntFrom(input: BinarySpan, numberOfBytes: number) : LongInt {
+    private static readSignedIntFrom(input: BinarySpan, numberOfBytes: number) : LongInt {
         if (numberOfBytes == 0) {
             return new LongInt(0);
         }
@@ -224,7 +224,7 @@ export class ParserBinaryRaw {
         return ParserBinaryRaw.readSignedIntFrom(this._in, this._len);
     }
 
-    static readUnsignedIntFrom(input: BinarySpan, numberOfBytes: number) : number {
+    private static readUnsignedIntFrom(input: BinarySpan, numberOfBytes: number) : number {
         let value = 0, bytesRead = 0, byte;
         if (numberOfBytes < 1)
             return 0;
@@ -254,7 +254,7 @@ export class ParserBinaryRaw {
         return ParserBinaryRaw.readUnsignedIntFrom(this._in, this._len);
     }
 
-    static readUnsignedLongIntFrom(input: BinarySpan, numberOfBytes: number) : LongInt {
+    private static readUnsignedLongIntFrom(input: BinarySpan, numberOfBytes: number) : LongInt {
         return LongInt.fromUIntBytes(Array.prototype.slice.call(input.view(numberOfBytes)));
     }
 
