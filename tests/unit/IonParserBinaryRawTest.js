@@ -277,7 +277,7 @@ define([
     }
 
     readVarSignedInt([0x80], 0);
-    readVarSignedInt([0xC0], -0); // Not forbidden by the spec
+    readVarSignedInt([0xC0], -0);
     readVarSignedInt([0x81], 1);
     readVarSignedInt([0xC1], -1);
     readVarSignedInt([0x00, 0x81], 1);
