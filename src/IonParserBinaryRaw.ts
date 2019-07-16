@@ -155,7 +155,7 @@ export class ParserBinaryRaw {
         }
     }
 
-    private static readVarUnsignedFrom(input: BinarySpan) : number {
+    private static readVarUnsignedIntFrom(input: BinarySpan) : number {
         let numberOfBits = 0;
         let byte;
         let magnitude = 0;
@@ -164,34 +164,45 @@ export class ParserBinaryRaw {
             byte = input.next();
             magnitude = (magnitude << 7) | (byte & 0x7F);
             numberOfBits += 7;
-            if (byte & 0x80) break;
+            if (byte & 0x80) {
+                break;
+            }
         }
 
-        if(numberOfBits > 32) throw new Error("Values larger than 32 bits need to be marshalled using LongInt")
+        if(numberOfBits > 31) {
+            throw new Error("VarUInt values larger than 31 bits must be read using LongInt.");
+        }
+
         return magnitude;
     }
 
     private readVarUnsignedInt() : number {
-        return ParserBinaryRaw.readVarUnsignedFrom(this._in);
+        return ParserBinaryRaw.readVarUnsignedIntFrom(this._in);
     }
 
-    private readVarSignedInt() : number {
-        let v = this._in.next(), byte;
+    private static readVarSignedIntFrom(input: BinarySpan) : number {
+        let v = input.next(), byte;
         let isNegative = v & 0x40;
         let stopBit = v & 0x80;
         v &= 0x3F;  // clears the sign/stop bit
         let bits = 6;
         while(!stopBit) {
-            byte = this._in.next();
+            byte = input.next();
             stopBit = byte & 0x80;
             byte &= 0x7F;
             v <<= 7;
             v |= byte;
             bits += 7;
         }
-        if(bits > 32) throw new Error("Values larger than 32 bits need to be marshalled using LongInt");
+        if(bits > 32) {
+            throw new Error("VarInt values larger than 32 bits must be read using LongInt");
+        }
         // now we put the sign on, if it's needed
         return isNegative? -v : v;
+    }
+
+    private readVarSignedInt() : number {
+        return ParserBinaryRaw.readVarSignedIntFrom(this._in);
     }
 
     private readVarLongInt() : LongInt {
