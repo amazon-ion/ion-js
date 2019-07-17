@@ -125,33 +125,46 @@ define(
             assert.equal(ionReader.fieldName(), "innerkey2");
         };
 
-        suite['Accept IVM-like symbols and throw on IVMs except $ion_1_0'] = function() {
-            let shouldPass = ["$ion_1_0", "$ion_schema_1_0", "$ion_1", "$ion_1_a", "$ion_", "ion_1_"];
-            let shouldThrow = ["$ion_2_0", "$ion_1_999", "$ion_999_0", "$ion_1_1", "$ion_1_00"];
 
-            for (let i = 0; i < shouldPass.length; i++) {
-                let input = shouldPass[i];
-                let ionReader = ion.makeReader(input);
-                try {
-                    while (ionReader.next() !== undefined) {}
-                } catch(error) {
-                    throw new Error(`Allowable IVM like symbol ${input} threw an error: ${error.message}.`);
-                }
+        suite['text IVM'] = function() {
+            var textReader = ion.makeReader("");
+            let isNotIVM = ["$ion_schema_1_0", "$ion_1", "$ion_1_a", "$ion_", "ion_1_"];
+            let unsupportedIVM = ["$ion_2_0", "$ion_1_999", "$ion_999_0", "$ion_1_1", "$ion_1_00"];
+
+            test_isIVM(textReader,"$ion_1_0", true, 0, []);
+            test_isIVM(textReader,"$ion_1_0", false, 1, []);
+            test_isIVM(textReader,"$ion_1_0", false, 0, ["taco"]);
+            for (let i = 0; i < isNotIVM; i++) {
+                test_isIVM(textReader, isNotIVM[i], false, 0, []);
             }
-
-            for (let i = 0; i < shouldThrow.length; i++) {
-                let input = shouldThrow[i];
-                let ionReader = ion.makeReader(input);
-                try {
-                    while (ionReader.next() !== undefined) {}
-                    throw new Error(`Unsupported IVM symbol ${input} did not throw an error.`);
-                } catch(error) {
-                     if (error.message !== "Only Ion version 1.0 is supported.") {
-                         throw new Error(`input: ${input} threw an unexpected error: ${error.message}.`);
-                     }
-                }
+            for (let i = 0; i < unsupportedIVM; i++) {
+                test_isIVM(textReader, unsupportedIVM[i], "throw", 0, []);
+            }
+            for (let i = 0; i < unsupportedIVM; i++) {
+                test_isIVM(textReader, unsupportedIVM[i], false, 1, []);
+            }
+            for (let i = 0; i < unsupportedIVM; i++) {
+                test_isIVM(textReader, unsupportedIVM[i], false, 0, ["taco"]);
             }
         };
+
+        function test_isIVM(reader, value, expected, depth, annotations) {
+            if (expected === "throw") {
+                try {
+                    reader.isIVM(value, depth, annotations);
+                } catch(error) {
+                    if (error.message !== "Only Ion version 1.0 is supported.") {
+                        throw new Error(`input: ${value} threw an unexpected error: ${error.message}.`);
+                    }
+                }
+                throw new Error("Expected " + value + " to throw an error.");
+            } else {
+                let actual = reader.isIVM(value, depth, annotations);
+                assert.equal(expected, actual);
+            }
+
+
+        }
         registerSuite(suite);
     }
 );

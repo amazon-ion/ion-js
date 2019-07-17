@@ -88,11 +88,11 @@ export class TextReader implements Reader {
     }
   }
 
-    isIVM(input : string) : boolean {
-        if (this.depth() > 0) return false;
+  isIVM(input : string, depth : number, annotations : string[]) : boolean {
+        if (depth > 0) return false;
         const ivm = "$ion_1_0";
         const prefix = "$ion_";
-        if (input.length < ivm.length || this.annotations().length > 0) return false;
+        if (input.length < ivm.length || annotations.length > 0) return false;
 
         let i = 0;
 
@@ -138,7 +138,7 @@ next() {
         if (this._raw_type === T_IDENTIFIER) {
             if (this._depth > 0) break;
             this.load_raw();
-            if (!this.isIVM(this._raw)) break;
+            if (!this.isIVM(this._raw, this.depth(), this.annotations())) break;
             this._symtab = defaultLocalSymbolTable();
             this._raw = undefined;
             this._raw_type = undefined;
