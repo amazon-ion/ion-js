@@ -134,16 +134,16 @@ define(
             test_isIVM(textReader,"$ion_1_0", true, 0, []);
             test_isIVM(textReader,"$ion_1_0", false, 1, []);
             test_isIVM(textReader,"$ion_1_0", false, 0, ["taco"]);
-            for (let i = 0; i < isNotIVM; i++) {
+            for (let i = 0; i < isNotIVM.length; i++) {
                 test_isIVM(textReader, isNotIVM[i], false, 0, []);
             }
-            for (let i = 0; i < unsupportedIVM; i++) {
+            for (let i = 0; i < unsupportedIVM.length; i++) {
                 test_isIVM(textReader, unsupportedIVM[i], "throw", 0, []);
             }
-            for (let i = 0; i < unsupportedIVM; i++) {
+            for (let i = 0; i < unsupportedIVM.length; i++) {
                 test_isIVM(textReader, unsupportedIVM[i], false, 1, []);
             }
-            for (let i = 0; i < unsupportedIVM; i++) {
+            for (let i = 0; i < unsupportedIVM.length; i++) {
                 test_isIVM(textReader, unsupportedIVM[i], false, 0, ["taco"]);
             }
         };
@@ -156,6 +156,7 @@ define(
                     if (error.message !== "Only Ion version 1.0 is supported.") {
                         throw new Error(`input: ${value} threw an unexpected error: ${error.message}.`);
                     }
+                    return;
                 }
                 throw new Error("Expected " + value + " to throw an error.");
             } else {
