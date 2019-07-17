@@ -43,18 +43,32 @@ import { LongInt } from "./IonLongInt";
 
 
 export class Decimal {
+
+    private _coefficient: LongInt;
+    private _exponent: number;
+
     public static readonly NULL: Decimal = new Decimal(undefined, undefined);
     public static readonly ZERO: Decimal = new Decimal(new LongInt(0), 0);
 
-    constructor(private _value: LongInt, private _exponent: number) {}
+    constructor(coefficient: LongInt | number, exponent: number) {
+        if (typeof coefficient === "number") {
+            if (!Number.isInteger(coefficient)) {
+                throw new Error("The provided coefficient was not an integer. (" + coefficient + ")");
+            }
+            this._coefficient = new LongInt(coefficient);
+        } else {
+            this._coefficient = coefficient;
+        }
+        this._exponent = exponent;
+    }
 
     isZero() : boolean {
         if (this.isNull()) return false;
-        return this._value.isZero();
+        return this._coefficient.isZero();
     }
 
     isNegative() : boolean {
-        return this._value.signum() === -1;
+        return this._coefficient.signum() === -1;
     }
 
     isNegativeZero() : boolean {
@@ -65,14 +79,14 @@ export class Decimal {
         if (this.isZero()) {
           // TODO - is this right? negative scale is valid decimal places
           if (this._exponent >= -1) {
-            return (this._value.signum() >= 0);
+            return (this._coefficient.signum() >= 0);
           }
         }
         return false;
     }
 
     numberValue(): number {
-        return this._value.numberValue() * Math.pow(10, this._exponent);
+        return this._coefficient.numberValue() * Math.pow(10, this._exponent);
     }
 
     getNumber() : number {
@@ -85,15 +99,15 @@ export class Decimal {
 
     stringValue(): string {
         if (this.isNull()) return "null.decimal";
-        return this._value.toString() + 'd' + this._exponent;
+        return this._coefficient.toString() + 'd' + this._exponent;
     }
 
     isNull() : boolean {
-        return this._value === undefined;
+        return this._coefficient === undefined;
     }
 
     getDigits() : LongInt {
-        return this._value;
+        return this._coefficient;
     }
 
     getExponent() : number {
@@ -101,7 +115,9 @@ export class Decimal {
     }
 
     equals(expected : Decimal) : boolean {
-        return this.getExponent() === expected.getExponent() && this.isNegative() === expected.isNegative() && this.getDigits().numberValue() === expected.getDigits().numberValue();
+        return this.getExponent() === expected.getExponent()
+            && this.isNegative() === expected.isNegative()
+            && this.getDigits().numberValue() === expected.getDigits().numberValue();
     }
 
     static parse(str: string) : Decimal {

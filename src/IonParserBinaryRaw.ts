@@ -273,16 +273,31 @@ export class ParserBinaryRaw {
         return ParserBinaryRaw.readUnsignedLongIntFrom(this._in, this._len);
     }
 
-    private read_decimal_value() : Decimal {
-        var pos, digits, exp, d;
+    /**
+     * Reads a Decimal value from the provided BinarySpan.
+     *
+     * @param input The BinarySpan to read from.
+     * @param numberOfBytes The number of bytes used to represent the Decimal.
+     */
+    private static readDecimalValueFrom(input: BinarySpan, numberOfBytes: number) : Decimal {
+        // Decimal representations have two components: exponent (a VarInt) and coefficient (an Int).
+        // The decimal’s value is: coefficient * 10 ^ exponent
 
-        // so it's a normal value
-        pos = this._in.position();//what is this...
-        exp = this.readVarSignedInt();
-        digits = this.readSignedInt();
-        d = new Decimal(digits, exp);
+        let coefficient, exponent, d;
+
+        let initialPosition = input.position();
+        exponent = ParserBinaryRaw.readVarSignedIntFrom(input);
+        let numberOfExponentBytes = input.position() - initialPosition;
+        let numberOfCoefficientBytes = numberOfBytes - numberOfExponentBytes;
+
+        coefficient = ParserBinaryRaw.readSignedIntFrom(input,  numberOfCoefficientBytes);
+        d = new Decimal(coefficient, exponent);
 
         return d;
+    }
+
+    private read_decimal_value() : Decimal {
+        return ParserBinaryRaw.readDecimalValueFrom(this._in, this._len);
     }
 
     private read_timestamp_value() : Timestamp {
