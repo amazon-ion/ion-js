@@ -296,6 +296,50 @@ define([
     overflowWhileReadingVarSignedInt([0x1F, 0x7F, 0x7F, 0x7F, 0xFF], maxValueForBits(33));
     overflowWhileReadingVarSignedInt([0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0xFF], -maxValueForBits(42));
 
+    /**
+     * Decimal
+     *
+     * Spec: http://amzn.github.io/ion-docs/docs/binary.html#5-decimal
+     */
+
+    // The base test function called by the more specific flavors below.
+    // Creates a test which will attempt to read the `expected` Decimal from the provided input bytes, handling
+    // any anticipated exceptions.
+    let readDecimalTest = function(testName, bytes, expected, throwsException) {
+          let test = function() {
+            let binarySpan = new ion.BinarySpan(new Uint8Array(bytes));
+            let actual = ion.ParserBinaryRaw.readDecimalValueFrom(binarySpan, bytes.length);
+            // Use Decimal#equals(Decimal) to determine equality
+            assert.isTrue(actual.equals(expected));
+          }
+          registerTest(testName, test, throwsException);
+    }
+
+    // Should read the `expected` Decimal value from the provided input bytes.
+    // Will fail if an exception is thrown or if the value that's read from the bytes is not equal to `expected`.
+    let readDecimal = function(bytes, expected) {
+      let testName = 'Read decimal ' + expected + ' from bytes: ' + bytes;
+      let testThrows = false;
+      readDecimalTest(testName, bytes, expected, testThrows);
+    }
+
+    // Test all single-byte coefficients -127 to 127 (signed Int) combined with each
+    // single-byte exponent from -63 to 63 (signed VarInt)
+    for (let coefficient = 0; coefficient <= maxValueForBits(7); coefficient++) {
+      for (let exponent = 0; exponent <= maxValueForBits(6); exponent++) {
+        readDecimal([0x80 | exponent, coefficient], new ion.Decimal(coefficient, exponent));
+        readDecimal([0xC0 | exponent, coefficient], new ion.Decimal(coefficient, -exponent));
+        readDecimal([0x80 | exponent, 0x80 | coefficient], new ion.Decimal(-coefficient, exponent));
+        readDecimal([0xC0 | exponent, 0x80 | coefficient], new ion.Decimal(-coefficient, -exponent));
+      }
+    }
+
+    readDecimal([0x00, 0x81, 0x05], new ion.Decimal(5, 1));
+    readDecimal([0x00, 0x00, 0x81, 0x05], new ion.Decimal(5, 1));
+
+    readDecimal([0x40, 0x81, 0x00, 0x01], new ion.Decimal(1, -1));
+    readDecimal([0x00, 0x00, 0x81, 0x80, 0x00, 0x01], new ion.Decimal(-1, 1));
+
     registerSuite(suite);
   }
 );
