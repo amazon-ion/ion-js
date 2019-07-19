@@ -89,33 +89,33 @@ export class TextReader implements Reader {
   }
 
   isIVM(input : string, depth : number, annotations : string[]) : boolean {
-        if (depth > 0) return false;
-        const ivm = "$ion_1_0";
-        const prefix = "$ion_";
-        if (input.length < ivm.length || annotations.length > 0) return false;
+    if (depth > 0) return false;
+    const ivm = "$ion_1_0";
+    const prefix = "$ion_";
+    if (input.length < ivm.length || annotations.length > 0) return false;
 
-        let i = 0;
+    let i = 0;
 
-        while (i < prefix.length) {
-            if (prefix.charAt(i) !== input.charAt(i)) return false;
-            i++;
-        }
-
-        while (i < input.length && input.charAt(i) != '_') {
-            let ch = input.charAt(i);
-            if (ch < '0' || ch > '9') return false;
-            i++;
-        }
-        i++;
-
-        while (i < input.length) {
-            let ch = input.charAt(i);
-            if (ch < '0' || ch > '9') return false;
-            i++;
-        }
-        if (input !== ivm) throw new Error("Only Ion version 1.0 is supported.");
-        return true;
+    while (i < prefix.length) {
+      if (prefix.charAt(i) !== input.charAt(i)) return false;
+      i++;
     }
+
+    while (i < input.length && input.charAt(i) != '_') {
+      let ch = input.charAt(i);
+      if (ch < '0' || ch > '9') return false;
+      i++;
+    }
+    i++;
+
+    while (i < input.length) {
+      let ch = input.charAt(i);
+      if (ch < '0' || ch > '9') return false;
+      i++;
+    }
+    if (input !== ivm) throw new Error("Only Ion version 1.0 is supported.");
+    return true;
+  }
 
     isLikeIVM() : boolean {
       return false;

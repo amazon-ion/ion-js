@@ -1,16 +1,17 @@
 /*
-* Copyright 2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
-*
-* Licensed under the Apache License, Version 2.0 (the "License").
-* You may not use this file except in compliance with the License.
-* A copy of the License is located at:
-*
-*     http://aws.amazon.com/apache2.0/
-*
-* or in the "license" file accompanying this file. This file is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific
-* language governing permissions and limitations under the License.
-*/
+ * Copyright 2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * A copy of the License is located at:
+ *
+ *     http://aws.amazon.com/apache2.0/
+ *
+ * or in the "license" file accompanying this file. This file is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific
+ * language governing permissions and limitations under the License.
+ */
+
 define(
     function(require) {
         const registerSuite = require('intern!object');
@@ -139,26 +140,14 @@ define(
             }
             for (let i = 0; i < unsupportedIVM.length; i++) {
                 test_isIVM(textReader, unsupportedIVM[i], "throw", 0, []);
-            }
-            for (let i = 0; i < unsupportedIVM.length; i++) {
                 test_isIVM(textReader, unsupportedIVM[i], false, 1, []);
-            }
-            for (let i = 0; i < unsupportedIVM.length; i++) {
                 test_isIVM(textReader, unsupportedIVM[i], false, 0, ["taco"]);
             }
         };
 
         function test_isIVM(reader, value, expected, depth, annotations) {
             if (expected === "throw") {
-                try {
-                    reader.isIVM(value, depth, annotations);
-                } catch(error) {
-                    if (error.message !== "Only Ion version 1.0 is supported.") {
-                        throw new Error(`input: ${value} threw an unexpected error: ${error.message}.`);
-                    }
-                    return;
-                }
-                throw new Error("Expected " + value + " to throw an error.");
+                assert.throws(() => { reader.isIVM(value, depth, annotations)});
             } else {
                 let actual = reader.isIVM(value, depth, annotations);
                 assert.equal(expected, actual);
