@@ -150,7 +150,7 @@ define(
                 assert.throws(() => { reader.isIVM(value, depth, annotations)});
             } else {
                 let actual = reader.isIVM(value, depth, annotations);
-                assert.equal(expected, actual);
+                assert.equal(actual, expected);
             }
 
 
