@@ -88,16 +88,34 @@ export class TextReader implements Reader {
     }
   }
 
-    isIVM(input : string) : boolean {
-        if(this.depth() > 0) return false;
-        if(input.length < 6 || this.annotations().length > 0) return false;
-        let prefix = "$ion_";
-        for(let i = 0; i < prefix.length; i++){
-            if(prefix.charAt(i) !== input.charAt(i)) return false;
-        }
-        if(input !== "$ion_1_0") throw new Error("Only ion version 1.0 is supported.");
-        return true;
+  isIVM(input : string, depth : number, annotations : string[]) : boolean {
+    if (depth > 0) return false;
+    const ivm = "$ion_1_0";
+    const prefix = "$ion_";
+    if (input.length < ivm.length || annotations.length > 0) return false;
+
+    let i = 0;
+
+    while (i < prefix.length) {
+      if (prefix.charAt(i) !== input.charAt(i)) return false;
+      i++;
     }
+
+    while (i < input.length && input.charAt(i) != '_') {
+      let ch = input.charAt(i);
+      if (ch < '0' || ch > '9') return false;
+      i++;
+    }
+    i++;
+
+    while (i < input.length) {
+      let ch = input.charAt(i);
+      if (ch < '0' || ch > '9') return false;
+      i++;
+    }
+    if (input !== ivm) throw new Error("Only Ion version 1.0 is supported.");
+    return true;
+  }
 
     isLikeIVM() : boolean {
       return false;
@@ -120,7 +138,7 @@ next() {
         if (this._raw_type === T_IDENTIFIER) {
             if (this._depth > 0) break;
             this.load_raw();
-            if (!this.isIVM(this._raw)) break;
+            if (!this.isIVM(this._raw, this.depth(), this.annotations())) break;
             this._symtab = defaultLocalSymbolTable();
             this._raw = undefined;
             this._raw_type = undefined;
