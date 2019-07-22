@@ -35,6 +35,7 @@ import { StringSpan } from "./IonSpan";
 import { Timestamp } from "./IonTimestamp";
 import { fromBase64 } from "./IonText";
 import { is_digit } from "./IonText";
+import { encodeUtf8 } from "./IonUnicode";
 
 const RAW_STRING = new IonType( -1, "raw_input", true,  false, false, false );
 
@@ -257,12 +258,7 @@ next() {
     if(this.isNull()) return null;
     switch(this._type){
         case IonTypes.CLOB : {
-            let length = this._raw.length;
-            let data = new Uint8Array(length);
-            for(let i = 0; i < this._raw.length; i++){
-                data[i] = this._raw.charCodeAt(i);
-            }
-            return data;
+            return encodeUtf8(this._raw);
         }
         case IonTypes.BLOB : {
             return fromBase64(this._raw);
