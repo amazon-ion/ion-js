@@ -127,12 +127,12 @@ export class Decimal {
         let f  = str.match('\\.');
         let exponentDelimiterIndex = str.length - 1;
         if(d) {
-            exponent = Number(str.substring(d.index + 1, str.length - 1));
-            exponentDelimiterIndex = d.index - 1;
+            exponent = Number(str.substring(d.index + 1, str.length));
+            exponentDelimiterIndex = d.index;
         }
         if(f) {
             let exponentShift = d ? (d.index - 1) - f.index : (str.length - 1) - f.index;
-            return new Decimal(new LongInt(str.substring(0, f.index - 1) +  str.substring(f.index + 1, exponentDelimiterIndex)), exponent - exponentShift);
+            return new Decimal(new LongInt(str.substring(0, f.index) +  str.substring(f.index + 1, exponentDelimiterIndex)),  exponent - exponentShift);
         } else {
             return new Decimal(new LongInt(str.substring(0,  exponentDelimiterIndex)), exponent);
         }
