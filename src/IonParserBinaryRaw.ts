@@ -387,7 +387,17 @@ export class ParserBinaryRaw {
                 rt = t.load_annotations();
             }
         }
-        if (rt === IonBinary.TB_NULL) t._null = true;
+        switch (rt) {
+            case IonBinary.TB_NULL:
+                t._null = true;
+                break;
+            case IonBinary.TB_BOOL:
+                if (t._len === 0 || t._len === 1) {
+                    t._curr = t._len === 1;
+                    t._len = 0;
+                }
+                break;
+        }
         t._raw_type = rt;
         return rt;
     }
@@ -446,7 +456,6 @@ export class ParserBinaryRaw {
         if (this.isNull()) return null;
         switch(this._raw_type) {
             case IonBinary.TB_BOOL:
-                this._curr = this._len === 1;
                 break;
             case IonBinary.TB_INT:
                 if (this._len === 0) {
@@ -497,7 +506,7 @@ export class ParserBinaryRaw {
         }
     }
 
-    next() : any {//this is some garbage ass code
+    next() : any {
         if (this._curr === undefined && this._len > 0) {
             this._in.skip(this._len);
         } else {
