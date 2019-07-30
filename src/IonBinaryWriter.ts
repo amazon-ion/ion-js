@@ -610,7 +610,7 @@ class StructNode extends ContainerNode {
   }
 
   getLength() : number {
-    if (this.length) {
+    if (this.length === undefined) {
       this.length = super.getLength();
     }
     return this.length;
