@@ -190,7 +190,7 @@ export class IonEventStream {
                             return;
                         } else {
                             this.reader.stepOut();
-                            this.closeContainer(currentContainer.pop(), currentContainerIndex.pop());
+                            this.endContainer(currentContainer.pop(), currentContainerIndex.pop());
                         }
                         break;
                     }
@@ -204,7 +204,7 @@ export class IonEventStream {
         }
     }
 
-    private closeContainer(thisContainer : IonEvent, thisContainerIndex : number) {
+    private endContainer(thisContainer : IonEvent, thisContainerIndex : number) {
         this.eventStream.push(this.eventFactory.makeEvent(IonEventType.CONTAINER_END, thisContainer.ionType, null, thisContainer.depth, null,false, null));
         thisContainer.ionValue = this.eventStream.slice(thisContainerIndex, this.eventStream.length);
     }
@@ -222,7 +222,7 @@ export class IonEventStream {
                     this.eventStream.push(tempEvent);
                     currentContainerIndex.push(this.eventStream.length);
                 } else if(tempEvent.eventType === IonEventType.CONTAINER_END) {
-                    this.closeContainer(currentContainer.pop(), currentContainerIndex.pop());
+                    this.endContainer(currentContainer.pop(), currentContainerIndex.pop());
                 } else if(tempEvent.eventType === IonEventType.SCALAR || tempEvent.eventType === IonEventType.STREAM_END) {
                     this.eventStream.push(tempEvent);
                 } else {
