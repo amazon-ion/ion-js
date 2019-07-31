@@ -358,22 +358,6 @@
           writer => { writer.writeStruct(); writer.endContainer(); writer.writeStruct() },
           '{}\n{}');
 
-
-    // Annotations
-    writerTest('Escapes keyword null in an annotation',    writer => { writer.writeInt(1, ["null"]) }, "'null'::1");
-    writerTest('Escapes keyword false in an annotation',   writer => { writer.writeInt(1, ["false"]) }, "'false'::1");
-    writerTest('Escapes struct characters as expected',    writer => { writer.writeInt(1, ["{}"]) }, "'{}'::1");
-    writerTest('Escapes int characters as expected',       writer => { writer.writeInt(1, ["1"]) }, "'1'::1");
-    writerTest('Escapes decimal characters as expected',   writer => { writer.writeInt(1, ["-0.12d4"]) }, "'-0.12d4'::1");
-    writerTest('Escapes float characters as expected',     writer => { writer.writeInt(1, ["-0.12e4"]) }, "'-0.12e4'::1");
-    writerTest('Escapes list characters as expected',      writer => { writer.writeInt(1, ["[]"]) }, "'[]'::1");
-    writerTest('Escapes blob characters as expected',      writer => { writer.writeInt(1, ["{{ VG8gaW5maW5pdHkuLi4gYW5kIGJleW9uZCE= }}"]) }, "'{{ VG8gaW5maW5pdHkuLi4gYW5kIGJleW9uZCE= }}'::1");
-    writerTest('Escapes clob characters as expected',      writer => { writer.writeInt(1, ["{{ \"This is a CLOB of text.\" }}"]) }, "'{{ \"This is a CLOB of text.\" }}'::1");
-    writerTest('Escapes sexp characters as expected',      writer => { writer.writeInt(1, ["(a+-b)"]) }, "'(a+-b)'::1");
-    writerTest('Escapes timestamp characters as expected', writer => { writer.writeInt(1, ["2007-02-23T12:14:33.079-08:00"]) }, "'2007-02-23T12:14:33.079-08:00'::1");
-    // add test for annotation with spaces
-
-
     // PrettyPrint
     prettyTest('Writes composite pretty ion',
       writer => {
