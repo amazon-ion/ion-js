@@ -13,7 +13,17 @@
 */
 import { Decimal } from "./IonDecimal";
 import { encodeUtf8 } from "./IonUnicode";
-import { escape, toBase64, StringEscapes, SymbolEscapes, isIdentifier, isOperator, CharCodes, ClobEscapes } from "./IonText";
+import {
+    escape,
+    toBase64,
+    StringEscapes,
+    SymbolEscapes,
+    isIdentifier,
+    isOperator,
+    CharCodes,
+    ClobEscapes,
+    is_keyword
+} from "./IonText";
 import { Timestamp } from "./IonTimestamp";
 import { TypeCodes } from "./IonBinary";
 import { Writeable } from "./IonWriteable";
@@ -360,22 +370,23 @@ export class TextWriter implements Writer {
         this.containerContext.push(new Context(container));
     }
 
+    private isSid(s: string) : boolean {
+        if (s.length > 1 && s.charAt(0) === '$'.charAt(0)) {
+            let t = s.substr(1, s.length);
+            return +t === +t;          // +str === +str is a one line "is integer?" hack
+        }
+        return false;
+    }
+
     protected writeSymbolToken(s: string) : void {
-        if (isIdentifier(s)) {
-            if(s.length > 1 && s.charAt(0) === '$'.charAt(0)){
-                let tempStr = s.substr(1, s.length);
-                if (+tempStr === +tempStr) {//+str === +str is a one line is integer hack
-                    this.writeable.writeBytes(encodeUtf8("'" + escape(s, SymbolEscapes) + "'"));
-                } else {
-                    this.writeUtf8(s);
-                }
-            } else {
-                this.writeUtf8(s);
-            }
-        } else if ((!this.isTopLevel) && (this.currentContainer.containerType === TypeCodes.SEXP) && isOperator(s)) {
-            this.writeUtf8(s);
-        } else {
+        if (s.length === 0
+                || is_keyword(s)
+                || this.isSid(s)
+                || (!isIdentifier(s) && !isOperator(s))
+                || (isOperator(s) && this.currentContainer.containerType != TypeCodes.SEXP)) {
             this.writeable.writeBytes(encodeUtf8("'" + escape(s, SymbolEscapes) + "'"));
+        } else {
+            this.writeUtf8(s);
         }
     }
 }

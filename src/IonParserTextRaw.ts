@@ -23,7 +23,7 @@ import * as IonText from "./IonText";
 import { IonType } from "./IonType";
 import { IonTypes } from "./IonTypes";
 import { StringSpan, Span } from "./IonSpan";
-import {is_whitespace} from "./IonText";
+import {is_keyword, is_whitespace} from "./IonText";
 
 const EOF = -1;  // EOF is end of container, distinct from undefined which is value has been consumed
 const ERROR           = -2;
@@ -155,10 +155,6 @@ function get_type_from_name(str: string) : number {
   if (str === "list")      return T_LIST;
   if (str === "struct")    return T_STRUCT;
   throw new Error("Unknown type: " + str + ".");
-}
-
-function is_keyword(str: string) : boolean {
-    return (str === "null") || (str === "true") || (str === "false") || (str === "nan") || (str === "+inf") || (str === "-inf");
 }
 
 function get_hex_value(ch: number) : number {
