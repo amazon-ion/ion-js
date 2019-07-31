@@ -12,6 +12,8 @@ define(
             nan:    () => verifyQuotesAdded('nan'),
             null:   () => verifyQuotesAdded('null'),
             true:   () => verifyQuotesAdded('true'),
+            '+inf': () => verifyQuotesAdded('+inf'),
+            '-inf': () => verifyQuotesAdded('-inf'),
             '':     () => verifyQuotesAdded(''),
             ' ':    () => verifyQuotesAdded(' '),
             '1':    () => verifyQuotesAdded('1'),
