@@ -56,6 +56,10 @@ export function is_digit(ch: number) : boolean {
   return true;
 }
 
+export function is_keyword(str: string) : boolean {
+  return str === "null" || str === "true" || str === "false" || str === "nan" || str === "+inf" || str === "-inf";
+}
+
 export function asAscii(s: any) : string {
   if (typeof s === 'undefined') {
     s = "undefined::null";
