@@ -323,7 +323,7 @@ class IonStringEvent extends AbstractIonEvent {
 
     }
     valueEquals(expected : IonStringEvent) : boolean {
-        return expected instanceof IonSymbolEvent && this.ionValue === expected.ionValue;
+        return expected instanceof IonStringEvent && this.ionValue === expected.ionValue;
     }
     writeIonValue(writer : Writer) : void {
         writer.writeString(this.ionValue);
@@ -396,7 +396,7 @@ class IonStructEvent extends AbsIonContainerEvent {//no embed support as of yet.
     }
     //two way equivalence between the structEvents, they must have the exact same number of equivalent elements.
     valueEquals(expected : IonStructEvent) : boolean {
-        return expected instanceof IonTimestampEvent && this.structsEqual(this.ionValue, expected.ionValue) && this.structsEqual(expected.ionValue, this.ionValue);
+        return expected instanceof IonStructEvent && this.structsEqual(this.ionValue, expected.ionValue) && this.structsEqual(expected.ionValue, this.ionValue);
     }
 
     //for each actual ionEvent, searches for an equivalent expected ionEvent,
@@ -424,6 +424,7 @@ class IonListEvent extends AbsIonContainerEvent {
 
     }
     valueEquals(expected : IonListEvent) : boolean {
+        if(!(expected instanceof IonListEvent)) return false;
         if(this.ionValue.length !== expected.ionValue.length) return false;
         for(let i : number = 0; i < this.ionValue.length; i++){
             if(!this.ionValue[i].equals(expected.ionValue[i])){
@@ -440,6 +441,7 @@ class IonSexpEvent extends AbsIonContainerEvent {
 
     }
     valueEquals(expected : IonSexpEvent) : boolean {
+        if(!(expected instanceof IonSexpEvent)) return false;
         for(let i : number = 0; i < this.ionValue.length; i++){
             if(!this.ionValue[i].equals(expected.ionValue[i])){
                 return false;
@@ -455,7 +457,8 @@ class IonEndEvent extends AbstractIonEvent {
 
     }
     valueEquals(expected : IonEndEvent) {
-        return this.ionValue === expected.ionValue; //should be null === null if they are both end events.
+        return expected instanceof IonEndEvent
+            && this.ionValue === expected.ionValue; //should be null === null if they are both end events.
     }
 
     writeIonValue(writer : Writer) : void {
