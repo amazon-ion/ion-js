@@ -453,6 +453,7 @@ export class ParserBinaryRaw {
     }
 
     private load_value() : void {
+        if (this._curr != undefined) return;   // current value is already loaded
         if (this.isNull()) return null;
         switch(this._raw_type) {
             case IonBinary.TB_BOOL:
@@ -491,7 +492,7 @@ export class ParserBinaryRaw {
                 this._curr = this.read_timestamp_value();
                 break;
             case IonBinary.TB_SYMBOL:
-
+                this._curr = this.readUnsignedInt();
                 break;
             case IonBinary.TB_STRING:
                 this._curr = this.read_string_value();

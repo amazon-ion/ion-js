@@ -168,7 +168,7 @@ export class BinaryReader implements Reader {
 
   stringValue() : string {
     let t: BinaryReader = this;
-    var n, s, p = t._parser;
+    let s, p = t._parser;
     if (t.isNull()) {
       s = "null";
       if (t._raw_type != TB_NULL) {
@@ -179,8 +179,7 @@ export class BinaryReader implements Reader {
       // BLOB is a scalar by you don't want to just use the string 
       // value otherwise all other scalars are fine as is
       if (t._raw_type === TB_SYMBOL) {
-        n = p.numberValue();//this is returning null.
-        s = this.getSymbolString(n);
+        s = this.getSymbolString(p.numberValue());
       }
       else {
         s = p.stringValue();
