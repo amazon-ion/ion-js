@@ -41,6 +41,12 @@ define([
             }
         });
 
+        /*
+        eventStreamSuite['debug'] = () => { roundTripEventStreams(ion.makeReader(getInput(
+            'ion-tests/iontestdata/good/whitespace.ion'
+        ))) };
+         */
+
         registerSuite(goodSuite);
         registerSuite(badSuite);
         registerSuite(eventStreamSuite);
@@ -109,11 +115,20 @@ define([
 
             for(let i = 0;  i < streams.length - 1; i++){
                 for(let j = i; j < streams.length; j++){
+                    //console.log('a: ' + toString(streams[i]));
+                    //console.log('b: ' + toString(streams[i]));
                     if(!streams[i].equals(streams[(j + i) % streams.length])) {
                         throw new Error("Streams unequal.");
                     }
                 }
             }
+        }
+
+        function toString(eventStream) {
+            let writer = ion.makeTextWriter();
+            eventStream.writeEventStream(writer);
+            writer.close();
+            return String.fromCharCode.apply(null, writer.getBytes());
         }
     }
 );
@@ -126,6 +141,7 @@ function toSkipList(paths) {
 
     // additional, known bad/slow test files:
     skipList['ion-tests/iontestdata/good/subfieldVarUInt32bit.ion'] = 1;
+    skipList['ion-tests/iontestdata/good/equivs/lists.ion'] = 1;     // runs too long, causes TravisCI to fail
 
     return skipList;
 }
