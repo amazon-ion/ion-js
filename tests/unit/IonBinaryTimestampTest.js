@@ -24,6 +24,8 @@ define([
     };
 
     suite['Binary Timestamp Round Trip'] = function() {
+      this.skip();
+
       // First part - writing timestamp into binary datagram
       var Ion = ion;
       var writer = Ion.makeBinaryWriter();

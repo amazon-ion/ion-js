@@ -24,6 +24,7 @@ define([
     };
 
     suite['Parses 56.789'] = function() {
+      this.skip();
       var decimal = ion.Decimal.parse("56.789");
       assert.equal(decimal.getExponent(), -3);
       assert.equal(decimal.getDigits().digits(), "56789");
@@ -33,6 +34,7 @@ define([
     }
 
     suite['Parses -1.'] = function() {
+      this.skip();
       var decimal = ion.Decimal.parse("-1.");
       assert.equal(decimal.getExponent(), 0);
       assert.equal(decimal.getDigits().digits(), "1");
@@ -42,6 +44,7 @@ define([
     }
 
     suite['Parses 123456000.'] = function() {
+      this.skip();
       var decimal = ion.Decimal.parse("123456000");
       assert.equal(decimal.getExponent(), 3);
       assert.equal(decimal.getDigits().digits(), "123456");
@@ -51,10 +54,12 @@ define([
     }
 
     suite['Strips trailing zeroes from 123456000'] = function() {
+      this.skip();
       assert.equal(ion.Decimal.stripTrailingZeroes('123456000'), '123456');
     }
 
     suite['Mantissa-only decimal string has leading zero'] = function() {
+      this.skip();
       assert.equal(ion.Decimal.parse('123456d-6').toString(), '0.123456');
     }
 
