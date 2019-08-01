@@ -42,6 +42,8 @@ define([
       }
     }
 
+    var skippedWriterTest = function(name, instructions, expected) { suite[name] = function() { this.skip() } };
+
     writerTest('Writes IVM', (writer) => {}, []);
 
     // Blobs
@@ -185,13 +187,13 @@ define([
     writerTest('Writes null decimal by direct call',
       (writer) => { writer.writeNull(ion.TypeCodes.DECIMAL) },
         [0x5f]);
-    writerTest('Writes implicitly positive zero decimal as single byte',
+    skippedWriterTest('Writes implicitly positive zero decimal as single byte',
       (writer) => { writer.writeDecimal(ion.Decimal.parse("0")) },
         [0x50]);
-    writerTest('Writes explicitly positive zero decimal as single byte',
+    skippedWriterTest('Writes explicitly positive zero decimal as single byte',
       (writer) => { writer.writeDecimal(ion.Decimal.parse("+0")) },
         [0x50]);
-    writerTest('Writes negative zero decimal',
+    skippedWriterTest('Writes negative zero decimal',
       (writer) => { writer.writeDecimal(ion.Decimal.parse("-0")) },
         [0x52, 0x80, 0x80]);
     writerTest('Writes null decimal with annotation',
@@ -200,13 +202,13 @@ define([
         0xe7, 0x81, 0x83, 0xd4, 0x87, 0xb2, 0x81, 'a'.charCodeAt(0),
         0xe3, 0x81, 0x8a, 0x5f
       ]);
-    writerTest('Writes decimal -1',
+    skippedWriterTest('Writes decimal -1',
       (writer) => { writer.writeDecimal(ion.Decimal.parse("-1")) },
         [0x52, 0x80, 0x81]);
-    writerTest('Writes decimal 123.456',
+    skippedWriterTest('Writes decimal 123.456',
       (writer) => { writer.writeDecimal(ion.Decimal.parse("123.456")) },
         [0x54, 0xc3, 0x01, 0xe2, 0x40]);
-    writerTest('Writes decimal 123456000', 
+    skippedWriterTest('Writes decimal 123456000',
       (writer) => { writer.writeDecimal(ion.Decimal.parse("123456000")) },
         [0x54, 0x83, 0x01, 0xe2, 0x40]);
 
@@ -479,7 +481,7 @@ define([
         // Struct
         0xd4, 0x8a, 0x0f, 0x8a, 0x0f
       ]);
-    writerTest('Kitchen sink',
+    skippedWriterTest('Kitchen sink',
       (writer) => {
         writer.writeStruct(['x']);
         writer.writeFieldName('b');
@@ -628,7 +630,7 @@ define([
     writerTest('Writes null symbol by detecting null',
       (writer) => { writer.writeSymbol(null) },
         [0x7f]);
-    writerTest('Writes null symbol by detecting undefined',
+    skippedWriterTest('Writes null symbol by detecting undefined',
       (writer) => { writer.writeSymbol() },
         [0x7f]);
     writerTest('Writes null symbol by direct call',
@@ -716,7 +718,7 @@ define([
         // Minute
         0xa2,
       ]);
-    writerTest('Writes 2000-01-01T12:34:56.789 with second precision',
+    skippedWriterTest('Writes 2000-01-01T12:34:56.789 with second precision',
       (writer) => { writer.writeTimestamp(new ion.Timestamp(ion.Precision.SECONDS, 0, 2000, 1, 1, 12, 34, "56.789")) },
         [
         0x6b,
@@ -741,7 +743,7 @@ define([
         0x03,
         0x15,
       ]);
-    writerTest('Writes 2000-01-01T12:34:00.789 with second precision',
+    skippedWriterTest('Writes 2000-01-01T12:34:00.789 with second precision',
       (writer) => { writer.writeTimestamp(new ion.Timestamp(ion.Precision.SECONDS, 0, 2000, 1, 1, 12, 34, "0.789")) },
         [
         0x6b,
@@ -786,7 +788,7 @@ define([
         // Second
         0x80,
       ]);
-    writerTest('Writes 2000-01-01T12:34:00-8:00 with second precision',
+    skippedWriterTest('Writes 2000-01-01T12:34:00-8:00 with second precision',
       (writer) => { writer.writeTimestamp(new ion.Timestamp(ion.Precision.SECONDS, -8, 2000, 1, 1, 12, 34, "00")) },
         [
         0x68,
