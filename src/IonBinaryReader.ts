@@ -85,6 +85,7 @@ export class BinaryReader implements Reader {
   private _cat: Catalog;
   private _symtab: LocalSymbolTable;
   private _raw_type: number;
+  private _annotations: string[] = null;
 
   constructor(source: BinarySpan, catalog?: Catalog) {
     this._parser   = new ParserBinaryRaw(source);
@@ -94,6 +95,8 @@ export class BinaryReader implements Reader {
   }
 
     next() : IonType {
+        this._annotations = null;
+
         if (this._raw_type === EOF) return undefined;
         for (this._raw_type = this._parser.next(); this.depth() === 0; this._raw_type = this._parser.next()) {
             if (this._raw_type === TB_SYMBOL) {
@@ -138,16 +141,23 @@ export class BinaryReader implements Reader {
     return this._parser.hasAnnotations();
   }
 
-  annotations() : string[] {//TODO binary support
-      return this._parser.getAnnotations();
+  private _loadAnnotations() : void {
+    if (this._annotations === null) {
+      this._annotations = [];
+      this._parser.getAnnotations().forEach(id => {
+        this._annotations.push(this.getSymbolString(id));
+      });
+    }
+  }
+
+  annotations() : string[] {
+    this._loadAnnotations();
+    return this._annotations;
   }
 
   getAnnotation(index: number) : string {
-    let t: BinaryReader = this;
-    var id, n;
-    id = t._parser.getAnnotation(index);
-    n = this.getSymbolString(id);
-    return n;
+    this._loadAnnotations();
+    return this._annotations[index];
   }
 
   isNull() : boolean {
