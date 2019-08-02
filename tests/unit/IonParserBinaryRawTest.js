@@ -188,14 +188,18 @@ define([
      * Spec: http://amzn.github.io/ion-docs/docs/binary.html#varuint-and-varint-fields
      */
 
+    let varUnsignedIntBytesMatchValue = function(bytes, expected) {
+      let binarySpan = new ion.BinarySpan(new Uint8Array(bytes));
+      let actual = ion.ParserBinaryRaw.readVarUnsignedIntFrom(binarySpan);
+      assert.equal(actual, expected);
+    }
+
     // The base test function called by the more specific flavors below.
     // Creates a test which will attempt to read the `expected` VarUInt from the provided input bytes, handling
     // any anticipated exceptions.
     let readVarUnsignedIntTest = function(testName, bytes, expected, throwsException) {
       let test = function() {
-        let binarySpan = new ion.BinarySpan(new Uint8Array(bytes));
-        let actual = ion.ParserBinaryRaw.readVarUnsignedIntFrom(binarySpan);
-        assert.equal(actual, expected)
+        varUnsignedIntBytesMatchValue(bytes, expected);
       }
       registerTest(testName, test, throwsException);
     }
@@ -217,9 +221,11 @@ define([
     }
 
     // Test all values that can be encoded in a single byte
-    for (let byte = 0; byte <= 0x7F; byte++) {
-        readVarUnsignedInt([byte | 0x80], byte);
-    }
+    registerTest('Read all possible single-byte var unsigned int encodings', function() {
+      for (let byte = 0; byte <= 0x7F; byte++) {
+        varUnsignedIntBytesMatchValue([byte | 0x80], byte);
+      }
+    });
 
     readVarUnsignedInt([0x80], 0);
     readVarUnsignedInt([0x00, 0x81], 1);
@@ -238,17 +244,21 @@ define([
      * Spec: http://amzn.github.io/ion-docs/docs/binary.html#varuint-and-varint-fields
      */
 
+    let varSignedIntBytesMatchValue = function(bytes, expected) {
+      let binarySpan = new ion.BinarySpan(new Uint8Array(bytes));
+      let actual = ion.ParserBinaryRaw.readVarSignedIntFrom(binarySpan);
+      assert.equal(actual, expected)
+    };
+
     // The base test function called by the more specific flavors below.
     // Creates a test which will attempt to read the `expected` VarUInt from the provided input bytes, handling
     // any anticipated exceptions.
     let readVarSignedIntTest = function(testName, bytes, expected, throwsException) {
       let test = function() {
-        let binarySpan = new ion.BinarySpan(new Uint8Array(bytes));
-        let actual = ion.ParserBinaryRaw.readVarSignedIntFrom(binarySpan);
-        assert.equal(actual, expected)
-      }
+        varSignedIntBytesMatchValue(bytes, expected);
+      };
       registerTest(testName, test, throwsException);
-    }
+    };
 
     // Should read the `expected` VarUInt value from the provided input bytes.
     // Will fail if an exception is thrown or if the value that's read from the bytes is not equal to `expected`.
@@ -256,7 +266,7 @@ define([
       let testName = 'Read var signed int ' + expected + ' from bytes: ' + bytes;
       let testThrows = false;
       readVarSignedIntTest(testName, bytes, expected, testThrows);
-    }
+    };
 
     // Should detect that overflow has occurred while reading and throw an exception.
     // Will fail if no exception is thrown.
@@ -264,17 +274,19 @@ define([
       let testName = 'Overflow while attempting to read var signed int value ' + expected + ' from the bytes: ' + bytes;
       let testThrows = true;
       readVarSignedIntTest(testName, bytes, expected, testThrows);
-    }
+    };
 
-    // Test all positive values that can be encoded in a single byte
-    for (let byte = 0; byte <= 0x3F; byte++) {
-      readVarSignedInt([byte | 0x80], byte);
-    }
+    registerTest('Read all positive, single-byte var signed int encodings.', function() {
+      for (let byte = 0; byte <= 0x3F; byte++) {
+        varSignedIntBytesMatchValue([byte | 0x80], byte);
+      }
+    });
 
-    // Test all negative values that can be encoded in a single byte
-    for (let byte = 0; byte <= 0x3F; byte++) {
-      readVarSignedInt([byte | 0xC0], -byte);
-    }
+    registerTest('Read all negative, single-byte var signed int encodings.', function() {
+      for (let byte = 0; byte <= 0x3F; byte++) {
+        varSignedIntBytesMatchValue([byte | 0xC0], -byte);
+      }
+    });
 
     readVarSignedInt([0x80], 0);
     readVarSignedInt([0xC0], -0);
@@ -302,18 +314,21 @@ define([
      * Spec: http://amzn.github.io/ion-docs/docs/binary.html#5-decimal
      */
 
-    // The base test function called by the more specific flavors below.
+    let decimalBytesMatchValue = function(bytes, expected) {
+      let binarySpan = new ion.BinarySpan(new Uint8Array(bytes));
+      let actual = ion.ParserBinaryRaw.readDecimalValueFrom(binarySpan, bytes.length);
+      // Use Decimal#equals(Decimal) to determine equality
+      assert.isTrue(actual.equals(expected));
+    };
+
     // Creates a test which will attempt to read the `expected` Decimal from the provided input bytes, handling
     // any anticipated exceptions.
     let readDecimalTest = function(testName, bytes, expected, throwsException) {
-          let test = function() {
-            let binarySpan = new ion.BinarySpan(new Uint8Array(bytes));
-            let actual = ion.ParserBinaryRaw.readDecimalValueFrom(binarySpan, bytes.length);
-            // Use Decimal#equals(Decimal) to determine equality
-            assert.isTrue(actual.equals(expected));
-          }
-          registerTest(testName, test, throwsException);
-    }
+      let test = function() {
+        decimalBytesMatchValue(bytes, expected);
+      };
+      registerTest(testName, test, throwsException);
+    };
 
     // Should read the `expected` Decimal value from the provided input bytes.
     // Will fail if an exception is thrown or if the value that's read from the bytes is not equal to `expected`.
@@ -321,18 +336,20 @@ define([
       let testName = 'Read decimal ' + expected + ' from bytes: ' + bytes;
       let testThrows = false;
       readDecimalTest(testName, bytes, expected, testThrows);
-    }
+    };
 
     // Test all single-byte coefficients -127 to 127 (signed Int) combined with each
     // single-byte exponent from -63 to 63 (signed VarInt)
-    for (let coefficient = 0; coefficient <= maxValueForBits(7); coefficient++) {
-      for (let exponent = 0; exponent <= maxValueForBits(6); exponent++) {
-        readDecimal([0x80 | exponent, coefficient], new ion.Decimal(coefficient, exponent));
-        readDecimal([0xC0 | exponent, coefficient], new ion.Decimal(coefficient, -exponent));
-        readDecimal([0x80 | exponent, 0x80 | coefficient], new ion.Decimal(-coefficient, exponent));
-        readDecimal([0xC0 | exponent, 0x80 | coefficient], new ion.Decimal(-coefficient, -exponent));
+    registerTest("Read all possible two-byte binary decimal encodings", function() {
+      for (let coefficient = 0; coefficient <= maxValueForBits(7); coefficient++) {
+        for (let exponent = 0; exponent <= maxValueForBits(6); exponent++) {
+          decimalBytesMatchValue([0x80 | exponent, coefficient], new ion.Decimal(coefficient, exponent));
+          decimalBytesMatchValue([0xC0 | exponent, coefficient], new ion.Decimal(coefficient, -exponent));
+          decimalBytesMatchValue([0x80 | exponent, 0x80 | coefficient], new ion.Decimal(-coefficient, exponent));
+          decimalBytesMatchValue([0xC0 | exponent, 0x80 | coefficient], new ion.Decimal(-coefficient, -exponent));
+        }
       }
-    }
+    });
 
     readDecimal([0x00, 0x81, 0x05], new ion.Decimal(5, 1));
     readDecimal([0x00, 0x00, 0x81, 0x05], new ion.Decimal(5, 1));
