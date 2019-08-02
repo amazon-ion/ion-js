@@ -274,7 +274,6 @@ let eventSkipList = toSkipList([
     'ion-tests/iontestdata/good/testfile5.ion',
     'ion-tests/iontestdata/good/testfile6.ion',
     'ion-tests/iontestdata/good/testfile7.ion',
-    'ion-tests/iontestdata/good/testfile8.ion',
     'ion-tests/iontestdata/good/utf16.ion',
     'ion-tests/iontestdata/good/utf32.ion',
     'ion-tests/iontestdata/good/whitespace.ion',
