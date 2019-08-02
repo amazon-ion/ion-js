@@ -107,9 +107,9 @@ define([
             streams[0].writeIon(eventBinaryWriter);
             streams.push(new ion.IonEventStream(new ion.makeReader(eventBinaryWriter.getBytes())));
 
-            for(let i = 0;  i < streams.length - 1; i++){
-                for(let j = i; j < streams.length; j++){
-                    if(!streams[i].equals(streams[(j + i) % streams.length])) {
+            for (let i = 0; i < streams.length - 1; i++) {
+                for (let j = i + 1; j < streams.length; j++) {
+                    if (!streams[i].equals(streams[j])) {
                         throw new Error("Streams unequal.");
                     }
                 }
