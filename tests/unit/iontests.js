@@ -244,7 +244,6 @@ let eventSkipList = toSkipList([
     'ion-tests/iontestdata/good/symbolWithDel.ion',
     'ion-tests/iontestdata/good/symbolWithSpecialWhitespace.ion',
     'ion-tests/iontestdata/good/symbolZero.ion',
-    'ion-tests/iontestdata/good/symbols.ion',
     'ion-tests/iontestdata/good/testfile0.ion',
     'ion-tests/iontestdata/good/testfile1.ion',
     'ion-tests/iontestdata/good/testfile10.ion',
