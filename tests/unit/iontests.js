@@ -192,6 +192,7 @@ let eventSkipList = toSkipList([
     'ion-tests/iontestdata/good/equivs/nopPadNonEmptyStruct.10n',
     'ion-tests/iontestdata/good/equivs/paddedInts.10n',
     'ion-tests/iontestdata/good/equivs/systemSymbols.ion',
+    'ion-tests/iontestdata/good/equivs/sexps.ion',
     'ion-tests/iontestdata/good/equivs/timestampFractions.10n',
     'ion-tests/iontestdata/good/equivs/timestampFractions.ion',
     'ion-tests/iontestdata/good/equivs/timestampSuperfluousOffset.10n',
