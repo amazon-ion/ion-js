@@ -306,10 +306,11 @@ define([
         0xbf,
       ]);
     writerTest('Writes empty list',
-      (writer) => { writer.writeList() },
+      (writer) => { writer.writeList(); writer.endContainer() },
         [0xb0]);
     writerTest('Writes nested lists',
-      (writer) => { writer.writeList(); writer.writeList(), writer.writeList() },
+      (writer) => { writer.writeList(); writer.writeList(); writer.writeList();
+                    writer.endContainer(); writer.endContainer(); writer.endContainer() },
         [0xb2, 0xb1, 0xb0]);
     writerTest('Writes pyramid lists',
       (writer) => {
@@ -334,7 +335,7 @@ define([
       },
         [0xb8, 0xb3, 0xb0, 0xb0, 0xb0, 0xb3, 0xb0, 0xb0, 0xb0]);
     writerTest('Writes list with annotation',
-      (writer) => { writer.writeList(['a']) },
+      (writer) => { writer.writeList(['a']); writer.endContainer() },
         [
         // Symbol table
         0xe7, 0x81, 0x83, 0xd4, 0x87, 0xb2, 0x81, 'a'.charCodeAt(0),
@@ -342,7 +343,8 @@ define([
         0xe3, 0x81, 0x8a, 0xb0,
       ]);
     writerTest('Writes nested list with annotation',
-      (writer) => { writer.writeList(); writer.writeList(['a']) },//string array seems dubious.
+      (writer) => { writer.writeList(); writer.writeList(['a']);
+                    writer.endContainer(); writer.endContainer() },
         [
         // Symbol table
         0xe7, 0x81, 0x83, 0xd4, 0x87, 0xb2, 0x81, 'a'.charCodeAt(0),
@@ -394,7 +396,7 @@ define([
     // S-Expressions
 
     writerTest('Writes null sexp by flag',
-      (writer) => { writer.writeSexp(null, true); },
+      (writer) => { writer.writeSexp(null, true) },
         [0xcf]);
     writerTest('Writes null sexp by direct call',
       (writer) => { writer.writeNull(ion.TypeCodes.SEXP) },
@@ -410,10 +412,11 @@ define([
         0xcf,
       ]);
     writerTest('Writes empty sexp',
-      (writer) => { writer.writeSexp() },
+      (writer) => { writer.writeSexp(); writer.endContainer() },
         [0xc0]);
     writerTest('Writes nested sexps',
-      (writer) => { writer.writeSexp(); writer.writeSexp(), writer.writeSexp() },
+      (writer) => { writer.writeSexp(); writer.writeSexp(); writer.writeSexp();
+                    writer.endContainer(); writer.endContainer(); writer.endContainer() },
         [0xc2, 0xc1, 0xc0]);
 
     // Strings
@@ -457,10 +460,11 @@ define([
       (writer) => { writer.writeStruct(null, true) },
         [0xdf]);
     writerTest('Writes empty struct',
-      (writer) => { writer.writeStruct() },
+      (writer) => { writer.writeStruct(); writer.endContainer() },
         [0xd0]);
     writerTest('Writes nested structs',
-      (writer) => { writer.writeStruct(); writer.writeFieldName('a'); writer.writeStruct() },
+      (writer) => { writer.writeStruct(); writer.writeFieldName('a'); writer.writeStruct();
+                    writer.endContainer(); writer.endContainer() },
         [
         // Symbol table
         0xe7, 0x81, 0x83, 0xd4, 0x87, 0xb2, 0x81, 'a'.charCodeAt(0),
@@ -474,6 +478,7 @@ define([
         writer.writeNull(ion.TypeCodes.NULL);
         writer.writeFieldName('a');
         writer.writeNull(ion.TypeCodes.NULL);
+        writer.endContainer();
       },
         [
         // Symbol table
