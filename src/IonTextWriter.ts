@@ -286,7 +286,7 @@ export class TextWriter implements Writer {
 
     close() : void {//TODO clear out resources when writer uses more than a basic array/devs have built in IO support etc.
         if(!this.isTopLevel) {
-            throw new Error("Writer has one or more open containers; call endContainer() prior to close()");
+            throw new Error("Writer has one or more open containers; call endContainer() for each container prior to close()");
         }
     }
 
