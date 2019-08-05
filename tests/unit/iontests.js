@@ -127,6 +127,7 @@ function toSkipList(paths) {
     // additional, known bad/slow test files:
     skipList['ion-tests/iontestdata/good/subfieldVarUInt32bit.ion'] = 1;
     skipList['ion-tests/iontestdata/good/equivs/lists.ion'] = 1;     // runs too long, causes TravisCI to fail
+    skipList['ion-tests/iontestdata/good/equivs/sexps.ion'] = 1;     // runs too long, causes TravisCI to fail
 
     return skipList;
 }
@@ -191,7 +192,6 @@ let eventSkipList = toSkipList([
     'ion-tests/iontestdata/good/equivs/nopPadEmptyStruct.10n',
     'ion-tests/iontestdata/good/equivs/nopPadNonEmptyStruct.10n',
     'ion-tests/iontestdata/good/equivs/paddedInts.10n',
-    'ion-tests/iontestdata/good/equivs/sexps.ion',
     'ion-tests/iontestdata/good/equivs/systemSymbols.ion',
     'ion-tests/iontestdata/good/equivs/timestampFractions.10n',
     'ion-tests/iontestdata/good/equivs/timestampFractions.ion',
