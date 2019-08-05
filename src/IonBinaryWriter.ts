@@ -366,8 +366,8 @@ export class BinaryWriter implements Writer {
 
   close() : void {
     this.checkClosed();
-    while(!this.isTopLevel()) {
-      this.endContainer();
+    if(!this.isTopLevel()) {
+      throw new Error("Writer has one or more open containers; call endContainer() for each container prior to close()");
     }
     this.writeIvm();
     let datagram: Node[] = this.datagram;
