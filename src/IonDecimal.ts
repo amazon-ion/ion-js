@@ -39,7 +39,6 @@ import { LongInt } from "./IonLongInt";
 export class Decimal {
     private _coefficient: LongInt;
     private _exponent: number;
-
     public static readonly ZERO: Decimal = new Decimal(new LongInt(0), 0);
     public static ONE = new Decimal(1, 0);
 
