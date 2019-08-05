@@ -20,10 +20,10 @@ import {_sign} from "./util";
  * Note that range of an exponent is limited to +/- 15 digits.
  */
 export class Decimal {
-    public static readonly _ZERO: Decimal = new Decimal(new LongInt(0), 0);
-
-    private readonly _coefficient: LongInt;
-    private readonly _exponent: number;
+    private _coefficient: LongInt;
+    private _exponent: number;
+    public static readonly _ZERO : Decimal = new Decimal(new LongInt(0), 0);
+    public static ONE = new Decimal(1, 0);
 
     constructor(coefficient: LongInt | number, exponent: number) {
         if (typeof coefficient === "number") {
@@ -120,7 +120,7 @@ export class Decimal {
      */
     compareTo(that : Decimal) : number {
         if (this._coefficient.numberValue() === 0
-                && that._getCoefficient().numberValue() === 0) {
+            && that._getCoefficient().numberValue() === 0) {
             return 0;
         }
 
@@ -156,7 +156,7 @@ export class Decimal {
         let thatLongInt = new LongInt(thatCoefficientStr);
         if (thisLongInt.greaterThan(thatLongInt)) {
             return neg ? -1 : 1;
-        } else if(thisLongInt.lessThan(thatLongInt)){
+        } else if (thisLongInt.lessThan(thatLongInt)) {
             return neg ? 1 : -1;
         }
 
