@@ -54,8 +54,10 @@ export class LowLevelBinaryWriter {
     let i: number = tempBuf.length;
 
     while (value > 0) {
-      tempBuf[--i] = value;
-      value >>>= 8;
+      // JavaScript bitwise operators treat operands as 32-bit sequences,
+      // so we avoid using >>> in order to support values requiring more than 32 bits
+      tempBuf[--i] = value % 256;
+      value = Math.trunc(value / 256);
     }
 
     this.writeable.writeBytes(tempBuf);
