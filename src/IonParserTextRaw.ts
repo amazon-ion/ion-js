@@ -507,7 +507,7 @@ export class ParserTextRaw {
       this._unread(ch1);
     }
     else {
-      this._error("operator symbols are not valid outside of sexp's");
+      this._error("operator symbols are not valid outside of sexps");
     }
   }
 
@@ -611,7 +611,7 @@ export class ParserTextRaw {
         return;
       }
       if (IonText.is_digit(ch)) {
-        this._error("leading zero's are not allowed");
+        this._error("leading zeros are not allowed");
       }
       ch = CH_0;
     }
