@@ -239,7 +239,6 @@ let eventSkipList = toSkipList([
     'ion-tests/iontestdata/good/testfile22.ion',
     'ion-tests/iontestdata/good/testfile23.ion',
     'ion-tests/iontestdata/good/testfile25.ion',
-    'ion-tests/iontestdata/good/testfile31.ion',
     'ion-tests/iontestdata/good/testfile33.ion',
     'ion-tests/iontestdata/good/testfile34.ion',
     'ion-tests/iontestdata/good/testfile35.ion',
