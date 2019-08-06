@@ -36,8 +36,9 @@ export class LongInt {
     public intBytes() : Uint8Array {
         let array =  this.int.toArray(256).value;
         if(array[0] > 127) {
-            array[0] -= 0x80;
-            array.splice(0, 0, 1);
+            // highest-order bit is being used to represent part of the value,
+            // so prepend a byte to allow for encoding of the sign bit
+            array.splice(0, 0, 0);
         }
         if(this.int.isNegative()) array[0] += 0x80;
         return new Uint8Array(array);
