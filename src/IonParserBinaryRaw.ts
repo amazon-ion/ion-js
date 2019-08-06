@@ -137,22 +137,26 @@ export class ParserBinaryRaw {
         this._in = source;
     }
 
-    private read_binary_float() : number {
+    private static readFloatFrom(input: BinarySpan, numberOfBytes) : number {
         let tempBuf : DataView;
-        switch(this._len) {
+        switch(numberOfBytes) {
             case 0:
                 return 0.0;
             case 4:
-                tempBuf = new DataView(this._in.chunk(4).buffer);
+                tempBuf = new DataView(input.chunk(4).buffer);
                 return tempBuf.getFloat32(0, false);
             case 8:
-                tempBuf = new DataView(this._in.chunk(8).buffer);
+                tempBuf = new DataView(input.chunk(8).buffer);
                 return tempBuf.getFloat64(0, false);
             case 15:
                 return null;
             default:
-                throw new Error("Illegal float length");
+                throw new Error("Illegal float length: " + numberOfBytes);
         }
+    }
+
+    private read_binary_float() : number {
+        return ParserBinaryRaw.readFloatFrom(this._in, this._len);
     }
 
     private static readVarUnsignedIntFrom(input: BinarySpan) : number {
