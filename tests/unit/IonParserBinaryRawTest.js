@@ -309,6 +309,99 @@ define([
     overflowWhileReadingVarSignedInt([0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0xFF], -maxValueForBits(42));
 
     /**
+     * Float
+     *
+     * Spec: http://amzn.github.io/ion-docs/docs/binary.html#4-float
+     */
+
+    let serializeFloat = function(value, viewType, numberOfBytes) {
+      let buffer = new ArrayBuffer(numberOfBytes);
+      let view = new viewType(buffer);
+      view[0] = value;
+      let bytes = new Uint8Array(buffer);
+      bytes.reverse(); // Big endian
+      return bytes;
+    };
+
+    let serializeFloat32 = function(value) {
+      return serializeFloat(value, Float32Array, 4);
+    };
+
+    let serializeFloat64 = function(value) {
+      return serializeFloat(value, Float64Array, 8);
+    };
+
+    let floatBytesMatchValue = function(bytes, expected, comparison) {
+      let binarySpan = new ion.BinarySpan(bytes);
+      let actual = ion.ParserBinaryRaw.readFloatFrom(binarySpan, binarySpan.getRemaining());
+      // Default to asserting equality, but allow the comparison function to be overridden by a parameter
+      comparison = comparison || function(actual, expected) {
+        assert.equal(actual, expected)
+      };
+      comparison(actual, expected);
+    };
+
+    // Creates a test which will attempt to read the `expected` float value from the provided input bytes, handling
+    // any anticipated exceptions.
+    let readFloatTest = function(testName, bytes, expected, throwsException) {
+      let test = function() {
+        floatBytesMatchValue(bytes, expected);
+      };
+      registerTest(testName, test, throwsException);
+    };
+
+    let readFloat32 = function(expected) {
+      let bytes = serializeFloat32(expected);
+      let testName = 'Read 32-bit float ' + expected + ' from bytes: ' + bytes;
+      let testThrows = false;
+      readFloatTest(testName, bytes, expected, testThrows);
+    };
+
+    let readFloat64 = function(expected) {
+      let bytes = serializeFloat64(expected);
+      let testName = 'Read 64-bit float ' + expected + ' from bytes: ' + bytes;
+      let testThrows = false;
+      readFloatTest(testName, bytes, expected, testThrows);
+    };
+
+    readFloat32(Number.NEGATIVE_INFINITY);
+    readFloat32(Number.POSITIVE_INFINITY);
+    readFloat32(0.0);
+    readFloat32(-0.0);
+    readFloat32(12.5);
+    readFloat32(-12.5);
+    readFloat32(-1230000000);
+    readFloat32(1230000000);
+
+    readFloat64(Number.NEGATIVE_INFINITY);
+    readFloat64(Number.POSITIVE_INFINITY);
+    readFloat64(0.0);
+    readFloat64(-0.0);
+    readFloat64(12.5);
+    readFloat64(-12.5);
+    readFloat64(1230000000);
+    readFloat64(-1230000000);
+
+    readFloat64(Number.MIN_SAFE_INTEGER);
+    readFloat64(Number.MAX_SAFE_INTEGER);
+
+    registerTest('Read 32-bit float NaN value', function() {
+      let expected = Number.NaN;
+      let bytes = serializeFloat32(expected);
+      floatBytesMatchValue(bytes, expected, function(actual) {
+        assert.isTrue(Number.isNaN(actual));
+      });
+    });
+
+    registerTest('Read 64-bit float NaN value', function() {
+      let expected = Number.NaN;
+      let bytes = serializeFloat64(expected);
+      floatBytesMatchValue(bytes, expected, function(actual) {
+        assert.isTrue(Number.isNaN(actual));
+      });
+    });
+
+    /**
      * Decimal
      *
      * Spec: http://amzn.github.io/ion-docs/docs/binary.html#5-decimal
