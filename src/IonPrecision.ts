@@ -21,4 +21,5 @@ export enum Precision {
   DAY = 3,
   HOUR_AND_MINUTE = 4,
   SECONDS = 5,
+  FRACTION = 6
 }
