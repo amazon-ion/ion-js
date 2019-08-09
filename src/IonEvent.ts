@@ -390,7 +390,7 @@ abstract class AbsIonContainerEvent extends AbstractIonEvent{
 }
 
 class IonStructEvent extends AbsIonContainerEvent {//no embed support as of yet.
-    constructor(eventType : IonEventType, ionType : IonType, fieldName : string, annotations : string[], depth : number) {
+     constructor(eventType : IonEventType, ionType : IonType, fieldName : string, annotations : string[], depth : number) {
         super(eventType , ionType, fieldName, annotations, depth);
 
     }
@@ -404,12 +404,18 @@ class IonStructEvent extends AbsIonContainerEvent {//no embed support as of yet.
     structsEqual(actualEvents : AbstractIonEvent[], expectedEvents : AbstractIonEvent[]) : boolean {
         let matchFound : boolean = true;
         let paired : boolean[] = new Array<boolean>(expectedEvents.length);
-        for(let i : number = 0; matchFound && i < actualEvents.length; i++) {
+        console.log("comparing struct");
+        for (let i : number = 0; matchFound && i < actualEvents.length; i++) {
             matchFound = false;
-            for(let j : number = 0; !matchFound && j < expectedEvents.length; j++) {
-                if(!paired[j]) {
+            for (let j : number = 0; !matchFound && j < expectedEvents.length; j++) {
+                if (!paired[j]) {
                     matchFound = actualEvents[i].equals(expectedEvents[j]);
-                    paired[j] = matchFound;
+                    if (matchFound && actualEvents[i].eventType === IonEventType.CONTAINER_START) {
+                        for (let k = j; k < expectedEvents[j].ionValue.length; k++) {
+                            paired[k] = true;
+                        }
+                        i = i + actualEvents[i].ionValue.length;
+                    }
                 }
             }
         }
@@ -426,9 +432,13 @@ class IonListEvent extends AbsIonContainerEvent {
     valueEquals(expected : IonListEvent) : boolean {
         if(!(expected instanceof IonListEvent)) return false;
         if(this.ionValue.length !== expected.ionValue.length) return false;
+        //console.log("found list");
         for(let i : number = 0; i < this.ionValue.length; i++){
+            console.log("found list");
             if(!this.ionValue[i].equals(expected.ionValue[i])){
                 return false;
+            } else if(this.ionValue[i].eventType === IonEventType.CONTAINER_START) {
+                i = i + this.ionValue[i].length;
             }
         }
         return true;
@@ -445,7 +455,9 @@ class IonSexpEvent extends AbsIonContainerEvent {
         for(let i : number = 0; i < this.ionValue.length; i++){
             if(!this.ionValue[i].equals(expected.ionValue[i])){
                 return false;
-            }
+            } else if(this.ionValue[i].eventType === IonEventType.CONTAINER_START) {
+            i = i + this.ionValue[i].length;
+        }
         }
         return true;
     }
