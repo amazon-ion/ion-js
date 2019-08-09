@@ -273,7 +273,7 @@ export class BinaryWriter implements Writer {
         writer.writeVariableLengthUnsignedInt(value.date.getUTCMinutes());
     }
     if (value.getPrecision() >= Precision.SECONDS) {
-            writer.writeVariableLengthUnsignedInt(value.seconds);
+        writer.writeVariableLengthUnsignedInt(value.seconds);
     }
     if (value.getPrecision() === Precision.FRACTION) {
         writer.writeVariableLengthSignedInt(value.fraction._getExponent());
