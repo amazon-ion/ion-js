@@ -307,26 +307,27 @@ export class ParserBinaryRaw {
     private read_timestamp_value() : Timestamp {
         let offset = null;
         let timeArray = [null, null, null, null, null, null];
-        let precision = 0;
-        if (this._len < 1) {
-            precision = Precision.NULL
-        } else {
+        let precision = Precision.NULL;
+        if (this._len > 0) {
             let end = this._in.position() + this._len;
             offset = this.readVarSignedInt();
             while(this._in.position() < end) {
-                if(precision  === Precision.SECONDS) {
-                    let second = this.readVarUnsignedInt();
+                precision++;
+                if(precision  === Precision.HOUR_AND_MINUTE) {
+                    timeArray[precision - 1] = this.readVarUnsignedInt();
+                    timeArray[precision] = this.readVarUnsignedInt();
+                } else if(precision  === Precision.SECONDS) {
+                    timeArray[precision] = this.readVarUnsignedInt();
+                } else if(precision  === Precision.FRACTION) {
                     let exp = this.readVarSignedInt();
                     let coef = this.readSignedInt();
-                    let decimal = new Decimal(coef, exp);
-                    //timeArray[precision] = decimal.add();
+                    return new Timestamp(precision, offset, timeArray[0], timeArray[1], timeArray[2], timeArray[3], timeArray[4], timeArray[5], new Decimal(coef, exp));
                 } else {
-                    timeArray[precision] = this.readVarUnsignedInt();
-                    precision++;
+                    timeArray[precision - 1] = this.readVarUnsignedInt();
                 }
             }
         }
-        return new Timestamp(precision, offset, timeArray[0], timeArray[1], timeArray[2], timeArray[3], timeArray[4], timeArray[5]);
+        return new Timestamp(precision, offset, timeArray[0], timeArray[1], timeArray[2], timeArray[3], timeArray[4], timeArray[5], null);
     }
 
     private read_string_value() : string {
