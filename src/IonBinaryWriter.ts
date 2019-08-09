@@ -267,26 +267,28 @@ export class BinaryWriter implements Writer {
       writer.writeVariableLengthUnsignedInt(value.date.getUTCMinutes());
     }
     if (value.getPrecision() >= Precision.SECONDS) {
-      let seconds: Decimal = value.seconds;
-      let exponent: number = seconds.getExponent();
-
-      if (exponent < 0) { // Fractional number of seconds {
-        let decimalString: string = seconds.getDigits().toString();
-        let numberOfCharacteristicDigits: number = decimalString.length + exponent;
-
-        // Characteristic is the value to the left of the decimal
-        let characteristic = new LongInt(decimalString.slice(0, numberOfCharacteristicDigits)).numberValue();
-        writer.writeVariableLengthUnsignedInt(characteristic);
-
-        // Exponent
-        writer.writeVariableLengthSignedInt(exponent);
-
-        writer.writeSignedInt(parseInt(decimalString.slice(numberOfCharacteristicDigits)));
-      } else { // Whole number of seconds
-        writer.writeVariableLengthUnsignedInt(seconds.numberValue());
-      }
+        let writer: LowLevelBinaryWriter = new LowLevelBinaryWriter(new Writeable(12));//where does the 12 come from
+        writer.writeVariableLengthSignedInt(value.getOffset());
+        writer.writeVariableLengthUnsignedInt(value.date.getUTCFullYear());
+        if (value.getPrecision() >= Precision.MONTH) {
+            writer.writeVariableLengthUnsignedInt(value.date.getUTCMonth());
+        }
+        if (value.getPrecision() >= Precision.DAY) {
+            writer.writeVariableLengthUnsignedInt(value.date.getUTCDate());
+        }
+        if (value.getPrecision() >= Precision.HOUR_AND_MINUTE) {
+            writer.writeVariableLengthUnsignedInt(value.date.getUTCHours());
+            writer.writeVariableLengthUnsignedInt(value.date.getUTCMinutes());
+        }
+        if (value.getPrecision() >= Precision.SECONDS) {
+            writer.writeVariableLengthUnsignedInt(value.seconds);
+        }
+        if (value.getPrecision() === Precision.FRACTION) {
+            writer.writeVariableLengthSignedInt(value.fraction.getExponent());
+            writer.writeBytes(value.fraction.getDigits().intBytes());
+        }
+        this.addNode(new BytesNode(this.writer, this.getCurrentContainer(), TypeCodes.TIMESTAMP, this.encodeAnnotations(annotations), writer.getBytes()));
     }
-    this.addNode(new BytesNode(this.writer, this.getCurrentContainer(), TypeCodes.TIMESTAMP, this.encodeAnnotations(annotations), writer.getBytes()));
   }
 
   endContainer() {
