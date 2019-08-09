@@ -232,7 +232,6 @@ export class Timestamp {
 
 
     constructor(precision : number, offset : number, year : number , month : number, day : number, hour : number, minute : number, seconds : number, decimal : Decimal) {
-
         this.precision = precision;
         this.offset = offset;
         this.year = year;
@@ -298,7 +297,7 @@ export class Timestamp {
                 if (this.fraction === undefined || this.fraction === null) {
                     throw new Error("Fractional Seconds and precision in illegal state.");
                 }
-                if (this.fraction.geq(Decimal.ONE) || this.fraction.lessThan(Decimal.ZERO)) {
+                if (this.fraction.compareTo(Decimal.ONE) === -1 || this.fraction.compareTo(Decimal._ZERO) >= 0) {
                     throw new Error("Timestamp fractional seconds must a Decimal between 0.0 and less than 1.0")
                 }
             case Precision.SECONDS:
@@ -377,9 +376,9 @@ export class Timestamp {
             case Precision.NULL:
                 return "null.timestamp";
             case Precision.FRACTION:
-                let digits = t.fraction.getDigits().toString();
+                let digits = t.fraction._getCoefficient().toString();
                 //exp always negative because we are a magnitude.
-                let tempExp = t.fraction.getExponent();
+                let tempExp = t.fraction._getExponent();
                 if(digits === '0') tempExp++;
                 let zeros = ".";
                 while(tempExp < 0) {
