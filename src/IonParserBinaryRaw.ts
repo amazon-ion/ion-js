@@ -464,7 +464,7 @@ export class ParserBinaryRaw {
                 } else if (this._len <= 4) {//32 bits of representation after shifts
                     this._curr = this.readUnsignedInt();
                 } else {
-                    this._curr = this.readUnsignedLongInt();
+                    throw new Error("Cant handle over 32 bits of int precision.")//this._curr = this.readUnsignedLongInt();
                 }
                 break;
             case IonBinary.TB_NEG_INT:
@@ -473,9 +473,10 @@ export class ParserBinaryRaw {
                 } else if (this._len <= 4) {//32 bits of representation after shifts
                     this._curr = -this.readUnsignedInt();
                 } else {
-                    let temp : LongInt = this.readUnsignedLongInt();
-                    temp.negate();
-                    this._curr = temp;
+                    //let temp : LongInt = this.readUnsignedLongInt();
+                    //temp.negate();
+                    //this._curr = temp;
+                    throw new Error("Cant handle over 32 bits of int precision.")
                 }
                 break;
             case IonBinary.TB_FLOAT:
