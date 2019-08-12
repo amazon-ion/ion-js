@@ -23,6 +23,7 @@ define([
         let goodSuite = { name: 'Good tests' };
         let badSuite = { name: 'Bad tests' };
         let eventStreamSuite = { name: 'EventStream tests' };
+        let readerCompareSuite = { name: 'ReaderCompare tests' };
 
         let goodTestsPath = paths.join('ion-tests', 'iontestdata', 'good');
         findFiles(goodTestsPath).forEach(path => {
@@ -31,6 +32,9 @@ define([
             }
             if (!eventSkipList[path]) {
                 eventStreamSuite[path] = () => { roundTripEventStreams(ion.makeReader(getInput(path))) };
+                if (!readerCompareSkipList[path]) {
+                    readerCompareSuite[path] = () => { readerCompareTest(getInput(path)) };
+                }
             }
         });
 
@@ -44,6 +48,7 @@ define([
         registerSuite(goodSuite);
         registerSuite(badSuite);
         registerSuite(eventStreamSuite);
+        registerSuite(readerCompareSuite);
 
         function findFiles(folder, files = []) {
             fs.readdirSync(folder).forEach(file => {
@@ -59,20 +64,126 @@ define([
         }
 
         function exhaust(reader) {
-            for (;;) {
-                let next = reader.next();
-                if (typeof(next) === 'undefined') {//should this be null?
-                    if (reader.depth() > 0) {
-                        // End of container
-                        reader.stepOut();
-                    } else {
-                        // End of data
-                        break;
-                    }
-                } else if (next.container && !reader.isNull()) {
+            for (let type; type = reader.next(); ) {
+                if (type.container && !reader.isNull()) {
                     reader.stepIn();
+                    exhaust(reader);
+                    reader.stepOut();
                 } else {
                     reader.value();
+                }
+            }
+        }
+
+        function readerCompareTest(source) {
+            function toBytes(source, writer) {
+                let reader = ion.makeReader(source);
+                writeTo(reader, writer);
+                writer.close();
+                return writer.getBytes();
+            }
+
+            let ionBinary = toBytes(source, ion.makeBinaryWriter());
+            let ionText = toBytes(source, ion.makeTextWriter());
+
+            readerCompare(ion.makeReader(ionBinary), ion.makeReader(ionText));
+        }
+
+        function readerCompare(r1, r2) {
+            checkReaderValueMethods(r1, r2, null);
+
+            while (true) {
+                let t1 = r1.next();
+                let t2 = r2.next();
+
+                let v;
+                try {
+                    v = r1.value();
+                } catch (e) {
+                    v = 'value() threw ' + e.message;
+                }
+                assert.equal(t1, t2);
+
+                checkReaderValueMethods(r1, r2, t1);
+
+                if (t1 === null) {
+                    break;
+                }
+
+                if (t1.container && !r1.isNull()) {
+                    r1.stepIn();
+                    r2.stepIn();
+                    readerCompare(r1, r2);
+                    r1.stepOut();
+                    r2.stepOut();
+                }
+            }
+        }
+
+        function checkReaderValueMethods(r1, r2, type) {
+            allValueMethods.forEach(methodName => {
+                let typeName = type == null ? 'null' : type.name;
+                if (type != null && nonThrowingMethods[typeName][methodName]) {
+                    let v1 = r1[methodName]();
+                    let v2 = r2[methodName]();
+                    assert(v1 !== undefined, "unexpected 'undefined' response");
+                    assert(v2 !== undefined, "unexpected 'undefined' response");
+                    assert.deepEqual(v1, v2, methodName + '():  ' + v1 + ' != ' + v2);
+                } else {
+                    assert.throws(() => { r1[methodName]() }, '', '', 'Expected ' + methodName + '() to throw');
+                    assert.throws(() => { r2[methodName]() }, '', '', 'Expected ' + methodName + '() to throw');
+                }
+            });
+
+            assert(r1.depth() !== undefined, 'depth() is undefined');
+            assert(r1.depth() !== null, 'depth() is null');
+            assert(r1.depth() >= 0, 'depth() is less than 0');
+            assert.equal(r1.depth(), r2.depth(), "depths don't match");
+
+            assert(r1.fieldName() !== undefined, 'fieldname() is undefined');
+            assert.equal(r1.fieldName(), r2.fieldName(), "fieldnames don't match");
+
+            assert(r1.isNull() !== undefined, 'isNull() is undefined');
+            assert(r1.isNull() !== null, 'isNull() is null');
+            assert.equal(r1.isNull(), r2.isNull(), "isNull values don't match");
+
+            assert(r1.annotations() !== undefined, 'annotations() is udnefined');
+            assert(r1.annotations() !== null, 'annotations() is null');
+            assert.deepEqual(r1.annotations(), r2.annotations(), "annotations don't match");
+        }
+
+        // TBD:  move this (or equivalent code) to a public API (pending addition of IonReader.type())
+        function writeTo(reader, writer, depth = 0) {
+            for (let type; type = reader.next(); ) {
+                if (depth > 0) {
+                    if (reader.fieldName() != undefined) {
+                        writer.writeFieldName(reader.fieldName());
+                    }
+                }
+                if (reader.isNull()) {
+                    writer.writeNull(type.bid, reader.annotations());
+                } else {
+                    switch (type) {
+                        case ion.IonTypes.BOOL:      writer.writeBoolean(reader.booleanValue(), reader.annotations()); break;
+                        case ion.IonTypes.INT:       writer.writeInt(reader.numberValue(), reader.annotations()); break;
+                        case ion.IonTypes.FLOAT:     writer.writeFloat64(reader.numberValue(), reader.annotations()); break;
+                        case ion.IonTypes.DECIMAL:   writer.writeDecimal(reader.decimalValue(), reader.annotations()); break;
+                        case ion.IonTypes.TIMESTAMP: writer.writeTimestamp(reader.timestampValue(), reader.annotations()); break;
+                        case ion.IonTypes.SYMBOL:    writer.writeSymbol(reader.stringValue(), reader.annotations()); break;
+                        case ion.IonTypes.STRING:    writer.writeString(reader.stringValue(), reader.annotations()); break;
+                        case ion.IonTypes.CLOB:      writer.writeClob(reader.byteValue(), reader.annotations()); break;
+                        case ion.IonTypes.BLOB:      writer.writeBlob(reader.byteValue(), reader.annotations()); break;
+                        case ion.IonTypes.LIST:      writer.writeList(reader.annotations()); break;
+                        case ion.IonTypes.SEXP:      writer.writeSexp(reader.annotations()); break;
+                        case ion.IonTypes.STRUCT:    writer.writeStruct(reader.annotations()); break;
+                        default: throw new Error('Unrecognized type' + type);
+                    }
+                    if (type.container) {
+                        reader.stepIn();
+                        writeTo(reader, writer, depth + 1);
+                        writer.endContainer();
+                        reader.stepOut();
+                    }
                 }
             }
         }
@@ -117,6 +228,33 @@ define([
         }
     }
 );
+
+// TBD:  add some mechanism to know when this list needs to be updated
+//       (e.g., a class that implements IonReader)
+let allValueMethods = [
+    'booleanValue',
+    'byteValue',
+    'decimalValue',
+    'numberValue',
+    'stringValue',
+    'timestampValue',
+    'value',
+];
+let nonThrowingMethods = {
+    null:      {booleanValue: 1, byteValue: 1, decimalValue: 1, numberValue: 1, stringValue: 1, timestampValue: 1, value: 1},
+    bool:      {booleanValue: 1, value: 1},
+    int:       {numberValue: 1, value: 1},
+    float:     {numberValue: 1, value: 1},
+    decimal:   {decimalValue: 1, value: 1},
+    timestamp: {timestampValue: 1, value: 1},
+    symbol:    {stringValue: 1, value: 1},
+    string:    {stringValue: 1, value: 1},
+    clob:      {byteValue: 1, value: 1},
+    blob:      {byteValue: 1, value: 1},
+    list:      {},
+    sexp:      {},
+    struct:    {},
+};
 
 function toSkipList(paths) {
     let skipList = {};
@@ -253,6 +391,10 @@ let eventSkipList = toSkipList([
     'ion-tests/iontestdata/good/timestamp/timestamps.ion',
     'ion-tests/iontestdata/good/utf16.ion',
     'ion-tests/iontestdata/good/utf32.ion',
+]);
+
+let readerCompareSkipList = toSkipList([
+    'ion-tests/iontestdata/good/decimal_zeros.ion',
 ]);
 
 ////// end of generated skiplists

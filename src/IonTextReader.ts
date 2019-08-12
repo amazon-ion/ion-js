@@ -81,7 +81,7 @@ export class TextReader implements Reader {
     this.stepIn();
     while (this.depth() > d) {
       type = this.next();
-      if (type === undefined) { // end of container
+      if (type === null) { // end of container
           this.stepOut();
       } else if (type.container && !this.isNull()) {
           this.stepIn();
@@ -122,7 +122,7 @@ export class TextReader implements Reader {
       return false;
     }
 
-next() {
+  next() {
     this._raw = undefined;
     if (this._raw_type === EOF) return undefined;
 
@@ -219,7 +219,7 @@ next() {
     return this._parser.isNull();
   }
 
-    stringValue() : string {
+    _stringRepresentation() : string {
         this.load_raw();
         if (this.isNull()) return (this._type === IonTypes.NULL) ? "null" : "null." + this._type.name;
         if (this._type.scalar) {
@@ -233,7 +233,7 @@ next() {
                         let tempStr = this._raw.substr(1, this._raw.length);
                         if (+tempStr === +tempStr) {//look up sid, +str === +str is a one line is integer hack
                             let symbol = this._symtab.getSymbol(Number(tempStr));
-                            if(symbol === undefined) throw new Error("Unresolveable symbol ID, symboltokens unsupported.");
+                            if(symbol === undefined) throw new Error("Unresolvable symbol ID, symboltokens unsupported.");
                             return symbol;
                         }
                     }
@@ -246,79 +246,113 @@ next() {
         }
     }
 
-  numberValue() {
-    if (!this._type.num) {
-      return undefined;
-    }
-    return this._parser.numberValue();
-  }
-
-  byteValue() : Uint8Array {
-    this.load_raw();
-    if(this.isNull()) return null;
-    switch(this._type){
-        case IonTypes.CLOB : {
-            return encodeUtf8(this._raw);
+    booleanValue() {
+        switch (this._type) {
+            case IonTypes.NULL: return null;
+            case IonTypes.BOOL: return this._parser.booleanValue();
         }
-        case IonTypes.BLOB : {
-            return fromBase64(this._raw);
-        }
-        default:
-            throw new Error(this._type.name + ".byteValue() is not supported.");
+        throw new Error('Current value is not a Boolean.')
     }
-  }
 
-  booleanValue() {
-    if (this._type !== IonTypes.BOOL) {
-      return undefined;
+    byteValue(): Uint8Array {
+        this.load_raw();
+        switch (this._type) {
+            case IonTypes.NULL: return null;
+            case IonTypes.BLOB:
+                if (this.isNull()) {
+                    return null;
+                }
+                return fromBase64(this._raw);
+            case IonTypes.CLOB:
+                if (this.isNull()) {
+                    return null;
+                }
+                return encodeUtf8(this._raw);
+        }
+        throw new Error('Current value is not a blob or clob.');
     }
-    return this._parser.booleanValue();
-  }
 
     decimalValue() : Decimal {
-        if(this.isNull()) return null;
-        return Decimal.parse(this.stringValue());
+        switch (this._type) {
+            case IonTypes.NULL: return null;
+            case IonTypes.DECIMAL: return Decimal.parse(this._stringRepresentation());
+        }
+        throw new Error('Current value is not a decimal.')
+    }
+
+    numberValue() {
+        if (this._type.num || this._type === IonTypes.NULL) {
+            return this._parser.numberValue();
+        }
+        throw new Error('Current value is not a float or int.');
+    }
+
+    stringValue() : string {
+        this.load_raw();
+        switch (this._type) {
+            case IonTypes.NULL: return null;
+            case IonTypes.STRING:
+                if (this._parser.isNull()) {
+                    return null;
+                }
+                return this._raw;
+            case IonTypes.SYMBOL:
+                if (this._parser.isNull()) {
+                    return null;
+                }
+                if(this._raw_type === T_IDENTIFIER && (this._raw.length > 1 && this._raw.charAt(0) === '$'.charAt(0))){
+                    let tempStr = this._raw.substr(1, this._raw.length);
+                    if (+tempStr === +tempStr) {//look up sid, +str === +str is a one line is integer hack
+                        let symbol = this._symtab.getSymbol(Number(tempStr));
+                        if(symbol === undefined) throw new Error("Unresolvable symbol ID, symboltokens unsupported.");
+                        return symbol;
+                    }
+                }
+                return this._raw;
+        }
+        throw new Error('Current value is not a string or symbol.');
     }
 
     timestampValue() : Timestamp {
-        if(this.isNull()) return null;
-        return Timestamp.parse(this.stringValue());
+        switch (this._type) {
+            case IonTypes.NULL: return null;
+            case IonTypes.TIMESTAMP:
+                let ts = Timestamp.parse(this._stringRepresentation());
+                if (ts === Timestamp.NULL) {
+                    return null;
+                }
+                return ts;
+        }
+        throw new Error('Current value is not a timestamp.')
     }
 
-    value() {
-        switch(this._type) {
-            case IonTypes.NULL :
+    value(): any {
+        if (this._type && this._type.container) {
+            if (this.isNull()) {
                 return null;
-            case IonTypes.BOOL : {
+            }
+            throw new Error('Unable to provide a value for ' + this._type.name + ' containers.');
+        }
+        switch(this._type) {
+            case IonTypes.NULL:
+                return null;
+            case IonTypes.BLOB:
+            case IonTypes.CLOB:
+                return this.byteValue();
+            case IonTypes.BOOL:
                 return this.booleanValue();
-            }
-            case IonTypes.INT : {
-                return this.numberValue();
-            }
-            case IonTypes.FLOAT : {
-                return this.numberValue();
-            }
-            case IonTypes.DECIMAL : {
+            case IonTypes.DECIMAL:
                 return this.decimalValue();
-            }
-            case IonTypes.SYMBOL : {
+            case IonTypes.FLOAT:
+            case IonTypes.INT:
+                return this.numberValue();
+            case IonTypes.STRING:
+            case IonTypes.SYMBOL:
                 return this.stringValue();
-            }
-            case IonTypes.STRING : {
-                return this.stringValue();
-            }
-            case IonTypes.TIMESTAMP : {
+            case IonTypes.TIMESTAMP:
                 return this.timestampValue();
-            }
-            case IonTypes.CLOB : {
-                return this.byteValue();
-            }
-            case IonTypes.BLOB : {
-                return this.byteValue();
-            }
-            default : {
-                return undefined;
-            }
+            default:
+                throw new Error('There is no current value.');
         }
     }
-}
+};

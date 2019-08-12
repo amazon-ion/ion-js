@@ -312,7 +312,7 @@ class IonSymbolEvent extends AbstractIonEvent {
         return expected instanceof IonSymbolEvent && this.ionValue === expected.ionValue;//will need to change when symboltokens are introduced.
     }
     writeIonValue(writer : Writer) : void{
-        writer.writeSymbol(this.ionValue.toString());//if symboltokens text is unknown we will need to write out symboltable
+        writer.writeSymbol(this.ionValue);//if symboltokens text is unknown we will need to write out symboltable
     }
 
 }
