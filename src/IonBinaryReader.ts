@@ -161,9 +161,7 @@ export class BinaryReader implements Reader {
   }
 
   isNull() : boolean {
-    let t: BinaryReader = this;
-    let isNull = (t._raw_type === TB_NULL) || t._parser.isNull();
-    return isNull;
+    return this._raw_type === TB_NULL || this._parser.isNull();
   }
 
   byteValue() : Uint8Array {
