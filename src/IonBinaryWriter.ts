@@ -259,19 +259,18 @@ export class BinaryWriter implements Writer {
       this.writeNull(TypeCodes.TIMESTAMP, annotations);
       return;
     }
-
     let writer: LowLevelBinaryWriter = new LowLevelBinaryWriter(new Writeable(12));//where does the 12 come from
     writer.writeVariableLengthSignedInt(value.getOffset());
     writer.writeVariableLengthUnsignedInt(value.date.getUTCFullYear());
     if (value.getPrecision() >= Precision.MONTH) {
-      writer.writeVariableLengthUnsignedInt(value.date.getUTCMonth() + 1);
+        writer.writeVariableLengthUnsignedInt(value.date.getUTCMonth());
     }
     if (value.getPrecision() >= Precision.DAY) {
-      writer.writeVariableLengthUnsignedInt(value.date.getUTCDate());
+        writer.writeVariableLengthUnsignedInt(value.date.getUTCDate());
     }
     if (value.getPrecision() >= Precision.HOUR_AND_MINUTE) {
-      writer.writeVariableLengthUnsignedInt(value.date.getUTCHours());
-      writer.writeVariableLengthUnsignedInt(value.date.getUTCMinutes());
+        writer.writeVariableLengthUnsignedInt(value.date.getUTCHours());
+        writer.writeVariableLengthUnsignedInt(value.date.getUTCMinutes());
     }
     if (value.getPrecision() >= Precision.SECONDS) {
             writer.writeVariableLengthUnsignedInt(value.seconds);
