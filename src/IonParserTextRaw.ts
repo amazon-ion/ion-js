@@ -191,11 +191,11 @@ function is_valid_base64_length(char_length: number, trailer_length: number) : b
   return true;
 }
 
-function is_valid_string_char(ch: number, allow_new_line: boolean ) : boolean {
+function is_valid_string_char(ch: number, allow_new_line: boolean, isEscapedChar: boolean) : boolean {
   if (ch == CH_CR) return allow_new_line;
   if (ch == CH_NL) return allow_new_line;
   if (IonText.is_whitespace(ch)) return true;
-  if (ch < 32) return false;
+  if (ch < 32) return isEscapedChar;
   return true;
 }
 
@@ -820,12 +820,16 @@ export class ParserTextRaw {
           //in tripleQuotes, index content of current triple quoted string,
           //looking for more triple quotes
           while(this._peek("\'\'\'") === ERROR) {
+              let isEscapedChar = false;
               ch = this._read();
               if (ch == CH_BS) {
+                  isEscapedChar = true;
                   this._read_string_escape_sequence();
               }
               if (ch === EOF) throw new Error('Closing triple quotes not found.');
-              if (!is_valid_string_char(ch, true)) throw new Error("invalid character "+ch+" in string" );
+              if (!is_valid_string_char(ch, true, isEscapedChar)) {
+                  throw new Error("invalid character " + ch + " in string" );
+              }
             // read single quoted strings until we see the triple quoted terminator
             // if it's not a triple quote, it's just content
           }
@@ -849,14 +853,16 @@ export class ParserTextRaw {
     var ch;
     this._start = this._in.position();
     for (;;) {
+      let isEscapedChar = false;
       ch = this._read();
       if (ch == CH_BS) {
+          isEscapedChar = true;
           this._read_string_escape_sequence();
-      }
-      else if (ch == terminator) {
+      } else if (ch == terminator) {
         break;
+      } else if (!is_valid_string_char(ch, allow_new_line, isEscapedChar)) {
+          throw new Error("invalid character " + ch + " in string" );
       }
-      else if (!is_valid_string_char(ch, allow_new_line)) throw new Error("invalid character "+ch+" in string" );
     }
   }
 
