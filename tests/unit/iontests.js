@@ -395,6 +395,8 @@ let eventSkipList = toSkipList([
 
 let readerCompareSkipList = toSkipList([
     'ion-tests/iontestdata/good/decimal_zeros.ion',
+    'ion-tests/iontestdata/good/subfieldInt.ion',
+    'ion-tests/iontestdata/good/subfieldUInt.ion',
 ]);
 
 ////// end of generated skiplists
