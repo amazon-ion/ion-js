@@ -397,6 +397,11 @@ let readerCompareSkipList = toSkipList([
     'ion-tests/iontestdata/good/decimal_zeros.ion',
     'ion-tests/iontestdata/good/subfieldInt.ion',
     'ion-tests/iontestdata/good/subfieldUInt.ion',
+    'ion-tests/iontestdata/good/subfieldVarInt.ion',
+    'ion-tests/iontestdata/good/subfieldVarUInt.ion',
+    'ion-tests/iontestdata/good/subfieldVarUInt15bit.ion',
+    'ion-tests/iontestdata/good/subfieldVarUInt16bit.ion',
+    'ion-tests/iontestdata/good/subfieldVarUInt32bit.ion',
 ]);
 
 ////// end of generated skiplists
