@@ -281,8 +281,10 @@ export class TextReader implements Reader {
     }
 
     numberValue() {
-        if (this._type.num || this._type === IonTypes.NULL) {
-            return this._parser.numberValue();
+        switch (this._type) {
+            case IonTypes.NULL: return null;
+            case IonTypes.FLOAT:
+            case IonTypes.INT: return this._parser.numberValue();
         }
         throw new Error('Current value is not a float or int.');
     }
