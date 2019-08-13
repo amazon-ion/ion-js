@@ -14,13 +14,13 @@
 
 # Issues 
 
-For questions and/or issues please use the projects [Github Issues](issues) page.
+For questions and/or issues please use the projects [Github Issues](https://github.com/amzn/ion-js/issues) page.
 It is extremely helpful to provide as much information and context around your question/issue as possible in order to help us 
 understand and reproduce your use case/issue while minimizing back and forth communication as much as possible. 
 
 Please read the following guideline prior to creating a new issue 
 
-1. Search through our existing [Github Issues](issues) first and ensure that you are not about to create a duplicate. 
+1. Search through our existing [Github Issues](https://github.com/amzn/ion-js/issues) first and ensure that you are not about to create a duplicate. 
 1. Provide a descriptive title for the issue. 
 1. If you are reporting a bug, please make sure that 
   1. You specify the version of `ion-js` that you are using (release version, or branch you are working on)
