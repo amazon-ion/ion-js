@@ -254,6 +254,19 @@ let eventSkipList = toSkipList([
     'ion-tests/iontestdata/good/timestamp/timestamps.ion',
     'ion-tests/iontestdata/good/utf16.ion',
     'ion-tests/iontestdata/good/utf32.ion',
+    'ion-tests/iontestdata/good/decimalNegativeZeroDot.10n',
+    'ion-tests/iontestdata/good/decimalNegativeZeroDotZero.10n',
+    'ion-tests/iontestdata/good/decimal_zeros.ion',
+    'ion-tests/iontestdata/good/equivs/zeroDecimals.ion',
+    'ion-tests/iontestdata/good/non-equivs/decimals.ion',
+    'ion-tests/iontestdata/good/non-equivs/floatsVsDecimals.ion',
+    'ion-tests/iontestdata/good/non-equivs/nonNulls.ion',
+    'ion-tests/iontestdata/good/nonNulls.ion',
+    'ion-tests/iontestdata/good/testfile13.ion',
+    'ion-tests/iontestdata/good/testfile21.ion',
+    'ion-tests/iontestdata/good/decimalNegativeOneDotTwoEight.ion',
+
+
 ]);
 
 ////// end of generated skiplists
