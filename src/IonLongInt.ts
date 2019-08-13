@@ -13,8 +13,14 @@
  */
 
 import * as bigInt from "./BigInteger.js";
-import { BigInteger } from "./BigInteger"
+import { BigInteger } from "./BigInteger";
+
+
 export class LongInt {
+    public static readonly intZero : LongInt = new LongInt(0);
+    public static readonly intPosOne : LongInt = new LongInt(1);
+    public static readonly intNegZero : LongInt = new LongInt(-0);
+    public static readonly intNegOne : LongInt = new LongInt(-1);
     private int : BigInteger;
 
     constructor(input: string | number | BigInteger) {
@@ -105,6 +111,30 @@ export class LongInt {
         return new LongInt(this.int.divide(num));
     }
 
+    public mathPow(num : number) : LongInt {
+        let val : BigInteger = bigInt(num);
+        return new LongInt(this.int.pow(val));
+    }
+
+    public lessThan(expected : LongInt) : boolean{
+        return this.int.lesser(expected.int);
+    }
+
+    public greaterThan(expected : LongInt) : boolean{
+        return this.int.greater(expected.int);
+    }
+
+    public equals(expected : LongInt) : boolean{
+        return this.int.equals(expected.int);
+    }
+    public geq(expected : LongInt) : boolean{
+        return this.int.geq(expected.int);
+    }
+
+    public leq(expected : LongInt) : boolean{
+        return this.int.leq(expected.int);
+    }
+
     numberValue() : number {
         return this.int.toJSNumber();
     }
@@ -120,6 +150,15 @@ export class LongInt {
     }
 
     signum() : number {
-        return this.int.isPositive() ? 1 : -1;
+        if(this.int.isZero()) {
+            if(1 / this.int.valueOf() > 0) {
+                return 1;
+            } else {
+                return -1;
+            }
+        } else {
+            return this.int.isPositive() ? 1 : -1;
+        }
+
     }
 }

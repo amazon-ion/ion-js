@@ -43,12 +43,12 @@ import { LongInt } from "./IonLongInt";
 
 
 export class Decimal {
-
     private _coefficient: LongInt;
     private _exponent: number;
 
-    public static readonly NULL: Decimal = new Decimal(undefined, undefined);
-    public static readonly ZERO: Decimal = new Decimal(new LongInt(0), 0);
+    public static readonly NULL : Decimal = new Decimal(undefined, undefined);
+    public static readonly ZERO : Decimal = new Decimal(new LongInt(0), 0);
+    public static ONE = new Decimal(1, 0);
 
     constructor(coefficient: LongInt | number, exponent: number) {
         if (typeof coefficient === "number") {
@@ -77,10 +77,10 @@ export class Decimal {
 
     isZeroZero() : boolean {
         if (this.isZero()) {
-          // TODO - is this right? negative scale is valid decimal places
-          if (this._exponent >= -1) {
-            return (this._coefficient.signum() >= 0);
-          }
+            // TODO - is this right? negative scale is valid decimal places
+            if (this._exponent >= -1) {
+                return (this._coefficient.signum() >= 0);
+            }
         }
         return false;
     }
@@ -114,10 +114,103 @@ export class Decimal {
         return this._exponent;
     }
 
-    equals(expected : Decimal) : boolean {
+    lessThan(dec : Decimal) : boolean {
+        return this.compare(dec) === -1;
+    }
+
+    greaterThan(dec : Decimal) : boolean {
+        return this.compare(dec) === 1;
+    }
+
+    leq(dec : Decimal) : boolean {
+        let result = this.compare(dec);
+        return result === -1 || result === 0;
+    }
+
+    geq(dec : Decimal) : boolean {
+        let result = this.compare(dec)
+        return result === 1 || result === 0;
+    }
+
+    equals(dec : Decimal) : boolean {
+        return this.compare(dec) === 0;
+    }
+
+    compare(dec : Decimal) : number {
+        let neg = this.isNegative();
+        if(neg !== dec.isNegative()) return neg ? -1 : 1;
+        //were the same sign
+        //compare order to normalize exponents.
+        let leftDigits = this._coefficient.toString();
+        let leftLength = leftDigits.length;
+        let rightDigits = dec._coefficient.toString();
+        let rightLength = rightDigits.length;
+        let leftOrder = leftLength + this._exponent;
+        let rightOrder = rightLength + dec._exponent;
+        if (leftOrder > rightOrder) {
+            if (neg) {
+                return -1;
+            } else {
+                return 1;
+            }
+        } else if(leftOrder < rightOrder) {
+            if (neg) {
+                1;
+            } else {
+                -1;
+            }
+        } else {
+            //we have two decimals of the same size(including exponents) and sign, need to compare the actual values
+            if(leftDigits < rightDigits) {
+                //shift the smaller left value to the same number of digits as our right.
+                let shift = rightLength - leftLength;
+                let textShift = '';
+                while (shift > 0) {
+                    textShift = textShift + '0';
+                    shift--;
+                }
+                leftDigits = leftDigits + textShift;
+            } else if(leftDigits > rightDigits) {
+                //shift the smaller right value to the same number of digits as our left.
+                let shift = leftLength - rightLength;
+                let textShift = '';
+                while (shift > 0) {
+                    textShift = textShift + '0';
+                    shift--;
+                }
+                rightDigits = rightDigits + textShift;
+            } else {
+                //number of digits is the same
+                //no op?
+            }
+            let left = new LongInt(leftDigits);
+            let right = new LongInt(rightDigits);
+            if (left.lessThan(right)) {
+                //left is smaller
+                if(neg) {
+                    //left is greaterThan when smaller and negative
+                    return 1;
+                } else {
+                    //left is lessThan when larger and negative
+                    return -1;
+                }
+            } else if(left.greaterThan(right)){
+                //right is smaller
+                if(neg) {
+                    return -1;
+                } else {
+                    return 1;
+                }
+            } else {
+                return 0;
+            }
+        }
+    }
+
+    DataModelequals(expected : Decimal) : boolean {
         return this.getExponent() === expected.getExponent()
             && this.isNegative() === expected.isNegative()
-            && this.getDigits().numberValue() === expected.getDigits().numberValue();
+            && this.getDigits().equals(expected.getDigits());
     }
 
     static parse(str: string) : Decimal {
@@ -125,7 +218,7 @@ export class Decimal {
         if (str === 'null' || str === 'null.decimal') return Decimal.NULL;
         let d = str.match('[d|D]');
         let f  = str.match('\\.');
-        let exponentDelimiterIndex = str.length - 1;
+        let exponentDelimiterIndex = str.length;
         if(d) {
             exponent = Number(str.substring(d.index + 1, str.length));
             exponentDelimiterIndex = d.index;

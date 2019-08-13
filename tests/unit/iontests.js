@@ -180,6 +180,9 @@ let eventSkipList = toSkipList([
     'ion-tests/iontestdata/good/clobWithNonAsciiCharacter.10n',
     'ion-tests/iontestdata/good/clobs.ion',
     'ion-tests/iontestdata/good/decimal64BitBoundary.ion',
+    'ion-tests/iontestdata/good/decimal_e_values.ion',
+    'ion-tests/iontestdata/good/decimal_values.ion',
+    'ion-tests/iontestdata/good/decimalNegativeOneDotTwoEight.ion',
     'ion-tests/iontestdata/good/decimalsWithUnderscores.ion',
     'ion-tests/iontestdata/good/equivs/bigInts.ion',
     'ion-tests/iontestdata/good/equivs/binaryInts.ion',
@@ -231,6 +234,8 @@ let eventSkipList = toSkipList([
     'ion-tests/iontestdata/good/symbolExplicitZero.10n',
     'ion-tests/iontestdata/good/symbolImplicitZero.10n',
     'ion-tests/iontestdata/good/symbolZero.ion',
+    'ion-tests/iontestdata/good/testfile13.ion',
+    'ion-tests/iontestdata/good/testfile21.ion',
     'ion-tests/iontestdata/good/testfile22.ion',
     'ion-tests/iontestdata/good/testfile23.ion',
     'ion-tests/iontestdata/good/testfile25.ion',
@@ -246,6 +251,16 @@ let eventSkipList = toSkipList([
     'ion-tests/iontestdata/good/timestamp/timestamps.ion',
     'ion-tests/iontestdata/good/utf16.ion',
     'ion-tests/iontestdata/good/utf32.ion',
+    'ion-tests/iontestdata/good/decimalNegativeZeroDot.10n',
+    'ion-tests/iontestdata/good/decimalNegativeZeroDotZero.10n',
+    'ion-tests/iontestdata/good/decimal_zeros.ion',
+    'ion-tests/iontestdata/good/equivs/zeroDecimals.ion',
+    'ion-tests/iontestdata/good/non-equivs/decimals.ion',
+    'ion-tests/iontestdata/good/non-equivs/floatsVsDecimals.ion',
+    'ion-tests/iontestdata/good/non-equivs/nonNulls.ion',
+    'ion-tests/iontestdata/good/nonNulls.ion',
+
+
 ]);
 
 ////// end of generated skiplists

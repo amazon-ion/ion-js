@@ -63,6 +63,16 @@ define([
       assert.equal(ion.Decimal.parse('123456d-6').toString(), '0.123456');
     }
 
-    registerSuite(suite);
+    suite['Decimal Compare'] = function() {
+        assert.equal(ion.Decimal.parse('2.1').compare(ion.Decimal.parse('2.10')), 0);
+        assert.equal(ion.Decimal.parse('2.15').compare(ion.Decimal.parse('2.10')), 1);
+        assert.equal(ion.Decimal.parse('2.1').compare(ion.Decimal.parse('2.15')), -1);
+        assert.equal(ion.Decimal.parse('2.5d1').compare(ion.Decimal.parse('25')), 0);
+        assert.equal(ion.Decimal.parse('25').compare(ion.Decimal.parse('2.1d1')), 1);
+        assert.equal(ion.Decimal.parse('.00005').compare(ion.Decimal.parse('0.05d-10')), 1);
+    }
+
+
+      registerSuite(suite);
   }
 );
