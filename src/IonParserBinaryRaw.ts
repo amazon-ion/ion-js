@@ -599,29 +599,15 @@ export class ParserBinaryRaw {
         return get_ion_type(this._raw_type);
     }
 
-    value() { // aka ionValue()
-        throw new Error("E_NOT_IMPL");
-    }
-
-    numberValue() : number {
-        var n = undefined,
-        t = this;
-        if (t.isNull()) return null;
-        t.load_value();
-        switch(t._raw_type) {
-            case IonBinary.TB_INT:
-            case IonBinary.TB_NEG_INT:
-            case IonBinary.TB_FLOAT:
-            case IonBinary.TB_SYMBOL:
-                return t._curr;
-            case IonBinary.TB_DECIMAL:
-                return t._curr.getNumber();
-            default:
-                throw new Error("Cannot convert to number.");//this might cause errors which is good because we want to rat out all undefined behavior masking.
+    _getSid() : number {
+        this.load_value();
+        if (this._raw_type == IonBinary.TB_SYMBOL) {
+            return this._curr === undefined ? null : this._curr;
         }
+        return null;
     }
 
-    stringValue() : string {
+    _stringRepresentation() : string {
         let t = this;
         switch(t._raw_type) {
             case IonBinary.TB_NULL:
@@ -663,42 +649,95 @@ export class ParserBinaryRaw {
                     let s = t.numberValue().toString();//this is really slow
                     if (s.indexOf("e") === -1) return s + "e0"; // force this to exponent form so we recognize it as binary float
                 case IonBinary.TB_STRING:
+                    if (t._null) {
+                        return null;
+                    }
                     return t._curr;
             }
         }
     }
 
-    decimalValue() : Decimal {
-        if(this._raw_type !== IonBinary.TB_DECIMAL) throw new Error('Value not of type decimal.');
-        if (this.isNull()) return null;
-        this.load_value();
-        return this._curr;
-    }
-
-    timestampValue() : Timestamp {
-        if(this._raw_type !== IonBinary.TB_TIMESTAMP) throw new Error('Value not of type timestamp.');
-        if (this.isNull()) return null;
-        this.load_value();
-        return this._curr;
-    }
-
     byteValue() : Uint8Array {
-        switch(this._raw_type) {
+        switch (this._raw_type) {
+            case IonBinary.TB_NULL: return null;
             case IonBinary.TB_CLOB:
             case IonBinary.TB_BLOB:
-                if (this.isNull()) break;
+                if (this.isNull()) {
+                    return null;
+                }
                 this.load_value();
                 return this._curr;
             default:
-                throw new Error(this._raw_type + " does not support byteValue API.");
+                throw new Error('Current value is not a blob or clob.');
         }
     }
 
     booleanValue() : boolean {
-        if (this._raw_type === IonBinary.TB_BOOL) {
-            return this._curr;
-        } else {
-            return undefined;
+        switch (this._raw_type) {
+            case IonBinary.TB_NULL: return null;
+            case IonBinary.TB_BOOL:
+                if (this.isNull()) {
+                    return null;
+                }
+                return this._curr;
+        }
+        throw new Error('Current value is not a Boolean.')
+    }
+
+    decimalValue() : Decimal {
+        switch (this._raw_type) {
+            case IonBinary.TB_NULL: return null;
+            case IonBinary.TB_DECIMAL:
+                if (this.isNull()) {
+                    return null;
+                }
+                this.load_value();
+                return this._curr;
+        }
+        throw new Error('Current value is not a decimal.');
+    }
+
+    numberValue() : number {
+        switch(this._raw_type) {
+            case IonBinary.TB_NULL: return null;
+            case IonBinary.TB_INT:
+            case IonBinary.TB_NEG_INT:
+            case IonBinary.TB_FLOAT:
+                if (this.isNull()) {
+                    return null;
+                }
+                this.load_value();
+                return this._curr;
+            default:
+                throw new Error('Current value is not a float or int.');
         }
     }
+
+    stringValue() : string {
+        switch (this._raw_type) {
+            case IonBinary.TB_NULL: return null;
+            case IonBinary.TB_STRING:
+            case IonBinary.TB_SYMBOL:
+                if (this.isNull()) {
+                    return null;
+                }
+                this.load_value();
+                return this._curr;
+        }
+        throw new Error('Current value is not a string or symbol.');
+    }
+
+    timestampValue() : Timestamp {
+        switch (this._raw_type) {
+            case IonBinary.TB_NULL: return null;
+            case IonBinary.TB_TIMESTAMP:
+                if (this.isNull()) {
+                    return null;
+                }
+                this.load_value();
+                return this._curr;
+        }
+        throw new Error('Current value is not a timestamp.');
+    }
 }
+

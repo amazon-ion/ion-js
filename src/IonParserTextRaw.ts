@@ -105,8 +105,8 @@ const INF = [ CH_i, CH_n, CH_f ];
 
 export function get_ion_type(t: number) : IonType {
   switch(t) {
-    case EOF:             return undefined;
-    case ERROR:           return undefined;
+    case EOF:             return null;
+    case ERROR:           return null;
     case T_NULL:          return IonTypes.NULL;
     case T_BOOL:          return IonTypes.BOOL;
     case T_INT:           return IonTypes.INT;
@@ -207,13 +207,13 @@ export class ParserTextRaw {
   private _in: StringSpan;
   private _ops: any[];
   private _value_type: any;
-  private _value_null: boolean;
+  private _value_null: boolean = false;
   private _value: any[];
   private _start: number;
   private _end: number;
   private _esc_len: number;
   private _curr: number;
-  private _curr_null: boolean;
+  private _curr_null: boolean = false;
   private _ann: any[];
   private _msg: string;
   private _error_msg: string;
@@ -995,6 +995,7 @@ export class ParserTextRaw {
 }
 
   booleanValue() : boolean {
+    if(this.isNull()) return null;
     let s: string = this.get_value_as_string(T_BOOL);
     if (s == "true") {
       return true;

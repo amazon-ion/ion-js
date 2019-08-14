@@ -76,7 +76,7 @@ function get_ion_type(t: number) : IonType {
     case TB_LIST:          return IonTypes.LIST;
     case TB_SEXP:          return IonTypes.SEXP;
     case TB_STRUCT:        return IonTypes.STRUCT;
-    default:               return undefined;
+    default:               return null;
   };
 }
 
@@ -97,10 +97,10 @@ export class BinaryReader implements Reader {
     next() : IonType {
         this._annotations = null;
 
-        if (this._raw_type === EOF) return undefined;
+        if (this._raw_type === EOF) return null;
         for (this._raw_type = this._parser.next(); this.depth() === 0; this._raw_type = this._parser.next()) {
             if (this._raw_type === TB_SYMBOL) {
-                let raw: number = this._parser.numberValue();
+                let raw: number = this._parser._getSid();
                 if (raw !== IVM.sid) break;
                 this._symtab = defaultLocalSymbolTable();
             } else if (this._raw_type === TB_STRUCT) {
@@ -161,35 +161,7 @@ export class BinaryReader implements Reader {
   }
 
   isNull() : boolean {
-    let t: BinaryReader = this;
-    var is_null = (t._raw_type === TB_NULL) || t._parser.isNull();
-    return is_null;
-  }
-
-  stringValue() : string {
-    let t: BinaryReader = this;
-    let s, p = t._parser;
-    if (t.isNull()) {
-      s = "null";
-      if (t._raw_type != TB_NULL) {
-        s += "." + get_ion_type(t._raw_type).name;
-      }
-    }
-    else if (get_ion_type(t._raw_type).scalar) {
-      // BLOB is a scalar by you don't want to just use the string 
-      // value otherwise all other scalars are fine as is
-      if (t._raw_type === TB_SYMBOL) {
-        s = this.getSymbolString(p.numberValue());
-      }
-      else {
-        s = p.stringValue();
-      }
-    }
-    return s;
-  }
-
-  numberValue() : number {
-    return this._parser.numberValue();
+    return this._raw_type === TB_NULL || this._parser.isNull();
   }
 
   byteValue() : Uint8Array {
@@ -204,13 +176,42 @@ export class BinaryReader implements Reader {
     return this._parser.decimalValue();
   }
 
+  numberValue() : number {
+    return this._parser.numberValue();
+  }
+
+  stringValue() : string {
+    let t: BinaryReader = this;
+    let p = t._parser;
+    switch (get_ion_type(t._raw_type)) {
+      case IonTypes.NULL: return null;
+      case IonTypes.STRING:
+        if (this.isNull()) {
+          return null;
+        }
+        return p.stringValue();
+      case IonTypes.SYMBOL:
+        if (this.isNull()) {
+          return null;
+        }
+        return this.getSymbolString(p._getSid());
+    }
+    throw new Error('Current value is not a string or symbol.')
+  }
+
   timestampValue() : Timestamp {
     return this._parser.timestampValue();
   }
 
   value() : any {
-    if(this.isNull()) return null;
-    switch(this.valueType()) {
+    let type = this.valueType();
+    if (type && type.container) {
+      if (this.isNull()) {
+        return null;
+      }
+      throw new Error('Unable to provide a value for ' + type.name + ' containers.');
+    }
+    switch(type) {
       case IonTypes.NULL:
         return null;
       case IonTypes.BLOB:
@@ -229,7 +230,7 @@ export class BinaryReader implements Reader {
       case IonTypes.TIMESTAMP:
         return this.timestampValue();
       default:
-        throw new Error('Unexpected type:' + this.valueType());
+        throw new Error('There is no current value.');
     }
   }
 

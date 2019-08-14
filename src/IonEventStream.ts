@@ -18,11 +18,7 @@ import { Writer } from "./IonWriter";
 import { IonType } from "./IonType";
 import { IonTypes } from "./IonTypes";
 import { IonEventType } from "./IonEvent";
-import {TypeCodes} from "./IonBinary";
-import {TextReader} from "./IonTextReader";
 import {makeReader} from "./Ion";
-import { Span } from "./IonSpan";
-import {BinaryReader} from "./IonBinaryReader";
 
 export class IonEventStream {
     private eventStream : IonEvent[];
@@ -45,7 +41,6 @@ export class IonEventStream {
     }
 
     writeIon(writer : Writer) {
-        let tempBuf : number[];
         let tempEvent : IonEvent;
         for(let indice : number = 0; indice < this.eventStream.length; indice++){
             tempEvent = this.eventStream[indice];
@@ -184,7 +179,7 @@ export class IonEventStream {
                         this.reader.stepIn();
                         break;
                     }
-                    case undefined : {
+                    case null : {
                         if (this.reader.depth() === 0) {
                             this.eventStream.push(this.eventFactory.makeEvent(IonEventType.STREAM_END, IonTypes.NULL, null, this.reader.depth(), undefined, false,undefined));
                             return;
@@ -234,9 +229,7 @@ export class IonEventStream {
 
     private marshalEvent() : IonEvent {
         let currentEvent = {};
-        let tid : IonType;
-        for(tid = this.reader.next(); tid !== undefined; tid = this.reader.next()) {
-
+        for(let tid: IonType; tid = this.reader.next(); ) {
             let fieldName = this.reader.fieldName();
             if (currentEvent[fieldName] !== undefined) throw new Error('Repeated event field: ' + fieldName);
             switch (fieldName) {
@@ -376,7 +369,7 @@ export class IonEventStream {
            return annotations;
         } else {
             this.reader.stepIn();
-            for(let tid = this.reader.next(); tid !== undefined; tid = this.reader.next()) {
+            for(let tid; tid = this.reader.next(); ) {
                 annotations.push(this.reader.value());
             }
             this.reader.stepOut();

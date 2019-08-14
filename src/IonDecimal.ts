@@ -27,27 +27,20 @@
 //      isZeroZero()
 //      toString()
 //      ION.Decimal.parse(string)
-//      ION.Decimal.NULL - constant null value (non-null reference)
-//      
+//
 //    This decimal is limited to 15 digits of precision but has an
 //    exponent range that is +/- 15 digits as well.
 //    
 //    It also accepts 'e', 'E', 'f' and 'F' as valid starts for
 //    the exponent (in addition to 'd' and 'D').
-//    
-//    If the string is undefined, empty or a null image it returns 
-//    the decimal NULL.
 
-import { is_digit } from "./IonText";
 import { LongInt } from "./IonLongInt";
-
 
 export class Decimal {
     private _coefficient: LongInt;
     private _exponent: number;
 
-    public static readonly NULL : Decimal = new Decimal(undefined, undefined);
-    public static readonly ZERO : Decimal = new Decimal(new LongInt(0), 0);
+    public static readonly ZERO: Decimal = new Decimal(new LongInt(0), 0);
     public static ONE = new Decimal(1, 0);
 
     constructor(coefficient: LongInt | number, exponent: number) {
@@ -215,7 +208,7 @@ export class Decimal {
 
     static parse(str: string) : Decimal {
         let exponent = 0;
-        if (str === 'null' || str === 'null.decimal') return Decimal.NULL;
+        if (str === 'null' || str === 'null.decimal') return null;
         let d = str.match('[d|D]');
         let f  = str.match('\\.');
         let exponentDelimiterIndex = str.length;
