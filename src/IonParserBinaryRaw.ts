@@ -130,7 +130,7 @@ export class ParserBinaryRaw {
     private _as: number = -1;
     private _ae: number = -1;
     private _a = [];
-    private _ts = [ TB_DATAGRAM ];//this looks sketch af.
+    private _ts = [ TB_DATAGRAM ];
     private _in_struct: boolean = false;
 
     constructor(source : BinarySpan) {

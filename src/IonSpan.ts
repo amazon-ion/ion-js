@@ -227,14 +227,16 @@ export class BinarySpan extends Span {
 
   //returns an array with the same backing buffer as the source.
   view(length : number) : Uint8Array {
-      return this._src.subarray(this._pos, this._pos +=length);
+      if (this._pos + length > this._limit) {
+          throw new Error('Unable to read ' + length + ' bytes (position: '
+              + this.position() + ', limit: ' + this._limit + ')');
+      }
+      return this._src.subarray(this._pos, this._pos += length);
   }
 
   //returns an array with a new backing buffer.
   chunk(length : number) : Uint8Array {
-      let buf = new Uint8Array(length);
-      buf.set(this._src.subarray(this._pos, this._pos += length));
-      return buf;
+      return new Uint8Array(this.view(length));
   }
 
   unread(b: number) : void {
