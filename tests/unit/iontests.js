@@ -162,7 +162,6 @@ let badSkipList = toSkipList([
     'ion-tests/iontestdata/bad/annotationWithNoValue.10n',
     'ion-tests/iontestdata/bad/blobLenTooLarge.10n',
     'ion-tests/iontestdata/bad/clobLenTooLarge.10n',
-    'ion-tests/iontestdata/bad/decimalLenTooLarge.10n',
     'ion-tests/iontestdata/bad/emptyAnnotatedInt.10n',
     'ion-tests/iontestdata/bad/floatLenTooLarge.10n',
     'ion-tests/iontestdata/bad/localSymbolTableImportNullMaxId.ion',
