@@ -317,8 +317,6 @@ let eventSkipList = toSkipList([
     'ion-tests/iontestdata/good/clobWithNonAsciiCharacter.10n',
     'ion-tests/iontestdata/good/clobs.ion',
     'ion-tests/iontestdata/good/decimal64BitBoundary.ion',
-    'ion-tests/iontestdata/good/decimal_e_values.ion',
-    'ion-tests/iontestdata/good/decimal_values.ion',
     'ion-tests/iontestdata/good/decimalNegativeOneDotTwoEight.ion',
     'ion-tests/iontestdata/good/decimalsWithUnderscores.ion',
     'ion-tests/iontestdata/good/equivs/bigInts.ion',
