@@ -109,18 +109,20 @@ export class BinaryWriter implements Writer {
     if (typeof value == 'string') value = Decimal.parse(value);
 
     let isPositiveZero: boolean = value.isZero() && !value.isNegative();
-    if (isPositiveZero) {
-      // Special case per the spec: http://amzn.github.io/ion-docs/binary.html#decimal
+    let exponent: number = value.getExponent();
+    if (isPositiveZero && exponent === 0 && !((1 / exponent) === -Infinity)) {
+      // Special case per the spec: http://amzn.github.io/ion-docs/docs/binary.html#5-decimal
       this.addNode(new BytesNode(this.writer, this.getCurrentContainer(), TypeCodes.DECIMAL, this.encodeAnnotations(annotations), new Uint8Array(0)));
       return;
     }
 
-    let exponent: number = value.getExponent();
-    let digits: Uint8Array = value.getDigits().intBytes();
+    let coefficientBytes: Uint8Array = value.getDigits().intBytes();
 
-    let writer: LowLevelBinaryWriter = new LowLevelBinaryWriter(new Writeable(LowLevelBinaryWriter.getVariableLengthSignedIntSize(exponent) + digits.length));
+    let writer: LowLevelBinaryWriter = new LowLevelBinaryWriter(new Writeable(LowLevelBinaryWriter.getVariableLengthSignedIntSize(exponent) + coefficientBytes.length));
     writer.writeVariableLengthSignedInt(exponent);
-    writer.writeBytes(digits);
+    if (!(coefficientBytes.length === 1 && coefficientBytes[0] === 0)) {   // no need to write the coefficient if it is 0
+      writer.writeBytes(coefficientBytes);
+    }
     this.addNode(new BytesNode(this.writer, this.getCurrentContainer(), TypeCodes.DECIMAL, this.encodeAnnotations(annotations), writer.getBytes()));
   }
 

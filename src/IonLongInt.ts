@@ -17,17 +17,24 @@ import { BigInteger } from "./BigInteger";
 
 
 export class LongInt {
-    public static readonly intZero : LongInt = new LongInt(0);
-    public static readonly intPosOne : LongInt = new LongInt(1);
-    public static readonly intNegZero : LongInt = new LongInt(-0);
-    public static readonly intNegOne : LongInt = new LongInt(-1);
     private int : BigInteger;
 
     constructor(input: string | number | BigInteger) {
         if(typeof input === 'string') {
-            this.int = bigInt(input);
+            let s = input.trim();
+            if (s[0] === '-') {
+                // this ensures this.int.sign is correct for -0:
+                this.int = bigInt(s.substr(1)).negate();
+            } else {
+                this.int = bigInt(s);
+            }
         } else if(typeof input === 'number') {
-            this.int = bigInt(input);
+            if (input === 0 && (1 / input) === -Infinity) {
+                // this ensures this.int.sign is correct for -0:
+                this.int = bigInt(0).negate();
+            } else {
+                this.int = bigInt(input);
+            }
         } else if(input instanceof bigInt) {
             this.int = input;
         } else {
@@ -46,7 +53,7 @@ export class LongInt {
             // so prepend a byte to allow for encoding of the sign bit
             array.splice(0, 0, 0);
         }
-        if(this.int.isNegative()) array[0] += 0x80;
+        if(this.signum() === -1) array[0] += 0x80;
         return new Uint8Array(array);
     }
 
@@ -56,7 +63,7 @@ export class LongInt {
             array[0] -= 0x80;
             array.splice(0, 0, 1);
         }
-        if(this.int.isNegative()) array[0] += 0x40;
+        if(this.signum() === -1) array[0] += 0x40;
         array[array.length - 1] += 0x80;
         return new Uint8Array(array);
     }

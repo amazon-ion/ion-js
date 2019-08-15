@@ -22,6 +22,7 @@ define({
     'tests/unit/IonCatalogTest',
     'tests/unit/IonImportTest',
     'tests/unit/IonLocalSymbolTableTest',
+    'tests/unit/IonLongIntTest',
     'tests/unit/IonDecimalTest',
     'tests/unit/IonWriteableTest',
     'tests/unit/IonTimestampTest',
