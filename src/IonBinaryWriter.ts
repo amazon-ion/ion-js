@@ -117,11 +117,14 @@ export class BinaryWriter implements Writer {
       return;
     }
 
-    let coefficientBytes: Uint8Array = value.getDigits().intBytes();
+    let coefficient: LongInt = value.getDigits();
+    let writeCoefficient = !(coefficient.isZero() && coefficient.signum() === 1);  // no need to write a coefficient of 0
+    let coefficientBytes: Uint8Array | null = writeCoefficient ? coefficient.intBytes() : null;
 
-    let writer: LowLevelBinaryWriter = new LowLevelBinaryWriter(new Writeable(LowLevelBinaryWriter.getVariableLengthSignedIntSize(exponent) + coefficientBytes.length));
+    let bufLen = LowLevelBinaryWriter.getVariableLengthSignedIntSize(exponent) + (writeCoefficient ? coefficientBytes.length : 0);
+    let writer: LowLevelBinaryWriter = new LowLevelBinaryWriter(new Writeable(bufLen));
     writer.writeVariableLengthSignedInt(exponent);
-    if (!(coefficientBytes.length === 1 && coefficientBytes[0] === 0)) {   // no need to write the coefficient if it is 0
+    if (writeCoefficient) {
       writer.writeBytes(coefficientBytes);
     }
     this.addNode(new BytesNode(this.writer, this.getCurrentContainer(), TypeCodes.DECIMAL, this.encodeAnnotations(annotations), writer.getBytes()));
