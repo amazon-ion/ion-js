@@ -35,6 +35,7 @@
 //    the exponent (in addition to 'd' and 'D').
 
 import { LongInt } from "./IonLongInt";
+import { _sign } from "./util";
 
 export class Decimal {
     private _coefficient: LongInt;
@@ -99,7 +100,7 @@ export class Decimal {
         }
         s += this._coefficient.toString() + 'd';
 
-        if (this._exponent === 0 && Decimal._sign(this._exponent) === -1) {
+        if (this._exponent === 0 && _sign(this._exponent) === -1) {
             s += '-';
         }
         s += this._exponent;
@@ -234,9 +235,5 @@ export class Decimal {
         } else {
             return new Decimal(new LongInt(str.substring(0, exponentDelimiterIndex)), exponent);
         }
-    }
-
-    private static _sign(x) {
-        return (x < 0 || (x===0 && (1/x)===-Infinity)) ? -1 : 1;
     }
 }

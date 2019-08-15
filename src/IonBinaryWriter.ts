@@ -22,6 +22,7 @@ import { Timestamp } from "./IonTimestamp";
 import { TypeCodes } from "./IonBinary";
 import { Writeable } from "./IonWriteable";
 import { Writer } from "./IonWriter";
+import { _sign } from "./util";
 
 const MAJOR_VERSION: number = 1;
 const MINOR_VERSION: number = 0;
@@ -110,7 +111,7 @@ export class BinaryWriter implements Writer {
 
     let isPositiveZero: boolean = value.isZero() && !value.isNegative();
     let exponent: number = value.getExponent();
-    if (isPositiveZero && exponent === 0 && !((1 / exponent) === -Infinity)) {
+    if (isPositiveZero && exponent === 0 && _sign(exponent) === 1) {
       // Special case per the spec: http://amzn.github.io/ion-docs/docs/binary.html#5-decimal
       this.addNode(new BytesNode(this.writer, this.getCurrentContainer(), TypeCodes.DECIMAL, this.encodeAnnotations(annotations), new Uint8Array(0)));
       return;

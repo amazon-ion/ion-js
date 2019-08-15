@@ -14,7 +14,7 @@
 
 import * as bigInt from "./BigInteger.js";
 import { BigInteger } from "./BigInteger";
-
+import { _sign } from "./util";
 
 export class LongInt {
     private int : BigInteger;
@@ -29,7 +29,7 @@ export class LongInt {
                 this.int = bigInt(s);
             }
         } else if(typeof input === 'number') {
-            if (input === 0 && (1 / input) === -Infinity) {
+            if (input === 0 && _sign(input) === -1) {
                 // this ensures this.int.sign is correct for -0:
                 this.int = bigInt(0).negate();
             } else {
