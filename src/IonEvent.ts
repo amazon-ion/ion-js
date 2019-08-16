@@ -435,7 +435,7 @@ class IonListEvent extends AbsIonContainerEvent {
             if(!this.ionValue[i].equals(expected.ionValue[i])){
                 return false;
             } else if(this.ionValue[i].eventType === IonEventType.CONTAINER_START) {
-                i = i + this.ionValue[i].length;
+                i += this.ionValue[i].length;
             }
         }
         return true;
@@ -453,7 +453,7 @@ class IonSexpEvent extends AbsIonContainerEvent {
             if(!this.ionValue[i].equals(expected.ionValue[i])){
                 return false;
             } else if(this.ionValue[i].eventType === IonEventType.CONTAINER_START) {
-                i = i + this.ionValue[i].length;
+                i += this.ionValue[i].length;
             }
         }
         return true;
