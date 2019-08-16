@@ -431,9 +431,7 @@ class IonListEvent extends AbsIonContainerEvent {
     valueEquals(expected : IonListEvent) : boolean {
         if(!(expected instanceof IonListEvent)) return false;
         if(this.ionValue.length !== expected.ionValue.length) return false;
-        //console.log("found list");
         for(let i : number = 0; i < this.ionValue.length; i++){
-            console.log("found list");
             if(!this.ionValue[i].equals(expected.ionValue[i])){
                 return false;
             } else if(this.ionValue[i].eventType === IonEventType.CONTAINER_START) {
