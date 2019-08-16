@@ -404,7 +404,6 @@ class IonStructEvent extends AbsIonContainerEvent {//no embed support as of yet.
     structsEqual(actualEvents : AbstractIonEvent[], expectedEvents : AbstractIonEvent[]) : boolean {
         let matchFound : boolean = true;
         let paired : boolean[] = new Array<boolean>(expectedEvents.length);
-        console.log("comparing struct");
         for (let i : number = 0; matchFound && i < actualEvents.length; i++) {
             matchFound = false;
             for (let j : number = 0; !matchFound && j < expectedEvents.length; j++) {
@@ -414,7 +413,7 @@ class IonStructEvent extends AbsIonContainerEvent {//no embed support as of yet.
                         for (let k = j; k < expectedEvents[j].ionValue.length; k++) {
                             paired[k] = true;
                         }
-                        i = i + actualEvents[i].ionValue.length;
+                        i += actualEvents[i].ionValue.length;
                     }
                 }
             }
