@@ -22,6 +22,7 @@ import { Timestamp } from "./IonTimestamp";
 import { TypeCodes } from "./IonBinary";
 import { Writeable } from "./IonWriteable";
 import { Writer } from "./IonWriter";
+import { _sign } from "./util";
 
 const MAJOR_VERSION: number = 1;
 const MINOR_VERSION: number = 0;
@@ -109,18 +110,23 @@ export class BinaryWriter implements Writer {
     if (typeof value == 'string') value = Decimal.parse(value);
 
     let isPositiveZero: boolean = value.isZero() && !value.isNegative();
-    if (isPositiveZero) {
-      // Special case per the spec: http://amzn.github.io/ion-docs/binary.html#decimal
+    let exponent: number = value.getExponent();
+    if (isPositiveZero && exponent === 0 && _sign(exponent) === 1) {
+      // Special case per the spec: http://amzn.github.io/ion-docs/docs/binary.html#5-decimal
       this.addNode(new BytesNode(this.writer, this.getCurrentContainer(), TypeCodes.DECIMAL, this.encodeAnnotations(annotations), new Uint8Array(0)));
       return;
     }
 
-    let exponent: number = value.getExponent();
-    let digits: Uint8Array = value.getDigits().intBytes();
+    let coefficient: LongInt = value.getDigits();
+    let writeCoefficient = !(coefficient.isZero() && coefficient.signum() === 1);  // no need to write a coefficient of 0
+    let coefficientBytes: Uint8Array | null = writeCoefficient ? coefficient.intBytes() : null;
 
-    let writer: LowLevelBinaryWriter = new LowLevelBinaryWriter(new Writeable(LowLevelBinaryWriter.getVariableLengthSignedIntSize(exponent) + digits.length));
+    let bufLen = LowLevelBinaryWriter.getVariableLengthSignedIntSize(exponent) + (writeCoefficient ? coefficientBytes.length : 0);
+    let writer: LowLevelBinaryWriter = new LowLevelBinaryWriter(new Writeable(bufLen));
     writer.writeVariableLengthSignedInt(exponent);
-    writer.writeBytes(digits);
+    if (writeCoefficient) {
+      writer.writeBytes(coefficientBytes);
+    }
     this.addNode(new BytesNode(this.writer, this.getCurrentContainer(), TypeCodes.DECIMAL, this.encodeAnnotations(annotations), writer.getBytes()));
   }
 

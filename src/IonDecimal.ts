@@ -35,6 +35,7 @@
 //    the exponent (in addition to 'd' and 'D').
 
 import { LongInt } from "./IonLongInt";
+import { _sign } from "./util";
 
 export class Decimal {
     private _coefficient: LongInt;
@@ -93,11 +94,17 @@ export class Decimal {
     stringValue(): string {
         if (this.isNull()) return "null.decimal";
 
-        let s = this._coefficient.toString() + 'd';
-        if (this._exponent === 0 && Decimal._sign(this._exponent) === -1) {
+        let s = '';
+        if (this._coefficient.isZero() && this._coefficient.signum() === -1) {
+            s = '-';
+        }
+        s += this._coefficient.toString() + 'd';
+
+        if (this._exponent === 0 && _sign(this._exponent) === -1) {
             s += '-';
         }
         s += this._exponent;
+
         return s;
     }
 
@@ -216,7 +223,7 @@ export class Decimal {
         let exponent = 0;
         if (str === 'null' || str === 'null.decimal') return null;
         let d = str.match('[d|D]');
-        let f  = str.match('\\.');
+        let f = str.match('\\.');
         let exponentDelimiterIndex = str.length;
         if(d) {
             exponent = Number(str.substring(d.index + 1, str.length));
@@ -224,13 +231,9 @@ export class Decimal {
         }
         if(f) {
             let exponentShift = d ? (d.index - 1) - f.index : (str.length - 1) - f.index;
-            return new Decimal(new LongInt(str.substring(0, f.index) +  str.substring(f.index + 1, exponentDelimiterIndex)),  exponent - exponentShift);
+            return new Decimal(new LongInt(str.substring(0, f.index) + str.substring(f.index + 1, exponentDelimiterIndex)), exponent - exponentShift);
         } else {
-            return new Decimal(new LongInt(str.substring(0,  exponentDelimiterIndex)), exponent);
+            return new Decimal(new LongInt(str.substring(0, exponentDelimiterIndex)), exponent);
         }
-    }
-
-    private static _sign(x) {
-        return (x < 0 || (x===0 && (1/x)===-Infinity)) ? -1 : 1;
     }
 }

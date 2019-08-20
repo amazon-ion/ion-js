@@ -310,9 +310,6 @@ let eventSkipList = toSkipList([
     'ion-tests/iontestdata/good/allNulls.ion',
     'ion-tests/iontestdata/good/clobWithNonAsciiCharacter.10n',
     'ion-tests/iontestdata/good/clobs.ion',
-    'ion-tests/iontestdata/good/decimalNegativeZeroDot.10n',
-    'ion-tests/iontestdata/good/decimalNegativeZeroDotZero.10n',
-    'ion-tests/iontestdata/good/decimal_zeros.ion',
     'ion-tests/iontestdata/good/decimalsWithUnderscores.ion',
     'ion-tests/iontestdata/good/equivs/bigInts.ion',
     'ion-tests/iontestdata/good/equivs/binaryInts.ion',
@@ -389,7 +386,6 @@ let eventSkipList = toSkipList([
 ]);
 
 let readerCompareSkipList = toSkipList([
-    'ion-tests/iontestdata/good/decimal_zeros.ion',
     'ion-tests/iontestdata/good/subfieldInt.ion',
     'ion-tests/iontestdata/good/subfieldUInt.ion',
     'ion-tests/iontestdata/good/subfieldVarInt.ion',
