@@ -29,7 +29,7 @@ define([
       // First part - writing timestamp into binary datagram
       var Ion = ion;
       var writer = Ion.makeBinaryWriter();
-      var timestamp = new Ion.Timestamp(0, 2017, 6, 7, 18, 29, 17, ion.Decimal.parse('.901'));
+      var timestamp = new Ion.Timestamp(6, 0, 2017, 6, 7, 18, 29, 17, ion.Decimal.parse('.901'));
       writer.writeTimestamp(timestamp);
       writer.close();
 
