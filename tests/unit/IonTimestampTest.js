@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-define(
+ define(
   function(require) {
     const registerSuite = require('intern!object');
     const assert = require('intern/chai!assert');
@@ -43,7 +43,6 @@ define(
     parseTest('Parses timestamp: The same instant, with unknown local offset', '2007-02-23T20:14:33.079-00:00');
     parseTest('Parses timestamp: The same instant, with unknown local offset where hour is 0', '2007-02-23T00:14:33.079-00:00');
     parseTest('Parses timestamp: Happy New Year in UTC, unknown local offset', '2007-01-01T00:00-00:00');
-
 
     registerSuite(suite);
   }
