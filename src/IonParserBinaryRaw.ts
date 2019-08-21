@@ -306,7 +306,11 @@ export class ParserBinaryRaw {
 
     private read_timestamp_value() : Timestamp {
         let offset = null;
+<<<<<<< HEAD
         let timeArray = [0, 0, 1, 0, 0, 0];
+=======
+        let timeArray = [null, null, null, null, null, null];
+>>>>>>> fff2e4361715d687c9e3107f53d9a240c59ffe29
         let precision = Precision.NULL;
         if (this._len > 0) {
             let end = this._in.position() + this._len;
