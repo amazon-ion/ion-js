@@ -232,6 +232,7 @@ export class Timestamp {
 
 
     constructor(precision : number, offset : number, year : number , month : number, day : number, hour : number, minute : number, seconds : number, decimal : Decimal) {
+
         this.precision = precision;
         this.offset = offset;
         this.year = year;
