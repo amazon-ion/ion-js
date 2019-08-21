@@ -306,7 +306,7 @@ export class ParserBinaryRaw {
 
     private read_timestamp_value() : Timestamp {
         let offset = null;
-        let timeArray = [null, null, null, null, null, null];
+        let timeArray = [0, 0, 1, 0, 0, 0];
         let precision = Precision.NULL;
         if (this._len > 0) {
             let end = this._in.position() + this._len;
@@ -320,7 +320,7 @@ export class ParserBinaryRaw {
                     timeArray[precision] = this.readVarUnsignedInt();
                 } else if(precision  === Precision.FRACTION) {
                     let exp = this.readVarSignedInt();
-                    let coef = this.readSignedInt();
+                    let coef = ParserBinaryRaw.readSignedIntFrom(this._in, end - this._in.position());
                     return new Timestamp(precision, offset, timeArray[0], timeArray[1], timeArray[2], timeArray[3], timeArray[4], timeArray[5], new Decimal(coef, exp));
                 } else {
                     timeArray[precision - 1] = this.readVarUnsignedInt();

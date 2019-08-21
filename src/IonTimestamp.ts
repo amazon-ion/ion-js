@@ -232,6 +232,7 @@ export class Timestamp {
 
 
     constructor(precision : number, offset : number, year : number , month : number, day : number, hour : number, minute : number, seconds : number, decimal : Decimal) {
+
         this.precision = precision;
         this.offset = offset;
         this.year = year;
@@ -242,7 +243,7 @@ export class Timestamp {
         this.seconds = seconds;
         this.fraction = decimal;
         this.checkValid();
-        this.date = new Date(Date.UTC(this.year, (this.precision === Precision.YEAR ? 0 : this.month), this.day, this.hour, this.minute, null, null) - (this.offset * 60000));
+        this.date = new Date(Date.UTC(this.year, (this.precision === Precision.YEAR ? 0 : this.month - 1), this.day, this.hour, this.minute, this.seconds, 0) - (this.offset * 60000));
         this.date.setUTCFullYear(this.year);
         /*
         let shiftHours = Math.floor(this.offset / 60);
@@ -473,12 +474,12 @@ export class Timestamp {
         }
 
         let offset: number = -0.0;
-        let year: number = null;
-        let month: number = null;
-        let day: number = null;
-        let hour: number = null;
-        let minute: number = null;
-        let seconds: number = null;
+        let year: number = 0;
+        let month: number = 1;
+        let day: number = 1;
+        let hour: number = 0;
+        let minute: number = 0;
+        let seconds: number = 0;
         let fraction : Decimal = null;
 
         let pos: number = 0;

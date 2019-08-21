@@ -670,7 +670,7 @@ define([
       (writer) => { writer.writeNull(ion.TypeCodes.TIMESTAMP) },
         [0x6f]);
     writerTest('Writes 2000-01-01T12:34:56.789 with year precision',
-      (writer) => { writer.writeTimestamp(new ion.Timestamp(ion.Precision.YEAR, 0, 2000, 1, 1, 12, 34, 56.789)) },
+      (writer) => { writer.writeTimestamp(new ion.Timestamp(ion.Precision.YEAR, 0, 2000, 1, 1, 12, 34, 56, ion.Decimal.parse('.789')))},
         [
         0x63,
         // Offset
@@ -680,7 +680,7 @@ define([
         0xd0,
       ]);
     writerTest('Writes 2000-01-01T12:34:56.789 with month precision',
-      (writer) => { writer.writeTimestamp(new ion.Timestamp(ion.Precision.MONTH, 0, 2000, 1, 1, 12, 34, 56.789)) },
+      (writer) => { writer.writeTimestamp(new ion.Timestamp(ion.Precision.MONTH, 0, 2000, 1, 1, 12, 34, 56, ion.Decimal.parse('.789'))) },
         [
         0x64,
         // Offset
@@ -692,7 +692,7 @@ define([
         0x81,
       ]);
     writerTest('Writes 2000-01-01T12:34:56.789 with day precision',
-      (writer) => { writer.writeTimestamp(new ion.Timestamp(ion.Precision.DAY, 0, 2000, 1, 1, 12, 34, 56.789)) },
+      (writer) => { writer.writeTimestamp(new ion.Timestamp(ion.Precision.FRACTION, 0, 2000, 1, 1, 12, 34, 56, ion.Decimal.parse('.789'))) },
         [
         0x65,
         // Offset
@@ -706,7 +706,7 @@ define([
         0x81,
       ]);
     writerTest('Writes 2000-01-01T12:34:56.789 with hour and minute precision',
-      (writer) => { writer.writeTimestamp(new ion.Timestamp(ion.Precision.HOUR_AND_MINUTE, 0, 2000, 1, 1, 12, 34, 56.789)) },
+      (writer) => { writer.writeTimestamp(new ion.Timestamp(ion.Precision.HOUR_AND_MINUTE, 0, 2000, 1, 1, 12, 34, 56, ion.Decimal.parse('.789'))) },
         [
         0x67,
         // Offset
@@ -723,8 +723,8 @@ define([
         // Minute
         0xa2,
       ]);
-    skippedWriterTest('Writes 2000-01-01T12:34:56.789 with second precision',
-      (writer) => { writer.writeTimestamp(new ion.Timestamp(ion.Precision.SECONDS, 0, 2000, 1, 1, 12, 34, "56.789")) },
+    writerTest('Writes 2000-01-01T12:34:56.789 with second precision',
+      (writer) => { writer.writeTimestamp(new ion.Timestamp(ion.Precision.FRACTION, 0, 2000, 1, 1, 12, 34, 56, ion.Decimal.parse('.789'))) },
         [
         0x6b,
         // Offset
@@ -748,8 +748,8 @@ define([
         0x03,
         0x15,
       ]);
-    skippedWriterTest('Writes 2000-01-01T12:34:00.789 with second precision',
-      (writer) => { writer.writeTimestamp(new ion.Timestamp(ion.Precision.SECONDS, 0, 2000, 1, 1, 12, 34, "0.789")) },
+    writerTest('Writes 2000-01-01T12:34:00.789 with second precision',
+      (writer) => { writer.writeTimestamp(new ion.Timestamp(ion.Precision.FRACTION, 0, 2000, 1, 1, 12, 34, 0, ion.Decimal.parse('.789'))) },
         [
         0x6b,
         // Offset
@@ -774,7 +774,7 @@ define([
         0x15,
       ]);
     writerTest('Writes 2000-01-01T12:34:00 with second precision',
-      (writer) => { writer.writeTimestamp(new ion.Timestamp(ion.Precision.SECONDS, 0, 2000, 1, 1, 12, 34, "00")) },
+      (writer) => { writer.writeTimestamp(new ion.Timestamp(ion.Precision.SECONDS, 0, 2000, 1, 1, 12, 34, 0)) },
         [
         0x68,
         // Offset
@@ -793,21 +793,23 @@ define([
         // Second
         0x80,
       ]);
-    skippedWriterTest('Writes 2000-01-01T12:34:00-8:00 with second precision',
-      (writer) => { writer.writeTimestamp(new ion.Timestamp(ion.Precision.SECONDS, -8, 2000, 1, 1, 12, 34, "00")) },
+    writerTest('Writes 2000-01-01T12:34:00-08:00 with second precision',
+      (writer) => { writer.writeTimestamp(new ion.Timestamp(ion.Precision.SECONDS, -8 * 60, 2000, 1, 1, 12, 34, 0)) },
         [
-        0x68,
+        0x69,
         // Offset
-        0xc8,
+        0x43,
         // Year
+        0xe0,
         0x0f,
-        0xd0,
         // Month
-        0x81,
+        0xd0,
         // Day
         0x81,
+
+        0x81,
         // Hour
-        0x8c,
+        0x94,
         // Minute
         0xa2,
         // Second
