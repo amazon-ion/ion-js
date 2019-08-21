@@ -45,15 +45,15 @@
 //    byteValue
 
 import * as IonBinary from "./IonBinary";
-import { decodeUtf8 } from "./IonUnicode";
-import { Decimal } from "./IonDecimal";
-import { IonType } from "./IonType";
-import { IonTypes } from "./IonTypes";
-import { IVM } from "./IonConstants";
-import { LongInt } from "./IonLongInt";
-import { Precision } from "./IonPrecision";
-import { BinarySpan } from "./IonSpan";
-import { Timestamp } from "./IonTimestamp";
+import {decodeUtf8} from "./IonUnicode";
+import {Decimal} from "./IonDecimal";
+import {IonType} from "./IonType";
+import {IonTypes} from "./IonTypes";
+import {IVM} from "./IonConstants";
+import {LongInt} from "./IonLongInt";
+import {Precision} from "./IonPrecision";
+import {BinarySpan} from "./IonSpan";
+import {Timestamp} from "./IonTimestamp";
 
 const DEBUG_FLAG = true;
 
@@ -306,32 +306,49 @@ export class ParserBinaryRaw {
 
     private read_timestamp_value() : Timestamp {
         let offset = null;
-<<<<<<< HEAD
-        let timeArray = [0, 0, 1, 0, 0, 0];
-=======
-        let timeArray = [null, null, null, null, null, null];
->>>>>>> fff2e4361715d687c9e3107f53d9a240c59ffe29
+        let year: number, month: number = 0, day: number = 1, hour: number = 0, minute: number = 0, second: number = 0, fraction: Decimal = null;
         let precision = Precision.NULL;
         if (this._len > 0) {
             let end = this._in.position() + this._len;
             offset = this.readVarSignedInt();
-            while(this._in.position() < end) {
-                precision++;
-                if(precision  === Precision.HOUR_AND_MINUTE) {
-                    timeArray[precision - 1] = this.readVarUnsignedInt();
-                    timeArray[precision] = this.readVarUnsignedInt();
-                } else if(precision  === Precision.SECONDS) {
-                    timeArray[precision] = this.readVarUnsignedInt();
-                } else if(precision  === Precision.FRACTION) {
-                    let exp = this.readVarSignedInt();
-                    let coef = ParserBinaryRaw.readSignedIntFrom(this._in, end - this._in.position());
-                    return new Timestamp(precision, offset, timeArray[0], timeArray[1], timeArray[2], timeArray[3], timeArray[4], timeArray[5], new Decimal(coef, exp));
+            if (this._in.position() < end) {
+                year = this.readVarUnsignedInt();
+                precision = Precision.YEAR;
+            } else {
+                throw new Error('Timestamps must include a year.');
+            }
+            if (this._in.position() < end) {
+                month = this.readVarUnsignedInt();
+                precision = Precision.MONTH;
+            }
+            if (this._in.position() < end) {
+                day = this.readVarUnsignedInt();
+                precision = Precision.DAY;
+            }
+            if (this._in.position() < end) {
+                hour = this.readVarUnsignedInt();
+                if (this._in.position() >= end) {
+                    throw new Error('Timestamps with an hour must include a minute.');
                 } else {
-                    timeArray[precision - 1] = this.readVarUnsignedInt();
+                    minute = this.readVarUnsignedInt();
+                    precision = Precision.HOUR_AND_MINUTE;
                 }
             }
+            if (this._in.position() < end) {
+                second = this.readVarUnsignedInt();
+                precision = Precision.SECONDS;
+            }
+            if(this._in.position() < end) {
+                let exp = this.readVarSignedInt();
+                let coef = LongInt.intZero;
+                if(this._in.position() < end) {
+                    coef = ParserBinaryRaw.readSignedIntFrom(this._in, end - this._in.position());
+                }
+                fraction = new Decimal(coef, exp);
+                precision = Precision.FRACTION;
+            }
         }
-        return new Timestamp(precision, offset, timeArray[0], timeArray[1], timeArray[2], timeArray[3], timeArray[4], timeArray[5], null);
+        return new Timestamp(precision, offset, year, month, day, hour, minute, second, fraction);
     }
 
     private read_string_value() : string {
