@@ -797,22 +797,14 @@ define([
       (writer) => { writer.writeTimestamp(new ion.Timestamp(ion.Precision.SECONDS, -8 * 60, 2000, 1, 1, 12, 34, 0)) },
         [
         0x69,
-        // Offset
         0x43,
-        // Year
         0xe0,
         0x0f,
-        // Month
         0xd0,
-        // Day
         0x81,
-
         0x81,
-        // Hour
         0x94,
-        // Minute
         0xa2,
-        // Second
         0x80,
       ]);
 
