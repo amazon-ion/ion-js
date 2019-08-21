@@ -11,8 +11,8 @@
 * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific
 * language governing permissions and limitations under the License.
 */
-import { Decimal } from "./IonDecimal";
-import { encodeUtf8 } from "./IonUnicode";
+import {Decimal} from "./IonDecimal";
+import {encodeUtf8} from "./IonUnicode";
 import {
     escape,
     toBase64,
@@ -24,10 +24,10 @@ import {
     ClobEscapes,
     is_keyword
 } from "./IonText";
-import { Timestamp } from "./IonTimestamp";
-import { TypeCodes } from "./IonBinary";
-import { Writeable } from "./IonWriteable";
-import { Writer } from "./IonWriter";
+import {Timestamp} from "./IonTimestamp";
+import {TypeCodes} from "./IonBinary";
+import {Writeable} from "./IonWriteable";
+import {Writer} from "./IonWriter";
 import {_sign} from "./util";
 
 type Serializer<T> = (value: T) => void;
