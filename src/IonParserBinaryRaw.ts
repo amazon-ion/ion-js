@@ -487,7 +487,7 @@ export class ParserBinaryRaw {
                 break;
             case IonBinary.TB_DECIMAL:
                 if (this._len === 0) {
-                    this._curr = Decimal.ZERO;
+                    this._curr = Decimal._ZERO;
                 } else {
                     this._curr = this.read_decimal_value();
                 }

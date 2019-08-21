@@ -12,37 +12,17 @@
  * language governing permissions and limitations under the License.
  */
 
-// Ion Value Support class.  This class offers the
-//       additional semantics necessary for
-//       decimal values.
-//
-//    ION.Decimal supports:
-//      new ION.Decimal(value, exponent)
-//      getNumber()
-//      getDigits()
-//      getScale()
-//      isNull()
-//      isZero()
-//      isNegativeZero()
-//      isZeroZero()
-//      toString()
-//      ION.Decimal.parse(string)
-//
-//    This decimal is limited to 15 digits of precision but has an
-//    exponent range that is +/- 15 digits as well.
-//    
-//    It also accepts 'e', 'E', 'f' and 'F' as valid starts for
-//    the exponent (in addition to 'd' and 'D').
-
 import { LongInt } from "./IonLongInt";
-import { _sign } from "./util";
 
+/**
+ * This class provides the additional semantics necessary for decimal values.
+ * Note that range of an exponent is limited to +/- 15 digits.
+ */
 export class Decimal {
-    private _coefficient: LongInt;
-    private _exponent: number;
+    public static readonly _ZERO: Decimal = new Decimal(new LongInt(0), 0);
 
-    public static readonly ZERO: Decimal = new Decimal(new LongInt(0), 0);
-    public static ONE = new Decimal(1, 0);
+    private readonly _coefficient: LongInt;
+    private readonly _exponent: number;
 
     constructor(coefficient: LongInt | number, exponent: number) {
         if (typeof coefficient === "number") {
@@ -56,86 +36,50 @@ export class Decimal {
         this._exponent = exponent;
     }
 
-    isZero() : boolean {
-        if (this.isNull()) return false;
-        return this._coefficient.isZero();
-    }
-
     isNegative() : boolean {
         return this._coefficient.signum() === -1;
-    }
-
-    isNegativeZero() : boolean {
-        return this.isZero() && this.isNegative();
-    }
-
-    isZeroZero() : boolean {
-        if (this.isZero()) {
-            // TODO - is this right? negative scale is valid decimal places
-            if (this._exponent >= -1) {
-                return (this._coefficient.signum() >= 0);
-            }
-        }
-        return false;
     }
 
     numberValue(): number {
         return this._coefficient.numberValue() * Math.pow(10, this._exponent);
     }
 
-    getNumber() : number {
-        return this.numberValue();
-    }
-
-    toString() : string {
-        return this.stringValue();
-    }
-
-    stringValue(): string {
-        if (this.isNull()) return "null.decimal";
+    // based on the algorithm defined in https://docs.oracle.com/javase/8/docs/api/java/math/BigDecimal.html#toString--
+    toString(): string {
+        let cStr = Math.abs(this._coefficient.numberValue())+'';
+        let precision = cStr.length;
+        let adjustedExponent = this._exponent + (precision - 1);
 
         let s = '';
-        if (this._coefficient.isZero() && this._coefficient.signum() === -1) {
-            s = '-';
+        if (this._exponent <= 0 && adjustedExponent >= -6) {
+            // no exponential notation
+            if (this._exponent === 0) {
+                s += cStr;
+            } else {
+                if (cStr.length <= -this._exponent) {
+                    cStr = '0'.repeat(-this._exponent - cStr.length + 1) + cStr;
+                    s += cStr.substr(0, 1) + '.' + cStr.substr(1);
+                } else {
+                    s += cStr.substr(0, precision + this._exponent) + '.' + cStr.substr(precision + this._exponent);
+                }
+            }
+        } else {
+            // use exponential notation
+            s += cStr[0];
+            if (cStr.length > 1) {
+                s += '.' + cStr.substr(1);
+            }
+            s += 'E' + (adjustedExponent > 0 ? '+' : '') + adjustedExponent;
         }
-        s += this._coefficient.toString() + 'd';
-
-        if (this._exponent === 0 && _sign(this._exponent) === -1) {
-            s += '-';
-        }
-        s += this._exponent;
-
-        return s;
+        return (this._coefficient.signum() === -1 ? '-' : '') + s;
     }
 
-    isNull() : boolean {
-        return this._coefficient === undefined;
-    }
-
-    getDigits() : LongInt {
+    _getCoefficient() : LongInt {
         return this._coefficient;
     }
 
-    getExponent() : number {
+    _getExponent() : number {
         return this._exponent;
-    }
-
-    lessThan(dec : Decimal) : boolean {
-        return this.compare(dec) === -1;
-    }
-
-    greaterThan(dec : Decimal) : boolean {
-        return this.compare(dec) === 1;
-    }
-
-    leq(dec : Decimal) : boolean {
-        let result = this.compare(dec);
-        return result === -1 || result === 0;
-    }
-
-    geq(dec : Decimal) : boolean {
-        let result = this.compare(dec)
-        return result === 1 || result === 0;
     }
 
     equals(dec : Decimal) : boolean {
@@ -214,9 +158,9 @@ export class Decimal {
     }
 
     DataModelequals(expected : Decimal) : boolean {
-        return this.getExponent() === expected.getExponent()
+        return this._getExponent() === expected._getExponent()
             && this.isNegative() === expected.isNegative()
-            && this.getDigits().equals(expected.getDigits());
+            && this._getCoefficient().equals(expected._getCoefficient());
     }
 
     static parse(str: string) : Decimal {

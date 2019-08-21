@@ -28,6 +28,7 @@ import { Timestamp } from "./IonTimestamp";
 import { TypeCodes } from "./IonBinary";
 import { Writeable } from "./IonWriteable";
 import { Writer } from "./IonWriter";
+import {_sign} from "./util";
 
 type Serializer<T> = (value: T) => void;
 
@@ -105,7 +106,23 @@ export class TextWriter implements Writer {
 
     writeDecimal(value: Decimal, annotations?: string[]) : void {
         this.writeValue(TypeCodes.DECIMAL, value, annotations, (value: Decimal) => {
-            this.writeUtf8(value.toString());
+            if (value === null) {
+                this.writeUtf8("null.decimal");
+            } else {
+                let s = '';
+                let coefficient = value._getCoefficient();
+                if (coefficient.isZero() && coefficient.signum() === -1) {
+                    s += '-';
+                }
+                s += coefficient.toString() + 'd';
+
+                let exponent = value._getExponent();
+                if (exponent === 0 && _sign(exponent) === -1) {
+                    s += '-';
+                }
+                s += exponent;
+                this.writeUtf8(s);
+            }
         });
     }
 
