@@ -262,7 +262,7 @@ export class BinaryWriter implements Writer {
     writer.writeVariableLengthSignedInt(value.getOffset());
     writer.writeVariableLengthUnsignedInt(value.date.getUTCFullYear());
     if (value.getPrecision() >= Precision.MONTH) {
-        writer.writeVariableLengthUnsignedInt(value.date.getUTCMonth());
+        writer.writeVariableLengthUnsignedInt(value.date.getUTCMonth() + 1);
     }
     if (value.getPrecision() >= Precision.DAY) {
         writer.writeVariableLengthUnsignedInt(value.date.getUTCDate());

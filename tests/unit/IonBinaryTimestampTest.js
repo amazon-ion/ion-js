@@ -24,18 +24,14 @@ define([
     };
 
     suite['Binary Timestamp Round Trip'] = function() {
-      this.skip();
+      //this.skip();
 
       // First part - writing timestamp into binary datagram
       var Ion = ion;
       var writer = Ion.makeBinaryWriter();
-      var timestamp = new Ion.Timestamp(5, 0, 2017, 06, 07, 18, 29, '17.901');
-      writer.writeStruct();
-      writer.writeFieldName('test_timestamp');
+      var timestamp = new Ion.Timestamp(0, 2017, 6, 7, 18, 29, 17, ion.Decimal.parse('.901'));
       writer.writeTimestamp(timestamp);
-      writer.endContainer();
       writer.close();
-      var binaryData = writer.getBytes();
 
       /* Datagram content
        * {
@@ -44,12 +40,9 @@ define([
        */
 
       // Second part - reading timestamp from binary datagram created above
-      var reader = Ion.makeReader(binaryData);
+      var reader = Ion.makeReader(writer.getBytes());
       reader.next();
-      reader.stepIn();
-      reader.next();
-      var timestampValue = reader.timestampValue();
-
+      var timestampValue = reader.value();
       assert.equal(timestamp.toString(), timestampValue.toString());
     }
 
