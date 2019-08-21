@@ -17,10 +17,7 @@ import { BigInteger } from "./BigInteger";
 import { _sign } from "./util";
 
 export class LongInt {
-    public static readonly intZero : LongInt = new LongInt(0);
-    public static readonly intPosOne : LongInt = new LongInt(1);
-    public static readonly intNegZero : LongInt = new LongInt(-0);
-    public static readonly intNegOne : LongInt = new LongInt(-1);
+    public static readonly _zero : LongInt = new LongInt(0);
     private int : BigInteger;
 
     constructor(input: string | number | BigInteger) {
