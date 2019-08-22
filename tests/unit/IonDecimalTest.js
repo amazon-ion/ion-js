@@ -54,18 +54,72 @@ define([
       '123456.0'  : () => test('123456.0', '1234560', -1, 123456.0, '123456.0'),
       '1234560d-1': () => test('1234560d-1', '1234560', -1, 123456.0, '123456.0'),
 
-      'compare()' : () => {
-        // this first assertion should fail;  2.1 and 2.10 are not equivalent
-        assert.equal(ion.Decimal.parse('2.1').compare(ion.Decimal.parse('2.10')), 0);
-        assert.equal(ion.Decimal.parse('2.15').compare(ion.Decimal.parse('2.10')), 1);
-        assert.equal(ion.Decimal.parse('2.1').compare(ion.Decimal.parse('2.15')), -1);
-        assert.equal(ion.Decimal.parse('2.5d1').compare(ion.Decimal.parse('25')), 0);
-        assert.equal(ion.Decimal.parse('25').compare(ion.Decimal.parse('2.1d1')), 1);
-        assert.equal(ion.Decimal.parse('.00005').compare(ion.Decimal.parse('0.05d-10')), 1);
-      },
-      // TBD:  'equals': () => { this.skip() },
-      // TBD:  'DataModelequals': () => { this.skip() },
-      // TBD:  'parse': () => { this.skip() },
+      'compareTo(0, 0)'               : () => testCompareTo('0', '0', 0),
+      'compareTo(0, 0d0)'             : () => testCompareTo('0', '0d0', 0),
+      'compareTo(0, 0d1)'             : () => testCompareTo('0', '0d1', 0),
+      'compareTo(0, 0d-1)'            : () => testCompareTo('0', '0d-1', 0),
+      'compareTo(0, 0d-0)'            : () => testCompareTo('0', '0d-0', 0),
+
+      'compareTo(-0, -0)'             : () => testCompareTo('-0', '-0', 0),
+      'compareTo(-0, -0d0)'           : () => testCompareTo('-0', '-0d0', 0),
+      'compareTo(-0, -0d1)'           : () => testCompareTo('-0', '-0d1', 0),
+      'compareTo(-0, -0d-1)'          : () => testCompareTo('-0', '-0d-1', 0),
+      'compareTo(-0, -0d-0)'          : () => testCompareTo('-0', '-0d-0', 0),
+
+      'compareTo(0, -0)'              : () => testCompareTo('0', '-0', 0),
+      'compareTo(0, -0d0)'            : () => testCompareTo('0', '-0d0', 0),
+      'compareTo(0, -0d1)'            : () => testCompareTo('0', '-0d1', 0),
+      'compareTo(0, -0d-1)'           : () => testCompareTo('0', '-0d-1', 0),
+      'compareTo(0, -0d-0)'           : () => testCompareTo('0', '-0d-0', 0),
+
+      'compareTo(0d-0, 0d-0)'         : () => testCompareTo('0d-0', '0d-0', 0),
+      'compareTo(-0d-0, -0d-0)'       : () => testCompareTo('-0d-0', '-0d-0', 0),
+
+      'compareTo(2.1, 2.1)'           : () => testCompareTo('2.1', '2.1', 0),
+      'compareTo(2.1, 2.10)'          : () => testCompareTo('2.1', '2.10', 0),
+      'compareTo(2.1, 2.11)'          : () => testCompareTo('2.1', '2.11', -1),
+      'compareTo(2.11, 2.10)'         : () => testCompareTo('2.11', '2.10', 1),
+      'compareTo(2.1d1, 21)'          : () => testCompareTo('2.1d1', '21', 0),
+      'compareTo(22, 2.1d1)'          : () => testCompareTo('22', '2.1d1', 1),
+      'compareTo(123d-101, 123d-100)' : () => testCompareTo('123d-101', '123d-100', -1),
+      'compareTo(123d-100, 123d-100)' : () => testCompareTo('123d-100', '123d-100', 0),
+      'compareTo(123d-99, 123d-100)'  : () => testCompareTo('123d-99', '123d-100', 1),
+      'compareTo(123d99, 123d100)'    : () => testCompareTo('123d99', '123d100', -1),
+      'compareTo(123d100, 123d100)'   : () => testCompareTo('123d100', '123d100', 0),
+      'compareTo(123d101, 123d100)'   : () => testCompareTo('123d101', '123d100', 1),
+
+
+      'equals(0, 0)':         () => testEquals('0', '0', true),
+      'equals(0, 0d0)':       () => testEquals('0', '0d0', true),
+      'equals(0, 0d1)':       () => testEquals('0', '0d1', false),
+      'equals(0, 0d-1)':      () => testEquals('0', '0d-1', false),
+      'equals(0, 0d-0)':      () => testEquals('0', '0d-0', false),
+
+      'equals(-0, -0)':       () => testEquals('-0', '-0', true),
+      'equals(-0, -0d0)':     () => testEquals('-0', '-0d0', true),
+      'equals(-0, -0d1)':     () => testEquals('-0', '-0d1', false),
+      'equals(-0, -0d-1)':    () => testEquals('-0', '-0d-1', false),
+      'equals(-0, -0d-0)':    () => testEquals('-0', '-0d-0', false),
+
+      'equals(0, -0)':        () => testEquals('0', '-0', false),
+      'equals(0, -0d0)':      () => testEquals('0', '-0d0', false),
+      'equals(0, -0d1)':      () => testEquals('0', '-0d1', false),
+      'equals(0, -0d-1)':     () => testEquals('0', '-0d-1', false),
+      'equals(0, -0d-0)':     () => testEquals('0', '-0d-0', false),
+
+      'equals(0d-0, 0d-0)':   () => testEquals('0d-0', '0d-0', true),
+      'equals(-0d-0, -0d-0)': () => testEquals('-0d-0', '-0d-0', true),
+
+      'equals(1, 1)':         () => testEquals('1', '1', true),
+      'equals(1, 2)':         () => testEquals('1', '2', false),
+      'equals(2.1, 2.10)':    () => testEquals('2.1', '2.10', false),
+
+      'equals(10000000000000000.00000000000000001, 10000000000000000.00000000000000001)': () =>
+          testEquals('10000000000000000.00000000000000001', '10000000000000000.00000000000000001', true),
+      'equals(10000000000000000.00000000000000001, 10000000000000000.00000000000000002)': () =>
+          testEquals('10000000000000000.00000000000000001', '10000000000000000.00000000000000002', false),
+      'equals(10000000000000000.00000000000000000, 10000000000000000.0000000000000000)': () =>
+          testEquals('10000000000000000.00000000000000000', '10000000000000000.0000000000000000', false),
     });
 
     function test(decimalString,
@@ -88,6 +142,20 @@ define([
         assert.equal(util._sign(decimal.numberValue()), util._sign(expectedNumberValue), 'numberValue sign');
 
         assert.equal(decimal.toString(), expectedToString, 'toString()');
+    }
+
+    function testEquals(decimalString1, decimalString2, expected) {
+      let dec1 = ion.Decimal.parse(decimalString1);
+      let dec2 = ion.Decimal.parse(decimalString2);
+      assert.equal(dec1.equals(dec2), expected);
+      assert.equal(dec2.equals(dec1), expected);
+    }
+
+    function testCompareTo(decimalString1, decimalString2, expected) {
+      let dec1 = ion.Decimal.parse(decimalString1);
+      let dec2 = ion.Decimal.parse(decimalString2);
+      assert.equal(dec1.compareTo(dec2), expected);
+      assert.equal(dec2.compareTo(dec1), -expected);
     }
   }
 );

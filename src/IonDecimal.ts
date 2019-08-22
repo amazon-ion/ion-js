@@ -12,7 +12,8 @@
  * language governing permissions and limitations under the License.
  */
 
-import { LongInt } from "./IonLongInt";
+import {LongInt} from "./IonLongInt";
+import {_sign} from "./util";
 
 /**
  * This class provides the additional semantics necessary for decimal values.
@@ -36,16 +37,28 @@ export class Decimal {
         this._exponent = exponent;
     }
 
+    /**
+     * Returns true if this Decimal is negative; otherwise false.
+     */
     isNegative() : boolean {
         return this._coefficient.signum() === -1;
     }
 
+    /**
+     * Returns a number representing the value of this Decimal.  Note that
+     * some Decimal (base-10) values cannot be precisely expressed in
+     * JavaScript's base-2 number type.
+     */
     numberValue(): number {
         return this._coefficient.numberValue() * Math.pow(10, this._exponent);
     }
 
-    // based on the algorithm defined in https://docs.oracle.com/javase/8/docs/api/java/math/BigDecimal.html#toString--
+    /**
+     * Returns a string representation of this Decimal, using exponential
+     * notation when appropriate.
+     */
     toString(): string {
+        // based on the algorithm defined in https://docs.oracle.com/javase/8/docs/api/java/math/BigDecimal.html#toString--
         let cStr = Math.abs(this._coefficient.numberValue())+'';
         let precision = cStr.length;
         let adjustedExponent = this._exponent + (precision - 1);
@@ -82,98 +95,91 @@ export class Decimal {
         return this._exponent;
     }
 
-    equals(dec : Decimal) : boolean {
-        return this.compare(dec) === 0;
+    /**
+     * Compares this Decimal with another and returns true if they are
+     * equivalent in value and precision; otherwise returns false.
+     * Note that this differs from compareTo(), which doesn't require
+     * precision to match when returning 0.
+     */
+    equals(that : Decimal) : boolean {
+        return this._getExponent() === that._getExponent()
+            && _sign(this._getExponent()) === _sign(that._getExponent())
+            && this.isNegative() === that.isNegative()
+            && this._getCoefficient().equals(that._getCoefficient());
     }
 
-    compare(dec : Decimal) : number {
-        let neg = this.isNegative();
-        if(neg !== dec.isNegative()) return neg ? -1 : 1;
-        //were the same sign
-        //compare order to normalize exponents.
-        let leftDigits = this._coefficient.toString();
-        let leftLength = leftDigits.length;
-        let rightDigits = dec._coefficient.toString();
-        let rightLength = rightDigits.length;
-        let leftOrder = leftLength + this._exponent;
-        let rightOrder = rightLength + dec._exponent;
-        if (leftOrder > rightOrder) {
-            if (neg) {
-                return -1;
-            } else {
-                return 1;
-            }
-        } else if(leftOrder < rightOrder) {
-            if (neg) {
-                1;
-            } else {
-                -1;
-            }
-        } else {
-            //we have two decimals of the same size(including exponents) and sign, need to compare the actual values
-            if(leftDigits < rightDigits) {
-                //shift the smaller left value to the same number of digits as our right.
-                let shift = rightLength - leftLength;
-                let textShift = '';
-                while (shift > 0) {
-                    textShift = textShift + '0';
-                    shift--;
-                }
-                leftDigits = leftDigits + textShift;
-            } else if(leftDigits > rightDigits) {
-                //shift the smaller right value to the same number of digits as our left.
-                let shift = leftLength - rightLength;
-                let textShift = '';
-                while (shift > 0) {
-                    textShift = textShift + '0';
-                    shift--;
-                }
-                rightDigits = rightDigits + textShift;
-            } else {
-                //number of digits is the same
-                //no op?
-            }
-            let left = new LongInt(leftDigits);
-            let right = new LongInt(rightDigits);
-            if (left.lessThan(right)) {
-                //left is smaller
-                if(neg) {
-                    //left is greaterThan when smaller and negative
-                    return 1;
-                } else {
-                    //left is lessThan when larger and negative
-                    return -1;
-                }
-            } else if(left.greaterThan(right)){
-                //right is smaller
-                if(neg) {
-                    return -1;
-                } else {
-                    return 1;
-                }
-            } else {
-                return 0;
-            }
+    /**
+     * Compares this Decimal with another and returns -1, 0, or 1 if this
+     * Decimal is less than, equal to, or greater than the other Decimal.
+     *
+     * Note that a return value of 0 doesn't guarantee that equals() would
+     * return true, as compareTo() doesn't require the values to have the
+     * same precision to be considered equal, whereas equals() does.
+     * Additionally, compareTo() treats 0. and -0. as equal, but equals()
+     * does not.
+     */
+    compareTo(that : Decimal) : number {
+        if (this._coefficient.numberValue() === 0
+                && that._getCoefficient().numberValue() === 0) {
+            return 0;
         }
+
+        let neg = this.isNegative();
+        if (neg !== that.isNegative()) {
+            return neg ? -1 : 1;
+        }
+
+        // decimals have the same sign; compare magnitudes
+        let thisCoefficientStr = this._coefficient.toString();
+        let thisPrecision = thisCoefficientStr.length;
+        let thisMagnitude = thisPrecision + this._exponent;
+
+        let thatCoefficientStr = that._coefficient.toString();
+        let thatPrecision = thatCoefficientStr.length;
+        let thatMagnitude = thatPrecision + that._exponent;
+
+        if (thisMagnitude > thatMagnitude) {
+            return neg ? -1 : 1;
+        } else if (thisMagnitude < thatMagnitude) {
+            return neg ? 1 : -1;
+        }
+
+        // decimals have the same sign and magnitude; append zeros so comparison is
+        // independent of precision
+        if (thisCoefficientStr.length < thatCoefficientStr.length) {
+            thisCoefficientStr += '0'.repeat(thatPrecision - thisPrecision);
+        } else if (thisCoefficientStr.length > thatCoefficientStr.length) {
+            thatCoefficientStr += '0'.repeat(thisPrecision - thatPrecision);
+        }
+
+        let thisLongInt = new LongInt(thisCoefficientStr);
+        let thatLongInt = new LongInt(thatCoefficientStr);
+        if (thisLongInt.greaterThan(thatLongInt)) {
+            return neg ? -1 : 1;
+        } else if(thisLongInt.lessThan(thatLongInt)){
+            return neg ? 1 : -1;
+        }
+
+        return 0;
     }
 
-    DataModelequals(expected : Decimal) : boolean {
-        return this._getExponent() === expected._getExponent()
-            && this.isNegative() === expected.isNegative()
-            && this._getCoefficient().equals(expected._getCoefficient());
-    }
-
+    /**
+     * Given a string containing the Ion text representation of a decimal value,
+     * returns a new Decimal object corresponding to the value.  If a string such as
+     * '5' is provided, a 'd0' suffix is assumed.
+     */
     static parse(str: string) : Decimal {
         let exponent = 0;
         if (str === 'null' || str === 'null.decimal') return null;
         let d = str.match('[d|D]');
         let f = str.match('\\.');
+
         let exponentDelimiterIndex = str.length;
-        if(d) {
+        if (d) {
             exponent = Number(str.substring(d.index + 1, str.length));
             exponentDelimiterIndex = d.index;
         }
-        if(f) {
+        if (f) {
             let exponentShift = d ? (d.index - 1) - f.index : (str.length - 1) - f.index;
             return new Decimal(new LongInt(str.substring(0, f.index) + str.substring(f.index + 1, exponentDelimiterIndex)), exponent - exponentShift);
         } else {
