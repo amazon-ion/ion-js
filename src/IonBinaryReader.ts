@@ -125,7 +125,7 @@ export class BinaryReader implements Reader {
     this._raw_type = BOC;
   }
 
-  valueType() : IonType {
+  type() : IonType {
     return get_ion_type(this._raw_type);
   }
 
@@ -204,7 +204,7 @@ export class BinaryReader implements Reader {
   }
 
   value() : any {
-    let type = this.valueType();
+    let type = this.type();
     if (type && type.container) {
       if (this.isNull()) {
         return null;
