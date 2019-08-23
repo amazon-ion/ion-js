@@ -256,6 +256,7 @@ class IonIntEvent extends AbstractIonEvent {
 
     }
     valueEquals(expected : IonIntEvent) : boolean {
+        console.log(expected);
         return expected instanceof IonIntEvent && this.ionValue === expected.ionValue;
     }
     writeIonValue(writer : Writer) : void {
@@ -390,7 +391,7 @@ abstract class AbsIonContainerEvent extends AbstractIonEvent{
 }
 
 class IonStructEvent extends AbsIonContainerEvent {//no embed support as of yet.
-     constructor(eventType : IonEventType, ionType : IonType, fieldName : string, annotations : string[], depth : number) {
+    constructor(eventType : IonEventType, ionType : IonType, fieldName : string, annotations : string[], depth : number) {
         super(eventType , ionType, fieldName, annotations, depth);
 
     }
@@ -435,7 +436,7 @@ class IonListEvent extends AbsIonContainerEvent {
             if(!this.ionValue[i].equals(expected.ionValue[i])){
                 return false;
             } else if(this.ionValue[i].eventType === IonEventType.CONTAINER_START) {
-                i += this.ionValue[i].length;
+                i += this.ionValue[i].ionValue.length;
             }
         }
         return true;
@@ -453,7 +454,7 @@ class IonSexpEvent extends AbsIonContainerEvent {
             if(!this.ionValue[i].equals(expected.ionValue[i])){
                 return false;
             } else if(this.ionValue[i].eventType === IonEventType.CONTAINER_START) {
-                i += this.ionValue[i].length;
+                i += this.ionValue[i].ionValue.length;
             }
         }
         return true;
