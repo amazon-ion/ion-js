@@ -24,11 +24,12 @@ import {
     ClobEscapes,
     is_keyword
 } from "./IonText";
+import {Reader} from "./IonReader";
 import {Timestamp} from "./IonTimestamp";
 import {TypeCodes} from "./IonBinary";
 import {Writeable} from "./IonWriteable";
 import {Writer} from "./IonWriter";
-import {_sign} from "./util";
+import {_sign, _writeValues} from "./util";
 
 type Serializer<T> = (value: T) => void;
 
@@ -405,5 +406,9 @@ export class TextWriter implements Writer {
         } else {
             this.writeUtf8(s);
         }
+    }
+
+    writeValues(reader: Reader, writer: Writer): void {
+        _writeValues(reader, this);
     }
 }

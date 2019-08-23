@@ -11,18 +11,19 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-import { Decimal } from "./IonDecimal";
-import { encodeUtf8 } from "./IonUnicode";
-import { Import } from "./IonImport";
-import { LocalSymbolTable } from "./IonLocalSymbolTable";
-import { LongInt } from "./IonLongInt";
-import { LowLevelBinaryWriter } from "./IonLowLevelBinaryWriter";
-import { Precision } from "./IonPrecision";
-import { Timestamp } from "./IonTimestamp";
-import { TypeCodes } from "./IonBinary";
-import { Writeable } from "./IonWriteable";
-import { Writer } from "./IonWriter";
-import { _sign } from "./util";
+import {Decimal} from "./IonDecimal";
+import {encodeUtf8} from "./IonUnicode";
+import {Import} from "./IonImport";
+import {LocalSymbolTable} from "./IonLocalSymbolTable";
+import {LongInt} from "./IonLongInt";
+import {LowLevelBinaryWriter} from "./IonLowLevelBinaryWriter";
+import {Precision} from "./IonPrecision";
+import {Reader} from "./IonReader";
+import {Timestamp} from "./IonTimestamp";
+import {TypeCodes} from "./IonBinary";
+import {Writeable} from "./IonWriteable";
+import {Writer} from "./IonWriter";
+import {_sign, _writeValues} from "./util";
 
 const MAJOR_VERSION: number = 1;
 const MINOR_VERSION: number = 0;
@@ -439,6 +440,10 @@ export class BinaryWriter implements Writer {
     this.writeFieldName('max_id');
     this.writeInt(import_.length);
     this.endContainer();
+  }
+
+  writeValues(reader: Reader, writer: Writer): void {
+    _writeValues(reader, this);
   }
 }
 

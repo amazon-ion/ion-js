@@ -78,7 +78,7 @@ define([
         function readerCompareTest(source) {
             function toBytes(source, writer) {
                 let reader = ion.makeReader(source);
-                writeTo(reader, writer);
+                writer.writeValues(reader);
                 writer.close();
                 return writer.getBytes();
             }
@@ -154,42 +154,6 @@ define([
             assert(r1.type() !== undefined, 'type() is undefined');
             assert.equal(r1.type(), type, "type() doesn't match expected type");
             assert.equal(r1.type(), r2.type(), "types don't match");
-        }
-
-        // TBD:  move this (or equivalent code) to a public API (pending addition of IonReader.type())
-        function writeTo(reader, writer, depth = 0) {
-            for (let type; type = reader.next(); ) {
-                if (depth > 0) {
-                    if (reader.fieldName() != undefined) {
-                        writer.writeFieldName(reader.fieldName());
-                    }
-                }
-                if (reader.isNull()) {
-                    writer.writeNull(type.bid, reader.annotations());
-                } else {
-                    switch (type) {
-                        case ion.IonTypes.BOOL:      writer.writeBoolean(reader.booleanValue(), reader.annotations()); break;
-                        case ion.IonTypes.INT:       writer.writeInt(reader.numberValue(), reader.annotations()); break;
-                        case ion.IonTypes.FLOAT:     writer.writeFloat64(reader.numberValue(), reader.annotations()); break;
-                        case ion.IonTypes.DECIMAL:   writer.writeDecimal(reader.decimalValue(), reader.annotations()); break;
-                        case ion.IonTypes.TIMESTAMP: writer.writeTimestamp(reader.timestampValue(), reader.annotations()); break;
-                        case ion.IonTypes.SYMBOL:    writer.writeSymbol(reader.stringValue(), reader.annotations()); break;
-                        case ion.IonTypes.STRING:    writer.writeString(reader.stringValue(), reader.annotations()); break;
-                        case ion.IonTypes.CLOB:      writer.writeClob(reader.byteValue(), reader.annotations()); break;
-                        case ion.IonTypes.BLOB:      writer.writeBlob(reader.byteValue(), reader.annotations()); break;
-                        case ion.IonTypes.LIST:      writer.writeList(reader.annotations()); break;
-                        case ion.IonTypes.SEXP:      writer.writeSexp(reader.annotations()); break;
-                        case ion.IonTypes.STRUCT:    writer.writeStruct(reader.annotations()); break;
-                        default: throw new Error('Unrecognized type' + type);
-                    }
-                    if (type.container) {
-                        reader.stepIn();
-                        writeTo(reader, writer, depth + 1);
-                        writer.endContainer();
-                        reader.stepOut();
-                    }
-                }
-            }
         }
 
         function getInput(path){
