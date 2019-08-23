@@ -147,7 +147,7 @@ define([
             assert(r1.isNull() !== null, 'isNull() is null');
             assert.equal(r1.isNull(), r2.isNull(), "isNull values don't match");
 
-            assert(r1.annotations() !== undefined, 'annotations() is udnefined');
+            assert(r1.annotations() !== undefined, 'annotations() is undefined');
             assert(r1.annotations() !== null, 'annotations() is null');
             assert.deepEqual(r1.annotations(), r2.annotations(), "annotations don't match");
 
