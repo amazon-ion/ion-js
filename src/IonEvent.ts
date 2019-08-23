@@ -256,7 +256,6 @@ class IonIntEvent extends AbstractIonEvent {
 
     }
     valueEquals(expected : IonIntEvent) : boolean {
-        console.log(expected);
         return expected instanceof IonIntEvent && this.ionValue === expected.ionValue;
     }
     writeIonValue(writer : Writer) : void {
