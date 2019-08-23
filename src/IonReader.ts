@@ -32,6 +32,7 @@ export interface Reader {
   stepOut: () => void;
   stringValue: () => string;
   timestampValue: () => Timestamp;
+  type: () => IonType;
   value: () => any;
   annotations: () => string[];//TODO implement symboltokens to replace string[] https://github.com/amzn/ion-js/issues/121
 }

@@ -63,7 +63,7 @@ export class TextReader implements Reader {
     this._depth    = 0;
     this._cat      = catalog ? catalog : new Catalog();
     this._symtab   = defaultLocalSymbolTable();
-    this._type     = undefined;
+    this._type     = null;
     this._raw_type = undefined;
     this._raw      = undefined;
   }
@@ -175,6 +175,7 @@ export class TextReader implements Reader {
       throw new Error("Can't step into a null container");
     }
     this._parser.clearFieldName();
+    this._type = null;
     this._raw_type = BEGINNING_OF_CONTAINER;
     this._depth++;
   }
@@ -188,7 +189,7 @@ export class TextReader implements Reader {
     this._depth--;
   }
 
-  valueType() : IonType {
+  type() : IonType {
     return this._type;
   }
 

@@ -150,6 +150,10 @@ define([
             assert(r1.annotations() !== undefined, 'annotations() is udnefined');
             assert(r1.annotations() !== null, 'annotations() is null');
             assert.deepEqual(r1.annotations(), r2.annotations(), "annotations don't match");
+
+            assert(r1.type() !== undefined, 'type() is undefined');
+            assert.equal(r1.type(), type, "type() doesn't match expected type");
+            assert.equal(r1.type(), r2.type(), "types don't match");
         }
 
         // TBD:  move this (or equivalent code) to a public API (pending addition of IonReader.type())
