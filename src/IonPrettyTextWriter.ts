@@ -12,10 +12,13 @@
  * language governing permissions and limitations under the License.
  */
 
-import { State, TextWriter } from "./IonTextWriter";
-import { Writeable } from "./IonWriteable";
-import { TypeCodes } from "./IonBinary";
-import { CharCodes } from "./IonText";
+import {State, TextWriter} from "./IonTextWriter";
+import {Writeable} from "./IonWriteable";
+import {TypeCodes} from "./IonBinary";
+import {CharCodes} from "./IonText";
+import {Reader} from "./IonReader";
+import {_writeValues} from "./util";
+import {Writer} from "./IonWriter";
 type Serializer<T> = (value: T) => void;
 /*
  * This class and functionality carry no guarantees of correctness or support.
@@ -200,5 +203,9 @@ export class PrettyTextWriter extends TextWriter {
                 }
             }
         }
+    }
+
+    writeValues(reader: Reader, writer: Writer): void {
+        _writeValues(reader, this);
     }
 }

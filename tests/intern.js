@@ -35,5 +35,6 @@ define({
     'tests/unit/IonBinaryWriterTest',
     'tests/unit/IonBinaryTimestampTest',
     'tests/unit/IonTextReaderTest',
+    'tests/unit/utilTest',
   ],
 });
