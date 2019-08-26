@@ -294,7 +294,6 @@ let eventSkipList = toSkipList([
     'ion-tests/iontestdata/good/equivs/timestampSuperfluousOffset.10n',
     'ion-tests/iontestdata/good/equivs/timestamps.ion',
     'ion-tests/iontestdata/good/equivs/timestampsLargeFractionalPrecision.ion',
-    'ion-tests/iontestdata/good/equivs/zeroDecimals.ion',
     'ion-tests/iontestdata/good/floatSpecials.ion',
     'ion-tests/iontestdata/good/floatsWithUnderscores.ion',
     'ion-tests/iontestdata/good/innerVersionIdentifiers.ion',
@@ -312,14 +311,10 @@ let eventSkipList = toSkipList([
     'ion-tests/iontestdata/good/intsWithUnderscores.ion',
     'ion-tests/iontestdata/good/item1.10n',
     'ion-tests/iontestdata/good/lists.ion',
-    'ion-tests/iontestdata/good/non-equivs/decimals.ion',
     'ion-tests/iontestdata/good/non-equivs/floats.ion',
-    'ion-tests/iontestdata/good/non-equivs/floatsVsDecimals.ion',
     'ion-tests/iontestdata/good/non-equivs/ints.ion',
-    'ion-tests/iontestdata/good/non-equivs/nonNulls.ion',
     'ion-tests/iontestdata/good/non-equivs/nulls.ion',
     'ion-tests/iontestdata/good/non-equivs/timestamps.ion',
-    'ion-tests/iontestdata/good/nonNulls.ion',
     'ion-tests/iontestdata/good/nopPadInsideEmptyStructZeroSymbolId.10n',
     'ion-tests/iontestdata/good/nopPadInsideStructWithNopPadThenValueZeroSymbolId.10n',
     'ion-tests/iontestdata/good/nopPadInsideStructWithValueThenNopPad.10n',
@@ -334,11 +329,9 @@ let eventSkipList = toSkipList([
     'ion-tests/iontestdata/good/symbolExplicitZero.10n',
     'ion-tests/iontestdata/good/symbolImplicitZero.10n',
     'ion-tests/iontestdata/good/symbolZero.ion',
-    'ion-tests/iontestdata/good/testfile13.ion',
     'ion-tests/iontestdata/good/testfile22.ion',
     'ion-tests/iontestdata/good/testfile23.ion',
     'ion-tests/iontestdata/good/testfile25.ion',
-    'ion-tests/iontestdata/good/testfile31.ion',
     'ion-tests/iontestdata/good/testfile33.ion',
     'ion-tests/iontestdata/good/testfile35.ion',
     'ion-tests/iontestdata/good/timestamp/equivTimeline/leapDayRollover.ion',
@@ -354,13 +347,6 @@ let eventSkipList = toSkipList([
 ]);
 
 let readerCompareSkipList = toSkipList([
-    'ion-tests/iontestdata/good/subfieldInt.ion',
-    'ion-tests/iontestdata/good/subfieldUInt.ion',
-    'ion-tests/iontestdata/good/subfieldVarInt.ion',
-    'ion-tests/iontestdata/good/subfieldVarUInt.ion',
-    'ion-tests/iontestdata/good/subfieldVarUInt15bit.ion',
-    'ion-tests/iontestdata/good/subfieldVarUInt16bit.ion',
-    'ion-tests/iontestdata/good/subfieldVarUInt32bit.ion',
 ]);
 
 ////// end of generated skiplists
