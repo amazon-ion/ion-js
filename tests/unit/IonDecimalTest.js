@@ -75,6 +75,8 @@ define([
             'compareTo(0d-0, 0d-0)'         : () => testCompareTo('0d-0', '0d-0', 0),
             'compareTo(-0d-0, -0d-0)'       : () => testCompareTo('-0d-0', '-0d-0', 0),
 
+            //'compareTo(79d-3, 0d0)'       : () => testCompareTo('79d-3', '0d0', 1),
+            //'compareTo(-0d0, -79d-3)'       : () => testCompareTo('-0d0', '-79d-3', 1),
             'compareTo(2.1, 2.1)'           : () => testCompareTo('2.1', '2.1', 0),
             'compareTo(2.1, 2.10)'          : () => testCompareTo('2.1', '2.10', 0),
             'compareTo(2.1, 2.11)'          : () => testCompareTo('2.1', '2.11', -1),

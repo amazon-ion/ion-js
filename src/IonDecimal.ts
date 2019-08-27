@@ -23,7 +23,7 @@ export class Decimal {
     private _coefficient: LongInt;
     private _exponent: number;
 
-    public static readonly _ZERO : Decimal = new Decimal(new LongInt(0), 0);
+    public static readonly ZERO : Decimal = new Decimal(new LongInt(0), 0);
     public static ONE = new Decimal(1, 0);
 
     constructor(coefficient: LongInt | number, exponent: number) {
@@ -157,7 +157,7 @@ export class Decimal {
         let thatLongInt = new LongInt(thatCoefficientStr);
         if (thisLongInt.greaterThan(thatLongInt)) {
             return neg ? -1 : 1;
-        } else if (thisLongInt.lessThan(thatLongInt)) {
+        } else if(thisLongInt.lessThan(thatLongInt)){
             return neg ? 1 : -1;
         }
 
