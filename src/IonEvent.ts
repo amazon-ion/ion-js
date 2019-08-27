@@ -296,7 +296,7 @@ class IonDecimalEvent extends AbstractIonEvent {
 
     }
     valueEquals(expected : IonDecimalEvent) : boolean {
-        return expected instanceof IonDecimalEvent && this.ionValue.DataModelequals(expected.ionValue);
+        return expected instanceof IonDecimalEvent && this.ionValue.equals(expected.ionValue);
     }
     writeIonValue(writer : Writer) : void {
         writer.writeDecimal(this.ionValue);

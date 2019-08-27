@@ -151,12 +151,6 @@ export class LongInt {
         return this.int.toString(10);
     }
 
-    digits() : string {  // used by decimal needs to lose the sign
-        let str = this.int.toString(10);
-        if(str.charAt(0) === '-') return str.substring(1);
-        return str;
-    }
-
     signum() : number {
         if(this.int.isZero()) {
             if(1 / this.int.valueOf() > 0) {

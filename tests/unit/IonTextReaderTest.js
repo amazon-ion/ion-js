@@ -72,7 +72,7 @@ define(
             var ionReader = ion.makeReader(ionToRead);
             ionReader.next();
 
-            assert.equal(ion.IonTypes.STRUCT, ionReader.valueType());
+            assert.equal(ion.IonTypes.STRUCT, ionReader.type());
 
             ionReader.stepIn(); // Step into the base struct.
             ionReader.next();
@@ -86,7 +86,7 @@ define(
             var ionReader = ion.makeReader(ionToRead);
             ionReader.next();
 
-            assert.equal(ion.IonTypes.STRUCT, ionReader.valueType());
+            assert.equal(ion.IonTypes.STRUCT, ionReader.type());
 
             ionReader.stepIn(); // Step into the base struct.
             ionReader.next();
@@ -109,7 +109,7 @@ define(
             var ionReader = ion.makeReader(ionToRead);
             ionReader.next();
 
-            assert.equal(ion.IonTypes.STRUCT, ionReader.valueType());
+            assert.equal(ion.IonTypes.STRUCT, ionReader.type());
 
             ionReader.stepIn(); // Step into the base struct.
             ionReader.next();

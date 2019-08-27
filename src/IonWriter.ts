@@ -11,9 +11,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-import { Decimal } from "./IonDecimal";
-import { Timestamp } from "./IonTimestamp";
-import { TypeCodes } from "./IonBinary";
+import {Decimal} from "./IonDecimal";
+import {Reader} from "./IonReader";
+import {Timestamp} from "./IonTimestamp";
+import {TypeCodes} from "./IonBinary";
 
 /**
  * Writes values in the Ion text or binary formats.
@@ -38,4 +39,11 @@ export interface Writer {
 
   close() : void;
   endContainer() : void;
+
+  /**
+   * Writes a reader's current value and all following values until the end
+   * of the current container.  If there's no current value then this method
+   * calls {@link next()} to get started.
+   */
+  writeValues(reader: Reader, writer: Writer) : void;
 }

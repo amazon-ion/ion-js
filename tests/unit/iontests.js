@@ -18,22 +18,28 @@ define([
         'intern/dojo/node!fs',
         'intern/dojo/node!path',
         'dist/amd/es6/IonTests',
+        'dist/amd/es6/util',
     ],
-    function(intern, registerSuite, assert, fs, paths, ion) {
+    function(intern, registerSuite, assert, fs, paths, ion, util) {
+        // TBD split each suite into a different test source file;
+        //     perhaps good/bad and equivs/non-equivs pairs belong together
+
         let goodSuite = { name: 'Good tests' };
         let badSuite = { name: 'Bad tests' };
+        let equivsSuite = { name: 'Equivs tests' };
+        let nonEquivsSuite = { name: 'Non-equivs tests' };
         let eventStreamSuite = { name: 'EventStream tests' };
         let readerCompareSuite = { name: 'ReaderCompare tests' };
 
         let goodTestsPath = paths.join('ion-tests', 'iontestdata', 'good');
         findFiles(goodTestsPath).forEach(path => {
             if (!goodSkipList[path]) {
-                goodSuite[path] = () => { exhaust(ion.makeReader(getInput(path))) };
+                goodSuite[path] = () => exhaust(ion.makeReader(getInput(path)));
             }
             if (!eventSkipList[path]) {
-                eventStreamSuite[path] = () => { roundTripEventStreams(ion.makeReader(getInput(path))) };
+                eventStreamSuite[path] = () => roundTripEventStreams(ion.makeReader(getInput(path)));
                 if (!readerCompareSkipList[path]) {
-                    readerCompareSuite[path] = () => { readerCompareTest(getInput(path)) };
+                    readerCompareSuite[path] = () => readerCompareTest(getInput(path));
                 }
             }
         });
@@ -41,12 +47,28 @@ define([
         let badTestsPath = paths.join('ion-tests', 'iontestdata', 'bad');
         findFiles(badTestsPath).forEach(path => {
             if (!badSkipList[path]) {
-                badSuite[path] = () => { assert.throws(() => { exhaust(ion.makeReader(getInput(path))) }) };
+                badSuite[path] = () => assert.throws(() => exhaust(ion.makeReader(getInput(path))));
+            }
+        });
+
+        let equivsTestsPath = paths.join('ion-tests', 'iontestdata', 'good', 'equivs');
+        findFiles(equivsTestsPath).forEach(path => {
+            if (!equivsSkipList[path]) {
+                equivsSuite[path] = () => equivsTest(path);
+            }
+        });
+
+        let nonEquivsTestsPath = paths.join('ion-tests', 'iontestdata', 'good', 'non-equivs');
+        findFiles(nonEquivsTestsPath).forEach(path => {
+            if (!nonEquivsSkipList[path]) {
+                nonEquivsSuite[path] = () => nonEquivsTest(path);
             }
         });
 
         registerSuite(goodSuite);
         registerSuite(badSuite);
+        registerSuite(equivsSuite);
+        registerSuite(nonEquivsSuite);
         registerSuite(eventStreamSuite);
         registerSuite(readerCompareSuite);
 
@@ -75,10 +97,78 @@ define([
             }
         }
 
+        function loadValues(path, newWriter) {
+            let reader = ion.makeReader(getInput(path));
+            let values = [];
+            let containerIdx = 0;
+
+            for (let topLevelType; topLevelType = reader.next(); ) {
+                if (!topLevelType.container) {
+                    throw Error('Expected top-level value to be a container, was ' + topLevelType);
+                }
+
+                reader.stepIn();
+                values.push([]);
+
+                for (let type; type = reader.next(); ) {
+                    let writer = newWriter();
+                    util._writeValue(reader, writer);
+                    writer.close();
+                    values[containerIdx].push(writer.getBytes());
+                }
+
+                containerIdx += 1;
+                reader.stepOut();
+            }
+            return values;
+        }
+
+        function equivsTest(path, expectedEquivalence = true) {
+            let binaryValues = loadValues(path, () => ion.makeBinaryWriter());
+            let textValues = loadValues(path, () => ion.makeTextWriter());
+
+            function bytesToString(c, idx, bytes) {
+                let sb = '[' + c + '][' + idx + ']';
+                if (bytes.length >= 4 && bytes[0] === 224 && bytes[1] === 1 && bytes[2] === 0 && bytes[3] === 234) {
+                    // Ion binary, convert to hex string
+                    bytes.forEach(b => {
+                        sb += ' ' + ('0' + (b & 0xFF).toString(16)).slice(-2);
+                    });
+                    return sb;
+                }
+                // otherwise, text:
+                return sb + ' ' + String.fromCharCode.apply(null, bytes);
+            }
+
+            function compare(c, i, j, valueI, valueJ) {
+                let eventStreamI = new ion.IonEventStream(ion.makeReader(valueI));
+                let eventStreamJ = new ion.IonEventStream(ion.makeReader(valueJ));
+                let result = eventStreamI.equals(eventStreamJ);
+                assert(expectedEquivalence ? result : !result,
+                    'Expected ' + bytesToString(c, i, valueI)
+                    + ' to' + (expectedEquivalence ? '' : ' not')
+                    + ' be equivalent to ' + bytesToString(c, j, valueJ));
+            }
+
+            for (let c = 0; c < binaryValues.length; c++) {
+                for (let i = 0; i < binaryValues[c].length; i++) {
+                    for (let j = i + 1; j < binaryValues[c].length; j++) {
+                        compare(c, i, j, binaryValues[c][i], binaryValues[c][j]);
+                        compare(c, i, j, binaryValues[c][i], textValues[c][j]);
+                        compare(c, i, j, textValues[c][i], textValues[c][j]);
+                    }
+                }
+            }
+        }
+
+        function nonEquivsTest(reader) {
+            equivsTest(reader, false);
+        }
+
         function readerCompareTest(source) {
             function toBytes(source, writer) {
                 let reader = ion.makeReader(source);
-                writeTo(reader, writer);
+                writer.writeValues(reader);
                 writer.close();
                 return writer.getBytes();
             }
@@ -147,45 +237,13 @@ define([
             assert(r1.isNull() !== null, 'isNull() is null');
             assert.equal(r1.isNull(), r2.isNull(), "isNull values don't match");
 
-            assert(r1.annotations() !== undefined, 'annotations() is udnefined');
+            assert(r1.annotations() !== undefined, 'annotations() is undefined');
             assert(r1.annotations() !== null, 'annotations() is null');
             assert.deepEqual(r1.annotations(), r2.annotations(), "annotations don't match");
-        }
 
-        // TBD:  move this (or equivalent code) to a public API (pending addition of IonReader.type())
-        function writeTo(reader, writer, depth = 0) {
-            for (let type; type = reader.next(); ) {
-                if (depth > 0) {
-                    if (reader.fieldName() != undefined) {
-                        writer.writeFieldName(reader.fieldName());
-                    }
-                }
-                if (reader.isNull()) {
-                    writer.writeNull(type.bid, reader.annotations());
-                } else {
-                    switch (type) {
-                        case ion.IonTypes.BOOL:      writer.writeBoolean(reader.booleanValue(), reader.annotations()); break;
-                        case ion.IonTypes.INT:       writer.writeInt(reader.numberValue(), reader.annotations()); break;
-                        case ion.IonTypes.FLOAT:     writer.writeFloat64(reader.numberValue(), reader.annotations()); break;
-                        case ion.IonTypes.DECIMAL:   writer.writeDecimal(reader.decimalValue(), reader.annotations()); break;
-                        case ion.IonTypes.TIMESTAMP: writer.writeTimestamp(reader.timestampValue(), reader.annotations()); break;
-                        case ion.IonTypes.SYMBOL:    writer.writeSymbol(reader.stringValue(), reader.annotations()); break;
-                        case ion.IonTypes.STRING:    writer.writeString(reader.stringValue(), reader.annotations()); break;
-                        case ion.IonTypes.CLOB:      writer.writeClob(reader.byteValue(), reader.annotations()); break;
-                        case ion.IonTypes.BLOB:      writer.writeBlob(reader.byteValue(), reader.annotations()); break;
-                        case ion.IonTypes.LIST:      writer.writeList(reader.annotations()); break;
-                        case ion.IonTypes.SEXP:      writer.writeSexp(reader.annotations()); break;
-                        case ion.IonTypes.STRUCT:    writer.writeStruct(reader.annotations()); break;
-                        default: throw new Error('Unrecognized type' + type);
-                    }
-                    if (type.container) {
-                        reader.stepIn();
-                        writeTo(reader, writer, depth + 1);
-                        writer.endContainer();
-                        reader.stepOut();
-                    }
-                }
-            }
+            assert(r1.type() !== undefined, 'type() is undefined');
+            assert.equal(r1.type(), type, "type() doesn't match expected type");
+            assert.equal(r1.type(), r2.type(), "types don't match");
         }
 
         function getInput(path){
@@ -343,11 +401,8 @@ let eventSkipList = toSkipList([
     'ion-tests/iontestdata/good/intsWithUnderscores.ion',
     'ion-tests/iontestdata/good/item1.10n',
     'ion-tests/iontestdata/good/lists.ion',
-    'ion-tests/iontestdata/good/non-equivs/decimals.ion',
     'ion-tests/iontestdata/good/non-equivs/floats.ion',
-    'ion-tests/iontestdata/good/non-equivs/floatsVsDecimals.ion',
     'ion-tests/iontestdata/good/non-equivs/ints.ion',
-    'ion-tests/iontestdata/good/non-equivs/nonNulls.ion',
     'ion-tests/iontestdata/good/non-equivs/nulls.ion',
     'ion-tests/iontestdata/good/non-equivs/timestamps.ion',
     'ion-tests/iontestdata/good/nopPadInsideEmptyStructZeroSymbolId.10n',
@@ -364,11 +419,9 @@ let eventSkipList = toSkipList([
     'ion-tests/iontestdata/good/symbolExplicitZero.10n',
     'ion-tests/iontestdata/good/symbolImplicitZero.10n',
     'ion-tests/iontestdata/good/symbolZero.ion',
-    'ion-tests/iontestdata/good/testfile13.ion',
     'ion-tests/iontestdata/good/testfile22.ion',
     'ion-tests/iontestdata/good/testfile23.ion',
     'ion-tests/iontestdata/good/testfile25.ion',
-    'ion-tests/iontestdata/good/testfile31.ion',
     'ion-tests/iontestdata/good/testfile33.ion',
     'ion-tests/iontestdata/good/testfile35.ion',
     'ion-tests/iontestdata/good/timestamp/equivTimeline/leapDayRollover.ion',
@@ -383,12 +436,47 @@ let eventSkipList = toSkipList([
 
 let readerCompareSkipList = toSkipList([
     'ion-tests/iontestdata/good/subfieldInt.ion',
-    'ion-tests/iontestdata/good/subfieldUInt.ion',
-    'ion-tests/iontestdata/good/subfieldVarInt.ion',
     'ion-tests/iontestdata/good/subfieldVarUInt.ion',
     'ion-tests/iontestdata/good/subfieldVarUInt15bit.ion',
     'ion-tests/iontestdata/good/subfieldVarUInt16bit.ion',
-    'ion-tests/iontestdata/good/subfieldVarUInt32bit.ion',
+]);
+
+let equivsSkipList = toSkipList([
+    'ion-tests/iontestdata/good/equivs/annotatedIvms.ion',
+    'ion-tests/iontestdata/good/equivs/bigInts.ion',
+    'ion-tests/iontestdata/good/equivs/binaryInts.ion',
+    'ion-tests/iontestdata/good/equivs/blobs.ion',
+    'ion-tests/iontestdata/good/equivs/decimalsWithUnderscores.ion',
+    'ion-tests/iontestdata/good/equivs/emptyStrings.ion',
+    'ion-tests/iontestdata/good/equivs/floatsWithUnderscores.ion',
+    'ion-tests/iontestdata/good/equivs/ints.ion',
+    'ion-tests/iontestdata/good/equivs/intsWithUnderscores.ion',
+    'ion-tests/iontestdata/good/equivs/localSymbolTableAppend.ion',
+    'ion-tests/iontestdata/good/equivs/localSymbolTableNullSlots.ion',
+    'ion-tests/iontestdata/good/equivs/localSymbolTables.ion',
+    'ion-tests/iontestdata/good/equivs/nonIVMNoOps.ion',
+    'ion-tests/iontestdata/good/equivs/nopPadEmptyStruct.10n',
+    'ion-tests/iontestdata/good/equivs/nopPadNonEmptyStruct.10n',
+    'ion-tests/iontestdata/good/equivs/strings.ion',
+    'ion-tests/iontestdata/good/equivs/structsFieldsDiffOrder.ion',
+    'ion-tests/iontestdata/good/equivs/symbols.ion',
+    'ion-tests/iontestdata/good/equivs/systemSymbols.ion',
+    'ion-tests/iontestdata/good/equivs/systemSymbolsAsAnnotations.ion',
+    'ion-tests/iontestdata/good/equivs/textNewlines.ion',
+    'ion-tests/iontestdata/good/equivs/timestampFractions.10n',
+    'ion-tests/iontestdata/good/equivs/timestampFractions.ion',
+    'ion-tests/iontestdata/good/equivs/timestampSuperfluousOffset.10n',
+    'ion-tests/iontestdata/good/equivs/timestamps.ion',
+    'ion-tests/iontestdata/good/equivs/timestampsLargeFractionalPrecision.ion',
+    'ion-tests/iontestdata/good/equivs/utf8/stringU0001D11E.ion',
+    'ion-tests/iontestdata/good/equivs/utf8/stringUtf8.ion',
+]);
+
+let nonEquivsSkipList = toSkipList([
+    'ion-tests/iontestdata/good/non-equivs/clobs.ion',
+    'ion-tests/iontestdata/good/non-equivs/floats.ion',
+    'ion-tests/iontestdata/good/non-equivs/floatsVsDecimals.ion',
+    'ion-tests/iontestdata/good/non-equivs/timestamps.ion',
 ]);
 
 ////// end of generated skiplists

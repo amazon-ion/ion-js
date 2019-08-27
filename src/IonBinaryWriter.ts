@@ -11,18 +11,19 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-import { Decimal } from "./IonDecimal";
-import { encodeUtf8 } from "./IonUnicode";
-import { Import } from "./IonImport";
-import { LocalSymbolTable } from "./IonLocalSymbolTable";
-import { LongInt } from "./IonLongInt";
-import { LowLevelBinaryWriter } from "./IonLowLevelBinaryWriter";
-import { Precision } from "./IonPrecision";
-import { Timestamp } from "./IonTimestamp";
-import { TypeCodes } from "./IonBinary";
-import { Writeable } from "./IonWriteable";
-import { Writer } from "./IonWriter";
-import { _sign } from "./util";
+import {Decimal} from "./IonDecimal";
+import {encodeUtf8} from "./IonUnicode";
+import {Import} from "./IonImport";
+import {LocalSymbolTable} from "./IonLocalSymbolTable";
+import {LongInt} from "./IonLongInt";
+import {LowLevelBinaryWriter} from "./IonLowLevelBinaryWriter";
+import {Precision} from "./IonPrecision";
+import {Reader} from "./IonReader";
+import {Timestamp} from "./IonTimestamp";
+import {TypeCodes} from "./IonBinary";
+import {Writeable} from "./IonWriteable";
+import {Writer} from "./IonWriter";
+import {_sign, _writeValues} from "./util";
 
 const MAJOR_VERSION: number = 1;
 const MINOR_VERSION: number = 0;
@@ -109,15 +110,15 @@ export class BinaryWriter implements Writer {
 
     if (typeof value == 'string') value = Decimal.parse(value);
 
-    let isPositiveZero: boolean = value.isZero() && !value.isNegative();
-    let exponent: number = value.getExponent();
+    let isPositiveZero: boolean = value.numberValue() === 0 && !value.isNegative();
+    let exponent: number = value._getExponent();
     if (isPositiveZero && exponent === 0 && _sign(exponent) === 1) {
       // Special case per the spec: http://amzn.github.io/ion-docs/docs/binary.html#5-decimal
       this.addNode(new BytesNode(this.writer, this.getCurrentContainer(), TypeCodes.DECIMAL, this.encodeAnnotations(annotations), new Uint8Array(0)));
       return;
     }
 
-    let coefficient: LongInt = value.getDigits();
+    let coefficient: LongInt = value._getCoefficient();
     let writeCoefficient = !(coefficient.isZero() && coefficient.signum() === 1);  // no need to write a coefficient of 0
     let coefficientBytes: Uint8Array | null = writeCoefficient ? coefficient.intBytes() : null;
 
@@ -275,8 +276,8 @@ export class BinaryWriter implements Writer {
         writer.writeVariableLengthUnsignedInt(value.seconds);
     }
     if (value.getPrecision() === Precision.FRACTION) {
-        writer.writeVariableLengthSignedInt(value.fraction.getExponent());
-        writer.writeBytes(value.fraction.getDigits().intBytes());
+        writer.writeVariableLengthSignedInt(value.fraction._getCoefficient());
+        writer.writeBytes(value.fraction._getExponent().intBytes());
     }
     this.addNode(new BytesNode(this.writer, this.getCurrentContainer(), TypeCodes.TIMESTAMP, this.encodeAnnotations(annotations), writer.getBytes()));
   }
@@ -425,6 +426,10 @@ export class BinaryWriter implements Writer {
     this.writeFieldName('max_id');
     this.writeInt(import_.length);
     this.endContainer();
+  }
+
+  writeValues(reader: Reader, writer: Writer): void {
+    _writeValues(reader, this);
   }
 }
 

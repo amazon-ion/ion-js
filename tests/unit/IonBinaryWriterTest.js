@@ -187,13 +187,13 @@ define([
     writerTest('Writes null decimal by direct call',
       (writer) => { writer.writeNull(ion.TypeCodes.DECIMAL) },
         [0x5f]);
-    skippedWriterTest('Writes implicitly positive zero decimal as single byte',
+    writerTest('Writes implicitly positive zero decimal as single byte',
       (writer) => { writer.writeDecimal(ion.Decimal.parse("0")) },
         [0x50]);
-    skippedWriterTest('Writes explicitly positive zero decimal as single byte',
+    writerTest('Writes explicitly positive zero decimal as single byte',
       (writer) => { writer.writeDecimal(ion.Decimal.parse("+0")) },
         [0x50]);
-    skippedWriterTest('Writes negative zero decimal',
+    writerTest('Writes negative zero decimal',
       (writer) => { writer.writeDecimal(ion.Decimal.parse("-0")) },
         [0x52, 0x80, 0x80]);
     writerTest('Writes null decimal with annotation',
@@ -202,15 +202,15 @@ define([
         0xe7, 0x81, 0x83, 0xd4, 0x87, 0xb2, 0x81, 'a'.charCodeAt(0),
         0xe3, 0x81, 0x8a, 0x5f
       ]);
-    skippedWriterTest('Writes decimal -1',
+    writerTest('Writes decimal -1',
       (writer) => { writer.writeDecimal(ion.Decimal.parse("-1")) },
         [0x52, 0x80, 0x81]);
-    skippedWriterTest('Writes decimal 123.456',
+    writerTest('Writes decimal 123.456',
       (writer) => { writer.writeDecimal(ion.Decimal.parse("123.456")) },
         [0x54, 0xc3, 0x01, 0xe2, 0x40]);
-    skippedWriterTest('Writes decimal 123456000',
+    writerTest('Writes decimal 123456000',
       (writer) => { writer.writeDecimal(ion.Decimal.parse("123456000")) },
-        [0x54, 0x83, 0x01, 0xe2, 0x40]);
+        [0x55, 0x80, 0x07, 0x5b, 0xca, 0x00]);
 
     // Floats
 
