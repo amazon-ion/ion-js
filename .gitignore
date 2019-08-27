@@ -3,6 +3,10 @@ dist/
 node_modules/
 src/.baseDir.ts
 lcov.info
+package-lock.json
+browser/scripts
+docs/
+coverage-final.json
 
 ### Emacs ###
 # -*- mode: gitignore; -*-
