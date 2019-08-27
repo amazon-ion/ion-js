@@ -47,13 +47,6 @@ const MIN_YEAR: number = 1;
 const MAX_YEAR: number = 9999;
 const MIN_OFFSET: number = (-23 * 60) - 59;
 const MAX_OFFSET: number = (23 * 60) + 59;
-const DAYS_PER_MONTH: number[] = [
-    -1,          // months start at 1, so we fill the 0 slot
-    31, 29, 31,  // jan, feb, mar
-    30, 31, 30,  // apr, may, june
-    31, 31, 30,  // jul, aug, sep
-    31, 30, 31,  // oct, nov, dec
-]
 
 enum States {
     YEAR,
@@ -310,8 +303,10 @@ export class Timestamp {
         }
 
         if (this.precision > Precision.MONTH) {
-            // check the days per month - first the general case
-            if (this.day > DAYS_PER_MONTH[this.month]) {
+            // check the days per month - first the general case, basically index into the next month (which doesnt need +1 because we index from 1 to 12 unlike Date) and look at the day before which is indexed with 0.
+            let tempDate : Date = new Date(this.year, this.month, 0);
+            tempDate.setUTCFullYear(this.year);
+            if (this.day > tempDate.getDate()) {
                 throw new Error(`Month ${this.month} has less than ${this.day} days`);
             }
 
