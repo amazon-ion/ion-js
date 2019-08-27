@@ -85,7 +85,7 @@
       writer => writer.writeBlob(),
       'null.blob');
     writerTest('Writes null blob using type',
-      writer => writer.writeNull(ion.TypeCodes.BLOB),
+      writer => writer.writeNull(ion.IonTypes.BLOB),
       'null.blob');
     writerTest('Writes blob with identifier annotations',
       writer => writer.writeBlob([1, 2, 3], ['foo', 'bar']),
@@ -109,7 +109,7 @@
       writer => writer.writeBoolean(),
       'null.bool');
     writerTest('Writes null boolean using type',
-      writer => writer.writeNull(ion.TypeCodes.BOOL),
+      writer => writer.writeNull(ion.IonTypes.BOOL),
       'null.bool');
     writerTest('Writes boolean with annotations',
       writer => writer.writeBoolean(true, ['abc', '123']),
@@ -127,7 +127,7 @@
       writer => writer.writeClob(),
       'null.clob'); 
     writerTest('Writes null clob using type',
-      writer => writer.writeNull(ion.TypeCodes.CLOB),
+      writer => writer.writeNull(ion.IonTypes.CLOB),
       'null.clob'); 
     writerTest('Writes clob with annotations',
       writer => writer.writeClob(['A'.charCodeAt(0)], ['baz', 'qux']),
@@ -155,7 +155,7 @@
       writer => writer.writeDecimal(),
       'null.decimal');
     writerTest('Writes null decimal using type',
-      writer => writer.writeNull(ion.TypeCodes.DECIMAL),
+      writer => writer.writeNull(ion.IonTypes.DECIMAL),
       'null.decimal');
     writerTest('Writes decimal with annotations',
       writer => writer.writeDecimal(ion.Decimal.parse('123.456'), ['foo', 'bar']),
@@ -194,7 +194,7 @@
       writer => writer.writeInt(),
       'null.int');
     writerTest('Writes null using type',
-      writer => writer.writeNull(ion.TypeCodes.POSITIVE_INT),
+      writer => writer.writeNull(ion.IonTypes.INT),
       'null.int');
 
     // Lists
@@ -225,19 +225,19 @@
       // Nulls
 
       writerTest('Writes null',
-          writer => writer.writeNull(ion.TypeCodes.NULL),
+          writer => writer.writeNull(ion.IonTypes.NULL),
           'null.null');
       writerTest('Writes null with annotations',
-          writer => writer.writeNull(ion.TypeCodes.NULL, ['foo', 'bar']),
+          writer => writer.writeNull(ion.IonTypes.NULL, ['foo', 'bar']),
           'foo::bar::null.null');
 
     // Nulls
 
     writerTest('Writes null',
-      writer => writer.writeNull(ion.TypeCodes.NULL),
+      writer => writer.writeNull(ion.IonTypes.NULL),
       'null.null');
     writerTest('Writes null with annotations',
-      writer => writer.writeNull(ion.TypeCodes.NULL, ['foo', 'bar']),
+      writer => writer.writeNull(ion.IonTypes.NULL, ['foo', 'bar']),
       'foo::bar::null.null');
 
     // S-Expressions
@@ -246,7 +246,7 @@
           writer => writer.writeSexp(),
           '()');
       writerTest('Writes null sexp',
-          writer => writer.writeNull(ion.TypeCodes.SEXP),
+          writer => writer.writeNull(ion.IonTypes.SEXP),
           'null.sexp');
       writerTest('Writes empty sexp with annotations',
           writer => writer.writeSexp(['foo', 'bar']),
@@ -375,7 +375,7 @@
         writer.writeFieldName('symbol');
         writer.writeSymbol('symbol', ['a5']);
         writer.writeFieldName('symbol');
-        writer.writeNull(ion.TypeCodes.SYMBOL);
+        writer.writeNull(ion.IonTypes.SYMBOL);
         writer.writeFieldName('timestamp');
         writer.writeTimestamp(ion.Timestamp.parse('2017-04-03T00:00:00.000Z'), ['a8']);
         writer.writeFieldName('decimal');
@@ -399,9 +399,9 @@
         writer.endContainer();
         writer.writeFieldName('sexp');
         writer.writeSexp(['a23']);
-        writer.writeNull(ion.TypeCodes.SYMBOL, ['a24']);
-        writer.writeNull(ion.TypeCodes.STRING, ['a25']);
-        writer.writeNull(ion.TypeCodes.NULL, ['a26']);
+        writer.writeNull(ion.IonTypes.SYMBOL, ['a24']);
+        writer.writeNull(ion.IonTypes.STRING, ['a25']);
+        writer.writeNull(ion.IonTypes.NULL, ['a26']);
         writer.endContainer();
       },
         `a1::{

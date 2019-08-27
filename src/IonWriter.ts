@@ -14,7 +14,7 @@
 import {Decimal} from "./IonDecimal";
 import {Reader} from "./IonReader";
 import {Timestamp} from "./IonTimestamp";
-import {TypeCodes} from "./IonBinary";
+import {IonType} from "./IonType";
 
 /**
  * Writes values in the Ion text or binary formats.
@@ -29,7 +29,7 @@ export interface Writer {
   writeFloat64(value: number, annotations?: string[]) : void;
   writeInt(value: number, annotations?: string[]) : void;
   writeList(annotations?: string[], isNull?: boolean) : void;
-  writeNull(type_: TypeCodes, annotations?: string[]) : void;
+  writeNull(type: IonType, annotations?: string[]) : void;
   writeSexp(annotations?: string[], isNull?: boolean) : void;
   writeString(value: string, annotations?: string[]) : void;
   writeStruct(annotations?: string[], isNull?: boolean) : void;
