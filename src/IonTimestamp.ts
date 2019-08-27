@@ -172,29 +172,16 @@ function read_digits(str: string, pos: number, len: number) : number {
     return v;
 }
 
-const SECS_PER_MIN    = 60;
-const SECS_PER_HOUR   = 60 * 60;
 const SECS_PER_DAY    = 24 * 60 * 60;
-const DAYS_TO_MONTH   = (function() {
-    let d: number = 0;
-    let a: number[] = [];
-    for (let m: number = 1; m < 13; m++) {
-        a.shift();
-        d += DAYS_PER_MONTH[m];
-    }
-    return a;
-})();
 
 function is_leapyear(year: number) : boolean {
-    if ((year % 4) > 0) return false; // not divisible by 4, it's not
-    if ((year % 100) > 0) return true; // not divisible by 100, (but div by 4), it IS
+    if ((year % 4) > 0) {
+        return false;
+    } // not divisible by 4, it's not
+    if ((year % 100) > 0) {
+        return true;
+    } // not divisible by 100, (but div by 4), it IS
     return (year % 1000) === 0; // 100's also divisible by 1000 ARE otherwise they're not
-}
-
-function days_to_start_of_month(month: number, year: number) : number {
-    var d = DAYS_TO_MONTH[month];
-    if (month > 2 && !is_leapyear(year)) d -= 1; // subtract out feb 29th
-    return d;
 }
 
 function days_to_start_of_year(year: number) : number {
@@ -204,12 +191,6 @@ function days_to_start_of_year(year: number) : number {
     d += Math.floor(year/1000); // all 1000' are leap years - put them back in
     return d;
 }
-
-const SECONDS_AT_EPOCH_START: number = (function() {
-    // unix epoch 1970-01-01T00:00z
-    var d = days_to_start_of_year(1970) * SECS_PER_DAY;
-    return d;
-})();
 
 export class Timestamp {
     readonly precision : Precision;
@@ -296,7 +277,7 @@ export class Timestamp {
                 throw new Error(`Unknown precision ${this.precision}`);
             case Precision.FRACTION:
                 if (this.fraction === undefined || this.fraction === null) {
-                    throw new Error("Fractional Seconds and precision in illegal state.");
+                    throw new Error("Expected fractional second as input based off of the provided precision.");
                 }
                 if (this.fraction.compareTo(Decimal.ONE) === -1 || this.fraction.compareTo(Decimal._ZERO) >= 0) {
                     throw new Error("Timestamp fractional seconds must a Decimal between 0.0 and less than 1.0")
@@ -353,78 +334,88 @@ export class Timestamp {
             case Precision.NULL:
                 return expected.precision === Precision.NULL;
             case Precision.FRACTION:
-                if(!this.fraction.equals(expected.fraction)) return false;
+                if(!this.fraction.equals(expected.fraction)) {
+                    return false;
+                }
             case Precision.SECONDS:
-                if(this.seconds !== expected.seconds) return false;
+                if(this.seconds !== expected.seconds){
+                    return false;
+                }
             case Precision.HOUR_AND_MINUTE:
-                if(this.minute !== expected.minute || this.hour !== expected.hour) return false;
+                if(this.minute !== expected.minute || this.hour !== expected.hour) {
+                    return false;
+                }
             case Precision.DAY:
-                if(this.day !== expected.day) return false;
+                if(this.day !== expected.day) {
+                    return false;
+                }
             case Precision.MONTH:
-                if(this.month !== expected.month) return false;
+                if(this.month !== expected.month) {
+                    return false;
+                }
             case Precision.YEAR:
-                if(this.year !== expected.year) return false;
+                if(this.year !== expected.year) {
+                    return false;
+                }
         }
         return true;
     }
 
     stringValue() : string {
-        let image: string = "";
-        let t: Timestamp = this;
-
-        switch (t.precision) {
-            default: throw { msg: "invalid value for timestamp precision", where: "IonValueSupport.timestamp.toString" };
+        let strVal: string = "";
+        switch (this.precision) {
+            default: throw new Error("invalid value for timestamp precision");
             case Precision.NULL:
                 return "null.timestamp";
             case Precision.FRACTION:
-                let digits = t.fraction._getCoefficient().toString();
+                let digits = this.fraction._getCoefficient().toString();
                 //exp always negative because we are a magnitude.
-                let tempExp = t.fraction._getExponent();
+                let tempExp = this.fraction._getExponent();
                 if(digits === '0') tempExp++;
                 let zeros = ".";
                 while(tempExp < 0) {
                     zeros = zeros + '0';
                     tempExp++;
                 }
-                image = zeros + digits;
+                strVal = zeros + digits;
             case Precision.SECONDS:
-                image = _to_2_digits(t.seconds) + image;
-                if(image.charAt(1)  === '.') image = "0" + image;
-                if(image.charAt(image.length - 1) === '.') image = image.slice(0, image.length - 1);
+                strVal = _to_2_digits(this.seconds) + strVal;
+                if(strVal.charAt(1)  === '.') strVal = "0" + strVal;
+                if(strVal.charAt(strVal.length - 1) === '.') strVal = strVal.slice(0, strVal.length - 1);
             case Precision.HOUR_AND_MINUTE:
-                image = _to_2_digits(t.minute) + (image ? ":" + image : "");
-                image = _to_2_digits(t.hour) + (image ? ":" + image : "");
+                strVal = _to_2_digits(this.minute) + (strVal ? ":" + strVal : "");
+                strVal = _to_2_digits(this.hour) + (strVal ? ":" + strVal : "");
             case Precision.DAY:
-                image = _to_2_digits(t.day) + (image ? "T" + image : "T");
+                strVal = _to_2_digits(this.day) + (strVal ? "T" + strVal : "T");
             case Precision.MONTH:
-                image = _to_2_digits(t.month) + (image ? "-" + image : "");
+                strVal = _to_2_digits(this.month) + (strVal ? "-" + strVal : "");
             case Precision.YEAR:
-                if (t.precision === Precision.YEAR) {
-                    image = to_4_digits(t.year) + "T";
-                } else if (t.precision === Precision.MONTH) {
-                    image = to_4_digits(t.year) + "-" + image + "T";
+                if (this.precision === Precision.YEAR) {
+                    strVal = to_4_digits(this.year) + "T";
+                } else if (this.precision === Precision.MONTH) {
+                    strVal = to_4_digits(this.year) + "-" + strVal + "T";
                 } else {
-                    image = to_4_digits(t.year) + "-" + image;
+                    strVal = to_4_digits(this.year) + "-" + strVal;
                 }
         }
 
         // hours : minute (for offset)
-        let o: number = t.offset;
-        if (t.precision > Precision.DAY || o === undefined) {  // TODO: is this right?
+        let o: number = this.offset;
+        if (this.precision > Precision.DAY || o === undefined) {  // TODO: is this right?
             if (o === undefined || o === -0.0) {
-                image = image + "Z";
+                strVal = strVal + "Z";
             } else {
                 if (o < 0) {
                     o = -o;
-                    image = image + "-";
+                    strVal = strVal + "-";
                 } else {
-                    image = image + "+";
+                    strVal = strVal + "+";
                 }
-                image = image + _to_2_digits(Math.floor(o / 60));
-                image = image + ":" + _to_2_digits(o % 60);
+                strVal = strVal + _to_2_digits(Math.floor(o / 60));
+                strVal = strVal + ":" + _to_2_digits(o % 60);
             }
         }
-        return image;
+        return strVal;
     }
 
     toString() : string {
@@ -445,7 +436,7 @@ export class Timestamp {
 
     public getDate() : Date {
         let offsetShift = this.offset*60000, ms = null;
-        if(this.precision === Precision.SECONDS) {
+        if(this.precision === Precision.FRACTION) {
             ms = this.fraction.numberValue()
         }
         let date = new Date(Date.UTC(this.year, (this.precision === Precision.YEAR ? 0 : this.month - 1), this.day, this.hour, this.minute, this.seconds, ms) - offsetShift);
@@ -466,10 +457,16 @@ export class Timestamp {
     static parse(str: string) : Timestamp {
         var precision;
 
-        if (str.length < 1) return Timestamp.NULL;
+        if (str.length < 1) {
+            return Timestamp.NULL;
+        }
         if (str.charCodeAt(0) === 110) {  // "n"
-            if (str === "null") return Timestamp.NULL;
-            if (str === "null.timestamp") return Timestamp.NULL;
+            if (str === "null") {
+                return Timestamp.NULL;
+            }
+            if (str === "null.timestamp") {
+                return Timestamp.NULL;
+            }
             throw new Error("Illegal timestamp: " + str);
         }
 

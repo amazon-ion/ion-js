@@ -340,7 +340,7 @@ export class ParserBinaryRaw {
             }
             if(this._in.position() < end) {
                 let exp = this.readVarSignedInt();
-                let coef = LongInt._zero;
+                let coef = LongInt._ZERO;
                 if(this._in.position() < end) {
                     coef = ParserBinaryRaw.readSignedIntFrom(this._in, end - this._in.position());
                 }
