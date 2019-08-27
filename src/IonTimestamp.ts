@@ -279,7 +279,7 @@ export class Timestamp {
                 if (this.fraction === undefined || this.fraction === null) {
                     throw new Error("Expected fractional second as input based off of the provided precision.");
                 }
-                if (this.fraction.compareTo(Decimal.ONE) === -1 || this.fraction.compareTo(Decimal._ZERO) >= 0) {
+                if (this.fraction.compareTo(Decimal.ONE) !== -1 || this.fraction.compareTo(Decimal._ZERO) === 1) {
                     throw new Error("Timestamp fractional seconds must a Decimal between 0.0 and less than 1.0")
                 }
             case Precision.SECONDS:
