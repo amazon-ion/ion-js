@@ -23,7 +23,6 @@ import { PrettyTextWriter } from "./IonPrettyTextWriter";
 import { Writeable } from "./IonWriteable";
 import { BinaryWriter } from "./IonBinaryWriter";
 import { LocalSymbolTable, defaultLocalSymbolTable } from "./IonLocalSymbolTable";
-import { IonEventStream } from "./IonEventStream";
 import { decodeUtf8 } from "./IonUnicode";
 
 const e = {
@@ -112,5 +111,4 @@ export { Precision } from "./IonPrecision";
 export { SharedSymbolTable } from "./IonSharedSymbolTable";
 export { Timestamp } from "./IonTimestamp";
 export { toBase64 } from "./IonText";
-export { IonEventStream } from "./IonEventStream";
 export { decodeUtf8 } from "./IonUnicode";
