@@ -45,15 +45,15 @@
 //    byteValue
 
 import * as IonBinary from "./IonBinary";
-import { decodeUtf8 } from "./IonUnicode";
-import { Decimal } from "./IonDecimal";
-import { IonType } from "./IonType";
-import { IonTypes } from "./IonTypes";
-import { IVM } from "./IonConstants";
-import { LongInt } from "./IonLongInt";
-import { Precision } from "./IonPrecision";
-import { BinarySpan } from "./IonSpan";
-import { Timestamp } from "./IonTimestamp";
+import {decodeUtf8} from "./IonUnicode";
+import {Decimal} from "./IonDecimal";
+import {IonType} from "./IonType";
+import {IonTypes} from "./IonTypes";
+import {IVM} from "./IonConstants";
+import {LongInt} from "./IonLongInt";
+import {Precision} from "./IonPrecision";
+import {BinarySpan} from "./IonSpan";
+import {Timestamp} from "./IonTimestamp";
 
 const DEBUG_FLAG = true;
 
@@ -306,27 +306,49 @@ export class ParserBinaryRaw {
 
     private read_timestamp_value() : Timestamp {
         let offset = null;
-        let timeArray = [null, null, null, null, null, null];
-        let precision = 0;
-        if (this._len < 1) {
-            precision = Precision.NULL
-        } else {
+        let year: number, month: number = 0, day: number = 1, hour: number = 0, minute: number = 0, second: number = 0, fraction: Decimal = null;
+        let precision = Precision.NULL;
+        if (this._len > 0) {
             let end = this._in.position() + this._len;
             offset = this.readVarSignedInt();
-            while(this._in.position() < end) {
-                if(precision  === Precision.SECONDS) {
-                    let second = this.readVarUnsignedInt();
-                    let exp = this.readVarSignedInt();
-                    let coef = this.readSignedInt();
-                    let decimal = new Decimal(coef, exp);
-                    //timeArray[precision] = decimal.add();
+            if (this._in.position() < end) {
+                year = this.readVarUnsignedInt();
+                precision = Precision.YEAR;
+            } else {
+                throw new Error('Timestamps must include a year.');
+            }
+            if (this._in.position() < end) {
+                month = this.readVarUnsignedInt();
+                precision = Precision.MONTH;
+            }
+            if (this._in.position() < end) {
+                day = this.readVarUnsignedInt();
+                precision = Precision.DAY;
+            }
+            if (this._in.position() < end) {
+                hour = this.readVarUnsignedInt();
+                if (this._in.position() >= end) {
+                    throw new Error('Timestamps with an hour must include a minute.');
                 } else {
-                    timeArray[precision] = this.readVarUnsignedInt();
-                    precision++;
+                    minute = this.readVarUnsignedInt();
+                    precision = Precision.HOUR_AND_MINUTE;
                 }
             }
+            if (this._in.position() < end) {
+                second = this.readVarUnsignedInt();
+                precision = Precision.SECONDS;
+            }
+            if(this._in.position() < end) {
+                let exp = this.readVarSignedInt();
+                let coef = LongInt._ZERO;
+                if(this._in.position() < end) {
+                    coef = ParserBinaryRaw.readSignedIntFrom(this._in, end - this._in.position());
+                }
+                fraction = new Decimal(coef, exp);
+                precision = Precision.FRACTION;
+            }
         }
-        return new Timestamp(precision, offset, timeArray[0], timeArray[1], timeArray[2], timeArray[3], timeArray[4], timeArray[5]);
+        return new Timestamp(precision, offset, year, month, day, hour, minute, second, fraction);
     }
 
     private read_string_value() : string {
@@ -487,7 +509,7 @@ export class ParserBinaryRaw {
                 break;
             case IonBinary.TB_DECIMAL:
                 if (this._len === 0) {
-                    this._curr = Decimal._ZERO;
+                    this._curr = Decimal.ZERO;
                 } else {
                     this._curr = this.read_decimal_value();
                 }

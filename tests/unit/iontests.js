@@ -362,6 +362,7 @@ let badSkipList = toSkipList([
     'ion-tests/iontestdata/bad/nopPadWithAnnotations.10n',
     'ion-tests/iontestdata/bad/structOrderedEmpty.10n',
     'ion-tests/iontestdata/bad/timestamp/timestampHourWithoutMinute.10n',
+    'ion-tests/iontestdata/bad/timestamp/timestampNegativeFraction.10n',
 ]);
 
 let eventSkipList = toSkipList([
@@ -428,9 +429,7 @@ let eventSkipList = toSkipList([
     'ion-tests/iontestdata/good/timestamp/equivTimeline/timestamps.ion',
     'ion-tests/iontestdata/good/timestamp/leapDay.ion',
     'ion-tests/iontestdata/good/timestamp/timestamp2011-02-20T19_30_59_100-08_00.10n',
-    'ion-tests/iontestdata/good/timestamp/timestamp2011-02.10n',
     'ion-tests/iontestdata/good/timestamp/timestamp2011.10n',
-    'ion-tests/iontestdata/good/timestamp/timestampWithTerminatingEof.ion',
     'ion-tests/iontestdata/good/timestamp/timestamps.ion',
     'ion-tests/iontestdata/good/utf16.ion',
     'ion-tests/iontestdata/good/utf32.ion',

@@ -259,39 +259,25 @@ export class BinaryWriter implements Writer {
       this.writeNull(TypeCodes.TIMESTAMP, annotations);
       return;
     }
-
     let writer: LowLevelBinaryWriter = new LowLevelBinaryWriter(new Writeable(12));//where does the 12 come from
     writer.writeVariableLengthSignedInt(value.getOffset());
     writer.writeVariableLengthUnsignedInt(value.date.getUTCFullYear());
     if (value.getPrecision() >= Precision.MONTH) {
-      writer.writeVariableLengthUnsignedInt(value.date.getUTCMonth() + 1);
+        writer.writeVariableLengthUnsignedInt(value.date.getUTCMonth() + 1);
     }
     if (value.getPrecision() >= Precision.DAY) {
-      writer.writeVariableLengthUnsignedInt(value.date.getUTCDate());
+        writer.writeVariableLengthUnsignedInt(value.date.getUTCDate());
     }
     if (value.getPrecision() >= Precision.HOUR_AND_MINUTE) {
-      writer.writeVariableLengthUnsignedInt(value.date.getUTCHours());
-      writer.writeVariableLengthUnsignedInt(value.date.getUTCMinutes());
+        writer.writeVariableLengthUnsignedInt(value.date.getUTCHours());
+        writer.writeVariableLengthUnsignedInt(value.date.getUTCMinutes());
     }
     if (value.getPrecision() >= Precision.SECONDS) {
-      let seconds: Decimal = value.seconds;
-      let exponent: number = seconds._getExponent();
-
-      if (exponent < 0) { // Fractional number of seconds {
-        let decimalString: string = seconds._getCoefficient().toString();
-        let numberOfCharacteristicDigits: number = decimalString.length + exponent;
-
-        // Characteristic is the value to the left of the decimal
-        let characteristic = new LongInt(decimalString.slice(0, numberOfCharacteristicDigits)).numberValue();
-        writer.writeVariableLengthUnsignedInt(characteristic);
-
-        // Exponent
-        writer.writeVariableLengthSignedInt(exponent);
-
-        writer.writeSignedInt(parseInt(decimalString.slice(numberOfCharacteristicDigits)));
-      } else { // Whole number of seconds
-        writer.writeVariableLengthUnsignedInt(seconds.numberValue());
-      }
+        writer.writeVariableLengthUnsignedInt(value.seconds);
+    }
+    if (value.getPrecision() === Precision.FRACTION) {
+        writer.writeVariableLengthSignedInt(value.fraction._getExponent());
+        writer.writeBytes(value.fraction._getCoefficient().intBytes());
     }
     this.addNode(new BytesNode(this.writer, this.getCurrentContainer(), TypeCodes.TIMESTAMP, this.encodeAnnotations(annotations), writer.getBytes()));
   }

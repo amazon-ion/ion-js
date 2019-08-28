@@ -23,7 +23,8 @@
 
     const parseTest = function(name, timestamp) {
       suite[name] = function() {
-        ion.Timestamp.parse(timestamp);
+        let val = ion.Timestamp.parse(timestamp);
+         //assert.isTrue(ion.Timestamp.parse(val.toString()).equals(timestamp));
       }
     };
 
@@ -43,7 +44,6 @@
     parseTest('Parses timestamp: The same instant, with unknown local offset', '2007-02-23T20:14:33.079-00:00');
     parseTest('Parses timestamp: The same instant, with unknown local offset where hour is 0', '2007-02-23T00:14:33.079-00:00');
     parseTest('Parses timestamp: Happy New Year in UTC, unknown local offset', '2007-01-01T00:00-00:00');
-
     registerSuite(suite);
   }
 );
