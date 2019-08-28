@@ -25,8 +25,6 @@ import { BinaryWriter } from "./IonBinaryWriter";
 import { LocalSymbolTable, defaultLocalSymbolTable } from "./IonLocalSymbolTable";
 import { decodeUtf8 } from "./IonUnicode";
 
-
-
 const e = {
   name: "IonError",
   where: undefined,
@@ -61,22 +59,21 @@ function isBinary(buf: Uint8Array) {
 /**
  * Create an Ion Reader object from a currentBuffer `buf`
  *
- *
  * @param buf the Ion data to be used by the reader. Typically a string, UTF-8 encoded buffer (text), or raw binary buffer.
  * @param options for the reader including catalog
  * @returns {Reader}
  */
-    export function makeReader(buf: any, catalog? : Catalog) : Reader {
-        if((typeof buf) === "string"){
-            return new TextReader(new StringSpan(<string>buf), catalog);
-        }
-        buf = new Uint8Array(buf);
-        if(isBinary(buf)){
-            return new BinaryReader(new BinarySpan(buf), catalog);
-        } else {
-            return new TextReader(new StringSpan(decodeUtf8(buf)), catalog);
-        }
+export function makeReader(buf: any, catalog? : Catalog) : Reader {
+    if((typeof buf) === "string"){
+        return new TextReader(new StringSpan(<string>buf), catalog);
     }
+    buf = new Uint8Array(buf);
+    if(isBinary(buf)){
+        return new BinaryReader(new BinarySpan(buf), catalog);
+    } else {
+        return new TextReader(new StringSpan(decodeUtf8(buf)), catalog);
+    }
+}
 
 /**
  * Create a new Ion Text Writer.
@@ -114,5 +111,4 @@ export { Precision } from "./IonPrecision";
 export { SharedSymbolTable } from "./IonSharedSymbolTable";
 export { Timestamp } from "./IonTimestamp";
 export { toBase64 } from "./IonText";
-export { TypeCodes } from "./IonBinary";
 export { decodeUtf8 } from "./IonUnicode";

@@ -54,7 +54,7 @@ export function _writeValue(reader: IonReader, writer: IonWriter, _depth = 0): v
         }
     }
     if (reader.isNull()) {
-        writer.writeNull(type.bid, reader.annotations());
+        writer.writeNull(type, reader.annotations());
     } else {
         switch (type) {
             case IonTypes.BOOL:      writer.writeBoolean(reader.booleanValue(), reader.annotations()); break;

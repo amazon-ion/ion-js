@@ -69,7 +69,7 @@ export class IonEventStream {
                             writer.writeFloat64(tempEvent.ionValue, tempEvent.annotations);
                             break;
                         case IonTypes.NULL :
-                            writer.writeNull(tempEvent.ionType.bid, tempEvent.annotations);
+                            writer.writeNull(tempEvent.ionType, tempEvent.annotations);
                             break;
                         case IonTypes.TIMESTAMP :
                             writer.writeTimestamp(tempEvent.ionValue, tempEvent.annotations);

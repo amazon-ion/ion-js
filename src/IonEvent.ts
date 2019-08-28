@@ -17,7 +17,6 @@ import { Decimal } from "./IonDecimal";
 import { Timestamp } from "./IonTimestamp";
 import { IonType } from "./IonType";
 import { Writer } from "./IonWriter";
-import { TypeCodes } from "./IonBinary";
 import { TextWriter } from "./IonTextWriter";
 import { Writeable } from "./IonWriteable";
 import { BinaryWriter } from "./IonBinaryWriter";
@@ -100,7 +99,7 @@ abstract class AbstractIonEvent implements IonEvent {
 
     writeAnnotations(writer : Writer) {
         if(this.annotations === undefined){
-            writer.writeNull(TypeCodes.LIST);
+            writer.writeNull(IonTypes.LIST);
             return;
         }
         writer.writeList();
@@ -116,7 +115,7 @@ abstract class AbstractIonEvent implements IonEvent {
     }
 
     writeImportDescriptor(writer){
-        writer.writeNull(TypeCodes.STRUCT);
+        writer.writeNull(IonTypes.STRUCT);
         /* TODO implement shared symboltable introduction event callbacks to build import descriptor value for the event.
         writer.writeStruct();
         writer.writeFieldName('import_name');
@@ -246,7 +245,7 @@ class IonNullEvent extends AbstractIonEvent {
         return expected instanceof IonNullEvent && this.ionValue === expected.ionValue;
     }
     writeIonValue(writer : Writer) : void {
-        writer.writeNull(this.ionType.bid);
+        writer.writeNull(this.ionType);
     }
 }
 
