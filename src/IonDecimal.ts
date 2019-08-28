@@ -173,12 +173,12 @@ export class Decimal {
         let exponent = 0;
         if (str === 'null' || str === 'null.decimal') return null;
         let d = str.match('[d|D]');
-        let f  = str.match('\\.');
         let exponentDelimiterIndex = str.length;
         if (d) {
             exponent = Number(str.substring(d.index + 1, str.length));
             exponentDelimiterIndex = d.index;
         }
+        let f  = str.match('\\.');
         if (f) {
             let exponentShift = d ? (d.index - 1) - f.index : (str.length - 1) - f.index;
             return new Decimal(new LongInt(str.substring(0, f.index) + str.substring(f.index + 1, exponentDelimiterIndex)), exponent - exponentShift);
