@@ -30,7 +30,7 @@
               var writer = new ionTextWriter.TextWriter(writeable);
               instructions(writer);
               while(!writer.isTopLevel){
-                  writer.endContainer();
+                  writer.stepOut();
               }
               writer.close();
               var actual = writeable.getBytes();
@@ -47,7 +47,7 @@
               let writer = new ion.makePrettyWriter(2);
               instructions(writer);
               while(!writer.isTopLevel){
-                  writer.endContainer();
+                  writer.stepOut();
               }
               writer.close();
               let buf = writer.getBytes();
@@ -200,23 +200,23 @@
     // Lists
 
       writerTest('Writes empty list',
-          writer => writer.writeList(),
+          writer => writer.stepIn(ion.IonTypes.LIST),
           '[]');
       writerTest('Writes empty list with annotations',
-          writer => writer.writeList(['foo', 'bar']),
+          writer => writer.stepIn(ion.IonTypes.LIST, ['foo', 'bar']),
           'foo::bar::[]');
       writerTest('Writes nested empty lists',
-          writer => { writer.writeList(); writer.writeList(); writer.writeList() },
+          writer => { writer.stepIn(ion.IonTypes.LIST); writer.stepIn(ion.IonTypes.LIST); writer.stepIn(ion.IonTypes.LIST) },
           '[[[]]]');
       writerTest('Writes list with multiple values',
-          writer => { writer.writeList(); writer.writeSymbol('$'); writer.writeSymbol('%') },
+          writer => { writer.stepIn(ion.IonTypes.LIST); writer.writeSymbol('$'); writer.writeSymbol('%') },
           "[$,'%']");
       writerTest('Writes nested lists with multiple values',
           writer => {
-              writer.writeList();
+              writer.stepIn(ion.IonTypes.LIST);
               writer.writeSymbol('foo');
               writer.writeSymbol('bar');
-              writer.writeList();
+              writer.stepIn(ion.IonTypes.LIST);
               writer.writeSymbol('baz');
               writer.writeSymbol('qux');
           },
@@ -243,17 +243,17 @@
     // S-Expressions
 
       writerTest('Writes empty sexp',
-          writer => writer.writeSexp(),
+          writer => writer.stepIn(ion.IonTypes.SEXP),
           '()');
       writerTest('Writes null sexp',
           writer => writer.writeNull(ion.IonTypes.SEXP),
           'null.sexp');
       writerTest('Writes empty sexp with annotations',
-          writer => writer.writeSexp(['foo', 'bar']),
+          writer => writer.stepIn(ion.IonTypes.SEXP, ['foo', 'bar']),
           'foo::bar::()');
       writerTest('Writes sexp with adjacent operators',
           writer => {
-              writer.writeSexp();
+              writer.stepIn(ion.IonTypes.SEXP);
               writer.writeSymbol('+');
               writer.writeSymbol('-');
               writer.writeSymbol('/');
@@ -261,7 +261,7 @@
           '(+ - /)');
       writerTest('Writes sexp with expression',
           writer => {
-              writer.writeSexp();
+              writer.stepIn(ion.IonTypes.SEXP);
               writer.writeSymbol('x');
               writer.writeSymbol('+');
               writer.writeSymbol('y');
@@ -283,35 +283,35 @@
     // Structs
 
       writerTest('Writes empty struct',
-          writer => writer.writeStruct(),
+          writer => writer.stepIn(ion.IonTypes.STRUCT),
           '{}');
       writerTest('Writes nested structs',
           writer => {
-              writer.writeStruct();
+              writer.stepIn(ion.IonTypes.STRUCT);
               writer.writeFieldName('foo');
-              writer.writeStruct();
-              writer.endContainer();
+              writer.stepIn(ion.IonTypes.STRUCT);
+              writer.stepOut();
               writer.writeFieldName('bar');
-              writer.writeStruct();
+              writer.stepIn(ion.IonTypes.STRUCT);
           },
           '{foo:{},bar:{}}');
       writerTest('Writes struct with non-identifier field name and annotation',
           writer => {
-              writer.writeStruct(['1foo']);
+              writer.stepIn(ion.IonTypes.STRUCT, ['1foo']);
               writer.writeFieldName('123');
-              writer.writeStruct(['2bar']);
+              writer.stepIn(ion.IonTypes.STRUCT, ['2bar']);
           },
           "'1foo'::{'123':'2bar'::{}}");
       badWriterTest('Cannot write field name at top level',
           writer => writer.writeFieldName('foo'));
       badWriterTest('Cannot write field name inside non-struct',
-          writer => { writer.writeList(); writer.writeFieldName('foo') });
+          writer => { writer.stepIn(ion.IonTypes.LIST); writer.writeFieldName('foo') });
       badWriterTest('Cannot write two adjacent field names',
-          writer => { writer.writeStruct(); writer.writeFieldName('foo'); writer.writeFieldName('foo') });
+          writer => { writer.stepIn(ion.IonTypes.STRUCT); writer.writeFieldName('foo'); writer.writeFieldName('foo') });
       badWriterTest('Cannot write value without field name',
-          writer => { writer.writeStruct(); writer.writeSymbol('foo') });
+          writer => { writer.stepIn(ion.IonTypes.STRUCT); writer.writeSymbol('foo') });
       badWriterTest('Cannot end struct with missing field value',
-          writer => { writer.writeStruct(); writer.writeFieldName('foo'); writer.endContainer() });
+          writer => { writer.stepIn(ion.IonTypes.STRUCT); writer.writeFieldName('foo'); writer.stepOut() });
 
     // Symbols
 
@@ -355,19 +355,19 @@
           writer => { writer.writeSymbol('a'); writer.writeSymbol('b') },
           'a\nb');
       writerTest('Writes two top-level lists',
-          writer => { writer.writeList(); writer.endContainer(); writer.writeList() },
+          writer => { writer.stepIn(ion.IonTypes.LIST); writer.stepOut(); writer.stepIn(ion.IonTypes.LIST) },
           '[]\n[]');
       writerTest('Writes two top-level lists with annotations',
-          writer => { writer.writeList(['foo']); writer.endContainer(); writer.writeList(['bar']) },
+          writer => { writer.stepIn(ion.IonTypes.LIST, ['foo']); writer.stepOut(); writer.stepIn(ion.IonTypes.LIST, ['bar']) },
           'foo::[]\nbar::[]');
       writerTest('Writes two top-level structs',
-          writer => { writer.writeStruct(); writer.endContainer(); writer.writeStruct() },
+          writer => { writer.stepIn(ion.IonTypes.STRUCT); writer.stepOut(); writer.stepIn(ion.IonTypes.STRUCT) },
           '{}\n{}');
 
     // PrettyPrint
     skippedPrettyTest('Writes composite pretty ion',
       writer => {
-        writer.writeStruct(['a1']);
+        writer.stepIn(ion.IonTypes.STRUCT, ['a1']);
         writer.writeFieldName('int');
         writer.writeInt(123, ['a3']);
         writer.writeFieldName('string');
@@ -381,28 +381,28 @@
         writer.writeFieldName('decimal');
         writer.writeDecimal(ion.Decimal.parse('1.2'), ['a9']);
         writer.writeFieldName('struct');
-        writer.writeStruct(['a10']);
+        writer.stepIn(ion.IonTypes.STRUCT, ['a10']);
         writer.writeFieldName('symbol');
         writer.writeSymbol('symbol', ['a11']);
-        writer.endContainer();
+        writer.stepOut();
         writer.writeFieldName('list');
-        writer.writeList(['a12']);
+        writer.stepIn(ion.IonTypes.LIST, ['a12']);
         writer.writeInt(123, ['a14']);
         writer.writeString('string', ['a15']);
         writer.writeSymbol('symbol', ['a16']);
         writer.writeTimestamp(ion.Timestamp.parse('2017-04-03T00:00:00.000Z'), ['a19']);
         writer.writeDecimal(ion.Decimal.parse('1.2'), ['a20']);
-        writer.writeStruct(['a21']);
-        writer.endContainer();
-        writer.writeList(['a22']);
-        writer.endContainer();
-        writer.endContainer();
+        writer.stepIn(ion.IonTypes.STRUCT, ['a21']);
+        writer.stepOut();
+        writer.stepIn(ion.IonTypes.LIST, ['a22']);
+        writer.stepOut();
+        writer.stepOut();
         writer.writeFieldName('sexp');
-        writer.writeSexp(['a23']);
+        writer.stepIn(ion.IonTypes.SEXP, ['a23']);
         writer.writeNull(ion.IonTypes.SYMBOL, ['a24']);
         writer.writeNull(ion.IonTypes.STRING, ['a25']);
         writer.writeNull(ion.IonTypes.NULL, ['a26']);
-        writer.endContainer();
+        writer.stepOut();
       },
         `a1::{
   int:a3::123,

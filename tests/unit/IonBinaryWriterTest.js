@@ -286,9 +286,6 @@ define([
 
     // Lists
 
-    writerTest('Writes null list by flag',
-      (writer) => { writer.writeList(null, true); },
-        [0xbf]);
     writerTest('Writes null list by direct call',
       (writer) => { writer.writeNull(ion.IonTypes.LIST) },
         [0xbf]);
@@ -303,36 +300,36 @@ define([
         0xbf,
       ]);
     writerTest('Writes empty list',
-      (writer) => { writer.writeList(); writer.endContainer() },
+      (writer) => { writer.stepIn(ion.IonTypes.LIST); writer.stepOut() },
         [0xb0]);
     writerTest('Writes nested lists',
-      (writer) => { writer.writeList(); writer.writeList(); writer.writeList();
-                    writer.endContainer(); writer.endContainer(); writer.endContainer() },
+      (writer) => { writer.stepIn(ion.IonTypes.LIST); writer.stepIn(ion.IonTypes.LIST); writer.stepIn(ion.IonTypes.LIST);
+                    writer.stepOut(); writer.stepOut(); writer.stepOut() },
         [0xb2, 0xb1, 0xb0]);
     writerTest('Writes pyramid lists',
       (writer) => {
-        writer.writeList();
-          writer.writeList();
-            writer.writeList();
-            writer.endContainer();
-            writer.writeList();
-            writer.endContainer();
-            writer.writeList();
-            writer.endContainer();
-          writer.endContainer();
-          writer.writeList();
-            writer.writeList();
-            writer.endContainer();
-            writer.writeList();
-            writer.endContainer();
-            writer.writeList();
-            writer.endContainer();
-          writer.endContainer();
-        writer.endContainer();
+        writer.stepIn(ion.IonTypes.LIST);
+          writer.stepIn(ion.IonTypes.LIST);
+            writer.stepIn(ion.IonTypes.LIST);
+            writer.stepOut();
+            writer.stepIn(ion.IonTypes.LIST);
+            writer.stepOut();
+            writer.stepIn(ion.IonTypes.LIST);
+            writer.stepOut();
+          writer.stepOut();
+          writer.stepIn(ion.IonTypes.LIST);
+            writer.stepIn(ion.IonTypes.LIST);
+            writer.stepOut();
+            writer.stepIn(ion.IonTypes.LIST);
+            writer.stepOut();
+            writer.stepIn(ion.IonTypes.LIST);
+            writer.stepOut();
+          writer.stepOut();
+        writer.stepOut();
       },
         [0xb8, 0xb3, 0xb0, 0xb0, 0xb0, 0xb3, 0xb0, 0xb0, 0xb0]);
     writerTest('Writes list with annotation',
-      (writer) => { writer.writeList(['a']); writer.endContainer() },
+      (writer) => { writer.stepIn(ion.IonTypes.LIST, ['a']); writer.stepOut() },
         [
         // Symbol table
         0xe7, 0x81, 0x83, 0xd4, 0x87, 0xb2, 0x81, 'a'.charCodeAt(0),
@@ -340,8 +337,8 @@ define([
         0xe3, 0x81, 0x8a, 0xb0,
       ]);
     writerTest('Writes nested list with annotation',
-      (writer) => { writer.writeList(); writer.writeList(['a']);
-                    writer.endContainer(); writer.endContainer() },
+      (writer) => { writer.stepIn(ion.IonTypes.LIST); writer.stepIn(ion.IonTypes.LIST, ['a']);
+                    writer.stepOut(); writer.stepOut() },
         [
         // Symbol table
         0xe7, 0x81, 0x83, 0xd4, 0x87, 0xb2, 0x81, 'a'.charCodeAt(0),
@@ -352,24 +349,24 @@ define([
       ]);
     writerTest('Writes pyramid lists with deep annotations',
       (writer) => {
-        writer.writeList();
-          writer.writeList();
-            writer.writeList();
-            writer.endContainer();
-            writer.writeList(['a']);
-            writer.endContainer();
-            writer.writeList();
-            writer.endContainer();
-          writer.endContainer();
-          writer.writeList();
-            writer.writeList();
-            writer.endContainer();
-            writer.writeList(['b']);
-            writer.endContainer();
-            writer.writeList();
-            writer.endContainer();
-          writer.endContainer();
-        writer.endContainer();
+        writer.stepIn(ion.IonTypes.LIST);
+          writer.stepIn(ion.IonTypes.LIST);
+            writer.stepIn(ion.IonTypes.LIST);
+            writer.stepOut();
+            writer.stepIn(ion.IonTypes.LIST, ['a']);
+            writer.stepOut();
+            writer.stepIn(ion.IonTypes.LIST);
+            writer.stepOut();
+          writer.stepOut();
+          writer.stepIn(ion.IonTypes.LIST);
+            writer.stepIn(ion.IonTypes.LIST);
+            writer.stepOut();
+            writer.stepIn(ion.IonTypes.LIST, ['b']);
+            writer.stepOut();
+            writer.stepIn(ion.IonTypes.LIST);
+            writer.stepOut();
+          writer.stepOut();
+        writer.stepOut();
       },
         [
         // Symbol table
@@ -392,9 +389,6 @@ define([
 
     // S-Expressions
 
-    writerTest('Writes null sexp by flag',
-      (writer) => { writer.writeSexp(null, true) },
-        [0xcf]);
     writerTest('Writes null sexp by direct call',
       (writer) => { writer.writeNull(ion.IonTypes.SEXP) },
         [0xcf]);
@@ -409,11 +403,11 @@ define([
         0xcf,
       ]);
     writerTest('Writes empty sexp',
-      (writer) => { writer.writeSexp(); writer.endContainer() },
+      (writer) => { writer.stepIn(ion.IonTypes.SEXP); writer.stepOut() },
         [0xc0]);
     writerTest('Writes nested sexps',
-      (writer) => { writer.writeSexp(); writer.writeSexp(); writer.writeSexp();
-                    writer.endContainer(); writer.endContainer(); writer.endContainer() },
+      (writer) => { writer.stepIn(ion.IonTypes.SEXP); writer.stepIn(ion.IonTypes.SEXP); writer.stepIn(ion.IonTypes.SEXP);
+                    writer.stepOut(); writer.stepOut(); writer.stepOut() },
         [0xc2, 0xc1, 0xc0]);
 
     // Strings
@@ -453,15 +447,15 @@ define([
 
     // Structs
 
-    writerTest('Writes null struct by flag',
-      (writer) => { writer.writeStruct(null, true) },
+    writerTest('Writes null struct by direct call',
+      (writer) => { writer.writeNull(ion.IonTypes.STRUCT) },
         [0xdf]);
     writerTest('Writes empty struct',
-      (writer) => { writer.writeStruct(); writer.endContainer() },
+      (writer) => { writer.stepIn(ion.IonTypes.STRUCT); writer.stepOut() },
         [0xd0]);
     writerTest('Writes nested structs',
-      (writer) => { writer.writeStruct(); writer.writeFieldName('a'); writer.writeStruct();
-                    writer.endContainer(); writer.endContainer() },
+      (writer) => { writer.stepIn(ion.IonTypes.STRUCT); writer.writeFieldName('a'); writer.stepIn(ion.IonTypes.STRUCT);
+                    writer.stepOut(); writer.stepOut() },
         [
         // Symbol table
         0xe7, 0x81, 0x83, 0xd4, 0x87, 0xb2, 0x81, 'a'.charCodeAt(0),
@@ -470,12 +464,12 @@ define([
       ]);
     writerTest('Writes struct with duplicate field names',
       (writer) => {
-        writer.writeStruct();
+        writer.stepIn(ion.IonTypes.STRUCT);
         writer.writeFieldName('a');
         writer.writeNull(ion.IonTypes.NULL);
         writer.writeFieldName('a');
         writer.writeNull(ion.IonTypes.NULL);
-        writer.endContainer();
+        writer.stepOut();
       },
         [
         // Symbol table
@@ -485,7 +479,7 @@ define([
       ]);
     skippedWriterTest('Kitchen sink',
       (writer) => {
-        writer.writeStruct(['x']);
+        writer.stepIn(ion.IonTypes.STRUCT, ['x']);
         writer.writeFieldName('b');
         writer.writeBoolean(true);
         writer.writeFieldName('b');
@@ -503,23 +497,23 @@ define([
         writer.writeFieldName('i');
         writer.writeInt(123456);
         writer.writeFieldName('l');
-        writer.writeList();
-        writer.endContainer();
+        writer.stepIn(ion.IonTypes.LIST);
+        writer.stepOut();
         writer.writeFieldName('n');
         writer.writeNull(ion.IonTypes.NULL);
         writer.writeFieldName('s');
-        writer.writeSexp();
-        writer.endContainer();
+        writer.stepIn(ion.IonTypes.SEXP);
+        writer.stepOut();
         writer.writeFieldName('s');
         writer.writeString('baz');
         writer.writeFieldName('s');
-        writer.writeStruct();
-        writer.endContainer();
+        writer.stepIn(ion.IonTypes.STRUCT);
+        writer.stepOut();
         writer.writeFieldName('s');
         writer.writeSymbol('qux');
         writer.writeFieldName('t');
         writer.writeTimestamp(new ion.Timestamp(ion.Precision.DAY, 0, 2000, 1, 1));
-        writer.endContainer();
+        writer.stepOut();
       },
         [
         // Symbol table
@@ -819,12 +813,12 @@ define([
     errorTest('Cannot write top-level field name',
       (writer) => { writer.writeFieldName('foo') });
     errorTest('Cannot exit container at top level',
-      (writer) => { writer.endContainer() });
+      (writer) => { writer.stepOut() });
     errorTest('Cannot double-exit container',
       (writer) => {
-        writer.writeList();
-        writer.endContainer();
-        writer.endConttainer();
+        writer.stepIn(ion.IonTypes.LIST);
+        writer.stepOut();
+        writer.stepOut();
       });
 
     // Node tests
