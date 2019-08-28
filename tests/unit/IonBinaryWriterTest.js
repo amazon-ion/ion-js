@@ -55,7 +55,7 @@ define([
       (writer) => { writer.writeBlob(null) },
         [0xaf]);
     writerTest('Writes null blob 2',
-      (writer) => { writer.writeNull(ion.TypeCodes.BLOB) },
+      (writer) => { writer.writeNull(ion.IonTypes.BLOB) },
         [0xaf]);
     writerTest('Writes blob with annotation',
       (writer) => { writer.writeBlob(new Uint8Array([1]), ['a']) },
@@ -102,7 +102,7 @@ define([
       (writer) => { writer.writeBoolean(undefined) },
         [0x1f]);
     writerTest('Writes null boolean by direct call',
-      (writer) => { writer.writeNull(ion.TypeCodes.BOOL) },
+      (writer) => { writer.writeNull(ion.IonTypes.BOOL) },
         [0x1f]);
     writerTest('Writes boolean with annotations',
       (writer) => { writer.writeBoolean(true, ['a', 'b']) },
@@ -144,7 +144,7 @@ define([
       (writer) => { writer.writeClob() },
       [0x9f]);
     writerTest('Writes null clob by direct call',
-      (writer) => { writer.writeNull(ion.TypeCodes.CLOB) },
+      (writer) => { writer.writeNull(ion.IonTypes.CLOB) },
       [0x9f]);
     writerTest('Writes clob with annotation',
       (writer) => { writer.writeClob(new Uint8Array([1, 2, 3]), ['foo']) },
@@ -185,7 +185,7 @@ define([
       (writer) => { writer.writeDecimal() },
         [0x5f]);
     writerTest('Writes null decimal by direct call',
-      (writer) => { writer.writeNull(ion.TypeCodes.DECIMAL) },
+      (writer) => { writer.writeNull(ion.IonTypes.DECIMAL) },
         [0x5f]);
     writerTest('Writes implicitly positive zero decimal as single byte',
       (writer) => { writer.writeDecimal(ion.Decimal.parse("0")) },
@@ -197,7 +197,7 @@ define([
       (writer) => { writer.writeDecimal(ion.Decimal.parse("-0")) },
         [0x52, 0x80, 0x80]);
     writerTest('Writes null decimal with annotation',
-      (writer) => { writer.writeNull(ion.TypeCodes.DECIMAL, ['a']) },
+      (writer) => { writer.writeNull(ion.IonTypes.DECIMAL, ['a']) },
         [
         0xe7, 0x81, 0x83, 0xd4, 0x87, 0xb2, 0x81, 'a'.charCodeAt(0),
         0xe3, 0x81, 0x8a, 0x5f
@@ -215,7 +215,7 @@ define([
     // Floats
 
     writerTest("Writes null float by direct call",
-      (writer) => { writer.writeNull(ion.TypeCodes.FLOAT) },
+      (writer) => { writer.writeNull(ion.IonTypes.FLOAT) },
         [0x4f]);
 
     // 32-bit floats
@@ -269,11 +269,8 @@ define([
       (writer) => { writer.writeInt() },
         [0x2f]);
     writerTest('Writes null positive int by direct call',
-      (writer) => { writer.writeNull(ion.TypeCodes.POSITIVE_INT) },
+      (writer) => { writer.writeNull(ion.IonTypes.INT) },
         [0x2f]);
-    writerTest('Writes null negative int by direct call',
-      (writer) => { writer.writeNull(ion.TypeCodes.NEGATIVE_INT) },
-        [0x3f]);
     writerTest('Writes int +0',
       (writer) => { writer.writeInt(0) },
         [0x20]);
@@ -293,10 +290,10 @@ define([
       (writer) => { writer.writeList(null, true); },
         [0xbf]);
     writerTest('Writes null list by direct call',
-      (writer) => { writer.writeNull(ion.TypeCodes.LIST) },
+      (writer) => { writer.writeNull(ion.IonTypes.LIST) },
         [0xbf]);
     writerTest('Writes null list with annotation',
-      (writer) => { writer.writeNull(ion.TypeCodes.LIST, ['a']) },
+      (writer) => { writer.writeNull(ion.IonTypes.LIST, ['a']) },
         [
         // Symbol table
         0xe7, 0x81, 0x83, 0xd4, 0x87, 0xb2, 0x81, 'a'.charCodeAt(0),
@@ -387,7 +384,7 @@ define([
     // Nulls
 
     writerTest('Writes explicit null',
-      (writer) => { writer.writeNull(ion.TypeCodes.NULL) },
+      (writer) => { writer.writeNull(ion.IonTypes.NULL) },
         [0x0f]);
     writerTest('Writes implicit null',
       (writer) => { writer.writeNull() },
@@ -399,10 +396,10 @@ define([
       (writer) => { writer.writeSexp(null, true) },
         [0xcf]);
     writerTest('Writes null sexp by direct call',
-      (writer) => { writer.writeNull(ion.TypeCodes.SEXP) },
+      (writer) => { writer.writeNull(ion.IonTypes.SEXP) },
         [0xcf]);
     writerTest('Writes null sexp with annotation',
-      (writer) => { writer.writeNull(ion.TypeCodes.SEXP, ['a']) },
+      (writer) => { writer.writeNull(ion.IonTypes.SEXP, ['a']) },
         [
         // Symbol table
         0xe7, 0x81, 0x83, 0xd4, 0x87, 0xb2, 0x81, 'a'.charCodeAt(0),
@@ -428,7 +425,7 @@ define([
       (writer) => { writer.writeString() },
         [0x8f]);
     writerTest('Writes null string by direct call',
-      (writer) => { writer.writeNull(ion.TypeCodes.STRING) },
+      (writer) => { writer.writeNull(ion.IonTypes.STRING) },
         [0x8f]);
     writerTest('Writes two top-level strings one with annotation',
       (writer) => { writer.writeString("foo"); writer.writeString("bar", ['a']) },
@@ -475,9 +472,9 @@ define([
       (writer) => {
         writer.writeStruct();
         writer.writeFieldName('a');
-        writer.writeNull(ion.TypeCodes.NULL);
+        writer.writeNull(ion.IonTypes.NULL);
         writer.writeFieldName('a');
-        writer.writeNull(ion.TypeCodes.NULL);
+        writer.writeNull(ion.IonTypes.NULL);
         writer.endContainer();
       },
         [
@@ -639,7 +636,7 @@ define([
       (writer) => { writer.writeSymbol() },
         [0x7f]);
     writerTest('Writes null symbol by direct call',
-      (writer) => { writer.writeNull(ion.TypeCodes.SYMBOL) },
+      (writer) => { writer.writeNull(ion.IonTypes.SYMBOL) },
         [0x7f]);
     writerTest('Writes symbol with identical annotation',
       (writer) => { writer.writeSymbol('a', ['a']) },
@@ -667,7 +664,7 @@ define([
       (writer) => { writer.writeTimestamp() },
         [0x6f]);
     writerTest('Writes null timestamp by direct call',
-      (writer) => { writer.writeNull(ion.TypeCodes.TIMESTAMP) },
+      (writer) => { writer.writeNull(ion.IonTypes.TIMESTAMP) },
         [0x6f]);
       skippedWriterTest('Writes 2000-01-01T12:34:56.789 with year precision',
       (writer) => { writer.writeTimestamp(new ion.Timestamp(ion.Precision.YEAR, 0, 2000, 1, 1, 12, 34, 56, ion.Decimal.parse('.789')))},
@@ -835,7 +832,7 @@ define([
     suite['Calculates node lengths correctly'] = function() {
       var writeable = new ion.Writeable();
       var writer = new ion.LowLevelBinaryWriter(writeable);
-      var node = new ion.NullNode(writer, null, ion.TypeCodes.LIST, [10 | 0x80]);
+      var node = new ion.NullNode(writer, null, ion.IonTypes.LIST, [10 | 0x80]);
       assert.equal(node.getAnnotatedContainerLength(), 3);
       assert.equal(node.getAnnotationsLength(), 3);
       assert.equal(node.getLength(), 4);
