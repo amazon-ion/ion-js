@@ -18,9 +18,10 @@ define([
         'intern/dojo/node!fs',
         'intern/dojo/node!path',
         'dist/amd/es6/IonTests',
+        'dist/amd/es6/IonEventStream',
         'dist/amd/es6/util',
     ],
-    function(intern, registerSuite, assert, fs, paths, ion, util) {
+    function(intern, registerSuite, assert, fs, paths, ion, es, util) {
         // TBD split each suite into a different test source file;
         //     perhaps good/bad and equivs/non-equivs pairs belong together
 
@@ -141,8 +142,8 @@ define([
             }
 
             function compare(c, i, j, valueI, valueJ) {
-                let eventStreamI = new ion.IonEventStream(ion.makeReader(valueI));
-                let eventStreamJ = new ion.IonEventStream(ion.makeReader(valueJ));
+                let eventStreamI = new es.IonEventStream(ion.makeReader(valueI));
+                let eventStreamJ = new es.IonEventStream(ion.makeReader(valueJ));
                 let result = eventStreamI.equals(eventStreamJ);
                 assert(expectedEquivalence ? result : !result,
                     'Expected ' + bytesToString(c, i, valueI)
@@ -253,28 +254,28 @@ define([
 
         function roundTripEventStreams(reader) {
             let streams = [];
-            streams.push(new ion.IonEventStream(reader));
+            streams.push(new es.IonEventStream(reader));
 
             let eventWriter = ion.makeTextWriter();
             streams[0].writeEventStream(eventWriter);
             eventWriter.close();
-            streams.push(new ion.IonEventStream(new ion.makeReader(eventWriter.getBytes())));
+            streams.push(new es.IonEventStream(new ion.makeReader(eventWriter.getBytes())));
 
             let textWriter = ion.makeTextWriter();
             streams[0].writeIon(textWriter);
-            streams.push(new ion.IonEventStream(new ion.makeReader(textWriter.getBytes())));
+            streams.push(new es.IonEventStream(new ion.makeReader(textWriter.getBytes())));
 
             let binaryWriter = ion.makeBinaryWriter();
             streams[0].writeIon(binaryWriter);
-            streams.push(new ion.IonEventStream(new ion.makeReader(binaryWriter.getBytes())));
+            streams.push(new es.IonEventStream(new ion.makeReader(binaryWriter.getBytes())));
 
             let eventTextWriter = ion.makeTextWriter();
             streams[0].writeIon(eventTextWriter);
-            streams.push(new ion.IonEventStream(new ion.makeReader(eventTextWriter.getBytes())));
+            streams.push(new es.IonEventStream(new ion.makeReader(eventTextWriter.getBytes())));
 
             let eventBinaryWriter = ion.makeBinaryWriter();
             streams[0].writeIon(eventBinaryWriter);
-            streams.push(new ion.IonEventStream(new ion.makeReader(eventBinaryWriter.getBytes())));
+            streams.push(new es.IonEventStream(new ion.makeReader(eventBinaryWriter.getBytes())));
 
             for (let i = 0; i < streams.length - 1; i++) {
                 for (let j = i + 1; j < streams.length; j++) {

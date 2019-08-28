@@ -22,7 +22,7 @@ module.exports = function(grunt) {
       es6: {
         options: {
           config: 'tests/intern',
-          reporters: ['Console', 'node_modules/remap-istanbul/lib/intern-reporters/JsonCoverage'],
+          reporters: ['Runner'],
           ionVersion: 'es6',
         },
       },
@@ -56,12 +56,12 @@ module.exports = function(grunt) {
     remapIstanbul: {
       build: {
         src: 'coverage-final.json',
-          options: {
-            reports: {
-              'html': 'docs/coverage/html',
-              'json': 'docs/coverage/coverage-final-mapped.json'
-            }
+        options: {
+          reports: {
+            'html': 'docs/coverage/html',
+            'json': 'docs/coverage/coverage-final-mapped.json'
           }
+        }
       }
     },
     ts: {
@@ -232,10 +232,13 @@ module.exports = function(grunt) {
 
   grunt.registerTask('doc', ['typedoc']);
 
+  grunt.registerTask('cleanup', 'Removes extraneous files from distributions', function() {
+    grunt.file.expand('dist/**/IonEvent*', 'dist/**/IonTests.*').forEach((file) => grunt.file.delete(file));
+  });
 
   // release target used by Travis 
-  grunt.registerTask('release', ['build', 'test:run', 'test:coverage', 'typedoc', 'nojekyll']);
+  grunt.registerTask('release', ['build', 'test:run', 'test:coverage', 'cleanup', 'typedoc', 'nojekyll']);
 
   // default for development
-  grunt.registerTask('default', ['test']);
+  grunt.registerTask('default', ['test', 'cleanup']);
 };
