@@ -79,6 +79,8 @@ define(
 
             assert.equal(ionReader.fieldName(), "key");
             assert.equal(ionReader.value(), "string");
+
+            assert.isNull(ionReader.next());
         };
 
         suite['Parse through struct can skip over container'] = function() {
@@ -102,6 +104,8 @@ define(
 
             assert.equal(ionReader.fieldName(), "key2");
             assert.equal(ionReader.value(), "string2");
+
+            assert.isNull(ionReader.next());
         };
 
         suite['Parse through struct can skip over nested containers'] = function() {
@@ -124,8 +128,64 @@ define(
             ionReader.next();
 
             assert.equal(ionReader.fieldName(), "innerkey2");
+
+            assert.isNull(ionReader.next());
         };
 
+        suite['Reads an array'] = function() {
+            var ionToRead = "{ key : ['v1', 'v2'] }";
+            var ionReader = ion.makeReader(ionToRead);
+            ionReader.next();
+
+            assert.equal(ion.IonTypes.STRUCT, ionReader.type());
+
+            ionReader.stepIn(); // Step into the base struct.
+            ionReader.next();
+
+            assert.equal(ionReader.fieldName(), "key");
+
+            ionReader.stepIn(); // Step into the array.
+
+            ionReader.next();
+            assert.equal(ionReader.value(), "v1");
+
+            ionReader.next();
+            assert.equal(ionReader.value(), "v2");
+
+            assert.isNull(ionReader.next());
+        };
+
+        suite['Reads a nested array'] = function() {
+            var ionToRead = "{ key : [['v1', 'v2']] }";
+            var ionReader = ion.makeReader(ionToRead);
+            ionReader.next();
+
+            assert.equal(ion.IonTypes.STRUCT, ionReader.type());
+
+            ionReader.stepIn(); // Step into the base struct.
+            ionReader.next();
+
+            assert.equal(ionReader.fieldName(), "key");
+
+            ionReader.stepIn(); // Step into the outer array.            
+            ionReader.next();
+            ionReader.stepIn(); // Step into the inner array.
+
+            ionReader.next();
+            assert.equal(ionReader.value(), "v1");
+
+            ionReader.next();
+            assert.equal(ionReader.value(), "v2");
+
+            assert.isNull(ionReader.next());
+        };
+        
+        suite['Returns null on EOF'] = function() {
+            var ionToRead = "";
+            var ionReader = ion.makeReader(ionToRead);
+            assert.isNull(ionReader.next());
+            assert.isNull(ionReader.next()); // EOF
+        };
 
         suite['text IVM'] = function() {
             var textReader = ion.makeReader("");

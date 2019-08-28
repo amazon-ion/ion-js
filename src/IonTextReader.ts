@@ -124,7 +124,7 @@ export class TextReader implements Reader {
 
   next() {
     this._raw = undefined;
-    if (this._raw_type === EOF) return undefined;
+    if (this._raw_type === EOF) return null;
 
     let should_skip: boolean =
     this._raw_type !== BEGINNING_OF_CONTAINER
