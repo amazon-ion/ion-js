@@ -257,11 +257,17 @@ export class BinaryWriter implements Writer {
 
   stepIn(type: IonType, annotations?: string[]) : void {
     this.checkWriteValue();
-    if (type === IonTypes.STRUCT) {
-      this.addNode(new StructNode(this.writer, this.getCurrentContainer(), this.encodeAnnotations(annotations)));
-      this.state = States.STRUCT_FIELD;
-    } else {
-      this.addNode(new SequenceNode(this.writer, this.getCurrentContainer(), type, this.encodeAnnotations(annotations)));
+    switch (type) {
+      case IonTypes.LIST:
+      case IonTypes.SEXP:
+        this.addNode(new SequenceNode(this.writer, this.getCurrentContainer(), type, this.encodeAnnotations(annotations)));
+        break;
+      case IonTypes.STRUCT:
+        this.addNode(new StructNode(this.writer, this.getCurrentContainer(), this.encodeAnnotations(annotations)));
+        this.state = States.STRUCT_FIELD;
+        break;
+      default:
+        throw new Error("Unrecognized container type");
     }
   }
 
