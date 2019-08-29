@@ -12,9 +12,9 @@
  * language governing permissions and limitations under the License.
  */
 import {Decimal} from "./IonDecimal";
+import {IonType} from "./IonType";
 import {Reader} from "./IonReader";
 import {Timestamp} from "./IonTimestamp";
-import {IonType} from "./IonType";
 
 /**
  * Writes values in the Ion text or binary formats.
@@ -28,17 +28,15 @@ export interface Writer {
   writeFloat32(value: number, annotations?: string[]) : void;
   writeFloat64(value: number, annotations?: string[]) : void;
   writeInt(value: number, annotations?: string[]) : void;
-  writeList(annotations?: string[], isNull?: boolean) : void;
   writeNull(type: IonType, annotations?: string[]) : void;
-  writeSexp(annotations?: string[], isNull?: boolean) : void;
   writeString(value: string, annotations?: string[]) : void;
-  writeStruct(annotations?: string[], isNull?: boolean) : void;
   writeSymbol(value: string, annotations?: string[]) : void;
   writeTimestamp(value: Timestamp, annotations?: string[]) : void;
+  stepIn(type: IonType, annotations?: string[]) : void;
+  stepOut() : void;
   getBytes(): Uint8Array;
 
   close() : void;
-  endContainer() : void;
 
   /**
    * Writes a reader's current value and all following values until the end

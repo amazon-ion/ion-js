@@ -68,7 +68,7 @@ abstract class AbstractIonEvent implements IonEvent {
     abstract valueEquals(expected : IonEvent) : boolean;
 
     write(writer : Writer) {
-        writer.writeStruct();
+        writer.stepIn(IonTypes.STRUCT);
         writer.writeFieldName('event_type');
         writer.writeSymbol(IonEventType[this.eventType]);
         if(this.ionType !== null) {
@@ -94,7 +94,7 @@ abstract class AbstractIonEvent implements IonEvent {
         */
         writer.writeFieldName('depth');
         writer.writeInt(this.depth);
-        writer.endContainer();
+        writer.stepOut();
     }
 
     writeAnnotations(writer : Writer) {
@@ -102,11 +102,11 @@ abstract class AbstractIonEvent implements IonEvent {
             writer.writeNull(IonTypes.LIST);
             return;
         }
-        writer.writeList();
+        writer.stepIn(IonTypes.LIST);
         for(var i = 0; i < this.annotations.length; i++){
             writer.writeString(this.annotations[i]);
         }
-        writer.endContainer();
+        writer.stepOut();
     }
 
     writeSymbolToken(writer : Writer, text : string){
@@ -149,11 +149,11 @@ abstract class AbstractIonEvent implements IonEvent {
         this.writeIonValue(tempBinaryWriter);
         tempBinaryWriter.close();
         let binaryBuffer = tempBinaryWriter.getBytes();
-        writer.writeList();
+        writer.stepIn(IonTypes.LIST);
         for(var i = 0; i < binaryBuffer.length; i++){
             writer.writeInt(binaryBuffer[i]);
         }
-        writer.endContainer();
+        writer.stepOut();
     }
 
     equals(expected : IonEvent) : boolean {

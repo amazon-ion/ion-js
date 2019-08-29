@@ -66,15 +66,15 @@ export function _writeValue(reader: IonReader, writer: IonWriter, _depth = 0): v
             case IonTypes.STRING:    writer.writeString(reader.stringValue(), reader.annotations()); break;
             case IonTypes.CLOB:      writer.writeClob(reader.byteValue(), reader.annotations()); break;
             case IonTypes.BLOB:      writer.writeBlob(reader.byteValue(), reader.annotations()); break;
-            case IonTypes.LIST:      writer.writeList(reader.annotations()); break;
-            case IonTypes.SEXP:      writer.writeSexp(reader.annotations()); break;
-            case IonTypes.STRUCT:    writer.writeStruct(reader.annotations()); break;
+            case IonTypes.LIST:      writer.stepIn(IonTypes.LIST, reader.annotations()); break;
+            case IonTypes.SEXP:      writer.stepIn(IonTypes.SEXP, reader.annotations()); break;
+            case IonTypes.STRUCT:    writer.stepIn(IonTypes.STRUCT, reader.annotations()); break;
             default: throw new Error('Unrecognized type ' + (type !== null ? type.name : type));
         }
         if (type.container) {
             reader.stepIn();
             _writeValues(reader, writer, _depth + 1);
-            writer.endContainer();
+            writer.stepOut();
             reader.stepOut();
         }
     }

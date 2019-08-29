@@ -81,7 +81,7 @@ export class PrettyTextWriter extends TextWriter {
         if (this.currentContainer.containerType === IonTypes.STRUCT) this.currentContainer.state = State.STRUCT_FIELD;
     }
 
-    endContainer() : void {
+    stepOut() : void {
         let currentContainer = this.containerContext.pop();
         if (!currentContainer || !currentContainer.containerType) {
             throw new Error("Can't step out when not in a container");
@@ -135,7 +135,7 @@ export class PrettyTextWriter extends TextWriter {
         this.writeAnnotations(annotations);
         this.writeable.writeByte(openingCharacter);
         this.writePrettyNewLine(1);
-        this.stepIn(type);
+        this._stepIn(type);
     }
 
     handleSeparator() : void {

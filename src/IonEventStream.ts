@@ -85,22 +85,10 @@ export class IonEventStream {
                     }
                     break;
                 case IonEventType.CONTAINER_START:
-                    switch(tempEvent.ionType) {
-                        case IonTypes.STRUCT :
-                            writer.writeStruct(tempEvent.annotations, false);
-                            break;
-                        case IonTypes.LIST :
-                            writer.writeList(tempEvent.annotations, false);
-                            break;
-                        case IonTypes.SEXP :
-                            writer.writeSexp(tempEvent.annotations, false);
-                            break;
-                        default :
-                            throw new Error('Unexpected IonType: ' + tempEvent.ionType.name);
-                    }
+                    writer.stepIn(tempEvent.ionType, tempEvent.annotations);
                     break;
                 case IonEventType.CONTAINER_END:
-                    writer.endContainer();
+                    writer.stepOut();
                     break;
                 case IonEventType.STREAM_END:
                     writer.close();

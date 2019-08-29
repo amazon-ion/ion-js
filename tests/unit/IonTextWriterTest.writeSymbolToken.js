@@ -42,14 +42,14 @@ define(
 
             writer.writeInt(5, [s]);      // annotation
 
-            writer.writeStruct();
+            writer.stepIn(ion.IonTypes.STRUCT);
             writer.writeFieldName(s);     // fieldname
             writer.writeInt(5);
-            writer.endContainer();
+            writer.stepOut();
 
-            writer.writeSexp();
+            writer.stepIn(ion.IonTypes.SEXP);
             writer.writeSymbol(s);        // symbol in sexp (operators should not be quoted)
-            writer.endContainer();
+            writer.stepOut();
 
             writer.close();
             let actual = String.fromCharCode.apply(null, writer.getBytes());

@@ -14,8 +14,8 @@
 import {Decimal} from "./IonDecimal";
 import {encodeUtf8} from "./IonUnicode";
 import {Import} from "./IonImport";
-import {IonTypes} from "./IonTypes";
 import {IonType} from "./IonType";
+import {IonTypes} from "./IonTypes";
 import {LocalSymbolTable} from "./IonLocalSymbolTable";
 import {LongInt} from "./IonLongInt";
 import {LowLevelBinaryWriter} from "./IonLowLevelBinaryWriter";
@@ -38,11 +38,11 @@ const TYPE_DESCRIPTOR_LENGTH: number = 1;
 
 /** Possible writer states */
 enum States {
-  /** The writer expects a value (a call to writeInt(), writeString(), etc.) or a transition (endContainer(), close()) */
+  /** The writer expects a value (a call to writeInt(), writeString(), etc.) or a transition (stepOut(), close()) */
   VALUE,
-  /** The writer expects a struct field name (valid calls are writeFieldName() and endContainer()) */
+  /** The writer expects a struct field name (valid calls are writeFieldName() and stepOut()) */
   STRUCT_FIELD,
-  /** The writer expects a struct value (writeInt(), writeString(), etc.) but not a transition (endContainer() and close() will throw an exception) */
+  /** The writer expects a struct value (writeInt(), writeString(), etc.) but not a transition (stepOut() and close() will throw an exception) */
   STRUCT_VALUE,
   /** The writer is closed, no further operations may be performed */
   CLOSED,
@@ -199,29 +199,9 @@ export class BinaryWriter implements Writer {
     this.addNode(new IntNode(this.writer, this.getCurrentContainer(), this.encodeAnnotations(annotations), value));
   }
 
-  writeList(annotations?: string[], isNull: boolean = false) : void {
-    this.checkWriteValue();
-    if (isNull) {
-      this.writeNull(IonTypes.LIST, annotations);
-      return;
-    }
-
-    this.addNode(new SequenceNode(this.writer, this.getCurrentContainer(), IonTypes.LIST, this.encodeAnnotations(annotations)));
-  }
-
   writeNull(type: IonType = IonTypes.NULL, annotations?: string[]) {
     this.checkWriteValue();
     this.addNode(new NullNode(this.writer, this.getCurrentContainer(), type, this.encodeAnnotations(annotations)));
-  }
-
-  writeSexp(annotations?: string[], isNull: boolean = false) : void {
-    this.checkWriteValue();
-    if (isNull) {
-      this.writeNull(IonTypes.SEXP, annotations);
-      return;
-    }
-
-    this.addNode(new SequenceNode(this.writer, this.getCurrentContainer(), IonTypes.SEXP, this.encodeAnnotations(annotations)));
   }
 
   writeString(value: string, annotations?: string[]) : void {
@@ -232,17 +212,6 @@ export class BinaryWriter implements Writer {
     }
 
     this.addNode(new BytesNode(this.writer, this.getCurrentContainer(), IonTypes.STRING, this.encodeAnnotations(annotations), encodeUtf8(value)));
-  }
-
-  writeStruct(annotations?: string[], isNull: boolean = false) : void {
-    this.checkWriteValue();
-    if (isNull) {
-      this.writeNull(IonTypes.STRUCT, annotations);
-      return;
-    }
-
-    this.addNode(new StructNode(this.writer, this.getCurrentContainer(), this.encodeAnnotations(annotations)));
-    this.state = States.STRUCT_FIELD;
   }
 
   writeSymbol(value: string, annotations?: string[]) : void {
@@ -286,7 +255,23 @@ export class BinaryWriter implements Writer {
     this.addNode(new BytesNode(this.writer, this.getCurrentContainer(), IonTypes.TIMESTAMP, this.encodeAnnotations(annotations), writer.getBytes()));
   }
 
-  endContainer() {
+  stepIn(type: IonType, annotations?: string[]) : void {
+    this.checkWriteValue();
+    switch (type) {
+      case IonTypes.LIST:
+      case IonTypes.SEXP:
+        this.addNode(new SequenceNode(this.writer, this.getCurrentContainer(), type, this.encodeAnnotations(annotations)));
+        break;
+      case IonTypes.STRUCT:
+        this.addNode(new StructNode(this.writer, this.getCurrentContainer(), this.encodeAnnotations(annotations)));
+        this.state = States.STRUCT_FIELD;
+        break;
+      default:
+        throw new Error("Unrecognized container type");
+    }
+  }
+
+  stepOut() {
     if (this.isTopLevel()) {
       throw new Error("Not currently in a container");
     }
@@ -364,7 +349,7 @@ export class BinaryWriter implements Writer {
   close() : void {
     this.checkClosed();
     if(!this.isTopLevel()) {
-      throw new Error("Writer has one or more open containers; call endContainer() for each container prior to close()");
+      throw new Error("Writer has one or more open containers; call stepOut() for each container prior to close()");
     }
     this.writeIvm();
     let datagram: Node[] = this.datagram;
@@ -396,24 +381,24 @@ export class BinaryWriter implements Writer {
       return;
     }
 
-    this.writeStruct(['$ion_symbol_table']);
+    this.stepIn(IonTypes.STRUCT, ['$ion_symbol_table']);
     if (hasImports) {
       this.writeFieldName('imports');
-      this.writeList();
+      this.stepIn(IonTypes.LIST);
       this.writeImport(this.symbolTable.import);
-      this.endContainer();
+      this.stepOut();
     }
     if (hasLocalSymbols) {
       this.writeFieldName('symbols');
-      this.writeList();
+      this.stepIn(IonTypes.LIST);
       for (let symbol_ of this.symbolTable.symbols) {
         if (symbol_ !== undefined) {//TODO investigate if this needs more error handling.
           this.writeString(symbol_);
         }
       }
-      this.endContainer();
+      this.stepOut();
     }
-    this.endContainer();
+    this.stepOut();
     this.datagram[0].write();
   }
 
@@ -422,14 +407,14 @@ export class BinaryWriter implements Writer {
       return;
     }
     this.writeImport(import_.parent);
-    this.writeStruct();
+    this.stepIn(IonTypes.STRUCT);
     this.writeFieldName('name');
     this.writeString(import_.symbolTable.name);
     this.writeFieldName('version');
     this.writeInt(import_.symbolTable.version);
     this.writeFieldName('max_id');
     this.writeInt(import_.length);
-    this.endContainer();
+    this.stepOut();
   }
 
   writeValues(reader: Reader, writer: Writer): void {

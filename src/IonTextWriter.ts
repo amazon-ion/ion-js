@@ -197,10 +197,6 @@ export class TextWriter implements Writer {
         });
     }
 
-    writeList(annotations?: string[], isNull?: boolean) : void {
-        this.writeContainer(IonTypes.LIST, CharCodes.LEFT_BRACKET, annotations, isNull);
-    }
-
     writeNull(type: IonType, annotations?: string[]) : void {
         if (type === null || type === undefined || type.bid < 0 || type.bid > 13) {
             throw new Error(`Cannot write null for type ${type}`);
@@ -211,19 +207,10 @@ export class TextWriter implements Writer {
         if (this.currentContainer.containerType === IonTypes.STRUCT) this.currentContainer.state = State.STRUCT_FIELD;
     }
 
-    writeSexp(annotations?: string[], isNull?: boolean) : void {
-        this.writeContainer(IonTypes.SEXP, CharCodes.LEFT_PARENTHESIS, annotations, isNull);
-    }
-
     writeString(value: string, annotations?: string[]) : void {
         this.writeValue(IonTypes.STRING, value, annotations, (value: string) => {
             this.writeable.writeBytes(encodeUtf8('"' + escape(value, StringEscapes) + '"'));
         });
-    }
-
-    writeStruct(annotations?: string[], isNull?: boolean) : void {
-        if(annotations !== undefined && annotations[0] === '$ion_symbol_table' && this.depth() === 0) throw new Error("Unable to alter symbol table context, it allows invalid ion to be written.");
-        this.writeContainer(IonTypes.STRUCT, CharCodes.LEFT_BRACE, annotations, isNull);
     }
 
     writeSymbol(value: string, annotations?: string[]) : void {
@@ -238,7 +225,24 @@ export class TextWriter implements Writer {
         });
     }
 
-    endContainer() : void {
+    stepIn(type: IonType, annotations?: string[]) : void {
+        switch (type) {
+            case IonTypes.LIST:
+                this.writeContainer(type, CharCodes.LEFT_BRACKET, annotations);
+                break;
+            case IonTypes.SEXP:
+                this.writeContainer(type, CharCodes.LEFT_PARENTHESIS, annotations);
+                break;
+            case IonTypes.STRUCT:
+                if(annotations !== undefined && annotations[0] === '$ion_symbol_table' && this.depth() === 0) throw new Error("Unable to alter symbol table context, it allows invalid ion to be written.");
+                this.writeContainer(type, CharCodes.LEFT_BRACE, annotations);
+                break;
+            default :
+                throw new Error("Unrecognized container type");
+        }
+    }
+
+    stepOut() : void {
         let currentContainer = this.containerContext.pop();
         if (!currentContainer || !currentContainer.containerType) {
             throw new Error("Can't step out when not in a container");
@@ -262,7 +266,7 @@ export class TextWriter implements Writer {
 
     close() : void {//TODO clear out resources when writer uses more than a basic array/devs have built in IO support etc.
         if(!this.isTopLevel) {
-            throw new Error("Writer has one or more open containers; call endContainer() for each container prior to close()");
+            throw new Error("Writer has one or more open containers; call stepOut() for each container prior to close()");
         }
     }
 
@@ -289,7 +293,7 @@ export class TextWriter implements Writer {
         this.handleSeparator();
         this.writeAnnotations(annotations);
         this.writeable.writeByte(openingCharacter);
-        this.stepIn(type);
+        this._stepIn(type);
     }
 
     protected handleSeparator() : void {
@@ -342,7 +346,7 @@ export class TextWriter implements Writer {
         return this.containerContext.length - 1;
     }
 
-    protected stepIn(container: IonType) : void {
+    protected _stepIn(container: IonType) : void {
         this.containerContext.push(new Context(container));
     }
 
