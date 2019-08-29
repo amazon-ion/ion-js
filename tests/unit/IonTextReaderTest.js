@@ -226,6 +226,19 @@ define(
 
 
         }
+
+        function testDeepValue(ionToRead, expectedOutput = ionToRead) {
+            var ionReader = ion.makeReader(ionToRead);
+            assert.equal(ionReader.deepValue(), expectedOutput);
+        }
+
+        suite['data'] = function() {
+            testDeepValue("123");
+            testDeepValue("{x : 123}", "{x:123}");
+            testDeepValue("{x:{y:[\"z\"]}}");
+            testDeepValue("a::123");
+        }
+
         registerSuite(suite);
     }
 );

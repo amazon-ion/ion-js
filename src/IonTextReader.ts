@@ -22,11 +22,9 @@ import { Catalog } from "./IonCatalog";
 import { Decimal } from "./IonDecimal";
 import { defaultLocalSymbolTable } from "./IonLocalSymbolTable";
 import { get_ion_type } from "./IonParserTextRaw";
-import { getSystemSymbolTable } from "./IonSystemSymbolTable";
 import { ion_symbol_table } from "./IonSymbols";
 import { IonType } from "./IonType";
 import { IonTypes } from "./IonTypes";
-import { IVM } from "./IonConstants";
 import { LocalSymbolTable } from "./IonLocalSymbolTable";
 import { makeSymbolTable } from "./IonSymbols";
 import { ParserTextRaw } from "./IonParserTextRaw";
@@ -34,8 +32,9 @@ import { Reader } from "./IonReader";
 import { StringSpan } from "./IonSpan";
 import { Timestamp } from "./IonTimestamp";
 import { fromBase64 } from "./IonText";
-import { is_digit } from "./IonText";
 import { encodeUtf8 } from "./IonUnicode";
+import { makeTextWriter } from "./Ion";
+import { decodeUtf8 } from "./IonUnicode";
 
 const RAW_STRING = new IonType( -1, "raw_input", true,  false, false, false );
 
@@ -354,5 +353,12 @@ export class TextReader implements Reader {
             default:
                 throw new Error('There is no current value.');
         }
+    }
+
+    deepValue(): string {
+        let writer = makeTextWriter();
+        writer.writeValues(this);
+        writer.close();
+        return decodeUtf8(writer.getBytes());
     }
 };

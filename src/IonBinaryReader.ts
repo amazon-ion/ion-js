@@ -21,8 +21,6 @@
 import { Catalog } from "./IonCatalog";
 import { Decimal } from "./IonDecimal";
 import { defaultLocalSymbolTable } from "./IonLocalSymbolTable";
-import { getSystemSymbolTable } from "./IonSystemSymbolTable";
-import { Import } from "./IonImport";
 import { ion_symbol_table_sid } from "./IonSymbols";
 import { IonType } from "./IonType";
 import { IonTypes } from "./IonTypes";
@@ -31,9 +29,9 @@ import { LocalSymbolTable } from "./IonLocalSymbolTable";
 import { makeSymbolTable } from "./IonSymbols";
 import { ParserBinaryRaw } from "./IonParserBinaryRaw";
 import { Reader } from "./IonReader";
-import { SharedSymbolTable } from "./IonSharedSymbolTable";
 import { BinarySpan } from "./IonSpan";
 import { Timestamp } from "./IonTimestamp";
+import { makeBinaryWriter } from "./Ion";
 
 const RAW_STRING = new IonType( -1, "raw_input", true,  false, false, false );
 
@@ -243,6 +241,13 @@ export class BinaryReader implements Reader {
       }
     }
     return s;
+  }
+
+  deepValue(): Uint8Array {
+    let writer = makeBinaryWriter();
+    writer.writeValues(this);
+    writer.close();
+    return writer.getBytes();
   }
 }
 

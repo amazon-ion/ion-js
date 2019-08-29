@@ -30,6 +30,12 @@ define([
                 reader.next();
                 assert.deepEqual(reader.timestampValue(), timestamp);
             },
+
+            'deepValue': () => {
+              var ivm = [0xe0, 0x01, 0x00, 0xea];
+              var ionReader = ion.makeReader(ivm);
+              assert.deepEqual(ionReader.deepValue(), new Uint8Array(ivm));
+            }
         });
     }
 );

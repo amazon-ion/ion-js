@@ -152,4 +152,14 @@ export interface Reader {
      * @throw Error when the reader is not positioned on a scalar value.
      */
     value(): ReaderScalarValue;
+
+    /**
+     * Returns a representation of the ion document.
+     * 
+     * @return `string` String value when text.
+     * @returns `Uint8Array` Binary array when binary.
+     * 
+     * @throws
+     */
+    deepValue: () => string | Uint8Array;
 }
