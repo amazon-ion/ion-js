@@ -36,6 +36,11 @@ import { Timestamp } from "./IonTimestamp";
 import { fromBase64 } from "./IonText";
 import { is_digit } from "./IonText";
 import { encodeUtf8 } from "./IonUnicode";
+import { TextWriter } from "./IonTextWriter";
+import { Writeable } from "./IonWriteable";
+import { makeTextWriter } from "./Ion";
+import { Writer } from "./IonWriter";
+import { decodeUtf8 } from "./IonUnicode";
 
 const RAW_STRING = new IonType( -1, "raw_input", true,  false, false, false );
 
@@ -357,5 +362,12 @@ export class TextReader implements Reader {
             default:
                 throw new Error('There is no current value.');
         }
+    }
+
+    raw(): string {
+        let writer = makeTextWriter();
+        writer.writeValues(this, writer);
+        writer.close();
+        return decodeUtf8(writer.getBytes());
     }
 };

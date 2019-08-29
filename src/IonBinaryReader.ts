@@ -34,6 +34,10 @@ import { Reader } from "./IonReader";
 import { SharedSymbolTable } from "./IonSharedSymbolTable";
 import { BinarySpan } from "./IonSpan";
 import { Timestamp } from "./IonTimestamp";
+import { BinaryWriter } from "./IonBinaryWriter";
+import { Writeable } from "./IonWriteable";
+import { makeBinaryWriter } from "./Ion";
+import { decodeUtf8 } from "./IonUnicode";
 
 const RAW_STRING = new IonType( -1, "raw_input", true,  false, false, false );
 
@@ -243,6 +247,13 @@ export class BinaryReader implements Reader {
       }
     }
     return s;
+  }
+
+  raw(): Uint8Array {
+    let writer = makeBinaryWriter();
+    writer.writeValues(this, writer);
+    writer.close();
+    return writer.getBytes();
   }
 }
 

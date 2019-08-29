@@ -215,6 +215,19 @@ define(
 
 
         }
+
+        function test_raw(ionToRead, expectedOutput = ionToRead) {
+            var ionReader = ion.makeReader(ionToRead);
+            assert.equal(ionReader.raw(), expectedOutput);
+        }
+
+        suite['data'] = function() {
+            test_raw("123");
+            test_raw("{x : 123}", "{x:123}");
+            test_raw("{x:{y:[\"z\"]}}");
+            test_raw("a::123");
+        }
+
         registerSuite(suite);
     }
 );
