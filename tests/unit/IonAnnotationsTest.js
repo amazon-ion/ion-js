@@ -76,7 +76,7 @@ define([
         reader.stepIn();
         reader.next();
 
-        util._writeValue(reader, writer, 1);
+        writer.writeValues(reader, 1);
 
         reader.stepOut();
 

@@ -165,7 +165,7 @@ export class PrettyTextWriter extends TextWriter {
         }
     }
 
-    writeValues(reader: Reader, writer: Writer): void {
-        _writeValues(reader, this);
+    writeValues(reader: Reader, depth: number = 0): void {
+        _writeValues(reader, this, depth);
     }
 }
