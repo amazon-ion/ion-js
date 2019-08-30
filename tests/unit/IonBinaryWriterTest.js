@@ -660,7 +660,7 @@ define([
     writerTest('Writes null timestamp by direct call',
       (writer) => { writer.writeNull(ion.IonTypes.TIMESTAMP) },
         [0x6f]);
-      skippedWriterTest('Writes 2000-01-01T12:34:56.789 with year precision',
+      writerTest('Writes 2000-01-01T12:34:56.789 with year precision',
       (writer) => { writer.writeTimestamp(new ion.Timestamp(ion.Precision.YEAR, 0, 2000, 1, 1, 12, 34, 56, ion.Decimal.parse('.789')))},
         [
         0x63,
@@ -670,7 +670,7 @@ define([
         0x0f,
         0xd0,
       ]);
-      skippedWriterTest('Writes 2000-01-01T12:34:56.789 with month precision',
+      writerTest('Writes 2000-01-01T12:34:56.789 with month precision',
       (writer) => { writer.writeTimestamp(new ion.Timestamp(ion.Precision.MONTH, 0, 2000, 1, 1, 12, 34, 56, ion.Decimal.parse('.789'))) },
         [
         0x64,
@@ -696,7 +696,7 @@ define([
         // Day
         0x81,
       ]);
-    skippedWriterTest('Writes 2000-01-01T12:34:56.789 with hour and minute precision',
+    writerTest('Writes 2000-01-01T12:34:56.789 with hour and minute precision',
       (writer) => { writer.writeTimestamp(new ion.Timestamp(ion.Precision.HOUR_AND_MINUTE, 0, 2000, 1, 1, 12, 34, 56, ion.Decimal.parse('.789'))) },
         [
         0x67,

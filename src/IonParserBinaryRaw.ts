@@ -51,9 +51,8 @@ import {IonType} from "./IonType";
 import {IonTypes} from "./IonTypes";
 import {IVM} from "./IonConstants";
 import {LongInt} from "./IonLongInt";
-import {Precision} from "./IonPrecision";
 import {BinarySpan} from "./IonSpan";
-import {Timestamp} from "./IonTimestamp";
+import {Precision,Timestamp} from "./IonTimestamp";
 
 const DEBUG_FLAG = true;
 
@@ -307,8 +306,8 @@ export class ParserBinaryRaw {
     private read_timestamp_value() : Timestamp {
         let offset = null;
         let year: number, month: number = 0, day: number = 1, hour: number = 0, minute: number = 0, second: number = 0, fraction: Decimal = null;
-        let precision = Precision.NULL;
         if (this._len > 0) {
+            let precision;
             let end = this._in.position() + this._len;
             offset = this.readVarSignedInt();
             if (this._in.position() < end) {
@@ -347,8 +346,9 @@ export class ParserBinaryRaw {
                 fraction = new Decimal(coef, exp);
                 precision = Precision.FRACTION;
             }
+            return new Timestamp(precision, offset, year, month, day, hour, minute, second, fraction);
         }
-        return new Timestamp(precision, offset, year, month, day, hour, minute, second, fraction);
+        return null;
     }
 
     private read_string_value() : string {

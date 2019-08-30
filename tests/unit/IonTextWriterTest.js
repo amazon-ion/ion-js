@@ -40,8 +40,6 @@
           }
       }
 
-      var skippedWriterTest = function(name, instructions, expected) { suite[name] = function() { this.skip() } };
-
       var prettyTest = function(name, instructions, expected) {
           suite[name] = function() {
               let writer = new ion.makePrettyWriter(2);

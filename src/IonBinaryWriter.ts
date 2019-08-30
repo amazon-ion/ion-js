@@ -19,9 +19,8 @@ import {IonTypes} from "./IonTypes";
 import {LocalSymbolTable} from "./IonLocalSymbolTable";
 import {LongInt} from "./IonLongInt";
 import {LowLevelBinaryWriter} from "./IonLowLevelBinaryWriter";
-import {Precision} from "./IonPrecision";
 import {Reader} from "./IonReader";
-import {Timestamp} from "./IonTimestamp";
+import {Precision,Timestamp} from "./IonTimestamp";
 import {Writeable} from "./IonWriteable";
 import {Writer} from "./IonWriter";
 import {_sign, _writeValues} from "./util";
@@ -233,17 +232,17 @@ export class BinaryWriter implements Writer {
       return;
     }
     let writer: LowLevelBinaryWriter = new LowLevelBinaryWriter(new Writeable(12));//where does the 12 come from
-    writer.writeVariableLengthSignedInt(value.getOffset());
-    writer.writeVariableLengthUnsignedInt(value.date.getUTCFullYear());
+    writer.writeVariableLengthSignedInt(value.getLocalOffset());
+    writer.writeVariableLengthUnsignedInt(value.getDate().getUTCFullYear());
     if (value.getPrecision() >= Precision.MONTH) {
-        writer.writeVariableLengthUnsignedInt(value.date.getUTCMonth() + 1);
+        writer.writeVariableLengthUnsignedInt(value.getDate().getUTCMonth() + 1);
     }
     if (value.getPrecision() >= Precision.DAY) {
-        writer.writeVariableLengthUnsignedInt(value.date.getUTCDate());
+        writer.writeVariableLengthUnsignedInt(value.getDate().getUTCDate());
     }
     if (value.getPrecision() >= Precision.HOUR_AND_MINUTE) {
-        writer.writeVariableLengthUnsignedInt(value.date.getUTCHours());
-        writer.writeVariableLengthUnsignedInt(value.date.getUTCMinutes());
+        writer.writeVariableLengthUnsignedInt(value.getDate().getUTCHours());
+        writer.writeVariableLengthUnsignedInt(value.getDate().getUTCMinutes());
     }
     if (value.getPrecision() >= Precision.SECONDS) {
         writer.writeVariableLengthUnsignedInt(value.seconds);
