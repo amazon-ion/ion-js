@@ -86,7 +86,7 @@ export class Timestamp {
                 /*private*/ readonly seconds : number,      // TBD combine seconds/fraction into a single param
                 /*private*/ readonly fraction : Decimal) {
 
-        this._checkBounds('Offset', this.offset, Timestamp._MIN_OFFSET, Timestamp._MAX_OFFSET);
+        this._checkBounds('Offset', Timestamp._MIN_OFFSET, Timestamp._MAX_OFFSET, this.offset);
 
         switch (this.precision) {
             case Precision.FRACTION:
@@ -134,7 +134,7 @@ export class Timestamp {
 
     private _checkBounds(fieldName: string, min: number, max: number, value: number) {
         if (value < min || value > max) {
-            throw new Error('${fieldName} ${value} must be between ${min} and ${max}, inclusive');
+            throw new Error(`${fieldName} ${value} must be between ${min} and ${max}, inclusive`);
         }
     }
 
