@@ -162,7 +162,7 @@ export class Decimal {
     /**
      * Calculates values used by compareTo(), specifically:
      * - a string representing the absolute value of the coefficient
-     * - the precision, or  number of digits in the coefficient
+     * - the precision, or number of digits in the coefficient
      * - the magnitude, which indicates what position the most significant digit is in,
      *   for example:
      *
