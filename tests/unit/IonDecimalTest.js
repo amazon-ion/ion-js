@@ -75,8 +75,6 @@ define([
             'compareTo(0d-0, 0d-0)'         : () => testCompareTo('0d-0', '0d-0', 0),
             'compareTo(-0d-0, -0d-0)'       : () => testCompareTo('-0d-0', '-0d-0', 0),
 
-            //'compareTo(79d-3, 0d0)'       : () => testCompareTo('79d-3', '0d0', 1),
-            //'compareTo(-0d0, -79d-3)'       : () => testCompareTo('-0d0', '-79d-3', 1),
             'compareTo(2.1, 2.1)'           : () => testCompareTo('2.1', '2.1', 0),
             'compareTo(2.1, 2.10)'          : () => testCompareTo('2.1', '2.10', 0),
             'compareTo(2.1, 2.11)'          : () => testCompareTo('2.1', '2.11', -1),
@@ -89,6 +87,35 @@ define([
             'compareTo(123d99, 123d100)'    : () => testCompareTo('123d99', '123d100', -1),
             'compareTo(123d100, 123d100)'   : () => testCompareTo('123d100', '123d100', 0),
             'compareTo(123d101, 123d100)'   : () => testCompareTo('123d101', '123d100', 1),
+
+            'compareTo(79d-3, 0d0)'         : () => testCompareTo('79d-3', '0d0', 1),
+            'compareTo(79d-3, 78d-3)'       : () => testCompareTo('79d-3', '78d-3', 1),
+            'compareTo(791d-4, 78d-3)'      : () => testCompareTo('791d-4', '78d-3', 1),
+            'compareTo(779d-4, 78d-3)'      : () => testCompareTo('779d-4', '78d-3', -1),
+            'compareTo(-0d0, -79d-3)'       : () => testCompareTo('-0d0', '-79d-3', 1),
+
+            'compareTo(0.01, 0.1)'          : () => testCompareTo('0.01', '0.1', -1),
+            'compareTo(0.01, 0.10)'         : () => testCompareTo('0.01', '0.10', -1),
+            'compareTo(0.010, 0.1)'         : () => testCompareTo('0.010', '0.1', -1),
+            'compareTo(0.010, 0.10)'        : () => testCompareTo('0.010', '0.10', -1),
+            'compareTo(0.01, 0.010)'        : () => testCompareTo('0.01', '0.010', 0),
+
+            'compareTo(10, 0.123)'          : () => testCompareTo('10d0', '0.123', 1),
+            'compareTo(10, 0.1234)'         : () => testCompareTo('10d0', '0.1234', 1),
+
+            'compareTo(1d1, 0d0)'           : () => testCompareTo('1d1', '0d0', 1),
+            'compareTo(1d0, 0d0)'           : () => testCompareTo('1d0', '0d0', 1),
+            'compareTo(1d-1, 0d0)'          : () => testCompareTo('1d-1', '0d0', 1),
+            'compareTo(1d1, -0d0)'          : () => testCompareTo('1d1', '-0d0', 1),
+            'compareTo(1d0, -0d0)'          : () => testCompareTo('1d0', '-0d0', 1),
+            'compareTo(1d-1, -0d0)'         : () => testCompareTo('1d-1', '-0d0', 1),
+
+            'compareTo(-1d1, 0d0)'          : () => testCompareTo('-1d1', '0d0', -1),
+            'compareTo(-1d0, 0d0)'          : () => testCompareTo('-1d0', '0d0', -1),
+            'compareTo(-1d-1, 0d0)'         : () => testCompareTo('-1d-1', '0d0', -1),
+            'compareTo(-1d1, -0d0)'         : () => testCompareTo('-1d1', '-0d0', -1),
+            'compareTo(-1d0, -0d0)'         : () => testCompareTo('-1d0', '-0d0', -1),
+            'compareTo(-1d-1, -0d0)'        : () => testCompareTo('-1d-1', '-0d0', -1),
 
 
             'equals(0, 0)':         () => testEquals('0', '0', true),
