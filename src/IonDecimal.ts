@@ -59,7 +59,7 @@ export class Decimal {
      * Any fractional portion of this Decimal is truncated.
      */
     intValue(): number {
-        return Math.trunc(numberValue());
+        return Math.trunc(this.numberValue());
     }
 
     /**
