@@ -131,13 +131,8 @@ export class Decimal {
         }
 
         // decimals have the same sign; compare magnitudes
-        let thisCoefficientStr = this._coefficient.toString();
-        let thisPrecision = thisCoefficientStr.length;
-        let thisMagnitude = thisPrecision + this._exponent;
-
-        let thatCoefficientStr = that._coefficient.toString();
-        let thatPrecision = thatCoefficientStr.length;
-        let thatMagnitude = thatPrecision + that._exponent;
+        let [thisCoefficientStr, thisPrecision, thisMagnitude] = this._compareToParams();
+        let [thatCoefficientStr, thatPrecision, thatMagnitude] = that._compareToParams();
 
         if (thisMagnitude > thatMagnitude) {
             return neg ? -1 : 1;
@@ -162,6 +157,42 @@ export class Decimal {
         }
 
         return 0;
+    }
+
+    /**
+     * Calculates values used by compareTo(), specifically:
+     * - a string representing the absolute value of the coefficient
+     * - the precision, or number of digits in the coefficient
+     * - the magnitude, which indicates what position the most significant digit is in,
+     *   for example:
+     *
+     *   decimal    magnitude
+     *   -------    ---------
+     *     100          3
+     *      10          2
+     *       1          1
+     *       0.1       -1
+     *       0.01      -2
+     *       0.001     -3
+     *       0         -Infinity
+     *
+     * @private
+     */
+    private _compareToParams(): [string, number, number] {
+        let coefficientStr = this.isNegative()
+                ? this._coefficient.toString().substring(1)
+                : this._coefficient.toString();
+        let precision = coefficientStr.length;
+        let magnitude = precision + this._exponent;
+        if (magnitude <= 0) {
+            // without this, the value 0.1 would have magnitude of 0 (not the end of the world,
+            // but simpler to describe and reason about if we make this adjustment)
+            magnitude -= 1;
+        }
+        if (this._coefficient.isZero()) {
+            magnitude = -Infinity;
+        }
+        return [coefficientStr, precision, magnitude];
     }
 
     /**
