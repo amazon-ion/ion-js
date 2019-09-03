@@ -55,6 +55,14 @@ export class Decimal {
     }
 
     /**
+     * Returns a number representing the integer portion of this Decimal.
+     * Any fractional portion of this Decimal is truncated.
+     */
+    intValue(): number {
+        return Math.trunc(numberValue());
+    }
+
+    /**
      * Returns a string representation of this Decimal, using exponential
      * notation when appropriate.
      */

@@ -245,11 +245,11 @@ export class BinaryWriter implements Writer {
         writer.writeVariableLengthUnsignedInt(value.getDate().getUTCMinutes());
     }
     if (value.getPrecision() >= Precision.SECONDS) {
-        writer.writeVariableLengthUnsignedInt(value.seconds);
-    }
-    if (value.getPrecision() === Precision.FRACTION) {
-        writer.writeVariableLengthSignedInt(value.fraction._getExponent());
-        writer.writeBytes(value.fraction._getCoefficient().intBytes());
+        writer.writeVariableLengthUnsignedInt(Math.trunc(value.getSecondsDecimal().numberValue()));
+        if (value.getSecondsDecimal().intValue() !== value.getSecondsDecimal().numberValue()) {
+            writer.writeVariableLengthSignedInt(value.getSecondsDecimal()._getExponent());
+            writer.writeBytes(value.getSecondsDecimal()._getCoefficient().intBytes());
+        }
     }
     this.addNode(new BytesNode(this.writer, this.getCurrentContainer(), IonTypes.TIMESTAMP, this.encodeAnnotations(annotations), writer.getBytes()));
   }
