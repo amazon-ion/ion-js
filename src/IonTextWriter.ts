@@ -370,7 +370,9 @@ export class TextWriter implements Writer {
         }
     }
 
-    writeValues(reader: Reader, depth: number = 0): void {
+    writeValues(reader: Reader): void {
+        let depth = 0;
+        if (this.currentContainer.state == State.STRUCT_FIELD) depth++;
         _writeValues(reader, this, depth);
     }
 }
