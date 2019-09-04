@@ -1032,9 +1032,16 @@ export class ParserTextRaw {
             case T_TIMESTAMP:
             case T_IDENTIFIER:
             case T_OPERATOR:
-            case T_BLOB:
                 for (index = this._start; index < this._end; index++) {
                     s += String.fromCharCode(this._in.valueAt(index));
+                }
+                break;
+            case T_BLOB:
+                for (index = this._start; index < this._end; index++) {
+                    ch = this._in.valueAt(index);
+                    if(IonText.is_base64_char(ch)){
+                        s += String.fromCharCode(ch);
+                    }
                 }
                 break;
             case T_STRING1:
