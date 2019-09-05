@@ -371,8 +371,6 @@ export class TextWriter implements Writer {
     }
 
     writeValues(reader: Reader): void {
-        let depth = 0;
-        if (this.currentContainer.state == State.STRUCT_FIELD) depth++;
-        _writeValues(reader, this, depth);
+        _writeValues(reader, this);
     }
 }

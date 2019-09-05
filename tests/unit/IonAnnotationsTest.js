@@ -69,20 +69,18 @@ define([
         let data = "{ x: 1 }";
         let reader = ion.makeReader(data);
         let writer = ion.makeTextWriter();
-        writer.stepIn(ion.IonTypes.STRUCT);
         writer.stepIn(ion.IonTypes.STRUCT, ['a', 'b']);
 
         reader.next();
         reader.stepIn();
         reader.next();
 
-        writer.writeValues(reader);
+        util._writeValues(reader, writer, 1);
 
         reader.stepOut();
 
         writer.stepOut();
-        writer.stepOut();
-        assert.equal(String.fromCharCode.apply(null, writer.getBytes()), '{a::b::{x:1}}');
+        assert.equal(String.fromCharCode.apply(null, writer.getBytes()), 'a::b::{x:1}');
       }
 
       registerSuite(suite);
