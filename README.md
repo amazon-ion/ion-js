@@ -114,6 +114,41 @@ These will create and initialize `window.ion` which has the exact API as our `np
 
 [Ion JS API](https://amzn.github.io/ion-js/api/)
 
+
+# Development
+
+Use `npm` to setup the dependencies.  In the project directory you can run the following:
+
+```
+$ npm install
+```
+
+Building the package can be done with the release script (which runs the tests).
+
+```
+$ npm run release
+```
+
+Tests can be run using npm as well
+
+```
+$ npm test
+```
+
+This package uses [Grunt](https://gruntjs.com/) for its build tasks.  For convenience, you may want to install
+this globally:
+
+```
+$ npm -g install grunt-cli
+$ grunt release
+```
+
+Or you could use the locally installed Grunt:
+
+```
+$ ./node_modules/.bin/grunt release
+```
+
 # Contribute
 
 [CONTRIBUTE.md](CONTRIBUTE.md)

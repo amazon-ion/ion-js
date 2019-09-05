@@ -133,7 +133,7 @@ module.exports = function(grunt) {
     babel: { 
       options: { 
         sourceMap: true, 
-        presets: ['es2015']
+        presets: ['@babel/preset-env']
       },
       dist: {
         files: [{
@@ -161,9 +161,9 @@ module.exports = function(grunt) {
          },
         transform: [["babelify", 
                      { 
-                       "presets": ["es2015"],
-                       "plugins" : [["transform-runtime", {"polyfill" : true}],
-                                    ["transform-object-assign"]]
+                       "presets": ["@babel/preset-env"], // TODO this targets ES2015, we should be more specific
+                       "plugins" : [["@babel/transform-runtime"],
+                                    ["@babel/transform-object-assign"]]
                      }]],
         }
       },
@@ -177,9 +177,9 @@ module.exports = function(grunt) {
          },
         transform: [["babelify", 
                      { 
-                       "presets": ["es2015"],
-                       "plugins" : [["transform-runtime", {"polyfill" : true}],
-                                    ["transform-object-assign"]]
+                       "presets": ["@babel/preset-env"], // TODO this targets ES2015, we should be more specific
+                       "plugins" : [["@babel/transform-runtime"],
+                                    ["@babel/transform-object-assign"]]
                      }]],
         }
       }
