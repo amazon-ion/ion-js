@@ -244,7 +244,10 @@ export class Timestamp {
      * @private
      */
     _getFractionalSeconds() : Decimal {
-        let fractionStr = Timestamp._splitSecondsDecimal(this._secondsDecimal)[1];
+        let [_, fractionStr] = Timestamp._splitSecondsDecimal(this._secondsDecimal);
+        if (fractionStr === '') {
+            return Decimal.ZERO;
+        }
         return Decimal.parse(fractionStr + 'd-' + fractionStr.length);
     }
 

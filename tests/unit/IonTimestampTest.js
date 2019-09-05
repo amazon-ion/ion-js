@@ -75,6 +75,13 @@ define(
 
             '2001-02-03T04:05:06.123456789-07:53': () =>
                 test('2001-02-03T04:05:06.123456789-07:53', ion.Precision.SECONDS, -(7*60 + 53), 2001, 2, 3, 4, 5, '6.123456789'),
+
+            'construct with seconds as a number': () => {
+                let ts = new ion.Timestamp(-7 * 60, 2000, 1, 1, 12, 30, 45);
+                assert.equal(ts.getSecondsInt(), 45);
+                assert.deepEqual(ts.getSecondsDecimal(), ion.Decimal.parse('45'));
+                assert.deepEqual(ts._getFractionalSeconds(), ion.Decimal.ZERO);
+            }
         });
 
         function test(str, precision, localOffset, year, month = null, day = null, hour = null, minutes = null, seconds = null) {
@@ -82,7 +89,7 @@ define(
             let ts = ion.Timestamp.parse(str);
             assert.equal(ts.getPrecision(), precision, 'precision');
             assert.equal(ts.getLocalOffset(), localOffset, 'local offset');
-            assert.equal(util._sign(ts._localOffset), util._sign(localOffset), 'local offset sign');
+            assert.equal(util._sign(ts.getLocalOffset()), util._sign(localOffset), 'local offset sign');
             assert.equal(ts._year, year, 'year');
             assert.equal(ts._month, month !== null ? month : 1, 'month');
             assert.equal(ts._day, day !== null ? day : 1, 'day');
@@ -105,7 +112,7 @@ define(
             assert.equal(ts2.equals(ts), true);
             assert.deepEqual(ts2, ts);
 
-            // verify Timestamp can be reconstituted via date, localOffset, and fractionalSeconds
+            // verify Timestamp can be fully reconstituted via date, localOffset, fractionalSeconds, and precision
             let ts3 = ion.Timestamp._valueOf(ts.getDate(), ts.getLocalOffset(), ts._getFractionalSeconds(), ts.getPrecision());
             assert.equal(ts3.compareTo(ts), 0);
             assert.equal(ts3.equals(ts), true);
