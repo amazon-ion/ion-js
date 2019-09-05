@@ -16,72 +16,132 @@ define(
         const registerSuite = require('intern!object');
         const assert = require('intern/chai!assert');
         const ion = require('dist/amd/es6/Ion');
+        const util = require('dist/amd/es6/util');
 
         registerSuite({
             name: 'Timestamp',
 
-            // Parses year: Years precision, unknown local offset
-            '2007T': () =>
-                test('2007T'),
+            // boundary tests (for each field of a timestamp)
+            '0001T': () => test('0001T', ion.Precision.YEAR, -0, 1),
+            '9999T': () => test('9999T', ion.Precision.YEAR, -0, 9999),
 
-            // Parses month: The same instant, with months precision, unknown local offset
-            '2007-02T': () =>
-                test('2007-02T'),
+            '2007-01T': () => test('2007-01T', ion.Precision.MONTH, -0, 2007, 1),
+            '2007-12T': () => test('2007-12T', ion.Precision.MONTH, -0, 2007, 12),
 
-            // Parses date: The same instant, with different syntax
-            '2007-02-01T': () =>
-                test('2007-02-01T'),
+            '2007-01-01' : () => test('2007-01-01T', ion.Precision.DAY, -0, 2007, 1, 1),
+            '2007-01-31T': () => test('2007-01-31T', ion.Precision.DAY, -0, 2007, 1, 31),
 
-            // Parses date: The same instant, with days precision, unknown local offset
-            '2007-02-01': () =>
-                test('2007-02-01T'),
+            '2007-01-01T00:00Z': () => test('2007-01-01T00:00Z', ion.Precision.HOUR_AND_MINUTE, 0, 2007, 1, 1, 0, 0),
+            '2007-01-01T23:59Z': () => test('2007-01-01T23:59Z', ion.Precision.HOUR_AND_MINUTE, 0, 2007, 1, 1, 23, 59),
 
-            // Parses date and time with only hour and minutes
-            '2007-02-23T12:14Z': () =>
-                test('2007-02-23T12:14Z'),
+            '2007-01-01T00:00:00Z': () => test('2007-01-01T00:00:00Z', ion.Precision.SECONDS, 0, 2007, 1, 1, 0, 0, '0'),
+            '2007-01-01T00:00:59Z': () => test('2007-01-01T00:00:59Z', ion.Precision.SECONDS, 0, 2007, 1, 1, 0, 0, '59'),
 
-            // Parses date and time with only hour and minutes where hour is 0
-            '2007-02-23T00:14Z': () =>
-                test('2007-02-23T00:14Z'),
+            '2007-01-01T00:00:00.000Z': () => test('2007-01-01T00:00:00.000Z', ion.Precision.SECONDS, 0, 2007, 1, 1, 0, 0, '0.000'),
+            '2007-01-01T00:00:00.999Z': () => test('2007-01-01T00:00:00.999Z', ion.Precision.SECONDS, 0, 2007, 1, 1, 0, 0, '0.999'),
 
-            '2007-05-01T01:00:00.000Z': () =>
-                test('2007-05-01T01:00:00.000Z'),
+            // local offset boundary tests
+            '2007-01-01T00:00Z'        : () => test('2007-01-01T00:00Z',      ion.Precision.HOUR_AND_MINUTE, 0, 2007, 1, 1, 0),
+            '2007-01-01T00:00+00:00'   : () => test('2007-01-01T00:00+00:00', ion.Precision.HOUR_AND_MINUTE, 0, 2007, 1, 1, 0),
+            '2007-01-01T00:00-00:00'   : () => test('2007-01-01T00:00-00:00', ion.Precision.HOUR_AND_MINUTE, -0, 2007, 1, 1, 0),
+            '2007-01-01T00:00-23:59'   : () => test('2007-01-01T00:00-23:59', ion.Precision.HOUR_AND_MINUTE, -(23 * 60 + 59), 2007, 1, 1, 0),
+            '2007-01-01T00:00+23:59'   : () => test('2007-01-01T00:00+23:59', ion.Precision.HOUR_AND_MINUTE, 23 * 60 + 59, 2007, 1, 1, 0),
+            '2007-01-01T00:00:00Z'     : () => test('2007-01-01T00:00:00Z',      ion.Precision.SECONDS, 0, 2007, 1, 1, 0, 0, '0'),
+            '2007-01-01T00:00:00+00:00': () => test('2007-01-01T00:00:00+00:00', ion.Precision.SECONDS, 0, 2007, 1, 1, 0, 0, '0'),
+            '2007-01-01T00:00:00-00:00': () => test('2007-01-01T00:00:00-00:00', ion.Precision.SECONDS, -0, 2007, 1, 1, 0, 0, '0'),
+            '2007-01-01T00:00:00-23:59': () => test('2007-01-01T00:00:00-23:59', ion.Precision.SECONDS, -(23 * 60 + 59), 2007, 1, 1, 0, 0, '0'),
+            '2007-01-01T00:00:00+23:59': () => test('2007-01-01T00:00:00+23:59', ion.Precision.SECONDS, 23 * 60 + 59, 2007, 1, 1, 0, 0, '0'),
 
-            '2007-05-01T00:00:00.000Z': () =>
-                test('2007-05-01T00:00:00.000Z'),
+            '2008-01-01T00:00:00.000Z'     : () => test('2008-01-01T00:00:00.000Z',      ion.Precision.SECONDS, 0, 2008, 1, 1, 0, 0, '0.000'),
+            '2008-01-01T00:00:00.000+00:00': () => test('2008-01-01T00:00:00.000+00:00', ion.Precision.SECONDS, 0, 2008, 1, 1, 0, 0, '0.000'),
+            '2008-01-01T00:00:00.000-00:00': () => test('2008-01-01T00:00:00.000-00:00', ion.Precision.SECONDS, -0, 2008, 1, 1, 0, 0, '0.000'),
+            '2008-01-01T00:00:00.000-23:59': () => test('2008-01-01T00:00:00.000-23:59', ion.Precision.SECONDS, -(23 * 60 + 59), 2008, 1, 1, 0, 0, '0.000'),
+            '2008-01-01T00:00:00.000+23:59': () => test('2008-01-01T00:00:00.000+23:59', ion.Precision.SECONDS, 23 * 60 + 59, 2008, 1, 1, 0, 0, '0.000'),
 
-            // Parses timestamp: A timestamp with millisecond precision and PST local time
-            '2007-02-23T12:14:33.079-08:00': () =>
-                test('2007-02-23T12:14:33.079-08:00'),
+            // / boundary tests
 
-            // Parses timestamp: A timestamp with millisecond precision and PST local time where hour is 0
-            '2007-02-23T00:14:33.079-08:00': () =>
-                test('2007-02-23T00:14:33.079-08:00'),
 
-            // Parses timestamp: The same instant, with explicit local offset
-            '2007-02-23T20:14:33.079+00:00': () =>
-                test('2007-02-23T20:14:33.079+00:00'),
-
-            // Parses timestamp: The same instant, with explicit local offset where hour is 0
-            '2007-02-23T00:14:33.079+00:00': () =>
-                test('2007-02-23T00:14:33.079+00:00'),
-
-            // Parses timestamp: The same instant, with unknown local offset
-            '2007-02-23T20:14:33.079-00:00': () =>
-                test('2007-02-23T20:14:33.079-00:00'),
-
-            // Parses timestamp: The same instant, with unknown local offset where hour is 0
-            '2007-02-23T00:14:33.079-00:00': () =>
-                test('2007-02-23T00:14:33.079-00:00'),
-
-            // Parses timestamp: Happy New Year in UTC, unknown local offset
-            '2007-01-01T00:00-00:00': () =>
-                test('2007-01-01T00:00-00:00'),
+            '2007-02-23T20:14:33.079+00:00': () => test('2007-02-23T20:14:33.079+00:00', ion.Precision.SECONDS, 0, 2007, 2, 23, 20, 14, '33.079'),
+            '2007-02-23T00:14:33.079+00:00': () => test('2007-02-23T00:14:33.079+00:00', ion.Precision.SECONDS, 0, 2007, 2, 23, 0, 14, '33.079'),
+            '2007-02-23T20:14:33.079-00:00': () => test('2007-02-23T20:14:33.079-00:00', ion.Precision.SECONDS, -0, 2007, 2, 23, 20, 14, '33.079'),
+            '2007-02-23T00:14:33.079-00:00': () => test('2007-02-23T00:14:33.079-00:00', ion.Precision.SECONDS, -0, 2007, 2, 23, 0, 14, '33.079'),
+            '2007-02-23T12:14:33.079-08:00': () => test('2007-02-23T12:14:33.079-08:00', ion.Precision.SECONDS, -8*60, 2007, 2, 23, 12, 14, '33.079'),
+            '2007-02-23T00:14:33.079-08:00': () => test('2007-02-23T00:14:33.079-08:00', ion.Precision.SECONDS, -8*60, 2007, 2, 23, 0, 14, '33.079'),
         });
 
-        function test(s, timestamp) {
-            let ts = ion.Timestamp.parse(s);
-            //assert.isTrue(ion.Timestamp.parse(val.toString()).equals(timestamp));
+
+        function test(str, precision, offset, year, month = null, day = null, hour = null, minute = null, seconds = null) {
+            // verify Timestamp members are set as expected:
+            let ts = ion.Timestamp.parse(str);
+            assert.equal(ts.getPrecision(), precision, 'precision');
+            assert.equal(ts.getLocalOffset(), offset, 'local offset');
+            assert.equal(util._sign(ts._offset), util._sign(offset), 'offset sign');
+            assert.equal(ts._year, year, 'year');
+            assert.equal(ts._month, month !== null ? month : 1, 'month');
+            assert.equal(ts._day, day !== null ? day : 1, 'day');
+            assert.equal(ts._hour, hour !== null ? hour : 0, 'hour');
+            assert.equal(ts._minute, minute !== null ? minute : 0, 'minute');
+            assert.equal(ts.getSecondsInt(), parseInt(seconds !== null ? seconds : '0'), 'seconds');
+            assert.deepEqual(ts.getSecondsDecimal(), ion.Decimal.parse(seconds !== null ? seconds : '0'), 'seconds decimal');
+
+            // verify Timestamp.toString() matches original string (modulo '+00:00' to 'Z' translation)
+            let expectedStr = str;
+            let idx = str.indexOf('+00:00');
+            if (idx >= 0) {
+                expectedStr = str.substring(0, idx) + 'Z';
+            }
+            assert.equal(ts.toString(), expectedStr);
+
+            // verify Timestamp constructor produces an equivalent object
+            let ts2 = new ion.Timestamp(offset, year, month, day, hour, minute, seconds !== null ? ion.Decimal.parse(seconds) : null);
+            assert.equal(ts2.compareTo(ts), 0);
+            assert.equal(ts2.equals(ts), true);
+            assert.deepEqual(ts2, ts);
+
+            // verify Timestamp can be reconstituted via date, localOffset, and fractionalSeconds
+            let date = ts.getDate();
+            let localOffset = ts.getLocalOffset();
+            let fractionalSeconds = ts._getFractionalSeconds();
+            let ts3 = ion.Timestamp._valueOf(date, localOffset, fractionalSeconds);
+            assert.equal(ts3.compareTo(ts), 0);
+            //assert.equal(ts3.equals(ts), true);
+            //assert.deepEqual(ts3, ts);
+        }
+
+
+        registerSuite({
+            name: 'Timestamp (invalid)',
+
+            // boundary tests
+            '0000T': () => testInvalid('0000T'),
+            '10000T': () => testInvalid('10000T'),
+
+            '2007-00T': () => testInvalid('2007-00T'),
+            '2007-13T': () => testInvalid('2007-13T'),
+
+            '2007-01-00T': () => testInvalid('2007-01-00T'),
+            '2007-01-32T': () => testInvalid('2007-01-32T'),
+            // TBD invalid days per month
+            // TBD invalid days for leap year
+
+            '2007-01-01T24:00': () => testInvalid('2007-01-01T24:00'),
+            '2007-01-01T00:60': () => testInvalid('2007-01-01T00:60'),
+
+            '2007-01-01T00:00:60': () => testInvalid('2007-01-01T00:00:60'),
+
+            '2007-01-01T00:00:60-24:00': () => testInvalid('2007-01-01T00:00:00-24:00'),
+            '2007-01-01T00:00:60+24:00': () => testInvalid('2007-01-01T00:00:00+24:00'),
+            '2007-01-01T00:00:60-00:60': () => testInvalid('2007-01-01T00:00:00-00:60'),
+            '2007-01-01T00:00:60+00:60': () => testInvalid('2007-01-01T00:00:00-00:60'),
+
+            // / boundary tests
+
+
+            '2007-01-01T00:00': () => testInvalid('2007-01-01T00:00'),  // no offset specified
+        });
+
+        function testInvalid(str) {
+            assert.throws(() => ion.Timestamp.parse(str));
         }
     }
 );

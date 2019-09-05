@@ -477,7 +477,7 @@ define([
         // Struct
         0xd4, 0x8a, 0x0f, 0x8a, 0x0f
       ]);
-    skippedWriterTest('Kitchen sink',
+    writerTest('Kitchen sink',
       (writer) => {
         writer.stepIn(ion.IonTypes.STRUCT, ['x']);
         writer.writeFieldName('b');
@@ -512,7 +512,7 @@ define([
         writer.writeFieldName('s');
         writer.writeSymbol('qux');
         writer.writeFieldName('t');
-        writer.writeTimestamp(new ion.Timestamp(ion.Precision.DAY, 0, 2000, 1, 1));
+        writer.writeTimestamp(new ion.Timestamp(0, 2000, 1, 1));
         writer.stepOut();
       },
         [
@@ -682,7 +682,7 @@ define([
         // Month
         0x81,
       ]);
-      skippedWriterTest('Writes 2000-01-01T',
+      writerTest('Writes 2000-01-01T',
       (writer) => { writer.writeTimestamp(new ion.Timestamp(0, 2000, 1, 1)) },
         [
         0x65,

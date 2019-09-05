@@ -233,22 +233,27 @@ export class BinaryWriter implements Writer {
     }
     let writer: LowLevelBinaryWriter = new LowLevelBinaryWriter(new Writeable(12));//where does the 12 come from
     writer.writeVariableLengthSignedInt(value.getLocalOffset());
-    writer.writeVariableLengthUnsignedInt(value.getDate().getUTCFullYear());
+
+    let date = value.getDate();
+    writer.writeVariableLengthUnsignedInt(date.getUTCFullYear());
     if (value.getPrecision() >= Precision.MONTH) {
-        writer.writeVariableLengthUnsignedInt(value.getDate().getUTCMonth() + 1);
+        writer.writeVariableLengthUnsignedInt(date.getUTCMonth() + 1);
     }
     if (value.getPrecision() >= Precision.DAY) {
-        writer.writeVariableLengthUnsignedInt(value.getDate().getUTCDate());
+        writer.writeVariableLengthUnsignedInt(date.getUTCDate());
     }
     if (value.getPrecision() >= Precision.HOUR_AND_MINUTE) {
-        writer.writeVariableLengthUnsignedInt(value.getDate().getUTCHours());
-        writer.writeVariableLengthUnsignedInt(value.getDate().getUTCMinutes());
+        writer.writeVariableLengthUnsignedInt(date.getUTCHours());
+        writer.writeVariableLengthUnsignedInt(date.getUTCMinutes());
     }
     if (value.getPrecision() >= Precision.SECONDS) {
-        writer.writeVariableLengthUnsignedInt(Math.trunc(value.getSecondsDecimal().numberValue()));
-        if (value.getSecondsDecimal().intValue() !== value.getSecondsDecimal().numberValue()) {
-            writer.writeVariableLengthSignedInt(value.getSecondsDecimal()._getExponent());
-            writer.writeBytes(value.getSecondsDecimal()._getCoefficient().intBytes());
+        writer.writeVariableLengthUnsignedInt(value.getSecondsInt());
+        let fractionalSeconds = value._getFractionalSeconds();
+        if (fractionalSeconds._getExponent() !== 0) {
+            writer.writeVariableLengthSignedInt(fractionalSeconds._getExponent());
+            if (!fractionalSeconds._getCoefficient().isZero()) {
+                writer.writeBytes(fractionalSeconds._getCoefficient().intBytes());
+            }
         }
     }
     this.addNode(new BytesNode(this.writer, this.getCurrentContainer(), IonTypes.TIMESTAMP, this.encodeAnnotations(annotations), writer.getBytes()));

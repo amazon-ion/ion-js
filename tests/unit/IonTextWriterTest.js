@@ -58,8 +58,6 @@
           }
       }
 
-      var skippedPrettyTest = function(name, instructions, expected) { suite[name] = function() { this.skip() } };
-
     var badWriterTest = function(name, instructions) {
       var test = function() {
         var writer = new ion.makeTextWriter();
@@ -334,14 +332,12 @@
         expected);
     };
 
-    var skippedTimestampTest = function(name, timestamp, expected) { suite[name] = function() { this.skip() } };
-
     timestampTest('Writes year timestamp', '2017T', '2017T');
     timestampTest('Writes month timestamp', '2017-02T', '2017-02T');
     timestampTest('Writes day timestamp', '2017-02-01', '2017-02-01T');
-    timestampTest('Writes hour and minute timestamp', '2017-02-01T22:38', '2017-02-01T22:38Z');
-    timestampTest('Writes whole second timestamp', '2017-02-01T22:38:43', '2017-02-01T22:38:43Z');
-    skippedTimestampTest('Writes fractional second timestamp', '2017-02-01T22:38:43.125', '2017-02-01T22:38:43.125Z');
+    timestampTest('Writes hour and minute timestamp', '2017-02-01T22:38+00:00', '2017-02-01T22:38Z');
+    timestampTest('Writes whole second timestamp', '2017-02-01T22:38:43+00:00', '2017-02-01T22:38:43Z');
+    timestampTest('Writes fractional second timestamp', '2017-02-01T22:38:43.125Z', '2017-02-01T22:38:43.125Z');
 
     timestampTest('Writes positive offset timestamp', '2017-02-01T22:38+08:00', '2017-02-01T22:38+08:00');
     timestampTest('Writes negative offset timestamp', '2017-02-01T22:38-08:00', '2017-02-01T22:38-08:00');
@@ -363,7 +359,7 @@
           '{}\n{}');
 
     // PrettyPrint
-    skippedPrettyTest('Writes composite pretty ion',
+    prettyTest('Writes composite pretty ion',
       writer => {
         writer.stepIn(ion.IonTypes.STRUCT, ['a1']);
         writer.writeFieldName('int');
@@ -408,7 +404,7 @@
   symbol:a5::symbol,
   symbol:null.symbol,
   timestamp:a8::2017-04-03T00:00:00.000Z,
-  decimal:a9::1.2,
+  decimal:a9::12d-1,
   struct:a10::{
     symbol:a11::symbol
   },
@@ -417,7 +413,7 @@
     a15::"string",
     a16::symbol,
     a19::2017-04-03T00:00:00.000Z,
-    a20::1.2,
+    a20::12d-1,
     a21::{
     },
     a22::[

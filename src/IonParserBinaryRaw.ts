@@ -313,6 +313,8 @@ export class ParserBinaryRaw {
             let minute: number;
             let secondInt: number;
             let second: Decimal;
+            let fractionalSeconds = Decimal.ZERO;
+            let precision = Precision.YEAR;
 
             let end = this._in.position() + this._len;
             offset = this.readVarSignedInt();
@@ -323,9 +325,11 @@ export class ParserBinaryRaw {
             }
             if (this._in.position() < end) {
                 month = this.readVarUnsignedInt();
+                precision = Precision.MONTH;
             }
             if (this._in.position() < end) {
                 day = this.readVarUnsignedInt();
+                precision = Precision.DAY;
             }
             if (this._in.position() < end) {
                 hour = this.readVarUnsignedInt();
@@ -334,24 +338,28 @@ export class ParserBinaryRaw {
                 } else {
                     minute = this.readVarUnsignedInt();
                 }
+                precision = Precision.HOUR_AND_MINUTE;
             }
             if (this._in.position() < end) {
                 secondInt = this.readVarUnsignedInt();
                 second = new Decimal(new LongInt(secondInt), 0);
+                precision = Precision.SECONDS;
             }
             if (this._in.position() < end) {
                 let exp = this.readVarSignedInt();
                 let coef = LongInt._ZERO;
-                if(this._in.position() < end) {
+                if (this._in.position() < end) {
                     coef = ParserBinaryRaw.readSignedIntFrom(this._in, end - this._in.position());
                 }
-
-                exp -= secondInt.toString().length;
                 let decimalStr = secondInt.toString() + coef.toString() + 'd' + exp;
-
                 second = Decimal.parse(decimalStr);
+
+                let [_, fractionStr] = Timestamp._splitSecondsDecimal(second);
+                fractionalSeconds = Decimal.parse(secondInt + '.' + fractionStr);
             }
-            return new Timestamp(offset, year, month, day, hour, minute, second);
+
+            let date = new Date(Date.UTC(year, month ? month - 1 : 0, day ? day : 1, hour ? hour : 0, minute ? minute : 0, secondInt ? secondInt : 0, 0));
+            return Timestamp._valueOf(date, offset, fractionalSeconds, precision);
         }
         return null;
     }
