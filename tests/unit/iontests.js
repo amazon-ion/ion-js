@@ -360,6 +360,9 @@ let badSkipList = toSkipList([
     'ion-tests/iontestdata/bad/nopPadWithAnnotations.10n',
     'ion-tests/iontestdata/bad/structOrderedEmpty.10n',
     'ion-tests/iontestdata/bad/timestamp/timestampNegativeFraction.10n',
+    'ion-tests/iontestdata/bad/timestamp/timestampSept31.10n',
+    'ion-tests/iontestdata/bad/timestamp/outOfRange/leapDayNonLeapYear_1.10n',
+    'ion-tests/iontestdata/bad/timestamp/outOfRange/leapDayNonLeapYear_2.10n',
 ]);
 
 let eventSkipList = toSkipList([
