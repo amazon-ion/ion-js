@@ -26,7 +26,7 @@ export enum Precision {
 }
 
 /**
- * This class provides the additional semantics necessary for timestamp values.
+ * This class provides the additional semantics necessary for Ion timestamp values.
  */
 export class Timestamp {
     private static _MIN_SECONDS = Decimal.ZERO;
@@ -41,8 +41,8 @@ export class Timestamp {
     private static _MAX_MONTH = 12;
     private static _MIN_YEAR = 1;
     private static _MAX_YEAR = 9999;
-    private static _MIN_OFFSET = (-23 * 60) - 59;
-    private static _MAX_OFFSET = (23 * 60) + 59;
+    private static _MIN_OFFSET = -23 * 60 - 59;
+    private static _MAX_OFFSET =  23 * 60 + 59;
 
     /**
      * Parses a string and returns a corresponding Timestamp object.
@@ -56,32 +56,50 @@ export class Timestamp {
     }
 
     private _precision: Precision;
+    private readonly _secondsDecimal: Decimal;
 
     /**
+     * Creates a new Timestamp, with precision determined by which parameters
+     * are provided.  If a parameter is not specified, it defaults to its lowest
+     * valid value;  defaulted values are not used when determining the precision.
      *
-     * @param offset[-(23*60+59) - (23*60+59)]
-     * @param year[1-9999]
-     * @param month[1-12]
-     * @param day[1-31]
-     * @param hour[0-23]
-     * @param minute[0-59]
-     * @param seconds[0-60)
+     * Logically, an instance of this class represents an instant in time based on
+     * an offset from UTC and the other provided parameters.
+     *
+     * @param _localOffset Local offset from UTC (range: [-(23*60+59):(23*60+59)])
+     * @param _year the year (range: [1-9999])
+     * @param _month the month (range: [1-12])
+     * @param _day the day of the month (range: [1-31])
+     * @param _hour the hour of the day (range: [0-23])
+     * @param _minutes number of minutes (range: [0-59])
+     * @param seconds number of seconds specified as a number (range: [0-59]),
+     *                or a Decimal (range: [0.0-60.0)) in order to express whole seconds
+     *                along with some fractional seconds
      */
-    constructor(private readonly _offset : number,
+    constructor(private readonly _localOffset : number,
                 private readonly _year : number,
                 private readonly _month? : number,
                 private readonly _day? : number,
                 private readonly _hour? : number,
-                private readonly _minute? : number,
-                private readonly _secondsDecimal? : Decimal) {
+                private readonly _minutes? : number,
+                seconds? : number | Decimal) {
 
         this._precision = Precision.YEAR;
-        this._checkRequiredField('Offset', this._offset, Timestamp._MIN_OFFSET, Timestamp._MAX_OFFSET);
+        this._checkRequiredField('Offset', this._localOffset, Timestamp._MIN_OFFSET, Timestamp._MAX_OFFSET);
         this._checkRequiredField('Year', this._year, Timestamp._MIN_YEAR, Timestamp._MAX_YEAR);
         this._month = this._checkOptionalField('Month', this._month, Timestamp._MIN_MONTH, Timestamp._MAX_MONTH, 1, Precision.MONTH);
         this._day = this._checkOptionalField('Day', this._day, Timestamp._MIN_DAY, Timestamp._MAX_DAY, 1, Precision.DAY);
         this._hour = this._checkOptionalField('Hour', this._hour, Timestamp._MIN_HOUR, Timestamp._MAX_HOUR, 0, Precision.HOUR_AND_MINUTE);
-        this._minute = this._checkOptionalField('Minute', this._minute, Timestamp._MIN_MINUTE, Timestamp._MAX_MINUTE, 0, Precision.HOUR_AND_MINUTE);
+        this._minutes = this._checkOptionalField('Minutes', this._minutes, Timestamp._MIN_MINUTE, Timestamp._MAX_MINUTE, 0, Precision.HOUR_AND_MINUTE);
+
+        if (typeof seconds === 'number') {
+            if (!Number.isInteger(seconds)) {
+                throw new Error('The provided seconds number was not an integer (' + seconds + ')');
+            }
+            this._secondsDecimal = new Decimal(seconds, 0);
+        } else {
+            this._secondsDecimal = seconds;
+        }
         if (this._secondsDecimal === null || this._secondsDecimal === undefined) {
             this._secondsDecimal = Decimal.ZERO;
         } else {
@@ -137,6 +155,9 @@ export class Timestamp {
                 throw new Error(`${fieldName} ${value} must be between ${min} inclusive, and ${max} exclusive`);
             }
         } else {
+            if (!Number.isInteger(value)) {
+                throw new Error(`${fieldName} ${value} must be an integer`);
+            }
             if (value < min || value > max) {
                 throw new Error(`${fieldName} ${value} must be between ${min} and ${max} inclusive`);
             }
@@ -157,7 +178,7 @@ export class Timestamp {
      * Returns this Timestamp's local offset from UTC, in minutes.
      */
     getLocalOffset() : number {
-        return this._offset;
+        return this._localOffset;
     }
 
     /**
@@ -168,12 +189,19 @@ export class Timestamp {
     }
 
     /**
-     * Returns a Date representing the value of this Timestamp.  Note that a Date cannot fully
-     * represent all Timestamp values.  Specifically:
+     * Returns a Date representing the value of this Timestamp.  Note that this may be a lossy
+     * operation, as a Date cannot fully represent all Timestamp values.  Specifically:
      * - fractional seconds of a Timestamp beyond millisecond precision are rounded
      *   to the nearest millisecond in the returned Date
      * - if the precision of this Timestamp is YEAR or MONTH, the returned Date's month and day
      *   are set to January 1
+     * - the returned Date object is not aware of this Timestamp's local offset property
+     *
+     * With the exception of the discrepancies noted above, the returned Date will represent the
+     * same instant in time as this Timestamp.  However, most methods of the Date API will return
+     * properties in the _local date and time_ of the instant, which may differ from the local
+     * offset of the Timestamp.  The Date class also provides methods for retrieving the properties
+     * of the instant in UTC.
      */
     getDate() : Date {
         let ms = null;
@@ -183,7 +211,7 @@ export class Timestamp {
 
         let msSinceEpoch = Date.UTC(
                 this._year, (this._precision === Precision.YEAR ? 0 : this._month - 1), this._day,
-                this._hour, this._minute, this.getSecondsInt(), ms);
+                this._hour, this._minutes, this.getSecondsInt(), ms);
 
         if (this._year < 100) {
             // for a year < 100, JavaScript Date's default behavior automatically adds 1900;
@@ -193,45 +221,53 @@ export class Timestamp {
             msSinceEpoch = date.getTime();
         }
 
-        let offsetShiftMs = this._offset * 60 * 1000;
+        let offsetShiftMs = this._localOffset * 60 * 1000;
         return new Date(msSinceEpoch - offsetShiftMs);
     }
 
+    /**
+     * Returns the number of seconds as an integer value; any fractional seconds are truncated.
+     */
     getSecondsInt() : number {
         return this._secondsDecimal.intValue();
     }
 
+    /**
+     * Returns a decimal representing the number of seconds (including fractional seconds).
+     */
     getSecondsDecimal() : Decimal {
         return this._secondsDecimal;
     }
 
+    /**
+     * Returns a decimal representing only the fractional seconds.
+     * @private
+     */
     _getFractionalSeconds() : Decimal {
         let fractionStr = Timestamp._splitSecondsDecimal(this._secondsDecimal)[1];
         return Decimal.parse(fractionStr + 'd-' + fractionStr.length);
     }
 
     /**
-     * Compares this Timestamp with another and returns true if they
-     * represent the same instant and have the same precision.
-     * Note that this differs from compareTo(), which doesn't require
+     * Compares this Timestamp with another and returns true if they represent the same instant
+     * and have the same precision.  Note that this differs from compareTo(), which doesn't require
      * precision to match when returning 0.
      */
     equals(that : Timestamp) : boolean {
         return this.getPrecision() === that.getPrecision()
-            && this._secondsDecimal.equals(that._secondsDecimal)
-            && this.compareTo(that) === 0
             && this.getLocalOffset() === that.getLocalOffset()
-            && _sign(this.getLocalOffset()) === _sign(that.getLocalOffset());
+            && _sign(this.getLocalOffset()) === _sign(that.getLocalOffset())
+            && this.compareTo(that) === 0
+            && this._secondsDecimal.equals(that._secondsDecimal);
     }
 
     /**
-     * Compares this Timestamp with anoter and returns -1, 0, or 1 if the
-     * instant represented by this Timestamp occurs before, at the same time,
-     * or after the other Timestamp.
+     * Compares this Timestamp with another and returns -1, 0, or 1 if the instant represented
+     * by this Timestamp occurs before, at the same time, or after the other Timestamp.
      *
-     * Note that a return value of 0 doesn't guarantee that equals() would
-     * return true, as compareTo() doesn't require the values to have the
-     * same precision to be considered equal, whereas equals() does.
+     * Note that a return value of 0 doesn't guarantee that equals() would return true,
+     * as compareTo() doesn't require the values to have the same precision to be considered equal,
+     * whereas equals() does.
      */
     compareTo(that : Timestamp) : number {
         let thisMs = this.getDate().getTime();
@@ -242,6 +278,10 @@ export class Timestamp {
         return thisMs < thatMs ? -1 : 1;
     }
 
+    /**
+     * Splits secondsDecimal into two strings representing the whole and fractional portions of the decimal.
+     * @private
+     */
     static _splitSecondsDecimal(secondsDecimal: Decimal) : [string, string] {
         let coefStr = secondsDecimal._getCoefficient().toString();
         let exp = secondsDecimal._getExponent();
@@ -276,7 +316,7 @@ export class Timestamp {
                     strVal += '.' + fractionStr;
                 }
             case Precision.HOUR_AND_MINUTE:
-                strVal = this._lpadZeros(this._minute, 2) + (strVal ? ":" + strVal : "");
+                strVal = this._lpadZeros(this._minutes, 2) + (strVal ? ":" + strVal : "");
                 strVal = this._lpadZeros(this._hour, 2) + (strVal ? ":" + strVal : "");
             case Precision.DAY:
                 strVal = this._lpadZeros(this._day, 2) + (strVal ? "T" + strVal : "T");
@@ -293,7 +333,7 @@ export class Timestamp {
         }
 
         // hours : minute (for offset)
-        let o: number = this._offset;
+        let o: number = this._localOffset;
         if (this._precision > Precision.DAY) {
             if (o === 0 && _sign(o) === 1) {
                 strVal = strVal + "Z";
@@ -312,9 +352,22 @@ export class Timestamp {
         if (s.length <= size) {
             return '0'.repeat(size - s.length) + s;
         }
-        return s.substr(s.length - size, size);    // TBD perhaps this should this throw?
+        throw new Error("Unable to fit '" + s + "' into " + size + " characters");
     }
 
+    /**
+     * Enables construction of a Timestamp based on a Date.  If the correct parameters are provided,
+     * a Timestamp can be fully reconstituted as follows:
+     *
+     * ```typescript
+     * let ts = Timestamp.parse('2001-02-03T04:05:06.123456789-07:00');
+     * let date = ts.getDate();
+     * ...
+     * let ts2 = Timestamp._valueOf(date, ts.getLocalOffset(), ts._getFractionalSeconds(), ts.getPrecision());
+     * assert.deepEqual(ts2, ts);
+     * ```
+     * @private
+     */
     static _valueOf(date: Date, localOffset: number, fractionalSeconds?: Decimal, precision?: Precision) : Timestamp {
         let msSinceEpoch = date.getTime() + localOffset * 60 * 1000;
         date = new Date(msSinceEpoch);

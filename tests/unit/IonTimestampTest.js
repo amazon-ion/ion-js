@@ -60,26 +60,34 @@ define(
             // / boundary tests
 
 
-            '2007-02-23T20:14:33.079+00:00': () => test('2007-02-23T20:14:33.079+00:00', ion.Precision.SECONDS, 0, 2007, 2, 23, 20, 14, '33.079'),
-            '2007-02-23T00:14:33.079+00:00': () => test('2007-02-23T00:14:33.079+00:00', ion.Precision.SECONDS, 0, 2007, 2, 23, 0, 14, '33.079'),
-            '2007-02-23T20:14:33.079-00:00': () => test('2007-02-23T20:14:33.079-00:00', ion.Precision.SECONDS, -0, 2007, 2, 23, 20, 14, '33.079'),
-            '2007-02-23T00:14:33.079-00:00': () => test('2007-02-23T00:14:33.079-00:00', ion.Precision.SECONDS, -0, 2007, 2, 23, 0, 14, '33.079'),
-            '2007-02-23T12:14:33.079-08:00': () => test('2007-02-23T12:14:33.079-08:00', ion.Precision.SECONDS, -8*60, 2007, 2, 23, 12, 14, '33.079'),
-            '2007-02-23T00:14:33.079-08:00': () => test('2007-02-23T00:14:33.079-08:00', ion.Precision.SECONDS, -8*60, 2007, 2, 23, 0, 14, '33.079'),
+            '2007-02-23T20:14:33.079+00:00': () =>
+                test('2007-02-23T20:14:33.079+00:00', ion.Precision.SECONDS, 0, 2007, 2, 23, 20, 14, '33.079'),
+            '2007-02-23T00:14:33.079+00:00': () =>
+                test('2007-02-23T00:14:33.079+00:00', ion.Precision.SECONDS, 0, 2007, 2, 23, 0, 14, '33.079'),
+            '2007-02-23T20:14:33.079-00:00': () =>
+                test('2007-02-23T20:14:33.079-00:00', ion.Precision.SECONDS, -0, 2007, 2, 23, 20, 14, '33.079'),
+            '2007-02-23T00:14:33.079-00:00': () =>
+                test('2007-02-23T00:14:33.079-00:00', ion.Precision.SECONDS, -0, 2007, 2, 23, 0, 14, '33.079'),
+            '2007-02-23T12:14:33.079-08:00': () =>
+                test('2007-02-23T12:14:33.079-08:00', ion.Precision.SECONDS, -8*60, 2007, 2, 23, 12, 14, '33.079'),
+            '2007-02-23T00:14:33.079-08:00': () =>
+                test('2007-02-23T00:14:33.079-08:00', ion.Precision.SECONDS, -8*60, 2007, 2, 23, 0, 14, '33.079'),
+
+            '2001-02-03T04:05:06.123456789-07:53': () =>
+                test('2001-02-03T04:05:06.123456789-07:53', ion.Precision.SECONDS, -(7*60 + 53), 2001, 2, 3, 4, 5, '6.123456789'),
         });
 
-
-        function test(str, precision, offset, year, month = null, day = null, hour = null, minute = null, seconds = null) {
+        function test(str, precision, localOffset, year, month = null, day = null, hour = null, minutes = null, seconds = null) {
             // verify Timestamp members are set as expected:
             let ts = ion.Timestamp.parse(str);
             assert.equal(ts.getPrecision(), precision, 'precision');
-            assert.equal(ts.getLocalOffset(), offset, 'local offset');
-            assert.equal(util._sign(ts._offset), util._sign(offset), 'offset sign');
+            assert.equal(ts.getLocalOffset(), localOffset, 'local offset');
+            assert.equal(util._sign(ts._localOffset), util._sign(localOffset), 'local offset sign');
             assert.equal(ts._year, year, 'year');
             assert.equal(ts._month, month !== null ? month : 1, 'month');
             assert.equal(ts._day, day !== null ? day : 1, 'day');
             assert.equal(ts._hour, hour !== null ? hour : 0, 'hour');
-            assert.equal(ts._minute, minute !== null ? minute : 0, 'minute');
+            assert.equal(ts._minutes, minutes !== null ? minutes : 0, 'minutes');
             assert.equal(ts.getSecondsInt(), parseInt(seconds !== null ? seconds : '0'), 'seconds');
             assert.deepEqual(ts.getSecondsDecimal(), ion.Decimal.parse(seconds !== null ? seconds : '0'), 'seconds decimal');
 
@@ -92,19 +100,16 @@ define(
             assert.equal(ts.toString(), expectedStr);
 
             // verify Timestamp constructor produces an equivalent object
-            let ts2 = new ion.Timestamp(offset, year, month, day, hour, minute, seconds !== null ? ion.Decimal.parse(seconds) : null);
+            let ts2 = new ion.Timestamp(localOffset, year, month, day, hour, minutes, seconds !== null ? ion.Decimal.parse(seconds) : null);
             assert.equal(ts2.compareTo(ts), 0);
             assert.equal(ts2.equals(ts), true);
             assert.deepEqual(ts2, ts);
 
             // verify Timestamp can be reconstituted via date, localOffset, and fractionalSeconds
-            let date = ts.getDate();
-            let localOffset = ts.getLocalOffset();
-            let fractionalSeconds = ts._getFractionalSeconds();
-            let ts3 = ion.Timestamp._valueOf(date, localOffset, fractionalSeconds);
+            let ts3 = ion.Timestamp._valueOf(ts.getDate(), ts.getLocalOffset(), ts._getFractionalSeconds(), ts.getPrecision());
             assert.equal(ts3.compareTo(ts), 0);
-            //assert.equal(ts3.equals(ts), true);
-            //assert.deepEqual(ts3, ts);
+            assert.equal(ts3.equals(ts), true);
+            assert.deepEqual(ts3, ts);
         }
 
 
