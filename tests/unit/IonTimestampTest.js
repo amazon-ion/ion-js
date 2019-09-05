@@ -57,7 +57,6 @@ define(
             '2008-01-01T00:00:00.000-00:00': () => test('2008-01-01T00:00:00.000-00:00', ion.Precision.SECONDS, -0, 2008, 1, 1, 0, 0, '0.000'),
             '2008-01-01T00:00:00.000-23:59': () => test('2008-01-01T00:00:00.000-23:59', ion.Precision.SECONDS, -(23 * 60 + 59), 2008, 1, 1, 0, 0, '0.000'),
             '2008-01-01T00:00:00.000+23:59': () => test('2008-01-01T00:00:00.000+23:59', ion.Precision.SECONDS, 23 * 60 + 59, 2008, 1, 1, 0, 0, '0.000'),
-
             // / boundary tests
 
 
@@ -109,40 +108,45 @@ define(
         }
 
 
-        registerSuite({
-            name: 'Timestamp (invalid)',
-
+        let invalidTimestamps = [
             // boundary tests
-            '0000T': () => testInvalid('0000T'),
-            '10000T': () => testInvalid('10000T'),
+            '0000T',
+            '10000T',
 
-            '2007-00T': () => testInvalid('2007-00T'),
-            '2007-13T': () => testInvalid('2007-13T'),
+            '2007-00T',
+            '2007-13T',
 
-            '2007-01-00T': () => testInvalid('2007-01-00T'),
-            '2007-01-32T': () => testInvalid('2007-01-32T'),
+            '2007-01-00T',
+            '2007-01-32T',
             // TBD invalid days per month
             // TBD invalid days for leap year
 
-            '2007-01-01T24:00': () => testInvalid('2007-01-01T24:00'),
-            '2007-01-01T00:60': () => testInvalid('2007-01-01T00:60'),
+            '2007-01-01T24:00',
+            '2007-01-01T00:60',
 
-            '2007-01-01T00:00:60': () => testInvalid('2007-01-01T00:00:60'),
+            '2007-01-01T00:00:60',
 
-            '2007-01-01T00:00:60-24:00': () => testInvalid('2007-01-01T00:00:00-24:00'),
-            '2007-01-01T00:00:60+24:00': () => testInvalid('2007-01-01T00:00:00+24:00'),
-            '2007-01-01T00:00:60-00:60': () => testInvalid('2007-01-01T00:00:00-00:60'),
-            '2007-01-01T00:00:60+00:60': () => testInvalid('2007-01-01T00:00:00-00:60'),
-
+            '2007-01-01T00:00:60-24:00',
+            '2007-01-01T00:00:60+24:00',
+            '2007-01-01T00:00:60-00:60',
+            '2007-01-01T00:00:60+00:60',
             // / boundary tests
 
 
-            '2007-01-01T00:00': () => testInvalid('2007-01-01T00:00'),  // no offset specified
+            // offset rollover tests
+            '0001-01-01T00:00+00:01',  // rolls back to year 0
+            '9999-12-31T23:59-00:01',  // rolls forward to year 10000
+            // /offset rollover tests
+
+
+            '2007-01-01T00:00',  // no offset specified
+        ];
+        let invalidSuite = { name: 'Timestamp (invalid)' };
+        invalidTimestamps.forEach(str => {
+            invalidSuite[str] = () => assert.throws(() => ion.Timestamp.parse(str));
         });
 
-        function testInvalid(str) {
-            assert.throws(() => ion.Timestamp.parse(str));
-        }
+        registerSuite(invalidSuite);
     }
 );
 
