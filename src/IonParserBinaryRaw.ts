@@ -354,10 +354,8 @@ export class ParserBinaryRaw {
             if (this._in.position() < end) {
                 coef = ParserBinaryRaw.readSignedIntFrom(this._in, end - this._in.position());
             }
-            let decimalStr = secondInt.toString() + coef.toString() + 'd' + exp;
-            second = Decimal.parse(decimalStr);
-
-            let [_, fractionStr] = Timestamp._splitSecondsDecimal(second);
+            let dec = new Decimal(coef, exp);
+            let [_, fractionStr] = Timestamp._splitSecondsDecimal(dec);
             fractionalSeconds = Decimal.parse(secondInt + '.' + fractionStr);
         }
 
