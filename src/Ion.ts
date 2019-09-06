@@ -25,32 +25,18 @@ import { BinaryWriter } from "./IonBinaryWriter";
 import { LocalSymbolTable, defaultLocalSymbolTable } from "./IonLocalSymbolTable";
 import { decodeUtf8 } from "./IonUnicode";
 
-const e = {
-  name: "IonError",
-  where: undefined,
-  msg: "error",
-}
-
-
 /**
- * Options object to be passed during the creation of an Ion Reader.
- * Holds the Ion catalogue @see http://amzn.github.io/ion-docs/symbols.html#the-catalog
- * and the Ion source type (i.e., binary or text) as a `string`
- */
-export interface Options {
-  catalog: Catalog;
-  sourceType: string;
-}
-
-/**
- * Returns the `buf` type as true for binary, false for text.
+ * Indicates whether the provided buffer contains binary Ion data.
  * 
- * @param buffer we want to check its type 
- * @returns either `'binary'` or `'text'`
+ * @param buffer    The buffer of data to inspect.
+ * @returns         True if the provided buffer begins with a binary Ion version marker, false otherwise.
  */
-function isBinary(buf: Uint8Array) {
+function isBinary(buffer: Uint8Array): boolean {
+    if (buffer.length < 4) {
+        return false;
+    }
     for(let i = 0; i < 4; i++){
-        if(buf[i] !== IVM.binary[i]) return false;
+        if(buffer[i] !== IVM.binary[i]) return false;
     }
   return true;
 }
@@ -59,8 +45,9 @@ function isBinary(buf: Uint8Array) {
 /**
  * Create an Ion Reader object from a currentBuffer `buf`
  *
- * @param buf the Ion data to be used by the reader. Typically a string, UTF-8 encoded buffer (text), or raw binary buffer.
- * @param options for the reader including catalog
+ * @param buf       The Ion data to be used by the reader. Typically a string, UTF-8 encoded buffer (text), or raw
+ *                  binary buffer.
+ * @param catalog   An optional {Catalog} to be used for resolving symbol table references.
  * @returns {Reader}
  */
 export function makeReader(buf: any, catalog? : Catalog) : Reader {
@@ -102,7 +89,6 @@ export function makeBinaryWriter(localSymbolTable : LocalSymbolTable = defaultLo
 
 export { Reader } from "./IonReader";
 export { Writer } from "./IonWriter";
-export { BinaryWriter } from "./IonBinaryWriter";
 export { Catalog } from "./IonCatalog";
 export { Decimal } from "./IonDecimal";
 export { defaultLocalSymbolTable } from "./IonLocalSymbolTable";
