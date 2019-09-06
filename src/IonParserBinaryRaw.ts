@@ -295,7 +295,7 @@ export class ParserBinaryRaw {
         let numberOfCoefficientBytes = numberOfBytes - numberOfExponentBytes;
 
         coefficient = ParserBinaryRaw.readSignedIntFrom(input,  numberOfCoefficientBytes);
-        d = new Decimal(coefficient, exponent);
+        d = Decimal._fromLongIntCoefficient(coefficient, exponent);
 
         return d;
     }
@@ -339,12 +339,12 @@ export class ParserBinaryRaw {
                 precision = Precision.SECONDS;
             }
             if(this._in.position() < end) {
-                let exp = this.readVarSignedInt();
-                let coef = LongInt._ZERO;
+                let exponent = this.readVarSignedInt();
+                let coefficient = LongInt._ZERO;
                 if(this._in.position() < end) {
-                    coef = ParserBinaryRaw.readSignedIntFrom(this._in, end - this._in.position());
+                    coefficient = ParserBinaryRaw.readSignedIntFrom(this._in, end - this._in.position());
                 }
-                fraction = new Decimal(coef, exp);
+                fraction = Decimal._fromLongIntCoefficient(coefficient, exponent);
                 precision = Precision.FRACTION;
             }
         }
@@ -478,6 +478,22 @@ export class ParserBinaryRaw {
         t._a = arr;
     }
 
+    /**
+     * Positive integers and negative integers are both encoded as an unsigned integer magnitude.
+     * This function will read in the magnitude, leaving it to the caller to set the value's sign as appropriate.
+     */
+    private _readIntegerMagnitude(): number {
+        if (this._len === 0) {
+            return 0;
+        }
+        // We currently only support reading integers that can be stored in 31 bits or fewer.
+        // For details, see: https://github.com/amzn/ion-js/issues/210
+        if (this._len <= 3 || (this._len === 4 && this._in.peek() < 128)) {
+            return this.readUnsignedInt();
+        }
+        throw new Error("Attempted to read an integer that could not be stored in 31 bits.");
+    }
+
     private load_value() : void {
         if (this._curr != undefined) return;   // current value is already loaded
         if (this.isNull()) return null;
@@ -485,24 +501,10 @@ export class ParserBinaryRaw {
             case IonBinary.TB_BOOL:
                 break;
             case IonBinary.TB_INT:
-                if (this._len === 0) {
-                    this._curr = 0;
-                } else if (this._len <= 4) {//32 bits of representation after shifts
-                    this._curr = this.readUnsignedInt();
-                } else {
-                    this._curr = this.readUnsignedLongInt();
-                }
+                this._curr = this._readIntegerMagnitude();
                 break;
             case IonBinary.TB_NEG_INT:
-                if (this._len === 0) {
-                    this._curr = 0;
-                } else if (this._len <= 4) {//32 bits of representation after shifts
-                    this._curr = -this.readUnsignedInt();
-                } else {
-                    let temp : LongInt = this.readUnsignedLongInt();
-                    temp.negate();
-                    this._curr = temp;
-                }
+                this._curr = -this._readIntegerMagnitude();
                 break;
             case IonBinary.TB_FLOAT:
                 this._curr = this.read_binary_float();

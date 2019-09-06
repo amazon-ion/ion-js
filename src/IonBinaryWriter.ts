@@ -130,15 +130,15 @@ export class BinaryWriter implements Writer {
 
     if (typeof value == 'string') value = Decimal.parse(value);
 
-    let isPositiveZero: boolean = value.numberValue() === 0 && !value.isNegative();
     let exponent: number = value._getExponent();
+    let coefficient: LongInt = value._getCoefficient();
+    let isPositiveZero: boolean = coefficient.isZero() && !value.isNegative();
     if (isPositiveZero && exponent === 0 && _sign(exponent) === 1) {
       // Special case per the spec: http://amzn.github.io/ion-docs/docs/binary.html#5-decimal
       this.addNode(new BytesNode(this.writer, this.getCurrentContainer(), IonTypes.DECIMAL, this.encodeAnnotations(annotations), new Uint8Array(0)));
       return;
     }
 
-    let coefficient: LongInt = value._getCoefficient();
     let writeCoefficient = !(coefficient.isZero() && coefficient.signum() === 1);  // no need to write a coefficient of 0
     let coefficientBytes: Uint8Array | null = writeCoefficient ? coefficient.intBytes() : null;
 
