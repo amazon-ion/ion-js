@@ -417,7 +417,7 @@ export class BinaryWriter implements Writer {
     this.stepOut();
   }
 
-  writeValues(reader: Reader, writer: Writer): void {
+  writeValues(reader: Reader): void {
     _writeValues(reader, this);
   }
 }
