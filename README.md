@@ -149,6 +149,19 @@ Or you could use the locally installed Grunt:
 $ ./node_modules/.bin/grunt release
 ```
 
+## Build Output
+
+The build above will compile the library into the `dist` directory.  This directory has subdirectories of
+the form `<module type>/<target ES version>`.  In general, we target ES6 and rely on polyfills to support earlier
+versions.
+
+* `dist/es6/es6` - Targets the ES6 module system and ES6
+* `dist/commonjs/es6` - Targets the CommonJS module system and ES6 
+* `dist/amd/es6` - Targets the AMD module system and ES6
+
+A distribution using `browserify` and `babelify` creates a browser friendly polyfilled distribution targeting ES6:
+at `dist/browser/js/ion-bundle.js`.
+
 # Contribute
 
 [CONTRIBUTE.md](CONTRIBUTE.md)
