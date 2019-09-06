@@ -81,8 +81,81 @@ define(
                 assert.equal(ts.getSecondsInt(), 45);
                 assert.deepEqual(ts.getSecondsDecimal(), ion.Decimal.parse('45'));
                 assert.deepEqual(ts._getFractionalSeconds(), ion.Decimal.ZERO);
-            }
+            },
+
+            // same precision
+            'compareToYear'    : () => testCompareTo('2001T', '2002T', -1),
+            'compareToMonth'   : () => testCompareTo('2001-01T', '2001-02T', -1),
+            'compareToDay'     : () => testCompareTo('2001-01-01T', '2001-01-02T', -1),
+            'compareToMinutes' : () => testCompareTo('2001-01-01T00:00Z', '2001-01-01T00:01Z', -1),
+            'compareToSeconds' : () => testCompareTo('2001-01-01T00:00:00Z', '2001-01-01T00:00:01Z', -1),
+            'compareToMs'      : () => testCompareTo('2001-01-01T00:00:00.000Z', '2001-01-01T00:00:00.001Z', -1),
+            'compareToNs'      : () => testCompareTo('2001-01-01T00:00:00.000000000Z', '2001-01-01T00:00:00.000000001Z', -1),
+
+            // different precision
+            'compareToYear2'   : () => testCompareTo('2001T', '2002-01-01T00:00:00.000Z', -1),
+            'compareToMonth2'  : () => testCompareTo('2001-01T', '2001-02-01T00:00:00.000Z', -1),
+            'compareToDay2'    : () => testCompareTo('2001-01-01T', '2001-01-02T00:00:00.000Z', -1),
+            'compareToMinutes2': () => testCompareTo('2001-01-01T00:00Z', '2001-01-01T00:01:00.000Z', -1),
+            'compareToSeconds2': () => testCompareTo('2001-01-01T00:00:00Z', '2001-01-01T00:00:01.000Z', -1),
+            'compareToMs2'     : () => testCompareTo('2001-01-01T00:00:00.000Z', '2001-01-01T00:00:00.001000000Z', -1),
+            'compareToNs2'     : () => testCompareTo('2001-01-01T00:00:00.000000000Z', '2001-01-01T00:00:00.000000001000Z', -1),
+
+            'compareToWithOffset1': () => testCompareTo('2001-01-01T00:59-00:01', '2001-01-01T01:00Z', 0),
+            'compareToWithOffset2': () => testCompareTo('2001-01-01T01:01+00:01', '2001-01-01T01:00Z', 0),
+            'compareToWithOffset3': () => testCompareTo('2001-01-01T00:59-00:01', '2001-01-01T01:01+00:01', 0),
+            'compareToWithOffset4': () => testCompareTo('2001-01-01T01:01+00:02', '2001-01-01T01:00+00:00', -1),
+            'compareToWithOffset5': () => testCompareTo('2001-01-01T00:59-00:02', '2001-01-01T01:00+00:00', 1),
+
+
+            'notEqualsYear'    : () => testEquals('2001T', '2002T', false),
+            'notEqualsYear0099': () => testEquals('0099T', '1999T', false),    // Date's default behavior converts 99 to 1999
+            'notEqualsMonth'   : () => testEquals('2001-01T', '2001-02T', false),
+            'notEqualsDay'     : () => testEquals('2001-01-01T', '2001-01-02T', false),
+            'notEqualsMinutes' : () => testEquals('2001-01-01T00:00Z', '2001-01-01T00:01Z', false),
+            'notEqualsSeconds' : () => testEquals('2001-01-01T00:00:00Z', '2001-01-01T00:00:01Z', false),
+            'notEqualsMs'      : () => testEquals('2001-01-01T00:00:00.000Z', '2001-01-01T00:00:00.001Z', false),
+            'notEqualsNs'      : () => testEquals('2001-01-01T00:00:00.000000000Z', '2001-01-01T00:00:00.000000001Z', false),
+
+            // same instants, but different offsets, so not equal:
+            'notEqualsWithOffset1': () => testEquals('2001-01-01T00:59-00:01', '2001-01-01T01:00Z', false),
+            'notEqualsWithOffset2': () => testEquals('2001-01-01T01:01+00:01', '2001-01-01T01:00Z', false),
+            'notEqualsWithOffset3': () => testEquals('2001-01-01T00:59-00:01', '2001-01-01T01:01+00:01', false),
+
+
+            'equivalence': () => {
+                let timestamps = [
+                    ion.Timestamp.parse('2001T'),
+                    ion.Timestamp.parse('2001-01T'),
+                    ion.Timestamp.parse('2001-01-01T'),
+                    ion.Timestamp.parse('2001-01-01T00:00Z'),
+                    ion.Timestamp.parse('2001-01-01T00:00:00Z'),
+                    ion.Timestamp.parse('2001-01-01T00:00:00.000Z'),
+                    ion.Timestamp.parse('2001-01-01T00:00:00.000000000Z'),
+                    ion.Timestamp.parse('2001-01-01T00:01+00:01'),
+                    ion.Timestamp.parse('2000-12-31T23:59-00:01'),
+                ];
+                for (let i = 0; i < timestamps.length; i++) {
+                    for (let j = 0; j < timestamps.length; j++) {
+                        assert.equal(timestamps[i].compareTo(timestamps[j]), 0);     // instant equivalence
+                        assert.equal(timestamps[i].equals(timestamps[j]), i === j);  // data model equivalence
+                    }
+                }
+            },
         });
+
+        function testCompareTo(s1, s2, expected) {
+            let ts1 = ion.Timestamp.parse(s1);
+            let ts2 = ion.Timestamp.parse(s2);
+            assert.equal(ts1.compareTo(ts2),  expected);
+            assert.equal(ts2.compareTo(ts1), -expected);
+        }
+
+        function testEquals(s1, s2, expected) {
+            let ts1 = ion.Timestamp.parse(s1);
+            let ts2 = ion.Timestamp.parse(s2);
+            assert.equal(ts1.equals(ts2), expected);
+        }
 
         function test(str, precision, localOffset, year, month = null, day = null, hour = null, minutes = null, seconds = null) {
             // verify Timestamp members are set as expected:

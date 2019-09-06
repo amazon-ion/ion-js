@@ -80,3 +80,11 @@ export function _writeValue(reader: IonReader, writer: IonWriter, _depth = 0): v
     }
 }
 
+/**
+ * Returns false if v is undefined or null; otherwise true.
+ * @private
+ */
+export function _hasValue(v: any): boolean {
+    return v !== undefined && v !== null;
+}
+

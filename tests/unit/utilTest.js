@@ -22,6 +22,12 @@ define([
     registerSuite({
       name: 'util',
 
+      '_hasValue()'         : () => assert.equal(util._hasValue(), false),
+      '_hasValue(undefined)': () => assert.equal(util._hasValue(undefined), false),
+      '_hasValue(null)'     : () => assert.equal(util._hasValue(null), false),
+      '_hasValue(0)'        : () => assert.equal(util._hasValue(0), true),
+      '_hasValue(1)'        : () => assert.equal(util._hasValue(1), true),
+
       '_sign(-1)': () => assert.equal(util._sign(-1), -1),
       '_sign(-0)': () => assert.equal(util._sign(-0), -1),
       '_sign(0)' : () => assert.equal(util._sign(0), 1),

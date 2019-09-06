@@ -304,64 +304,65 @@ export class ParserBinaryRaw {
     }
 
     private read_timestamp_value() : Timestamp {
-        if (this._len > 0) {
-            let offset: number;
-            let year: number;
-            let month: number;
-            let day: number;
-            let hour: number;
-            let minute: number;
-            let secondInt: number;
-            let second: Decimal;
-            let fractionalSeconds = Decimal.ZERO;
-            let precision = Precision.YEAR;
-
-            let end = this._in.position() + this._len;
-            offset = this.readVarSignedInt();
-            if (this._in.position() < end) {
-                year = this.readVarUnsignedInt();
-            } else {
-                throw new Error('Timestamps must include a year.');
-            }
-            if (this._in.position() < end) {
-                month = this.readVarUnsignedInt();
-                precision = Precision.MONTH;
-            }
-            if (this._in.position() < end) {
-                day = this.readVarUnsignedInt();
-                precision = Precision.DAY;
-            }
-            if (this._in.position() < end) {
-                hour = this.readVarUnsignedInt();
-                if (this._in.position() >= end) {
-                    throw new Error('Timestamps with an hour must include a minute.');
-                } else {
-                    minute = this.readVarUnsignedInt();
-                }
-                precision = Precision.HOUR_AND_MINUTE;
-            }
-            if (this._in.position() < end) {
-                secondInt = this.readVarUnsignedInt();
-                second = new Decimal(new LongInt(secondInt), 0);
-                precision = Precision.SECONDS;
-            }
-            if (this._in.position() < end) {
-                let exp = this.readVarSignedInt();
-                let coef = LongInt._ZERO;
-                if (this._in.position() < end) {
-                    coef = ParserBinaryRaw.readSignedIntFrom(this._in, end - this._in.position());
-                }
-                let decimalStr = secondInt.toString() + coef.toString() + 'd' + exp;
-                second = Decimal.parse(decimalStr);
-
-                let [_, fractionStr] = Timestamp._splitSecondsDecimal(second);
-                fractionalSeconds = Decimal.parse(secondInt + '.' + fractionStr);
-            }
-
-            let date = new Date(Date.UTC(year, month ? month - 1 : 0, day ? day : 1, hour ? hour : 0, minute ? minute : 0, secondInt ? secondInt : 0, 0));
-            return Timestamp._valueOf(date, offset, fractionalSeconds, precision);
+        if (!(this._len > 0)) {
+            return null;
         }
-        return null;
+
+        let offset: number;
+        let year: number;
+        let month: number;
+        let day: number;
+        let hour: number;
+        let minute: number;
+        let secondInt: number;
+        let second: Decimal;
+        let fractionalSeconds = Decimal.ZERO;
+        let precision = Precision.YEAR;
+
+        let end = this._in.position() + this._len;
+        offset = this.readVarSignedInt();
+        if (this._in.position() < end) {
+            year = this.readVarUnsignedInt();
+        } else {
+            throw new Error('Timestamps must include a year.');
+        }
+        if (this._in.position() < end) {
+            month = this.readVarUnsignedInt();
+            precision = Precision.MONTH;
+        }
+        if (this._in.position() < end) {
+            day = this.readVarUnsignedInt();
+            precision = Precision.DAY;
+        }
+        if (this._in.position() < end) {
+            hour = this.readVarUnsignedInt();
+            if (this._in.position() >= end) {
+                throw new Error('Timestamps with an hour must include a minute.');
+            } else {
+                minute = this.readVarUnsignedInt();
+            }
+            precision = Precision.HOUR_AND_MINUTE;
+        }
+        if (this._in.position() < end) {
+            secondInt = this.readVarUnsignedInt();
+            second = new Decimal(new LongInt(secondInt), 0);
+            precision = Precision.SECONDS;
+        }
+        if (this._in.position() < end) {
+            let exp = this.readVarSignedInt();
+            let coef = LongInt._ZERO;
+            if (this._in.position() < end) {
+                coef = ParserBinaryRaw.readSignedIntFrom(this._in, end - this._in.position());
+            }
+            let decimalStr = secondInt.toString() + coef.toString() + 'd' + exp;
+            second = Decimal.parse(decimalStr);
+
+            let [_, fractionStr] = Timestamp._splitSecondsDecimal(second);
+            fractionalSeconds = Decimal.parse(secondInt + '.' + fractionStr);
+        }
+
+        let date = new Date(Date.UTC(year, month ? month - 1 : 0, day ? day : 1, hour ? hour : 0, minute ? minute : 0, secondInt ? secondInt : 0, 0));
+        return Timestamp._valueOf(date, offset, fractionalSeconds, precision);
     }
 
     private read_string_value() : string {
