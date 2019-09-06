@@ -159,7 +159,7 @@ versions.
 * `dist/commonjs/es6` - Targets the CommonJS module system and ES6 
 * `dist/amd/es6` - Targets the AMD module system and ES6
 
-A distribution using `browserify` and `babelify` creates a browser friendly polyfilled distribution targeting ES6:
+A distribution using `browserify` and `babelify` creates a browser friendly polyfilled distribution targeting ES5:
 at `dist/browser/js/ion-bundle.js`.
 
 # Contribute
