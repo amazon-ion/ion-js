@@ -277,17 +277,18 @@ export class Timestamp {
      * Compares this Timestamp with another and returns -1, 0, or 1 if the instant represented
      * by this Timestamp occurs before, at the same time, or after the other Timestamp.
      *
-     * Note that a return value of 0 doesn't guarantee that equals() would return true,
-     * as compareTo() doesn't require the values to have the same precision to be considered equal,
-     * whereas equals() does.  For example, calling compareTo() for any of the following timestamps
-     * will produce a result of 0, but equals() will return false, as they have different precisions
-     * or local offsets:
+     * Note that a return value of 0 from this method doesn't guarantee that equals() will return true,
+     * as compareTo() doesn't require the values to have the same precision and local offset to be
+     * considered the same instant, whereas equals() does.  The following table illustrates this behavior:
      *
-     *     2001T
-     *     2001-01-01T
-     *     2001-01-01T00:00:00Z
-     *     2001-01-01T00:00:00.000Z
-     *     2000-12-31T23:59-00:01
+     *   | Timestamp 1              | Timestamp 2              | compareTo | equals |
+     *   | ------------------------ | ------------------------ | --------- | ------ |
+     *   | 2001T                    | 2001T                    |     0     | true   |
+     *   | 2001-01-01T              | 2001-01-01T              |     0     | true   |
+     *   | 2001-01-01T00:00:00.000Z | 2001-01-01T00:00:00.000Z |     0     | true   |
+     *   | 2001T                    | 2001-01-01T              |     0     | false  |
+     *   | 2001T                    | 2001-01-01T00:00:00.000Z |     0     | false  |
+     *   | 2001-01-01T00:00Z        | 2000-12-31T23:59-00:01   |     0     | false  |
      */
     compareTo(that : Timestamp) : number {
         let thisMs = this.getDate().getTime();
