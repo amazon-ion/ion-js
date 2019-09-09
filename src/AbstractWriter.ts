@@ -13,7 +13,7 @@
  */
 import {Writer} from "./IonWriter";
 
-// @ts-ignore
+// @ts-ignore: 'AbstractWriter' is missing properties from type 'Writer'
 export abstract class AbstractWriter implements Writer {
     protected _annotations = [];
 
