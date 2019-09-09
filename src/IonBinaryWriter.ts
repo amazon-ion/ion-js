@@ -19,9 +19,8 @@ import {IonTypes} from "./IonTypes";
 import {LocalSymbolTable} from "./IonLocalSymbolTable";
 import {LongInt} from "./IonLongInt";
 import {LowLevelBinaryWriter} from "./IonLowLevelBinaryWriter";
-import {Precision} from "./IonPrecision";
 import {Reader} from "./IonReader";
-import {Timestamp} from "./IonTimestamp";
+import {Precision,Timestamp} from "./IonTimestamp";
 import {Writeable} from "./IonWriteable";
 import {Writer} from "./IonWriter";
 import {_sign, _writeValues} from "./util";
@@ -233,24 +232,29 @@ export class BinaryWriter implements Writer {
       return;
     }
     let writer: LowLevelBinaryWriter = new LowLevelBinaryWriter(new Writeable(12));//where does the 12 come from
-    writer.writeVariableLengthSignedInt(value.getOffset());
-    writer.writeVariableLengthUnsignedInt(value.date.getUTCFullYear());
+    writer.writeVariableLengthSignedInt(value.getLocalOffset());
+
+    let date = value.getDate();
+    writer.writeVariableLengthUnsignedInt(date.getUTCFullYear());
     if (value.getPrecision() >= Precision.MONTH) {
-        writer.writeVariableLengthUnsignedInt(value.date.getUTCMonth() + 1);
+        writer.writeVariableLengthUnsignedInt(date.getUTCMonth() + 1);
     }
     if (value.getPrecision() >= Precision.DAY) {
-        writer.writeVariableLengthUnsignedInt(value.date.getUTCDate());
+        writer.writeVariableLengthUnsignedInt(date.getUTCDate());
     }
     if (value.getPrecision() >= Precision.HOUR_AND_MINUTE) {
-        writer.writeVariableLengthUnsignedInt(value.date.getUTCHours());
-        writer.writeVariableLengthUnsignedInt(value.date.getUTCMinutes());
+        writer.writeVariableLengthUnsignedInt(date.getUTCHours());
+        writer.writeVariableLengthUnsignedInt(date.getUTCMinutes());
     }
     if (value.getPrecision() >= Precision.SECONDS) {
-        writer.writeVariableLengthUnsignedInt(value.seconds);
-    }
-    if (value.getPrecision() === Precision.FRACTION) {
-        writer.writeVariableLengthSignedInt(value.fraction._getExponent());
-        writer.writeBytes(value.fraction._getCoefficient().intBytes());
+        writer.writeVariableLengthUnsignedInt(value.getSecondsInt());
+        let fractionalSeconds = value._getFractionalSeconds();
+        if (fractionalSeconds._getExponent() !== 0) {
+            writer.writeVariableLengthSignedInt(fractionalSeconds._getExponent());
+            if (!fractionalSeconds._getCoefficient().isZero()) {
+                writer.writeBytes(fractionalSeconds._getCoefficient().intBytes());
+            }
+        }
     }
     this.addNode(new BytesNode(this.writer, this.getCurrentContainer(), IonTypes.TIMESTAMP, this.encodeAnnotations(annotations), writer.getBytes()));
   }

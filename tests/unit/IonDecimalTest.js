@@ -149,6 +149,30 @@ define([
                 testEquals('10000000000000000.00000000000000001', '10000000000000000.00000000000000002', false),
             'equals(10000000000000000.00000000000000000, 10000000000000000.0000000000000000)': () =>
                 testEquals('10000000000000000.00000000000000000', '10000000000000000.0000000000000000', false),
+
+
+            'intValue(5.0)'       : () => assert.equal(ion.Decimal.parse('5.0').intValue(), 5),
+            'intValue(5.0000001)' : () => assert.equal(ion.Decimal.parse('5.0000001').intValue(), 5),
+            'intValue(5.9999999)' : () => assert.equal(ion.Decimal.parse('5.9999999').intValue(), 5),
+            'intValue(0)'         : () => assert.equal(ion.Decimal.parse('0').intValue(), 0),
+            'intValue(0.0000001)' : () => assert.equal(ion.Decimal.parse('0.0000001').intValue(), 0),
+            'intValue(0.9999999)' : () => assert.equal(ion.Decimal.parse('0.9999999').intValue(), 0),
+            'intValue(-0)'        : () => {
+                let int = ion.Decimal.parse('-0').intValue();
+                assert.equal(int, 0);
+                assert.equal(util._sign(int), -1);
+            },
+            'intValue(-0.0000001)': () => {
+                let int = ion.Decimal.parse('-0.0000001').intValue();
+                assert.equal(int, 0);
+                assert.equal(util._sign(int), -1);
+            },
+            'intValue(-0.9999999)': () => {
+                let int = ion.Decimal.parse('-0.9999999').intValue();
+                assert.equal(int, 0);
+                assert.equal(util._sign(int), -1);
+            },
+            'intValue(-1.0000001)': () => () => assert.equal(ion.Decimal.parse('-1.0000001').intValue(), -1),
         });
 
         function test(decimalString,

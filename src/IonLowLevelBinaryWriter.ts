@@ -12,6 +12,7 @@
  * language governing permissions and limitations under the License.
  */
 import { Writeable } from "./IonWriteable";
+import {_sign} from "./util";
 
 /**
  * Values in the Ion binary format are serialized as a sequence of low-level fields. This

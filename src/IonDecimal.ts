@@ -23,8 +23,8 @@ export class Decimal {
     private _coefficient: LongInt;
     private _exponent: number;
 
-    public static readonly ZERO : Decimal = new Decimal(0, 0);
-    public static ONE = new Decimal(1, 0);
+    public static readonly ZERO = new Decimal(0, 0);
+    public static readonly ONE = new Decimal(1, 0);
 
     constructor(coefficient: number, exponent: number) {
         if (!Number.isInteger(coefficient)) {
@@ -65,6 +65,14 @@ export class Decimal {
      */
     numberValue(): number {
         return this._coefficient.numberValue() * Math.pow(10, this._exponent);
+    }
+
+    /**
+     * Returns a number representing the integer portion of this Decimal.
+     * Any fractional portion of this Decimal is truncated.
+     */
+    intValue(): number {
+        return Math.trunc(this.numberValue());
     }
 
     /**

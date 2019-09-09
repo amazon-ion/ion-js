@@ -477,7 +477,7 @@ define([
         // Struct
         0xd4, 0x8a, 0x0f, 0x8a, 0x0f
       ]);
-    skippedWriterTest('Kitchen sink',
+    writerTest('Kitchen sink',
       (writer) => {
         writer.stepIn(ion.IonTypes.STRUCT, ['x']);
         writer.writeFieldName('b');
@@ -512,7 +512,7 @@ define([
         writer.writeFieldName('s');
         writer.writeSymbol('qux');
         writer.writeFieldName('t');
-        writer.writeTimestamp(new ion.Timestamp(ion.Precision.DAY, 0, 2000, 1, 1));
+        writer.writeTimestamp(new ion.Timestamp(0, 2000, 1, 1));
         writer.stepOut();
       },
         [
@@ -660,8 +660,8 @@ define([
     writerTest('Writes null timestamp by direct call',
       (writer) => { writer.writeNull(ion.IonTypes.TIMESTAMP) },
         [0x6f]);
-      skippedWriterTest('Writes 2000-01-01T12:34:56.789 with year precision',
-      (writer) => { writer.writeTimestamp(new ion.Timestamp(ion.Precision.YEAR, 0, 2000, 1, 1, 12, 34, 56, ion.Decimal.parse('.789')))},
+      writerTest('Writes 2000T',
+      (writer) => { writer.writeTimestamp(new ion.Timestamp(0, 2000))},
         [
         0x63,
         // Offset
@@ -670,8 +670,8 @@ define([
         0x0f,
         0xd0,
       ]);
-      skippedWriterTest('Writes 2000-01-01T12:34:56.789 with month precision',
-      (writer) => { writer.writeTimestamp(new ion.Timestamp(ion.Precision.MONTH, 0, 2000, 1, 1, 12, 34, 56, ion.Decimal.parse('.789'))) },
+      writerTest('Writes 2000-01T',
+      (writer) => { writer.writeTimestamp(new ion.Timestamp(0, 2000, 1)) },
         [
         0x64,
         // Offset
@@ -682,8 +682,8 @@ define([
         // Month
         0x81,
       ]);
-      skippedWriterTest('Writes 2000-01-01T12:34:56.789 with day precision',
-      (writer) => { writer.writeTimestamp(new ion.Timestamp(ion.Precision.FRACTION, 0, 2000, 1, 1, 12, 34, 56, ion.Decimal.parse('.789'))) },
+      writerTest('Writes 2000-01-01T',
+      (writer) => { writer.writeTimestamp(new ion.Timestamp(0, 2000, 1, 1)) },
         [
         0x65,
         // Offset
@@ -696,8 +696,8 @@ define([
         // Day
         0x81,
       ]);
-    skippedWriterTest('Writes 2000-01-01T12:34:56.789 with hour and minute precision',
-      (writer) => { writer.writeTimestamp(new ion.Timestamp(ion.Precision.HOUR_AND_MINUTE, 0, 2000, 1, 1, 12, 34, 56, ion.Decimal.parse('.789'))) },
+    writerTest('Writes 2000-01-01T12:34',
+      (writer) => { writer.writeTimestamp(new ion.Timestamp(0, 2000, 1, 1, 12, 34)) },
         [
         0x67,
         // Offset
@@ -715,7 +715,7 @@ define([
         0xa2,
       ]);
     writerTest('Writes 2000-01-01T12:34:56.789 with fraction precision',
-      (writer) => { writer.writeTimestamp(new ion.Timestamp(ion.Precision.FRACTION, 0, 2000, 1, 1, 12, 34, 56, ion.Decimal.parse('.789'))) },
+      (writer) => { writer.writeTimestamp(new ion.Timestamp(0, 2000, 1, 1, 12, 34, ion.Decimal.parse('56.789'))) },
         [
         0x6b,
         // Offset
@@ -740,7 +740,7 @@ define([
         0x15,
       ]);
     writerTest('Writes 2000-01-01T12:34:00.789 with fraction precision',
-      (writer) => { writer.writeTimestamp(new ion.Timestamp(ion.Precision.FRACTION, 0, 2000, 1, 1, 12, 34, 0, ion.Decimal.parse('.789'))) },
+      (writer) => { writer.writeTimestamp(new ion.Timestamp(0, 2000, 1, 1, 12, 34, ion.Decimal.parse('0.789'))) },
         [
         0x6b,
         // Offset
@@ -765,7 +765,7 @@ define([
         0x15,
       ]);
     writerTest('Writes 2000-01-01T12:34:00 with second precision',
-      (writer) => { writer.writeTimestamp(new ion.Timestamp(ion.Precision.SECONDS, 0, 2000, 1, 1, 12, 34, 0)) },
+      (writer) => { writer.writeTimestamp(new ion.Timestamp(0, 2000, 1, 1, 12, 34, ion.Decimal.parse('0'))) },
         [
         0x68,
         // Offset
@@ -785,7 +785,7 @@ define([
         0x80,
       ]);
     writerTest('Writes 2000-01-01T12:34:00-08:00 with second precision',
-      (writer) => { writer.writeTimestamp(new ion.Timestamp(ion.Precision.SECONDS, -8 * 60, 2000, 1, 1, 12, 34, 0)) },
+      (writer) => { writer.writeTimestamp(new ion.Timestamp(-8 * 60, 2000, 1, 1, 12, 34, ion.Decimal.parse('0'))) },
         [
         0x69,
         0x43,

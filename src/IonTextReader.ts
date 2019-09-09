@@ -320,11 +320,7 @@ export class TextReader implements Reader {
         switch (this._type) {
             case IonTypes.NULL: return null;
             case IonTypes.TIMESTAMP:
-                let ts = Timestamp.parse(this._stringRepresentation());
-                if (ts === Timestamp.NULL) {
-                    return null;
-                }
-                return ts;
+                return Timestamp.parse(this._stringRepresentation());
         }
         throw new Error('Current value is not a timestamp.')
     }
