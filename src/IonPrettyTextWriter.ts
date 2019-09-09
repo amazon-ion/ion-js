@@ -19,7 +19,6 @@ import {IonType} from "./IonType";
 import {IonTypes} from "./IonTypes";
 import {Reader} from "./IonReader";
 import {_writeValues} from "./util";
-import {Writer} from "./IonWriter";
 type Serializer<T> = (value: T) => void;
 
 /*
@@ -70,13 +69,13 @@ export class PrettyTextWriter extends TextWriter {
         this.currentContainer.state = State.VALUE;
     }
 
-    writeNull(type: IonType, annotations?: string[]) : void {
+    writeNull(type: IonType) : void {
         if (type === null || type === undefined || type.bid < 0 || type.bid > 13) {
             throw new Error(`Cannot write null for type ${type}`);
         }
         this.handleSeparator();
         this.writePrettyValue();
-        this.writeAnnotations(annotations);
+        this.writeAnnotations();
         this.writeUtf8("null." + type.name);
         if (this.currentContainer.containerType === IonTypes.STRUCT) this.currentContainer.state = State.STRUCT_FIELD;
     }
@@ -108,31 +107,27 @@ export class PrettyTextWriter extends TextWriter {
         }
     }
 
-    writeValue<T>(type: IonType, value: T, annotations: string[], serialize: Serializer<T>) {
+    writeValue<T>(type: IonType, value: T, serialize: Serializer<T>) {
         if (this.currentContainer.state === State.STRUCT_FIELD) throw new Error("Expecting a struct field");
         if (value === null || value === undefined) {
-            this.writeNull(type, annotations);
+            this.writeNull(type);
             return;
         }
 
         this.handleSeparator();
         this.writePrettyValue();
-        this.writeAnnotations(annotations);
+        this.writeAnnotations();
         serialize(value);
         if (this.currentContainer.containerType === IonTypes.STRUCT) this.currentContainer.state = State.STRUCT_FIELD;
     }
 
-    writeContainer(type: IonType, openingCharacter: number, annotations?: string[], isNull?: boolean) : void {
-        if (isNull) {
-            this.writeNull(type, annotations);
-            return;
-        }
+    writeContainer(type: IonType, openingCharacter: number) : void {
         if(this.currentContainer.containerType === IonTypes.STRUCT && this.currentContainer.state === State.VALUE){
             this.currentContainer.state = State.STRUCT_FIELD;
         }
         this.handleSeparator();
         this.writePrettyValue();
-        this.writeAnnotations(annotations);
+        this.writeAnnotations();
         this.writeable.writeByte(openingCharacter);
         this.writePrettyNewLine(1);
         this._stepIn(type);

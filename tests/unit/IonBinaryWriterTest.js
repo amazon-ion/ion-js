@@ -58,7 +58,7 @@ define([
       (writer) => { writer.writeNull(ion.IonTypes.BLOB) },
         [0xaf]);
     writerTest('Writes blob with annotation',
-      (writer) => { writer.writeBlob(new Uint8Array([1]), ['a']) },
+      (writer) => { writer.setAnnotations(['a']); writer.writeBlob(new Uint8Array([1])) },
         [
         // '$ion_symbol_table'::
         0xe7,
@@ -105,7 +105,7 @@ define([
       (writer) => { writer.writeNull(ion.IonTypes.BOOL) },
         [0x1f]);
     writerTest('Writes boolean with annotations',
-      (writer) => { writer.writeBoolean(true, ['a', 'b']) },
+      (writer) => { writer.setAnnotations(['a', 'b']); writer.writeBoolean(true) },
         [
         // '$ion_symbol_table'::
         0xe9,
@@ -147,7 +147,7 @@ define([
       (writer) => { writer.writeNull(ion.IonTypes.CLOB) },
       [0x9f]);
     writerTest('Writes clob with annotation',
-      (writer) => { writer.writeClob(new Uint8Array([1, 2, 3]), ['foo']) },
+      (writer) => { writer.setAnnotations(['foo']); writer.writeClob(new Uint8Array([1, 2, 3])) },
         [
         // Symbol table
         // // '$ion_symbol_table'
@@ -197,7 +197,7 @@ define([
       (writer) => { writer.writeDecimal(ion.Decimal.parse("-0")) },
         [0x52, 0x80, 0x80]);
     writerTest('Writes null decimal with annotation',
-      (writer) => { writer.writeNull(ion.IonTypes.DECIMAL, ['a']) },
+      (writer) => { writer.setAnnotations(['a']); writer.writeNull(ion.IonTypes.DECIMAL) },
         [
         0xe7, 0x81, 0x83, 0xd4, 0x87, 0xb2, 0x81, 'a'.charCodeAt(0),
         0xe3, 0x81, 0x8a, 0x5f
@@ -227,7 +227,7 @@ define([
       (writer) => { writer.writeFloat32() },
         [0x4f]);
     writerTest("Writes null 32-bit float with annotation",
-      (writer) => { writer.writeFloat32(null, ['a']) },
+      (writer) => { writer.setAnnotations(['a']); writer.writeFloat32(null) },
         [
         0xe7, 0x81, 0x83, 0xd4, 0x87, 0xb2, 0x81, 'a'.charCodeAt(0),
         0xe3, 0x81, 0x8a, 0x4f
@@ -248,7 +248,7 @@ define([
       (writer) => { writer.writeFloat64() },
         [0x4f]);
     writerTest("Writes null 64-bit float with annotation",
-      (writer) => { writer.writeFloat64(null, ['a']) },
+      (writer) => { writer.setAnnotations(['a']); writer.writeFloat64(null) },
         [
         0xe7, 0x81, 0x83, 0xd4, 0x87, 0xb2, 0x81, 'a'.charCodeAt(0),
         0xe3, 0x81, 0x8a, 0x4f
@@ -278,7 +278,7 @@ define([
       (writer) => { writer.writeInt(123456) },
         [0x23, 0x01, 0xe2, 0x40]);
     writerTest('Writes int 123456 with annotations',
-      (writer) => { writer.writeInt(123456, ['a', 'b', 'c']) },
+      (writer) => { writer.setAnnotations(['a', 'b', 'c']); writer.writeInt(123456) },
         [
         0xeb, 0x81, 0x83, 0xd8, 0x87, 0xb6, 0x81, 'a'.charCodeAt(0), 0x81, 'b'.charCodeAt(0), 0x81, 'c'.charCodeAt(0),
         0xe8, 0x83, 0x8a, 0x8b, 0x8c, 0x23, 0x01, 0xe2, 0x40
@@ -290,7 +290,7 @@ define([
       (writer) => { writer.writeNull(ion.IonTypes.LIST) },
         [0xbf]);
     writerTest('Writes null list with annotation',
-      (writer) => { writer.writeNull(ion.IonTypes.LIST, ['a']) },
+      (writer) => { writer.setAnnotations(['a']); writer.writeNull(ion.IonTypes.LIST) },
         [
         // Symbol table
         0xe7, 0x81, 0x83, 0xd4, 0x87, 0xb2, 0x81, 'a'.charCodeAt(0),
@@ -329,7 +329,7 @@ define([
       },
         [0xb8, 0xb3, 0xb0, 0xb0, 0xb0, 0xb3, 0xb0, 0xb0, 0xb0]);
     writerTest('Writes list with annotation',
-      (writer) => { writer.stepIn(ion.IonTypes.LIST, ['a']); writer.stepOut() },
+      (writer) => { writer.setAnnotations(['a']); writer.stepIn(ion.IonTypes.LIST); writer.stepOut() },
         [
         // Symbol table
         0xe7, 0x81, 0x83, 0xd4, 0x87, 0xb2, 0x81, 'a'.charCodeAt(0),
@@ -337,7 +337,7 @@ define([
         0xe3, 0x81, 0x8a, 0xb0,
       ]);
     writerTest('Writes nested list with annotation',
-      (writer) => { writer.stepIn(ion.IonTypes.LIST); writer.stepIn(ion.IonTypes.LIST, ['a']);
+      (writer) => { writer.stepIn(ion.IonTypes.LIST); writer.setAnnotations(['a']); writer.stepIn(ion.IonTypes.LIST);
                     writer.stepOut(); writer.stepOut() },
         [
         // Symbol table
@@ -353,7 +353,8 @@ define([
           writer.stepIn(ion.IonTypes.LIST);
             writer.stepIn(ion.IonTypes.LIST);
             writer.stepOut();
-            writer.stepIn(ion.IonTypes.LIST, ['a']);
+            writer.setAnnotations(['a']);
+            writer.stepIn(ion.IonTypes.LIST);
             writer.stepOut();
             writer.stepIn(ion.IonTypes.LIST);
             writer.stepOut();
@@ -361,7 +362,8 @@ define([
           writer.stepIn(ion.IonTypes.LIST);
             writer.stepIn(ion.IonTypes.LIST);
             writer.stepOut();
-            writer.stepIn(ion.IonTypes.LIST, ['b']);
+            writer.setAnnotations(['b']);
+            writer.stepIn(ion.IonTypes.LIST);
             writer.stepOut();
             writer.stepIn(ion.IonTypes.LIST);
             writer.stepOut();
@@ -393,7 +395,7 @@ define([
       (writer) => { writer.writeNull(ion.IonTypes.SEXP) },
         [0xcf]);
     writerTest('Writes null sexp with annotation',
-      (writer) => { writer.writeNull(ion.IonTypes.SEXP, ['a']) },
+      (writer) => { writer.setAnnotations(['a']); writer.writeNull(ion.IonTypes.SEXP) },
         [
         // Symbol table
         0xe7, 0x81, 0x83, 0xd4, 0x87, 0xb2, 0x81, 'a'.charCodeAt(0),
@@ -422,7 +424,7 @@ define([
       (writer) => { writer.writeNull(ion.IonTypes.STRING) },
         [0x8f]);
     writerTest('Writes two top-level strings one with annotation',
-      (writer) => { writer.writeString("foo"); writer.writeString("bar", ['a']) },
+      (writer) => { writer.writeString("foo"); writer.setAnnotations(['a']); writer.writeString("bar") },
         [
         // Symbol table
         0xe7, 0x81, 0x83, 0xd4, 0x87, 0xb2, 0x81, 'a'.charCodeAt(0),
@@ -633,7 +635,7 @@ define([
       (writer) => { writer.writeNull(ion.IonTypes.SYMBOL) },
         [0x7f]);
     writerTest('Writes symbol with identical annotation',
-      (writer) => { writer.writeSymbol('a', ['a']) },
+      (writer) => { writer.setAnnotations(['a']); writer.writeSymbol('a') },
         [
         // Symbol table
         0xe7, 0x81, 0x83, 0xd4, 0x87, 0xb2, 0x81, 'a'.charCodeAt(0),

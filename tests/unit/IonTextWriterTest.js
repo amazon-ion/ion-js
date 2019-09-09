@@ -88,10 +88,10 @@
       writer => writer.writeNull(ion.IonTypes.BLOB),
       'null.blob');
     writerTest('Writes blob with identifier annotations',
-      writer => writer.writeBlob([1, 2, 3], ['foo', 'bar']),
+      writer => { writer.setAnnotations(['foo', 'bar']); writer.writeBlob([1, 2, 3]) },
       'foo::bar::{{AQID}}');
     writerTest('Writes blob with non-identifier annotations',
-      writer => writer.writeBlob([1, 2, 3], ['123abc', '{}']),
+      writer => { writer.setAnnotations(['123abc', '{}']); writer.writeBlob([1, 2, 3]) },
       "'123abc'::'{}'::{{AQID}}");
 
     // Booleans
@@ -112,7 +112,7 @@
       writer => writer.writeNull(ion.IonTypes.BOOL),
       'null.bool');
     writerTest('Writes boolean with annotations',
-      writer => writer.writeBoolean(true, ['abc', '123']),
+      writer => { writer.setAnnotations(['abc', '123']); writer.writeBoolean(true) },
       "abc::'123'::true");
 
     // Clobs
@@ -130,7 +130,7 @@
       writer => writer.writeNull(ion.IonTypes.CLOB),
       'null.clob'); 
     writerTest('Writes clob with annotations',
-      writer => writer.writeClob(['A'.charCodeAt(0)], ['baz', 'qux']),
+      writer => { writer.setAnnotations(['baz', 'qux']); writer.writeClob(['A'.charCodeAt(0)]) },
       'baz::qux::{{"A"}}');
     writerTest('Writes clob escapes',
       writer => writer.writeClob([0x00, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x22, 0x27, 0x2f, 0x3f, 0x5c]),
@@ -158,7 +158,7 @@
       writer => writer.writeNull(ion.IonTypes.DECIMAL),
       'null.decimal');
     writerTest('Writes decimal with annotations',
-      writer => writer.writeDecimal(ion.Decimal.parse('123.456'), ['foo', 'bar']),
+      writer => { writer.setAnnotations(['foo', 'bar']); writer.writeDecimal(ion.Decimal.parse('123.456')) },
       'foo::bar::123456d-3');
 
     // Floats
@@ -173,7 +173,7 @@
       writer => writer.writeFloat32(),
       'null.float');
     writerTest('Writes 32-bit float with annotations',
-      writer => writer.writeFloat32(8.125, ['foo', 'bar']),
+      writer => { writer.setAnnotations(['foo', 'bar']); writer.writeFloat32(8.125) },
       'foo::bar::8.125e0');
     writerTest('Writes negative 32-bit float',
       writer => writer.writeFloat32(-8.125),
@@ -203,7 +203,7 @@
           writer => writer.stepIn(ion.IonTypes.LIST),
           '[]');
       writerTest('Writes empty list with annotations',
-          writer => writer.stepIn(ion.IonTypes.LIST, ['foo', 'bar']),
+          writer => { writer.setAnnotations(['foo', 'bar']); writer.stepIn(ion.IonTypes.LIST) },
           'foo::bar::[]');
       writerTest('Writes nested empty lists',
           writer => { writer.stepIn(ion.IonTypes.LIST); writer.stepIn(ion.IonTypes.LIST); writer.stepIn(ion.IonTypes.LIST) },
@@ -228,7 +228,7 @@
           writer => writer.writeNull(ion.IonTypes.NULL),
           'null.null');
       writerTest('Writes null with annotations',
-          writer => writer.writeNull(ion.IonTypes.NULL, ['foo', 'bar']),
+          writer => { writer.setAnnotations(['foo', 'bar']); writer.writeNull(ion.IonTypes.NULL) },
           'foo::bar::null.null');
 
     // Nulls
@@ -237,7 +237,7 @@
       writer => writer.writeNull(ion.IonTypes.NULL),
       'null.null');
     writerTest('Writes null with annotations',
-      writer => writer.writeNull(ion.IonTypes.NULL, ['foo', 'bar']),
+      writer => { writer.setAnnotations(['foo', 'bar']); writer.writeNull(ion.IonTypes.NULL) },
       'foo::bar::null.null');
 
     // S-Expressions
@@ -249,7 +249,7 @@
           writer => writer.writeNull(ion.IonTypes.SEXP),
           'null.sexp');
       writerTest('Writes empty sexp with annotations',
-          writer => writer.stepIn(ion.IonTypes.SEXP, ['foo', 'bar']),
+          writer => { writer.setAnnotations(['foo', 'bar']); writer.stepIn(ion.IonTypes.SEXP) },
           'foo::bar::()');
       writerTest('Writes sexp with adjacent operators',
           writer => {
@@ -297,9 +297,11 @@
           '{foo:{},bar:{}}');
       writerTest('Writes struct with non-identifier field name and annotation',
           writer => {
-              writer.stepIn(ion.IonTypes.STRUCT, ['1foo']);
+              writer.setAnnotations(['1foo']);
+              writer.stepIn(ion.IonTypes.STRUCT);
               writer.writeFieldName('123');
-              writer.stepIn(ion.IonTypes.STRUCT, ['2bar']);
+              writer.setAnnotations(['2bar']);
+              writer.stepIn(ion.IonTypes.STRUCT);
           },
           "'1foo'::{'123':'2bar'::{}}");
       badWriterTest('Cannot write field name at top level',
@@ -358,7 +360,13 @@
           writer => { writer.stepIn(ion.IonTypes.LIST); writer.stepOut(); writer.stepIn(ion.IonTypes.LIST) },
           '[]\n[]');
       writerTest('Writes two top-level lists with annotations',
-          writer => { writer.stepIn(ion.IonTypes.LIST, ['foo']); writer.stepOut(); writer.stepIn(ion.IonTypes.LIST, ['bar']) },
+          writer => {
+            writer.setAnnotations(['foo']);
+            writer.stepIn(ion.IonTypes.LIST);
+            writer.stepOut();
+            writer.setAnnotations(['bar']);
+            writer.stepIn(ion.IonTypes.LIST);
+          },
           'foo::[]\nbar::[]');
       writerTest('Writes two top-level structs',
           writer => { writer.stepIn(ion.IonTypes.STRUCT); writer.stepOut(); writer.stepIn(ion.IonTypes.STRUCT) },
@@ -367,41 +375,61 @@
     // PrettyPrint
     skippedPrettyTest('Writes composite pretty ion',
       writer => {
-        writer.stepIn(ion.IonTypes.STRUCT, ['a1']);
+        writer.setAnnotations(['a1']);
+        writer.stepIn(ion.IonTypes.STRUCT);
         writer.writeFieldName('int');
-        writer.writeInt(123, ['a3']);
+        writer.setAnnotations(['a3']);
+        writer.writeInt(123);
         writer.writeFieldName('string');
-        writer.writeString('string', ['a4']);
+        writer.setAnnotations(['a4']);
+        writer.writeString('string');
         writer.writeFieldName('symbol');
-        writer.writeSymbol('symbol', ['a5']);
+        writer.setAnnotations(['a5']);
+        writer.writeSymbol('symbol');
         writer.writeFieldName('symbol');
         writer.writeNull(ion.IonTypes.SYMBOL);
         writer.writeFieldName('timestamp');
-        writer.writeTimestamp(ion.Timestamp.parse('2017-04-03T00:00:00.000Z'), ['a8']);
+        writer.setAnnotations(['a8']);
+        writer.writeTimestamp(ion.Timestamp.parse('2017-04-03T00:00:00.000Z'));
         writer.writeFieldName('decimal');
-        writer.writeDecimal(ion.Decimal.parse('1.2'), ['a9']);
+        writer.setAnnotations(['a9']);
+        writer.writeDecimal(ion.Decimal.parse('1.2'));
         writer.writeFieldName('struct');
-        writer.stepIn(ion.IonTypes.STRUCT, ['a10']);
+        writer.setAnnotations(['a10']);
+        writer.stepIn(ion.IonTypes.STRUCT);
         writer.writeFieldName('symbol');
-        writer.writeSymbol('symbol', ['a11']);
+        writer.setAnnotations(['a11']);
+        writer.writeSymbol('symbol');
         writer.stepOut();
         writer.writeFieldName('list');
-        writer.stepIn(ion.IonTypes.LIST, ['a12']);
-        writer.writeInt(123, ['a14']);
-        writer.writeString('string', ['a15']);
-        writer.writeSymbol('symbol', ['a16']);
-        writer.writeTimestamp(ion.Timestamp.parse('2017-04-03T00:00:00.000Z'), ['a19']);
-        writer.writeDecimal(ion.Decimal.parse('1.2'), ['a20']);
-        writer.stepIn(ion.IonTypes.STRUCT, ['a21']);
+        writer.setAnnotations(['a12']);
+        writer.stepIn(ion.IonTypes.LIST);
+        writer.setAnnotations(['a14']);
+        writer.writeInt(123);
+        writer.setAnnotations(['a15']);
+        writer.writeString('string');
+        writer.setAnnotations(['a16']);
+        writer.writeSymbol('symbol');
+        writer.setAnnotations(['a19']);
+        writer.writeTimestamp(ion.Timestamp.parse('2017-04-03T00:00:00.000Z'));
+        writer.setAnnotations(['a20']);
+        writer.writeDecimal(ion.Decimal.parse('1.2'));
+        writer.setAnnotations(['a21']);
+        writer.stepIn(ion.IonTypes.STRUCT);
         writer.stepOut();
-        writer.stepIn(ion.IonTypes.LIST, ['a22']);
+        writer.setAnnotations(['a22']);
+        writer.stepIn(ion.IonTypes.LIST);
         writer.stepOut();
         writer.stepOut();
         writer.writeFieldName('sexp');
-        writer.stepIn(ion.IonTypes.SEXP, ['a23']);
-        writer.writeNull(ion.IonTypes.SYMBOL, ['a24']);
-        writer.writeNull(ion.IonTypes.STRING, ['a25']);
-        writer.writeNull(ion.IonTypes.NULL, ['a26']);
+        writer.setAnnotations(['a23']);
+        writer.stepIn(ion.IonTypes.SEXP);
+        writer.setAnnotations(['a24']);
+        writer.writeNull(ion.IonTypes.SYMBOL);
+        writer.setAnnotations(['a25']);
+        writer.writeNull(ion.IonTypes.STRING);
+        writer.setAnnotations(['a26']);
+        writer.writeNull(ion.IonTypes.NULL);
         writer.stepOut();
       },
         `a1::{
