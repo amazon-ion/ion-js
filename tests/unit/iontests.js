@@ -444,7 +444,6 @@ let equivsSkipList = toSkipList([
     'ion-tests/iontestdata/good/equivs/annotatedIvms.ion',
     'ion-tests/iontestdata/good/equivs/bigInts.ion',
     'ion-tests/iontestdata/good/equivs/binaryInts.ion',
-    'ion-tests/iontestdata/good/equivs/blobs.ion',
     'ion-tests/iontestdata/good/equivs/decimalsWithUnderscores.ion',
     'ion-tests/iontestdata/good/equivs/emptyStrings.ion',
     'ion-tests/iontestdata/good/equivs/floatsWithUnderscores.ion',
