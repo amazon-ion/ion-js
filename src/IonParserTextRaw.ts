@@ -1039,7 +1039,7 @@ export class ParserTextRaw {
             case T_BLOB:
                 for (index = this._start; index < this._end; index++) {
                     ch = this._in.valueAt(index);
-                    if(IonText.is_base64_char(ch)){
+                    if (IonText.is_base64_char(ch)) {
                         s += String.fromCharCode(ch);
                     }
                 }
