@@ -16,8 +16,7 @@ import {Decimal} from "./IonDecimal";
 import {isDigit} from "./IonText"
 import {_hasValue, _sign} from "./util";
 
-// TBD rename TimestampPrecision?
-export enum Precision {
+export enum TimestampPrecision {
     YEAR = 1,
     MONTH = 2,
     DAY = 3,
@@ -55,7 +54,7 @@ export class Timestamp {
         return _TimestampParser._parse(str);
     }
 
-    private _precision: Precision;
+    private _precision: TimestampPrecision;
     private readonly _secondsDecimal: Decimal;
 
     /**
@@ -84,13 +83,13 @@ export class Timestamp {
                 private readonly _minutes? : number,
                 seconds? : number | Decimal) {
 
-        this._precision = Precision.YEAR;
+        this._precision = TimestampPrecision.YEAR;
         this._checkRequiredField('Offset', this._localOffset, Timestamp._MIN_OFFSET, Timestamp._MAX_OFFSET);
         this._checkRequiredField('Year', this._year, Timestamp._MIN_YEAR, Timestamp._MAX_YEAR);
-        this._month = this._checkOptionalField('Month', this._month, Timestamp._MIN_MONTH, Timestamp._MAX_MONTH, 1, Precision.MONTH);
-        this._day = this._checkOptionalField('Day', this._day, Timestamp._MIN_DAY, Timestamp._MAX_DAY, 1, Precision.DAY);
-        this._hour = this._checkOptionalField('Hour', this._hour, Timestamp._MIN_HOUR, Timestamp._MAX_HOUR, 0, Precision.HOUR_AND_MINUTE);
-        this._minutes = this._checkOptionalField('Minutes', this._minutes, Timestamp._MIN_MINUTE, Timestamp._MAX_MINUTE, 0, Precision.HOUR_AND_MINUTE);
+        this._month = this._checkOptionalField('Month', this._month, Timestamp._MIN_MONTH, Timestamp._MAX_MONTH, 1, TimestampPrecision.MONTH);
+        this._day = this._checkOptionalField('Day', this._day, Timestamp._MIN_DAY, Timestamp._MAX_DAY, 1, TimestampPrecision.DAY);
+        this._hour = this._checkOptionalField('Hour', this._hour, Timestamp._MIN_HOUR, Timestamp._MAX_HOUR, 0, TimestampPrecision.HOUR_AND_MINUTE);
+        this._minutes = this._checkOptionalField('Minutes', this._minutes, Timestamp._MIN_MINUTE, Timestamp._MAX_MINUTE, 0, TimestampPrecision.HOUR_AND_MINUTE);
 
         if (typeof seconds === 'number') {
             if (!Number.isInteger(seconds)) {
@@ -104,10 +103,10 @@ export class Timestamp {
             this._secondsDecimal = Decimal.ZERO;
         } else {
             this._checkFieldRange('Seconds', this._secondsDecimal, Timestamp._MIN_SECONDS, Timestamp._MAX_SECONDS);
-            this._precision = Precision.SECONDS;
+            this._precision = TimestampPrecision.SECONDS;
         }
 
-        if (this._precision > Precision.MONTH) {
+        if (this._precision > TimestampPrecision.MONTH) {
             // check the days per month - first the general case, basically index into the next month
             // (which doesnt need +1 because we index from 1 to 12 unlike Date) and look at the day before which is indexed with 0.
             let tempDate = new Date(this._year, this._month, 0);
@@ -138,7 +137,7 @@ export class Timestamp {
 
     private _checkOptionalField(fieldName: string, value: number,
                                 min: number, max: number, defaultValue: number,
-                                precision: Precision) : number {
+                                precision: TimestampPrecision) : number {
         if (!_hasValue(value)) {
             return defaultValue;
         }
@@ -193,7 +192,7 @@ export class Timestamp {
     /**
      * Returns the precision of this Timestamp.
      */
-    getPrecision() : Precision {
+    getPrecision() : TimestampPrecision {
         return this._precision;
     }
 
@@ -214,12 +213,12 @@ export class Timestamp {
      */
     getDate() : Date {
         let ms = null;
-        if (this._precision === Precision.SECONDS) {
+        if (this._precision === TimestampPrecision.SECONDS) {
             ms = Math.round((this._secondsDecimal.numberValue() - this.getSecondsInt()) * 1000);
         }
 
         let msSinceEpoch = Date.UTC(
-                this._year, (this._precision === Precision.YEAR ? 0 : this._month - 1), this._day,
+                this._year, (this._precision === TimestampPrecision.YEAR ? 0 : this._month - 1), this._day,
                 this._hour, this._minutes, this.getSecondsInt(), ms);
 
         if (this._year < 100) {
@@ -330,23 +329,23 @@ export class Timestamp {
         let strVal: string = "";
         switch (this._precision) {
             default: throw new Error("unrecognized timestamp precision " + this._precision);
-            case Precision.SECONDS:
+            case TimestampPrecision.SECONDS:
                 let [secondsStr, fractionStr] = Timestamp._splitSecondsDecimal(this._secondsDecimal);
                 strVal = this._lpadZeros(secondsStr, 2);
                 if (fractionStr.length > 0) {
                     strVal += '.' + fractionStr;
                 }
-            case Precision.HOUR_AND_MINUTE:
+            case TimestampPrecision.HOUR_AND_MINUTE:
                 strVal = this._lpadZeros(this._minutes, 2) + (strVal ? ":" + strVal : "");
                 strVal = this._lpadZeros(this._hour, 2) + (strVal ? ":" + strVal : "");
-            case Precision.DAY:
+            case TimestampPrecision.DAY:
                 strVal = this._lpadZeros(this._day, 2) + (strVal ? "T" + strVal : "T");
-            case Precision.MONTH:
+            case TimestampPrecision.MONTH:
                 strVal = this._lpadZeros(this._month, 2) + (strVal ? "-" + strVal : "");
-            case Precision.YEAR:
-                if (this._precision === Precision.YEAR) {
+            case TimestampPrecision.YEAR:
+                if (this._precision === TimestampPrecision.YEAR) {
                     strVal = this._lpadZeros(this._year, 4) + "T";
-                } else if (this._precision === Precision.MONTH) {
+                } else if (this._precision === TimestampPrecision.MONTH) {
                     strVal = this._lpadZeros(this._year, 4) + "-" + strVal + "T";
                 } else {
                     strVal = this._lpadZeros(this._year, 4) + "-" + strVal;
@@ -355,7 +354,7 @@ export class Timestamp {
 
         // hours : minute (for offset)
         let o: number = this._localOffset;
-        if (this._precision > Precision.DAY) {
+        if (this._precision > TimestampPrecision.DAY) {
             if (o === 0 && _sign(o) === 1) {
                 strVal = strVal + "Z";
             } else {
@@ -389,7 +388,7 @@ export class Timestamp {
      * ```
      * @private
      */
-    static _valueOf(date: Date, localOffset: number, fractionalSeconds?: Decimal, precision?: Precision) : Timestamp {
+    static _valueOf(date: Date, localOffset: number, fractionalSeconds?: Decimal, precision?: TimestampPrecision) : Timestamp {
         let msSinceEpoch = date.getTime() + localOffset * 60 * 1000;
         date = new Date(msSinceEpoch);
 
@@ -402,16 +401,16 @@ export class Timestamp {
         }
 
         switch (precision) {
-            case Precision.YEAR:
+            case TimestampPrecision.YEAR:
                 return new Timestamp(localOffset, date.getUTCFullYear());
-            case Precision.MONTH:
+            case TimestampPrecision.MONTH:
                 return new Timestamp(localOffset, date.getUTCFullYear(), date.getUTCMonth() + 1);
-            case Precision.DAY:
+            case TimestampPrecision.DAY:
                 return new Timestamp(localOffset, date.getUTCFullYear(), date.getUTCMonth() + 1, date.getUTCDate());
-            case Precision.HOUR_AND_MINUTE:
+            case TimestampPrecision.HOUR_AND_MINUTE:
                 return new Timestamp(localOffset, date.getUTCFullYear(), date.getUTCMonth() + 1, date.getUTCDate(),
                     date.getUTCHours(), date.getUTCMinutes());
-            case Precision.SECONDS:
+            case TimestampPrecision.SECONDS:
             default:
                 return new Timestamp(localOffset, date.getUTCFullYear(), date.getUTCMonth() + 1, date.getUTCDate(),
                     date.getUTCHours(), date.getUTCMinutes(), secondsDecimal);

@@ -52,7 +52,7 @@ import {IonTypes} from "./IonTypes";
 import {IVM} from "./IonConstants";
 import {LongInt} from "./IonLongInt";
 import {BinarySpan} from "./IonSpan";
-import {Precision,Timestamp} from "./IonTimestamp";
+import {TimestampPrecision,Timestamp} from "./IonTimestamp";
 
 const DEBUG_FLAG = true;
 
@@ -316,7 +316,7 @@ export class ParserBinaryRaw {
         let minute: number;
         let secondInt: number;
         let fractionalSeconds = Decimal.ZERO;
-        let precision = Precision.YEAR;
+        let precision = TimestampPrecision.YEAR;
 
         let end = this._in.position() + this._len;
         offset = this.readVarSignedInt();
@@ -327,11 +327,11 @@ export class ParserBinaryRaw {
         }
         if (this._in.position() < end) {
             month = this.readVarUnsignedInt();
-            precision = Precision.MONTH;
+            precision = TimestampPrecision.MONTH;
         }
         if (this._in.position() < end) {
             day = this.readVarUnsignedInt();
-            precision = Precision.DAY;
+            precision = TimestampPrecision.DAY;
         }
         if (this._in.position() < end) {
             hour = this.readVarUnsignedInt();
@@ -340,11 +340,11 @@ export class ParserBinaryRaw {
             } else {
                 minute = this.readVarUnsignedInt();
             }
-            precision = Precision.HOUR_AND_MINUTE;
+            precision = TimestampPrecision.HOUR_AND_MINUTE;
         }
         if (this._in.position() < end) {
             secondInt = this.readVarUnsignedInt();
-            precision = Precision.SECONDS;
+            precision = TimestampPrecision.SECONDS;
         }
         if (this._in.position() < end) {
             let exponent = this.readVarSignedInt();
