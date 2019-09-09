@@ -65,33 +65,14 @@ module.exports = function(grunt) {
       }
     },
     ts: {
-      'amd-es6-debug': {
-        src: ['src/**/*.ts'],
-        outDir: 'dist/amd/es6',
-        options: {
-          target: "es6",
-          module: "amd",
-          declaration: true
-        }
+      'es6-es6': {
+        tsconfig: 'tsconfig.json'
       },
-
       'amd-es6': {
-        src: ['src/**/*.ts'],
-        outDir: 'dist/amd/es6',
-        options: {
-          target: "es6",
-          module: "amd",
-          declaration: true
-        }
+        tsconfig: 'tsconfig.amd.json'
       },
       'commonjs-es6': {
-        src: ['src/**/*.ts'],
-        outDir: 'dist/commonjs/es6',
-        options: {
-          target: "es6",
-          module: "commonjs",
-          declaration: true
-        }
+        tsconfig: 'tsconfig.commonjs.json'
       }
     },
       /**
@@ -120,12 +101,22 @@ module.exports = function(grunt) {
       bigInt: {
         files: [
           {
-            src: ['BigInteger.js','./src/BigInteger.d.ts'],
-            dest: 'dist/commonjs/es6/'
+            expand: true,
+            src: ['BigInteger.js', 'src/BigInteger.d.ts'],
+            dest: 'dist/es6/es6/',
+            flatten: true
           },
           {
+            expand: true,
             src: ['BigInteger.js','./src/BigInteger.d.ts'],
-            dest: 'dist/amd/es6/'
+            dest: 'dist/commonjs/es6/',
+            flatten: true
+          },
+          {
+            expand: true,
+            src: ['BigInteger.js','./src/BigInteger.d.ts'],
+            dest: 'dist/amd/es6/',
+            flatten: true
           }
         ]
       }
@@ -133,7 +124,7 @@ module.exports = function(grunt) {
     babel: { 
       options: { 
         sourceMap: true, 
-        presets: ['es2015']
+        presets: ['@babel/preset-env']
       },
       dist: {
         files: [{
@@ -161,9 +152,9 @@ module.exports = function(grunt) {
          },
         transform: [["babelify", 
                      { 
-                       "presets": ["es2015"],
-                       "plugins" : [["transform-runtime", {"polyfill" : true}],
-                                    ["transform-object-assign"]]
+                       "presets": ["@babel/preset-env"], // TODO this targets ES2015, we should be more specific
+                       "plugins" : [["@babel/transform-runtime"],
+                                    ["@babel/transform-object-assign"]]
                      }]],
         }
       },
@@ -177,9 +168,9 @@ module.exports = function(grunt) {
          },
         transform: [["babelify", 
                      { 
-                       "presets": ["es2015"],
-                       "plugins" : [["transform-runtime", {"polyfill" : true}],
-                                    ["transform-object-assign"]]
+                       "presets": ["@babel/preset-env"], // TODO this targets ES2015, we should be more specific
+                       "plugins" : [["@babel/transform-runtime"],
+                                    ["@babel/transform-object-assign"]]
                      }]],
         }
       }
@@ -214,10 +205,12 @@ module.exports = function(grunt) {
   // Build and Translation tasks 
   grunt.registerTask('build:browser', ['build', 'browserify:prod', 'uglify']); // standalone for browser
   grunt.registerTask('trans:browser', ['browserify:prod', 'uglify']); // browserify (assumes 'build' was run)
+  grunt.registerTask('build:es6', ['ts:es6-es6']);
   grunt.registerTask('build:cjs', ['ts:commonjs-es6']);
   grunt.registerTask('build:amd', ['ts:amd-es6']);
-  grunt.registerTask('build:amd:debug', ['ts:amd-es6-debug']);
-  grunt.registerTask('build', ['clean', 'build:amd', 'build:cjs', 'copy:bigInt', 'trans:browser', 'copy:all']);
+  grunt.registerTask('build', [
+      'clean', 'build:es6', 'build:amd', 'build:cjs', 'copy:bigInt', 'trans:browser', 'copy:all'
+  ]);
 
   // Tests
   grunt.registerTask('test', ['build', 'intern:es6']);     // build and test

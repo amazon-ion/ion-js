@@ -23,18 +23,31 @@ export class Decimal {
     private readonly _coefficient: LongInt;
     private readonly _exponent: number;
 
-    public static readonly ZERO = new Decimal(new LongInt(0), 0);
+    public static readonly ZERO = new Decimal(0, 0);
     public static readonly ONE = new Decimal(1, 0);
 
-    constructor(coefficient: LongInt | number, exponent: number) {
-        if (typeof coefficient === "number") {
-            if (!Number.isInteger(coefficient)) {
-                throw new Error("The provided coefficient was not an integer. (" + coefficient + ")");
-            }
-            this._coefficient = new LongInt(coefficient);
-        } else {
-            this._coefficient = coefficient;
+    constructor(coefficient: number, exponent: number) {
+        if (!Number.isInteger(coefficient)) {
+            throw new Error("The provided coefficient was not an integer. (" + coefficient + ")");
         }
+        this._initialize(new LongInt(coefficient), exponent);
+    }
+
+    /**
+     * Allows a Decimal to be constructed using a coefficient of arbitrary size without exposing the LongInt class
+     * as part of the public API.
+     */
+    static _fromLongIntCoefficient(coefficient: LongInt, exponent: number) {
+        let value = Object.create(this.prototype);
+        value._initialize(coefficient, exponent);
+        return value;
+    }
+
+    /**
+     * Constructor helper shared by the public constructor and _fromLongIntCoefficient
+     */
+    private _initialize(coefficient: LongInt, exponent: number) {
+        this._coefficient = coefficient;
         this._exponent = exponent;
     }
 
@@ -128,8 +141,8 @@ export class Decimal {
      * does not.
      */
     compareTo(that : Decimal) : number {
-        if (this._coefficient.numberValue() === 0
-            && that._getCoefficient().numberValue() === 0) {
+        if (this._coefficient.isZero()
+            && that._getCoefficient().isZero()) {
             return 0;
         }
 
@@ -220,9 +233,9 @@ export class Decimal {
         let f  = str.match('\\.');
         if (f) {
             let exponentShift = d ? (d.index - 1) - f.index : (str.length - 1) - f.index;
-            return new Decimal(new LongInt(str.substring(0, f.index) + str.substring(f.index + 1, exponentDelimiterIndex)), exponent - exponentShift);
+            return Decimal._fromLongIntCoefficient(new LongInt(str.substring(0, f.index) + str.substring(f.index + 1, exponentDelimiterIndex)), exponent - exponentShift);
         } else {
-            return new Decimal(new LongInt(str.substring(0, exponentDelimiterIndex)), exponent);
+            return Decimal._fromLongIntCoefficient(new LongInt(str.substring(0, exponentDelimiterIndex)), exponent);
         }
     }
 }

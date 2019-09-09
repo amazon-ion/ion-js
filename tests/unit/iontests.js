@@ -344,6 +344,16 @@ let goodSkipList = toSkipList([
     'ion-tests/iontestdata/good/symbolZero.ion',
     'ion-tests/iontestdata/good/utf16.ion',
     'ion-tests/iontestdata/good/utf32.ion',
+
+    // Support for reading LongInts was removed as part of: https://github.com/amzn/ion-js/issues/310
+    'ion-tests/iontestdata/good/equivs/paddedInts.10n',
+    'ion-tests/iontestdata/good/intBigSize1201.10n',
+    'ion-tests/iontestdata/good/intBigSize13.10n',
+    'ion-tests/iontestdata/good/intBigSize14.10n',
+    'ion-tests/iontestdata/good/intBigSize16.10n',
+    'ion-tests/iontestdata/good/intBigSize256.10n',
+    'ion-tests/iontestdata/good/intLongMaxValuePlusOne.10n',
+    'ion-tests/iontestdata/good/intLongMinValue.10n',
 ]);
 
 let badSkipList = toSkipList([
@@ -469,6 +479,9 @@ let equivsSkipList = toSkipList([
     'ion-tests/iontestdata/good/equivs/timestampsLargeFractionalPrecision.ion',
     'ion-tests/iontestdata/good/equivs/utf8/stringU0001D11E.ion',
     'ion-tests/iontestdata/good/equivs/utf8/stringUtf8.ion',
+
+    // See: https://github.com/amzn/ion-js/issues/310
+    'ion-tests/iontestdata/good/equivs/paddedInts.10n',
 ]);
 
 let nonEquivsSkipList = toSkipList([
@@ -476,6 +489,9 @@ let nonEquivsSkipList = toSkipList([
     'ion-tests/iontestdata/good/non-equivs/floats.ion',
     'ion-tests/iontestdata/good/non-equivs/floatsVsDecimals.ion',
     'ion-tests/iontestdata/good/non-equivs/timestamps.ion',
+
+    // See: https://github.com/amzn/ion-js/issues/310
+    'ion-tests/iontestdata/good/non-equivs/ints.ion',
 ]);
 
 ////// end of generated skiplists

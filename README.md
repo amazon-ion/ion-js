@@ -114,6 +114,54 @@ These will create and initialize `window.ion` which has the exact API as our `np
 
 [Ion JS API](https://amzn.github.io/ion-js/api/)
 
+
+# Development
+
+Use `npm` to setup the dependencies.  In the project directory you can run the following:
+
+```
+$ npm install
+```
+
+Building the package can be done with the release script (which runs the tests).
+
+```
+$ npm run release
+```
+
+Tests can be run using npm as well
+
+```
+$ npm test
+```
+
+This package uses [Grunt](https://gruntjs.com/) for its build tasks.  For convenience, you may want to install
+this globally:
+
+```
+$ npm -g install grunt-cli
+$ grunt release
+```
+
+Or you could use the locally installed Grunt:
+
+```
+$ ./node_modules/.bin/grunt release
+```
+
+## Build Output
+
+The build above will compile the library into the `dist` directory.  This directory has subdirectories of
+the form `<module type>/<target ES version>`.  In general, we target ES6 and rely on polyfills to support earlier
+versions.
+
+* `dist/es6/es6` - Targets the ES6 module system and ES6
+* `dist/commonjs/es6` - Targets the CommonJS module system and ES6 
+* `dist/amd/es6` - Targets the AMD module system and ES6
+
+A distribution using `browserify` and `babelify` creates a browser friendly polyfilled distribution targeting ES5:
+at `dist/browser/js/ion-bundle.js`.
+
 # Contribute
 
 [CONTRIBUTE.md](CONTRIBUTE.md)

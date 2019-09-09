@@ -43,5 +43,5 @@ export interface Writer {
    * of the current container.  If there's no current value then this method
    * calls {@link next()} to get started.
    */
-  writeValues(reader: Reader, writer: Writer) : void;
+  writeValues(reader: Reader) : void;
 }
