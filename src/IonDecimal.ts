@@ -20,8 +20,8 @@ import {_sign} from "./util";
  * Note that range of an exponent is limited to +/- 15 digits.
  */
 export class Decimal {
-    private readonly _coefficient: LongInt;
-    private readonly _exponent: number;
+    private _coefficient: LongInt;
+    private _exponent: number;
 
     public static readonly ZERO = new Decimal(0, 0);
     public static readonly ONE = new Decimal(1, 0);

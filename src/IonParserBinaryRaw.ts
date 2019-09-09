@@ -347,10 +347,10 @@ export class ParserBinaryRaw {
             precision = Precision.SECONDS;
         }
         if (this._in.position() < end) {
-            let expponent = this.readVarSignedInt();
+            let exponent = this.readVarSignedInt();
             let coefficient = LongInt._ZERO;
             if (this._in.position() < end) {
-                coeffficient = ParserBinaryRaw.readSignedIntFrom(this._in, end - this._in.position());
+                coefficient = ParserBinaryRaw.readSignedIntFrom(this._in, end - this._in.position());
             }
             let dec = Decimal._fromLongIntCoefficient(coefficient, exponent);
             let [_, fractionStr] = Timestamp._splitSecondsDecimal(dec);
