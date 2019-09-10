@@ -36,7 +36,6 @@ export class Decimal {
     /**
      * Allows a Decimal to be constructed using a coefficient of arbitrary size without exposing the LongInt class
      * as part of the public API.
-     *
      * @hidden
      */
     static _fromLongIntCoefficient(coefficient: LongInt, exponent: number) {
@@ -47,7 +46,6 @@ export class Decimal {
 
     /**
      * Constructor helper shared by the public constructor and _fromLongIntCoefficient
-     *
      * @hidden
      */
     private _initialize(coefficient: LongInt, exponent: number) {
