@@ -1,3 +1,4 @@
+dist: bionic
 language: node_js
 cache:
   directories:
@@ -5,7 +6,7 @@ cache:
 notifications:
   email: false
 node_js:
-  - '7'
+  - '8'
 before_script:
   - npm prune
 script: 
