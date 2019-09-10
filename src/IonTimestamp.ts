@@ -244,6 +244,7 @@ export class Timestamp {
     /**
      * For a year < 100, JavaScript Date's default behavior automatically adds 1900;
      * this method compensates for that behavior
+     * @hidden
      */
     static _adjustMsSinceEpochIfNeeded(year: number, msSinceEpoch: number) : number {
         if (year >= 100) {
