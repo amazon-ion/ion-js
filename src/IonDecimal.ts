@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2012 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -17,7 +17,24 @@ import {_sign} from "./util";
 
 /**
  * This class provides the additional semantics necessary for decimal values.
- * Note that range of an exponent is limited to +/- 15 digits.
+ *
+ * Unlike IEEE-754 floating point representation, Decimal values can represent numeric values without loss of precision.
+ * Each number is stored as a pair of integers, a "coefficient" and an "exponent", which can be combined to calculate
+ * the original value using the following formula:
+ *
+ *     value = coefficient * (10 ^ exponent)
+ *
+ * Here are some examples:
+ *
+ *      coefficient     exponent        value
+ *             0           0                0
+ *            37          -5                0.00037
+ *           314          -2                3.14
+ *           -76           0              -76
+ *            11           1              110
+ *             5           6        5,000,000
+ *
+ * Presently, the supported range of an exponent is limited to +/- 15 digits.
  */
 export class Decimal {
     private _coefficient: LongInt;
@@ -26,6 +43,11 @@ export class Decimal {
     public static readonly ZERO = new Decimal(0, 0);
     public static readonly ONE = new Decimal(1, 0);
 
+    /**
+     * Creates a new Decimal value.
+     * @param coefficient   See the {@link Decimal} class-level documentation for details.
+     * @param exponent      See the {@link Decimal} class-level documentation for details.
+     */
     constructor(coefficient: number, exponent: number) {
         if (!Number.isInteger(coefficient)) {
             throw new Error("The provided coefficient was not an integer. (" + coefficient + ")");
@@ -45,7 +67,7 @@ export class Decimal {
     }
 
     /**
-     * Constructor helper shared by the public constructor and _fromLongIntCoefficient
+     * Constructor helper shared by the public constructor and _fromLongIntCoefficient.
      * @hidden
      */
     private _initialize(coefficient: LongInt, exponent: number) {
@@ -61,7 +83,7 @@ export class Decimal {
     }
 
     /**
-     * Returns a number representing the value of this Decimal.  Note that
+     * Returns a number representing the value of this Decimal. Note that
      * some Decimal (base-10) values cannot be precisely expressed in
      * JavaScript's base-2 number type.
      */
