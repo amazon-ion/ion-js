@@ -20,21 +20,33 @@ import {Timestamp} from "./IonTimestamp";
  * Writes values in the Ion text or binary formats.
  */
 export interface Writer {
-  writeBlob(value: Uint8Array, annotations?: string[]) : void;
-  writeBoolean(value: boolean, annotations?: string[]) : void;
-  writeClob(value: Uint8Array, annotations?: string[]) : void;
-  writeDecimal(value: Decimal, annotations?: string[]) : void;
+  writeBlob(value: Uint8Array) : void;
+  writeBoolean(value: boolean) : void;
+  writeClob(value: Uint8Array) : void;
+  writeDecimal(value: Decimal) : void;
   writeFieldName(fieldName: string) : void;
-  writeFloat32(value: number, annotations?: string[]) : void;
-  writeFloat64(value: number, annotations?: string[]) : void;
-  writeInt(value: number, annotations?: string[]) : void;
-  writeNull(type: IonType, annotations?: string[]) : void;
-  writeString(value: string, annotations?: string[]) : void;
-  writeSymbol(value: string, annotations?: string[]) : void;
-  writeTimestamp(value: Timestamp, annotations?: string[]) : void;
-  stepIn(type: IonType, annotations?: string[]) : void;
+  writeFloat32(value: number) : void;
+  writeFloat64(value: number) : void;
+  writeInt(value: number) : void;
+  writeNull(type: IonType) : void;
+  writeString(value: string) : void;
+  writeSymbol(value: string) : void;
+  writeTimestamp(value: Timestamp) : void;
+  stepIn(type: IonType) : void;
   stepOut() : void;
   getBytes(): Uint8Array;
+
+  /**
+   * Adds an annotation to the list of annotations to be used when
+   * writing the next value.
+   */
+  addAnnotation(annotation: string) : void;
+
+  /**
+   * Specifies the list of annotations to be used when writing
+   * the next value.
+   */
+  setAnnotations(annotations: string[]) : void;
 
   close() : void;
 

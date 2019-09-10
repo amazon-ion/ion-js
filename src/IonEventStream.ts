@@ -47,45 +47,46 @@ export class IonEventStream {
             if(tempEvent.fieldName !== null) {
                 writer.writeFieldName(tempEvent.fieldName);
             }
+            writer.setAnnotations(tempEvent.annotations);
             switch(tempEvent.eventType){
                 case IonEventType.SCALAR:
                     switch(tempEvent.ionType) {
                         case IonTypes.BOOL :
-                            writer.writeBoolean(tempEvent.ionValue, tempEvent.annotations);
+                            writer.writeBoolean(tempEvent.ionValue);
                             break;
                         case IonTypes.STRING:
-                            writer.writeString(tempEvent.ionValue, tempEvent.annotations);
+                            writer.writeString(tempEvent.ionValue);
                             break;
                         case IonTypes.SYMBOL :
-                            writer.writeSymbol(tempEvent.ionValue, tempEvent.annotations);
+                            writer.writeSymbol(tempEvent.ionValue);
                             break;
                         case IonTypes.INT :
-                            writer.writeInt(tempEvent.ionValue, tempEvent.annotations);
+                            writer.writeInt(tempEvent.ionValue);
                             break;
                         case IonTypes.DECIMAL :
-                            writer.writeDecimal(tempEvent.ionValue, tempEvent.annotations);
+                            writer.writeDecimal(tempEvent.ionValue);
                             break;
                         case IonTypes.FLOAT :
-                            writer.writeFloat64(tempEvent.ionValue, tempEvent.annotations);
+                            writer.writeFloat64(tempEvent.ionValue);
                             break;
                         case IonTypes.NULL :
-                            writer.writeNull(tempEvent.ionType, tempEvent.annotations);
+                            writer.writeNull(tempEvent.ionType);
                             break;
                         case IonTypes.TIMESTAMP :
-                            writer.writeTimestamp(tempEvent.ionValue, tempEvent.annotations);
+                            writer.writeTimestamp(tempEvent.ionValue);
                             break;
                         case IonTypes.CLOB :
-                            writer.writeClob(tempEvent.ionValue, tempEvent.annotations);
+                            writer.writeClob(tempEvent.ionValue);
                             break;
                         case IonTypes.BLOB :
-                            writer.writeBlob(tempEvent.ionValue, tempEvent.annotations);
+                            writer.writeBlob(tempEvent.ionValue);
                             break;
                         default :
                             throw new Error("unexpected type: " + tempEvent.ionType.name);
                     }
                     break;
                 case IonEventType.CONTAINER_START:
-                    writer.stepIn(tempEvent.ionType, tempEvent.annotations);
+                    writer.stepIn(tempEvent.ionType);
                     break;
                 case IonEventType.CONTAINER_END:
                     writer.stepOut();

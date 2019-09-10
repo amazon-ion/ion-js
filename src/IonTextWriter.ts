@@ -11,6 +11,7 @@
 * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific
 * language governing permissions and limitations under the License.
 */
+import {AbstractWriter} from "./AbstractWriter";
 import {Decimal} from "./IonDecimal";
 import {encodeUtf8} from "./IonUnicode";
 import {
@@ -29,7 +30,6 @@ import {IonTypes} from "./IonTypes";
 import {Reader} from "./IonReader";
 import {Timestamp} from "./IonTimestamp";
 import {Writeable} from "./IonWriteable";
-import {Writer} from "./IonWriter";
 import {_sign, _writeValues} from "./util";
 
 type Serializer<T> = (value: T) => void;
@@ -51,7 +51,7 @@ export class Context {
     }
 }
 
-export class TextWriter implements Writer {
+export class TextWriter extends AbstractWriter {
 
     protected containerContext : Context[];
 
@@ -60,23 +60,24 @@ export class TextWriter implements Writer {
     }
 
     constructor(protected readonly writeable: Writeable) {
+        super();
         this.containerContext = [new Context(undefined)];
     }
 
-    writeBlob(value: Uint8Array, annotations?: string[]) : void {
-        this.writeValue(IonTypes.BLOB, value, annotations, (value: Uint8Array) => {
+    writeBlob(value: Uint8Array) : void {
+        this.writeValue(IonTypes.BLOB, value, (value: Uint8Array) => {
             this.writeable.writeBytes(encodeUtf8('{{' + toBase64(value) + '}}'));
         });
     }
 
-    writeBoolean(value: boolean, annotations?: string[]) : void {
-        this.writeValue(IonTypes.BOOL, value, annotations, (value: boolean) => {
+    writeBoolean(value: boolean) : void {
+        this.writeValue(IonTypes.BOOL, value, (value: boolean) => {
             this.writeUtf8(value ? "true" : "false");
         });
     }
 
-    writeClob(value: Uint8Array, annotations?: string[]) : void {
-        this.writeValue(IonTypes.CLOB, value, annotations, (value: Uint8Array) => {
+    writeClob(value: Uint8Array) : void {
+        this.writeValue(IonTypes.CLOB, value, (value: Uint8Array) => {
             let hexStr : string;
             this.writeUtf8('{{"');
             for (let i : number = 0; i < value.length; i++) {
@@ -106,8 +107,8 @@ export class TextWriter implements Writer {
         });
     }
 
-    writeDecimal(value: Decimal, annotations?: string[]) : void {
-        this.writeValue(IonTypes.DECIMAL, value, annotations, (value: Decimal) => {
+    writeDecimal(value: Decimal) : void {
+        this.writeValue(IonTypes.DECIMAL, value, (value: Decimal) => {
             if (value === null) {
                 this.writeUtf8("null.decimal");
             } else {
@@ -153,7 +154,7 @@ export class TextWriter implements Writer {
         this.currentContainer.state = State.VALUE;
     }
 
-    writeFloat32(value: number, annotations?: string[]) : void {
+    writeFloat32(value: number) : void {
         var tempVal : any = value;
         if(value === Number.POSITIVE_INFINITY){
             tempVal = "+inf";
@@ -167,12 +168,12 @@ export class TextWriter implements Writer {
                 tempVal = tempVal.slice(0, tempVal.length - 2) + tempVal.charAt(tempVal.length - 1);
             }
         }
-        this.writeValue(IonTypes.FLOAT, value, annotations, (value: number) => {
+        this.writeValue(IonTypes.FLOAT, value, (value: number) => {
             this.writeUtf8(tempVal);
         });
     }
 
-    writeFloat64(value: number, annotations?: string[]) : void {
+    writeFloat64(value: number) : void {
         var tempVal : any = value;
         if(value === Number.POSITIVE_INFINITY){
             tempVal = "+inf";
@@ -186,56 +187,59 @@ export class TextWriter implements Writer {
                 tempVal = tempVal.slice(0, tempVal.length - 2) + tempVal.charAt(tempVal.length - 1);
             }
         }
-        this.writeValue(IonTypes.FLOAT, value, annotations, (value: number) => {
+        this.writeValue(IonTypes.FLOAT, value, (value: number) => {
             this.writeUtf8(tempVal);
         });
     }
 
-    writeInt(value: number, annotations?: string[]) : void {
-        this.writeValue(IonTypes.INT, value, annotations, (value: number) => {
+    writeInt(value: number) : void {
+        this.writeValue(IonTypes.INT, value, (value: number) => {
             this.writeUtf8(value.toString(10));
         });
     }
 
-    writeNull(type: IonType, annotations?: string[]) : void {
+    writeNull(type: IonType) : void {
         if (type === null || type === undefined || type.bid < 0 || type.bid > 13) {
             throw new Error(`Cannot write null for type ${type}`);
         }
         this.handleSeparator();
-        this.writeAnnotations(annotations);
+        this.writeAnnotations();
         this.writeUtf8("null." + type.name);
         if (this.currentContainer.containerType === IonTypes.STRUCT) this.currentContainer.state = State.STRUCT_FIELD;
     }
 
-    writeString(value: string, annotations?: string[]) : void {
-        this.writeValue(IonTypes.STRING, value, annotations, (value: string) => {
+    writeString(value: string) : void {
+        this.writeValue(IonTypes.STRING, value, (value: string) => {
             this.writeable.writeBytes(encodeUtf8('"' + escape(value, StringEscapes) + '"'));
         });
     }
 
-    writeSymbol(value: string, annotations?: string[]) : void {
-        this.writeValue(IonTypes.SYMBOL, value, annotations, (value: string) => {
+    writeSymbol(value: string) : void {
+        this.writeValue(IonTypes.SYMBOL, value, (value: string) => {
             this.writeSymbolToken(value);
         });
     }
 
-    writeTimestamp(value: Timestamp, annotations?: string[]) : void {
-        this.writeValue(IonTypes.TIMESTAMP, value, annotations, (value: Timestamp) => {
+    writeTimestamp(value: Timestamp) : void {
+        this.writeValue(IonTypes.TIMESTAMP, value, (value: Timestamp) => {
             this.writeUtf8(value.toString());
         });
     }
 
-    stepIn(type: IonType, annotations?: string[]) : void {
+    stepIn(type: IonType) : void {
         switch (type) {
             case IonTypes.LIST:
-                this.writeContainer(type, CharCodes.LEFT_BRACKET, annotations);
+                this.writeContainer(type, CharCodes.LEFT_BRACKET);
                 break;
             case IonTypes.SEXP:
-                this.writeContainer(type, CharCodes.LEFT_PARENTHESIS, annotations);
+                this.writeContainer(type, CharCodes.LEFT_PARENTHESIS);
                 break;
             case IonTypes.STRUCT:
-                if(annotations !== undefined && annotations[0] === '$ion_symbol_table' && this.depth() === 0) throw new Error("Unable to alter symbol table context, it allows invalid ion to be written.");
-                this.writeContainer(type, CharCodes.LEFT_BRACE, annotations);
+                if(this._annotations !== undefined
+                        && this._annotations[0] === '$ion_symbol_table' && this.depth() === 0) {
+                    throw new Error("Unable to alter symbol table context, it allows invalid ion to be written.");
+                }
+                this.writeContainer(type, CharCodes.LEFT_BRACE);
                 break;
             default :
                 throw new Error("Unrecognized container type");
@@ -270,28 +274,24 @@ export class TextWriter implements Writer {
         }
     }
 
-    protected writeValue<T>(type: IonType, value: T, annotations: string[], serialize: Serializer<T>) {
+    protected writeValue<T>(type: IonType, value: T, serialize: Serializer<T>) {
         if (this.currentContainer.state === State.STRUCT_FIELD) throw new Error("Expecting a struct field");
         if (value === null || value === undefined) {
-            this.writeNull(type, annotations);
+            this.writeNull(type);
             return;
         }
         this.handleSeparator();
-        this.writeAnnotations(annotations);
+        this.writeAnnotations();
         serialize(value);
         if (this.currentContainer.containerType === IonTypes.STRUCT) this.currentContainer.state = State.STRUCT_FIELD;
     }
 
-    protected writeContainer(type: IonType, openingCharacter: number, annotations?: string[], isNull?: boolean) : void {
-        if (isNull) {
-            this.writeNull(type, annotations);
-            return;
-        }
+    protected writeContainer(type: IonType, openingCharacter: number) : void {
         if(this.currentContainer.containerType === IonTypes.STRUCT && this.currentContainer.state === State.VALUE){
             this.currentContainer.state = State.STRUCT_FIELD;
         }
         this.handleSeparator();
-        this.writeAnnotations(annotations);
+        this.writeAnnotations();
         this.writeable.writeByte(openingCharacter);
         this._stepIn(type);
     }
@@ -326,12 +326,13 @@ export class TextWriter implements Writer {
             this.writeable.writeBytes(encodeUtf8(s));
     }
 
-    protected writeAnnotations(annotations: string[]) : void {
-        if (annotations === null || annotations === undefined) return;
-        for (let annotation of annotations) {
+    protected writeAnnotations() : void {
+        if (this._annotations === null || this._annotations === undefined) return;
+        for (let annotation of this._annotations) {
             this.writeSymbolToken(annotation);
             this.writeUtf8('::');
         }
+        this._clearAnnotations();
     }
 
     get isTopLevel() : boolean {

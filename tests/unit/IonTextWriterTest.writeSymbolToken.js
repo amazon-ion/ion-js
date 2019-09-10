@@ -40,7 +40,8 @@ define(
 
             writer.writeSymbol(s);        // symbol
 
-            writer.writeInt(5, [s]);      // annotation
+            writer.setAnnotations([s]);
+            writer.writeInt(5);      // annotation
 
             writer.stepIn(ion.IonTypes.STRUCT);
             writer.writeFieldName(s);     // fieldname

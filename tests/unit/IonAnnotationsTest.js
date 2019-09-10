@@ -48,7 +48,8 @@ define([
         let reader = ion.makeReader(data);
         reader.next();
         let writer = ion.makeTextWriter();
-        writer.writeInt(reader.numberValue(), ['a']);
+        writer.setAnnotations(['a']);
+        writer.writeInt(reader.numberValue());
         reader.next();
         writer.writeValues(reader);
         assert.equal(String.fromCharCode.apply(null, writer.getBytes()), 'a::123');
@@ -59,9 +60,9 @@ define([
         let reader = ion.makeReader(data);
         reader.next();
         let writer = ion.makeTextWriter();
-        writer.writeInt(reader.numberValue(), reader.annotations().concat('c'));
-        reader.next();
-        writer.writeValues(reader);
+        writer.setAnnotations(reader.annotations());
+        writer.addAnnotation('c');
+        writer.writeInt(reader.numberValue());
         assert.equal(String.fromCharCode.apply(null, writer.getBytes()), 'a::b::c::123');
       };
 
@@ -69,7 +70,8 @@ define([
         let data = "{ x: 1 }";
         let reader = ion.makeReader(data);
         let writer = ion.makeTextWriter();
-        writer.stepIn(ion.IonTypes.STRUCT, ['a', 'b']);
+        writer.setAnnotations(['a', 'b']);
+        writer.stepIn(ion.IonTypes.STRUCT);
 
         reader.next();
         reader.stepIn();
@@ -81,7 +83,7 @@ define([
 
         writer.stepOut();
         assert.equal(String.fromCharCode.apply(null, writer.getBytes()), 'a::b::{x:1}');
-      }
+      };
 
       registerSuite(suite);
   }
