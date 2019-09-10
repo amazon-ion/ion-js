@@ -88,29 +88,35 @@ function load_symbols(reader: Reader) : string[] {
   return symbols;
 }
 
-    export function makeSymbolTable(catalog: Catalog, reader: Reader) : LocalSymbolTable {
-        let import_: Import;
-        let symbols: string[];
-        let maxId: number;
-        let foundSymbols : boolean = false;
-        let foundImports : boolean = false;
+/**
+ * Constructs a {LocalSymbolTable} from the given Ion {Reader}.
+ *
+ * @param catalog The catalog to resolve imported shared symbol tables from.
+ * @param reader The Ion {Reader} over the local symbol table in its serialized form.
+ */
+export function makeSymbolTable(catalog: Catalog, reader: Reader) : LocalSymbolTable {
+    let import_: Import;
+    let symbols: string[];
+    let maxId: number;
+    let foundSymbols : boolean = false;
+    let foundImports : boolean = false;
 
-        reader.stepIn();
-        while (reader.next()) {
-            switch(reader.fieldName()) {
-            case "imports":
-                if(foundImports) throw new Error("Multiple import fields found.");
-                import_ = load_imports(reader, catalog);
-                foundImports = true;
-                break;
-            case "symbols":
-                if(foundSymbols) throw new Error("Multiple symbol fields found.");
-                symbols = load_symbols(reader);
-                foundSymbols = true;
-                break;
-            }
+    reader.stepIn();
+    while (reader.next()) {
+        switch(reader.fieldName()) {
+        case "imports":
+            if(foundImports) throw new Error("Multiple import fields found.");
+            import_ = load_imports(reader, catalog);
+            foundImports = true;
+            break;
+        case "symbols":
+            if(foundSymbols) throw new Error("Multiple symbol fields found.");
+            symbols = load_symbols(reader);
+            foundSymbols = true;
+            break;
         }
-        reader.stepOut();
-
-        return new LocalSymbolTable(import_, symbols);
     }
+    reader.stepOut();
+
+    return new LocalSymbolTable(import_, symbols);
+}
