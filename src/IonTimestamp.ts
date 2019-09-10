@@ -236,13 +236,6 @@ export class Timestamp {
                 this._hour, this._minutes, this.getSecondsInt(), ms);
 
         msSinceEpoch = Timestamp._adjustMsSinceEpochIfNeeded(this._year, msSinceEpoch);
-        if (this._year < 100) {
-            // for a year < 100, JavaScript Date's default behavior automatically adds 1900;
-            // this block compensates for that behavior
-            let date = new Date(msSinceEpoch);
-            date.setUTCFullYear(this._year);     // yes, we really do mean some year < 100
-            msSinceEpoch = date.getTime();
-        }
 
         let offsetShiftMs = this._localOffset * 60 * 1000;
         return new Date(msSinceEpoch - offsetShiftMs);
