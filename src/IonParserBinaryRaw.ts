@@ -357,7 +357,9 @@ export class ParserBinaryRaw {
             fractionalSeconds = Decimal.parse(secondInt + '.' + fractionStr);
         }
 
-        let date = new Date(Date.UTC(year, month ? month - 1 : 0, day ? day : 1, hour ? hour : 0, minute ? minute : 0, secondInt ? secondInt : 0, 0));
+        let msSinceEpoch = Date.UTC(year, month ? month - 1 : 0, day ? day : 1, hour ? hour : 0, minute ? minute : 0, secondInt ? secondInt : 0, 0);
+        msSinceEpoch = Timestamp._adjustMsSinceEpochIfNeeded(year, msSinceEpoch);
+        let date = new Date(msSinceEpoch);
         return Timestamp._valueOf(date, offset, fractionalSeconds, precision);
     }
 

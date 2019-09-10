@@ -621,7 +621,7 @@ define([
         // 't':
         0x94,
         // Timestamp
-        0x65, 0x80, 0x0f, 0xd0, 0x81, 0x81
+        0x65, 0xc0, 0x0f, 0xd0, 0x81, 0x81
       ]);
 
     // Symbols
@@ -668,7 +668,7 @@ define([
         [
         0x63,
         // Offset
-        0x80,
+        0xc0,
         // Year
         0x0f,
         0xd0,
@@ -678,7 +678,7 @@ define([
         [
         0x64,
         // Offset
-        0x80,
+        0xc0,
         // Year
         0x0f,
         0xd0,
@@ -690,7 +690,7 @@ define([
         [
         0x65,
         // Offset
-        0x80,
+        0xc0,
         // Year
         0x0f,
         0xd0,
