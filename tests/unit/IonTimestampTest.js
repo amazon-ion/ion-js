@@ -22,59 +22,59 @@ define(
             name: 'Timestamp',
 
             // boundary tests (for each field of a timestamp)
-            '0001T': () => test('0001T', ion.Precision.YEAR, -0, 1),
-            '9999T': () => test('9999T', ion.Precision.YEAR, -0, 9999),
+            '0001T': () => test('0001T', ion.TimestampPrecision.YEAR, -0, 1),
+            '9999T': () => test('9999T', ion.TimestampPrecision.YEAR, -0, 9999),
 
-            '2007-01T': () => test('2007-01T', ion.Precision.MONTH, -0, 2007, 1),
-            '2007-12T': () => test('2007-12T', ion.Precision.MONTH, -0, 2007, 12),
+            '2007-01T': () => test('2007-01T', ion.TimestampPrecision.MONTH, -0, 2007, 1),
+            '2007-12T': () => test('2007-12T', ion.TimestampPrecision.MONTH, -0, 2007, 12),
 
-            '2007-01-01' : () => test('2007-01-01T', ion.Precision.DAY, -0, 2007, 1, 1),
-            '2007-01-31T': () => test('2007-01-31T', ion.Precision.DAY, -0, 2007, 1, 31),
+            '2007-01-01' : () => test('2007-01-01T', ion.TimestampPrecision.DAY, -0, 2007, 1, 1),
+            '2007-01-31T': () => test('2007-01-31T', ion.TimestampPrecision.DAY, -0, 2007, 1, 31),
 
-            '2007-01-01T00:00Z': () => test('2007-01-01T00:00Z', ion.Precision.HOUR_AND_MINUTE, 0, 2007, 1, 1, 0, 0),
-            '2007-01-01T23:59Z': () => test('2007-01-01T23:59Z', ion.Precision.HOUR_AND_MINUTE, 0, 2007, 1, 1, 23, 59),
+            '2007-01-01T00:00Z': () => test('2007-01-01T00:00Z', ion.TimestampPrecision.HOUR_AND_MINUTE, 0, 2007, 1, 1, 0, 0),
+            '2007-01-01T23:59Z': () => test('2007-01-01T23:59Z', ion.TimestampPrecision.HOUR_AND_MINUTE, 0, 2007, 1, 1, 23, 59),
 
-            '2007-01-01T00:00:00Z': () => test('2007-01-01T00:00:00Z', ion.Precision.SECONDS, 0, 2007, 1, 1, 0, 0, '0'),
-            '2007-01-01T00:00:59Z': () => test('2007-01-01T00:00:59Z', ion.Precision.SECONDS, 0, 2007, 1, 1, 0, 0, '59'),
+            '2007-01-01T00:00:00Z': () => test('2007-01-01T00:00:00Z', ion.TimestampPrecision.SECONDS, 0, 2007, 1, 1, 0, 0, '0'),
+            '2007-01-01T00:00:59Z': () => test('2007-01-01T00:00:59Z', ion.TimestampPrecision.SECONDS, 0, 2007, 1, 1, 0, 0, '59'),
 
-            '2007-01-01T00:00:00.000Z': () => test('2007-01-01T00:00:00.000Z', ion.Precision.SECONDS, 0, 2007, 1, 1, 0, 0, '0.000'),
-            '2007-01-01T00:00:00.999Z': () => test('2007-01-01T00:00:00.999Z', ion.Precision.SECONDS, 0, 2007, 1, 1, 0, 0, '0.999'),
+            '2007-01-01T00:00:00.000Z': () => test('2007-01-01T00:00:00.000Z', ion.TimestampPrecision.SECONDS, 0, 2007, 1, 1, 0, 0, '0.000'),
+            '2007-01-01T00:00:00.999Z': () => test('2007-01-01T00:00:00.999Z', ion.TimestampPrecision.SECONDS, 0, 2007, 1, 1, 0, 0, '0.999'),
 
             // local offset boundary tests
-            '2007-01-01T00:00Z'        : () => test('2007-01-01T00:00Z',      ion.Precision.HOUR_AND_MINUTE, 0, 2007, 1, 1, 0),
-            '2007-01-01T00:00+00:00'   : () => test('2007-01-01T00:00+00:00', ion.Precision.HOUR_AND_MINUTE, 0, 2007, 1, 1, 0),
-            '2007-01-01T00:00-00:00'   : () => test('2007-01-01T00:00-00:00', ion.Precision.HOUR_AND_MINUTE, -0, 2007, 1, 1, 0),
-            '2007-01-01T00:00-23:59'   : () => test('2007-01-01T00:00-23:59', ion.Precision.HOUR_AND_MINUTE, -(23 * 60 + 59), 2007, 1, 1, 0),
-            '2007-01-01T00:00+23:59'   : () => test('2007-01-01T00:00+23:59', ion.Precision.HOUR_AND_MINUTE, 23 * 60 + 59, 2007, 1, 1, 0),
-            '2007-01-01T00:00:00Z'     : () => test('2007-01-01T00:00:00Z',      ion.Precision.SECONDS, 0, 2007, 1, 1, 0, 0, '0'),
-            '2007-01-01T00:00:00+00:00': () => test('2007-01-01T00:00:00+00:00', ion.Precision.SECONDS, 0, 2007, 1, 1, 0, 0, '0'),
-            '2007-01-01T00:00:00-00:00': () => test('2007-01-01T00:00:00-00:00', ion.Precision.SECONDS, -0, 2007, 1, 1, 0, 0, '0'),
-            '2007-01-01T00:00:00-23:59': () => test('2007-01-01T00:00:00-23:59', ion.Precision.SECONDS, -(23 * 60 + 59), 2007, 1, 1, 0, 0, '0'),
-            '2007-01-01T00:00:00+23:59': () => test('2007-01-01T00:00:00+23:59', ion.Precision.SECONDS, 23 * 60 + 59, 2007, 1, 1, 0, 0, '0'),
+            '2007-01-01T00:00Z'        : () => test('2007-01-01T00:00Z',      ion.TimestampPrecision.HOUR_AND_MINUTE, 0, 2007, 1, 1, 0),
+            '2007-01-01T00:00+00:00'   : () => test('2007-01-01T00:00+00:00', ion.TimestampPrecision.HOUR_AND_MINUTE, 0, 2007, 1, 1, 0),
+            '2007-01-01T00:00-00:00'   : () => test('2007-01-01T00:00-00:00', ion.TimestampPrecision.HOUR_AND_MINUTE, -0, 2007, 1, 1, 0),
+            '2007-01-01T00:00-23:59'   : () => test('2007-01-01T00:00-23:59', ion.TimestampPrecision.HOUR_AND_MINUTE, -(23 * 60 + 59), 2007, 1, 1, 0),
+            '2007-01-01T00:00+23:59'   : () => test('2007-01-01T00:00+23:59', ion.TimestampPrecision.HOUR_AND_MINUTE, 23 * 60 + 59, 2007, 1, 1, 0),
+            '2007-01-01T00:00:00Z'     : () => test('2007-01-01T00:00:00Z',      ion.TimestampPrecision.SECONDS, 0, 2007, 1, 1, 0, 0, '0'),
+            '2007-01-01T00:00:00+00:00': () => test('2007-01-01T00:00:00+00:00', ion.TimestampPrecision.SECONDS, 0, 2007, 1, 1, 0, 0, '0'),
+            '2007-01-01T00:00:00-00:00': () => test('2007-01-01T00:00:00-00:00', ion.TimestampPrecision.SECONDS, -0, 2007, 1, 1, 0, 0, '0'),
+            '2007-01-01T00:00:00-23:59': () => test('2007-01-01T00:00:00-23:59', ion.TimestampPrecision.SECONDS, -(23 * 60 + 59), 2007, 1, 1, 0, 0, '0'),
+            '2007-01-01T00:00:00+23:59': () => test('2007-01-01T00:00:00+23:59', ion.TimestampPrecision.SECONDS, 23 * 60 + 59, 2007, 1, 1, 0, 0, '0'),
 
-            '2008-01-01T00:00:00.000Z'     : () => test('2008-01-01T00:00:00.000Z',      ion.Precision.SECONDS, 0, 2008, 1, 1, 0, 0, '0.000'),
-            '2008-01-01T00:00:00.000+00:00': () => test('2008-01-01T00:00:00.000+00:00', ion.Precision.SECONDS, 0, 2008, 1, 1, 0, 0, '0.000'),
-            '2008-01-01T00:00:00.000-00:00': () => test('2008-01-01T00:00:00.000-00:00', ion.Precision.SECONDS, -0, 2008, 1, 1, 0, 0, '0.000'),
-            '2008-01-01T00:00:00.000-23:59': () => test('2008-01-01T00:00:00.000-23:59', ion.Precision.SECONDS, -(23 * 60 + 59), 2008, 1, 1, 0, 0, '0.000'),
-            '2008-01-01T00:00:00.000+23:59': () => test('2008-01-01T00:00:00.000+23:59', ion.Precision.SECONDS, 23 * 60 + 59, 2008, 1, 1, 0, 0, '0.000'),
+            '2008-01-01T00:00:00.000Z'     : () => test('2008-01-01T00:00:00.000Z',      ion.TimestampPrecision.SECONDS, 0, 2008, 1, 1, 0, 0, '0.000'),
+            '2008-01-01T00:00:00.000+00:00': () => test('2008-01-01T00:00:00.000+00:00', ion.TimestampPrecision.SECONDS, 0, 2008, 1, 1, 0, 0, '0.000'),
+            '2008-01-01T00:00:00.000-00:00': () => test('2008-01-01T00:00:00.000-00:00', ion.TimestampPrecision.SECONDS, -0, 2008, 1, 1, 0, 0, '0.000'),
+            '2008-01-01T00:00:00.000-23:59': () => test('2008-01-01T00:00:00.000-23:59', ion.TimestampPrecision.SECONDS, -(23 * 60 + 59), 2008, 1, 1, 0, 0, '0.000'),
+            '2008-01-01T00:00:00.000+23:59': () => test('2008-01-01T00:00:00.000+23:59', ion.TimestampPrecision.SECONDS, 23 * 60 + 59, 2008, 1, 1, 0, 0, '0.000'),
             // / boundary tests
 
 
             '2007-02-23T20:14:33.079+00:00': () =>
-                test('2007-02-23T20:14:33.079+00:00', ion.Precision.SECONDS, 0, 2007, 2, 23, 20, 14, '33.079'),
+                test('2007-02-23T20:14:33.079+00:00', ion.TimestampPrecision.SECONDS, 0, 2007, 2, 23, 20, 14, '33.079'),
             '2007-02-23T00:14:33.079+00:00': () =>
-                test('2007-02-23T00:14:33.079+00:00', ion.Precision.SECONDS, 0, 2007, 2, 23, 0, 14, '33.079'),
+                test('2007-02-23T00:14:33.079+00:00', ion.TimestampPrecision.SECONDS, 0, 2007, 2, 23, 0, 14, '33.079'),
             '2007-02-23T20:14:33.079-00:00': () =>
-                test('2007-02-23T20:14:33.079-00:00', ion.Precision.SECONDS, -0, 2007, 2, 23, 20, 14, '33.079'),
+                test('2007-02-23T20:14:33.079-00:00', ion.TimestampPrecision.SECONDS, -0, 2007, 2, 23, 20, 14, '33.079'),
             '2007-02-23T00:14:33.079-00:00': () =>
-                test('2007-02-23T00:14:33.079-00:00', ion.Precision.SECONDS, -0, 2007, 2, 23, 0, 14, '33.079'),
+                test('2007-02-23T00:14:33.079-00:00', ion.TimestampPrecision.SECONDS, -0, 2007, 2, 23, 0, 14, '33.079'),
             '2007-02-23T12:14:33.079-08:00': () =>
-                test('2007-02-23T12:14:33.079-08:00', ion.Precision.SECONDS, -8*60, 2007, 2, 23, 12, 14, '33.079'),
+                test('2007-02-23T12:14:33.079-08:00', ion.TimestampPrecision.SECONDS, -8*60, 2007, 2, 23, 12, 14, '33.079'),
             '2007-02-23T00:14:33.079-08:00': () =>
-                test('2007-02-23T00:14:33.079-08:00', ion.Precision.SECONDS, -8*60, 2007, 2, 23, 0, 14, '33.079'),
+                test('2007-02-23T00:14:33.079-08:00', ion.TimestampPrecision.SECONDS, -8*60, 2007, 2, 23, 0, 14, '33.079'),
 
             '2001-02-03T04:05:06.123456789-07:53': () =>
-                test('2001-02-03T04:05:06.123456789-07:53', ion.Precision.SECONDS, -(7*60 + 53), 2001, 2, 3, 4, 5, '6.123456789'),
+                test('2001-02-03T04:05:06.123456789-07:53', ion.TimestampPrecision.SECONDS, -(7*60 + 53), 2001, 2, 3, 4, 5, '6.123456789'),
 
             'construct with seconds as a number': () => {
                 let ts = new ion.Timestamp(-7 * 60, 2000, 1, 1, 12, 30, 45);

@@ -20,7 +20,7 @@ import {LocalSymbolTable} from "./IonLocalSymbolTable";
 import {LongInt} from "./IonLongInt";
 import {LowLevelBinaryWriter} from "./IonLowLevelBinaryWriter";
 import {Reader} from "./IonReader";
-import {Precision,Timestamp} from "./IonTimestamp";
+import {TimestampPrecision,Timestamp} from "./IonTimestamp";
 import {Writeable} from "./IonWriteable";
 import {Writer} from "./IonWriter";
 import {_sign, _writeValues} from "./util";
@@ -236,17 +236,17 @@ export class BinaryWriter implements Writer {
 
     let date = value.getDate();
     writer.writeVariableLengthUnsignedInt(date.getUTCFullYear());
-    if (value.getPrecision() >= Precision.MONTH) {
+    if (value.getPrecision() >= TimestampPrecision.MONTH) {
         writer.writeVariableLengthUnsignedInt(date.getUTCMonth() + 1);
     }
-    if (value.getPrecision() >= Precision.DAY) {
+    if (value.getPrecision() >= TimestampPrecision.DAY) {
         writer.writeVariableLengthUnsignedInt(date.getUTCDate());
     }
-    if (value.getPrecision() >= Precision.HOUR_AND_MINUTE) {
+    if (value.getPrecision() >= TimestampPrecision.HOUR_AND_MINUTE) {
         writer.writeVariableLengthUnsignedInt(date.getUTCHours());
         writer.writeVariableLengthUnsignedInt(date.getUTCMinutes());
     }
-    if (value.getPrecision() >= Precision.SECONDS) {
+    if (value.getPrecision() >= TimestampPrecision.SECONDS) {
         writer.writeVariableLengthUnsignedInt(value.getSecondsInt());
         let fractionalSeconds = value._getFractionalSeconds();
         if (fractionalSeconds._getExponent() !== 0) {

@@ -94,6 +94,6 @@ export { Decimal } from "./IonDecimal";
 export { defaultLocalSymbolTable } from "./IonLocalSymbolTable";
 export { IonTypes } from "./IonTypes";
 export { SharedSymbolTable } from "./IonSharedSymbolTable";
-export { Precision, Timestamp } from "./IonTimestamp";
+export { TimestampPrecision, Timestamp } from "./IonTimestamp";
 export { toBase64 } from "./IonText";
 export { decodeUtf8 } from "./IonUnicode";
