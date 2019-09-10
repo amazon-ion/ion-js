@@ -11,17 +11,22 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
+import {Writer} from "./IonWriter";
 
- //  Ion Errors (Exceptions)
+// @ts-ignore: 'AbstractWriter' is missing properties from type 'Writer'
+export abstract class AbstractWriter implements Writer {
+    protected _annotations = [];
 
+    addAnnotation(annotation: string): void {
+        this._annotations.push(annotation);
+    }
 
-export interface InvalidArgumentError extends Error {
+    setAnnotations(annotations: string[]): void {
+        this._annotations = annotations;
+    }
+
+    protected _clearAnnotations(): void {
+        this._annotations = [];
+    }
 }
 
-export interface InvalidArgumentConstructor {
-  new (message?: string): InvalidArgumentError;
-  (message?: string): InvalidArgumentError;
-  readonly prototype: InvalidArgumentError;
-}
-
-export declare const InvalidArgumentError: InvalidArgumentConstructor;

@@ -13,7 +13,6 @@
  */
 
 import { EOF } from "./IonConstants";
-import { InvalidArgumentError } from "./IonErrors"
 
 const SPAN_TYPE_STRING = 0;
 const SPAN_TYPE_BINARY = 1;
@@ -21,7 +20,7 @@ const SPAN_TYPE_SUB_FLAG = 2;
 const SPAN_TYPE_SUB_STRING = SPAN_TYPE_SUB_FLAG | SPAN_TYPE_STRING;
 const SPAN_TYPE_SUB_BINARY = SPAN_TYPE_SUB_FLAG | SPAN_TYPE_BINARY;
 
-const MAX_POS = 1024*1024*1024; // 1 gig 
+const MAX_POS = 1024*1024*1024; // 1 gig
 const LINE_FEED = 10;
 const CARRAIGE_RETURN = 13;
 const DEBUG_FLAG = true;
@@ -51,6 +50,8 @@ export abstract class Span {
 
   abstract peek() : number;
 
+  abstract chunk(length : number) : any;
+
   protected abstract clone(start: number, len: number): Span;
 
   write(b: number) : never {
@@ -71,19 +72,14 @@ export class StringSpan extends Span {
   private _old_line_start : number;
   private _line_start : number;
 
-  constructor(src: string, start: number, len: number) {
+  constructor(src: string) {
     super(SPAN_TYPE_STRING);
     this._line = 1;
     this._src = src;
     this._limit = src.length;
-    if (typeof start !== 'undefined') {
-      this._pos = start;
-      if (typeof len !== 'undefined') {
-        this._limit = start + len;
-      }
-    }
-    this._start = this._pos;
-    this._line_start = this._pos;
+    this._start = 0;
+    this._pos = 0;
+    this._line_start = 0;
     this._old_line_start = 0;
   }
 
@@ -168,7 +164,14 @@ export class StringSpan extends Span {
     return this._src.charCodeAt(ii);
   }
 
+  chunk(length : number) : string {
+      let tempStr : string = this._src.substr(this._pos, length);
+      this._pos += length
+      return tempStr;
+  }
+
   getCodePoint(index : number) : number {
+      // @ts-ignore
       return this._src.codePointAt(index);
   }
 
@@ -180,30 +183,23 @@ export class StringSpan extends Span {
     return this._pos - this._line_start;
   }
 
-  clone(start: number, len: number) : StringSpan {
-    let actual_len: number = this._limit - this._pos - start;
-    if (actual_len > len) {
-      actual_len = len;
-    }
-    return new StringSpan(this._src, this._pos, actual_len);
+  clone(start: number) : StringSpan {
+    return new StringSpan(this._src.substr(this._pos));
   }
 }
 
-class BinarySpan extends Span {
-  private _src: number[];
+export class BinarySpan extends Span {
+  private _src: Uint8Array;
   private _pos: number;
   private _start: number;
   private _limit: number;
 
-  constructor(src: number[], start?: number, len?: number) {
+  constructor(src: Uint8Array) {
     super(SPAN_TYPE_BINARY);
     this._src = src;
     this._limit = src.length;
-    this._start = start || 0;
-    if (typeof len !== 'undefined') {
-      this._limit = start + len;
-    }
-    this._pos = this._start;
+    this._start = 0;
+    this._pos = 0;
   }
 
   position() : number {
@@ -223,17 +219,24 @@ class BinarySpan extends Span {
   }
 
   next(): number {
-    var b;
     if (this.is_empty()) {
-      if (this._pos > MAX_POS) {
-        throw new Error("span position is out of bounds");
-      }
-      this._pos++;
       return EOF;
     }
-    b = this._src[this._pos];
-    this._pos++;
-    return (b & 0xFF);
+    return this._src[this._pos++];
+  }
+
+  //returns an array with the same backing buffer as the source.
+  view(length : number) : Uint8Array {
+      if (this._pos + length > this._limit) {
+          throw new Error('Unable to read ' + length + ' bytes (position: '
+              + this.position() + ', limit: ' + this._limit + ')');
+      }
+      return this._src.subarray(this._pos, this._pos += length);
+  }
+
+  //returns an array with a new backing buffer.
+  chunk(length : number) : Uint8Array {
+      return new Uint8Array(this.view(length));
   }
 
   unread(b: number) : void {
@@ -247,67 +250,20 @@ class BinarySpan extends Span {
 
   peek(): number {
     if (this.is_empty()) return EOF;
-    return (this._src[this._pos] & 0xFF);
+    return (this._src[this._pos]);
   }
 
   skip(dist: number) : void {
     this._pos += dist;
-    if (this._pos > this._limit) {
-      this._pos = this._limit;
-    }
+    if (this._pos > this._limit) throw new Error("Skipped over end of source.");
   }
 
   valueAt(ii: number) : number {
     if (ii < this._start || ii >= this._limit) return undefined;
-    return (this._src[ii] & 0xFF);
+    return (this._src[ii]);
   }
 
-  clone(start: number, len: number) : BinarySpan {
-    let actual_len: number = this._limit - this._pos - start;
-    if (actual_len > len) {
-      actual_len = len;
-    }
-    return new BinarySpan(this._src, this._pos + start, actual_len);
+  clone(start: number, len: number) : BinarySpan {//this doesn't make sense
+    return new BinarySpan(this._src.subarray(this._pos));
   }
-}
-
-
-
-
-/**
- * Create a Span object that wraps src.
- * @see http://www.cs.cmu.edu/~wjh/papers/subseq.html
- *
- * @param src value to be stored inside a span, typically a string
- * @param start beginning index of src
- * @param len end index of src
- * @returns {Span}
- */
-export function makeSpan(src: any, start?: number, len?: number): Span {
-  if (src instanceof Span) {
-    return src as Span;
-  }
-  if (typeof start === 'undefined') {
-    start = 0;
-  }
-  if (typeof len === 'undefined') {
-    len = src.length;
-  }
-
-  let span: Span = undefined;
-  let src_type = typeof src;
-  if (src_type === 'undefined') {
-    throw new InvalidArgumentError("Given \'undefined\' as input");
-  } else if (src_type === 'string') {
-    span = new StringSpan(src, start, len);
-  } else if (src_type === 'object') {
-    // TODO: this seems fishy since isSpan is not defined on Span types!
-    if (typeof (src.isSpan) === 'undefined') { // probably an array
-      span = new BinarySpan(src, start, len);
-    }
-  }
-  if (span === undefined) {
-    throw new InvalidArgumentError("invalid span source");
-  }
-  return span;
 }

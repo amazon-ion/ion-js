@@ -12,44 +12,56 @@
  * language governing permissions and limitations under the License.
  */
 import { getSystemSymbolTable } from "./IonSystemSymbolTable";
-import { Import } from "./IonImport";
-import { isUndefined } from "./IonUtilities";
-import { max } from "./IonUtilities";
 import { SharedSymbolTable } from "./IonSharedSymbolTable";
 
-interface SymbolTableIndex { [name: string]: SharedSymbolTable[] }
+    interface SymbolTableIndex { [name: string]: SharedSymbolTable[] }
 
-function byVersion(x: SharedSymbolTable, y: SharedSymbolTable) : number {
-  return x.version - y.version;
-}
-
-/**
- * A catalog holds available shared symbol tables and always includes the system symbol table.
- * @see http://amzn.github.io/ion-docs/symbols.html#the-catalog
- */
-export class Catalog {
-  private symbolTables: SymbolTableIndex = {};
-
-  constructor() {
-    this.addSymbolTable(getSystemSymbolTable());
-  }
-
-  addSymbolTable(symbolTable: SharedSymbolTable) : void {
-    let versions: SharedSymbolTable[] = this.symbolTables[symbolTable.name];
-    if (isUndefined(versions)) {
-      versions = [];
-      this.symbolTables[symbolTable.name] = versions;
+    function byVersion(x: SharedSymbolTable, y: SharedSymbolTable) : number {
+        return x.version - y.version;
     }
 
-    versions[symbolTable.version] = symbolTable;
-  }
+    /**
+     * A catalog holds available shared symbol tables and always includes the system symbol table.
+     * @see https://amzn.github.io/ion-docs/docs/symbols.html#the-catalog
+     */
+    export class Catalog {
+        private symbolTables: SymbolTableIndex;
 
-  findSpecificVersion(name: string, version: number) : SharedSymbolTable {
-    let versions: SharedSymbolTable[] = this.symbolTables[name];
-    return (versions && versions[version]) || undefined;
-  }
+        /** Creates a catalog containing only the system symbol table. */
+        constructor() {
+            this.symbolTables = {};
+            this.add(getSystemSymbolTable());
+        }
 
-  findLatestVersion(name: string) : SharedSymbolTable {
-    return max(this.symbolTables[name], byVersion);
-  }
-}
+        /** Adds a new shared symbol table to this catalog. */
+        add(symbolTable: SharedSymbolTable) : void {
+            if(symbolTable.name === undefined || symbolTable.name === null) throw new Error("SymbolTable name must be defined.");
+            let versions = this.symbolTables[symbolTable.name];
+            if (versions === undefined) this.symbolTables[symbolTable.name] = [];
+            this.symbolTables[symbolTable.name][symbolTable.version] = symbolTable;
+        }
+
+        /**
+         * Returns a symbol table by name and version.
+         *
+         * @return The symbol table or `null` if it does not exist in the {Catalog}.
+         */
+        getVersion(name: string, version: number) : SharedSymbolTable | null {
+            let tables : SharedSymbolTable[] = this.symbolTables[name];
+            if(!tables) return null;
+            let table = tables[version];
+            if(!table) table = tables[tables.length];
+            return table? table : null;
+        }
+
+        /**
+         * Retrieves the latest version of a symbol table by name.
+         *
+         * @return The symbol table or `null` if it does not exist in the {Catalog}.
+         */
+        getTable(name: string) : SharedSymbolTable | null {
+            let versions = this.symbolTables[name], table;
+            if(versions === undefined) return null;
+            return versions[versions.length - 1];
+        }
+    }

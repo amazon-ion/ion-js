@@ -33,7 +33,9 @@ import { ParserTextRaw } from "./IonParserTextRaw";
 import { Reader } from "./IonReader";
 import { StringSpan } from "./IonSpan";
 import { Timestamp } from "./IonTimestamp";
-import {is_digit} from "./IonText";
+import { fromBase64 } from "./IonText";
+import { is_digit } from "./IonText";
+import { encodeUtf8 } from "./IonUnicode";
 
 const RAW_STRING = new IonType( -1, "raw_input", true,  false, false, false );
 
@@ -52,7 +54,7 @@ export class TextReader implements Reader {
   private _raw_type: number;
   private _raw: any;
 
-  constructor(source: StringSpan, catalog: Catalog) {
+  constructor(source: StringSpan, catalog?: Catalog) {
     if (!source) {
       throw new Error("a source Span is required to make a reader");
     }
@@ -61,7 +63,7 @@ export class TextReader implements Reader {
     this._depth    = 0;
     this._cat      = catalog ? catalog : new Catalog();
     this._symtab   = defaultLocalSymbolTable();
-    this._type     = undefined;
+    this._type     = null;
     this._raw_type = undefined;
     this._raw      = undefined;
   }
@@ -79,7 +81,7 @@ export class TextReader implements Reader {
     this.stepIn();
     while (this.depth() > d) {
       type = this.next();
-      if (type === undefined) { // end of container
+      if (type === null) { // end of container
           this.stepOut();
       } else if (type.container && !this.isNull()) {
           this.stepIn();
@@ -87,24 +89,42 @@ export class TextReader implements Reader {
     }
   }
 
-    isIVM(input : string) : boolean {
-        if(this.depth() > 0) return false;
-        if(input.length < 6 || this.annotations().length > 0) return false;
-        let prefix = "$ion_";
-        for(let i = 0; i < prefix.length; i++){
-            if(prefix.charAt(i) !== input.charAt(i)) return false;
-        }
-        if(input !== "$ion_1_0") throw new Error("Only ion version 1.0 is supported.");
-        return true;
+  isIVM(input : string, depth : number, annotations : string[]) : boolean {
+    if (depth > 0) return false;
+    const ivm = "$ion_1_0";
+    const prefix = "$ion_";
+    if (input.length < ivm.length || annotations.length > 0) return false;
+
+    let i = 0;
+
+    while (i < prefix.length) {
+      if (prefix.charAt(i) !== input.charAt(i)) return false;
+      i++;
     }
+
+    while (i < input.length && input.charAt(i) != '_') {
+      let ch = input.charAt(i);
+      if (ch < '0' || ch > '9') return false;
+      i++;
+    }
+    i++;
+
+    while (i < input.length) {
+      let ch = input.charAt(i);
+      if (ch < '0' || ch > '9') return false;
+      i++;
+    }
+    if (input !== ivm) throw new Error("Only Ion version 1.0 is supported.");
+    return true;
+  }
 
     isLikeIVM() : boolean {
       return false;
     }
 
-next() {
+  next() {
     this._raw = undefined;
-    if (this._raw_type === EOF) return undefined;
+    if (this._raw_type === EOF) return null;
 
     let should_skip: boolean =
     this._raw_type !== BEGINNING_OF_CONTAINER
@@ -119,7 +139,7 @@ next() {
         if (this._raw_type === T_IDENTIFIER) {
             if (this._depth > 0) break;
             this.load_raw();
-            if (!this.isIVM(this._raw)) break;
+            if (!this.isIVM(this._raw, this.depth(), this.annotations())) break;
             this._symtab = defaultLocalSymbolTable();
             this._raw = undefined;
             this._raw_type = undefined;
@@ -155,6 +175,7 @@ next() {
       throw new Error("Can't step into a null container");
     }
     this._parser.clearFieldName();
+    this._type = null;
     this._raw_type = BEGINNING_OF_CONTAINER;
     this._depth++;
   }
@@ -168,7 +189,7 @@ next() {
     this._depth--;
   }
 
-  valueType() : IonType {
+  type() : IonType {
     return this._type;
   }
 
@@ -199,7 +220,7 @@ next() {
     return this._parser.isNull();
   }
 
-    stringValue() : string {
+    _stringRepresentation() : string {
         this.load_raw();
         if (this.isNull()) return (this._type === IonTypes.NULL) ? "null" : "null." + this._type.name;
         if (this._type.scalar) {
@@ -207,13 +228,13 @@ next() {
             // value otherwise all other scalars are fine as is
             switch(this._type) {
                 case IonTypes.BLOB:
-                    throw new Error("Blobs currently unsupported.");
+                    return this._raw;
                 case IonTypes.SYMBOL:
                     if(this._raw_type === T_IDENTIFIER && (this._raw.length > 1 && this._raw.charAt(0) === '$'.charAt(0))){
                         let tempStr = this._raw.substr(1, this._raw.length);
                         if (+tempStr === +tempStr) {//look up sid, +str === +str is a one line is integer hack
                             let symbol = this._symtab.getSymbol(Number(tempStr));
-                            if(symbol === undefined) throw new Error("Unresolveable symbol ID, symboltokens unsupported.");
+                            if(symbol === undefined) throw new Error("Unresolvable symbol ID, symboltokens unsupported.");
                             return symbol;
                         }
                     }
@@ -226,68 +247,111 @@ next() {
         }
     }
 
-  numberValue() {
-    if (!this._type.num) {
-      return undefined;
+    booleanValue() {
+        switch (this._type) {
+            case IonTypes.NULL: return null;
+            case IonTypes.BOOL: return this._parser.booleanValue();
+        }
+        throw new Error('Current value is not a Boolean.')
     }
-    return this._parser.numberValue();
-  }
 
-  byteValue() : number[] {
-    throw new Error("E_NOT_IMPL: byteValue");
-  }
-
-  booleanValue() {
-    if (this._type !== IonTypes.BOOL) {
-      return undefined;
+    byteValue(): Uint8Array {
+        this.load_raw();
+        switch (this._type) {
+            case IonTypes.NULL: return null;
+            case IonTypes.BLOB:
+                if (this.isNull()) {
+                    return null;
+                }
+                return fromBase64(this._raw);
+            case IonTypes.CLOB:
+                if (this.isNull()) {
+                    return null;
+                }
+                return encodeUtf8(this._raw);
+        }
+        throw new Error('Current value is not a blob or clob.');
     }
-    return this._parser.booleanValue();
-  }
 
     decimalValue() : Decimal {
-        return Decimal.parse(this.stringValue());
+        switch (this._type) {
+            case IonTypes.NULL: return null;
+            case IonTypes.DECIMAL: return Decimal.parse(this._stringRepresentation());
+        }
+        throw new Error('Current value is not a decimal.')
+    }
+
+    numberValue() {
+        switch (this._type) {
+            case IonTypes.NULL: return null;
+            case IonTypes.FLOAT:
+            case IonTypes.INT: return this._parser.numberValue();
+        }
+        throw new Error('Current value is not a float or int.');
+    }
+
+    stringValue() : string {
+        this.load_raw();
+        switch (this._type) {
+            case IonTypes.NULL: return null;
+            case IonTypes.STRING:
+                if (this._parser.isNull()) {
+                    return null;
+                }
+                return this._raw;
+            case IonTypes.SYMBOL:
+                if (this._parser.isNull()) {
+                    return null;
+                }
+                if(this._raw_type === T_IDENTIFIER && (this._raw.length > 1 && this._raw.charAt(0) === '$'.charAt(0))){
+                    let tempStr = this._raw.substr(1, this._raw.length);
+                    if (+tempStr === +tempStr) {//look up sid, +str === +str is a one line is integer hack
+                        let symbol = this._symtab.getSymbol(Number(tempStr));
+                        if(symbol === undefined) throw new Error("Unresolvable symbol ID, symboltokens unsupported.");
+                        return symbol;
+                    }
+                }
+                return this._raw;
+        }
+        throw new Error('Current value is not a string or symbol.');
     }
 
     timestampValue() : Timestamp {
-        return Timestamp.parse(this.stringValue());
+        switch (this._type) {
+            case IonTypes.NULL: return null;
+            case IonTypes.TIMESTAMP:
+                return Timestamp.parse(this._stringRepresentation());
+        }
+        throw new Error('Current value is not a timestamp.')
     }
 
-    value() {
+    value(): any {
+        if (this._type && this._type.container) {
+            if (this.isNull()) {
+                return null;
+            }
+            throw new Error('Unable to provide a value for ' + this._type.name + ' containers.');
+        }
         switch(this._type) {
-            case IonTypes.BOOL : {
+            case IonTypes.NULL:
+                return null;
+            case IonTypes.BLOB:
+            case IonTypes.CLOB:
+                return this.byteValue();
+            case IonTypes.BOOL:
                 return this.booleanValue();
-            }
-            case IonTypes.INT : {
-                return this.numberValue();
-            }
-            case IonTypes.FLOAT : {
-                return this.numberValue();
-            }
-            case IonTypes.DECIMAL : {
+            case IonTypes.DECIMAL:
                 return this.decimalValue();
-            }
-            case IonTypes.SYMBOL : {
+            case IonTypes.FLOAT:
+            case IonTypes.INT:
+                return this.numberValue();
+            case IonTypes.STRING:
+            case IonTypes.SYMBOL:
                 return this.stringValue();
-            }
-            case IonTypes.STRING : {
-                return this.stringValue();
-            }
-            case IonTypes.TIMESTAMP : {
+            case IonTypes.TIMESTAMP:
                 return this.timestampValue();
-            }
-            case IonTypes.CLOB : {
-                return this.stringValue();
-            }
-            case IonTypes.BLOB : {
-                return this.stringValue();
-            }
-            default : {
-                return undefined;
-            }
+            default:
+                throw new Error('There is no current value.');
         }
     }
-
-  ionValue() {
-    throw new Error("E_NOT_IMPL: ionValue");
-  }
-}
+};

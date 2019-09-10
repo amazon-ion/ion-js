@@ -22,7 +22,7 @@ module.exports = function(grunt) {
       es6: {
         options: {
           config: 'tests/intern',
-          reporters: ['Console', 'node_modules/remap-istanbul/lib/intern-reporters/JsonCoverage'],
+          reporters: ['Runner'],
           ionVersion: 'es6',
         },
       },
@@ -40,12 +40,6 @@ module.exports = function(grunt) {
        */
     typedoc: {
       build: {
-        options: {
-          module: 'amd',
-          target: 'es6',
-          out: 'docs/api/',
-          name: 'Ion Library',
-        },
         src: 'src/**/*'
       }
     },
@@ -56,43 +50,23 @@ module.exports = function(grunt) {
     remapIstanbul: {
       build: {
         src: 'coverage-final.json',
-          options: {
-            reports: {
-              'html': 'docs/coverage/html',
-              'json': 'docs/coverage/coverage-final-mapped.json'
-            }
+        options: {
+          reports: {
+            'html': 'docs/coverage/html',
+            'json': 'docs/coverage/coverage-final-mapped.json'
           }
+        }
       }
     },
     ts: {
-      'amd-es6-debug': {
-        src: ['src/**/*.ts'],
-        outDir: 'dist/amd/es6',
-        options: {
-          target: "es6",
-          module: "amd",
-          declaration: true,
-          sourceMap: true  // generate .map files for debugging
-        }
+      'es6-es6': {
+        tsconfig: 'tsconfig.json'
       },
- 
       'amd-es6': {
-        src: ['src/**/*.ts'],
-        outDir: 'dist/amd/es6',
-        options: {
-          target: "es6",
-          module: "amd",
-          declaration: true,
-        }
+        tsconfig: 'tsconfig.amd.json'
       },
       'commonjs-es6': {
-        src: ['src/**/*.ts'],
-        outDir: 'dist/commonjs/es6',
-        options: {
-          target: "es6",
-          module: "commonjs",
-          declaration: true
-        }
+        tsconfig: 'tsconfig.commonjs.json'
       }
     },
       /**
@@ -117,21 +91,43 @@ module.exports = function(grunt) {
             dest: 'docs/',
           }
         ]
+      }, 
+      bigInt: {
+        files: [
+          {
+            expand: true,
+            src: ['BigInteger.js', 'src/BigInteger.d.ts'],
+            dest: 'dist/es6/es6/',
+            flatten: true
+          },
+          {
+            expand: true,
+            src: ['BigInteger.js','./src/BigInteger.d.ts'],
+            dest: 'dist/commonjs/es6/',
+            flatten: true
+          },
+          {
+            expand: true,
+            src: ['BigInteger.js','./src/BigInteger.d.ts'],
+            dest: 'dist/amd/es6/',
+            flatten: true
+          }
+        ]
       }
     },
     babel: { 
       options: { 
         sourceMap: true, 
-        presets: ['es2015']
+        presets: ['@babel/preset-env']
       },
-      dist: { 
-        files: [{ 
-          'expand': true, 
+      dist: {
+        files: [{
+          'expand': true,
           cwd: 'dist/amd/es6',
-          'src': ['*.js'], 
-          'dest': 'dist/amd/es5/', 
+          'src': ['*.js'],
+          'dest': 'dist/amd/es5/',
           'ext': '.js',
-        }], 
+        }],
       },
     },
     /**
@@ -150,9 +146,9 @@ module.exports = function(grunt) {
          },
         transform: [["babelify", 
                      { 
-                       "presets": ["es2015"],
-                       "plugins" : [["transform-runtime", {"polyfill" : true}],
-                                    ["transform-object-assign"]]
+                       "presets": ["@babel/preset-env"], // TODO this targets ES2015, we should be more specific
+                       "plugins" : [["@babel/transform-runtime"],
+                                    ["@babel/transform-object-assign"]]
                      }]],
         }
       },
@@ -166,9 +162,9 @@ module.exports = function(grunt) {
          },
         transform: [["babelify", 
                      { 
-                       "presets": ["es2015"],
-                       "plugins" : [["transform-runtime", {"polyfill" : true}],
-                                    ["transform-object-assign"]]
+                       "presets": ["@babel/preset-env"], // TODO this targets ES2015, we should be more specific
+                       "plugins" : [["@babel/transform-runtime"],
+                                    ["@babel/transform-object-assign"]]
                      }]],
         }
       }
@@ -203,11 +199,12 @@ module.exports = function(grunt) {
   // Build and Translation tasks 
   grunt.registerTask('build:browser', ['build', 'browserify:prod', 'uglify']); // standalone for browser
   grunt.registerTask('trans:browser', ['browserify:prod', 'uglify']); // browserify (assumes 'build' was run)
+  grunt.registerTask('build:es6', ['ts:es6-es6']);
   grunt.registerTask('build:cjs', ['ts:commonjs-es6']);
   grunt.registerTask('build:amd', ['ts:amd-es6']);
-  grunt.registerTask('build:amd:debug', ['ts:amd-es6-debug']); 
-  grunt.registerTask('build', ['clean', 'build:amd', 'build:cjs','trans:browser', 'copy:all']);
-
+  grunt.registerTask('build', [
+      'clean', 'build:es6', 'build:amd', 'build:cjs', 'copy:bigInt', 'trans:browser', 'copy:all'
+  ]);
 
   // Tests
   grunt.registerTask('test', ['build', 'intern:es6']);     // build and test
@@ -222,10 +219,13 @@ module.exports = function(grunt) {
 
   grunt.registerTask('doc', ['typedoc']);
 
+  grunt.registerTask('cleanup', 'Removes extraneous files from distributions', function() {
+    grunt.file.expand('dist/**/IonEvent*', 'dist/**/IonTests.*').forEach((file) => grunt.file.delete(file));
+  });
 
   // release target used by Travis 
-  grunt.registerTask('release', ['build', 'test:run', 'test:coverage', 'typedoc', 'nojekyll']);
+  grunt.registerTask('release', ['build', 'test:run', 'test:coverage', 'cleanup', 'typedoc', 'nojekyll']);
 
   // default for development
-  grunt.registerTask('default', ['test']);
+  grunt.registerTask('default', ['test', 'cleanup']);
 };

@@ -11,8 +11,6 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-import { isNullOrUndefined } from "./IonUtilities";
-import { isUndefined } from "./IonUtilities";
 import { SharedSymbolTable } from "./IonSharedSymbolTable";
 import { SymbolIndex } from "./IonSymbolIndex";
 
@@ -47,9 +45,10 @@ export class Import {
     }
 
     getSymbol(symbolId: number) : string {
-        if (!isNullOrUndefined(this.parent)) {
+        if(this.parent === undefined) throw new Error("Illegal parent state.");
+        if (this.parent !== null) {
             let parentSymbol = this.parent.getSymbol(symbolId);
-            if (!isUndefined(parentSymbol)) {
+            if (parentSymbol) {
                 return parentSymbol;
             }
         }
@@ -58,8 +57,6 @@ export class Import {
         if (index < this.length) {
             return this.symbolTable.symbols[index];
         }
-
-        return undefined;
     }
 
     getSymbolId(symbol_: string) : number {

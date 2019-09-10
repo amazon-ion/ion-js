@@ -11,31 +11,49 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-import { Decimal } from "./IonDecimal";
-import { Timestamp } from "./IonTimestamp";
-import { TypeCodes } from "./IonBinary";
+import {Decimal} from "./IonDecimal";
+import {IonType} from "./IonType";
+import {Reader} from "./IonReader";
+import {Timestamp} from "./IonTimestamp";
 
 /**
  * Writes values in the Ion text or binary formats.
  */
 export interface Writer {
-  writeBlob(value: number[], annotations?: string[]) : void;
-  writeBoolean(value: boolean, annotations?: string[]) : void;
-  writeClob(value: number[], annotations?: string[]) : void;
-  writeDecimal(value: Decimal, annotations?: string[]) : void;
+  writeBlob(value: Uint8Array) : void;
+  writeBoolean(value: boolean) : void;
+  writeClob(value: Uint8Array) : void;
+  writeDecimal(value: Decimal) : void;
   writeFieldName(fieldName: string) : void;
-  writeFloat32(value: number, annotations?: string[]) : void;
-  writeFloat64(value: number, annotations?: string[]) : void;
-  writeInt(value: number, annotations?: string[]) : void;
-  writeList(annotations?: string[], isNull?: boolean) : void;
-  writeNull(type_: TypeCodes, annotations?: string[]) : void;
-  writeSexp(annotations?: string[], isNull?: boolean) : void;
-  writeString(value: string, annotations?: string[]) : void;
-  writeStruct(annotations?: string[], isNull?: boolean) : void;
-  writeSymbol(value: string, annotations?: string[]) : void;
-  writeTimestamp(value: Timestamp, annotations?: string[]) : void;
-  getBytes(): number[];
+  writeFloat32(value: number) : void;
+  writeFloat64(value: number) : void;
+  writeInt(value: number) : void;
+  writeNull(type: IonType) : void;
+  writeString(value: string) : void;
+  writeSymbol(value: string) : void;
+  writeTimestamp(value: Timestamp) : void;
+  stepIn(type: IonType) : void;
+  stepOut() : void;
+  getBytes(): Uint8Array;
+
+  /**
+   * Adds an annotation to the list of annotations to be used when
+   * writing the next value.
+   */
+  addAnnotation(annotation: string) : void;
+
+  /**
+   * Specifies the list of annotations to be used when writing
+   * the next value.
+   */
+  setAnnotations(annotations: string[]) : void;
 
   close() : void;
-  endContainer() : void;
+
+  /**
+   * Writes a reader's current value and all following values until the end
+   * of the current container.  If there's no current value then this method
+   * calls {@link next()} to get started.
+   */
+  writeValues(reader: Reader) : void;
 }

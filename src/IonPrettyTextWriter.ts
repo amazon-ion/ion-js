@@ -12,12 +12,15 @@
  * language governing permissions and limitations under the License.
  */
 
-import { State, TextWriter } from "./IonTextWriter";
-import { Writeable } from "./IonWriteable";
-import { TypeCodes } from "./IonBinary";
-import { CharCodes } from "./IonText";
-import { isNullOrUndefined } from "./IonUtilities";
+import {State, TextWriter} from "./IonTextWriter";
+import {Writeable} from "./IonWriteable";
+import {CharCodes} from "./IonText";
+import {IonType} from "./IonType";
+import {IonTypes} from "./IonTypes";
+import {Reader} from "./IonReader";
+import {_writeValues} from "./util";
 type Serializer<T> = (value: T) => void;
+
 /*
  * This class and functionality carry no guarantees of correctness or support.
  * Do not rely on this functionality for more than front end formatting.
@@ -27,7 +30,7 @@ export class PrettyTextWriter extends TextWriter {
     constructor(writeable: Writeable, private readonly indentSize : number = 2) { super(writeable);}
 
     private writePrettyValue() : void {
-        if(!this.isTopLevel && this.currentContainer.containerType && this.currentContainer.containerType !== TypeCodes.STRUCT){
+        if(!this.isTopLevel && this.currentContainer.containerType && this.currentContainer.containerType !== IonTypes.STRUCT){
             this.writePrettyIndent(0);
         }
     }
@@ -47,7 +50,7 @@ export class PrettyTextWriter extends TextWriter {
     }
 
     writeFieldName(fieldName: string) : void {
-        if (this.currentContainer.containerType !== TypeCodes.STRUCT) {
+        if (this.currentContainer.containerType !== IonTypes.STRUCT) {
             throw new Error("Cannot write field name outside of a struct");
         }
         if (this.currentContainer.state !== State.STRUCT_FIELD) {
@@ -66,64 +69,22 @@ export class PrettyTextWriter extends TextWriter {
         this.currentContainer.state = State.VALUE;
     }
 
-    writeNull(type_: TypeCodes, annotations?: string[]) : void {
+    writeNull(type: IonType) : void {
+        if (type === null || type === undefined || type.bid < 0 || type.bid > 13) {
+            throw new Error(`Cannot write null for type ${type}`);
+        }
         this.handleSeparator();
         this.writePrettyValue();
-        this.writeAnnotations(annotations);
-        let s: string;
-        switch (type_) {
-            case TypeCodes.NULL:
-                s = "null";
-                break;
-            case TypeCodes.BOOL:
-                s = "bool";
-                break;
-            case TypeCodes.POSITIVE_INT:
-            case TypeCodes.NEGATIVE_INT:
-                s = "int";
-                break;
-            case TypeCodes.FLOAT:
-                s = "float";
-                break;
-            case TypeCodes.DECIMAL:
-                s = "decimal";
-                break;
-            case TypeCodes.TIMESTAMP:
-                s = "timestamp";
-                break;
-            case TypeCodes.SYMBOL:
-                s = "symbol";
-                break;
-            case TypeCodes.STRING:
-                s = "string";
-                break;
-            case TypeCodes.CLOB:
-                s = "clob";
-                break;
-            case TypeCodes.BLOB:
-                s = "blob";
-                break;
-            case TypeCodes.LIST:
-                s = "list";
-                break;
-            case TypeCodes.SEXP:
-                s = "sexp";
-                break;
-            case TypeCodes.STRUCT:
-                s = "struct";
-                break;
-            default:
-                throw new Error(`Cannot write null for type ${type_}`);
-        }
-        this.writeUtf8("null." + s);
-        if (this.currentContainer.containerType === TypeCodes.STRUCT) this.currentContainer.state = State.STRUCT_FIELD;
+        this.writeAnnotations();
+        this.writeUtf8("null." + type.name);
+        if (this.currentContainer.containerType === IonTypes.STRUCT) this.currentContainer.state = State.STRUCT_FIELD;
     }
 
-    endContainer() : void {
+    stepOut() : void {
         let currentContainer = this.containerContext.pop();
         if (!currentContainer || !currentContainer.containerType) {
             throw new Error("Can't step out when not in a container");
-        } else if (currentContainer.containerType === TypeCodes.STRUCT && currentContainer.state === State.VALUE) {
+        } else if (currentContainer.containerType === IonTypes.STRUCT && currentContainer.state === State.VALUE) {
             throw new Error("Expecting a struct value");
         }
 
@@ -132,48 +93,44 @@ export class PrettyTextWriter extends TextWriter {
         }
         this.writePrettyIndent(-1);
         switch (currentContainer.containerType) {
-            case TypeCodes.LIST:
+            case IonTypes.LIST:
                 this.writeable.writeByte(CharCodes.RIGHT_BRACKET);
                 break;
-            case TypeCodes.SEXP:
+            case IonTypes.SEXP:
                 this.writeable.writeByte(CharCodes.RIGHT_PARENTHESIS);
                 break;
-            case TypeCodes.STRUCT:
+            case IonTypes.STRUCT:
                 this.writeable.writeByte(CharCodes.RIGHT_BRACE);
                 break;
             default :
-                throw new Error("Unexpected container TypeCode");
+                throw new Error("Unexpected container type");
         }
     }
 
-    writeValue<T>(typeCode: TypeCodes, value: T, annotations: string[], serialize: Serializer<T>) {
+    writeValue<T>(type: IonType, value: T, serialize: Serializer<T>) {
         if (this.currentContainer.state === State.STRUCT_FIELD) throw new Error("Expecting a struct field");
-        if (isNullOrUndefined(value)) {
-            this.writeNull(typeCode, annotations);
+        if (value === null || value === undefined) {
+            this.writeNull(type);
             return;
         }
 
         this.handleSeparator();
         this.writePrettyValue();
-        this.writeAnnotations(annotations);
+        this.writeAnnotations();
         serialize(value);
-        if (this.currentContainer.containerType === TypeCodes.STRUCT) this.currentContainer.state = State.STRUCT_FIELD;
+        if (this.currentContainer.containerType === IonTypes.STRUCT) this.currentContainer.state = State.STRUCT_FIELD;
     }
 
-    writeContainer(typeCode: TypeCodes, openingCharacter: number, annotations?: string[], isNull?: boolean) : void {
-        if (isNull) {
-            this.writeNull(typeCode, annotations);
-            return;
-        }
-        if(this.currentContainer.containerType === TypeCodes.STRUCT && this.currentContainer.state === State.VALUE){
+    writeContainer(type: IonType, openingCharacter: number) : void {
+        if(this.currentContainer.containerType === IonTypes.STRUCT && this.currentContainer.state === State.VALUE){
             this.currentContainer.state = State.STRUCT_FIELD;
         }
         this.handleSeparator();
         this.writePrettyValue();
-        this.writeAnnotations(annotations);
+        this.writeAnnotations();
         this.writeable.writeByte(openingCharacter);
         this.writePrettyNewLine(1);
-        this.stepIn(typeCode);
+        this._stepIn(type);
     }
 
     handleSeparator() : void {
@@ -188,11 +145,11 @@ export class PrettyTextWriter extends TextWriter {
                 this.currentContainer.clean = false;
             } else {
                 switch (this.currentContainer.containerType) {
-                    case TypeCodes.LIST:
+                    case IonTypes.LIST:
                         this.writeable.writeByte(CharCodes.COMMA);
                         this.writePrettyNewLine(0);
                         break;
-                    case TypeCodes.SEXP:
+                    case IonTypes.SEXP:
                         this.writeable.writeByte(CharCodes.SPACE);
                         this.writePrettyNewLine(0);
                         break;
@@ -201,5 +158,9 @@ export class PrettyTextWriter extends TextWriter {
                 }
             }
         }
+    }
+
+    writeValues(reader: Reader): void {
+        _writeValues(reader, this);
     }
 }

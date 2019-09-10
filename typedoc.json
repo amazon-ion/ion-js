@@ -1,0 +1,32 @@
+{
+  "name": "Ion-JS Library",
+
+  "excludeNotExported": true,
+  "excludePrivate": true,
+  "excludeProtected": true,
+
+  "exclude": [
+    "src/AbstractWriter.ts",
+    "src/IonConstants.ts",
+    "src/IonImport.ts",
+    "src/IonLongInt.ts",
+    "src/IonSubstituteSymbolTable.ts",
+    "src/IonSpan.ts",
+    "src/IonSymbol.ts",
+    "src/IonSymbolIndex.ts",
+    "src/IonUnicode.ts",
+    "src/IonValue.ts",
+    "src/IonWriteable.ts",
+    "src/util.ts",
+
+    "src/IonBinary*.ts",
+    "src/Ion+(Pretty|)Text*.ts",
+    "src/*Raw.ts",
+    "src/IonLowLevel*.ts",
+
+    "src/IonTest*.ts",
+    "src/IonEvent*.ts"
+  ],
+
+  "out": "docs/api/"
+}

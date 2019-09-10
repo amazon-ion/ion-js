@@ -11,9 +11,8 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-import { isNumber } from "./IonUtilities";
-import { isUndefined } from "./IonUtilities";
 import { Writeable } from "./IonWriteable";
+import {_sign} from "./util";
 
 /**
  * Values in the Ion binary format are serialized as a sequence of low-level fields. This
@@ -22,131 +21,108 @@ import { Writeable } from "./IonWriteable";
  */
 export class LowLevelBinaryWriter {
   private readonly writeable: Writeable;
-  private numberBuffer: number[] = new Array(10);
 
-  constructor(writeableOrLength: Writeable | number) {
-    if (isNumber(writeableOrLength)) {
-      this.writeable = new Writeable();
-    } else {
-      this.writeable = <Writeable>writeableOrLength;
-    }
-  }
-
-  writeSignedInt(originalValue: number, length: number) : void {
-    if (length > this.numberBuffer.length) {
-      this.numberBuffer = new Array(length);
+  constructor(writeable : Writeable) {
+        this.writeable = writeable;
     }
 
+
+  writeSignedInt(originalValue: number) : void {//TODO this should flip to different modes based on the length calculation because bit shifting will drop to 32 bits.
+    let length = LowLevelBinaryWriter.getSignedIntSize(originalValue);
     let value: number = Math.abs(originalValue);
-
+    let tempBuf = new Uint8Array(length);
     // Trailing bytes
-    let i: number = this.numberBuffer.length;
+    let i: number = tempBuf.length;
     while (value >= 128) {
-      this.numberBuffer[--i] = value & 0xFF;
+      tempBuf[--i] = value & 0xFF;
       value >>>= 8;
     }
 
-    this.numberBuffer[--i] = value;
-
-    // Padding
-    let bytesWritten: number = this.numberBuffer.length - i;
-    for (let j: number = 0; j < length - bytesWritten; j++) {
-      this.numberBuffer[--i] = 0;
-    }
-
-    if (bytesWritten > length) {
-      throw new Error(`Value ${value} cannot fit into ${length} bytes`);
-    }
+    tempBuf[--i] = value & 0xFF;
 
     // Sign bit
-    if (originalValue < 0) {
-      this.numberBuffer[i] |= 0x80;
-    }
+    if (1/originalValue < 0) tempBuf[0] |= 0x80;
 
-    this.writeable.writeBytes(this.numberBuffer, i);
+    this.writeable.writeBytes(tempBuf);
   }
 
-  writeUnsignedInt(originalValue: number, length?: number) : void {
-    if (isUndefined(length)) {
-      length = LowLevelBinaryWriter.getUnsignedIntSize(originalValue)
-    }
-    if (length > this.numberBuffer.length) {
-      this.numberBuffer = new Array(length);
-    }
+  writeUnsignedInt(originalValue: number) : void {
+    let length = LowLevelBinaryWriter.getUnsignedIntSize(originalValue);
+    let tempBuf = new Uint8Array(length);
+
 
     let value: number = originalValue;
-    let i: number = this.numberBuffer.length;
+    let i: number = tempBuf.length;
 
     while (value > 0) {
-      this.numberBuffer[--i] = value & 0xFF;
-      value >>>= 8;
+      // JavaScript bitwise operators treat operands as 32-bit sequences,
+      // so we avoid using >>> in order to support values requiring more than 32 bits
+      tempBuf[--i] = value % 256;
+      value = Math.trunc(value / 256);
     }
 
-    // Padding
-    let bytesWritten: number = this.numberBuffer.length - i;
-    for (let j: number = 0; j < length - bytesWritten; j++) {
-      this.numberBuffer[--i] = 0;
-    }
-
-    if (bytesWritten > length) {
-      throw new Error(`Value ${value} cannot fit into ${length} bytes`);
-    }
-
-    this.writeable.writeBytes(this.numberBuffer, i);
+    this.writeable.writeBytes(tempBuf);
   }
 
   writeVariableLengthSignedInt(originalValue: number) : void {
-    if (!Number['isInteger'](originalValue)) {
-      throw new Error(`Cannot call writeVariableLengthSignedInt with non-integer value ${originalValue}`);
-    }
-
+    let tempBuf = new Uint8Array(LowLevelBinaryWriter.getVariableLengthSignedIntSize(originalValue));
     let value: number = Math.abs(originalValue);
-    let i: number = this.numberBuffer.length - 1;
+    let i = tempBuf.length - 1;
 
     while (value >= 64) {
-      this.numberBuffer[i--] = value & 0x7F;
+      tempBuf[i--] = value & 0x7F;
       value >>>= 7;
     }
 
     // Leading byte
-    this.numberBuffer[i] = value;
+    tempBuf[i] = value;
 
     // Sign bit
-    if (originalValue < 0) {
-      this.numberBuffer[i] |= 0x40;
+    if (1/originalValue < 0) {
+      tempBuf[i] |= 0x40;
     }
 
     // Stop bit
-    this.numberBuffer[this.numberBuffer.length - 1] |= 0x80;
+    tempBuf[tempBuf.length - 1] |= 0x80;
 
-    this.writeable.writeBytes(this.numberBuffer, i, this.numberBuffer.length - i);
+    this.writeable.writeBytes(tempBuf);
   }
 
-  writeVariableLengthUnsignedInt(originalValue: number) : void {
-    let value: number = originalValue;
-    let i: number = this.numberBuffer.length;
+    writeVariableLengthUnsignedInt(originalValue: number) : void {
+        let tempBuf = new Uint8Array(LowLevelBinaryWriter.getVariableLengthUnsignedIntSize(originalValue));
+        let value: number = originalValue;
+        let i = tempBuf.length;
 
-    this.numberBuffer[--i] = (value & 0x7F) | 0x80;
-    value >>>= 7;
+        tempBuf[--i] = (value & 0x7F) | 0x80;
+        value >>>= 7;
 
-    while (value > 0) {
-      this.numberBuffer[--i] = value & 0x7F
-      value >>>= 7;
+        while (value > 0) {
+            tempBuf[--i] = value & 0x7F
+            value >>>= 7;
+        }
+
+        this.writeable.writeBytes(tempBuf);
     }
-
-    this.writeable.writeBytes(this.numberBuffer, i);
-  }
 
   writeByte(byte: number) : void {
     this.writeable.writeByte(byte);
   }
 
-  writeBytes(bytes: number[]) : void {
+  writeBytes(bytes: Uint8Array) : void {
     this.writeable.writeBytes(bytes);
   }
 
-  getBytes(): number[] {
+  getBytes(): Uint8Array {
     return this.writeable.getBytes();
+  }
+
+  static getSignedIntSize(value : number) : number {
+      if (value === 0) return 1;
+      let absValue = Math.abs(value);
+      let numberOfBits = Math.floor(Math['log2'](absValue));
+      let numberOfBytes = Math.ceil(numberOfBits / 8);
+      if(numberOfBits % 8 === 0) numberOfBytes++;
+      return numberOfBytes;
   }
 
   static getUnsignedIntSize(value: number) : number {

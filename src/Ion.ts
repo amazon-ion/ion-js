@@ -15,115 +15,74 @@ import { BinaryReader } from "./IonBinaryReader";
 import { Catalog } from "./IonCatalog";
 import { IVM } from "./IonConstants";
 import { Reader } from "./IonReader";
-import { Span, makeSpan, StringSpan } from "./IonSpan";
+import { StringSpan, BinarySpan } from "./IonSpan";
 import { TextReader } from "./IonTextReader";
-import { InvalidArgumentError } from "./IonErrors";
 import { Writer } from "./IonWriter";
 import { TextWriter } from "./IonTextWriter";
 import { PrettyTextWriter } from "./IonPrettyTextWriter";
 import { Writeable } from "./IonWriteable";
 import { BinaryWriter } from "./IonBinaryWriter";
 import { LocalSymbolTable, defaultLocalSymbolTable } from "./IonLocalSymbolTable";
-import { IonEventStream } from "./IonEventStream";
-
-const e = {
-  name: "IonError",
-  where: undefined,
-  msg: "error",
-}
-
+import { decodeUtf8 } from "./IonUnicode";
 
 /**
- * Options object to be passed during the creation of an Ion Reader.
- * Holds the Ion catalogue @see http://amzn.github.io/ion-docs/symbols.html#the-catalog
- * and the Ion source type (i.e., binary or text) as a `string`
- */
-export interface Options {
-  catalog: Catalog;
-  sourceType: string;
-}
-
-/**
- * Returns the `buf` type as binary or text. 
+ * Indicates whether the provided buffer contains binary Ion data.
  * 
- * @param buffer we want to check its type 
- * @returns either `'binary'` or `'text'`
+ * @param buffer    The buffer of data to inspect.
+ * @returns         True if the provided buffer begins with a binary Ion version marker, false otherwise.
  */
-function get_buf_type(buf: Span) {
-  var firstByte = buf.valueAt(0);
-  return (firstByte === IVM.binary[0]) ? 'binary' : 'text';
-}
-
-function makeBinaryReader(span: Span, options: Options) : BinaryReader {
-  return new BinaryReader(span, options && options.catalog);
-}
-
-function makeTextReader(span: StringSpan, options: Options) : TextReader {
-  return new TextReader(span, options && options.catalog);
-}
-
-/**
- * Wrapper method to capture and/or propagate exceptions occuring during span creation.
- *
- * @param buf value passed in that should represent Ion data, typically as a `string`
- * @returns {Span}
- */
-function asSpan(buf: any) : Span {
-  try {
-    return  makeSpan(buf)
-  } catch (e) {
-    if (e instanceof InvalidArgumentError) {
-      throw new Error("Invalid argument, expected \'string\' value found:  " + buf);
-    } else {
-      throw e;
+function isBinary(buffer: Uint8Array): boolean {
+    if (buffer.length < 4) {
+        return false;
     }
-  }
+    for(let i = 0; i < 4; i++){
+        if(buffer[i] !== IVM.binary[i]) return false;
+    }
+  return true;
 }
 
+/** Octet buffer input types for the Ion reader interface. */
+export type ReaderOctetBuffer = ArrayBufferLike | ArrayLike<number>;
+
+/** All buffer input types for the Ion reader interface. */
+export type ReaderBuffer = ReaderOctetBuffer | string;
+
 /**
- * Create an Ion Reader object from a buffer `buf` and `options`.
+ * Create an {Reader} over Ion data in a {ReaderBuffer}.
  *
- *
- * @param buf the Ion data to be used by the reader. Typically a string.
- * @param options for the reader including catalogue and type of source, e.g., `'binary'` or `'text'`
+ * @param buf       The Ion data to be used by the reader. Typically a string, UTF-8 encoded buffer (text), or raw
+ *                  binary buffer.
+ * @param catalog   An optional {Catalog} to be used for resolving symbol table references.
  * @returns {Reader}
  */
-export function makeReader(buf: any, options: Options) : Reader {
-  let inSpan : Span = asSpan(buf);
-  let stype =  options && isSourceType(options.sourceType)
-                ? options.sourceType
-                : get_buf_type(inSpan);
-  let reader: Reader = (stype === 'binary')
-             ? makeBinaryReader(inSpan, options)
-             : makeTextReader(<StringSpan>inSpan, options);
-  return reader;
+export function makeReader(buf: ReaderBuffer, catalog? : Catalog) : Reader {
+    if((typeof buf) === "string"){
+        return new TextReader(new StringSpan(<string>buf), catalog);
+    }
+    const bufArray = new Uint8Array(buf as ReaderOctetBuffer);
+    if(isBinary(bufArray)){
+        return new BinaryReader(new BinarySpan(bufArray), catalog);
+    } else {
+        return new TextReader(new StringSpan(decodeUtf8(bufArray)), catalog);
+    }
 }
 
-
-function isSourceType(val) : boolean {
-  return val === 'text' || val === 'binary';
-}
-
-/**
- * Create a new Ion Text Writer.
- *
- * @returns {TextWriter}
- */
+/** Creates a new Ion Text Writer. */
 export function makeTextWriter() : Writer {
   return new TextWriter(new Writeable());
 }
 
+/** Creates a new Ion Text Writer with pretty printing of the text. */
 export function makePrettyWriter(indentSize?: number) : Writer {
     return new PrettyTextWriter(new Writeable(), indentSize);
 }
 
 
 /**
- * Create a new Ion Binary Writer. You can optionally provide a local symbol table else
+ * Creates a new Ion Binary Writer. You can optionally provide a local symbol table else
  * the default local symbol table will be used.
  *
  * @param localSymbolTable to use for the new writer
- * @returns {BinaryWriter}
  */
 export function makeBinaryWriter(localSymbolTable : LocalSymbolTable = defaultLocalSymbolTable()) : Writer {
   return new BinaryWriter(localSymbolTable, new Writeable());
@@ -135,10 +94,7 @@ export { Catalog } from "./IonCatalog";
 export { Decimal } from "./IonDecimal";
 export { defaultLocalSymbolTable } from "./IonLocalSymbolTable";
 export { IonTypes } from "./IonTypes";
-export { Precision } from "./IonPrecision";
 export { SharedSymbolTable } from "./IonSharedSymbolTable";
-export { Timestamp } from "./IonTimestamp";
+export { TimestampPrecision, Timestamp } from "./IonTimestamp";
 export { toBase64 } from "./IonText";
-export { TypeCodes } from "./IonBinary";
-export { IonEventStream } from "./IonEventStream";
-
+export { decodeUtf8 } from "./IonUnicode";

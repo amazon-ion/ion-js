@@ -12,236 +12,238 @@
  * language governing permissions and limitations under the License.
  */
 
-// Ion Value Support class.  This class offers the
-//       additional semantics necessary for
-//       decimal values.
-//
-//    ION.Decimal supports:
-//      new ION.Decimal(value, exponent)
-//      getNumber()
-//      getDigits()
-//      getScale()
-//      isNull()
-//      isZero()
-//      isNegativeZero()
-//      isZeroZero()
-//      toString()
-//      ION.Decimal.parse(string)
-//      ION.Decimal.NULL - constant null value (non-null reference)
-//      
-//    This decimal is limited to 15 digits of precision but has an
-//    exponent range that is +/- 15 digits as well.
-//    
-//    It also accepts 'e', 'E', 'f' and 'F' as valid starts for
-//    the exponent (in addition to 'd' and 'D').
-//    
-//    If the string is undefined, empty or a null image it returns 
-//    the decimal NULL.
+import {LongInt} from "./IonLongInt";
+import {_sign} from "./util";
 
-import { is_digit } from "./IonText";
-import { LongInt } from "./IonLongInt";
-
+/**
+ * This class provides the additional semantics necessary for decimal values.
+ * Note that range of an exponent is limited to +/- 15 digits.
+ */
 export class Decimal {
-  public static readonly NULL: Decimal = new Decimal(undefined, undefined);
-  public static readonly ZERO: Decimal = new Decimal(LongInt.ZERO, 0);
+    private _coefficient: LongInt;
+    private _exponent: number;
 
-  constructor(private _value: LongInt, private _exponent: number) {}
+    public static readonly ZERO = new Decimal(0, 0);
+    public static readonly ONE = new Decimal(1, 0);
 
-  isZero() : boolean {
-    if (this.isNull()) return false;
-    return this._value.isZero();
-  }
-
-  isNegative() : boolean {
-    return this._value.signum() === -1;
-  }
-
-  isNegativeZero() : boolean {
-    return this.isZero() && this.isNegative();
-  }
-
-  isZeroZero() : boolean {
-    if (this.isZero()) {
-      // TODO - is this right? negative scale is valid decimal places
-      if (this._exponent >= -1) {
-        return (this._value.signum() >= 0);
-      }
-    }
-    return false;
-  }
-
-  numberValue(): number {
-      var n = this._value.numberValue();
-      n = n * Math.pow(10, this._exponent);
-      return n;
-  }
-
-  getNumber() : number {
-    return this.numberValue();
-  }
-
-  toString() : string {
-    return this.stringValue();
-  }
-
-    stringValue(): string {
-        if (this.isNull()) {
-            return "null.decimal";
+    constructor(coefficient: number, exponent: number) {
+        if (!Number.isInteger(coefficient)) {
+            throw new Error("The provided coefficient was not an integer. (" + coefficient + ")");
         }
+        this._initialize(new LongInt(coefficient), exponent);
+    }
 
-        let exponent: number = this._exponent;
-        let coefficient: string = this._value.digits();
-        let significantDigits : number = coefficient.length;
-        let result : string = '';
-        //digits returns an integer coefficient with an exponent that shifts it back to its original state
-        if (exponent < 0) {
-            // negative shift - prefix decimal point this may require leading zero's
-            let adjustedExponent : number = significantDigits - 1 + exponent;
-            if(adjustedExponent >= 0){
-                let decimalIndex : number = significantDigits + exponent;
-                result = coefficient.slice(0, decimalIndex) + '.' + coefficient.slice(decimalIndex);
-            }else if(adjustedExponent >= -6){//adapted from http://speleotrove.com/decimal/daconvs.html
-                result = '0.00000'.slice(0, (2 - exponent) - significantDigits) + coefficient;
-            }else{
-                result = coefficient + '.d' + exponent;
+    /**
+     * Allows a Decimal to be constructed using a coefficient of arbitrary size without exposing the LongInt class
+     * as part of the public API.
+     * @hidden
+     */
+    static _fromLongIntCoefficient(coefficient: LongInt, exponent: number) {
+        let value = Object.create(this.prototype);
+        value._initialize(coefficient, exponent);
+        return value;
+    }
+
+    /**
+     * Constructor helper shared by the public constructor and _fromLongIntCoefficient
+     * @hidden
+     */
+    private _initialize(coefficient: LongInt, exponent: number) {
+        this._coefficient = coefficient;
+        this._exponent = exponent;
+    }
+
+    /**
+     * Returns true if this Decimal is negative; otherwise false.
+     */
+    isNegative() : boolean {
+        return this._coefficient.signum() === -1;
+    }
+
+    /**
+     * Returns a number representing the value of this Decimal.  Note that
+     * some Decimal (base-10) values cannot be precisely expressed in
+     * JavaScript's base-2 number type.
+     */
+    numberValue(): number {
+        return this._coefficient.numberValue() * Math.pow(10, this._exponent);
+    }
+
+    /**
+     * Returns a number representing the integer portion of this Decimal.
+     * Any fractional portion of this Decimal is truncated.
+     */
+    intValue(): number {
+        return Math.trunc(this.numberValue());
+    }
+
+    /**
+     * Returns a string representation of this Decimal, using exponential
+     * notation when appropriate.
+     */
+    toString(): string {
+        // based on the algorithm defined in https://docs.oracle.com/javase/8/docs/api/java/math/BigDecimal.html#toString--
+        let cStr = Math.abs(this._coefficient.numberValue())+'';
+        let precision = cStr.length;
+        let adjustedExponent = this._exponent + (precision - 1);
+
+        let s = '';
+        if (this._exponent <= 0 && adjustedExponent >= -6) {
+            // no exponential notation
+            if (this._exponent === 0) {
+                s += cStr;
+            } else {
+                if (cStr.length <= -this._exponent) {
+                    cStr = '0'.repeat(-this._exponent - cStr.length + 1) + cStr;
+                    s += cStr.substr(0, 1) + '.' + cStr.substr(1);
+                } else {
+                    s += cStr.substr(0, precision + this._exponent) + '.' + cStr.substr(precision + this._exponent);
+                }
             }
-        } else if (exponent > 0) {
-            // positive shift
-            result = coefficient + '.d' + exponent;
-        } else if(exponent === 0) {
-            result = coefficient + ".";
+        } else {
+            // use exponential notation
+            s += cStr[0];
+            if (cStr.length > 1) {
+                s += '.' + cStr.substr(1);
+            }
+            s += 'E' + (adjustedExponent > 0 ? '+' : '') + adjustedExponent;
         }
-        if (this.isNegative()) result = '-' + result;
-        return result;
+        return (this._coefficient.signum() === -1 ? '-' : '') + s;
     }
 
-  isNull() : boolean {
-    var isnull = (this._value === undefined);
-    return isnull;
-  }
-
-  getDigits() : LongInt {
-    return this._value;
-  }
-
-  getExponent() : number {
-    return this._exponent;
-  }
-
-  equals(expected : Decimal) : boolean {
-      return this.getExponent() === expected.getExponent() && this.isNegative() === expected.isNegative() && this.getDigits().numberValue() === expected.getDigits().numberValue();
-  }
-
-  static parse(str: string, stripLeadingZeroes : boolean = true) : Decimal {
-    let index: number = 0;
-    let exponent: number = 0;
-    let c: number;
-    let isNegative: boolean = false;
-
-    c = str.charCodeAt(index);
-    if (c === '+'.charCodeAt(0)) {
-      index++;
-    } else if (c === '-'.charCodeAt(0)) {
-      isNegative = true;
-      index++;
-    } else if (c === 'n'.charCodeAt(0)) {
-      if (str == 'null' || str == 'null.decimal') {
-        return Decimal.NULL;
-      } 
+    /**
+     * @hidden
+     */
+    _getCoefficient() : LongInt {
+        return this._coefficient;
     }
 
-    let digits: string = Decimal.readDigits(str, index);
-    index += digits.length;
-    if(stripLeadingZeroes) digits = Decimal.stripLeadingZeroes(digits);
-
-    if (index === str.length) {
-      let trimmedDigits: string = Decimal.stripTrailingZeroes(digits);
-      exponent += digits.length - trimmedDigits.length;
-      return new Decimal(new LongInt(trimmedDigits, null, isNegative? -1: 1), exponent);
+    /**
+     * @hidden
+     */
+    _getExponent() : number {
+        return this._exponent;
     }
 
-    let hasDecimal: boolean = false;
-    c = str.charCodeAt(index);
-    if (c === '.'.charCodeAt(0)) {
-      hasDecimal = true;
-      index++;
-      let mantissaDigits: string = Decimal.readDigits(str, index);
-      index += mantissaDigits.length;
-      exponent -= mantissaDigits.length;
-      digits = digits.concat(mantissaDigits);
+    /**
+     * Compares this Decimal with another and returns true if they are
+     * equivalent in value and precision; otherwise returns false.
+     * Note that this differs from compareTo(), which doesn't require
+     * precision to match when returning 0.
+     */
+    equals(that : Decimal) : boolean {
+        return this._getExponent() === that._getExponent()
+            && _sign(this._getExponent()) === _sign(that._getExponent())
+            && this.isNegative() === that.isNegative()
+            && this._getCoefficient().equals(that._getCoefficient());
     }
 
-    if (!hasDecimal) {
-      let trimmedDigits: string = Decimal.stripTrailingZeroes(digits);
-      exponent += digits.length - trimmedDigits.length;
-      digits = trimmedDigits;
+    /**
+     * Compares this Decimal with another and returns -1, 0, or 1 if this
+     * Decimal is less than, equal to, or greater than the other Decimal.
+     *
+     * Note that a return value of 0 doesn't guarantee that equals() would
+     * return true, as compareTo() doesn't require the values to have the
+     * same precision to be considered equal, whereas equals() does.
+     * Additionally, compareTo() treats 0. and -0. as equal, but equals()
+     * does not.
+     */
+    compareTo(that : Decimal) : number {
+        if (this._coefficient.isZero()
+            && that._getCoefficient().isZero()) {
+            return 0;
+        }
+
+        let neg = this.isNegative();
+        if (neg !== that.isNegative()) {
+            return neg ? -1 : 1;
+        }
+
+        // decimals have the same sign; compare magnitudes
+        let [thisCoefficientStr, thisPrecision, thisMagnitude] = this._compareToParams();
+        let [thatCoefficientStr, thatPrecision, thatMagnitude] = that._compareToParams();
+
+        if (thisMagnitude > thatMagnitude) {
+            return neg ? -1 : 1;
+        } else if (thisMagnitude < thatMagnitude) {
+            return neg ? 1 : -1;
+        }
+
+        // decimals have the same sign and magnitude; append zeros so comparison is
+        // independent of precision
+        if (thisCoefficientStr.length < thatCoefficientStr.length) {
+            thisCoefficientStr += '0'.repeat(thatPrecision - thisPrecision);
+        } else if (thisCoefficientStr.length > thatCoefficientStr.length) {
+            thatCoefficientStr += '0'.repeat(thisPrecision - thatPrecision);
+        }
+
+        let thisLongInt = new LongInt(thisCoefficientStr);
+        let thatLongInt = new LongInt(thatCoefficientStr);
+        if (thisLongInt.greaterThan(thatLongInt)) {
+            return neg ? -1 : 1;
+        } else if(thisLongInt.lessThan(thatLongInt)){
+            return neg ? 1 : -1;
+        }
+
+        return 0;
     }
 
-    if (index === str.length) {
-      return new Decimal(new LongInt(digits, null, isNegative? -1 : 1), exponent);
+    /**
+     * Calculates values used by compareTo(), specifically:
+     * - a string representing the absolute value of the coefficient
+     * - the precision, or number of digits in the coefficient
+     * - the magnitude, which indicates what position the most significant digit is in,
+     *   for example:
+     *
+     *   decimal    magnitude
+     *   -------    ---------
+     *     100          3
+     *      10          2
+     *       1          1
+     *       0.1       -1
+     *       0.01      -2
+     *       0.001     -3
+     *       0         -Infinity
+     *
+     * @hidden
+     */
+    private _compareToParams(): [string, number, number] {
+        let coefficientStr = this.isNegative()
+                ? this._coefficient.toString().substring(1)
+                : this._coefficient.toString();
+        let precision = coefficientStr.length;
+        let magnitude = precision + this._exponent;
+        if (magnitude <= 0) {
+            // without this, the value 0.1 would have magnitude of 0 (not the end of the world,
+            // but simpler to describe and reason about if we make this adjustment)
+            magnitude -= 1;
+        }
+        if (this._coefficient.isZero()) {
+            magnitude = -Infinity;
+        }
+        return [coefficientStr, precision, magnitude];
     }
 
-    c = str.charCodeAt(index);
-    if (c !== 'd'.charCodeAt(0) && c !== 'D'.charCodeAt(0)) {
-      throw new Error(`Invalid decimal ${str}`);
+    /**
+     * Given a string containing the Ion text representation of a decimal value,
+     * returns a new Decimal object corresponding to the value.  If a string such as
+     * '5' is provided, a 'd0' suffix is assumed.
+     */
+    static parse(str: string) : Decimal {
+        let exponent = 0;
+        if (str === 'null' || str === 'null.decimal') return null;
+        let d = str.match('[d|D]');
+        let exponentDelimiterIndex = str.length;
+        if (d) {
+            exponent = Number(str.substring(d.index + 1, str.length));
+            exponentDelimiterIndex = d.index;
+        }
+        let f  = str.match('\\.');
+        if (f) {
+            let exponentShift = d ? (d.index - 1) - f.index : (str.length - 1) - f.index;
+            return Decimal._fromLongIntCoefficient(new LongInt(str.substring(0, f.index) + str.substring(f.index + 1, exponentDelimiterIndex)), exponent - exponentShift);
+        } else {
+            return Decimal._fromLongIntCoefficient(new LongInt(str.substring(0, exponentDelimiterIndex)), exponent);
+        }
     }
-    index++;
-
-    let isExplicitExponentNegative: boolean = false;
-    c = str.charCodeAt(index);
-    if (c === '+'.charCodeAt(0)) {
-      index++;
-    } else if (c === '-'.charCodeAt(0)) {
-      isExplicitExponentNegative = true;
-      index++;
-    }
-
-    let explicitExponentDigits: string = Decimal.readDigits(str, index);
-    let explicitExponent = parseInt(explicitExponentDigits, 10);
-    if (isExplicitExponentNegative) {
-      explicitExponent = -explicitExponent;
-    }
-    exponent += explicitExponent;
-    index += explicitExponentDigits.length;
-
-    if (index !== str.length) {
-      // Did not consume the entire string so it must be invalid
-      throw new Error(`Invalid decimal ${str}`);
-    }
-
-    let decimal: Decimal = new Decimal(new LongInt(digits, null, isNegative ? -1 : 1), exponent);
-    return decimal;
-  }
-
-  private static readDigits(s: string, offset: number) : string {
-    let digits: number = 0;
-    for (let i: number = offset; i < s.length; i++) {
-      if (is_digit(s.charCodeAt(i))) {
-        digits++;
-      } else {
-        break;
-      }
-    }
-    return s.slice(offset, offset + digits);
-  }
-
-  private static stripLeadingZeroes(s: string) : string {
-    let i: number = 0;
-    for (; i < s.length - 1; i++) {
-      if (s.charCodeAt(i) !== '0'.charCodeAt(0)) {
-        break;
-      }
-    }
-    return (i > 0) ? s.slice(i) : s;
-  }
-
-  private static stripTrailingZeroes(s: string) : string {
-    let i: number = s.length - 1;
-    for (; i >= 1; i--) {
-      if (s.charCodeAt(i) !== '0'.charCodeAt(0)) {
-        break;
-      }
-    }
-    return (i < s.length - 1) ? s.slice(0, i + 1) : s;
-  }
 }

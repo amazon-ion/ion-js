@@ -9,7 +9,7 @@
  *
  * or in the "license" file accompanying this file. This file is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific
- * language governing permissions and limitations under the License.
+ * language governing permissuions and limitations under the License.
  */
 define([
     'intern',
@@ -24,19 +24,19 @@ define([
     };
 
     suite['Encode dollar sign'] = function() {
-      assert.deepEqual(ion.encodeUtf8('$'), [0x24]);
+      assert.deepEqual(ion.encodeUtf8('$'), new Uint8Array([0x24]));
     }
 
     suite['Encode cent sign'] = function() {
-      assert.deepEqual(ion.encodeUtf8('¢'), [0xc2, 0xa2]);
+      assert.deepEqual(ion.encodeUtf8('¢'), new Uint8Array([0xc2, 0xa2]));
     }
 
     suite['Encode euro sign'] = function() {
-      assert.deepEqual(ion.encodeUtf8('€'), [0xe2, 0x82, 0xac]);
+      assert.deepEqual(ion.encodeUtf8('€'), new Uint8Array([0xe2, 0x82, 0xac]));
     };
 
     suite['Encode Gothic letter hwair'] = function() {
-      assert.deepEqual(ion.encodeUtf8(String.fromCodePoint(0x10348)), [0xf0, 0x90, 0x8d, 0x88]);
+      assert.deepEqual(ion.encodeUtf8(String.fromCodePoint(0x10348)), new Uint8Array([0xf0, 0x90, 0x8d, 0x88]));
     };
 
     registerSuite(suite);

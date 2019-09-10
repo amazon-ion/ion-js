@@ -23,7 +23,7 @@ import * as IonText from "./IonText";
 import { IonType } from "./IonType";
 import { IonTypes } from "./IonTypes";
 import { StringSpan, Span } from "./IonSpan";
-import {is_whitespace} from "./IonText";
+import {is_keyword, is_whitespace} from "./IonText";
 
 const EOF = -1;  // EOF is end of container, distinct from undefined which is value has been consumed
 const ERROR           = -2;
@@ -105,8 +105,8 @@ const INF = [ CH_i, CH_n, CH_f ];
 
 export function get_ion_type(t: number) : IonType {
   switch(t) {
-    case EOF:             return undefined;
-    case ERROR:           return undefined;
+    case EOF:             return null;
+    case ERROR:           return null;
     case T_NULL:          return IonTypes.NULL;
     case T_BOOL:          return IonTypes.BOOL;
     case T_INT:           return IonTypes.INT;
@@ -155,10 +155,6 @@ function get_type_from_name(str: string) : number {
   if (str === "list")      return T_LIST;
   if (str === "struct")    return T_STRUCT;
   throw new Error("Unknown type: " + str + ".");
-}
-
-function is_keyword(str: string) : boolean {
-    return (str === "null") || (str === "true") || (str === "false") || (str === "nan") || (str === "+inf") || (str === "-inf");
 }
 
 function get_hex_value(ch: number) : number {
@@ -211,13 +207,13 @@ export class ParserTextRaw {
   private _in: StringSpan;
   private _ops: any[];
   private _value_type: any;
-  private _value_null: boolean;
+  private _value_null: boolean = false;
   private _value: any[];
   private _start: number;
   private _end: number;
   private _esc_len: number;
   private _curr: number;
-  private _curr_null: boolean;
+  private _curr_null: boolean = false;
   private _ann: any[];
   private _msg: string;
   private _error_msg: string;
@@ -293,7 +289,7 @@ export class ParserTextRaw {
   }
 
   private _read_sexp_values() {
-    var ch = this._read_after_whitespace(true);
+    let ch = this._read_after_whitespace(true);
     if (ch == CH_CP) {
       this._value_push( EOF );
     } else if (ch === EOF){
@@ -511,7 +507,7 @@ export class ParserTextRaw {
       this._unread(ch1);
     }
     else {
-      this._error("operator symbols are not valid outside of sexp's");
+      this._error("operator symbols are not valid outside of sexps");
     }
   }
 
@@ -615,7 +611,7 @@ export class ParserTextRaw {
         return;
       }
       if (IonText.is_digit(ch)) {
-        this._error("leading zero's are not allowed");
+        this._error("leading zeros are not allowed");
       }
       ch = CH_0;
     }
@@ -942,32 +938,25 @@ export class ParserTextRaw {
   }
 
   private _read_blob() : void {
-    var ch, base64_chars = 0, trailers = 0;
-    for (;;) {
-      ch = this._read()
+    let ch, base64_chars = 0, trailers = 0;
+    this._start = this._in.position();//is this going to be accurate where is the start being set that leads to this value?
+    while(true) {
+      ch = this._read();
       if (IonText.is_base64_char(ch)) {
-        base64_chars++;
-      }
-      else if (!IonText.is_whitespace(ch)) {
-        break;
+          base64_chars++;
+          this._end = this._in.position();
+      } else if(!IonText.is_whitespace(ch)) {
+          break;
       }
     }
     while (ch == CH_EQ) {
-      trailers++
+      trailers++;
       ch = this._read_after_whitespace(false);
     }
-    if (ch != CH_CC || this._read() != CH_CC) {
-      this._error("invalid blob");
-    }
-    else {
-      if (!is_valid_base64_length(base64_chars, trailers)) {
-        this._error( "invalid base64 value" );
-      }
-      else {
-        this._end = this._in.position() - 1;
-        this._value_push( T_BLOB );
-      }
-    }
+    if (ch != CH_CC || this._read() != CH_CC) throw new Error("Invalid blob");
+    if (!is_valid_base64_length(base64_chars, trailers)) throw new Error( "Invalid base64 value" );
+
+    this._value_push( T_BLOB );
   }
 
   private _read_comma() : void {
@@ -987,6 +976,7 @@ export class ParserTextRaw {
   }
 
   numberValue() : number {
+    if(this.isNull()) return null;
     var n, s = this.get_value_as_string(this._curr);
     switch (this._curr) {
       case T_INT:
@@ -1005,6 +995,7 @@ export class ParserTextRaw {
 }
 
   booleanValue() : boolean {
+    if(this.isNull()) return null;
     let s: string = this.get_value_as_string(T_BOOL);
     if (s == "true") {
       return true;
@@ -1041,9 +1032,16 @@ export class ParserTextRaw {
             case T_TIMESTAMP:
             case T_IDENTIFIER:
             case T_OPERATOR:
-            case T_BLOB:
                 for (index = this._start; index < this._end; index++) {
                     s += String.fromCharCode(this._in.valueAt(index));
+                }
+                break;
+            case T_BLOB:
+                for (index = this._start; index < this._end; index++) {
+                    ch = this._in.valueAt(index);
+                    if (IonText.is_base64_char(ch)) {
+                        s += String.fromCharCode(ch);
+                    }
                 }
                 break;
             case T_STRING1:
@@ -1145,8 +1143,7 @@ export class ParserTextRaw {
                 }
                 break;
             default:
-                this._error("can't get this value as a string");
-                break;
+                throw new Error("can't get this value as a string");
             }
         return s;
     }
