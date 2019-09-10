@@ -41,47 +41,48 @@ function isBinary(buffer: Uint8Array): boolean {
   return true;
 }
 
+/** Octet buffer input types for the Ion reader interface. */
+export type ReaderOctetBuffer = ArrayBufferLike | ArrayLike<number>;
+
+/** All buffer input types for the Ion reader interface. */
+export type ReaderBuffer = ReaderOctetBuffer | string;
 
 /**
- * Create an Ion Reader object from a currentBuffer `buf`
+ * Create an {Reader} over Ion data in a {ReaderBuffer}.
  *
  * @param buf       The Ion data to be used by the reader. Typically a string, UTF-8 encoded buffer (text), or raw
  *                  binary buffer.
  * @param catalog   An optional {Catalog} to be used for resolving symbol table references.
  * @returns {Reader}
  */
-export function makeReader(buf: any, catalog? : Catalog) : Reader {
+export function makeReader(buf: ReaderBuffer, catalog? : Catalog) : Reader {
     if((typeof buf) === "string"){
         return new TextReader(new StringSpan(<string>buf), catalog);
     }
-    buf = new Uint8Array(buf);
-    if(isBinary(buf)){
-        return new BinaryReader(new BinarySpan(buf), catalog);
+    const bufArray = new Uint8Array(buf as ReaderOctetBuffer);
+    if(isBinary(bufArray)){
+        return new BinaryReader(new BinarySpan(bufArray), catalog);
     } else {
-        return new TextReader(new StringSpan(decodeUtf8(buf)), catalog);
+        return new TextReader(new StringSpan(decodeUtf8(bufArray)), catalog);
     }
 }
 
-/**
- * Create a new Ion Text Writer.
- *
- * @returns {TextWriter}
- */
+/** Creates a new Ion Text Writer. */
 export function makeTextWriter() : Writer {
   return new TextWriter(new Writeable());
 }
 
+/** Creates a new Ion Text Writer with pretty printing of the text. */
 export function makePrettyWriter(indentSize?: number) : Writer {
     return new PrettyTextWriter(new Writeable(), indentSize);
 }
 
 
 /**
- * Create a new Ion Binary Writer. You can optionally provide a local symbol table else
+ * Creates a new Ion Binary Writer. You can optionally provide a local symbol table else
  * the default local symbol table will be used.
  *
  * @param localSymbolTable to use for the new writer
- * @returns {BinaryWriter}
  */
 export function makeBinaryWriter(localSymbolTable : LocalSymbolTable = defaultLocalSymbolTable()) : Writer {
   return new BinaryWriter(localSymbolTable, new Writeable());
