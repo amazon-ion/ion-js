@@ -359,7 +359,7 @@ export class IonEventStream {
         } else {
             this.reader.stepIn();
             for(let tid; tid = this.reader.next(); ) {
-                annotations.push(this.reader.value());
+                annotations.push(this.reader.stringValue());
             }
             this.reader.stepOut();
             return annotations;
