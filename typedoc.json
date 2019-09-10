@@ -6,6 +6,7 @@
   "excludeProtected": true,
 
   "exclude": [
+    "src/AbstractWriter.ts",
     "src/IonConstants.ts",
     "src/IonImport.ts",
     "src/IonLongInt.ts",

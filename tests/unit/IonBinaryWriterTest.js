@@ -481,7 +481,8 @@ define([
       ]);
     writerTest('Kitchen sink',
       (writer) => {
-        writer.stepIn(ion.IonTypes.STRUCT, ['x']);
+        writer.setAnnotations(['x']);
+        writer.stepIn(ion.IonTypes.STRUCT);
         writer.writeFieldName('b');
         writer.writeBoolean(true);
         writer.writeFieldName('b');

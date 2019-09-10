@@ -54,6 +54,13 @@ export class Timestamp {
         return _TimestampParser._parse(str);
     }
 
+    private readonly _localOffset : number;
+    private readonly _year : number;
+    private readonly _month? : number;
+    private readonly _day? : number;
+    private readonly _hour? : number;
+    private readonly _minutes? : number;
+
     private _precision: TimestampPrecision;
     private readonly _secondsDecimal: Decimal;
 
@@ -65,31 +72,34 @@ export class Timestamp {
      * Logically, an instance of this class represents an instant in time based on
      * an offset from UTC and the other provided parameters.
      *
-     * @param _localOffset Local offset from UTC (range: [-(23*60+59):(23*60+59)])
-     * @param _year the year (range: [1-9999])
-     * @param _month the month (range: [1-12])
-     * @param _day the day of the month (range: [1-31])
-     * @param _hour the hour of the day (range: [0-23])
-     * @param _minutes number of minutes (range: [0-59])
+     * @param localOffset Local offset from UTC (range: [-(23\*60+59):(23\*60+59)])
+     * @param year the year (range: [1-9999])
+     * @param month the month (range: [1-12])
+     * @param day the day of the month (range: [1-31])
+     * @param hour the hour of the day (range: [0-23])
+     * @param minutes number of minutes (range: [0-59])
      * @param seconds number of seconds specified as a number (range: [0-59]),
      *                or a Decimal (range: [0.0-60.0)) in order to express whole seconds
      *                along with some fractional seconds
      */
-    constructor(private readonly _localOffset : number,
-                private readonly _year : number,
-                private readonly _month? : number,
-                private readonly _day? : number,
-                private readonly _hour? : number,
-                private readonly _minutes? : number,
+    constructor(localOffset : number,
+                year : number,
+                month? : number,
+                day? : number,
+                hour? : number,
+                minutes? : number,
                 seconds? : number | Decimal) {
+
+        this._localOffset = localOffset;
+        this._year = year;
 
         this._precision = TimestampPrecision.YEAR;
         this._checkRequiredField('Offset', this._localOffset, Timestamp._MIN_OFFSET, Timestamp._MAX_OFFSET);
         this._checkRequiredField('Year', this._year, Timestamp._MIN_YEAR, Timestamp._MAX_YEAR);
-        this._month = this._checkOptionalField('Month', this._month, Timestamp._MIN_MONTH, Timestamp._MAX_MONTH, 1, TimestampPrecision.MONTH);
-        this._day = this._checkOptionalField('Day', this._day, Timestamp._MIN_DAY, Timestamp._MAX_DAY, 1, TimestampPrecision.DAY);
-        this._hour = this._checkOptionalField('Hour', this._hour, Timestamp._MIN_HOUR, Timestamp._MAX_HOUR, 0, TimestampPrecision.HOUR_AND_MINUTE);
-        this._minutes = this._checkOptionalField('Minutes', this._minutes, Timestamp._MIN_MINUTE, Timestamp._MAX_MINUTE, 0, TimestampPrecision.HOUR_AND_MINUTE);
+        this._month = this._checkOptionalField('Month', month, Timestamp._MIN_MONTH, Timestamp._MAX_MONTH, 1, TimestampPrecision.MONTH);
+        this._day = this._checkOptionalField('Day', day, Timestamp._MIN_DAY, Timestamp._MAX_DAY, 1, TimestampPrecision.DAY);
+        this._hour = this._checkOptionalField('Hour', hour, Timestamp._MIN_HOUR, Timestamp._MAX_HOUR, 0, TimestampPrecision.HOUR_AND_MINUTE);
+        this._minutes = this._checkOptionalField('Minutes', minutes, Timestamp._MIN_MINUTE, Timestamp._MAX_MINUTE, 0, TimestampPrecision.HOUR_AND_MINUTE);
 
         if (typeof seconds === 'number') {
             if (!Number.isInteger(seconds)) {
@@ -249,7 +259,7 @@ export class Timestamp {
 
     /**
      * Returns a decimal representing only the fractional seconds.
-     * @private
+     * @hidden
      */
     _getFractionalSeconds() : Decimal {
         let [_, fractionStr] = Timestamp._splitSecondsDecimal(this._secondsDecimal);
@@ -300,7 +310,7 @@ export class Timestamp {
 
     /**
      * Splits secondsDecimal into two strings representing the whole and fractional portions of the decimal.
-     * @private
+     * @hidden
      */
     static _splitSecondsDecimal(secondsDecimal: Decimal) : [string, string] {
         let coefStr = secondsDecimal._getCoefficient().toString();
@@ -386,7 +396,7 @@ export class Timestamp {
      * let ts2 = Timestamp._valueOf(date, ts.getLocalOffset(), ts._getFractionalSeconds(), ts.getPrecision());
      * assert.deepEqual(ts2, ts);
      * ```
-     * @private
+     * @hidden
      */
     static _valueOf(date: Date, localOffset: number, fractionalSeconds?: Decimal, precision?: TimestampPrecision) : Timestamp {
         let msSinceEpoch = date.getTime() + localOffset * 60 * 1000;
