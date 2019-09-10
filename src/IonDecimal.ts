@@ -36,6 +36,8 @@ export class Decimal {
     /**
      * Allows a Decimal to be constructed using a coefficient of arbitrary size without exposing the LongInt class
      * as part of the public API.
+     *
+     * @hidden
      */
     static _fromLongIntCoefficient(coefficient: LongInt, exponent: number) {
         let value = Object.create(this.prototype);
@@ -45,6 +47,8 @@ export class Decimal {
 
     /**
      * Constructor helper shared by the public constructor and _fromLongIntCoefficient
+     *
+     * @hidden
      */
     private _initialize(coefficient: LongInt, exponent: number) {
         this._coefficient = coefficient;
@@ -109,10 +113,16 @@ export class Decimal {
         return (this._coefficient.signum() === -1 ? '-' : '') + s;
     }
 
+    /**
+     * @hidden
+     */
     _getCoefficient() : LongInt {
         return this._coefficient;
     }
 
+    /**
+     * @hidden
+     */
     _getExponent() : number {
         return this._exponent;
     }
@@ -197,7 +207,7 @@ export class Decimal {
      *       0.001     -3
      *       0         -Infinity
      *
-     * @private
+     * @hidden
      */
     private _compareToParams(): [string, number, number] {
         let coefficientStr = this.isNegative()
