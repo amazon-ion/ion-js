@@ -21,17 +21,19 @@ import { SharedSymbolTable } from "./IonSharedSymbolTable";
     }
 
     /**
-    * A catalog holds available shared symbol tables and always includes the system symbol table.
-    * @see http://amzn.github.io/ion-docs/symbols.html#the-catalog
-    */
+     * A catalog holds available shared symbol tables and always includes the system symbol table.
+     * @see https://amzn.github.io/ion-docs/docs/symbols.html#the-catalog
+     */
     export class Catalog {
         private symbolTables: SymbolTableIndex;
 
+        /** Creates a catalog containing only the system symbol table. */
         constructor() {
             this.symbolTables = {};
             this.add(getSystemSymbolTable());
         }
 
+        /** Adds a new shared symbol table to this catalog. */
         add(symbolTable: SharedSymbolTable) : void {
             if(symbolTable.name === undefined || symbolTable.name === null) throw new Error("SymbolTable name must be defined.");
             let versions = this.symbolTables[symbolTable.name];
@@ -39,7 +41,12 @@ import { SharedSymbolTable } from "./IonSharedSymbolTable";
             this.symbolTables[symbolTable.name][symbolTable.version] = symbolTable;
         }
 
-        getVersion(name: string, version: number) : SharedSymbolTable {
+        /**
+         * Returns a symbol table by name and version.
+         *
+         * @return The symbol table or `null` if it does not exist in the {Catalog}.
+         */
+        getVersion(name: string, version: number) : SharedSymbolTable | null {
             let tables : SharedSymbolTable[] = this.symbolTables[name];
             if(!tables) return null;
             let table = tables[version];
@@ -47,7 +54,12 @@ import { SharedSymbolTable } from "./IonSharedSymbolTable";
             return table? table : null;
         }
 
-        getTable(name: string) : SharedSymbolTable {
+        /**
+         * Retrieves the latest version of a symbol table by name.
+         *
+         * @return The symbol table or `null` if it does not exist in the {Catalog}.
+         */
+        getTable(name: string) : SharedSymbolTable | null {
             let versions = this.symbolTables[name], table;
             if(versions === undefined) return null;
             return versions[versions.length - 1];
