@@ -106,6 +106,10 @@ export class Timestamp {
             this._precision = TimestampPrecision.SECONDS;
         }
 
+        if (this._precision <= TimestampPrecision.DAY) {
+            this._localOffset = -0;    // force local offset to "unknown" for YEAR/MONTH/DAY precisions
+        }
+
         if (this._precision > TimestampPrecision.MONTH) {
             // check the days per month - first the general case, basically index into the next month
             // (which doesnt need +1 because we index from 1 to 12 unlike Date) and look at the day before which is indexed with 0.
@@ -221,6 +225,7 @@ export class Timestamp {
                 this._year, (this._precision === TimestampPrecision.YEAR ? 0 : this._month - 1), this._day,
                 this._hour, this._minutes, this.getSecondsInt(), ms);
 
+        msSinceEpoch = Timestamp._adjustMsSinceEpochIfNeeded(this._year, msSinceEpoch);
         if (this._year < 100) {
             // for a year < 100, JavaScript Date's default behavior automatically adds 1900;
             // this block compensates for that behavior
@@ -231,6 +236,20 @@ export class Timestamp {
 
         let offsetShiftMs = this._localOffset * 60 * 1000;
         return new Date(msSinceEpoch - offsetShiftMs);
+    }
+
+    /**
+     * For a year < 100, JavaScript Date's default behavior automatically adds 1900;
+     * this method compensates for that behavior
+     */
+    static _adjustMsSinceEpochIfNeeded(year: number, msSinceEpoch: number) : number {
+        if (year >= 100) {
+            return msSinceEpoch;
+        }
+
+        let date = new Date(msSinceEpoch);
+        date.setUTCFullYear(year);     // yes, we really do mean some year < 100
+        return date.getTime();
     }
 
     /**
