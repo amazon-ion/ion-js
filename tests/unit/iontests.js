@@ -29,6 +29,7 @@ define([
         let badSuite = { name: 'Bad tests' };
         let equivsSuite = { name: 'Equivs tests' };
         let nonEquivsSuite = { name: 'Non-equivs tests' };
+        let equivTimelinesSuite = { name: 'Equiv timelines tests' };
         let eventStreamSuite = { name: 'EventStream tests' };
         let readerCompareSuite = { name: 'ReaderCompare tests' };
 
@@ -66,10 +67,16 @@ define([
             }
         });
 
+        let equivTimelinesPath = paths.join('ion-tests', 'iontestdata', 'good', 'timestamp', 'equivTimeline');
+        findFiles(equivTimelinesPath).forEach(path => {
+            equivTimelinesSuite[path] = () => equivTimelinesTest(path);
+        });
+
         registerSuite(goodSuite);
         registerSuite(badSuite);
         registerSuite(equivsSuite);
         registerSuite(nonEquivsSuite);
+        registerSuite(equivTimelinesSuite);
         registerSuite(eventStreamSuite);
         registerSuite(readerCompareSuite);
 
@@ -124,46 +131,61 @@ define([
             return values;
         }
 
-        function equivsTest(path, expectedEquivalence = true) {
+        function bytesToString(c, idx, bytes) {
+            let sb = '[' + c + '][' + idx + ']';
+            if (bytes.length >= 4 && bytes[0] === 224 && bytes[1] === 1 && bytes[2] === 0 && bytes[3] === 234) {
+                // Ion binary, convert to hex string
+                bytes.forEach(b => {
+                    sb += ' ' + ('0' + (b & 0xFF).toString(16)).slice(-2);
+                });
+                return sb;
+            }
+            // otherwise, text:
+            return sb + ' ' + String.fromCharCode.apply(null, bytes);
+        }
+
+        function equivsTestCompare(c, i, j, bytesI, bytesJ, expectedEquivalence) {
+            let eventStreamI = new es.IonEventStream(ion.makeReader(bytesI));
+            let eventStreamJ = new es.IonEventStream(ion.makeReader(bytesJ));
+            let result = eventStreamI.equals(eventStreamJ);
+            assert(expectedEquivalence ? result : !result,
+                'Expected ' + bytesToString(c, i, bytesI)
+                + ' to' + (expectedEquivalence ? '' : ' not')
+                + ' be equivalent to ' + bytesToString(c, j, bytesJ));
+        }
+
+        function equivsTest(path, expectedEquivalence = true, compare = equivsTestCompare) {
             let binaryValues = loadValues(path, () => ion.makeBinaryWriter());
             let textValues = loadValues(path, () => ion.makeTextWriter());
-
-            function bytesToString(c, idx, bytes) {
-                let sb = '[' + c + '][' + idx + ']';
-                if (bytes.length >= 4 && bytes[0] === 224 && bytes[1] === 1 && bytes[2] === 0 && bytes[3] === 234) {
-                    // Ion binary, convert to hex string
-                    bytes.forEach(b => {
-                        sb += ' ' + ('0' + (b & 0xFF).toString(16)).slice(-2);
-                    });
-                    return sb;
-                }
-                // otherwise, text:
-                return sb + ' ' + String.fromCharCode.apply(null, bytes);
-            }
-
-            function compare(c, i, j, valueI, valueJ) {
-                let eventStreamI = new es.IonEventStream(ion.makeReader(valueI));
-                let eventStreamJ = new es.IonEventStream(ion.makeReader(valueJ));
-                let result = eventStreamI.equals(eventStreamJ);
-                assert(expectedEquivalence ? result : !result,
-                    'Expected ' + bytesToString(c, i, valueI)
-                    + ' to' + (expectedEquivalence ? '' : ' not')
-                    + ' be equivalent to ' + bytesToString(c, j, valueJ));
-            }
 
             for (let c = 0; c < binaryValues.length; c++) {
                 for (let i = 0; i < binaryValues[c].length; i++) {
                     for (let j = i + 1; j < binaryValues[c].length; j++) {
-                        compare(c, i, j, binaryValues[c][i], binaryValues[c][j]);
-                        compare(c, i, j, binaryValues[c][i], textValues[c][j]);
-                        compare(c, i, j, textValues[c][i], textValues[c][j]);
+                        compare(c, i, j, binaryValues[c][i], binaryValues[c][j], expectedEquivalence);
+                        compare(c, i, j, binaryValues[c][i], textValues[c][j], expectedEquivalence);
+                        compare(c, i, j, textValues[c][i], textValues[c][j], expectedEquivalence);
                     }
                 }
             }
         }
 
-        function nonEquivsTest(reader) {
-            equivsTest(reader, false);
+        function nonEquivsTest(path) {
+            equivsTest(path, false);
+        }
+
+        function equivTimelinesTest(path) {
+            function timelinesCompare(c, i, j, bytesI, bytesJ) {
+                function readTimestamp(bytes) {
+                    let reader = ion.makeReader(bytes);
+                    reader.next();
+                    return reader.value();
+                }
+                let tsI = readTimestamp(bytesI);
+                let tsJ = readTimestamp(bytesJ);
+                // assert that the timestamps represent the same instant (but not necessarily data-model equivalent):
+                assert(tsI.compareTo(tsJ) === 0, 'Expected ' + tsI + ' to be instant-equivalent to ' + tsJ);
+            }
+            equivsTest(path, true, timelinesCompare);
         }
 
         function readerCompareTest(source) {
