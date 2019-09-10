@@ -40,12 +40,6 @@ module.exports = function(grunt) {
        */
     typedoc: {
       build: {
-        options: {
-          module: 'amd',
-          target: 'es6',
-          out: 'docs/api/',
-          name: 'Ion Library',
-        },
         src: 'src/**/*'
       }
     },
