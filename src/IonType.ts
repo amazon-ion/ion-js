@@ -12,12 +12,24 @@
  * language governing permissions and limitations under the License.
  */
 
+/** Ion value type enumeration class. */
 export class IonType {
+  /** The binary type ID for this Ion Type. */
   bid: number;
+
+  /** The textual name of this type. */
   name: string;
+
+  /** Whether or not this type is a scalar value. */
   scalar: boolean;
+
+  /** Whether or not this type is a `clob` or `blob`. */
   lob: boolean;
+
+  /** Whether or not this type is an `int`, `float`, or `decimal`. */
   num: boolean;
+
+  /** Whether or not this type is a `list`, `sexp`, or `struct`. */
   container: boolean;
 
   constructor(bid: number, name: string, scalar: boolean, lob: boolean, num: boolean, container: boolean) {
