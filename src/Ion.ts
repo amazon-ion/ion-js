@@ -22,7 +22,7 @@ import { TextWriter } from "./IonTextWriter";
 import { PrettyTextWriter } from "./IonPrettyTextWriter";
 import { Writeable } from "./IonWriteable";
 import { BinaryWriter } from "./IonBinaryWriter";
-import { LocalSymbolTable, defaultLocalSymbolTable } from "./IonLocalSymbolTable";
+import { defaultLocalSymbolTable } from "./IonLocalSymbolTable";
 import { decodeUtf8 } from "./IonUnicode";
 
 /**
@@ -86,7 +86,7 @@ export function makeBinaryWriter() : Writer {
     return new BinaryWriter(localSymbolTable, new Writeable());
 }
 
-export { Reader } from "./IonReader";
+export { Reader, ReaderScalarValue } from "./IonReader";
 export { Writer } from "./IonWriter";
 export { Catalog } from "./IonCatalog";
 export { Decimal } from "./IonDecimal";
