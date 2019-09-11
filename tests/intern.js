@@ -19,6 +19,7 @@ define({
     'tests/unit/textNulls',
     'tests/unit/spans',
     'tests/unit/iontests',
+    'tests/unit/AbstractWriterTest',
     'tests/unit/IonCatalogTest',
     'tests/unit/IonImportTest',
     'tests/unit/IonLocalSymbolTableTest',

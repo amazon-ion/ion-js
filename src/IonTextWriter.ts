@@ -27,10 +27,9 @@ import {
 } from "./IonText";
 import {IonType} from "./IonType";
 import {IonTypes} from "./IonTypes";
-import {Reader} from "./IonReader";
 import {Timestamp} from "./IonTimestamp";
 import {Writeable} from "./IonWriteable";
-import {_sign, _writeValues} from "./util";
+import {_sign} from "./util";
 
 type Serializer<T> = (value: T) => void;
 
@@ -65,19 +64,19 @@ export class TextWriter extends AbstractWriter {
     }
 
     writeBlob(value: Uint8Array) : void {
-        this.writeValue(IonTypes.BLOB, value, (value: Uint8Array) => {
+        this._serializeValue(IonTypes.BLOB, value, (value: Uint8Array) => {
             this.writeable.writeBytes(encodeUtf8('{{' + toBase64(value) + '}}'));
         });
     }
 
     writeBoolean(value: boolean) : void {
-        this.writeValue(IonTypes.BOOL, value, (value: boolean) => {
+        this._serializeValue(IonTypes.BOOL, value, (value: boolean) => {
             this.writeUtf8(value ? "true" : "false");
         });
     }
 
     writeClob(value: Uint8Array) : void {
-        this.writeValue(IonTypes.CLOB, value, (value: Uint8Array) => {
+        this._serializeValue(IonTypes.CLOB, value, (value: Uint8Array) => {
             let hexStr : string;
             this.writeUtf8('{{"');
             for (let i : number = 0; i < value.length; i++) {
@@ -108,7 +107,7 @@ export class TextWriter extends AbstractWriter {
     }
 
     writeDecimal(value: Decimal) : void {
-        this.writeValue(IonTypes.DECIMAL, value, (value: Decimal) => {
+        this._serializeValue(IonTypes.DECIMAL, value, (value: Decimal) => {
             if (value === null) {
                 this.writeUtf8("null.decimal");
             } else {
@@ -131,7 +130,7 @@ export class TextWriter extends AbstractWriter {
 
 
     /*
-    Another way to handle this is simply to store the field name here, and actually write it in writeValue.
+    Another way to handle this is simply to store the field name here, and actually write it in _serializeValue.
     This is how the other implementations I know of handle it.
     This allows you to move the comma-writing logic into handleSeparator, and might even enable you to get rid of currentContainer.state altogether.
     I can't think of a reason why it HAS to be done that way right now, but if that feels cleaner to you, then consider it.
@@ -168,7 +167,7 @@ export class TextWriter extends AbstractWriter {
                 tempVal = tempVal.slice(0, tempVal.length - 2) + tempVal.charAt(tempVal.length - 1);
             }
         }
-        this.writeValue(IonTypes.FLOAT, value, (value: number) => {
+        this._serializeValue(IonTypes.FLOAT, value, (value: number) => {
             this.writeUtf8(tempVal);
         });
     }
@@ -187,13 +186,13 @@ export class TextWriter extends AbstractWriter {
                 tempVal = tempVal.slice(0, tempVal.length - 2) + tempVal.charAt(tempVal.length - 1);
             }
         }
-        this.writeValue(IonTypes.FLOAT, value, (value: number) => {
+        this._serializeValue(IonTypes.FLOAT, value, (value: number) => {
             this.writeUtf8(tempVal);
         });
     }
 
     writeInt(value: number) : void {
-        this.writeValue(IonTypes.INT, value, (value: number) => {
+        this._serializeValue(IonTypes.INT, value, (value: number) => {
             this.writeUtf8(value.toString(10));
         });
     }
@@ -209,19 +208,19 @@ export class TextWriter extends AbstractWriter {
     }
 
     writeString(value: string) : void {
-        this.writeValue(IonTypes.STRING, value, (value: string) => {
+        this._serializeValue(IonTypes.STRING, value, (value: string) => {
             this.writeable.writeBytes(encodeUtf8('"' + escape(value, StringEscapes) + '"'));
         });
     }
 
     writeSymbol(value: string) : void {
-        this.writeValue(IonTypes.SYMBOL, value, (value: string) => {
+        this._serializeValue(IonTypes.SYMBOL, value, (value: string) => {
             this.writeSymbolToken(value);
         });
     }
 
     writeTimestamp(value: Timestamp) : void {
-        this.writeValue(IonTypes.TIMESTAMP, value, (value: Timestamp) => {
+        this._serializeValue(IonTypes.TIMESTAMP, value, (value: Timestamp) => {
             this.writeUtf8(value.toString());
         });
     }
@@ -274,7 +273,7 @@ export class TextWriter extends AbstractWriter {
         }
     }
 
-    protected writeValue<T>(type: IonType, value: T, serialize: Serializer<T>) {
+    protected _serializeValue<T>(type: IonType, value: T, serialize: Serializer<T>) {
         if (this.currentContainer.state === State.STRUCT_FIELD) throw new Error("Expecting a struct field");
         if (value === null || value === undefined) {
             this.writeNull(type);
@@ -369,9 +368,5 @@ export class TextWriter extends AbstractWriter {
         } else {
             this.writeUtf8(s);
         }
-    }
-
-    writeValues(reader: Reader): void {
-        _writeValues(reader, this);
     }
 }

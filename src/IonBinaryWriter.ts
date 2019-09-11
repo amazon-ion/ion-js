@@ -20,10 +20,9 @@ import {IonTypes} from "./IonTypes";
 import {LocalSymbolTable} from "./IonLocalSymbolTable";
 import {LongInt} from "./IonLongInt";
 import {LowLevelBinaryWriter} from "./IonLowLevelBinaryWriter";
-import {Reader} from "./IonReader";
 import {TimestampPrecision,Timestamp} from "./IonTimestamp";
 import {Writeable} from "./IonWriteable";
-import {_sign, _writeValues} from "./util";
+import {_sign} from "./util";
 
 const MAJOR_VERSION: number = 1;
 const MINOR_VERSION: number = 0;
@@ -422,10 +421,6 @@ export class BinaryWriter extends AbstractWriter {
     this.writeFieldName('max_id');
     this.writeInt(import_.length);
     this.stepOut();
-  }
-
-  writeValues(reader: Reader): void {
-    _writeValues(reader, this);
   }
 }
 
