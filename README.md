@@ -39,26 +39,20 @@ is beta supported at this time.
 |:-------------:|:-------------:|:-------------:|:-------------:|
 | null      | yes | yes      | none |
 | bool      | yes      | yes      |   none |
-| int | yes      | yes      |    underscores, binaryints, over a signed 31 bit number >8798240505855 |
+| int | yes      | yes      |    underscores, binaryints, over a signed 31 bit number >4294967295 |
 | float | yes      | yes      |    underscores |
-| decimal | yes      | yes      |    node12 |
+| decimal | yes      | yes      |    none |
 | timestamp | yes      | yes      |    none |
-| string | yes      | yes      |    escape sequences currently insert non printable characters, generating illegal ion |
+| string | yes      | yes      |    escape sequences |
 | symbol | yes      | yes      |    sid0, no symboltokens |
 | blob | yes      | yes      |    no |
 | clob | yes      | yes      |    no |
-| struct | yes      | yes      |   containers can be written inside of structs without a fieldname, generating illegal ion |
+| struct | yes      | yes      |   none |
 | list | yes      | yes      |    none |
 | sexp | yes      | yes      |    none |
 | annotations | yes      | yes      |    none |
 | local symbol tables | yes      | yes      |    none |
-| shared symbol tables | no      | no      |    We have removed ssts/catalogs from the public api temporarily |
-
-| Github Issues |
-|:-------------|
-| [SymbolTokens](https://github.com/amzn/ion-js/issues/121) |
-| [Numbers](https://github.com/amzn/ion-js/issues/123) |
-| [Utf8/32/64](https://github.com/amzn/ion-js/issues/124) |
+| shared symbol tables | no      | no      |  none |
 
 # Use
 
