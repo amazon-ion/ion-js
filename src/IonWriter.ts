@@ -62,7 +62,12 @@ export interface Writer {
      */
     writeDecimal(value: Decimal | null) : void;
 
-    writeTimestamp(value: Timestamp) : void;
+    /**
+     * Writes a [[Timestamp]] value as an Ion `timestamp` value.
+     *
+     * @param value The [[Timestamp]] to write, which may be `null` to write a `null.timestamp`.
+     */
+    writeTimestamp(value: Timestamp | null) : void;
 
     /**
      * Writes a `string` value as an Ion `string`.
@@ -144,7 +149,7 @@ export interface Writer {
     close() : void;
 
     /**
-     * Retrieves the serialized buffer as an array of octets.  Generally this will
+     * Retrieves the serialized buffer as an array of octets.  The buffer will
      * be either a UTF-8 encoded buffer for Ion text or Ion binary.  The buffer is
      * not well-defined until [[close]] is invoked.
      *
