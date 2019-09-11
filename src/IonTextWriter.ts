@@ -226,6 +226,9 @@ export class TextWriter extends AbstractWriter {
     }
 
     stepIn(type: IonType) : void {
+        if (this.currentContainer.containerType === IonTypes.STRUCT && this.currentContainer.state === State.STRUCT_FIELD) {
+            throw new Error("Expecting a struct field");
+        }
         switch (type) {
             case IonTypes.LIST:
                 this.writeContainer(type, CharCodes.LEFT_BRACKET);
