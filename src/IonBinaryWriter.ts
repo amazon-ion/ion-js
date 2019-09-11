@@ -320,10 +320,16 @@ export class BinaryWriter extends AbstractWriter {
     if (!annotations || annotations.length === 0) {
       return new Uint8Array(0);
     }
+    if (!Array.isArray(annotations)) {
+      throw new Error('Annotations must be an array of strings.');
+    }
 
     let writeable: Writeable = new Writeable();
     let writer: LowLevelBinaryWriter = new LowLevelBinaryWriter(writeable);
     for (let annotation of annotations) {
+      if(typeof annotation !== 'string') {
+        throw new Error('Annotation must be of type string.');
+      }
       let symbolId: number = this.symbolTable.addSymbol(annotation);
       writer.writeVariableLengthUnsignedInt(symbolId);
     }

@@ -27,7 +27,13 @@ export abstract class AbstractWriter implements Writer {
     }
 
     setAnnotations(annotations: string[]): void {
-        this._annotations = annotations;
+        if (annotations === undefined || annotations === null) {
+            this._annotations = [];
+        } else if(!Array.isArray(annotations)){
+            throw new Error("Annotations must be an array of strings.")
+        } else {
+            this._annotations = annotations;
+        }
     }
 
     protected _clearAnnotations(): void {

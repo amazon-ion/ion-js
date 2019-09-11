@@ -356,6 +356,9 @@ export class TextWriter extends AbstractWriter {
     protected writeAnnotations() : void {
         if (this._annotations === null || this._annotations === undefined) return;
         for (let annotation of this._annotations) {
+            if (typeof annotation !== 'string') {
+                throw new Error('Annotations must be of type string.');
+            }
             this.writeSymbolToken(annotation);
             this.writeUtf8('::');
         }
