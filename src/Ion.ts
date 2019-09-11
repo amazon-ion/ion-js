@@ -93,6 +93,7 @@ export { Writer } from "./IonWriter";
 export { Catalog } from "./IonCatalog";
 export { Decimal } from "./IonDecimal";
 export { defaultLocalSymbolTable } from "./IonLocalSymbolTable";
+export { IonType } from "./IonType";
 export { IonTypes } from "./IonTypes";
 export { SharedSymbolTable } from "./IonSharedSymbolTable";
 export { TimestampPrecision, Timestamp } from "./IonTimestamp";
