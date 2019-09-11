@@ -14,30 +14,17 @@
 
 /** Ion value type enumeration class. */
 export class IonType {
-  /** The binary type ID for this Ion Type. */
-  bid: number;
-
-  /** The textual name of this type. */
-  name: string;
-
-  /** Whether or not this type is a scalar value. */
-  scalar: boolean;
-
-  /** Whether or not this type is a `clob` or `blob`. */
-  lob: boolean;
-
-  /** Whether or not this type is an `int`, `float`, or `decimal`. */
-  num: boolean;
-
-  /** Whether or not this type is a `list`, `sexp`, or `struct`. */
-  container: boolean;
-
-  constructor(bid: number, name: string, scalar: boolean, lob: boolean, num: boolean, container: boolean) {
-    this.bid = bid;
-    this.name = name;
-    this.scalar = scalar;
-    this.lob = lob;
-    this.num = num;
-    this.container = container;
-  }
+  constructor(
+      /** The binary type ID for this Ion Type. */
+      public readonly binaryTypeId: number,
+      /** The textual name of this type. */
+      public readonly name: string,
+      /** Whether or not this type is a scalar value. */
+      public readonly isScalar: boolean,
+      /** Whether or not this type is a `clob` or `blob`. */
+      public readonly isLob: boolean,
+      /** Whether or not this type is an `int`, `float`, or `decimal`. */
+      public readonly isNumeric: boolean,
+      /** Whether or not this type is a `list`, `sexp`, or `struct`. */
+      public readonly isContainer: boolean) {}
 }

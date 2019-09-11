@@ -72,7 +72,7 @@ export function _writeValue(reader: IonReader, writer: IonWriter, _depth = 0): v
             case IonTypes.STRUCT:    writer.stepIn(IonTypes.STRUCT); break;
             default: throw new Error('Unrecognized type ' + (type !== null ? type.name : type));
         }
-        if (type.container) {
+        if (type.isContainer) {
             reader.stepIn();
             _writeValues(reader, writer, _depth + 1);
             writer.stepOut();

@@ -95,7 +95,7 @@ define([
 
         function exhaust(reader) {
             for (let type; type = reader.next(); ) {
-                if (type.container && !reader.isNull()) {
+                if (type.isContainer && !reader.isNull()) {
                     reader.stepIn();
                     exhaust(reader);
                     reader.stepOut();
@@ -111,7 +111,7 @@ define([
             let containerIdx = 0;
 
             for (let topLevelType; topLevelType = reader.next(); ) {
-                if (!topLevelType.container) {
+                if (!topLevelType.isContainer) {
                     throw Error('Expected top-level value to be a container, was ' + topLevelType);
                 }
 
@@ -223,7 +223,7 @@ define([
                     break;
                 }
 
-                if (t1.container && !r1.isNull()) {
+                if (t1.isContainer && !r1.isNull()) {
                     r1.stepIn();
                     r2.stepIn();
                     readerCompare(r1, r2);
