@@ -14,9 +14,11 @@
 
 import { IonType } from "./IonType";
 
+/** Enumeration of the Ion types. */
 export const IonTypes = {
   NULL      : new IonType(  0, "null",       true,   false, false,  false ),
   BOOL      : new IonType(  1, "bool",       true,   false, false,  false ),
+  // note that INT is actually 0x2 **and** 0x3 in the Ion binary encoding
   INT       : new IonType(  2, "int",        true,   false, true,   false ),
   FLOAT     : new IonType(  4, "float",      true,   false, true,   false ),
   DECIMAL   : new IonType(  5, "decimal",    true,   false, false,  false ),
@@ -28,6 +30,4 @@ export const IonTypes = {
   LIST      : new IonType( 11, "list",       false,  false, false,  true  ),
   SEXP      : new IonType( 12, "sexp",       false,  false, false,  true  ),
   STRUCT    : new IonType( 13, "struct",     false,  false, false,  true  ),
-  DATAGRAM  : new IonType( 20, "datagram",   false,  false, false,  true  ),
-  BOC       : new IonType( -2, "boc",        false,  false, false,  false ),
-}
+};
