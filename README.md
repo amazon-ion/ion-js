@@ -44,7 +44,7 @@ is beta supported at this time.
 | decimal | yes      | yes      |    none |
 | timestamp | yes      | yes      |    none |
 | string | yes      | yes      |    escape sequences |
-| symbol | yes      | yes      |    sid0, no symboltokens |
+| symbol | yes      | yes      |    sid0, symboltokens |
 | blob | yes      | yes      |    no |
 | clob | yes      | yes      |    no |
 | struct | yes      | yes      |   none |
