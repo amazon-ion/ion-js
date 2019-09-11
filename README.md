@@ -37,22 +37,22 @@ is beta supported at this time.
 
 | Types        | IonText | IonBinary | Limitations  |
 |:-------------:|:-------------:|:-------------:|:-------------:|
-| null      | yes | no      | none |
-| bool      | yes      | no      |   none |
-| int | yes      | no      |    underscores, binaryints, bigints |
-| float | yes      | no      |    underscores |
-| decimal | yes      | no      |    large fractions are slow roundtrip |
-| timestamp | yes      | no      |    fractional seconds are slow on large fractions |
-| string | yes      | no      |    none |
-| symbol | yes      | no      |    sid0, no symboltokens |
-| blob | no      | no      |    broken |
-| clob | yes      | no      |    backed by string |
-| struct | yes      | no      |    none |
-| list | yes      | no      |    none |
-| sexp | yes      | no      |    none |
-| annotations | yes      | no      |    none |
-| local symbol tables | yes      | no      |    none |
-| shared symbol tables | yes      | no      |    user marshals symboltables into the catalog themselves |
+| null      | yes | yes      | none |
+| bool      | yes      | yes      |   none |
+| int | yes      | yes      |    underscores, binaryints, over a signed 31 bit number >8798240505855 |
+| float | yes      | yes      |    underscores |
+| decimal | yes      | yes      |    node12 |
+| timestamp | yes      | yes      |    none |
+| string | yes      | yes      |    escape sequences currently insert non printable characters, generating illegal ion |
+| symbol | yes      | yes      |    sid0, no symboltokens |
+| blob | yes      | yes      |    no |
+| clob | yes      | yes      |    no |
+| struct | yes      | yes      |   containers can be written inside of structs without a fieldname, generating illegal ion |
+| list | yes      | yes      |    none |
+| sexp | yes      | yes      |    none |
+| annotations | yes      | yes      |    none |
+| local symbol tables | yes      | yes      |    none |
+| shared symbol tables | no      | no      |    We have removed ssts/catalogs from the public api temporarily |
 
 | Github Issues |
 |:-------------|
