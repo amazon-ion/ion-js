@@ -19,9 +19,8 @@ define([
         'intern/dojo/node!path',
         'dist/amd/es6/IonTests',
         'dist/amd/es6/IonEventStream',
-        'dist/amd/es6/util',
     ],
-    function(intern, registerSuite, assert, fs, paths, ion, es, util) {
+    function(intern, registerSuite, assert, fs, paths, ion, es) {
         // TBD split each suite into a different test source file;
         //     perhaps good/bad and equivs/non-equivs pairs belong together
 
@@ -120,7 +119,7 @@ define([
 
                 for (let type; type = reader.next(); ) {
                     let writer = newWriter();
-                    util._writeValue(reader, writer);
+                    writer.writeValue(reader);
                     writer.close();
                     values[containerIdx].push(writer.getBytes());
                 }

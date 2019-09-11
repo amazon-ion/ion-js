@@ -16,9 +16,8 @@ define([
   'intern!object',
   'intern/chai!assert',
   'dist/amd/es6/IonTests',
-  'dist/amd/es6/util',
   ],
-  function(registerSuite, assert, ion, util) {
+  function(registerSuite, assert, ion) {
       let suite = {
           name: 'Annotations'
       };
@@ -77,7 +76,7 @@ define([
         reader.stepIn();
         reader.next();
 
-        util._writeValues(reader, writer, 1);
+        writer._writeValues(reader, 1);
 
         reader.stepOut();
 

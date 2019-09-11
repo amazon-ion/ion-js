@@ -98,6 +98,12 @@ export interface Writer {
     writeClob(value: Uint8Array | null) : void;
 
     /**
+     * Writes a reader's current value.  If there's no current value, this method
+     * does nothing.
+     */
+    writeValue(reader: Reader) : void;
+
+    /**
      * Writes a reader's current value and all following values until the end
      * of the current container.  If there's no current value then this method
      * calls {@link next()} to get started.

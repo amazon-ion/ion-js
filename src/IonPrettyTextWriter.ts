@@ -17,8 +17,7 @@ import {Writeable} from "./IonWriteable";
 import {CharCodes} from "./IonText";
 import {IonType} from "./IonType";
 import {IonTypes} from "./IonTypes";
-import {Reader} from "./IonReader";
-import {_writeValues} from "./util";
+
 type Serializer<T> = (value: T) => void;
 
 /*
@@ -107,7 +106,7 @@ export class PrettyTextWriter extends TextWriter {
         }
     }
 
-    writeValue<T>(type: IonType, value: T, serialize: Serializer<T>) {
+    _serializeValue<T>(type: IonType, value: T, serialize: Serializer<T>) {
         if (this.currentContainer.state === State.STRUCT_FIELD) throw new Error("Expecting a struct field");
         if (value === null || value === undefined) {
             this.writeNull(type);
@@ -158,9 +157,5 @@ export class PrettyTextWriter extends TextWriter {
                 }
             }
         }
-    }
-
-    writeValues(reader: Reader): void {
-        _writeValues(reader, this);
     }
 }
