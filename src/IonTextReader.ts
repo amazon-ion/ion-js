@@ -83,7 +83,7 @@ export class TextReader implements Reader {
       type = this.next();
       if (type === null) { // end of container
           this.stepOut();
-      } else if (type.container && !this.isNull()) {
+      } else if (type.isContainer && !this.isNull()) {
           this.stepIn();
       }
     }
@@ -130,7 +130,7 @@ export class TextReader implements Reader {
     this._raw_type !== BEGINNING_OF_CONTAINER
     && !this.isNull()
     && this._type
-    && this._type.container;
+    && this._type.isContainer;
     if (should_skip) this.skip_past_container();
 
     let p: ParserTextRaw = this._parser;
@@ -168,7 +168,7 @@ export class TextReader implements Reader {
   }
 
   stepIn() {
-    if (!this._type.container) {
+    if (!this._type.isContainer) {
       throw new Error("can't step in to a scalar value");
     }
     if (this.isNull()) {
@@ -223,7 +223,7 @@ export class TextReader implements Reader {
     _stringRepresentation() : string {
         this.load_raw();
         if (this.isNull()) return (this._type === IonTypes.NULL) ? "null" : "null." + this._type.name;
-        if (this._type.scalar) {
+        if (this._type.isScalar) {
             // BLOB is a scalar by you don't want to just use the string
             // value otherwise all other scalars are fine as is
             switch(this._type) {
@@ -326,7 +326,7 @@ export class TextReader implements Reader {
     }
 
     value(): any {
-        if (this._type && this._type.container) {
+        if (this._type && this._type.isContainer) {
             if (this.isNull()) {
                 return null;
             }

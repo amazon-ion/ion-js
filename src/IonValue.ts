@@ -77,7 +77,7 @@ abstract class IonValue {
     if (this._parent) {
       error("a value can only be added to one container");
     }
-    if (!(p instanceof IonValue) || !p.getType().container) {
+    if (!(p instanceof IonValue) || !p.getType().isContainer) {
       error("a value can only be added an Ion container");
     }
     this._parent = p;
@@ -149,7 +149,7 @@ abstract class IonValue {
 }
 
 class IonNull extends IonValue {
-  private binary_image = (IonTypes.NULL.bid << IonBinary.TYPE_SHIFT) | IonBinary.LEN_NULL;
+  private binary_image = (IonTypes.NULL.binaryTypeId << IonBinary.TYPE_SHIFT) | IonBinary.LEN_NULL;
 
   getType() : IonType {
     return IonTypes.NULL;
@@ -204,7 +204,7 @@ class IonBool extends IonValue {
   }
 
   writeBinary(span : Span) : number {
-    var binary_image = (IonTypes.BOOL.bid << IonBinary.TYPE_SHIFT)
+    var binary_image = (IonTypes.BOOL.binaryTypeId << IonBinary.TYPE_SHIFT)
     if (this.isNull()) {
       binary_image = binary_image | IonBinary.LEN_NULL;
     }
@@ -265,7 +265,7 @@ class IonInt extends IonNumber {
   }
 
   writeBinary(span: Span) : number {
-    var binary_image = (IonTypes.INT.bid << IonBinary.TYPE_SHIFT),
+    var binary_image = (IonTypes.INT.binaryTypeId << IonBinary.TYPE_SHIFT),
         len = 1;
     if (this.isNull()) {
       span.write( binary_image | IonBinary.LEN_NULL );

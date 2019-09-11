@@ -199,7 +199,7 @@ export class TextWriter extends AbstractWriter {
     }
 
     writeNull(type: IonType) : void {
-        if (type === null || type === undefined || type.bid < 0 || type.bid > 13) {
+        if (type === null || type === undefined || type.binaryTypeId < 0 || type.binaryTypeId > 13) {
             throw new Error(`Cannot write null for type ${type}`);
         }
         this.handleSeparator();

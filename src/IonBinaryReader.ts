@@ -115,7 +115,7 @@ export class BinaryReader implements Reader {
     }
 
   stepIn() : void {
-    if (!get_ion_type(this._raw_type).container) throw new Error("Can't step in to a scalar value");
+    if (!get_ion_type(this._raw_type).isContainer) throw new Error("Can't step in to a scalar value");
     this._parser.stepIn();
     this._raw_type = BOC;
   }
@@ -205,7 +205,7 @@ export class BinaryReader implements Reader {
 
   value() : any {
     let type = this.type();
-    if (type && type.container) {
+    if (type && type.isContainer) {
       if (this.isNull()) {
         return null;
       }

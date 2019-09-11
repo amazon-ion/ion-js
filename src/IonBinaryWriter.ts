@@ -515,7 +515,7 @@ export abstract class AbstractNode implements Node {
   }
 
   get typeCode() : number {
-    return this._type.bid;
+    return this._type.binaryTypeId;
   }
 
   get writer() : LowLevelBinaryWriter {
