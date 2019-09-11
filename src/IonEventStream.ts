@@ -245,7 +245,7 @@ export class IonEventStream {
                 case 'value_text' : {
                     let tempString : string = this.reader.stringValue();
                     if(tempString.substr(0,5) === '$ion_') tempString = "$ion_user_value::" + tempString
-                    let tempReader : Reader = makeReader(tempString, undefined);
+                    let tempReader : Reader = makeReader(tempString);
                     tempReader.next();
                     let tempValue = tempReader.value();
                     currentEvent['isNull'] =  tempReader.isNull();
@@ -378,7 +378,7 @@ export class IonEventStream {
             tid = this.reader.next();
         }
         this.reader.stepOut();
-        let tempReader : Reader = makeReader(numBuffer, undefined);
+        let tempReader : Reader = makeReader(numBuffer);
         tempReader.next();
         return tempReader.value();
     }

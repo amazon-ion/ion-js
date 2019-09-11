@@ -52,10 +52,10 @@ export type ReaderBuffer = ReaderOctetBuffer | string;
  *
  * @param buf       The Ion data to be used by the reader. Typically a string, UTF-8 encoded buffer (text), or raw
  *                  binary buffer.
- * @param catalog   An optional {Catalog} to be used for resolving symbol table references.
- * @returns {Reader}
  */
-export function makeReader(buf: ReaderBuffer, catalog? : Catalog) : Reader {
+export function makeReader(buf: ReaderBuffer) : Reader {
+    // TODO #387 make the catalog an optional parameter
+    const catalog = null;
     if((typeof buf) === "string"){
         return new TextReader(new StringSpan(<string>buf), catalog);
     }
@@ -69,23 +69,21 @@ export function makeReader(buf: ReaderBuffer, catalog? : Catalog) : Reader {
 
 /** Creates a new Ion Text Writer. */
 export function makeTextWriter() : Writer {
-  return new TextWriter(new Writeable());
+    // TODO #384 make LST an optional parameter
+    return new TextWriter(new Writeable());
 }
 
 /** Creates a new Ion Text Writer with pretty printing of the text. */
 export function makePrettyWriter(indentSize?: number) : Writer {
+    // TODO #384 make LST an optional parameter
     return new PrettyTextWriter(new Writeable(), indentSize);
 }
 
-
-/**
- * Creates a new Ion Binary Writer. You can optionally provide a local symbol table else
- * the default local symbol table will be used.
- *
- * @param localSymbolTable to use for the new writer
- */
-export function makeBinaryWriter(localSymbolTable : LocalSymbolTable = defaultLocalSymbolTable()) : Writer {
-  return new BinaryWriter(localSymbolTable, new Writeable());
+/** Creates a new Ion Binary Writer. */
+export function makeBinaryWriter() : Writer {
+    // TODO #384 make LST an optional parameter
+    const localSymbolTable = defaultLocalSymbolTable();
+    return new BinaryWriter(localSymbolTable, new Writeable());
 }
 
 export { Reader } from "./IonReader";

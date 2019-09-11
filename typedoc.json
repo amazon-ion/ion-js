@@ -19,6 +19,10 @@
     "src/IonWriteable.ts",
     "src/util.ts",
 
+    "src/IonCatalog.ts",
+    "src/IonSymbols.ts",
+    "src/Ion*SymbolTable.ts",
+
     "src/IonBinary*.ts",
     "src/Ion+(Pretty|)Text*.ts",
     "src/*Raw.ts",
