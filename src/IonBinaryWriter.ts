@@ -22,7 +22,7 @@ import {LongInt} from "./IonLongInt";
 import {LowLevelBinaryWriter} from "./IonLowLevelBinaryWriter";
 import {TimestampPrecision,Timestamp} from "./IonTimestamp";
 import {Writeable} from "./IonWriteable";
-import {_sign} from "./util";
+import {_sign, _validateAnnotations} from "./util";
 
 const MAJOR_VERSION: number = 1;
 const MINOR_VERSION: number = 0;
@@ -317,19 +317,12 @@ export class BinaryWriter extends AbstractWriter {
   }
 
   private encodeAnnotations(annotations: string[]) : Uint8Array {
-    if (!annotations || annotations.length === 0) {
+    if (annotations.length === 0) {
       return new Uint8Array(0);
     }
-    if (!Array.isArray(annotations)) {
-      throw new Error('Annotations must be an array of strings.');
-    }
-
     let writeable: Writeable = new Writeable();
     let writer: LowLevelBinaryWriter = new LowLevelBinaryWriter(writeable);
     for (let annotation of annotations) {
-      if(typeof annotation !== 'string') {
-        throw new Error('Annotation must be of type string.');
-      }
       let symbolId: number = this.symbolTable.addSymbol(annotation);
       writer.writeVariableLengthUnsignedInt(symbolId);
     }

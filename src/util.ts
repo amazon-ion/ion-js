@@ -27,3 +27,17 @@ export function _hasValue(v: any): boolean {
     return v !== undefined && v !== null;
 }
 
+export function _validateAnnotations(input : string[]) : boolean {
+    if (!Array.isArray(input)) {
+        return false;
+    }
+    for (let ann in input) {
+        if (!_isString(ann)) {
+            return false;
+        }
+    }
+    return true;
+}
+export function _isString(input : string) : boolean {
+    return typeof input === 'string';
+}
