@@ -22,7 +22,7 @@ import {LongInt} from "./IonLongInt";
 import {LowLevelBinaryWriter} from "./IonLowLevelBinaryWriter";
 import {TimestampPrecision,Timestamp} from "./IonTimestamp";
 import {Writeable} from "./IonWriteable";
-import {_sign, _validateAnnotations} from "./util";
+import {_sign} from "./util";
 
 const MAJOR_VERSION: number = 1;
 const MINOR_VERSION: number = 0;
