@@ -125,11 +125,12 @@ export interface Reader {
     numberValue(): number | null;
 
     /**
-     * Returns the current value as a `string`.  This is only valid if `type() == IonTypes.STRING`.
+     * Returns the current value as a `string`.  This is only valid if `type() == IonTypes.STRING`
+     * or `type() == IonTypes.SYMBOL`.
      *
      * @return `null` if the current Ion value [[isNull]].
      *
-     * @throw Error when the reader is not positioned on a `string` typed value.
+     * @throw Error when the reader is not positioned on a `string` or `symbol` typed value.
      */
     stringValue(): string | null;
 
