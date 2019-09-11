@@ -70,7 +70,7 @@ export interface Reader {
     /**
      * Returns the field name of the current value.
      *
-     * @return `null` if the reader is not positioned on a value or is in a value that has no field name.
+     * @return `null` if the reader is not positioned on a value or is on a value that has no field name.
      */
     fieldName(): string | null;
 
@@ -94,8 +94,8 @@ export interface Reader {
     booleanValue(): boolean | null;
 
     /**
-     * Returns the current value as a `Uint8Array`.  This is only valid if `type() == IonTypes.BLOB`
-     * or `type() == IonTypes.CLOB`.
+     * Returns the current value as a `Uint8Array`.  This is only valid if `type() == IonTypes.CLOB`
+     * or `type() == IonTypes.BLOB`.
      *
      * @return `null` if the current Ion value [[isNull]].
      *
@@ -125,11 +125,11 @@ export interface Reader {
     numberValue(): number | null;
 
     /**
-     * Returns the current value as a [[Timestamp]].  This is only valid if `type() == IonTypes.TIMESTAMP`.
+     * Returns the current value as a `string`.  This is only valid if `type() == IonTypes.STRING`.
      *
      * @return `null` if the current Ion value [[isNull]].
      *
-     * @throw Error when the reader is not positioned on a `timestamp` typed value.
+     * @throw Error when the reader is not positioned on a `string` typed value.
      */
     stringValue(): string | null;
 
@@ -143,7 +143,7 @@ export interface Reader {
     timestampValue(): Timestamp | null;
 
     /**
-     * Returns the current value as a "native" JavaScript value.  This is only valid when `type().scalar == true`.
+     * Returns the current scalar value.  This is only valid when `type().scalar == true`.
      *
      * @return `null` if the current value is [[isNull]], equivalent to the corresponding `xxxValue` methods
      *  for all scalar types.
