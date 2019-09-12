@@ -1,67 +1,20 @@
-<p align="right">
- <a title="npm-version" href="https://www.npmjs.com/package/ion-js"><img src="https://img.shields.io/npm/v/ion-js.svg"/></a>
- <a title="license" href="https://github.com/amzn/ion-js/blob/master/LICENSE"><img src="https://img.shields.io/hexpm/l/plug.svg"/></a>
+# Amazon Ion JavaScript
+An implementation of [Amazon Ion](https://amzn.github.io/ion-docs/) for JavaScript written in TypeScript.
 
-</p>
-<p align="right">
- <a title="travis" href="https://travis-ci.org/amzn/ion-js"><img src="https://api.travis-ci.org/amzn/ion-js.svg?branch=master"/></a>
- <a title="docs" href="https://amzn.github.io/ion-js/api/index.html"><img src="https://img.shields.io/badge/docs-api-green.svg?style=flat-square"/></a>
- <a title="semantic-release" href="https://github.com/amzn/ion-js/releases"><img src="https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg?style=flat-square"/></a>
-</p>
+[![NPM Version](https://img.shields.io/npm/v/ion-js.svg)](https://www.npmjs.com/package/ion-js)
+[![License](https://img.shields.io/hexpm/l/plug.svg)](https://github.com/amzn/ion-js/blob/master/LICENSE)
+[![Travis CI Status](https://api.travis-ci.org/amzn/ion-js.svg?branch=master)](https://travis-ci.org/amzn/ion-js)
+[![Documentation](https://img.shields.io/badge/docs-api-green.svg)](https://amzn.github.io/ion-js/api/index.html)
+[![Semantic Releases](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg)](https://github.com/amzn/ion-js/releases)
 
-# Table of Contents
+This package is designed with work with Node JS major versions **8**, **10**, and **12**.  Browser compatibility
+should be anything that supports **ES5+**.
 
-* [About](#about)
-* [Use](#use)
-  * [NPM](#npm)
-  * [Browser](#browser)
-  * [API](#api)
-* [Contribute](#contribute)
-* [License](#license)
-* [Links](#links)
+## Getting Started
 
-# About
+You can use this library either as a Node.js module or inside an HTML page.
 
-Ion-JS is a Javascript library for [Ion](https://amzn.github.io/ion-docs/). The library allows for reading/writing Ion
-data from within Javascript code.
-
-For more information on Ion have a look at the [Ion Specification](https://amzn.github.io/ion-docs/spec.html) as well as some of the other Ion language specific libraries such as
-
-* [Ion C](https://github.com/amzn/ion-c)
-* [Ion Java](https://github.com/amzn/ion-java)
-* [Ion Python](https://github.com/amzn/ion-python)
-
-# Master Specification Support
-The current release on master branch  <a title="npm-version" href="https://www.npmjs.com/package/ion-js"><img src="https://img.shields.io/npm/v/ion-js.svg"/></a>
-is beta supported at this time.
-
-| Types        | IonText | IonBinary | Limitations  |
-|:-------------:|:-------------:|:-------------:|:-------------:|
-| null      | yes | yes      | none |
-| bool      | yes      | yes      |   none |
-| int | yes      | yes      |    underscores, binaryints, ints outside [-2147483648, 2147483647] |
-| float | yes      | yes      |    underscores |
-| decimal | yes      | yes      |    none |
-| timestamp | yes      | yes      |    none |
-| string | yes      | yes      |    verbatim newline escapes |
-| symbol | yes      | yes      |    sid0, symboltokens, verbatim newline escapes |
-| blob | yes      | yes      |    none |
-| clob | yes      | yes      |    verbatim newline escapes |
-| struct | yes      | yes      |   none |
-| list | yes      | yes      |    none |
-| sexp | yes      | yes      |    none |
-| annotations | yes      | yes      |    none |
-| local symbol tables | yes      | yes      |    none |
-| shared symbol tables | no      | no      |  none |
-
-Verbatim newline escapes are the backslash character `U+005C` followed by the code point of the
-carriage return `U+000D` (CR), newline character `U+000A` (LF), or combination of CR & LF `U+000D` `U+000A`.
-
-# Use
-
-You can use ion-js either as a Node.js module or inside an html page.
-
-## NPM
+### NPM
 
 1. Add `ion-js` to your dependencies using `npm`
     ```
@@ -86,7 +39,7 @@ You can use ion-js either as a Node.js module or inside an html page.
 [install `ion-js` locally using NPM](https://github.com/amzn/ion-js/#npm) to try it out. For status
 updates, refer to this [issue](https://github.com/amzn/ion-js/issues/201).
 
-## Browser
+### Web Browser
 
 You can include the Ion-js bundle (ES5 compatible) using the URLs
 
@@ -106,12 +59,33 @@ These will create and initialize `window.ion` which has the same exact API as ou
 </html>
 ```
 
-## API
+### API
 
-[Ion JS API](https://amzn.github.io/ion-js/api/)
+[TypeDoc](https://typedoc.org/) generated documentation can be found at [here](https://amzn.github.io/ion-js/api/).
+Please note that anything not documented in the the API documentation is not supported for public use and is
+subject to change in any version.
 
+## Git Setup
 
-# Development
+This repository contains a [git submodule](https://git-scm.com/docs/git-submodule)
+called `ion-tests`, which holds test data used by `ion-js`'s unit tests.
+
+The easiest way to clone the `ion-js` repository and initialize its `ion-tests`
+submodule is to run the following command.
+
+```
+$ git clone --recursive https://github.com/amzn/ion-js.git ion-js
+```
+
+Alternatively, the submodule may be initialized independently from the clone
+by running the following commands.
+
+```
+$ git submodule init
+$ git submodule update
+```
+
+## Development
 
 Use `npm` to setup the dependencies.  In the project directory you can run the following:
 
@@ -145,7 +119,7 @@ Or you could use the locally installed Grunt:
 $ ./node_modules/.bin/grunt release
 ```
 
-## Build Output
+### Build Output
 
 The build above will compile the library into the `dist` directory.  This directory has subdirectories of
 the form `<module type>/<target ES version>`.  In general, we target ES6 and rely on polyfills to support earlier
@@ -158,15 +132,45 @@ versions.
 A distribution using `browserify` and `babelify` creates a browser friendly polyfilled distribution targeting ES5:
 at `dist/browser/js/ion-bundle.js`.
 
-# Contribute
+## Ion Specification Support
+The current release in NPM is currently considered a beta.
 
-[CONTRIBUTE.md](CONTRIBUTE.md)
+| Types                     | IonText       | IonBinary     | Limitations                                   |
+|:-------------------------:|:-------------:|:-------------:|:---------------------------------------------:|
+| `null`                    | yes           | yes           | none                                          |
+| `bool`                    | yes           | yes           | none                                          |
+| `int`                     | yes           | yes           | underscores, binary digits, signed 32-bit     |
+| `float`                   | yes           | yes           | underscores                                   |
+| `decimal`                 | yes           | yes           | none                                          |
+| `timestamp`               | yes           | yes           | none                                          |
+| `string`                  | yes           | yes           | verbatim newline escapes                      |
+| `symbol`                  | yes           | yes           | `$0`, symbol tokens, verbatim newline escapes |
+| `blob`                    | yes           | yes           | none                                          |
+| `clob`                    | yes           | yes           | verbatim newline escapes                      |
+| `struct`                  | yes           | yes           | none                                          |
+| `list`                    | yes           | yes           | none                                          |
+| `sexp`                    | yes           | yes           | none                                          |
+| annotations               | yes           | yes           | none                                          |
+| local symbol tables       | yes           | yes           | none                                          |
+| shared symbol tables      | no            | no            | none                                          |
 
-# License
+Notes:
+* *Signed 32-bit* `int` values are values inside the closed interval [`-2147483648`, `2147483647`].
+* *Verbatim newline escapes* are the backslash character `U+005C` followed by the code point of the
+  carriage return `U+000D` (CR), newline character `U+000A` (LF), or combination of CR & LF `U+000D` `U+000A`.
+  Which should not be confused with the backslash character `U+005C` followed by the `n` character (`U+006E`) or
+  `r` character (`U+0072`).
 
-[Apache License 2.0](LICENSE)
+## Contributing
 
-# Links
+See [CONTRIBUTE.md](CONTRIBUTE.md)
+
+## License
+
+This library is licensed under [Apache License version 2.0](LICENSE)
+
+## Links
+For more information about Ion or its other impleemntation, please see:
 
 * [Ion](https://amzn.github.io/ion-docs/)
 * [Ion Specification](https://amzn.github.io/ion-docs/spec.html)
