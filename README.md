@@ -37,32 +37,22 @@ is beta supported at this time.
 
 | Types        | IonText | IonBinary | Limitations  |
 |:-------------:|:-------------:|:-------------:|:-------------:|
-| null      | yes | no      | none |
-| bool      | yes      | no      |   none |
-| int | yes      | no      |    underscores, binaryints, bigints |
-| float | yes      | no      |    underscores |
-| decimal | yes      | no      |    large fractions are slow roundtrip |
-| timestamp | yes      | no      |    fractional seconds are slow on large fractions |
-| string | yes      | no      |    none |
-| symbol | yes      | no      |    sid0, no symboltokens |
-| blob | no      | no      |    broken |
-| clob | yes      | no      |    backed by string |
-| struct | yes      | no      |    none |
-| list | yes      | no      |    none |
-| sexp | yes      | no      |    none |
-| annotations | yes      | no      |    none |
-| local symbol tables | yes      | no      |    none |
-| shared symbol tables | yes      | no      |    user marshals symboltables into the catalog themselves |
-
-| Github Issues |
-|:-------------|
-| [SymbolTokens](https://github.com/amzn/ion-js/issues/121) |
-| [IVM](https://github.com/amzn/ion-js/issues/122) |
-| [Numbers](https://github.com/amzn/ion-js/issues/123) |
-| [Utf8/32/64](https://github.com/amzn/ion-js/issues/124) |
-| [Blobs](https://github.com/amzn/ion-js/issues/125) |
-| [Triplequotes](https://github.com/amzn/ion-js/issues/126) |
-| [Binary](https://github.com/amzn/ion-js/issues/131) |
+| null      | yes | yes      | none |
+| bool      | yes      | yes      |   none |
+| int | yes      | yes      |    underscores, binaryints, ints outside [-2147483648, 2147483647] |
+| float | yes      | yes      |    underscores |
+| decimal | yes      | yes      |    none |
+| timestamp | yes      | yes      |    none |
+| string | yes      | yes      |    '\' + '\n', and '\' + '\r'|
+| symbol | yes      | yes      |    sid0, symboltokens, '\' + '\n', and '\' + '\r' |
+| blob | yes      | yes      |    none |
+| clob | yes      | yes      |    '\' + '\n', and '\' + '\r' |
+| struct | yes      | yes      |   none |
+| list | yes      | yes      |    none |
+| sexp | yes      | yes      |    none |
+| annotations | yes      | yes      |    none |
+| local symbol tables | yes      | yes      |    none |
+| shared symbol tables | no      | no      |  none |
 
 # Use
 
