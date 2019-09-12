@@ -39,7 +39,7 @@ is beta supported at this time.
 |:-------------:|:-------------:|:-------------:|:-------------:|
 | null      | yes | yes      | none |
 | bool      | yes      | yes      |   none |
-| int | yes      | yes      |    underscores, binaryints, ints over 4294967295 |
+| int | yes      | yes      |    underscores, binaryints, ints outside [-2147483648, 2147483647] |
 | float | yes      | yes      |    underscores |
 | decimal | yes      | yes      |    none |
 | timestamp | yes      | yes      |    none |
