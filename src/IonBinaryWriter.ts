@@ -158,7 +158,7 @@ export class BinaryWriter extends AbstractWriter {
     }
 
     let bytes: Uint8Array;
-    if (value === 0) {
+    if (Object.is(value, 0)) {
       bytes = new Uint8Array(0);
     } else {
       let buffer: ArrayBuffer = new ArrayBuffer(4);
@@ -177,7 +177,7 @@ export class BinaryWriter extends AbstractWriter {
     }
 
     let bytes: Uint8Array;
-    if (value === 0) {
+    if (Object.is(value, 0)) {
       bytes = new Uint8Array(0);
     } else {
       let buffer: ArrayBuffer = new ArrayBuffer(8);

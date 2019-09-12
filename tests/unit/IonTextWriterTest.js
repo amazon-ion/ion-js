@@ -174,6 +174,38 @@
     writerTest('Writes negative 32-bit float',
       writer => writer.writeFloat32(-8.125),
       '-8.125e0');
+    writerTest('Writes positive 0 as a 32-bit float',
+      writer => writer.writeFloat32(0),
+       '0e0');
+    writerTest('Writes negative 0 as a 32-bit float',
+      writer => writer.writeFloat32(-0),
+      '-0e0');
+
+    writerTest('Writes 64-bit float',
+      writer => writer.writeFloat64(8.125),
+      '8.125e0');
+    writerTest('Writes null 64-bit float using null',
+      writer => writer.writeFloat64(null),
+      'null.float');
+    writerTest('Writes null 64-bit float using undefined',
+      writer => writer.writeFloat64(),
+      'null.float');
+    writerTest('Writes 64-bit float with annotations',
+      writer => { writer.setAnnotations(['foo', 'bar']); writer.writeFloat64(8.125) },
+      'foo::bar::8.125e0');
+    writerTest('Writes negative 64-bit float',
+      writer => writer.writeFloat64(-8.125),
+      '-8.125e0');
+    writerTest('Writes positive 0 as a 64-bit float',
+      writer => writer.writeFloat64(0),
+      '0e0');
+    writerTest('Writes negative 0 as a 64-bit float',
+      writer => writer.writeFloat64(-0),
+      '-0e0');
+    writerTest('Writes ten billion as a 64-bit float',
+      writer => writer.writeFloat64(10000000000),
+      '1e10');
+
 
     // Ints
 

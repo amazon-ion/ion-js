@@ -154,41 +154,61 @@ export class TextWriter extends AbstractWriter {
     }
 
     writeFloat32(value: number) : void {
-        var tempVal : any = value;
-        if(value === Number.POSITIVE_INFINITY){
-            tempVal = "+inf";
-        } else if(value === Number.NEGATIVE_INFINITY){
-            tempVal = "-inf";
-        } else if(isNaN(value)){
-            tempVal = "nan";
-        } else if (tempVal !== null && tempVal !== undefined){
-            tempVal = tempVal.toExponential();
-            if (tempVal.charAt(tempVal.length - 2) === '+') {
-                tempVal = tempVal.slice(0, tempVal.length - 2) + tempVal.charAt(tempVal.length - 1);
-            }
-        }
-        this._serializeValue(IonTypes.FLOAT, value, (value: number) => {
-            this.writeUtf8(tempVal);
-        });
+        this._writeFloat(value);
     }
 
     writeFloat64(value: number) : void {
-        var tempVal : any = value;
-        if(value === Number.POSITIVE_INFINITY){
-            tempVal = "+inf";
-        } else if(value === Number.NEGATIVE_INFINITY){
-            tempVal = "-inf";
-        } else if(value === Number.NaN){
-            tempVal = "nan";
-        } else if(tempVal !== null && tempVal !== undefined) {
-            tempVal = tempVal.toExponential();
-            if (tempVal.charAt(tempVal.length - 2) === '+') {
-                tempVal = tempVal.slice(0, tempVal.length - 2) + tempVal.charAt(tempVal.length - 1);
+        this._writeFloat(value);
+    }
+
+    /**
+     * Ion's textual representation doesn't distinguish between 32- and 64-bit floats.
+     * This method provides a common implementation of [[writeFloat32]] and [[writeFloat64]], which
+     * are distinct functions to satisfy the [[Writer]] interface.
+     *
+     * @param value - A numeric value to write as an Ion float.
+     */
+    private _writeFloat(value: number): void {
+        this._serializeValue(IonTypes.FLOAT, value, this._floatSerializer);
+    }
+
+    /**
+     * This method provides an implementation of Serializer<number> that can be used in calls to
+     * [[_writeValue]]. It maintains the expected binding to `this` even when used as a callback.
+     *
+     * @param value
+     */
+    private readonly _floatSerializer: Serializer<number> = (value: number) => {
+        TextWriter._serializeFloat(this, value);
+    }
+
+    /**
+     * Converts the provided numeric value into Ion text and writes it to the specified TextWriter.
+     *
+     * @param writer - The TextWriter to which the value should be written.
+     * @param value - A numeric value to write as an Ion float.
+     */
+    private static _serializeFloat(writer: TextWriter, value: number): void {
+        let text: string;
+        if (value === Number.POSITIVE_INFINITY) {
+            text = "+inf";
+        } else if (value === Number.NEGATIVE_INFINITY) {
+            text = "-inf";
+        } else if (value === Number.NaN) {
+            text = "nan";
+        } else if (Object.is(value, -0)) { // 0 === -0, but Object.is(-0, 0) === false
+            text = "-0e0";
+        } else {
+            text = value.toExponential();
+            // If present, removes '+' character from the serialized exponent.
+            // The '+' is legal Ion, but is superfluous.
+            let plusSignIndex = text.lastIndexOf('+');
+            if (plusSignIndex > -1) {
+                text = text.slice(0, plusSignIndex) + text.slice(plusSignIndex + 1);
             }
         }
-        this._serializeValue(IonTypes.FLOAT, value, (value: number) => {
-            this.writeUtf8(tempVal);
-        });
+
+        writer.writeUtf8(text);
     }
 
     writeInt(value: number) : void {
