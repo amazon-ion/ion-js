@@ -43,10 +43,10 @@ is beta supported at this time.
 | float | yes      | yes      |    underscores |
 | decimal | yes      | yes      |    none |
 | timestamp | yes      | yes      |    none |
-| string | yes      | yes      |    '\' + <U+0010>, and '\' + <U+0013>|
-| symbol | yes      | yes      |    sid0, symboltokens, '\' + <U+0010>, and '\' + <U+0013> |
-| blob | yes      | yes      |    no |
-| clob | yes      | yes      |    '\' + <U+0010>, and '\' + <U+0013> |
+| string | yes      | yes      |    '\' + '\n', and '\' + '\r'|
+| symbol | yes      | yes      |    sid0, symboltokens, '\' + '\n', and '\' + '\r' |
+| blob | yes      | yes      |    none |
+| clob | yes      | yes      |    '\' + '\n', and '\' + '\r' |
 | struct | yes      | yes      |   none |
 | list | yes      | yes      |    none |
 | sexp | yes      | yes      |    none |
