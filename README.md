@@ -46,7 +46,7 @@ is beta supported at this time.
 | string | yes      | yes      |    '\' + <U+0010>, and '\' + <U+0013>|
 | symbol | yes      | yes      |    sid0, symboltokens, '\' + <U+0010>, and '\' + <U+0013> |
 | blob | yes      | yes      |    no |
-| clob | yes      | yes      |    no |
+| clob | yes      | yes      |    '\' + <U+0010>, and '\' + <U+0013> |
 | struct | yes      | yes      |   none |
 | list | yes      | yes      |    none |
 | sexp | yes      | yes      |    none |
