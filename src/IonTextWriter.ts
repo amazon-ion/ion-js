@@ -196,7 +196,12 @@ export class TextWriter extends AbstractWriter {
             text = "-inf";
         } else if (value === Number.NaN) {
             text = "nan";
-        } else if (Object.is(value, -0)) { // 0 === -0, but Object.is(-0, 0) === false
+        } else if (Object.is(value, -0)) {
+            // Generally, we use Number#toExponential to convert the number `value` to Ion text.
+            // However, that function does not preserve sign information if the input value is -0.
+            // As such, we've broken the handling for -0 out into a special case.
+            // `Object.is` is used in our if-statement condition to detect -0 because
+            // `0 === -0` evaluates to `true`.
             text = "-0e0";
         } else {
             text = value.toExponential();
