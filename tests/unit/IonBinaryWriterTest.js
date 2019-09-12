@@ -235,6 +235,13 @@ define([
     writerTest("Writes 32-bit float 1.0",
       (writer) => { writer.writeFloat32(1.0) },
         [0x44, 0x3f, 0x80, 0x00, 0x00]);
+    writerTest("Writes 32-bit float 0.0",
+      (writer) => { writer.writeFloat32(0) },
+      [0x40]);
+    writerTest("Writes 32-bit float -0.0",
+      (writer) => { writer.writeFloat32(-0) },
+      [0x44, 0x80, 0x00, 0x00, 0x00]);
+
     writerTest("Writes 32-bit float -8.125",
       (writer) => { writer.writeFloat32(-8.125) },
         [0x44, 0xc1, 0x02, 0x00, 0x00]);
@@ -253,6 +260,13 @@ define([
         0xe7, 0x81, 0x83, 0xd4, 0x87, 0xb2, 0x81, 'a'.charCodeAt(0),
         0xe3, 0x81, 0x8a, 0x4f
       ]);
+
+    writerTest("Writes 64-bit float 0.0",
+      (writer) => { writer.writeFloat64(0) },
+      [0x40]);
+    writerTest("Writes 64-bit float -0.0",
+      (writer) => { writer.writeFloat64(-0) },
+      [0x48, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]);
     writerTest("Writes 64-bit float 1.0",
       (writer) => { writer.writeFloat64(1.0) },
         [0x48, 0x3f, 0xf0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]);
