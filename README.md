@@ -43,16 +43,19 @@ is beta supported at this time.
 | float | yes      | yes      |    underscores |
 | decimal | yes      | yes      |    none |
 | timestamp | yes      | yes      |    none |
-| string | yes      | yes      |    '\' + '\n', and '\' + '\r'|
-| symbol | yes      | yes      |    sid0, symboltokens, '\' + '\n', and '\' + '\r' |
+| string | yes      | yes      |    verbatim newline escapes |
+| symbol | yes      | yes      |    sid0, symboltokens, verbatim newline escapes |
 | blob | yes      | yes      |    none |
-| clob | yes      | yes      |    '\' + '\n', and '\' + '\r' |
+| clob | yes      | yes      |    verbatim newline escapes |
 | struct | yes      | yes      |   none |
 | list | yes      | yes      |    none |
 | sexp | yes      | yes      |    none |
 | annotations | yes      | yes      |    none |
 | local symbol tables | yes      | yes      |    none |
 | shared symbol tables | no      | no      |  none |
+
+Verbatim newline escapes are the backslash character `U+005C` followed by the code point of the
+carriage return `U+000D` (CR), newline character `U+000A` (LF), or combination of CR & LF `U+000D` `U+000A`.
 
 # Use
 
