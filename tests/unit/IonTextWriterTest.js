@@ -310,6 +310,8 @@
           writer => { writer.stepIn(ion.IonTypes.STRUCT); writer.writeSymbol('foo') });
       badWriterTest('Cannot end struct with missing field value',
           writer => { writer.stepIn(ion.IonTypes.STRUCT); writer.writeFieldName('foo'); writer.stepOut() });
+      badWriterTest('Cannot end struct with missing field value',//todo this should be testing nested stepin throws, one for each type/message.
+          writer => { writer.stepIn(ion.IonTypes.STRUCT); writer.writeFieldName('foo'); writer.stepOut() });
 
     // Symbols
 
