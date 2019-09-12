@@ -43,8 +43,8 @@ is beta supported at this time.
 | float | yes      | yes      |    underscores |
 | decimal | yes      | yes      |    none |
 | timestamp | yes      | yes      |    none |
-| string | yes      | yes      |    escape sequences |
-| symbol | yes      | yes      |    sid0, symboltokens |
+| string | yes      | yes      |    '\' + <U+0010>, and '\' + <U+0013>|
+| symbol | yes      | yes      |    sid0, symboltokens, '\' + <U+0010>, and '\' + <U+0013> |
 | blob | yes      | yes      |    no |
 | clob | yes      | yes      |    no |
 | struct | yes      | yes      |   none |
