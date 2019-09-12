@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>Ion Library</title>
+	<title>Ion-JS Library</title>
 	<meta name="description" content="">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="assets/css/main.css">
@@ -22,7 +22,7 @@
 						<li class="state loading">Preparing search index...</li>
 						<li class="state failure">The search index is not available</li>
 					</ul>
-					<a href="index.html" class="title">Ion Library</a>
+					<a href="index.html" class="title">Ion-JS Library</a>
 				</div>
 				<div class="table-cell" id="tsd-widgets">
 					<div id="tsd-filter">
@@ -40,8 +40,6 @@
 							<label class="tsd-widget" for="tsd-filter-inherited">Inherited</label>
 							<input type="checkbox" id="tsd-filter-externals" checked />
 							<label class="tsd-widget" for="tsd-filter-externals">Externals</label>
-							<input type="checkbox" id="tsd-filter-only-exported" />
-							<label class="tsd-widget" for="tsd-filter-only-exported">Only exported</label>
 						</div>
 					</div>
 					<a href="#" class="tsd-widget menu no-caption" data-toggle="menu">Menu</a>
@@ -56,7 +54,7 @@
 					<a href="globals.html">Globals</a>
 				</li>
 			</ul>
-			<h1> Ion Library</h1>
+			<h1> Ion-JS Library</h1>
 		</div>
 	</div>
 </header>
@@ -73,7 +71,9 @@
 					<a title="docs" href="https://amzn.github.io/ion-js/api/index.html"><img src="https://img.shields.io/badge/docs-api-green.svg?style=flat-square"/></a>
 					<a title="semantic-release" href="https://github.com/amzn/ion-js/releases"><img src="https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg?style=flat-square"/></a>
 				</p>
-				<h1 id="table-of-contents">Table of Contents</h1>
+				<a href="#table-of-contents" id="table-of-contents" style="color: inherit; text-decoration: none;">
+					<h1>Table of Contents</h1>
+				</a>
 				<ul>
 					<li><a href="#about">About</a></li>
 					<li><a href="#use">Use</a><ul>
@@ -86,64 +86,217 @@
 					<li><a href="#license">License</a></li>
 					<li><a href="#links">Links</a></li>
 				</ul>
-				<h1 id="about">About</h1>
-				<p>Ion-JS is a JavaScript library for <a href="https://amzn.github.io/ion-docs/">Ion</a> -- this is currently alpha software and is subject to change. The library allows for reading/writing Ion
-				data from within JavaScript code. </p>
-				<p>For more information on Ion have a look at the <a href="https://amzn.github.io/ion-docs/spec.html">Ion Specification</a> as well as some of the other Ion language specific libraries such as </p>
+				<a href="#about" id="about" style="color: inherit; text-decoration: none;">
+					<h1>About</h1>
+				</a>
+				<p>Ion-JS is a Javascript library for <a href="https://amzn.github.io/ion-docs/">Ion</a>. The library allows for reading/writing Ion
+				data from within Javascript code.</p>
+				<p>For more information on Ion have a look at the <a href="https://amzn.github.io/ion-docs/spec.html">Ion Specification</a> as well as some of the other Ion language specific libraries such as</p>
 				<ul>
 					<li><a href="https://github.com/amzn/ion-c">Ion C</a></li>
 					<li><a href="https://github.com/amzn/ion-java">Ion Java</a></li>
 					<li><a href="https://github.com/amzn/ion-python">Ion Python</a></li>
 				</ul>
-				<h1 id="use">Use</h1>
-				<p>You can use ion-js either as a Node.js module or inside an html page. </p>
-				<h2 id="npm">NPM</h2>
+				<a href="#master-specification-support" id="master-specification-support" style="color: inherit; text-decoration: none;">
+					<h1>Master Specification Support</h1>
+				</a>
+				<p>The current release on master branch  <a title="npm-version" href="https://www.npmjs.com/package/ion-js"><img src="https://img.shields.io/npm/v/ion-js.svg"/></a>
+				is beta supported at this time.</p>
+				<table>
+					<thead>
+						<tr>
+							<th align="center">Types</th>
+							<th align="center">IonText</th>
+							<th align="center">IonBinary</th>
+							<th align="center">Limitations</th>
+						</tr>
+					</thead>
+					<tbody><tr>
+							<td align="center">null</td>
+							<td align="center">yes</td>
+							<td align="center">yes</td>
+							<td align="center">none</td>
+						</tr>
+						<tr>
+							<td align="center">bool</td>
+							<td align="center">yes</td>
+							<td align="center">yes</td>
+							<td align="center">none</td>
+						</tr>
+						<tr>
+							<td align="center">int</td>
+							<td align="center">yes</td>
+							<td align="center">yes</td>
+							<td align="center">underscores, binaryints, ints outside [-2147483648, 2147483647]</td>
+						</tr>
+						<tr>
+							<td align="center">float</td>
+							<td align="center">yes</td>
+							<td align="center">yes</td>
+							<td align="center">underscores</td>
+						</tr>
+						<tr>
+							<td align="center">decimal</td>
+							<td align="center">yes</td>
+							<td align="center">yes</td>
+							<td align="center">none</td>
+						</tr>
+						<tr>
+							<td align="center">timestamp</td>
+							<td align="center">yes</td>
+							<td align="center">yes</td>
+							<td align="center">none</td>
+						</tr>
+						<tr>
+							<td align="center">string</td>
+							<td align="center">yes</td>
+							<td align="center">yes</td>
+							<td align="center">verbatim newline escapes</td>
+						</tr>
+						<tr>
+							<td align="center">symbol</td>
+							<td align="center">yes</td>
+							<td align="center">yes</td>
+							<td align="center">sid0, symboltokens, verbatim newline escapes</td>
+						</tr>
+						<tr>
+							<td align="center">blob</td>
+							<td align="center">yes</td>
+							<td align="center">yes</td>
+							<td align="center">none</td>
+						</tr>
+						<tr>
+							<td align="center">clob</td>
+							<td align="center">yes</td>
+							<td align="center">yes</td>
+							<td align="center">verbatim newline escapes</td>
+						</tr>
+						<tr>
+							<td align="center">struct</td>
+							<td align="center">yes</td>
+							<td align="center">yes</td>
+							<td align="center">none</td>
+						</tr>
+						<tr>
+							<td align="center">list</td>
+							<td align="center">yes</td>
+							<td align="center">yes</td>
+							<td align="center">none</td>
+						</tr>
+						<tr>
+							<td align="center">sexp</td>
+							<td align="center">yes</td>
+							<td align="center">yes</td>
+							<td align="center">none</td>
+						</tr>
+						<tr>
+							<td align="center">annotations</td>
+							<td align="center">yes</td>
+							<td align="center">yes</td>
+							<td align="center">none</td>
+						</tr>
+						<tr>
+							<td align="center">local symbol tables</td>
+							<td align="center">yes</td>
+							<td align="center">yes</td>
+							<td align="center">none</td>
+						</tr>
+						<tr>
+							<td align="center">shared symbol tables</td>
+							<td align="center">no</td>
+							<td align="center">no</td>
+							<td align="center">none</td>
+						</tr>
+				</tbody></table>
+				<p>Verbatim newline escapes are the backslash character <code>U+005C</code> followed by the code point of the
+				carriage return <code>U+000D</code> (CR), newline character <code>U+000A</code> (LF), or combination of CR &amp; LF <code>U+000D</code> <code>U+000A</code>.</p>
+				<a href="#use" id="use" style="color: inherit; text-decoration: none;">
+					<h1>Use</h1>
+				</a>
+				<p>You can use ion-js either as a Node.js module or inside an html page.</p>
+				<a href="#npm" id="npm" style="color: inherit; text-decoration: none;">
+					<h2>NPM</h2>
+				</a>
 				<ol>
-					<li>Add <code>ion-js</code> to your dependencies using <code>npm</code><pre><code> npm install --<span class="hljs-built_in">save</span>-<span class="hljs-built_in">dev</span> ion-js
-</code></pre></li>
-					<li><p>Use the library to read/write ion data. Here is an example that reads Ion data from a JavaScript string</p>
-						<pre><code class="lang-javascript"> <span class="hljs-keyword">var</span> ionJs = <span class="hljs-built_in">require</span>(<span class="hljs-string">"ion-js"</span>)
+					<li><p>Add <code>ion-js</code> to your dependencies using <code>npm</code></p>
+					<pre><code> npm install --<span class="hljs-built_in">save</span>-<span class="hljs-built_in">dev</span> ion-js</code></pre></li>
+					<li><p>Use the library to read/write ion data. Here is an example that reads Ion data from a Javascript string</p>
+						<pre><code class="language-javascript"> <span class="hljs-keyword">var</span> ionJs = <span class="hljs-built_in">require</span>(<span class="hljs-string">"ion-js"</span>)
 
- <span class="hljs-keyword">var</span> ionData = <span class="hljs-string">"{ hello: \"Ion\" }"</span>; 
- <span class="hljs-keyword">var</span> ionReader = ionJs.makeReader(ionData); 
- ionReader.next(); 
- ionReader.stepIn(); 
- ionReader.next(); 
- <span class="hljs-keyword">var</span> hello = ionReader.fieldName(); 
- <span class="hljs-keyword">var</span> ion = ionReader.stringValue(); 
- ionReader.stepOut(); 
- <span class="hljs-built_in">console</span>.log(ion.concat(<span class="hljs-string">", "</span>).concat(hello));
-</code></pre>
-						<p> <a href="https://npm.runkit.com/ion-js">Try it yourself</a>. </p>
+ <span class="hljs-keyword">var</span> ionData = <span class="hljs-string">"{ hello: \"Ion\" }"</span>;
+ <span class="hljs-keyword">var</span> ionReader = ionJs.makeReader(ionData);
+ ionReader.next();
+ ionReader.stepIn();
+ ionReader.next();
+ <span class="hljs-keyword">var</span> hello = ionReader.fieldName();
+ <span class="hljs-keyword">var</span> ion = ionReader.stringValue();
+ ionReader.stepOut();
+ <span class="hljs-built_in">console</span>.log(ion.concat(<span class="hljs-string">", "</span>).concat(hello));</code></pre>
 					</li>
 				</ol>
-				<h2 id="browser">Browser</h2>
-				<p>You can include the Ion-js bundle (ES5 compatible) using the URLs </p>
+				<p><strong>Warning:</strong> RunKit has an old version of ion-js and the APIs have changed considerably since them. Please
+					<a href="https://github.com/amzn/ion-js/#npm">install <code>ion-js</code> locally using NPM</a> to try it out. For status
+				updates, refer to this <a href="https://github.com/amzn/ion-js/issues/201">issue</a>.</p>
+				<a href="#browser" id="browser" style="color: inherit; text-decoration: none;">
+					<h2>Browser</h2>
+				</a>
+				<p>You can include the Ion-js bundle (ES5 compatible) using the URLs</p>
 				<ul>
 					<li><a href="https://amzn.github.io/ion-js/browser/scripts/ion-bundle.min.js">ion-bundle.min.js</a></li>
 					<li><a href="https://amzn.github.io/ion-js/browser/scripts/ion-bundle.js">ion-bundle.js</a></li>
 				</ul>
-				<p>These will create and initialize <code>window.ion</code> which has the exact API as our <code>npm</code> package. Here is an example </p>
-				<pre><code class="lang-html"><span class="hljs-tag">&lt;<span class="hljs-name">html</span>&gt;</span>
+				<p>These will create and initialize <code>window.ion</code> which has the same exact API as our <code>npm</code> package. Here is an example</p>
+				<pre><code class="language-html"><span class="hljs-tag">&lt;<span class="hljs-name">html</span>&gt;</span>
 <span class="hljs-tag">&lt;<span class="hljs-name">head</span>&gt;</span>
   <span class="hljs-tag">&lt;<span class="hljs-name">meta</span> <span class="hljs-attr">charset</span>=<span class="hljs-string">"UTF-8"</span>/&gt;</span>
-  <span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">"scripts/ion-bundle.min.js"</span>&gt;</span><span class="undefined"></span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">"scripts/ion-bundle.min.js"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
 
   <span class="hljs-comment">&lt;!-- more HTML/JS code that can now use `window.ion` to create/write Ion --&gt;</span>
 <span class="hljs-tag">&lt;/<span class="hljs-name">head</span>&gt;</span>
-<span class="hljs-tag">&lt;/<span class="hljs-name">html</span>&gt;</span>
-</code></pre>
-				<h2 id="api">API</h2>
+<span class="hljs-tag">&lt;/<span class="hljs-name">html</span>&gt;</span></code></pre>
+				<a href="#api" id="api" style="color: inherit; text-decoration: none;">
+					<h2>API</h2>
+				</a>
 				<p><a href="https://amzn.github.io/ion-js/api/">Ion JS API</a></p>
-				<h1 id="contribute">Contribute</h1>
+				<a href="#development" id="development" style="color: inherit; text-decoration: none;">
+					<h1>Development</h1>
+				</a>
+				<p>Use <code>npm</code> to setup the dependencies.  In the project directory you can run the following:</p>
+				<pre><code>$ npm <span class="hljs-keyword">install</span></code></pre><p>Building the package can be done with the release script (which runs the tests).</p>
+				<pre><code>$ npm <span class="hljs-built_in">run</span> <span class="hljs-built_in">release</span></code></pre><p>Tests can be run using npm as well</p>
+				<pre><code><span class="hljs-meta">$</span><span class="bash"> npm <span class="hljs-built_in">test</span></span></code></pre><p>This package uses <a href="https://gruntjs.com/">Grunt</a> for its build tasks.  For convenience, you may want to install
+				this globally:</p>
+				<pre><code><span class="hljs-variable">$ </span>npm -g install grunt-cli
+<span class="hljs-variable">$ </span>grunt release</code></pre><p>Or you could use the locally installed Grunt:</p>
+				<pre><code>$ ./node_modules/.bin/grunt <span class="hljs-built_in">release</span></code></pre>
+				<a href="#build-output" id="build-output" style="color: inherit; text-decoration: none;">
+					<h2>Build Output</h2>
+				</a>
+				<p>The build above will compile the library into the <code>dist</code> directory.  This directory has subdirectories of
+					the form <code>&lt;module type&gt;/&lt;target ES version&gt;</code>.  In general, we target ES6 and rely on polyfills to support earlier
+				versions.</p>
+				<ul>
+					<li><code>dist/es6/es6</code> - Targets the ES6 module system and ES6</li>
+					<li><code>dist/commonjs/es6</code> - Targets the CommonJS module system and ES6 </li>
+					<li><code>dist/amd/es6</code> - Targets the AMD module system and ES6</li>
+				</ul>
+				<p>A distribution using <code>browserify</code> and <code>babelify</code> creates a browser friendly polyfilled distribution targeting ES5:
+				at <code>dist/browser/js/ion-bundle.js</code>.</p>
+				<a href="#contribute" id="contribute" style="color: inherit; text-decoration: none;">
+					<h1>Contribute</h1>
+				</a>
 				<p><a href="CONTRIBUTE.md">CONTRIBUTE.md</a></p>
-				<h1 id="license">License</h1>
+				<a href="#license" id="license" style="color: inherit; text-decoration: none;">
+					<h1>License</h1>
+				</a>
 				<p><a href="LICENSE">Apache License 2.0</a></p>
-				<h1 id="links">Links</h1>
+				<a href="#links" id="links" style="color: inherit; text-decoration: none;">
+					<h1>Links</h1>
+				</a>
 				<ul>
 					<li><a href="https://amzn.github.io/ion-docs/">Ion</a></li>
 					<li><a href="https://amzn.github.io/ion-docs/spec.html">Ion Specification</a></li>
-					<li><a href="https://amzn.github.io/ion-docs/cookbook.html">Ion Cookbook</a> uses the Java library for its examples. </li>
+					<li><a href="https://amzn.github.io/ion-docs/cookbook.html">Ion Cookbook</a> uses the Java library for its examples.</li>
 					<li><a href="https://github.com/amzn/ion-c">Ion C</a></li>
 					<li><a href="https://github.com/amzn/ion-java">Ion Java</a></li>
 					<li><a href="https://github.com/amzn/ion-python">Ion Python</a></li>
@@ -160,82 +313,10 @@
 						<a href="modules/_ion_.html">"<wbr>Ion"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
-						<a href="modules/_ionbinary_.html">"<wbr>Ion<wbr>Binary"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="modules/_ionbinaryreader_.html">"<wbr>Ion<wbr>Binary<wbr>Reader"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="modules/_ionbinarywriter_.html">"<wbr>Ion<wbr>Binary<wbr>Writer"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="modules/_ioncatalog_.html">"<wbr>Ion<wbr>Catalog"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="modules/_ionconstants_.html">"<wbr>Ion<wbr>Constants"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
 						<a href="modules/_iondecimal_.html">"<wbr>Ion<wbr>Decimal"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
-						<a href="modules/_ionerrors_.html">"<wbr>Ion<wbr>Errors"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="modules/_ionimport_.html">"<wbr>Ion<wbr>Import"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="modules/_ionlocalsymboltable_.html">"<wbr>Ion<wbr>Local<wbr>Symbol<wbr>Table"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="modules/_ionlongint_.html">"<wbr>Ion<wbr>Long<wbr>Int"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="modules/_ionlowlevelbinarywriter_.html">"<wbr>Ion<wbr>Low<wbr>Level<wbr>Binary<wbr>Writer"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="modules/_ionparserbinaryraw_.html">"<wbr>Ion<wbr>Parser<wbr>Binary<wbr>Raw"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="modules/_ionparsertextraw_.html">"<wbr>Ion<wbr>Parser<wbr>Text<wbr>Raw"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="modules/_ionprecision_.html">"<wbr>Ion<wbr>Precision"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
 						<a href="modules/_ionreader_.html">"<wbr>Ion<wbr>Reader"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="modules/_ionsharedsymboltable_.html">"<wbr>Ion<wbr>Shared<wbr>Symbol<wbr>Table"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="modules/_ionspan_.html">"<wbr>Ion<wbr>Span"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="modules/_ionsubstitutesymboltable_.html">"<wbr>Ion<wbr>Substitute<wbr>Symbol<wbr>Table"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="modules/_ionsymbol_.html">"<wbr>Ion<wbr>Symbol"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="modules/_ionsymbolindex_.html">"<wbr>Ion<wbr>Symbol<wbr>Index"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="modules/_ionsymbols_.html">"<wbr>Ion<wbr>Symbols"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="modules/_ionsystemsymboltable_.html">"<wbr>Ion<wbr>System<wbr>Symbol<wbr>Table"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="modules/_iontests_.html">"<wbr>Ion<wbr>Tests"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="modules/_iontext_.html">"<wbr>Ion<wbr>Text"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="modules/_iontextreader_.html">"<wbr>Ion<wbr>Text<wbr>Reader"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="modules/_iontextwriter_.html">"<wbr>Ion<wbr>Text<wbr>Writer"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
 						<a href="modules/_iontimestamp_.html">"<wbr>Ion<wbr>Timestamp"</a>
@@ -245,18 +326,6 @@
 					</li>
 					<li class=" tsd-kind-external-module">
 						<a href="modules/_iontypes_.html">"<wbr>Ion<wbr>Types"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="modules/_ionunicode_.html">"<wbr>Ion<wbr>Unicode"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="modules/_ionutilities_.html">"<wbr>Ion<wbr>Utilities"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="modules/_ionvalue_.html">"<wbr>Ion<wbr>Value"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="modules/_ionwriteable_.html">"<wbr>Ion<wbr>Writeable"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
 						<a href="modules/_ionwriter_.html">"<wbr>Ion<wbr>Writer"</a>
@@ -282,6 +351,7 @@
 				<li class="tsd-kind-function tsd-has-type-parameter"><span class="tsd-kind-icon">Function with type parameter</span></li>
 				<li class="tsd-kind-index-signature"><span class="tsd-kind-icon">Index signature</span></li>
 				<li class="tsd-kind-type-alias"><span class="tsd-kind-icon">Type alias</span></li>
+				<li class="tsd-kind-type-alias tsd-has-type-parameter"><span class="tsd-kind-icon">Type alias with type parameter</span></li>
 			</ul>
 			<ul class="tsd-legend">
 				<li class="tsd-kind-enum"><span class="tsd-kind-icon">Enumeration</span></li>
@@ -330,7 +400,7 @@
 	</div>
 </footer>
 <div class="container tsd-generator">
-	<p>Generated using <a href="http://typedoc.org/" target="_blank">TypeDoc</a></p>
+	<p>Generated using <a href="https://typedoc.org/" target="_blank">TypeDoc</a></p>
 </div>
 <div class="overlay"></div>
 <script src="assets/js/main.js"></script>

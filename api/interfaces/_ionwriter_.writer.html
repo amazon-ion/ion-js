@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>Writer | Ion Library</title>
+	<title>Writer | Ion-JS Library</title>
 	<meta name="description" content="">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -22,7 +22,7 @@
 						<li class="state loading">Preparing search index...</li>
 						<li class="state failure">The search index is not available</li>
 					</ul>
-					<a href="../index.html" class="title">Ion Library</a>
+					<a href="../index.html" class="title">Ion-JS Library</a>
 				</div>
 				<div class="table-cell" id="tsd-widgets">
 					<div id="tsd-filter">
@@ -40,8 +40,6 @@
 							<label class="tsd-widget" for="tsd-filter-inherited">Inherited</label>
 							<input type="checkbox" id="tsd-filter-externals" checked />
 							<label class="tsd-widget" for="tsd-filter-externals">Externals</label>
-							<input type="checkbox" id="tsd-filter-only-exported" />
-							<label class="tsd-widget" for="tsd-filter-only-exported">Only exported</label>
 						</div>
 					</div>
 					<a href="#" class="tsd-widget menu no-caption" data-toggle="menu">Menu</a>
@@ -72,7 +70,7 @@
 			<section class="tsd-panel tsd-comment">
 				<div class="tsd-comment tsd-typography">
 					<div class="lead">
-						<p>Writes values in the Ion text or binary formats.</p>
+						<p>Serializes data in Ion text or binary format to an implementation defined buffer.</p>
 					</div>
 				</div>
 			</section>
@@ -84,13 +82,6 @@
 					</li>
 				</ul>
 			</section>
-			<section class="tsd-panel">
-				<h3>Implemented by</h3>
-				<ul class="tsd-hierarchy">
-					<li><a href="../classes/_ionbinarywriter_.binarywriter.html" class="tsd-signature-type">BinaryWriter</a></li>
-					<li><a href="../classes/_iontextwriter_.textwriter.html" class="tsd-signature-type">TextWriter</a></li>
-				</ul>
-			</section>
 			<section class="tsd-panel-group tsd-index-group">
 				<h2>Index</h2>
 				<section class="tsd-panel tsd-index-panel">
@@ -98,9 +89,12 @@
 						<section class="tsd-index-section ">
 							<h3>Methods</h3>
 							<ul class="tsd-index-list">
+								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_ionwriter_.writer.html#addannotation" class="tsd-kind-icon">add<wbr>Annotation</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_ionwriter_.writer.html#close" class="tsd-kind-icon">close</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_ionwriter_.writer.html#endcontainer" class="tsd-kind-icon">end<wbr>Container</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_ionwriter_.writer.html#getbytes" class="tsd-kind-icon">get<wbr>Bytes</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_ionwriter_.writer.html#setannotations" class="tsd-kind-icon">set<wbr>Annotations</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_ionwriter_.writer.html#stepin" class="tsd-kind-icon">step<wbr>In</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_ionwriter_.writer.html#stepout" class="tsd-kind-icon">step<wbr>Out</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_ionwriter_.writer.html#writeblob" class="tsd-kind-icon">write<wbr>Blob</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_ionwriter_.writer.html#writeboolean" class="tsd-kind-icon">write<wbr>Boolean</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_ionwriter_.writer.html#writeclob" class="tsd-kind-icon">write<wbr>Clob</a></li>
@@ -109,13 +103,12 @@
 								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_ionwriter_.writer.html#writefloat32" class="tsd-kind-icon">write<wbr>Float32</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_ionwriter_.writer.html#writefloat64" class="tsd-kind-icon">write<wbr>Float64</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_ionwriter_.writer.html#writeint" class="tsd-kind-icon">write<wbr>Int</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_ionwriter_.writer.html#writelist" class="tsd-kind-icon">write<wbr>List</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_ionwriter_.writer.html#writenull" class="tsd-kind-icon">write<wbr>Null</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_ionwriter_.writer.html#writesexp" class="tsd-kind-icon">write<wbr>Sexp</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_ionwriter_.writer.html#writestring" class="tsd-kind-icon">write<wbr>String</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_ionwriter_.writer.html#writestruct" class="tsd-kind-icon">write<wbr>Struct</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_ionwriter_.writer.html#writesymbol" class="tsd-kind-icon">write<wbr>Symbol</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_ionwriter_.writer.html#writetimestamp" class="tsd-kind-icon">write<wbr>Timestamp</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_ionwriter_.writer.html#writevalue" class="tsd-kind-icon">write<wbr>Value</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_ionwriter_.writer.html#writevalues" class="tsd-kind-icon">write<wbr>Values</a></li>
 							</ul>
 						</section>
 					</div>
@@ -123,6 +116,35 @@
 			</section>
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Methods</h2>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface">
+					<a name="addannotation" class="tsd-anchor"></a>
+					<h3>add<wbr>Annotation</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
+						<li class="tsd-signature tsd-kind-icon">add<wbr>Annotation<span class="tsd-signature-symbol">(</span>annotation<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/0b2f6be/src/IonWriter.ts#L140">IonWriter.ts:140</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Adds an annotation to the list of annotations to be used when
+									writing the next value.</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>annotation: <span class="tsd-signature-type">string</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
 				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface">
 					<a name="close" class="tsd-anchor"></a>
 					<h3>close</h3>
@@ -133,26 +155,20 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/b1591da/src/IonWriter.ts#L39">IonWriter.ts:39</a></li>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/0b2f6be/src/IonWriter.ts#L155">IonWriter.ts:155</a></li>
 								</ul>
 							</aside>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
-						</li>
-					</ul>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface">
-					<a name="endcontainer" class="tsd-anchor"></a>
-					<h3>end<wbr>Container</h3>
-					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
-						<li class="tsd-signature tsd-kind-icon">end<wbr>Container<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
-					</ul>
-					<ul class="tsd-descriptions">
-						<li class="tsd-description">
-							<aside class="tsd-sources">
-								<ul>
-									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/b1591da/src/IonWriter.ts#L40">IonWriter.ts:40</a></li>
-								</ul>
-							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Flushes data to the internal buffer and finalizes the Ion stream.</p>
+								</div>
+								<dl class="tsd-comment-tags">
+									<dt>throws</dt>
+									<dd><p>Error if the <a href="_ionwriter_.writer.html">Writer</a> is already closed or the writer is not
+										at the top-level (i.e. inside of a container).</p>
+									</dd>
+								</dl>
+							</div>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
 						</li>
 					</ul>
@@ -161,16 +177,119 @@
 					<a name="getbytes" class="tsd-anchor"></a>
 					<h3>get<wbr>Bytes</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
-						<li class="tsd-signature tsd-kind-icon">get<wbr>Bytes<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span></li>
+						<li class="tsd-signature tsd-kind-icon">get<wbr>Bytes<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Uint8Array</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/b1591da/src/IonWriter.ts#L37">IonWriter.ts:37</a></li>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/0b2f6be/src/IonWriter.ts#L164">IonWriter.ts:164</a></li>
 								</ul>
 							</aside>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span></h4>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Retrieves the serialized buffer as an array of octets.  The buffer will
+										be either a UTF-8 encoded buffer for Ion text or Ion binary.  The buffer is
+									not well-defined until <a href="_ionwriter_.writer.html#close">close</a> is invoked.</p>
+								</div>
+								<dl class="tsd-comment-tags">
+									<dt>throws</dt>
+									<dd><p>Error if <a href="_ionwriter_.writer.html#close">close</a> has not been invoked.</p>
+									</dd>
+								</dl>
+							</div>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Uint8Array</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface">
+					<a name="setannotations" class="tsd-anchor"></a>
+					<h3>set<wbr>Annotations</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
+						<li class="tsd-signature tsd-kind-icon">set<wbr>Annotations<span class="tsd-signature-symbol">(</span>annotations<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/0b2f6be/src/IonWriter.ts#L147">IonWriter.ts:147</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Specifies the list of annotations to be used when writing
+										the next value.  This clears the current annotations set
+									for the next value.</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>annotations: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface">
+					<a name="stepin" class="tsd-anchor"></a>
+					<h3>step<wbr>In</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
+						<li class="tsd-signature tsd-kind-icon">step<wbr>In<span class="tsd-signature-symbol">(</span>type<span class="tsd-signature-symbol">: </span><a href="../classes/_iontype_.iontype.html" class="tsd-signature-type">IonType</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/0b2f6be/src/IonWriter.ts#L127">IonWriter.ts:127</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Starts a container and positions the writer within that container.</p>
+								</div>
+								<dl class="tsd-comment-tags">
+									<dt>throws</dt>
+									<dd><p>Error if <code>type.container</code> is not one of <code>IonTypes.LIST</code>, <code>IonTypes.SEXP</code>,
+										or <code>IonTypes.STRUCT</code>.</p>
+									</dd>
+								</dl>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>type: <a href="../classes/_iontype_.iontype.html" class="tsd-signature-type">IonType</a></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface">
+					<a name="stepout" class="tsd-anchor"></a>
+					<h3>step<wbr>Out</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
+						<li class="tsd-signature tsd-kind-icon">step<wbr>Out<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/0b2f6be/src/IonWriter.ts#L134">IonWriter.ts:134</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Steps out of a container and positions the writer after the container.</p>
+								</div>
+								<dl class="tsd-comment-tags">
+									<dt>throws</dt>
+									<dd><p>Error if the writer is not inside a container.</p>
+									</dd>
+								</dl>
+							</div>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
 						</li>
 					</ul>
 				</section>
@@ -178,22 +297,27 @@
 					<a name="writeblob" class="tsd-anchor"></a>
 					<h3>write<wbr>Blob</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
-						<li class="tsd-signature tsd-kind-icon">write<wbr>Blob<span class="tsd-signature-symbol">(</span>value<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span>, annotations<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+						<li class="tsd-signature tsd-kind-icon">write<wbr>Blob<span class="tsd-signature-symbol">(</span>value<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Uint8Array</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/b1591da/src/IonWriter.ts#L22">IonWriter.ts:22</a></li>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/0b2f6be/src/IonWriter.ts#L91">IonWriter.ts:91</a></li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Writes a <code>Uint8Array</code> as an Ion <code>blob</code> value.</p>
+								</div>
+							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>value: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span></h5>
-								</li>
-								<li>
-									<h5><span class="tsd-flag ts-flagOptional">Optional</span> annotations: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span></h5>
+									<h5>value: <span class="tsd-signature-type">Uint8Array</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The array to write, which may be <code>null</code> to write a <code>null.blob</code>.</p>
+									</div>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -204,22 +328,27 @@
 					<a name="writeboolean" class="tsd-anchor"></a>
 					<h3>write<wbr>Boolean</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
-						<li class="tsd-signature tsd-kind-icon">write<wbr>Boolean<span class="tsd-signature-symbol">(</span>value<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span>, annotations<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+						<li class="tsd-signature tsd-kind-icon">write<wbr>Boolean<span class="tsd-signature-symbol">(</span>value<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/b1591da/src/IonWriter.ts#L23">IonWriter.ts:23</a></li>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/0b2f6be/src/IonWriter.ts#L31">IonWriter.ts:31</a></li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Writes a <code>boolean</code> as an Ion <code>bool</code> value.</p>
+								</div>
+							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>value: <span class="tsd-signature-type">boolean</span></h5>
-								</li>
-								<li>
-									<h5><span class="tsd-flag ts-flagOptional">Optional</span> annotations: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span></h5>
+									<h5>value: <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The <code>boolean</code> to write, which may be <code>null</code> to write a <code>null.bool</code>.</p>
+									</div>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -230,22 +359,27 @@
 					<a name="writeclob" class="tsd-anchor"></a>
 					<h3>write<wbr>Clob</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
-						<li class="tsd-signature tsd-kind-icon">write<wbr>Clob<span class="tsd-signature-symbol">(</span>value<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span>, annotations<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+						<li class="tsd-signature tsd-kind-icon">write<wbr>Clob<span class="tsd-signature-symbol">(</span>value<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Uint8Array</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/b1591da/src/IonWriter.ts#L24">IonWriter.ts:24</a></li>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/0b2f6be/src/IonWriter.ts#L98">IonWriter.ts:98</a></li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Writes a <code>Uint8Array</code> as an Ion <code>clob</code> value.</p>
+								</div>
+							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>value: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span></h5>
-								</li>
-								<li>
-									<h5><span class="tsd-flag ts-flagOptional">Optional</span> annotations: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span></h5>
+									<h5>value: <span class="tsd-signature-type">Uint8Array</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The array to write, which may be <code>null</code> to write a <code>null.clob</code>.</p>
+									</div>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -256,22 +390,27 @@
 					<a name="writedecimal" class="tsd-anchor"></a>
 					<h3>write<wbr>Decimal</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
-						<li class="tsd-signature tsd-kind-icon">write<wbr>Decimal<span class="tsd-signature-symbol">(</span>value<span class="tsd-signature-symbol">: </span><a href="../classes/_iondecimal_.decimal.html" class="tsd-signature-type">Decimal</a>, annotations<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+						<li class="tsd-signature tsd-kind-icon">write<wbr>Decimal<span class="tsd-signature-symbol">(</span>value<span class="tsd-signature-symbol">: </span><a href="../classes/_iondecimal_.decimal.html" class="tsd-signature-type">Decimal</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/b1591da/src/IonWriter.ts#L25">IonWriter.ts:25</a></li>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/0b2f6be/src/IonWriter.ts#L63">IonWriter.ts:63</a></li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Writes a <a href="../classes/_iondecimal_.decimal.html">Decimal</a> value as an Ion <code>decimal</code> value.</p>
+								</div>
+							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>value: <a href="../classes/_iondecimal_.decimal.html" class="tsd-signature-type">Decimal</a></h5>
-								</li>
-								<li>
-									<h5><span class="tsd-flag ts-flagOptional">Optional</span> annotations: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span></h5>
+									<h5>value: <a href="../classes/_iondecimal_.decimal.html" class="tsd-signature-type">Decimal</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The <a href="../classes/_iondecimal_.decimal.html">Decimal</a> to write, which may be <code>null</code> to write a <code>null.decimal</code>.</p>
+									</div>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -288,9 +427,20 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/b1591da/src/IonWriter.ts#L26">IonWriter.ts:26</a></li>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/0b2f6be/src/IonWriter.ts#L119">IonWriter.ts:119</a></li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Writes the field name for a member of a <code>struct</code>.</p>
+								</div>
+								<dl class="tsd-comment-tags">
+									<dt>throws</dt>
+									<dd><p>Error if the <a href="_ionwriter_.writer.html">Writer</a> is not within a <code>struct</code> or this method was already
+										called before a value was written.</p>
+									</dd>
+								</dl>
+							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
@@ -305,22 +455,29 @@
 					<a name="writefloat32" class="tsd-anchor"></a>
 					<h3>write<wbr>Float32</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
-						<li class="tsd-signature tsd-kind-icon">write<wbr>Float32<span class="tsd-signature-symbol">(</span>value<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, annotations<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+						<li class="tsd-signature tsd-kind-icon">write<wbr>Float32<span class="tsd-signature-symbol">(</span>value<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/b1591da/src/IonWriter.ts#L27">IonWriter.ts:27</a></li>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/0b2f6be/src/IonWriter.ts#L49">IonWriter.ts:49</a></li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Writes a <code>number</code> value as an Ion 32-bit binary <code>float</code> value.</p>
+								</div>
+							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>value: <span class="tsd-signature-type">number</span></h5>
-								</li>
-								<li>
-									<h5><span class="tsd-flag ts-flagOptional">Optional</span> annotations: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span></h5>
+									<h5>value: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The <code>number</code> to write, which may be <code>null</code> to write a <code>null.float</code>.
+											If the <code>number</code> cannot be represented exactly as a 32-bit binary floating point
+										value, an implementation may truncate or round the value.</p>
+									</div>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -331,22 +488,27 @@
 					<a name="writefloat64" class="tsd-anchor"></a>
 					<h3>write<wbr>Float64</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
-						<li class="tsd-signature tsd-kind-icon">write<wbr>Float64<span class="tsd-signature-symbol">(</span>value<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, annotations<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+						<li class="tsd-signature tsd-kind-icon">write<wbr>Float64<span class="tsd-signature-symbol">(</span>value<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/b1591da/src/IonWriter.ts#L28">IonWriter.ts:28</a></li>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/0b2f6be/src/IonWriter.ts#L56">IonWriter.ts:56</a></li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Writes a <code>number</code> value as an Ion 64-bit binary <code>float</code> value.</p>
+								</div>
+							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>value: <span class="tsd-signature-type">number</span></h5>
-								</li>
-								<li>
-									<h5><span class="tsd-flag ts-flagOptional">Optional</span> annotations: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span></h5>
+									<h5>value: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The <code>number</code> to write, which may be <code>null</code> to write a <code>null.float</code>.</p>
+									</div>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -357,48 +519,29 @@
 					<a name="writeint" class="tsd-anchor"></a>
 					<h3>write<wbr>Int</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
-						<li class="tsd-signature tsd-kind-icon">write<wbr>Int<span class="tsd-signature-symbol">(</span>value<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, annotations<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+						<li class="tsd-signature tsd-kind-icon">write<wbr>Int<span class="tsd-signature-symbol">(</span>value<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/b1591da/src/IonWriter.ts#L29">IonWriter.ts:29</a></li>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/0b2f6be/src/IonWriter.ts#L40">IonWriter.ts:40</a></li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Writes a <code>number</code> value as an Ion <code>int</code>.</p>
+								</div>
+							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>value: <span class="tsd-signature-type">number</span></h5>
-								</li>
-								<li>
-									<h5><span class="tsd-flag ts-flagOptional">Optional</span> annotations: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span></h5>
-								</li>
-							</ul>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
-						</li>
-					</ul>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface">
-					<a name="writelist" class="tsd-anchor"></a>
-					<h3>write<wbr>List</h3>
-					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
-						<li class="tsd-signature tsd-kind-icon">write<wbr>List<span class="tsd-signature-symbol">(</span>annotations<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span>, isNull<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
-					</ul>
-					<ul class="tsd-descriptions">
-						<li class="tsd-description">
-							<aside class="tsd-sources">
-								<ul>
-									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/b1591da/src/IonWriter.ts#L30">IonWriter.ts:30</a></li>
-								</ul>
-							</aside>
-							<h4 class="tsd-parameters-title">Parameters</h4>
-							<ul class="tsd-parameters">
-								<li>
-									<h5><span class="tsd-flag ts-flagOptional">Optional</span> annotations: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span></h5>
-								</li>
-								<li>
-									<h5><span class="tsd-flag ts-flagOptional">Optional</span> isNull: <span class="tsd-signature-type">boolean</span></h5>
+									<h5>value: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The <code>number</code> to write, which may be <code>null</code> to write a <code>null.int</code>.
+											If <code>number</code> is not an integer between the range specified by <code>Number.MIN_SAFE_INTEGER</code>
+										and <code>Number.MAX_SAFE_INTEGER</code>, an implementation may truncate or round the value.</p>
+									</div>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -409,48 +552,24 @@
 					<a name="writenull" class="tsd-anchor"></a>
 					<h3>write<wbr>Null</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
-						<li class="tsd-signature tsd-kind-icon">write<wbr>Null<span class="tsd-signature-symbol">(</span>type_<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">TypeCodes.NULL</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">TypeCodes.BOOL</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">TypeCodes.POSITIVE_INT</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">TypeCodes.NEGATIVE_INT</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">TypeCodes.FLOAT</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">TypeCodes.DECIMAL</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">TypeCodes.TIMESTAMP</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">TypeCodes.SYMBOL</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">TypeCodes.STRING</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">TypeCodes.CLOB</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">TypeCodes.BLOB</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">TypeCodes.LIST</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">TypeCodes.SEXP</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">TypeCodes.STRUCT</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">TypeCodes.ANNOTATION</span>, annotations<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+						<li class="tsd-signature tsd-kind-icon">write<wbr>Null<span class="tsd-signature-symbol">(</span>type<span class="tsd-signature-symbol">: </span><a href="../classes/_iontype_.iontype.html" class="tsd-signature-type">IonType</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/b1591da/src/IonWriter.ts#L31">IonWriter.ts:31</a></li>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/0b2f6be/src/IonWriter.ts#L24">IonWriter.ts:24</a></li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Writes a null value of the given <a href="../classes/_iontype_.iontype.html">IonType</a>.</p>
+								</div>
+							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>type_: <span class="tsd-signature-type">TypeCodes.NULL</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">TypeCodes.BOOL</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">TypeCodes.POSITIVE_INT</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">TypeCodes.NEGATIVE_INT</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">TypeCodes.FLOAT</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">TypeCodes.DECIMAL</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">TypeCodes.TIMESTAMP</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">TypeCodes.SYMBOL</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">TypeCodes.STRING</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">TypeCodes.CLOB</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">TypeCodes.BLOB</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">TypeCodes.LIST</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">TypeCodes.SEXP</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">TypeCodes.STRUCT</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">TypeCodes.ANNOTATION</span></h5>
-								</li>
-								<li>
-									<h5><span class="tsd-flag ts-flagOptional">Optional</span> annotations: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span></h5>
-								</li>
-							</ul>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
-						</li>
-					</ul>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface">
-					<a name="writesexp" class="tsd-anchor"></a>
-					<h3>write<wbr>Sexp</h3>
-					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
-						<li class="tsd-signature tsd-kind-icon">write<wbr>Sexp<span class="tsd-signature-symbol">(</span>annotations<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span>, isNull<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
-					</ul>
-					<ul class="tsd-descriptions">
-						<li class="tsd-description">
-							<aside class="tsd-sources">
-								<ul>
-									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/b1591da/src/IonWriter.ts#L32">IonWriter.ts:32</a></li>
-								</ul>
-							</aside>
-							<h4 class="tsd-parameters-title">Parameters</h4>
-							<ul class="tsd-parameters">
-								<li>
-									<h5><span class="tsd-flag ts-flagOptional">Optional</span> annotations: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span></h5>
-								</li>
-								<li>
-									<h5><span class="tsd-flag ts-flagOptional">Optional</span> isNull: <span class="tsd-signature-type">boolean</span></h5>
+									<h5>type: <a href="../classes/_iontype_.iontype.html" class="tsd-signature-type">IonType</a></h5>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -461,48 +580,27 @@
 					<a name="writestring" class="tsd-anchor"></a>
 					<h3>write<wbr>String</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
-						<li class="tsd-signature tsd-kind-icon">write<wbr>String<span class="tsd-signature-symbol">(</span>value<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, annotations<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+						<li class="tsd-signature tsd-kind-icon">write<wbr>String<span class="tsd-signature-symbol">(</span>value<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/b1591da/src/IonWriter.ts#L33">IonWriter.ts:33</a></li>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/0b2f6be/src/IonWriter.ts#L77">IonWriter.ts:77</a></li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Writes a <code>string</code> value as an Ion <code>string</code>.</p>
+								</div>
+							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>value: <span class="tsd-signature-type">string</span></h5>
-								</li>
-								<li>
-									<h5><span class="tsd-flag ts-flagOptional">Optional</span> annotations: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span></h5>
-								</li>
-							</ul>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
-						</li>
-					</ul>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface">
-					<a name="writestruct" class="tsd-anchor"></a>
-					<h3>write<wbr>Struct</h3>
-					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
-						<li class="tsd-signature tsd-kind-icon">write<wbr>Struct<span class="tsd-signature-symbol">(</span>annotations<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span>, isNull<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
-					</ul>
-					<ul class="tsd-descriptions">
-						<li class="tsd-description">
-							<aside class="tsd-sources">
-								<ul>
-									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/b1591da/src/IonWriter.ts#L34">IonWriter.ts:34</a></li>
-								</ul>
-							</aside>
-							<h4 class="tsd-parameters-title">Parameters</h4>
-							<ul class="tsd-parameters">
-								<li>
-									<h5><span class="tsd-flag ts-flagOptional">Optional</span> annotations: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span></h5>
-								</li>
-								<li>
-									<h5><span class="tsd-flag ts-flagOptional">Optional</span> isNull: <span class="tsd-signature-type">boolean</span></h5>
+									<h5>value: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The <code>string</code> to write, which may be <code>null</code> to write a <code>null.string</code>.</p>
+									</div>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -513,22 +611,27 @@
 					<a name="writesymbol" class="tsd-anchor"></a>
 					<h3>write<wbr>Symbol</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
-						<li class="tsd-signature tsd-kind-icon">write<wbr>Symbol<span class="tsd-signature-symbol">(</span>value<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, annotations<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+						<li class="tsd-signature tsd-kind-icon">write<wbr>Symbol<span class="tsd-signature-symbol">(</span>value<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/b1591da/src/IonWriter.ts#L35">IonWriter.ts:35</a></li>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/0b2f6be/src/IonWriter.ts#L84">IonWriter.ts:84</a></li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Writes a <code>string</code> value as an Ion <code>symbol</code>.</p>
+								</div>
+							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>value: <span class="tsd-signature-type">string</span></h5>
-								</li>
-								<li>
-									<h5><span class="tsd-flag ts-flagOptional">Optional</span> annotations: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span></h5>
+									<h5>value: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The <code>string</code> to write, which may be <code>null</code> to write a <code>null.symbol</code>.</p>
+									</div>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -539,22 +642,86 @@
 					<a name="writetimestamp" class="tsd-anchor"></a>
 					<h3>write<wbr>Timestamp</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
-						<li class="tsd-signature tsd-kind-icon">write<wbr>Timestamp<span class="tsd-signature-symbol">(</span>value<span class="tsd-signature-symbol">: </span><a href="../classes/_iontimestamp_.timestamp.html" class="tsd-signature-type">Timestamp</a>, annotations<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+						<li class="tsd-signature tsd-kind-icon">write<wbr>Timestamp<span class="tsd-signature-symbol">(</span>value<span class="tsd-signature-symbol">: </span><a href="../classes/_iontimestamp_.timestamp.html" class="tsd-signature-type">Timestamp</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/b1591da/src/IonWriter.ts#L36">IonWriter.ts:36</a></li>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/0b2f6be/src/IonWriter.ts#L70">IonWriter.ts:70</a></li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Writes a <a href="../classes/_iontimestamp_.timestamp.html">Timestamp</a> value as an Ion <code>timestamp</code> value.</p>
+								</div>
+							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>value: <a href="../classes/_iontimestamp_.timestamp.html" class="tsd-signature-type">Timestamp</a></h5>
+									<h5>value: <a href="../classes/_iontimestamp_.timestamp.html" class="tsd-signature-type">Timestamp</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The <a href="../classes/_iontimestamp_.timestamp.html">Timestamp</a> to write, which may be <code>null</code> to write a <code>null.timestamp</code>.</p>
+									</div>
 								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface">
+					<a name="writevalue" class="tsd-anchor"></a>
+					<h3>write<wbr>Value</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
+						<li class="tsd-signature tsd-kind-icon">write<wbr>Value<span class="tsd-signature-symbol">(</span>reader<span class="tsd-signature-symbol">: </span><a href="_ionreader_.reader.html" class="tsd-signature-type">Reader</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/0b2f6be/src/IonWriter.ts#L104">IonWriter.ts:104</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Writes a reader&#39;s current value.  If there&#39;s no current value, this method
+									does nothing.</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
 								<li>
-									<h5><span class="tsd-flag ts-flagOptional">Optional</span> annotations: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span></h5>
+									<h5>reader: <a href="_ionreader_.reader.html" class="tsd-signature-type">Reader</a></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface">
+					<a name="writevalues" class="tsd-anchor"></a>
+					<h3>write<wbr>Values</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
+						<li class="tsd-signature tsd-kind-icon">write<wbr>Values<span class="tsd-signature-symbol">(</span>reader<span class="tsd-signature-symbol">: </span><a href="_ionreader_.reader.html" class="tsd-signature-type">Reader</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/0b2f6be/src/IonWriter.ts#L111">IonWriter.ts:111</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Writes a reader&#39;s current value and all following values until the end
+										of the current container.  If there&#39;s no current value then this method
+									calls {@link next()} to get started.</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>reader: <a href="_ionreader_.reader.html" class="tsd-signature-type">Reader</a></h5>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -569,6 +736,24 @@
 					<li class="globals  ">
 						<a href="../globals.html"><em>Globals</em></a>
 					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="../modules/_ion_.html">"<wbr>Ion"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="../modules/_iondecimal_.html">"<wbr>Ion<wbr>Decimal"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="../modules/_ionreader_.html">"<wbr>Ion<wbr>Reader"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="../modules/_iontimestamp_.html">"<wbr>Ion<wbr>Timestamp"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="../modules/_iontype_.html">"<wbr>Ion<wbr>Type"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="../modules/_iontypes_.html">"<wbr>Ion<wbr>Types"</a>
+					</li>
 					<li class="current tsd-kind-external-module">
 						<a href="../modules/_ionwriter_.html">"<wbr>Ion<wbr>Writer"</a>
 					</li>
@@ -582,13 +767,22 @@
 						<a href="_ionwriter_.writer.html" class="tsd-kind-icon">Writer</a>
 						<ul>
 							<li class=" tsd-kind-method tsd-parent-kind-interface">
+								<a href="_ionwriter_.writer.html#addannotation" class="tsd-kind-icon">add<wbr>Annotation</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-interface">
 								<a href="_ionwriter_.writer.html#close" class="tsd-kind-icon">close</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-interface">
-								<a href="_ionwriter_.writer.html#endcontainer" class="tsd-kind-icon">end<wbr>Container</a>
+								<a href="_ionwriter_.writer.html#getbytes" class="tsd-kind-icon">get<wbr>Bytes</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-interface">
-								<a href="_ionwriter_.writer.html#getbytes" class="tsd-kind-icon">get<wbr>Bytes</a>
+								<a href="_ionwriter_.writer.html#setannotations" class="tsd-kind-icon">set<wbr>Annotations</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-interface">
+								<a href="_ionwriter_.writer.html#stepin" class="tsd-kind-icon">step<wbr>In</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-interface">
+								<a href="_ionwriter_.writer.html#stepout" class="tsd-kind-icon">step<wbr>Out</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-interface">
 								<a href="_ionwriter_.writer.html#writeblob" class="tsd-kind-icon">write<wbr>Blob</a>
@@ -615,25 +809,22 @@
 								<a href="_ionwriter_.writer.html#writeint" class="tsd-kind-icon">write<wbr>Int</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-interface">
-								<a href="_ionwriter_.writer.html#writelist" class="tsd-kind-icon">write<wbr>List</a>
-							</li>
-							<li class=" tsd-kind-method tsd-parent-kind-interface">
 								<a href="_ionwriter_.writer.html#writenull" class="tsd-kind-icon">write<wbr>Null</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-interface">
-								<a href="_ionwriter_.writer.html#writesexp" class="tsd-kind-icon">write<wbr>Sexp</a>
-							</li>
-							<li class=" tsd-kind-method tsd-parent-kind-interface">
 								<a href="_ionwriter_.writer.html#writestring" class="tsd-kind-icon">write<wbr>String</a>
-							</li>
-							<li class=" tsd-kind-method tsd-parent-kind-interface">
-								<a href="_ionwriter_.writer.html#writestruct" class="tsd-kind-icon">write<wbr>Struct</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-interface">
 								<a href="_ionwriter_.writer.html#writesymbol" class="tsd-kind-icon">write<wbr>Symbol</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-interface">
 								<a href="_ionwriter_.writer.html#writetimestamp" class="tsd-kind-icon">write<wbr>Timestamp</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-interface">
+								<a href="_ionwriter_.writer.html#writevalue" class="tsd-kind-icon">write<wbr>Value</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-interface">
+								<a href="_ionwriter_.writer.html#writevalues" class="tsd-kind-icon">write<wbr>Values</a>
 							</li>
 						</ul>
 					</li>
@@ -656,6 +847,7 @@
 				<li class="tsd-kind-function tsd-has-type-parameter"><span class="tsd-kind-icon">Function with type parameter</span></li>
 				<li class="tsd-kind-index-signature"><span class="tsd-kind-icon">Index signature</span></li>
 				<li class="tsd-kind-type-alias"><span class="tsd-kind-icon">Type alias</span></li>
+				<li class="tsd-kind-type-alias tsd-has-type-parameter"><span class="tsd-kind-icon">Type alias with type parameter</span></li>
 			</ul>
 			<ul class="tsd-legend">
 				<li class="tsd-kind-enum"><span class="tsd-kind-icon">Enumeration</span></li>
@@ -704,7 +896,7 @@
 	</div>
 </footer>
 <div class="container tsd-generator">
-	<p>Generated using <a href="http://typedoc.org/" target="_blank">TypeDoc</a></p>
+	<p>Generated using <a href="https://typedoc.org/" target="_blank">TypeDoc</a></p>
 </div>
 <div class="overlay"></div>
 <script src="../assets/js/main.js"></script>

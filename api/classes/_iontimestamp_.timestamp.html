@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>Timestamp | Ion Library</title>
+	<title>Timestamp | Ion-JS Library</title>
 	<meta name="description" content="">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -22,7 +22,7 @@
 						<li class="state loading">Preparing search index...</li>
 						<li class="state failure">The search index is not available</li>
 					</ul>
-					<a href="../index.html" class="title">Ion Library</a>
+					<a href="../index.html" class="title">Ion-JS Library</a>
 				</div>
 				<div class="table-cell" id="tsd-widgets">
 					<div id="tsd-filter">
@@ -40,8 +40,6 @@
 							<label class="tsd-widget" for="tsd-filter-inherited">Inherited</label>
 							<input type="checkbox" id="tsd-filter-externals" checked />
 							<label class="tsd-widget" for="tsd-filter-externals">Externals</label>
-							<input type="checkbox" id="tsd-filter-only-exported" />
-							<label class="tsd-widget" for="tsd-filter-only-exported">Only exported</label>
 						</div>
 					</div>
 					<a href="#" class="tsd-widget menu no-caption" data-toggle="menu">Menu</a>
@@ -69,6 +67,13 @@
 <div class="container container-main">
 	<div class="row">
 		<div class="col-8 col-content">
+			<section class="tsd-panel tsd-comment">
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>This class provides the additional semantics necessary for Ion timestamp values.</p>
+					</div>
+				</div>
+			</section>
 			<section class="tsd-panel tsd-hierarchy">
 				<h3>Hierarchy</h3>
 				<ul class="tsd-hierarchy">
@@ -88,35 +93,15 @@
 							</ul>
 						</section>
 						<section class="tsd-index-section ">
-							<h3>Properties</h3>
-							<ul class="tsd-index-list">
-								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="_iontimestamp_.timestamp.html#day" class="tsd-kind-icon">day</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="_iontimestamp_.timestamp.html#hour" class="tsd-kind-icon">hour</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="_iontimestamp_.timestamp.html#minute" class="tsd-kind-icon">minute</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="_iontimestamp_.timestamp.html#month" class="tsd-kind-icon">month</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="_iontimestamp_.timestamp.html#offset" class="tsd-kind-icon">offset</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="_iontimestamp_.timestamp.html#precision" class="tsd-kind-icon">precision</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="_iontimestamp_.timestamp.html#seconds" class="tsd-kind-icon">seconds</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="_iontimestamp_.timestamp.html#year" class="tsd-kind-icon">year</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-static"><a href="_iontimestamp_.timestamp.html#null" class="tsd-kind-icon">NULL</a></li>
-							</ul>
-						</section>
-						<section class="tsd-index-section ">
 							<h3>Methods</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-private"><a href="_iontimestamp_.timestamp.html#checkvalid" class="tsd-kind-icon">check<wbr>Valid</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_iontimestamp_.timestamp.html#getepochmilliseconds" class="tsd-kind-icon">get<wbr>Epoch<wbr>Milliseconds</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_iontimestamp_.timestamp.html#getoffset" class="tsd-kind-icon">get<wbr>Offset</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_iontimestamp_.timestamp.html#compareto" class="tsd-kind-icon">compare<wbr>To</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_iontimestamp_.timestamp.html#equals" class="tsd-kind-icon">equals</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_iontimestamp_.timestamp.html#getdate" class="tsd-kind-icon">get<wbr>Date</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_iontimestamp_.timestamp.html#getlocaloffset" class="tsd-kind-icon">get<wbr>Local<wbr>Offset</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_iontimestamp_.timestamp.html#getprecision" class="tsd-kind-icon">get<wbr>Precision</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_iontimestamp_.timestamp.html#getzuluday" class="tsd-kind-icon">get<wbr>Zulu<wbr>Day</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_iontimestamp_.timestamp.html#getzuluhour" class="tsd-kind-icon">get<wbr>Zulu<wbr>Hour</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_iontimestamp_.timestamp.html#getzuluminute" class="tsd-kind-icon">get<wbr>Zulu<wbr>Minute</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_iontimestamp_.timestamp.html#getzulumonth" class="tsd-kind-icon">get<wbr>Zulu<wbr>Month</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_iontimestamp_.timestamp.html#getzuluseconds" class="tsd-kind-icon">get<wbr>Zulu<wbr>Seconds</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_iontimestamp_.timestamp.html#getzuluyear" class="tsd-kind-icon">get<wbr>Zulu<wbr>Year</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_iontimestamp_.timestamp.html#isnull" class="tsd-kind-icon">is<wbr>Null</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_iontimestamp_.timestamp.html#numbervalue" class="tsd-kind-icon">number<wbr>Value</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_iontimestamp_.timestamp.html#stringvalue" class="tsd-kind-icon">string<wbr>Value</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_iontimestamp_.timestamp.html#getsecondsdecimal" class="tsd-kind-icon">get<wbr>Seconds<wbr>Decimal</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_iontimestamp_.timestamp.html#getsecondsint" class="tsd-kind-icon">get<wbr>Seconds<wbr>Int</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_iontimestamp_.timestamp.html#tostring" class="tsd-kind-icon">to<wbr>String</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-static"><a href="_iontimestamp_.timestamp.html#parse" class="tsd-kind-icon">parse</a></li>
 							</ul>
@@ -130,40 +115,83 @@
 					<a name="constructor" class="tsd-anchor"></a>
 					<h3>constructor</h3>
 					<ul class="tsd-signatures tsd-kind-constructor tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">new <wbr>Timestamp<span class="tsd-signature-symbol">(</span>precision<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">Precision.EMPTY</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Precision.NULL</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Precision.YEAR</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Precision.MONTH</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Precision.DAY</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Precision.HOUR_AND_MINUTE</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Precision.SECONDS</span>, offset<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span>, year<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span>, month<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span>, day<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span>, hour<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span>, minute<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span>, seconds<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><a href="_iondecimal_.decimal.html" class="tsd-signature-type">Decimal</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_iontimestamp_.timestamp.html" class="tsd-signature-type">Timestamp</a></li>
+						<li class="tsd-signature tsd-kind-icon">new <wbr>Timestamp<span class="tsd-signature-symbol">(</span>localOffset<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, year<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, month<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span>, day<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span>, hour<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span>, minutes<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span>, seconds<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> | </span><a href="_iondecimal_.decimal.html" class="tsd-signature-type">Decimal</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_iontimestamp_.timestamp.html" class="tsd-signature-type">Timestamp</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/b1591da/src/IonTimestamp.ts#L246">IonTimestamp.ts:246</a></li>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/0b2f6be/src/IonTimestamp.ts#L65">IonTimestamp.ts:65</a></li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Creates a new Timestamp, with precision determined by which parameters
+										are provided.  If a parameter is not specified, it defaults to its lowest
+									valid value;  defaulted values are not used when determining the precision.</p>
+								</div>
+								<p>Logically, an instance of this class represents an instant in time based on
+								an offset from UTC and the other provided parameters.</p>
+							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> precision: <span class="tsd-signature-type">Precision.EMPTY</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Precision.NULL</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Precision.YEAR</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Precision.MONTH</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Precision.DAY</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Precision.HOUR_AND_MINUTE</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Precision.SECONDS</span><span class="tsd-signature-symbol"> =&nbsp;Precision.NULL</span></h5>
+									<h5>localOffset: <span class="tsd-signature-type">number</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<div class="lead">
+											<p>Local offset from UTC (range: [-(23*60+59):(23*60+59)])</p>
+										</div>
+									</div>
 								</li>
 								<li>
-									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> offset: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> =&nbsp;0</span></h5>
+									<h5>year: <span class="tsd-signature-type">number</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<div class="lead">
+											<p>the year (range: [1-9999])</p>
+										</div>
+									</div>
 								</li>
 								<li>
-									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> year: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> =&nbsp;0</span></h5>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> month: <span class="tsd-signature-type">number</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<div class="lead">
+											<p>the month (range: [1-12])</p>
+										</div>
+									</div>
 								</li>
 								<li>
-									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> month: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> =&nbsp;0</span></h5>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> day: <span class="tsd-signature-type">number</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<div class="lead">
+											<p>the day of the month (range: [1-31])</p>
+										</div>
+									</div>
 								</li>
 								<li>
-									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> day: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> =&nbsp;0</span></h5>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> hour: <span class="tsd-signature-type">number</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<div class="lead">
+											<p>the hour of the day (range: [0-23])</p>
+										</div>
+									</div>
 								</li>
 								<li>
-									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> hour: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> =&nbsp;0</span></h5>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> minutes: <span class="tsd-signature-type">number</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<div class="lead">
+											<p>number of minutes (range: [0-59])</p>
+										</div>
+									</div>
 								</li>
 								<li>
-									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> minute: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> =&nbsp;0</span></h5>
-								</li>
-								<li>
-									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> seconds: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><a href="_iondecimal_.decimal.html" class="tsd-signature-type">Decimal</a><span class="tsd-signature-symbol"> =&nbsp;0</span></h5>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> seconds: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> | </span><a href="_iondecimal_.decimal.html" class="tsd-signature-type">Decimal</a></h5>
+									<div class="tsd-comment tsd-typography">
+										<div class="lead">
+											<p>number of seconds specified as a number (range: [0-59]),
+												or a Decimal (range: [0.0-60.0)) in order to express whole seconds
+											along with some fractional seconds</p>
+										</div>
+									</div>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <a href="_iontimestamp_.timestamp.html" class="tsd-signature-type">Timestamp</a></h4>
@@ -172,147 +200,168 @@
 				</section>
 			</section>
 			<section class="tsd-panel-group tsd-member-group ">
-				<h2>Properties</h2>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private">
-					<a name="day" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagPrivate">Private</span> day</h3>
-					<div class="tsd-signature tsd-kind-icon">day<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
-					<aside class="tsd-sources">
-						<ul>
-							<li>Defined in <a href="https://github.com/amzn/ion-js/blob/b1591da/src/IonTimestamp.ts#L253">IonTimestamp.ts:253</a></li>
-						</ul>
-					</aside>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private">
-					<a name="hour" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagPrivate">Private</span> hour</h3>
-					<div class="tsd-signature tsd-kind-icon">hour<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
-					<aside class="tsd-sources">
-						<ul>
-							<li>Defined in <a href="https://github.com/amzn/ion-js/blob/b1591da/src/IonTimestamp.ts#L254">IonTimestamp.ts:254</a></li>
-						</ul>
-					</aside>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private">
-					<a name="minute" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagPrivate">Private</span> minute</h3>
-					<div class="tsd-signature tsd-kind-icon">minute<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
-					<aside class="tsd-sources">
-						<ul>
-							<li>Defined in <a href="https://github.com/amzn/ion-js/blob/b1591da/src/IonTimestamp.ts#L255">IonTimestamp.ts:255</a></li>
-						</ul>
-					</aside>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private">
-					<a name="month" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagPrivate">Private</span> month</h3>
-					<div class="tsd-signature tsd-kind-icon">month<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
-					<aside class="tsd-sources">
-						<ul>
-							<li>Defined in <a href="https://github.com/amzn/ion-js/blob/b1591da/src/IonTimestamp.ts#L252">IonTimestamp.ts:252</a></li>
-						</ul>
-					</aside>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private">
-					<a name="offset" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagPrivate">Private</span> offset</h3>
-					<div class="tsd-signature tsd-kind-icon">offset<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
-					<aside class="tsd-sources">
-						<ul>
-							<li>Defined in <a href="https://github.com/amzn/ion-js/blob/b1591da/src/IonTimestamp.ts#L250">IonTimestamp.ts:250</a></li>
-						</ul>
-					</aside>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private">
-					<a name="precision" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagPrivate">Private</span> precision</h3>
-					<div class="tsd-signature tsd-kind-icon">precision<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Precision.EMPTY</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Precision.NULL</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Precision.YEAR</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Precision.MONTH</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Precision.DAY</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Precision.HOUR_AND_MINUTE</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Precision.SECONDS</span></div>
-					<aside class="tsd-sources">
-						<ul>
-							<li>Defined in <a href="https://github.com/amzn/ion-js/blob/b1591da/src/IonTimestamp.ts#L249">IonTimestamp.ts:249</a></li>
-						</ul>
-					</aside>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private">
-					<a name="seconds" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagPrivate">Private</span> seconds</h3>
-					<div class="tsd-signature tsd-kind-icon">seconds<span class="tsd-signature-symbol">:</span> <a href="_iondecimal_.decimal.html" class="tsd-signature-type">Decimal</a></div>
-					<aside class="tsd-sources">
-						<ul>
-							<li>Defined in <a href="https://github.com/amzn/ion-js/blob/b1591da/src/IonTimestamp.ts#L246">IonTimestamp.ts:246</a></li>
-						</ul>
-					</aside>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private">
-					<a name="year" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagPrivate">Private</span> year</h3>
-					<div class="tsd-signature tsd-kind-icon">year<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
-					<aside class="tsd-sources">
-						<ul>
-							<li>Defined in <a href="https://github.com/amzn/ion-js/blob/b1591da/src/IonTimestamp.ts#L251">IonTimestamp.ts:251</a></li>
-						</ul>
-					</aside>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-static">
-					<a name="null" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagStatic">Static</span> NULL</h3>
-					<div class="tsd-signature tsd-kind-icon">NULL<span class="tsd-signature-symbol">:</span> <a href="_iontimestamp_.timestamp.html" class="tsd-signature-type">Timestamp</a><span class="tsd-signature-symbol"> =&nbsp;new Timestamp(Precision.NULL)</span></div>
-					<aside class="tsd-sources">
-						<ul>
-							<li>Defined in <a href="https://github.com/amzn/ion-js/blob/b1591da/src/IonTimestamp.ts#L441">IonTimestamp.ts:441</a></li>
-						</ul>
-					</aside>
-				</section>
-			</section>
-			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Methods</h2>
-				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-private">
-					<a name="checkvalid" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagPrivate">Private</span> check<wbr>Valid</h3>
-					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-private">
-						<li class="tsd-signature tsd-kind-icon">check<wbr>Valid<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
-					</ul>
-					<ul class="tsd-descriptions">
-						<li class="tsd-description">
-							<aside class="tsd-sources">
-								<ul>
-									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/b1591da/src/IonTimestamp.ts#L271">IonTimestamp.ts:271</a></li>
-								</ul>
-							</aside>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
-						</li>
-					</ul>
-				</section>
 				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
-					<a name="getepochmilliseconds" class="tsd-anchor"></a>
-					<h3>get<wbr>Epoch<wbr>Milliseconds</h3>
+					<a name="compareto" class="tsd-anchor"></a>
+					<h3>compare<wbr>To</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">get<wbr>Epoch<wbr>Milliseconds<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span></li>
+						<li class="tsd-signature tsd-kind-icon">compare<wbr>To<span class="tsd-signature-symbol">(</span>that<span class="tsd-signature-symbol">: </span><a href="_iontimestamp_.timestamp.html" class="tsd-signature-type">Timestamp</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/b1591da/src/IonTimestamp.ts#L324">IonTimestamp.ts:324</a></li>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/0b2f6be/src/IonTimestamp.ts#L315">IonTimestamp.ts:315</a></li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Compares this Timestamp with another and returns -1, 0, or 1 if the instant represented
+									by this Timestamp occurs before, at the same time, or after the other Timestamp.</p>
+								</div>
+								<p>Note that a return value of 0 from this method doesn&#39;t guarantee that equals() will return true,
+									as compareTo() doesn&#39;t require the values to have the same precision and local offset to be
+								considered the same instant, whereas equals() does.  The following table illustrates this behavior:</p>
+								<table>
+									<thead>
+										<tr>
+											<th>Timestamp 1</th>
+											<th>Timestamp 2</th>
+											<th>compareTo</th>
+											<th>equals</th>
+										</tr>
+									</thead>
+									<tbody><tr>
+											<td>2001T</td>
+											<td>2001T</td>
+											<td>0</td>
+											<td>true</td>
+										</tr>
+										<tr>
+											<td>2001-01-01T</td>
+											<td>2001-01-01T</td>
+											<td>0</td>
+											<td>true</td>
+										</tr>
+										<tr>
+											<td>2001-01-01T00:00:00.000Z</td>
+											<td>2001-01-01T00:00:00.000Z</td>
+											<td>0</td>
+											<td>true</td>
+										</tr>
+										<tr>
+											<td>2001T</td>
+											<td>2001-01-01T</td>
+											<td>0</td>
+											<td>false</td>
+										</tr>
+										<tr>
+											<td>2001T</td>
+											<td>2001-01-01T00:00:00.000Z</td>
+											<td>0</td>
+											<td>false</td>
+										</tr>
+										<tr>
+											<td>2001-01-01T00:00Z</td>
+											<td>2000-12-31T23:59-00:01</td>
+											<td>0</td>
+											<td>false</td>
+										</tr>
+								</tbody></table>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>that: <a href="_iontimestamp_.timestamp.html" class="tsd-signature-type">Timestamp</a></h5>
+								</li>
+							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
 						</li>
 					</ul>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
-					<a name="getoffset" class="tsd-anchor"></a>
-					<h3>get<wbr>Offset</h3>
+					<a name="equals" class="tsd-anchor"></a>
+					<h3>equals</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">get<wbr>Offset<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span></li>
+						<li class="tsd-signature tsd-kind-icon">equals<span class="tsd-signature-symbol">(</span>that<span class="tsd-signature-symbol">: </span><a href="_iontimestamp_.timestamp.html" class="tsd-signature-type">Timestamp</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/b1591da/src/IonTimestamp.ts#L433">IonTimestamp.ts:433</a></li>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/0b2f6be/src/IonTimestamp.ts#L290">IonTimestamp.ts:290</a></li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Compares this Timestamp with another and returns true if they represent the same instant
+										and have the same precision.  Note that this differs from compareTo(), which doesn&#39;t require
+									precision to match when returning 0.</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>that: <a href="_iontimestamp_.timestamp.html" class="tsd-signature-type">Timestamp</a></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="getdate" class="tsd-anchor"></a>
+					<h3>get<wbr>Date</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">get<wbr>Date<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Date</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/0b2f6be/src/IonTimestamp.ts#L228">IonTimestamp.ts:228</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Returns a Date representing the value of this Timestamp.  Note that this may be a lossy
+									operation, as a Date cannot fully represent all Timestamp values.  Specifically:</p>
+									<ul>
+										<li>fractional seconds of a Timestamp beyond millisecond precision are rounded
+										to the nearest millisecond in the returned Date</li>
+										<li>if the precision of this Timestamp is YEAR or MONTH, the returned Date&#39;s month and day
+										are set to January 1</li>
+										<li>the returned Date object is not aware of this Timestamp&#39;s local offset property</li>
+									</ul>
+								</div>
+								<p>With the exception of the discrepancies noted above, the returned Date will represent the
+									same instant in time as this Timestamp.  However, most methods of the Date API will return
+									properties in the <em>local date and time</em> of the instant, which may differ from the local
+									offset of the Timestamp.  The Date class also provides methods for retrieving the properties
+								of the instant in UTC.</p>
+							</div>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Date</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="getlocaloffset" class="tsd-anchor"></a>
+					<h3>get<wbr>Local<wbr>Offset</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">get<wbr>Local<wbr>Offset<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/0b2f6be/src/IonTimestamp.ts#L202">IonTimestamp.ts:202</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Returns this Timestamp&#39;s local offset from UTC, in minutes.</p>
+								</div>
+							</div>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
 						</li>
 					</ul>
@@ -321,182 +370,65 @@
 					<a name="getprecision" class="tsd-anchor"></a>
 					<h3>get<wbr>Precision</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">get<wbr>Precision<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Precision.EMPTY</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Precision.NULL</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Precision.YEAR</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Precision.MONTH</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Precision.DAY</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Precision.HOUR_AND_MINUTE</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Precision.SECONDS</span></li>
+						<li class="tsd-signature tsd-kind-icon">get<wbr>Precision<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../enums/_iontimestamp_.timestampprecision.html" class="tsd-signature-type">TimestampPrecision</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/b1591da/src/IonTimestamp.ts#L437">IonTimestamp.ts:437</a></li>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/0b2f6be/src/IonTimestamp.ts#L209">IonTimestamp.ts:209</a></li>
 								</ul>
 							</aside>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Precision.EMPTY</span>
-								<span class="tsd-signature-symbol"> | </span>
-								<span class="tsd-signature-type">Precision.NULL</span>
-								<span class="tsd-signature-symbol"> | </span>
-								<span class="tsd-signature-type">Precision.YEAR</span>
-								<span class="tsd-signature-symbol"> | </span>
-								<span class="tsd-signature-type">Precision.MONTH</span>
-								<span class="tsd-signature-symbol"> | </span>
-								<span class="tsd-signature-type">Precision.DAY</span>
-								<span class="tsd-signature-symbol"> | </span>
-								<span class="tsd-signature-type">Precision.HOUR_AND_MINUTE</span>
-								<span class="tsd-signature-symbol"> | </span>
-								<span class="tsd-signature-type">Precision.SECONDS</span>
-							</h4>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Returns the precision of this Timestamp.</p>
+								</div>
+							</div>
+							<h4 class="tsd-returns-title">Returns <a href="../enums/_iontimestamp_.timestampprecision.html" class="tsd-signature-type">TimestampPrecision</a></h4>
 						</li>
 					</ul>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
-					<a name="getzuluday" class="tsd-anchor"></a>
-					<h3>get<wbr>Zulu<wbr>Day</h3>
+					<a name="getsecondsdecimal" class="tsd-anchor"></a>
+					<h3>get<wbr>Seconds<wbr>Decimal</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">get<wbr>Zulu<wbr>Day<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span></li>
+						<li class="tsd-signature tsd-kind-icon">get<wbr>Seconds<wbr>Decimal<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_iondecimal_.decimal.html" class="tsd-signature-type">Decimal</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/b1591da/src/IonTimestamp.ts#L417">IonTimestamp.ts:417</a></li>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/0b2f6be/src/IonTimestamp.ts#L269">IonTimestamp.ts:269</a></li>
 								</ul>
 							</aside>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
-						</li>
-					</ul>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
-					<a name="getzuluhour" class="tsd-anchor"></a>
-					<h3>get<wbr>Zulu<wbr>Hour</h3>
-					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">get<wbr>Zulu<wbr>Hour<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span></li>
-					</ul>
-					<ul class="tsd-descriptions">
-						<li class="tsd-description">
-							<aside class="tsd-sources">
-								<ul>
-									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/b1591da/src/IonTimestamp.ts#L421">IonTimestamp.ts:421</a></li>
-								</ul>
-							</aside>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
-						</li>
-					</ul>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
-					<a name="getzuluminute" class="tsd-anchor"></a>
-					<h3>get<wbr>Zulu<wbr>Minute</h3>
-					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">get<wbr>Zulu<wbr>Minute<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span></li>
-					</ul>
-					<ul class="tsd-descriptions">
-						<li class="tsd-description">
-							<aside class="tsd-sources">
-								<ul>
-									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/b1591da/src/IonTimestamp.ts#L425">IonTimestamp.ts:425</a></li>
-								</ul>
-							</aside>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
-						</li>
-					</ul>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
-					<a name="getzulumonth" class="tsd-anchor"></a>
-					<h3>get<wbr>Zulu<wbr>Month</h3>
-					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">get<wbr>Zulu<wbr>Month<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span></li>
-					</ul>
-					<ul class="tsd-descriptions">
-						<li class="tsd-description">
-							<aside class="tsd-sources">
-								<ul>
-									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/b1591da/src/IonTimestamp.ts#L413">IonTimestamp.ts:413</a></li>
-								</ul>
-							</aside>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
-						</li>
-					</ul>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
-					<a name="getzuluseconds" class="tsd-anchor"></a>
-					<h3>get<wbr>Zulu<wbr>Seconds</h3>
-					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">get<wbr>Zulu<wbr>Seconds<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_iondecimal_.decimal.html" class="tsd-signature-type">Decimal</a></li>
-					</ul>
-					<ul class="tsd-descriptions">
-						<li class="tsd-description">
-							<aside class="tsd-sources">
-								<ul>
-									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/b1591da/src/IonTimestamp.ts#L429">IonTimestamp.ts:429</a></li>
-								</ul>
-							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Returns a decimal representing the number of seconds (including fractional seconds).</p>
+								</div>
+							</div>
 							<h4 class="tsd-returns-title">Returns <a href="_iondecimal_.decimal.html" class="tsd-signature-type">Decimal</a></h4>
 						</li>
 					</ul>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
-					<a name="getzuluyear" class="tsd-anchor"></a>
-					<h3>get<wbr>Zulu<wbr>Year</h3>
+					<a name="getsecondsint" class="tsd-anchor"></a>
+					<h3>get<wbr>Seconds<wbr>Int</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">get<wbr>Zulu<wbr>Year<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span></li>
+						<li class="tsd-signature tsd-kind-icon">get<wbr>Seconds<wbr>Int<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/b1591da/src/IonTimestamp.ts#L409">IonTimestamp.ts:409</a></li>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/0b2f6be/src/IonTimestamp.ts#L262">IonTimestamp.ts:262</a></li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Returns the number of seconds as an integer value; any fractional seconds are truncated.</p>
+								</div>
+							</div>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
-						</li>
-					</ul>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
-					<a name="isnull" class="tsd-anchor"></a>
-					<h3>is<wbr>Null</h3>
-					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">is<wbr>Null<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span></li>
-					</ul>
-					<ul class="tsd-descriptions">
-						<li class="tsd-description">
-							<aside class="tsd-sources">
-								<ul>
-									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/b1591da/src/IonTimestamp.ts#L405">IonTimestamp.ts:405</a></li>
-								</ul>
-							</aside>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
-						</li>
-					</ul>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
-					<a name="numbervalue" class="tsd-anchor"></a>
-					<h3>number<wbr>Value</h3>
-					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">number<wbr>Value<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span></li>
-					</ul>
-					<ul class="tsd-descriptions">
-						<li class="tsd-description">
-							<aside class="tsd-sources">
-								<ul>
-									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/b1591da/src/IonTimestamp.ts#L397">IonTimestamp.ts:397</a></li>
-								</ul>
-							</aside>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
-						</li>
-					</ul>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
-					<a name="stringvalue" class="tsd-anchor"></a>
-					<h3>string<wbr>Value</h3>
-					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">string<wbr>Value<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></li>
-					</ul>
-					<ul class="tsd-descriptions">
-						<li class="tsd-description">
-							<aside class="tsd-sources">
-								<ul>
-									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/b1591da/src/IonTimestamp.ts#L351">IonTimestamp.ts:351</a></li>
-								</ul>
-							</aside>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4>
 						</li>
 					</ul>
 				</section>
@@ -510,9 +442,14 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/b1591da/src/IonTimestamp.ts#L401">IonTimestamp.ts:401</a></li>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/0b2f6be/src/IonTimestamp.ts#L351">IonTimestamp.ts:351</a></li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Returns a string representation of this Timestamp.</p>
+								</div>
+							</div>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4>
 						</li>
 					</ul>
@@ -527,9 +464,21 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/b1591da/src/IonTimestamp.ts#L443">IonTimestamp.ts:443</a></li>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/0b2f6be/src/IonTimestamp.ts#L53">IonTimestamp.ts:53</a></li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Parses a string and returns a corresponding Timestamp object.
+										The provided string must be a text-encoded Timestamp as specified
+									in the Ion specification.</p>
+								</div>
+								<dl class="tsd-comment-tags">
+									<dt>see</dt>
+									<dd><p><a href="https://amzn.github.io/ion-docs/docs/spec.html#timestamp">https://amzn.github.io/ion-docs/docs/spec.html#timestamp</a></p>
+									</dd>
+								</dl>
+							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
@@ -548,18 +497,33 @@
 					<li class="globals  ">
 						<a href="../globals.html"><em>Globals</em></a>
 					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="../modules/_ion_.html">"<wbr>Ion"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="../modules/_iondecimal_.html">"<wbr>Ion<wbr>Decimal"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="../modules/_ionreader_.html">"<wbr>Ion<wbr>Reader"</a>
+					</li>
 					<li class="current tsd-kind-external-module">
 						<a href="../modules/_iontimestamp_.html">"<wbr>Ion<wbr>Timestamp"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="../modules/_iontype_.html">"<wbr>Ion<wbr>Type"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="../modules/_iontypes_.html">"<wbr>Ion<wbr>Types"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="../modules/_ionwriter_.html">"<wbr>Ion<wbr>Writer"</a>
 					</li>
 				</ul>
 			</nav>
 			<nav class="tsd-navigation secondary menu-sticky">
 				<ul class="before-current">
-					<li class=" tsd-kind-enum tsd-parent-kind-external-module tsd-is-not-exported">
-						<a href="../enums/_iontimestamp_.states.html" class="tsd-kind-icon">States</a>
-					</li>
-					<li class=" tsd-kind-class tsd-parent-kind-external-module tsd-is-not-exported">
-						<a href="_iontimestamp_.timeparserstate.html" class="tsd-kind-icon">Time<wbr>Parser<wbr>State</a>
+					<li class=" tsd-kind-enum tsd-parent-kind-external-module">
+						<a href="../enums/_iontimestamp_.timestampprecision.html" class="tsd-kind-icon">Timestamp<wbr>Precision</a>
 					</li>
 				</ul>
 				<ul class="current">
@@ -569,71 +533,26 @@
 							<li class=" tsd-kind-constructor tsd-parent-kind-class">
 								<a href="_iontimestamp_.timestamp.html#constructor" class="tsd-kind-icon">constructor</a>
 							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-private">
-								<a href="_iontimestamp_.timestamp.html#day" class="tsd-kind-icon">day</a>
-							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-private">
-								<a href="_iontimestamp_.timestamp.html#hour" class="tsd-kind-icon">hour</a>
-							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-private">
-								<a href="_iontimestamp_.timestamp.html#minute" class="tsd-kind-icon">minute</a>
-							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-private">
-								<a href="_iontimestamp_.timestamp.html#month" class="tsd-kind-icon">month</a>
-							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-private">
-								<a href="_iontimestamp_.timestamp.html#offset" class="tsd-kind-icon">offset</a>
-							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-private">
-								<a href="_iontimestamp_.timestamp.html#precision" class="tsd-kind-icon">precision</a>
-							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-private">
-								<a href="_iontimestamp_.timestamp.html#seconds" class="tsd-kind-icon">seconds</a>
-							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-private">
-								<a href="_iontimestamp_.timestamp.html#year" class="tsd-kind-icon">year</a>
-							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-static">
-								<a href="_iontimestamp_.timestamp.html#null" class="tsd-kind-icon">NULL</a>
-							</li>
-							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-private">
-								<a href="_iontimestamp_.timestamp.html#checkvalid" class="tsd-kind-icon">check<wbr>Valid</a>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_iontimestamp_.timestamp.html#compareto" class="tsd-kind-icon">compare<wbr>To</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
-								<a href="_iontimestamp_.timestamp.html#getepochmilliseconds" class="tsd-kind-icon">get<wbr>Epoch<wbr>Milliseconds</a>
+								<a href="_iontimestamp_.timestamp.html#equals" class="tsd-kind-icon">equals</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
-								<a href="_iontimestamp_.timestamp.html#getoffset" class="tsd-kind-icon">get<wbr>Offset</a>
+								<a href="_iontimestamp_.timestamp.html#getdate" class="tsd-kind-icon">get<wbr>Date</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_iontimestamp_.timestamp.html#getlocaloffset" class="tsd-kind-icon">get<wbr>Local<wbr>Offset</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
 								<a href="_iontimestamp_.timestamp.html#getprecision" class="tsd-kind-icon">get<wbr>Precision</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
-								<a href="_iontimestamp_.timestamp.html#getzuluday" class="tsd-kind-icon">get<wbr>Zulu<wbr>Day</a>
+								<a href="_iontimestamp_.timestamp.html#getsecondsdecimal" class="tsd-kind-icon">get<wbr>Seconds<wbr>Decimal</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
-								<a href="_iontimestamp_.timestamp.html#getzuluhour" class="tsd-kind-icon">get<wbr>Zulu<wbr>Hour</a>
-							</li>
-							<li class=" tsd-kind-method tsd-parent-kind-class">
-								<a href="_iontimestamp_.timestamp.html#getzuluminute" class="tsd-kind-icon">get<wbr>Zulu<wbr>Minute</a>
-							</li>
-							<li class=" tsd-kind-method tsd-parent-kind-class">
-								<a href="_iontimestamp_.timestamp.html#getzulumonth" class="tsd-kind-icon">get<wbr>Zulu<wbr>Month</a>
-							</li>
-							<li class=" tsd-kind-method tsd-parent-kind-class">
-								<a href="_iontimestamp_.timestamp.html#getzuluseconds" class="tsd-kind-icon">get<wbr>Zulu<wbr>Seconds</a>
-							</li>
-							<li class=" tsd-kind-method tsd-parent-kind-class">
-								<a href="_iontimestamp_.timestamp.html#getzuluyear" class="tsd-kind-icon">get<wbr>Zulu<wbr>Year</a>
-							</li>
-							<li class=" tsd-kind-method tsd-parent-kind-class">
-								<a href="_iontimestamp_.timestamp.html#isnull" class="tsd-kind-icon">is<wbr>Null</a>
-							</li>
-							<li class=" tsd-kind-method tsd-parent-kind-class">
-								<a href="_iontimestamp_.timestamp.html#numbervalue" class="tsd-kind-icon">number<wbr>Value</a>
-							</li>
-							<li class=" tsd-kind-method tsd-parent-kind-class">
-								<a href="_iontimestamp_.timestamp.html#stringvalue" class="tsd-kind-icon">string<wbr>Value</a>
+								<a href="_iontimestamp_.timestamp.html#getsecondsint" class="tsd-kind-icon">get<wbr>Seconds<wbr>Int</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
 								<a href="_iontimestamp_.timestamp.html#tostring" class="tsd-kind-icon">to<wbr>String</a>
@@ -645,99 +564,6 @@
 					</li>
 				</ul>
 				<ul class="after-current">
-					<li class=" tsd-kind-interface tsd-parent-kind-external-module tsd-is-not-exported">
-						<a href="../interfaces/_iontimestamp_.statemap.html" class="tsd-kind-icon">State<wbr>Map</a>
-					</li>
-					<li class=" tsd-kind-interface tsd-parent-kind-external-module tsd-is-not-exported">
-						<a href="../interfaces/_iontimestamp_.transitionmap.html" class="tsd-kind-icon">Transition<wbr>Map</a>
-					</li>
-					<li class=" tsd-kind-variable tsd-parent-kind-external-module tsd-is-not-exported">
-						<a href="../modules/_iontimestamp_.html#days_per_month" class="tsd-kind-icon">DAYS_<wbr>PER_<wbr>MONTH</a>
-					</li>
-					<li class=" tsd-kind-variable tsd-parent-kind-external-module tsd-is-not-exported">
-						<a href="../modules/_iontimestamp_.html#days_to_month" class="tsd-kind-icon">DAYS_<wbr>TO_<wbr>MONTH</a>
-					</li>
-					<li class=" tsd-kind-variable tsd-parent-kind-external-module tsd-is-not-exported">
-						<a href="../modules/_iontimestamp_.html#max_day" class="tsd-kind-icon">MAX_<wbr>DAY</a>
-					</li>
-					<li class=" tsd-kind-variable tsd-parent-kind-external-module tsd-is-not-exported">
-						<a href="../modules/_iontimestamp_.html#max_hour" class="tsd-kind-icon">MAX_<wbr>HOUR</a>
-					</li>
-					<li class=" tsd-kind-variable tsd-parent-kind-external-module tsd-is-not-exported">
-						<a href="../modules/_iontimestamp_.html#max_minute" class="tsd-kind-icon">MAX_<wbr>MINUTE</a>
-					</li>
-					<li class=" tsd-kind-variable tsd-parent-kind-external-module tsd-is-not-exported">
-						<a href="../modules/_iontimestamp_.html#max_month" class="tsd-kind-icon">MAX_<wbr>MONTH</a>
-					</li>
-					<li class=" tsd-kind-variable tsd-parent-kind-external-module tsd-is-not-exported">
-						<a href="../modules/_iontimestamp_.html#max_offset" class="tsd-kind-icon">MAX_<wbr>OFFSET</a>
-					</li>
-					<li class=" tsd-kind-variable tsd-parent-kind-external-module tsd-is-not-exported">
-						<a href="../modules/_iontimestamp_.html#max_seconds" class="tsd-kind-icon">MAX_<wbr>SECONDS</a>
-					</li>
-					<li class=" tsd-kind-variable tsd-parent-kind-external-module tsd-is-not-exported">
-						<a href="../modules/_iontimestamp_.html#max_year" class="tsd-kind-icon">MAX_<wbr>YEAR</a>
-					</li>
-					<li class=" tsd-kind-variable tsd-parent-kind-external-module tsd-is-not-exported">
-						<a href="../modules/_iontimestamp_.html#min_day" class="tsd-kind-icon">MIN_<wbr>DAY</a>
-					</li>
-					<li class=" tsd-kind-variable tsd-parent-kind-external-module tsd-is-not-exported">
-						<a href="../modules/_iontimestamp_.html#min_hour" class="tsd-kind-icon">MIN_<wbr>HOUR</a>
-					</li>
-					<li class=" tsd-kind-variable tsd-parent-kind-external-module tsd-is-not-exported">
-						<a href="../modules/_iontimestamp_.html#min_minute" class="tsd-kind-icon">MIN_<wbr>MINUTE</a>
-					</li>
-					<li class=" tsd-kind-variable tsd-parent-kind-external-module tsd-is-not-exported">
-						<a href="../modules/_iontimestamp_.html#min_month" class="tsd-kind-icon">MIN_<wbr>MONTH</a>
-					</li>
-					<li class=" tsd-kind-variable tsd-parent-kind-external-module tsd-is-not-exported">
-						<a href="../modules/_iontimestamp_.html#min_offset" class="tsd-kind-icon">MIN_<wbr>OFFSET</a>
-					</li>
-					<li class=" tsd-kind-variable tsd-parent-kind-external-module tsd-is-not-exported">
-						<a href="../modules/_iontimestamp_.html#min_seconds" class="tsd-kind-icon">MIN_<wbr>SECONDS</a>
-					</li>
-					<li class=" tsd-kind-variable tsd-parent-kind-external-module tsd-is-not-exported">
-						<a href="../modules/_iontimestamp_.html#min_year" class="tsd-kind-icon">MIN_<wbr>YEAR</a>
-					</li>
-					<li class=" tsd-kind-variable tsd-parent-kind-external-module tsd-is-not-exported">
-						<a href="../modules/_iontimestamp_.html#seconds_at_epoch_start" class="tsd-kind-icon">SECONDS_<wbr>AT_<wbr>EPOCH_<wbr>START</a>
-					</li>
-					<li class=" tsd-kind-variable tsd-parent-kind-external-module tsd-is-not-exported">
-						<a href="../modules/_iontimestamp_.html#secs_per_day" class="tsd-kind-icon">SECS_<wbr>PER_<wbr>DAY</a>
-					</li>
-					<li class=" tsd-kind-variable tsd-parent-kind-external-module tsd-is-not-exported">
-						<a href="../modules/_iontimestamp_.html#secs_per_hour" class="tsd-kind-icon">SECS_<wbr>PER_<wbr>HOUR</a>
-					</li>
-					<li class=" tsd-kind-variable tsd-parent-kind-external-module tsd-is-not-exported">
-						<a href="../modules/_iontimestamp_.html#secs_per_min" class="tsd-kind-icon">SECS_<wbr>PER_<wbr>MIN</a>
-					</li>
-					<li class=" tsd-kind-variable tsd-parent-kind-external-module tsd-is-not-exported">
-						<a href="../modules/_iontimestamp_.html#timeparserstates" class="tsd-kind-icon">time<wbr>Parser<wbr>States</a>
-					</li>
-					<li class=" tsd-kind-function tsd-parent-kind-external-module tsd-is-not-exported">
-						<a href="../modules/_iontimestamp_.html#_to_2_digits" class="tsd-kind-icon">_to_<wbr>2_digits</a>
-					</li>
-					<li class=" tsd-kind-function tsd-parent-kind-external-module tsd-is-not-exported">
-						<a href="../modules/_iontimestamp_.html#bad_timestamp" class="tsd-kind-icon">bad_<wbr>timestamp</a>
-					</li>
-					<li class=" tsd-kind-function tsd-parent-kind-external-module tsd-is-not-exported">
-						<a href="../modules/_iontimestamp_.html#days_to_start_of_month" class="tsd-kind-icon">days_<wbr>to_<wbr>start_<wbr>of_<wbr>month</a>
-					</li>
-					<li class=" tsd-kind-function tsd-parent-kind-external-module tsd-is-not-exported">
-						<a href="../modules/_iontimestamp_.html#days_to_start_of_year" class="tsd-kind-icon">days_<wbr>to_<wbr>start_<wbr>of_<wbr>year</a>
-					</li>
-					<li class=" tsd-kind-function tsd-parent-kind-external-module tsd-is-not-exported">
-						<a href="../modules/_iontimestamp_.html#is_leapyear" class="tsd-kind-icon">is_<wbr>leapyear</a>
-					</li>
-					<li class=" tsd-kind-function tsd-parent-kind-external-module tsd-is-not-exported">
-						<a href="../modules/_iontimestamp_.html#read_digits" class="tsd-kind-icon">read_<wbr>digits</a>
-					</li>
-					<li class=" tsd-kind-function tsd-parent-kind-external-module tsd-is-not-exported">
-						<a href="../modules/_iontimestamp_.html#read_unknown_digits" class="tsd-kind-icon">read_<wbr>unknown_<wbr>digits</a>
-					</li>
-					<li class=" tsd-kind-function tsd-parent-kind-external-module tsd-is-not-exported">
-						<a href="../modules/_iontimestamp_.html#to_4_digits" class="tsd-kind-icon">to_<wbr>4_digits</a>
-					</li>
 				</ul>
 			</nav>
 		</div>
@@ -755,6 +581,7 @@
 				<li class="tsd-kind-function tsd-has-type-parameter"><span class="tsd-kind-icon">Function with type parameter</span></li>
 				<li class="tsd-kind-index-signature"><span class="tsd-kind-icon">Index signature</span></li>
 				<li class="tsd-kind-type-alias"><span class="tsd-kind-icon">Type alias</span></li>
+				<li class="tsd-kind-type-alias tsd-has-type-parameter"><span class="tsd-kind-icon">Type alias with type parameter</span></li>
 			</ul>
 			<ul class="tsd-legend">
 				<li class="tsd-kind-enum"><span class="tsd-kind-icon">Enumeration</span></li>
@@ -803,7 +630,7 @@
 	</div>
 </footer>
 <div class="container tsd-generator">
-	<p>Generated using <a href="http://typedoc.org/" target="_blank">TypeDoc</a></p>
+	<p>Generated using <a href="https://typedoc.org/" target="_blank">TypeDoc</a></p>
 </div>
 <div class="overlay"></div>
 <script src="../assets/js/main.js"></script>
