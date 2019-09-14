@@ -180,6 +180,15 @@
     writerTest('Writes negative 0 as a 32-bit float',
       writer => writer.writeFloat32(-0),
       '-0e0');
+    writerTest('Writes nan as a 32-bit float',
+      writer => writer.writeFloat32(NaN),
+      'nan');
+    writerTest('Writes +inf as a 32-bit float',
+      writer => writer.writeFloat32(Number.POSITIVE_INFINITY),
+      '+inf');
+    writerTest('Writes -inf as a 32-bit float',
+      writer => writer.writeFloat32(Number.NEGATIVE_INFINITY),
+      '-inf');
 
     writerTest('Writes 64-bit float',
       writer => writer.writeFloat64(8.125),
@@ -205,6 +214,15 @@
     writerTest('Writes ten billion as a 64-bit float',
       writer => writer.writeFloat64(10000000000),
       '1e10');
+    writerTest('Writes nan as a 64-bit float',
+      writer => writer.writeFloat64(Number.NaN),
+      'nan');
+    writerTest('Writes +inf as a 64-bit float',
+      writer => writer.writeFloat64(Number.POSITIVE_INFINITY),
+      '+inf');
+    writerTest('Writes -inf as a 64-bit float',
+      writer => writer.writeFloat64(Number.NEGATIVE_INFINITY),
+      '-inf');
 
 
     // Ints

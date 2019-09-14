@@ -194,7 +194,7 @@ export class TextWriter extends AbstractWriter {
             text = "+inf";
         } else if (value === Number.NEGATIVE_INFINITY) {
             text = "-inf";
-        } else if (value === Number.NaN) {
+        } else if (Object.is(value, Number.NaN)) {
             text = "nan";
         } else if (Object.is(value, -0)) {
             // Generally, we use Number#toExponential to convert the number `value` to Ion text.
