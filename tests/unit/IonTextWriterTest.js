@@ -322,6 +322,9 @@
     writerTest('Writes string containing single quote',
       writer => writer.writeString('’'),
       '’');
+    writerTest('Writes string containing Russian',
+      writer => writer.writeString('русский'),
+      'русский');
     writerTest('Writes string containing null',
       writer => writer.writeString(String.fromCharCode(0)),
       '"\\0"');
