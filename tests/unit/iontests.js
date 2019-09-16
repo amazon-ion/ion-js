@@ -411,9 +411,6 @@ let eventSkipList = toSkipList([
     'ion-tests/iontestdata/good/equivs/nopPadNonEmptyStruct.10n',
     'ion-tests/iontestdata/good/equivs/paddedInts.10n',
     'ion-tests/iontestdata/good/equivs/systemSymbols.ion',
-    'ion-tests/iontestdata/good/equivs/timestampFractions.ion',
-    'ion-tests/iontestdata/good/equivs/timestampSuperfluousOffset.10n',
-    'ion-tests/iontestdata/good/floatSpecials.ion',
     'ion-tests/iontestdata/good/floatsWithUnderscores.ion',
     'ion-tests/iontestdata/good/innerVersionIdentifiers.ion',
     'ion-tests/iontestdata/good/intBigSize1201.10n',
@@ -448,7 +445,6 @@ let eventSkipList = toSkipList([
     'ion-tests/iontestdata/good/symbolZero.ion',
     'ion-tests/iontestdata/good/testfile22.ion',
     'ion-tests/iontestdata/good/testfile23.ion',
-    'ion-tests/iontestdata/good/timestamp/timestamps.ion',
     'ion-tests/iontestdata/good/utf16.ion',
     'ion-tests/iontestdata/good/utf32.ion',
 ]);
@@ -458,7 +454,6 @@ let readerCompareSkipList = toSkipList([
     'ion-tests/iontestdata/good/subfieldVarUInt.ion',
     'ion-tests/iontestdata/good/subfieldVarUInt15bit.ion',
     'ion-tests/iontestdata/good/subfieldVarUInt16bit.ion',
-    'ion-tests/iontestdata/good/timestamp/timestamp2011.10n',
 ]);
 
 let equivsSkipList = toSkipList([
@@ -482,8 +477,6 @@ let equivsSkipList = toSkipList([
     'ion-tests/iontestdata/good/equivs/systemSymbols.ion',
     'ion-tests/iontestdata/good/equivs/systemSymbolsAsAnnotations.ion',
     'ion-tests/iontestdata/good/equivs/textNewlines.ion',
-    'ion-tests/iontestdata/good/equivs/timestampFractions.ion',
-    'ion-tests/iontestdata/good/equivs/timestampSuperfluousOffset.10n',
     'ion-tests/iontestdata/good/equivs/utf8/stringU0001D11E.ion',
     'ion-tests/iontestdata/good/equivs/utf8/stringUtf8.ion',
 
