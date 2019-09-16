@@ -20,6 +20,25 @@ import { SharedSymbolTable } from "./IonSharedSymbolTable";
  */
 export class SubstituteSymbolTable extends SharedSymbolTable {
   constructor(length: number) {
-    super(null, undefined, new Array(length));
+    if (length < 0) {
+      throw new Error(
+        "Cannot instantiate a SubstituteSymbolTable with a negative length. (" + length + ")"
+      );
+    }
+    super("_substitute", undefined, []);
+    this._numberOfSymbols = length;
+  }
+
+  getSymbolText(symbolId: number): string {
+    if (symbolId < 0) {
+      throw new Error(
+          `Index ${symbolId} is out of bounds for the SharedSymbolTable name=${this.name}, version=${this.version}`
+      );
+    }
+    return undefined;
+  }
+
+  getSymbolId(text: string): number {
+    return undefined;
   }
 }
