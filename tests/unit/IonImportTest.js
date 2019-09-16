@@ -60,9 +60,9 @@ define([
       assert.equal(child.getSymbolId('c'), 3);
 
       // Verify that duplicate symbols are accessible
-      assert.equal(child.getSymbol(4), 'a');
-      assert.equal(child.getSymbol(5), 'b');
-      assert.equal(child.getSymbol(6), 'c');
+      assert.equal(child.getSymbolText(4), 'a');
+      assert.equal(child.getSymbolText(5), 'b');
+      assert.equal(child.getSymbolText(6), 'c');
     };
 
     suite['Short length omits symbols'] = function() {
@@ -70,10 +70,10 @@ define([
       var parent = new ion.Import(null, symbolTable, 1);
       var child = new ion.Import(parent, symbolTable);
 
-      assert.equal(child.getSymbol(1), 'a');
-      assert.equal(child.getSymbol(2), 'a');
-      assert.equal(child.getSymbol(3), 'b');
-      assert.equal(child.getSymbol(4), 'c');
+      assert.equal(child.getSymbolText(1), 'a');
+      assert.equal(child.getSymbolText(2), 'a');
+      assert.equal(child.getSymbolText(3), 'b');
+      assert.equal(child.getSymbolText(4), 'c');
     }
 
     suite['Long length pads symbols'] = function() {
@@ -81,13 +81,13 @@ define([
       var parent = new ion.Import(null, symbolTable, 4);
       var child = new ion.Import(parent, symbolTable);
 
-      assert.equal(child.getSymbol(1), 'a');
-      assert.equal(child.getSymbol(2), 'b');
-      assert.equal(child.getSymbol(3), 'c');
-      assert.isUndefined(child.getSymbol(4));
-      assert.equal(child.getSymbol(5), 'a');
-      assert.equal(child.getSymbol(6), 'b');
-      assert.equal(child.getSymbol(7), 'c');
+      assert.equal(child.getSymbolText(1), 'a');
+      assert.equal(child.getSymbolText(2), 'b');
+      assert.equal(child.getSymbolText(3), 'c');
+      assert.isUndefined(child.getSymbolText(4));
+      assert.equal(child.getSymbolText(5), 'a');
+      assert.equal(child.getSymbolText(6), 'b');
+      assert.equal(child.getSymbolText(7), 'c');
     }
 
     registerSuite(suite);
