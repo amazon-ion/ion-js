@@ -319,6 +319,9 @@
     writerTest('Writes string containing double quote',
       writer => writer.writeString('"'),
       '"\\""');
+    writerTest('Writes string containing single quote',
+      writer => writer.writeString('’'),
+      '’');
     writerTest('Writes string containing null',
       writer => writer.writeString(String.fromCharCode(0)),
       '"\\0"');
