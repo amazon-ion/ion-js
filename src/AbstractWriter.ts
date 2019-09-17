@@ -15,7 +15,6 @@ import {Writer} from "./IonWriter";
 import {IonType} from "./IonType";
 import {Reader} from "./IonReader";
 import {IonTypes} from "./IonTypes";
-import {_validateAnnotations, _isString} from "./util"
 
 // TS workaround that avoids the need to copy all Writer method signatures into AbstractWriter
 export interface AbstractWriter extends Writer {}
@@ -24,7 +23,7 @@ export abstract class AbstractWriter implements Writer {
     protected _annotations = [];
 
     addAnnotation(annotation: string): void {
-        if(!_isString(annotation)) {
+        if(!this._isString(annotation)) {
             throw new Error('Annotation must be of type string.');
         }
         this._annotations.push(annotation);
@@ -33,7 +32,7 @@ export abstract class AbstractWriter implements Writer {
     setAnnotations(annotations: string[]): void {
         if(annotations === undefined || annotations === null){
             this._annotations = [];
-        } else if (!_validateAnnotations(annotations)) {
+        } else if (!this._validateAnnotations(annotations)) {
             throw new Error('Annotations must be of type string[].');
         } else {
             this._annotations = annotations;
@@ -99,6 +98,22 @@ export abstract class AbstractWriter implements Writer {
                 reader.stepOut();
             }
         }
+    }
+
+    private _validateAnnotations(input : string[]) : boolean {
+        if (!Array.isArray(input)) {
+            return false;
+        }
+        for (let ann in input) {
+            if (!this._isString(ann)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private _isString(input : string) : boolean {
+        return typeof input === 'string';
     }
 }
 
