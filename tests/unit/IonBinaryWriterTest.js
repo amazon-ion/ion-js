@@ -42,6 +42,19 @@ define([
       }
     }
 
+      var badWriterTest = function(name, instructions) {
+          var test = function() {
+              var symbolTable = new ion.LocalSymbolTable(ion.getSystemSymbolTableImport());
+              var writeable = new ion.Writeable();
+              var writer = new ion.BinaryWriter(symbolTable, writeable);
+              instructions(writer);
+              writer.close();
+          };
+          suite[name] = function() {
+              assert.throws(test, Error);
+          }
+      }
+
     var skippedWriterTest = function(name, instructions, expected) { suite[name] = function() { this.skip() } };
 
     writerTest('Writes IVM', (writer) => {}, []);
@@ -651,6 +664,12 @@ define([
         // Symbols
         0x71, 0x0a, 0x71, 0x0b
       ]);
+      badWriterTest('Cannot step into struct with missing field value',
+          writer => { writer.stepIn(ion.IonTypes.STRUCT); writer.stepIn(ion.IonTypes.STRUCT);});
+      badWriterTest('Cannot step into sexp with missing field value',
+          writer => { writer.stepIn(ion.IonTypes.STRUCT); writer.stepIn(ion.IonTypes.SEXP);});
+      badWriterTest('Cannot step into list with missing field value',
+          writer => { writer.stepIn(ion.IonTypes.STRUCT); writer.stepIn(ion.IonTypes.LIST);});
 
     // Timestamps
 
