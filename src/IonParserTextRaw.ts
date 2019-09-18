@@ -1019,7 +1019,6 @@ export class ParserTextRaw {
         let index : number;
         let ch : number;
         let escaped : number;
-        let acceptComments : boolean;
         let s : string = "";
         switch (t) {
             case T_NULL:
@@ -1046,58 +1045,30 @@ export class ParserTextRaw {
                 break;
             case T_STRING1:
             case T_STRING2:
+            case T_STRING3:
                 for (index = this._start; index < this._end; index++) {
                     ch = this._in.valueAt(index);
                     if (ch == CH_BS) {
                         ch = this._read_escape_sequence(index, this._end);
                         index += this._esc_len;
                     }
-                    if(this.isHighSurrogate(ch)){
+                    if (this.isHighSurrogate(ch)) {
                         index++;
                         let tempChar = this._in.valueAt(index);
                         if (tempChar == CH_BS) {
                             tempChar = this._read_escape_sequence(index, this._end);
                             index += this._esc_len;
                         }
-                        if(this.isLowSurrogate(tempChar)){
+                        if (this.isLowSurrogate(tempChar)) {
                             s += ch + tempChar;
-                            index++;
-                        } else{
+                        } else {
                             throw new Error("illegal high surrogate" + ch);
                         }
-                    } else if(this.isLowSurrogate(ch)){
+                    } else if (this.isLowSurrogate(ch)) {
                         throw new Error("illegal low surrogate: " + ch);
-                    } else{
-                        s += String.fromCharCode(ch);
-                    }
-                }
-                break;
-            case T_STRING3:
-                acceptComments = true;
-                for(index = this._start; index < this._end; index++) {
-                    ch = this._in.valueAt(index);
-                    if (ch == CH_BS) {
-                        ch = this._read_escape_sequence(index, this._end);
-                        index += this._esc_len;
-                    }
-                    if(this.isHighSurrogate(ch)){
-                        index++;
-                        let tempChar = this._in.valueAt(index);
-                        if (tempChar == CH_BS) {
-                            tempChar = this._read_escape_sequence(index, this._end);
-                            index += this._esc_len;
-                        }
-                        if(this.isLowSurrogate(tempChar)){
-                            s += ch + tempChar;
-                            index++;
-                        } else{
-                            throw new Error("illegal high surrogate" + ch);
-                        }
-                    } else if(this.isLowSurrogate(ch)){
-                        throw new Error("illegal low surrogate: " + ch);
-                    } else if(ch === CH_SQ) {
+                    } else if (t === T_STRING3 && ch === CH_SQ) {
                         if (this.verifyTriple(index)) {
-                            index = this._skip_triple_quote_gap(index, this._end, acceptComments);
+                            index = this._skip_triple_quote_gap(index, this._end, /*acceptComments*/ true);
                         } else {
                             s += String.fromCharCode(ch);
                         }
@@ -1120,7 +1091,6 @@ export class ParserTextRaw {
                 }
                 break;
             case T_CLOB3:
-                acceptComments = false;
                 for(index = this._start; index < this._end; index++) {
                     ch = this._in.valueAt(index);
                     if(ch === CH_BS) {
@@ -1131,7 +1101,7 @@ export class ParserTextRaw {
                         index += this._esc_len;
                     } else if ( ch === CH_SQ) {
                         if (this.verifyTriple(index)) {
-                            index = this._skip_triple_quote_gap(index, this._end, acceptComments);
+                            index = this._skip_triple_quote_gap(index, this._end, /*acceptComments*/ false);
                         } else {
                             s += String.fromCharCode(ch);
                         }
@@ -1144,7 +1114,7 @@ export class ParserTextRaw {
                 break;
             default:
                 throw new Error("can't get this value as a string");
-            }
+        }
         return s;
     }
 
