@@ -104,8 +104,8 @@ export abstract class AbstractWriter implements Writer {
         if (!Array.isArray(input)) {
             return false;
         }
-        for (let ann in input) {
-            if (!this._isString(ann)) {
+        for (let i = 0; i < input.length; i++) {
+            if (!this._isString(input[i])) {
                 return false;
             }
         }

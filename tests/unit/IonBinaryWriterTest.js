@@ -846,6 +846,12 @@ define([
       }
     }
 
+    errorTest('Cannot pass single string as an annotation.',
+        (writer) => { writer.setAnnotations('taco'), writer.writeInt(5) });
+    errorTest('Cannot pass annotations array without a string.',
+        (writer) => { writer.setAnnotations([5]), writer.writeInt(5) });
+    errorTest('Cannot pass annotations array containing a non string value.',
+        (writer) => { writer.setAnnotations(['a', 5,'t']), writer.writeInt(5) });
     errorTest('Cannot write top-level field name',
       (writer) => { writer.writeFieldName('foo') });
     errorTest('Cannot exit container at top level',
