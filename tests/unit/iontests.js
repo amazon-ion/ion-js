@@ -343,7 +343,6 @@ function toSkipList(paths) {
     });
 
     // additional, known bad/slow test files:
-    skipList['ion-tests/iontestdata/good/subfieldVarUInt32bit.ion'] = 1;
     skipList['ion-tests/iontestdata/good/equivs/lists.ion'] = 1;     // runs too long, causes TravisCI to fail
     skipList['ion-tests/iontestdata/good/equivs/sexps.ion'] = 1;     // runs too long, causes TravisCI to fail
 
@@ -450,10 +449,6 @@ let eventSkipList = toSkipList([
 ]);
 
 let readerCompareSkipList = toSkipList([
-    'ion-tests/iontestdata/good/subfieldInt.ion',
-    'ion-tests/iontestdata/good/subfieldVarUInt.ion',
-    'ion-tests/iontestdata/good/subfieldVarUInt15bit.ion',
-    'ion-tests/iontestdata/good/subfieldVarUInt16bit.ion',
 ]);
 
 let equivsSkipList = toSkipList([
@@ -498,15 +493,12 @@ let nonEquivsSkipList = toSkipList([
 
 /*
   notes from the previous skipList mechanism:
-    'good/subfieldVarInt.ion', //passes, but takes too long to run every build due to longint rounding.
     'good/intBinary.ion', //binaryInts unsupported.
     'good/integer_values.ion', //binary ints unsupported.
     'good/intsWithUnderscores.ion', //binary ints unsupported.
     'good/intBigSize256.ion', //int maxsize limitation.
     'good/equivs/intsWithUnderscores.ion', //binary ints unsupported.
     'good/equivs/binaryInts.ion', //binary ints unsupported.
-    'good/subfieldVarUInt32bit.ion', //passes, but takes too long to run every build.
-    'good/subfieldVarUInt.ion', //passes, but takes too long to run every build.
     'good/floatsWithUnderscores.ion', //numbers with underscores unsupported.
     'good/equivs/floatsWithUnderscores.ion', //numbers with underscores unsupported.
     'good/equivs/decimalsWithUnderscores.ion', //numbers with underscores unsupported.
