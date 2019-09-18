@@ -15,6 +15,8 @@
 import {assert} from 'chai';
 import * as ion from '../src/IonTests';
 import * as util from '../src/util';
+import JSBI from "jsbi";
+import {JsbiSupport} from "../src/JsbiSupport";
 
 /**
  * @param decimalString The text representation of the decimal to test.
@@ -32,8 +34,10 @@ function test(decimalString,
 
     let decimal = ion.Decimal.parse(decimalString);
 
-    assert.deepEqual(decimal._getCoefficient(), new ion.LongInt(expectedCoefficient), '_getCoefficient()');
-    assert.equal(decimal._getCoefficient().signum(), new ion.LongInt(expectedCoefficient).signum(), 'coefficient sign');
+    // assert.deepEqual(decimal._getCoefficient(), new ion.LongInt(expectedCoefficient), '_getCoefficient()');
+    // assert.equal(decimal._getCoefficient().signum(), new ion.LongInt(expectedCoefficient).signum(), 'coefficient sign');
+    assert.deepEqual(decimal._getCoefficient(), JSBI.BigInt(expectedCoefficient), '_getCoefficient()');
+    assert.equal(decimal.isNegative(), Object.is(Number(expectedCoefficient), -0) || JsbiSupport.isNegative(JSBI.BigInt(expectedCoefficient)), 'coefficient sign');
 
     assert.equal(decimal._getExponent(), expectedExponent, '_getExponent()');
     assert.equal(util._sign(decimal._getExponent()), util._sign(expectedExponent), 'exponent sign');
@@ -171,7 +175,7 @@ let decimalComparisonTests = [
 ];
 
 let decimalEqualsTests = [
-    {input1: '0', input2: '0', expected: true},
+    {input1: '0', input2: '0', expected: true, skip: false},
     {input1: '0', input2: '0d0', expected: true},
     {input1: '0', input2: '0d1', expected: false},
     {input1: '0', input2: '0d-1', expected: false},
@@ -184,9 +188,8 @@ let decimalEqualsTests = [
     {input1: '-0', input2: '-0d-1', expected: false},
     {input1: '-0', input2: '-0d-0', expected: false},
 
-    // FIXME: https://github.com/amzn/ion-js/issues/444
-    {input1: '0', input2: '-0', expected: false, skip: true},
-    {input1: '0', input2: '-0d0', expected: false, skip: true},
+    {input1: '0', input2: '-0', expected: false},
+    {input1: '0', input2: '-0d0', expected: false},
 
     {input1: '0', input2: '-0d1', expected: false},
     {input1: '0', input2: '-0d-1', expected: false},
@@ -208,11 +211,6 @@ describe('Decimal', () => {
     describe('Parsing', () => {
         decimalParsingTests.forEach(
             ({inputString, coefficient, exponent, numberValue, text}) => {
-            if (coefficient === '-0') {
-                // FIXME: https://github.com/amzn/ion-js/issues/444
-                it.skip(inputString, () => {});
-                return;
-            }
             it(
                 inputString,
                 () => test(inputString, coefficient, exponent, numberValue, text)
@@ -222,8 +220,9 @@ describe('Decimal', () => {
 
     describe('equals', () => {
         decimalEqualsTests.forEach(
-            ({input1, input2, expected, skip}) => {
-                let testName = input1 + ' equals ' + input2;
+            ({input1, input2, expected, skip = false}) => {
+                let shouldEqual = expected ? ' equals ' : ' is not equal to ';
+                let testName = input1 + shouldEqual + input2;
                 if(skip) {
                   it.skip(testName, () => {});
                   return;
@@ -251,8 +250,7 @@ describe('Decimal', () => {
     it('intValue(0)',  () => assert.equal(ion.Decimal.parse('0').intValue(), 0));
     it('intValue(0.0000001)',  () => assert.equal(ion.Decimal.parse('0.0000001').intValue(), 0));
     it('intValue(0.9999999)',  () => assert.equal(ion.Decimal.parse('0.9999999').intValue(), 0));
-    // FIXME: https://github.com/amzn/ion-js/issues/444
-    it.skip('intValue(-0)', () => {
+    it('intValue(-0)', () => {
         let int = ion.Decimal.parse('-0').intValue();
         assert.equal(int, 0);
         assert.equal(util._sign(int), -1);

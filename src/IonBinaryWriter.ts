@@ -18,11 +18,13 @@ import {Import} from "./IonImport";
 import {IonType} from "./IonType";
 import {IonTypes} from "./IonTypes";
 import {LocalSymbolTable} from "./IonLocalSymbolTable";
-import {LongInt} from "./IonLongInt";
 import {LowLevelBinaryWriter} from "./IonLowLevelBinaryWriter";
 import {TimestampPrecision,Timestamp} from "./IonTimestamp";
 import {Writeable} from "./IonWriteable";
 import {_sign} from "./util";
+import JSBI from "jsbi";
+import {JsbiSupport} from "./JsbiSupport";
+import {JsbiSerde} from "./JsbiSerde";
 
 const MAJOR_VERSION: number = 1;
 const MINOR_VERSION: number = 0;
@@ -130,16 +132,17 @@ export class BinaryWriter extends AbstractWriter {
     if (typeof value == 'string') value = Decimal.parse(value);
 
     let exponent: number = value._getExponent();
-    let coefficient: LongInt = value._getCoefficient();
-    let isPositiveZero: boolean = coefficient.isZero() && !value.isNegative();
+    let coefficient: JSBI = value._getCoefficient();
+    let isPositiveZero: boolean = JSBI.equal(coefficient, JsbiSupport.ZERO) && !value.isNegative();
     if (isPositiveZero && exponent === 0 && _sign(exponent) === 1) {
       // Special case per the spec: http://amzn.github.io/ion-docs/docs/binary.html#5-decimal
       this.addNode(new BytesNode(this.writer, this.getCurrentContainer(), IonTypes.DECIMAL, this.encodeAnnotations(this._annotations), new Uint8Array(0)));
       return;
     }
 
-    let writeCoefficient = !(coefficient.isZero() && coefficient.signum() === 1);  // no need to write a coefficient of 0
-    let coefficientBytes: Uint8Array | null = writeCoefficient ? coefficient.intBytes() : null;
+    let isNegative = value.isNegative();
+    let writeCoefficient = isNegative || JSBI.notEqual(coefficient, JsbiSupport.ZERO);
+    let coefficientBytes: Uint8Array | null = writeCoefficient ? JsbiSerde.toSignedIntBytes(coefficient, isNegative) : null;
 
     let bufLen = LowLevelBinaryWriter.getVariableLengthSignedIntSize(exponent) + (writeCoefficient ? coefficientBytes.length : 0);
     let writer: LowLevelBinaryWriter = new LowLevelBinaryWriter(new Writeable(bufLen));
@@ -194,11 +197,16 @@ export class BinaryWriter extends AbstractWriter {
     this.addNode(new BytesNode(this.writer, this.getCurrentContainer(), IonTypes.FLOAT, this.encodeAnnotations(this._annotations), bytes));
   }
 
-  writeInt(value: number) : void {
+  writeInt(value: number | JSBI | null) : void {
     this.checkWriteValue();
     if (value === null || value === undefined) {
       this.writeNull(IonTypes.INT);
       return;
+    }
+
+    // FIXME: https://github.com/amzn/ion-js/issues/464
+    if (value instanceof JSBI) {
+      value = JsbiSupport.clampToSafeIntegerRange(value);
     }
 
     this.addNode(new IntNode(this.writer, this.getCurrentContainer(), this.encodeAnnotations(this._annotations), value));
@@ -257,8 +265,8 @@ export class BinaryWriter extends AbstractWriter {
         let fractionalSeconds = value._getFractionalSeconds();
         if (fractionalSeconds._getExponent() !== 0) {
             writer.writeVariableLengthSignedInt(fractionalSeconds._getExponent());
-            if (!fractionalSeconds._getCoefficient().isZero()) {
-                writer.writeBytes(fractionalSeconds._getCoefficient().intBytes());
+            if (!JsbiSupport.isZero(fractionalSeconds._getCoefficient())) {
+              writer.writeBytes(JsbiSerde.toSignedIntBytes(fractionalSeconds._getCoefficient(), fractionalSeconds.isNegative()));
             }
         }
     }

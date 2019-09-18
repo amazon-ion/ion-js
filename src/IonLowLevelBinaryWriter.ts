@@ -23,8 +23,7 @@ export class LowLevelBinaryWriter {
 
   constructor(writeable : Writeable) {
         this.writeable = writeable;
-    }
-
+  }
 
   writeSignedInt(originalValue: number) : void {//TODO this should flip to different modes based on the length calculation because bit shifting will drop to 32 bits.
     let length = LowLevelBinaryWriter.getSignedIntSize(originalValue);
@@ -87,21 +86,21 @@ export class LowLevelBinaryWriter {
     this.writeable.writeBytes(tempBuf);
   }
 
-    writeVariableLengthUnsignedInt(originalValue: number) : void {
-        let tempBuf = new Uint8Array(LowLevelBinaryWriter.getVariableLengthUnsignedIntSize(originalValue));
-        let value: number = originalValue;
-        let i = tempBuf.length;
+  writeVariableLengthUnsignedInt(originalValue: number) : void {
+      let tempBuf = new Uint8Array(LowLevelBinaryWriter.getVariableLengthUnsignedIntSize(originalValue));
+      let value: number = originalValue;
+      let i = tempBuf.length;
 
-        tempBuf[--i] = (value & 0x7F) | 0x80;
-        value >>>= 7;
+      tempBuf[--i] = (value & 0x7F) | 0x80;
+      value >>>= 7;
 
-        while (value > 0) {
-            tempBuf[--i] = value & 0x7F
-            value >>>= 7;
-        }
+      while (value > 0) {
+          tempBuf[--i] = value & 0x7F
+          value >>>= 7;
+      }
 
-        this.writeable.writeBytes(tempBuf);
-    }
+      this.writeable.writeBytes(tempBuf);
+  }
 
   writeByte(byte: number) : void {
     this.writeable.writeByte(byte);

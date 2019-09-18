@@ -93,6 +93,7 @@ module.exports = function(grunt) {
         ]
       },
     },
+
     babel: { 
       options: { 
         sourceMap: true, 
@@ -110,7 +111,7 @@ module.exports = function(grunt) {
     },
     /**
      * Two steps here
-     *   1. Take CommonJS and generates ES5 using Bable (babelify)
+     *   1. Take CommonJS and generates ES5 using Babel (babelify)
      *   2. Package the ES5 code to be used in the browser (browserify)
      */
     browserify: {
