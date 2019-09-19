@@ -22,7 +22,7 @@ import * as IonText from "./IonText";
 
 import { IonType } from "./IonType";
 import { IonTypes } from "./IonTypes";
-import { StringSpan, Span } from "./IonSpan";
+import { StringSpan } from "./IonSpan";
 import {is_keyword, is_whitespace} from "./IonText";
 
 const EOF = -1;  // EOF is end of container, distinct from undefined which is value has been consumed
@@ -102,6 +102,9 @@ const ESC_U =     85; //  values['U'] = ESCAPE_BIG_U;    //    any  \ UHHHHHHHH 
 const empty_array: any[] = [];
 
 const INF = [ CH_i, CH_n, CH_f ];
+
+// mask the 6 hi-order bits of a UTF-16 surrogate; the 10 low-order bits are the ones of interest
+const _UTF16_MASK = 0x03ff;
 
 export function get_ion_type(t: number) : IonType {
   switch(t) {
@@ -1015,7 +1018,6 @@ export class ParserTextRaw {
     }
 
     get_value_as_string(t: number) : string {
-
         let index : number;
         let ch : number;
         let escaped : number;
@@ -1060,9 +1062,13 @@ export class ParserTextRaw {
                             index += this._esc_len;
                         }
                         if (this.isLowSurrogate(tempChar)) {
-                            s += ch + tempChar;
+                            // convert from UTF-16 surrogate pair to a codepoint
+                            let hiSurrogate = ch;
+                            let loSurrogate = tempChar;
+                            let codepoint = 0x10000 + ((hiSurrogate & _UTF16_MASK) << 10) + (loSurrogate & _UTF16_MASK);
+                            s += String.fromCodePoint(codepoint);
                         } else {
-                            throw new Error("illegal high surrogate" + ch);
+                            throw new Error("illegal low surrogate: " + ch);
                         }
                     } else if (this.isLowSurrogate(ch)) {
                         throw new Error("illegal low surrogate: " + ch);
