@@ -72,6 +72,37 @@
     isOperatorTest('!a', false);
     isOperatorTest('<=>', true);
 
+    let escapeTest = (ch, expected) => {
+        let value = String.fromCharCode(ch);
+        suite['escape(chr(' + ch + '), ClobEscapes)'] = () => assert.equal(
+            ionText.escape(value, ionText.ClobEscapes), expected);
+        suite['escape(chr(' + ch + '), StringEscapes)'] = () => assert.equal(
+            ionText.escape(value, ionText.StringEscapes), expected);
+        suite['escape(chr(' + ch + '), SymbolEscapes)'] = () => assert.equal(
+            ionText.escape(value, ionText.SymbolEscapes), expected);
+    };
+    for (let i = 0; i < 32; i++) {
+        let expected;
+        switch (i) {
+            case  0: expected = '\\0'; break;
+            case  7: expected = '\\a'; break;
+            case  8: expected = '\\b'; break;
+            case  9: expected = '\\t'; break;
+            case 10: expected = '\\n'; break;
+            case 11: expected = '\\v'; break;
+            case 12: expected = '\\f'; break;
+            case 13: expected = '\\r'; break;
+            default:
+                let hex = i.toString(16);
+                expected = '\\x' + '0'.repeat(2 - hex.length) + hex;
+        }
+        escapeTest(i, expected);
+    }
+    escapeTest(0x7e, '~');     // not escaped
+    escapeTest(0x7f, '\\x7f');
+    escapeTest(0x9f, '\\x9f');
+    escapeTest(0xa0, '\xa0');  // not escaped
+
     registerSuite(suite);
   }
 );
