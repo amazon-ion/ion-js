@@ -852,6 +852,12 @@ define([
         (writer) => { writer.setAnnotations([5]), writer.writeInt(5) });
     errorTest('Cannot pass annotations array containing a non string value.',
         (writer) => { writer.setAnnotations(['a', 5,'t']), writer.writeInt(5) });
+    errorTest('Cannot pass annotations array containing undefined.',
+        (writer) => { writer.setAnnotations([undefined]), writer.writeInt(5) });
+    errorTest('Cannot pass annotations array containing null',
+        (writer) => { writer.setAnnotations([null]), writer.writeInt(5) });
+    errorTest('Cannot pass undefined as annotations.',
+        (writer) => { writer.setAnnotations(undefined), writer.writeInt(5) });
     errorTest('Cannot write top-level field name',
       (writer) => { writer.writeFieldName('foo') });
     errorTest('Cannot exit container at top level',
