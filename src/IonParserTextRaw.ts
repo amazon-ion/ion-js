@@ -1068,10 +1068,10 @@ export class ParserTextRaw {
                             let codepoint = 0x10000 + ((hiSurrogate & _UTF16_MASK) << 10) + (loSurrogate & _UTF16_MASK);
                             s += String.fromCodePoint(codepoint);
                         } else {
-                            throw new Error("illegal low surrogate: " + ch);
+                            throw new Error("expected a low surrogate, but found: " + ch);
                         }
                     } else if (this.isLowSurrogate(ch)) {
-                        throw new Error("illegal low surrogate: " + ch);
+                        throw new Error("unexpected low surrogate: " + ch);
                     } else if (t === T_STRING3 && ch === CH_SQ) {
                         if (this.verifyTriple(index)) {
                             index = this._skip_triple_quote_gap(index, this._end, /*acceptComments*/ true);
