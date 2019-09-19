@@ -31,9 +31,14 @@ define(
         };
 
         suite['Read emoji with modifier'] = function() {
-            let r = ion.makeReader('"👩🏽"');
+            let s = 'a👩🏽b👩🏽👩🏽c';
+            let r = ion.makeReader("'" + s + "'" + ' ' + '"' + s + '"' + ' ' + "'''" + s + "'''");
             r.next();
-            r.stringValue();
+            assert.equal(r.stringValue(), s);
+            r.next();
+            assert.equal(r.stringValue(), s);
+            r.next();
+            assert.equal(r.stringValue(), s);
         };
 
         suite['Read boolean value'] = function() {
