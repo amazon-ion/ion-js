@@ -371,6 +371,10 @@
 
       badWriterTest('Cannot pass single string as an annotation.',
           (writer) => { writer.setAnnotations('taco'), writer.writeInt(5) });
+      badWriterTest('Cannot add int as annotation.',
+          (writer) => { writer.addAnnotation(5), writer.writeInt(5) });
+      badWriterTest('Cannot add array of chars.',
+          (writer) => { writer.addAnnotation(['t', 'a', 'c', 'o']), writer.writeInt(5) });
       badWriterTest('Cannot pass annotations array without a string.',
           (writer) => { writer.setAnnotations([5]), writer.writeInt(5) });
       badWriterTest('Cannot pass annotations array containing a non string value.',
