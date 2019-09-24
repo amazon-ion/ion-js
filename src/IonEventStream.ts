@@ -12,12 +12,11 @@
  * language governing permissions and limitations under the License.
  */
 
-import { Reader } from "./IonReader";
-import {IonEvent, IonEventFactory} from "./IonEvent";
-import { Writer } from "./IonWriter";
-import { IonType } from "./IonType";
-import { IonTypes } from "./IonTypes";
-import { IonEventType } from "./IonEvent";
+import {Reader} from "./IonReader";
+import {IonEvent, IonEventFactory, IonEventType} from "./IonEvent";
+import {Writer} from "./IonWriter";
+import {IonType} from "./IonType";
+import {IonTypes} from "./IonTypes";
 import {makeReader} from "./Ion";
 
 export class IonEventStream {
@@ -290,9 +289,8 @@ export class IonEventStream {
                 throw new Error('Symbol tables unsupported');
         }
         let fieldname = (currentEvent['field_name'] !== undefined ? currentEvent['field_name'] : null);
-        //if(currentEvent.get('value_text') !== currentEvent.get('value_binary')) throw new Error(`${currentEvent.get('value_text')} does not equal ${currentEvent.get('value_binary')}`);
 
-        return this.eventFactory.makeEvent(
+        let textEvent = this.eventFactory.makeEvent(
             eventType,
             currentEvent['ion_type'],
             fieldname,
@@ -301,6 +299,22 @@ export class IonEventStream {
             currentEvent['isNull'],
             currentEvent['value_text']
         );
+
+        let binaryEvent = this.eventFactory.makeEvent(
+            eventType,
+            currentEvent['ion_type'],
+            fieldname,
+            currentEvent['depth'],
+            currentEvent['annotations'],
+            currentEvent['isNull'],
+            currentEvent['value_binary']
+        );
+        if(eventType === IonEventType.SCALAR){
+            if(!textEvent.equals(binaryEvent)) {
+                throw new Error(`${currentEvent['value_text']} does not equal ${currentEvent['value_binary']}`);
+            }
+        }
+        return textEvent;
     }
 
     private parseIonType() : IonType{
