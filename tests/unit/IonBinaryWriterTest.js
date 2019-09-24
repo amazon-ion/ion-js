@@ -640,7 +640,7 @@ define([
         // 's':
         0x92,
         // Struct
-        0xd0, // 96
+        0xd0, // 9
         // 's':
         0x92,
         // 'qux'
@@ -652,10 +652,12 @@ define([
       ]);
 
     // Symbols
-
     writerTest('Writes null symbol by detecting null',
       (writer) => { writer.writeSymbol(null) },
         [0x7f]);
+    writerTest('Writes null symbol by detecting null and allows user to pass null into set annotations',
+          (writer) => { writer.setAnnotations(null); writer.writeSymbol(null) },
+          [0x7f]);
     skippedWriterTest('Writes null symbol by detecting undefined',
       (writer) => { writer.writeSymbol() },
         [0x7f]);

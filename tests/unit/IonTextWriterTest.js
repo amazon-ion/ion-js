@@ -402,7 +402,9 @@
 
 
     // Symbols
-
+    writerTest('Writes null symbol by detecting null and allows user to pass null into set annotations',
+          (writer) => { writer.setAnnotations(null); writer.writeSymbol(null) },
+          "null.symbol");
     writerTest('Writes symbol containing single quote',
       writer => writer.writeSymbol("'"),
       "'\\''");
