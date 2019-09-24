@@ -367,6 +367,32 @@
       badWriterTest('Cannot step into list with missing field value',
           writer => { writer.stepIn(ion.IonTypes.STRUCT); writer.stepIn(ion.IonTypes.LIST);});
 
+      //  annotations
+
+      badWriterTest('Cannot pass single string as an annotation.',
+          (writer) => { writer.setAnnotations('taco'), writer.writeInt(5) });
+      badWriterTest('Cannot pass annotations array without a string.',
+          (writer) => { writer.setAnnotations([5]), writer.writeInt(5) });
+      badWriterTest('Cannot pass annotations array containing a non string value.',
+          (writer) => { writer.setAnnotations(['a', 5,'t']), writer.writeInt(5) });
+      badWriterTest('Cannot pass annotations array containing undefined.',
+          (writer) => { writer.setAnnotations([undefined]), writer.writeInt(5) });
+      badWriterTest('Cannot pass annotations array containing null',
+          (writer) => { writer.setAnnotations([null]), writer.writeInt(5) });
+      badWriterTest('Cannot pass undefined as annotations.',
+          (writer) => { writer.setAnnotations(undefined), writer.writeInt(5) });
+      badWriterTest('Cannot write top-level field name',
+          (writer) => { writer.writeFieldName('foo') });
+      badWriterTest('Cannot exit container at top level',
+          (writer) => { writer.stepOut() });
+      badWriterTest('Cannot double-exit container',
+          (writer) => {
+              writer.stepIn(ion.IonTypes.LIST);
+              writer.stepOut();
+              writer.stepOut();
+          });
+
+
     // Symbols
 
     writerTest('Writes symbol containing single quote',
