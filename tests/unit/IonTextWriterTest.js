@@ -375,6 +375,10 @@
           (writer) => { writer.addAnnotation(5), writer.writeInt(5) });
       badWriterTest('Cannot add array of chars.',
           (writer) => { writer.addAnnotation(['t', 'a', 'c', 'o']), writer.writeInt(5) });
+      badWriterTest('Cannot add a non string annotation.',
+          (writer) => { writer.addAnnotation(null), writer.writeInt(5) });
+      badWriterTest('Cannot add a non string annotation.',
+          (writer) => { writer.addAnnotation(undefined), writer.writeInt(5) });
       badWriterTest('Cannot pass annotations array without a string.',
           (writer) => { writer.setAnnotations([5]), writer.writeInt(5) });
       badWriterTest('Cannot pass annotations array containing a non string value.',

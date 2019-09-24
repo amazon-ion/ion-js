@@ -856,6 +856,10 @@ define([
           (writer) => { writer.addAnnotation(['t', 'a', 'c', 'o']), writer.writeInt(5) });
     errorTest('Cannot pass annotations array containing a non string value.',
         (writer) => { writer.setAnnotations(['a', 5,'t']), writer.writeInt(5) });
+    errorTest('Cannot add a non string annotation.',
+          (writer) => { writer.addAnnotation(null), writer.writeInt(5) });
+    errorTest('Cannot add a non string annotation.',
+          (writer) => { writer.addAnnotation(undefined), writer.writeInt(5) });
     errorTest('Cannot pass annotations array containing undefined.',
         (writer) => { writer.setAnnotations([undefined]), writer.writeInt(5) });
     errorTest('Cannot pass annotations array containing null',
