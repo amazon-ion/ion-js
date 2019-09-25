@@ -300,16 +300,16 @@ export class IonEventStream {
             currentEvent['value_text']
         );
 
-        let binaryEvent = this.eventFactory.makeEvent(
-            eventType,
-            currentEvent['ion_type'],
-            fieldname,
-            currentEvent['depth'],
-            currentEvent['annotations'],
-            currentEvent['isNull'],
-            currentEvent['value_binary']
-        );
         if(eventType === IonEventType.SCALAR){
+            let binaryEvent = this.eventFactory.makeEvent(
+                eventType,
+                currentEvent['ion_type'],
+                fieldname,
+                currentEvent['depth'],
+                currentEvent['annotations'],
+                currentEvent['isNull'],
+                currentEvent['value_binary']
+            );
             if(!textEvent.equals(binaryEvent)) {
                 throw new Error(`${currentEvent['value_text']} does not equal ${currentEvent['value_binary']}`);
             }
