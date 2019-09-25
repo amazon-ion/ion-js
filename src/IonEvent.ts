@@ -407,13 +407,15 @@ class IonStructEvent extends AbsIonContainerEvent {//no embed support as of yet.
             matchFound = false;
             for (let j : number = 0; !matchFound && j < expectedEvents.length; j++) {
                 if (!paired[j]) {
-                    matchFound = actualEvents[i].equals(expectedEvents[j]);
+                    let child = actualEvents[i]
+                    let expectedChild = expectedEvents[j]
+                    matchFound = child.equals(expectedChild);
                     if (matchFound) paired[j] = true;
-                    if (matchFound && actualEvents[i].eventType === IonEventType.CONTAINER_START) {
-                        for (let k = j + 1; k < expectedEvents[j].ionValue.length; k++) {
+                    if (matchFound && child.eventType === IonEventType.CONTAINER_START) {
+                        for (let k = j + 1; k < expectedChild.ionValue.length; k++) {
                             paired[k] = true;
                         }
-                        i += actualEvents[i].ionValue.length;
+                        i += child.ionValue.length;
                     }
                 }
             }
@@ -430,12 +432,15 @@ class IonListEvent extends AbsIonContainerEvent {
     }
     valueEquals(expected : IonListEvent) : boolean {
         if(!(expected instanceof IonListEvent)) return false;
-        if(this.ionValue.length !== expected.ionValue.length) return false;
-        for(let i : number = 0; i < this.ionValue.length; i++){
-            if(!this.ionValue[i].equals(expected.ionValue[i])){
+        let container = this.ionValue;
+        let expectedContainer = expected.ionValue;
+        if(container.length !== expectedContainer.length) return false;
+        for(let i : number = 0; i < container.length; i++){
+            let child = container[i];
+            if(!child.equals(expectedContainer[i])){
                 return false;
-            } else if(this.ionValue[i].eventType === IonEventType.CONTAINER_START) {
-                i += this.ionValue[i].ionValue.length;
+            } else if(child.eventType === IonEventType.CONTAINER_START) {
+                i += child.ionValue.length;
             }
         }
         return true;
@@ -449,11 +454,15 @@ class IonSexpEvent extends AbsIonContainerEvent {
     }
     valueEquals(expected : IonSexpEvent) : boolean {
         if(!(expected instanceof IonSexpEvent)) return false;
-        for(let i : number = 0; i < this.ionValue.length; i++){
-            if(!this.ionValue[i].equals(expected.ionValue[i])){
+        let container = this.ionValue;
+        let expectedContainer = expected.ionValue;
+        if(container.length !== expectedContainer.length) return false;
+        for(let i : number = 0; i < container.length; i++){
+            let child = container[i];
+            if(!child.equals(expectedContainer[i])){
                 return false;
-            } else if(this.ionValue[i].eventType === IonEventType.CONTAINER_START) {
-                i += this.ionValue[i].ionValue.length;
+            } else if(child.eventType === IonEventType.CONTAINER_START) {
+                i += child.ionValue.length;
             }
         }
         return true;
