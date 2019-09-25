@@ -267,16 +267,16 @@ function toCharCodes(s: string) {
   return charCodes;
 }
 
+const _HEX_ESCAPE_PREFIX = [CharCodes.BACKSLASH, CharCodes.LOWERCASE_X];
 function hexEscape(codePoint: number) : number[] {
-    let prefix: number[] = [CharCodes.BACKSLASH, CharCodes.LOWERCASE_X];
     let hexEscape: string = codePoint.toString(16);
     while (hexEscape.length < 2) {
         hexEscape = "0" + hexEscape;
     }
-    return prefix.concat(toCharCodes(hexEscape));
+    return _HEX_ESCAPE_PREFIX.concat(toCharCodes(hexEscape));
 }
 
-function hexEscapes(escapes: EscapeIndex, start: number, end?: number) {
+function populateWithHexEscapes(escapes: EscapeIndex, start: number, end?: number) {
     if (end === undefined) {
         escapes[start] = hexEscape(start);
     } else {
@@ -288,7 +288,7 @@ function hexEscapes(escapes: EscapeIndex, start: number, end?: number) {
 
 let CommonEscapes : EscapeIndex = {};
 CommonEscapes[CharCodes.NULL] = backslashEscape('0');
-hexEscapes(CommonEscapes, 1, 7);
+populateWithHexEscapes(CommonEscapes, 1, 7);
 CommonEscapes[CharCodes.BELL] = backslashEscape('a');
 CommonEscapes[CharCodes.BACKSPACE] = backslashEscape('b');
 CommonEscapes[CharCodes.HORIZONTAL_TAB] = backslashEscape('t');
@@ -296,9 +296,9 @@ CommonEscapes[CharCodes.LINE_FEED] = backslashEscape('n');
 CommonEscapes[CharCodes.VERTICAL_TAB] = backslashEscape('v');
 CommonEscapes[CharCodes.FORM_FEED] = backslashEscape('f');
 CommonEscapes[CharCodes.CARRIAGE_RETURN] = backslashEscape('r');
-hexEscapes(CommonEscapes, 14, 32);
+populateWithHexEscapes(CommonEscapes, 14, 32);
 CommonEscapes[CharCodes.BACKSLASH] = backslashEscape('\\');
-hexEscapes(CommonEscapes, 0x7f, 0xa0);
+populateWithHexEscapes(CommonEscapes, 0x7f, 0xa0);
 
 export let ClobEscapes : EscapeIndex = Object['assign']({}, CommonEscapes);
 ClobEscapes[CharCodes.DOUBLE_QUOTE] = backslashEscape('"');
