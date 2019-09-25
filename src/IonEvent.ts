@@ -395,7 +395,7 @@ class IonStructEvent extends AbsIonContainerEvent {//no embed support as of yet.
     }
     //two way equivalence between the structEvents, they must have the exact same number of equivalent elements.
     valueEquals(expected : IonStructEvent) : boolean {
-        return expected instanceof IonStructEvent && this.structsEqual(this.ionValue, expected.ionValue) && this.structsEqual(expected.ionValue, this.ionValue);
+        return expected instanceof IonStructEvent && this.ionValue.length === expected.ionValue.length && this.structsEqual(this.ionValue, expected.ionValue);
     }
 
     //for each actual ionEvent, searches for an equivalent expected ionEvent,
@@ -403,12 +403,18 @@ class IonStructEvent extends AbsIonContainerEvent {//no embed support as of yet.
     structsEqual(actualEvents : AbstractIonEvent[], expectedEvents : AbstractIonEvent[]) : boolean {
         let matchFound : boolean = true;
         let paired : boolean[] = new Array<boolean>(expectedEvents.length);
-        for(let i : number = 0; matchFound && i < actualEvents.length; i++) {
+        for (let i : number = 0; matchFound && i < actualEvents.length; i++) {
             matchFound = false;
-            for(let j : number = 0; !matchFound && j < expectedEvents.length; j++) {
-                if(!paired[j]) {
+            for (let j : number = 0; !matchFound && j < expectedEvents.length; j++) {
+                if (!paired[j]) {
                     matchFound = actualEvents[i].equals(expectedEvents[j]);
-                    paired[j] = matchFound;
+                    if (matchFound) paired[j] = true;
+                    if (matchFound && actualEvents[i].eventType === IonEventType.CONTAINER_START) {
+                        for (let k = j + 1; k < expectedEvents[j].ionValue.length; k++) {
+                            paired[k] = true;
+                        }
+                        i += actualEvents[i].ionValue.length;
+                    }
                 }
             }
         }
@@ -428,6 +434,8 @@ class IonListEvent extends AbsIonContainerEvent {
         for(let i : number = 0; i < this.ionValue.length; i++){
             if(!this.ionValue[i].equals(expected.ionValue[i])){
                 return false;
+            } else if(this.ionValue[i].eventType === IonEventType.CONTAINER_START) {
+                i += this.ionValue[i].ionValue.length;
             }
         }
         return true;
@@ -444,6 +452,8 @@ class IonSexpEvent extends AbsIonContainerEvent {
         for(let i : number = 0; i < this.ionValue.length; i++){
             if(!this.ionValue[i].equals(expected.ionValue[i])){
                 return false;
+            } else if(this.ionValue[i].eventType === IonEventType.CONTAINER_START) {
+                i += this.ionValue[i].ionValue.length;
             }
         }
         return true;
