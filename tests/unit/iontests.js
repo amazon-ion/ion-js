@@ -308,6 +308,12 @@ define([
             binaryWriter.close();
             streams.push(new es.IonEventStream(new ion.makeReader(binaryWriter.getBytes())));
 
+            //eventstream
+            textWriter = new ion.makeTextWriter();
+            streams[0].writeEventStream(textWriter);
+            textWriter.close();
+            streams.push(new es.IonEventStream(new ion.makeReader(textWriter.getBytes())));
+
             for (let i = 0; i < streams.length - 1; i++) {
                 for (let j = i + 1; j < streams.length; j++) {
                     if (!streams[i].equals(streams[j])) {
