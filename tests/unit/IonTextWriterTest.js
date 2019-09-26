@@ -324,7 +324,7 @@
       '"\\0"');
     writerTest('Writes string containing control character',
       writer => writer.writeString(String.fromCharCode(1)),
-      '"\\u0001"');
+      '"\\x01"');
 
     // Structs
 
@@ -371,7 +371,7 @@
       "'\\0'");
     writerTest('Writes symbol containing control character',
       writer => writer.writeSymbol(String.fromCharCode(1)),
-      "'\\u0001'");
+      "'\\x01'");
 
     // Timestamps
 

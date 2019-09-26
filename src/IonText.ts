@@ -247,7 +247,7 @@ export enum CharCodes {
   RIGHT_BRACKET = 0x5d,
   COMMA = 0x2c,
   SPACE = 0x20,
-  LOWERCASE_U = 0x75,
+  LOWERCASE_X = 0x78,
   COLON = 0x3a,
 }
 
@@ -267,43 +267,28 @@ function toCharCodes(s: string) {
   return charCodes;
 }
 
-function unicodeEscape(codePoint: number) : number[] {
-  let prefix: number[] = [CharCodes.BACKSLASH, CharCodes.LOWERCASE_U];
-  let hexEscape: string = codePoint.toString(16);
-  while (hexEscape.length < 4) {
-    hexEscape = "0" + hexEscape;
-  }
-  return prefix.concat(toCharCodes(hexEscape));
+const _HEX_ESCAPE_PREFIX = [CharCodes.BACKSLASH, CharCodes.LOWERCASE_X];
+function hexEscape(codePoint: number) : number[] {
+    let hexEscape: string = codePoint.toString(16);
+    while (hexEscape.length < 2) {
+        hexEscape = "0" + hexEscape;
+    }
+    return _HEX_ESCAPE_PREFIX.concat(toCharCodes(hexEscape));
 }
 
-export let ClobEscapes : EscapeIndex = {};
-ClobEscapes[CharCodes.NULL] = backslashEscape("0");
-ClobEscapes[CharCodes.BELL] = backslashEscape("a");
-ClobEscapes[CharCodes.BACKSPACE] = backslashEscape("b");
-ClobEscapes[CharCodes.HORIZONTAL_TAB] = backslashEscape("t");
-ClobEscapes[CharCodes.LINE_FEED] = backslashEscape("n");
-ClobEscapes[CharCodes.VERTICAL_TAB] = backslashEscape("v");
-ClobEscapes[CharCodes.FORM_FEED] = backslashEscape("f");
-ClobEscapes[CharCodes.CARRIAGE_RETURN] = backslashEscape("r");
-ClobEscapes[CharCodes.DOUBLE_QUOTE] = backslashEscape('"');
-ClobEscapes[CharCodes.SINGLE_QUOTE] = backslashEscape("'");
-ClobEscapes[CharCodes.FORWARD_SLASH] = backslashEscape("/");
-ClobEscapes[CharCodes.QUESTION_MARK] = backslashEscape("?");
-ClobEscapes[CharCodes.BACKSLASH] = backslashEscape("\\");
-
-    function unicodeEscapes(escapes: EscapeIndex, start: number, end?: number) {
-        if (end === undefined) {
-            escapes[start] = unicodeEscape(start);
-        } else {
-            for (let i: number = start; i < end; i++) {
-                escapes[i] = unicodeEscape(i);
-            }
+function populateWithHexEscapes(escapes: EscapeIndex, start: number, end?: number) {
+    if (end === undefined) {
+        escapes[start] = hexEscape(start);
+    } else {
+        for (let i: number = start; i < end; i++) {
+            escapes[i] = hexEscape(i);
         }
     }
+}
 
 let CommonEscapes : EscapeIndex = {};
 CommonEscapes[CharCodes.NULL] = backslashEscape('0');
-unicodeEscapes(CommonEscapes, 1, 6);
+populateWithHexEscapes(CommonEscapes, 1, 7);
 CommonEscapes[CharCodes.BELL] = backslashEscape('a');
 CommonEscapes[CharCodes.BACKSPACE] = backslashEscape('b');
 CommonEscapes[CharCodes.HORIZONTAL_TAB] = backslashEscape('t');
@@ -311,7 +296,15 @@ CommonEscapes[CharCodes.LINE_FEED] = backslashEscape('n');
 CommonEscapes[CharCodes.VERTICAL_TAB] = backslashEscape('v');
 CommonEscapes[CharCodes.FORM_FEED] = backslashEscape('f');
 CommonEscapes[CharCodes.CARRIAGE_RETURN] = backslashEscape('r');
+populateWithHexEscapes(CommonEscapes, 14, 32);
 CommonEscapes[CharCodes.BACKSLASH] = backslashEscape('\\');
+populateWithHexEscapes(CommonEscapes, 0x7f, 0xa0);
+
+export let ClobEscapes : EscapeIndex = Object['assign']({}, CommonEscapes);
+ClobEscapes[CharCodes.DOUBLE_QUOTE] = backslashEscape('"');
+ClobEscapes[CharCodes.SINGLE_QUOTE] = backslashEscape("'");
+ClobEscapes[CharCodes.FORWARD_SLASH] = backslashEscape("/");
+ClobEscapes[CharCodes.QUESTION_MARK] = backslashEscape("?");
 
 export let StringEscapes : EscapeIndex = Object['assign']({}, CommonEscapes);
 StringEscapes[CharCodes.DOUBLE_QUOTE] = backslashEscape('"');
