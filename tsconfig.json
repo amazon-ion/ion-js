@@ -9,7 +9,7 @@
   ],
   "compilerOptions": {
     "target": "es6",
-    "module": "es6",
+    "module": "commonjs",
     "lib": ["es6"],
     "declaration": true,
     "inlineSources": true,
@@ -17,6 +17,7 @@
     // TODO enable this to have stricter checking
     "strict": false,
     "rootDir": "src",
-    "outDir": "dist/es6/es6"
+    "outDir": "dist/es6/es6",
+    "experimentalDecorators": true
   }
 }
