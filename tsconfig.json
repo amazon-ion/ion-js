@@ -10,6 +10,7 @@
   "compilerOptions": {
     "target": "es6",
     "module": "commonjs",
+    "moduleResolution": "node",
     "lib": ["es6"],
     "declaration": true,
     "inlineSources": true,

@@ -91,29 +91,7 @@ module.exports = function(grunt) {
             dest: 'docs/',
           }
         ]
-      }, 
-      bigInt: {
-        files: [
-          {
-            expand: true,
-            src: ['BigInteger.js', 'src/BigInteger.d.ts'],
-            dest: 'dist/es6/es6/',
-            flatten: true
-          },
-          {
-            expand: true,
-            src: ['BigInteger.js','./src/BigInteger.d.ts'],
-            dest: 'dist/commonjs/es6/',
-            flatten: true
-          },
-          {
-            expand: true,
-            src: ['BigInteger.js','./src/BigInteger.d.ts'],
-            dest: 'dist/amd/es6/',
-            flatten: true
-          }
-        ]
-      }
+      },
     },
     babel: { 
       options: { 
@@ -225,7 +203,7 @@ module.exports = function(grunt) {
   grunt.registerTask('build:cjs', ['ts:commonjs-es6']);
   grunt.registerTask('build:amd', ['ts:amd-es6']);
   grunt.registerTask('build', [
-      'clean', 'build:es6', 'build:amd', 'build:cjs', 'copy:bigInt', 'trans:browser', 'copy:all'
+      'clean', 'build:es6', 'build:amd', 'build:cjs', 'trans:browser', 'copy:all'
   ]);
 
   // Temporary targets that will eventually replace 'test' and 'test:coverage'
