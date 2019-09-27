@@ -282,7 +282,7 @@ export class BinaryWriter extends AbstractWriter {
   }
 
   stepOut() {
-    if (this.isTopLevel()) {
+    if (this.depth() === 0) {
       throw new Error("Not currently in a container");
     }
     if (this.state === States.STRUCT_VALUE) {
@@ -291,7 +291,7 @@ export class BinaryWriter extends AbstractWriter {
 
     this.containers.pop();
 
-    if (!this.isTopLevel()) {
+    if (this.depth() > 0) {
       this.state = this.getCurrentContainer() instanceof StructNode
         ? States.STRUCT_FIELD
         : States.VALUE;
@@ -331,8 +331,8 @@ export class BinaryWriter extends AbstractWriter {
     return writeable.getBytes();
   }
 
-  private isTopLevel() : boolean {
-    return this.containers.length === 0;
+  public depth() : number {
+      return this.containers.length;
   }
 
   private getCurrentContainer() : Node {
@@ -340,7 +340,7 @@ export class BinaryWriter extends AbstractWriter {
   }
 
   private addNode(node: Node) : void {
-    if (this.isTopLevel()) {
+    if (this.depth() === 0) {
       this.datagram.push(node);
     } else {
       if (this.state === States.STRUCT_VALUE) {
@@ -359,7 +359,7 @@ export class BinaryWriter extends AbstractWriter {
 
   close() : void {
     this.checkClosed();
-    if(!this.isTopLevel()) {
+    if(this.depth() > 0) {
       throw new Error("Writer has one or more open containers; call stepOut() for each container prior to close()");
     }
     this.writeIvm();

@@ -293,7 +293,7 @@ export class TextWriter extends AbstractWriter {
     }
 
     close() : void {//TODO clear out resources when writer uses more than a basic array/devs have built in IO support etc.
-        if(!this.isTopLevel) {
+        if(this.depth() > 0) {
             throw new Error("Writer has one or more open containers; call stepOut() for each container prior to close()");
         }
     }
@@ -321,7 +321,7 @@ export class TextWriter extends AbstractWriter {
     }
 
     protected handleSeparator() : void {
-        if (this.isTopLevel) {
+        if (this.depth() === 0) {
             if (this.currentContainer.clean) {
                 this.currentContainer.clean = false;
             } else {
@@ -367,7 +367,7 @@ export class TextWriter extends AbstractWriter {
         return this.containerContext[this.depth()];
     }
 
-    private depth() : number {
+    public depth() : number {
         return this.containerContext.length - 1;
     }
 

@@ -854,6 +854,38 @@ define([
       assert.deepEqual(bytes, new Uint8Array([0xe3, 0x81, 0x8a, 0xbf]));
     }
 
+    //depth tests
+      var depthTest = function(name, instructions, expectedDepth) {
+          suite[name] = function() {
+              var symbolTable = new ion.LocalSymbolTable(ion.getSystemSymbolTableImport());
+              var writeable = new ion.Writeable();
+              var writer = new ion.BinaryWriter(symbolTable, writeable);
+              instructions(writer);
+              assert.equal(writer.depth(), expectedDepth);
+          }
+      }
+      depthTest('Stepping into a list results in a depth of 1.',
+          (writer) => {writer.stepIn(ion.IonTypes.LIST);}, 1);
+      depthTest('Stepping into a struct results in a depth of 1.',
+          (writer) => {writer.stepIn(ion.IonTypes.STRUCT);}, 1);
+      depthTest('Stepping into a sexp results in a depth of 1.',
+          (writer) => {writer.stepIn(ion.IonTypes.SEXP);}, 1);
+      depthTest('Stepping into 2 lists results in a depth of 2.',
+          (writer) => {writer.stepIn(ion.IonTypes.LIST); writer.stepIn(ion.IonTypes.LIST);}, 2);
+      depthTest('Stepping into 2 lists and out results in a depth of 1.',
+          (writer) => {
+          writer.stepIn(ion.IonTypes.LIST);
+          writer.stepIn(ion.IonTypes.LIST);
+          writer.stepOut()},
+          1);
+      depthTest('Stepping into a list results in a depth of 1.',
+          (writer) => {
+              writer.stepIn(ion.IonTypes.LIST);
+              writer.stepIn(ion.IonTypes.LIST);
+              writer.stepOut(),
+              writer.stepIn(ion.IonTypes.SEXP);},
+          2);
+
     registerSuite(suite);
   }
 );
