@@ -375,7 +375,7 @@ export class BinaryWriter extends AbstractWriter {
   private checkWriteValue() : void {
     this.checkClosed();
     if (this.state === States.STRUCT_FIELD) {
-      throw new Error("Expected a struct field name instead of a value, Call writeFieldName(string) with the desired name before calling stepIn(IonType)");
+      throw new Error("Expected a struct field name instead of a value, Call writeFieldName(string) with the desired name before calling stepIn(IonType) or writeIonType()");
     }
   }
 
