@@ -105,7 +105,11 @@ export class Decimal {
      */
     toString(): string {
         // based on the algorithm defined in https://docs.oracle.com/javase/8/docs/api/java/math/BigDecimal.html#toString--
-        let cStr = Math.abs(this._coefficient.numberValue())+'';
+        let cStr = this._coefficient.toString();
+        let negative = cStr[0] === '-';
+        if(negative) {
+            cStr = cStr.substr(1, cStr.length);
+        }
         let precision = cStr.length;
         let adjustedExponent = this._exponent + (precision - 1);
 
