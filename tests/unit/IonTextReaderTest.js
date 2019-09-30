@@ -30,6 +30,17 @@ define(
             assert.equal(ionReader.value(), "string");
         };
 
+        suite['Read emoji with modifier'] = function() {
+            let s = 'a👩🏽b👩🏽👩🏽c';
+            let r = ion.makeReader("'" + s + "'" + ' ' + '"' + s + '"' + ' ' + "'''" + s + "'''");
+            r.next();
+            assert.equal(r.stringValue(), s);
+            r.next();
+            assert.equal(r.stringValue(), s);
+            r.next();
+            assert.equal(r.stringValue(), s);
+        };
+
         suite['Read boolean value'] = function() {
             var ionToRead = "true";
             var ionReader = ion.makeReader(ionToRead);

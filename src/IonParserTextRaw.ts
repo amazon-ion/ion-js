@@ -22,7 +22,7 @@ import * as IonText from "./IonText";
 
 import { IonType } from "./IonType";
 import { IonTypes } from "./IonTypes";
-import { StringSpan, Span } from "./IonSpan";
+import { StringSpan } from "./IonSpan";
 import {is_keyword, is_whitespace} from "./IonText";
 
 const EOF = -1;  // EOF is end of container, distinct from undefined which is value has been consumed
@@ -102,6 +102,9 @@ const ESC_U =     85; //  values['U'] = ESCAPE_BIG_U;    //    any  \ UHHHHHHHH 
 const empty_array: any[] = [];
 
 const INF = [ CH_i, CH_n, CH_f ];
+
+// mask the 6 hi-order bits of a UTF-16 surrogate; the 10 low-order bits are the ones of interest
+const _UTF16_MASK = 0x03ff;
 
 export function get_ion_type(t: number) : IonType {
   switch(t) {
@@ -1015,11 +1018,9 @@ export class ParserTextRaw {
     }
 
     get_value_as_string(t: number) : string {
-
         let index : number;
         let ch : number;
         let escaped : number;
-        let acceptComments : boolean;
         let s : string = "";
         switch (t) {
             case T_NULL:
@@ -1046,58 +1047,34 @@ export class ParserTextRaw {
                 break;
             case T_STRING1:
             case T_STRING2:
+            case T_STRING3:
                 for (index = this._start; index < this._end; index++) {
                     ch = this._in.valueAt(index);
                     if (ch == CH_BS) {
                         ch = this._read_escape_sequence(index, this._end);
                         index += this._esc_len;
                     }
-                    if(this.isHighSurrogate(ch)){
+                    if (this.isHighSurrogate(ch)) {
                         index++;
                         let tempChar = this._in.valueAt(index);
                         if (tempChar == CH_BS) {
                             tempChar = this._read_escape_sequence(index, this._end);
                             index += this._esc_len;
                         }
-                        if(this.isLowSurrogate(tempChar)){
-                            s += ch + tempChar;
-                            index++;
-                        } else{
-                            throw new Error("illegal high surrogate" + ch);
+                        if (this.isLowSurrogate(tempChar)) {
+                            // convert from UTF-16 surrogate pair to a codepoint
+                            let hiSurrogate = ch;
+                            let loSurrogate = tempChar;
+                            let codepoint = 0x10000 + ((hiSurrogate & _UTF16_MASK) << 10) + (loSurrogate & _UTF16_MASK);
+                            s += String.fromCodePoint(codepoint);
+                        } else {
+                            throw new Error("expected a low surrogate, but found: " + ch);
                         }
-                    } else if(this.isLowSurrogate(ch)){
-                        throw new Error("illegal low surrogate: " + ch);
-                    } else{
-                        s += String.fromCharCode(ch);
-                    }
-                }
-                break;
-            case T_STRING3:
-                acceptComments = true;
-                for(index = this._start; index < this._end; index++) {
-                    ch = this._in.valueAt(index);
-                    if (ch == CH_BS) {
-                        ch = this._read_escape_sequence(index, this._end);
-                        index += this._esc_len;
-                    }
-                    if(this.isHighSurrogate(ch)){
-                        index++;
-                        let tempChar = this._in.valueAt(index);
-                        if (tempChar == CH_BS) {
-                            tempChar = this._read_escape_sequence(index, this._end);
-                            index += this._esc_len;
-                        }
-                        if(this.isLowSurrogate(tempChar)){
-                            s += ch + tempChar;
-                            index++;
-                        } else{
-                            throw new Error("illegal high surrogate" + ch);
-                        }
-                    } else if(this.isLowSurrogate(ch)){
-                        throw new Error("illegal low surrogate: " + ch);
-                    } else if(ch === CH_SQ) {
+                    } else if (this.isLowSurrogate(ch)) {
+                        throw new Error("unexpected low surrogate: " + ch);
+                    } else if (t === T_STRING3 && ch === CH_SQ) {
                         if (this.verifyTriple(index)) {
-                            index = this._skip_triple_quote_gap(index, this._end, acceptComments);
+                            index = this._skip_triple_quote_gap(index, this._end, /*acceptComments*/ true);
                         } else {
                             s += String.fromCharCode(ch);
                         }
@@ -1120,7 +1097,6 @@ export class ParserTextRaw {
                 }
                 break;
             case T_CLOB3:
-                acceptComments = false;
                 for(index = this._start; index < this._end; index++) {
                     ch = this._in.valueAt(index);
                     if(ch === CH_BS) {
@@ -1131,7 +1107,7 @@ export class ParserTextRaw {
                         index += this._esc_len;
                     } else if ( ch === CH_SQ) {
                         if (this.verifyTriple(index)) {
-                            index = this._skip_triple_quote_gap(index, this._end, acceptComments);
+                            index = this._skip_triple_quote_gap(index, this._end, /*acceptComments*/ false);
                         } else {
                             s += String.fromCharCode(ch);
                         }
@@ -1144,7 +1120,7 @@ export class ParserTextRaw {
                 break;
             default:
                 throw new Error("can't get this value as a string");
-            }
+        }
         return s;
     }
 

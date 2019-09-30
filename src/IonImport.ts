@@ -28,7 +28,6 @@ import { SymbolIndex } from "./IonSymbolIndex";
 export class Import {
     private readonly _offset: number;
     private readonly _length: number;
-    private readonly index: SymbolIndex = {};
     private readonly _parent : Import;
     private readonly _symbolTable : SharedSymbolTable;
 
@@ -36,31 +35,42 @@ export class Import {
         this._parent = parent;
         this._symbolTable = symbolTable;
         this._offset = this.parent ? this.parent.offset + this.parent.length : 1;
-        this._length = length || this.symbolTable.symbols.length;
-
-        let symbols: string[] = this.symbolTable.symbols;
-        for (let i: number = 0; i < this.length; i++) {
-            this.index[symbols[i]] = this.offset + i;
-        }
+        this._length = length || this.symbolTable.numberOfSymbols;
     }
 
-    getSymbol(symbolId: number) : string {
+    getSymbolText(symbolId: number) : string {
         if(this.parent === undefined) throw new Error("Illegal parent state.");
         if (this.parent !== null) {
-            let parentSymbol = this.parent.getSymbol(symbolId);
+            let parentSymbol = this.parent.getSymbolText(symbolId);
             if (parentSymbol) {
                 return parentSymbol;
             }
         }
 
         let index: number = symbolId - this.offset;
-        if (index < this.length) {
-            return this.symbolTable.symbols[index];
+        if (index >= 0 && index < this.length) {
+            return this.symbolTable.getSymbolText(index);
         }
+        return undefined;
     }
 
-    getSymbolId(symbol_: string) : number {
-        return (this.parent && this._parent.getSymbolId(symbol_)) || this.index[symbol_];
+    getSymbolId(symbolText: string) : number {
+        let symbolId;
+        if (this.parent !== null) {
+            symbolId = this.parent.getSymbolId(symbolText);
+            if (symbolId) {
+                return symbolId;
+            }
+        }
+
+        symbolId = this.symbolTable.getSymbolId(symbolText);
+        if (symbolId !== null
+            && symbolId !== undefined
+            && symbolId < this.length) {
+            return symbolId + this.offset;
+        }
+
+        return undefined;
     }
 
     get parent() : Import {

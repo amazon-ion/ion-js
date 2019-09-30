@@ -174,6 +174,56 @@
     writerTest('Writes negative 32-bit float',
       writer => writer.writeFloat32(-8.125),
       '-8.125e0');
+    writerTest('Writes positive 0 as a 32-bit float',
+      writer => writer.writeFloat32(0),
+       '0e0');
+    writerTest('Writes negative 0 as a 32-bit float',
+      writer => writer.writeFloat32(-0),
+      '-0e0');
+    writerTest('Writes nan as a 32-bit float',
+      writer => writer.writeFloat32(NaN),
+      'nan');
+    writerTest('Writes +inf as a 32-bit float',
+      writer => writer.writeFloat32(Number.POSITIVE_INFINITY),
+      '+inf');
+    writerTest('Writes -inf as a 32-bit float',
+      writer => writer.writeFloat32(Number.NEGATIVE_INFINITY),
+      '-inf');
+
+    writerTest('Writes 64-bit float',
+      writer => writer.writeFloat64(8.125),
+      '8.125e0');
+    writerTest('Writes null 64-bit float using null',
+      writer => writer.writeFloat64(null),
+      'null.float');
+    writerTest('Writes null 64-bit float using undefined',
+      writer => writer.writeFloat64(),
+      'null.float');
+    writerTest('Writes 64-bit float with annotations',
+      writer => { writer.setAnnotations(['foo', 'bar']); writer.writeFloat64(8.125) },
+      'foo::bar::8.125e0');
+    writerTest('Writes negative 64-bit float',
+      writer => writer.writeFloat64(-8.125),
+      '-8.125e0');
+    writerTest('Writes positive 0 as a 64-bit float',
+      writer => writer.writeFloat64(0),
+      '0e0');
+    writerTest('Writes negative 0 as a 64-bit float',
+      writer => writer.writeFloat64(-0),
+      '-0e0');
+    writerTest('Writes ten billion as a 64-bit float',
+      writer => writer.writeFloat64(10000000000),
+      '1e10');
+    writerTest('Writes nan as a 64-bit float',
+      writer => writer.writeFloat64(Number.NaN),
+      'nan');
+    writerTest('Writes +inf as a 64-bit float',
+      writer => writer.writeFloat64(Number.POSITIVE_INFINITY),
+      '+inf');
+    writerTest('Writes -inf as a 64-bit float',
+      writer => writer.writeFloat64(Number.NEGATIVE_INFINITY),
+      '-inf');
+
 
     // Ints
 
@@ -274,7 +324,7 @@
       '"\\0"');
     writerTest('Writes string containing control character',
       writer => writer.writeString(String.fromCharCode(1)),
-      '"\\u0001"');
+      '"\\x01"');
 
     // Structs
 
@@ -327,7 +377,7 @@
       "'\\0'");
     writerTest('Writes symbol containing control character',
       writer => writer.writeSymbol(String.fromCharCode(1)),
-      "'\\u0001'");
+      "'\\x01'");
 
     // Timestamps
 

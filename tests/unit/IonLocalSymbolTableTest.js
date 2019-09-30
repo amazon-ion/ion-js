@@ -46,7 +46,7 @@ define([
       var symbolTable = ion.defaultLocalSymbolTable();
       assertSystemSymbols(symbolTable);
       try {
-        symbolTable.getSymbol(10);
+        symbolTable.getSymbolText(10);
         throw new Error("Expected Error.")
       } catch(e) {
           if(e.message === "Expected Error.") throw new Error("Failed to cause index Error")
@@ -61,9 +61,9 @@ define([
 
       var symbolTable = new ion.LocalSymbolTable(import2);
 
-      assert.isDefined(symbolTable.getSymbol(13));
+      assert.isDefined(symbolTable.getSymbolText(13));
       try{
-          symbolTable.getSymbol(14);
+          symbolTable.getSymbolText(14);
           throw new Error("Expected Error.")
       } catch(e) {
           if(e.message === "Expected Error.") throw new Error("Failed to cause index Error")
@@ -93,7 +93,7 @@ define([
       assert.equal(symbolTable.getSymbolId('e'), 14);
       assert.equal(symbolTable.getSymbolId('f'), 15);
       try{
-          symbolTable.getSymbol(16);
+          symbolTable.getSymbolText(16);
           throw new Error("Expected Error.")
       } catch(e) {
           if(e.message === "Expected Error.") throw new Error("Failed to cause index Error")
@@ -108,9 +108,9 @@ define([
 
       var symbolTable = new ion.LocalSymbolTable(import2, ['e', 'f']);
 
-      assert.isDefined(symbolTable.getSymbol(13));
+      assert.isDefined(symbolTable.getSymbolText(13));
       try{
-          symbolTable.getSymbol(14);
+          symbolTable.getSymbolText(14);
           throw new Error("Expected Error.")
       } catch(e) {
           if(e.message === "Expected Error.") throw new Error("Failed to cause index Error")
@@ -133,9 +133,9 @@ define([
 
       var symbolTable = new ion.LocalSymbolTable(import2, ['e', 'f']);
 
-      assert.isDefined(symbolTable.getSymbol(17));
+      assert.isDefined(symbolTable.getSymbolText(17));
       try {
-          symbolTable.getSymbol(18);
+          symbolTable.getSymbolText(18);
           throw new Error("Expected Error.")
       } catch(e) {
           if(e.message === "Expected Error.") throw new Error("Failed to cause index Error")
@@ -145,10 +145,10 @@ define([
       assertSystemSymbols(symbolTable);
       assert.equal(symbolTable.getSymbolId('a'), 10);
       assert.equal(symbolTable.getSymbolId('b'), 11);
-      assert.isUndefined(symbolTable.getSymbol(12));
+      assert.isUndefined(symbolTable.getSymbolText(12));
       assert.equal(symbolTable.getSymbolId('c'), 13);
       assert.equal(symbolTable.getSymbolId('d'), 14);
-      assert.isUndefined(symbolTable.getSymbol(15));
+      assert.isUndefined(symbolTable.getSymbolText(15));
       assert.equal(symbolTable.getSymbolId('e'), 16);
       assert.equal(symbolTable.getSymbolId('f'), 17);
     }
@@ -163,7 +163,7 @@ define([
       assert.isDefined(id, "Unable to add symbol to symbol table");
       assert.equal(id, 10);
 
-      var actualSymbol_ = symbolTable.getSymbol(id);
+      var actualSymbol_ = symbolTable.getSymbolText(id);
       assert.equal(symbol_, actualSymbol_, "Symbol names did not match");
     };
 

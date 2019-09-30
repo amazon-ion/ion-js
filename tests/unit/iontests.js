@@ -343,7 +343,6 @@ function toSkipList(paths) {
     });
 
     // additional, known bad/slow test files:
-    skipList['ion-tests/iontestdata/good/subfieldVarUInt32bit.ion'] = 1;
     skipList['ion-tests/iontestdata/good/equivs/lists.ion'] = 1;     // runs too long, causes TravisCI to fail
     skipList['ion-tests/iontestdata/good/equivs/sexps.ion'] = 1;     // runs too long, causes TravisCI to fail
 
@@ -411,9 +410,6 @@ let eventSkipList = toSkipList([
     'ion-tests/iontestdata/good/equivs/nopPadNonEmptyStruct.10n',
     'ion-tests/iontestdata/good/equivs/paddedInts.10n',
     'ion-tests/iontestdata/good/equivs/systemSymbols.ion',
-    'ion-tests/iontestdata/good/equivs/timestampFractions.ion',
-    'ion-tests/iontestdata/good/equivs/timestampSuperfluousOffset.10n',
-    'ion-tests/iontestdata/good/floatSpecials.ion',
     'ion-tests/iontestdata/good/floatsWithUnderscores.ion',
     'ion-tests/iontestdata/good/innerVersionIdentifiers.ion',
     'ion-tests/iontestdata/good/intBigSize1201.10n',
@@ -448,17 +444,11 @@ let eventSkipList = toSkipList([
     'ion-tests/iontestdata/good/symbolZero.ion',
     'ion-tests/iontestdata/good/testfile22.ion',
     'ion-tests/iontestdata/good/testfile23.ion',
-    'ion-tests/iontestdata/good/timestamp/timestamps.ion',
     'ion-tests/iontestdata/good/utf16.ion',
     'ion-tests/iontestdata/good/utf32.ion',
 ]);
 
 let readerCompareSkipList = toSkipList([
-    'ion-tests/iontestdata/good/subfieldInt.ion',
-    'ion-tests/iontestdata/good/subfieldVarUInt.ion',
-    'ion-tests/iontestdata/good/subfieldVarUInt15bit.ion',
-    'ion-tests/iontestdata/good/subfieldVarUInt16bit.ion',
-    'ion-tests/iontestdata/good/timestamp/timestamp2011.10n',
 ]);
 
 let equivsSkipList = toSkipList([
@@ -482,8 +472,6 @@ let equivsSkipList = toSkipList([
     'ion-tests/iontestdata/good/equivs/systemSymbols.ion',
     'ion-tests/iontestdata/good/equivs/systemSymbolsAsAnnotations.ion',
     'ion-tests/iontestdata/good/equivs/textNewlines.ion',
-    'ion-tests/iontestdata/good/equivs/timestampFractions.ion',
-    'ion-tests/iontestdata/good/equivs/timestampSuperfluousOffset.10n',
     'ion-tests/iontestdata/good/equivs/utf8/stringU0001D11E.ion',
     'ion-tests/iontestdata/good/equivs/utf8/stringUtf8.ion',
 
@@ -505,15 +493,12 @@ let nonEquivsSkipList = toSkipList([
 
 /*
   notes from the previous skipList mechanism:
-    'good/subfieldVarInt.ion', //passes, but takes too long to run every build due to longint rounding.
     'good/intBinary.ion', //binaryInts unsupported.
     'good/integer_values.ion', //binary ints unsupported.
     'good/intsWithUnderscores.ion', //binary ints unsupported.
     'good/intBigSize256.ion', //int maxsize limitation.
     'good/equivs/intsWithUnderscores.ion', //binary ints unsupported.
     'good/equivs/binaryInts.ion', //binary ints unsupported.
-    'good/subfieldVarUInt32bit.ion', //passes, but takes too long to run every build.
-    'good/subfieldVarUInt.ion', //passes, but takes too long to run every build.
     'good/floatsWithUnderscores.ion', //numbers with underscores unsupported.
     'good/equivs/floatsWithUnderscores.ion', //numbers with underscores unsupported.
     'good/equivs/decimalsWithUnderscores.ion', //numbers with underscores unsupported.

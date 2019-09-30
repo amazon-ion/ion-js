@@ -12,8 +12,8 @@
  * language governing permissions and limitations under the License.
  */
 
-import * as bigInt from "./BigInteger.js";
-import { BigInteger } from "./BigInteger";
+import * as bigInt from "big-integer";
+import { BigInteger } from "big-integer";
 import { _sign } from "./util";
 
 export class LongInt {

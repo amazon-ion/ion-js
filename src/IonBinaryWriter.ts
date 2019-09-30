@@ -158,7 +158,10 @@ export class BinaryWriter extends AbstractWriter {
     }
 
     let bytes: Uint8Array;
-    if (value === 0) {
+    // According to the spec, the value 0 is encoded as a length of zero bytes while -0 is encoded using the
+    // full 4 bytes like any other value. We use `Object.is` to distinguish between -0 and 0 in this check
+    // because `0 === -0` evaluates to `true`.
+    if (Object.is(value, 0)) {
       bytes = new Uint8Array(0);
     } else {
       let buffer: ArrayBuffer = new ArrayBuffer(4);
@@ -177,7 +180,10 @@ export class BinaryWriter extends AbstractWriter {
     }
 
     let bytes: Uint8Array;
-    if (value === 0) {
+    // According to the spec, the value 0 is encoded as a length of zero bytes while -0 is encoded using the
+    // full 8 bytes like any other value. We use `Object.is` to distinguish between -0 and 0 in this check
+    // because `0 === -0` evaluates to `true`.
+    if (Object.is(value, 0)) {
       bytes = new Uint8Array(0);
     } else {
       let buffer: ArrayBuffer = new ArrayBuffer(8);

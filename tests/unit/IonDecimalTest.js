@@ -47,7 +47,7 @@ define([
             '123d1'     : () => test('123d1', '123', 1, 1230, '1.23E+3'),
             '123d3'     : () => test('123d3', '123', 3, 123000, '1.23E+5'),
             '123d-1'    : () => test('123d-1', '123', -1, 12.3, '12.3'),
-            '123d-5'    : () => test('123d-5', '123', -5, 0.0012300000000000002, '0.00123'),
+            '123d-5'    : () => test('123d-5', '123', -5, [0.00123, 0.0012300000000000002], '0.00123'),
             '123d-10'   : () => test('123d-10', '123', -10, 1.2300000000000001e-8, '1.23E-8'),
             '-123d-12'  : () => test('-123d-12', '-123', -12, -0.000000000123, '-1.23E-10'),
             '12300d-2'  : () => test('12300d-2', '12300', -2, 123, '123.00'),
@@ -175,6 +175,14 @@ define([
             'intValue(-1.0000001)': () => () => assert.equal(ion.Decimal.parse('-1.0000001').intValue(), -1),
         });
 
+        /**
+         * @param decimalString The text representation of the decimal to test.
+         * @param expectedCoefficient The expected `number` or `string` (LongInt) for the coefficient.
+         * @param expectedExponent The expected `number` or `string` (LongInt) for the exponent part.
+         * @param expectedNumberValue The expected number or an array of size two indicating the inclusive range of
+         *  possible values (due to platform dependent rounding of `Math.pow()`).
+         * @param expectedToString The expected text image of `Decimal.toString()`
+         */
         function test(decimalString,
                       expectedCoefficient,
                       expectedExponent,
@@ -191,7 +199,16 @@ define([
 
             assert.equal(decimal.isNegative(), decimalString.trim()[0] === '-', 'isNegative()');
 
-            assert.equal(decimal.numberValue(), expectedNumberValue, 'numberValue()');
+            if (expectedNumberValue instanceof Array) {
+                if (expectedNumberValue.length !== 2) {
+                    throw new Error(`Expected number value must be size two ${expectedNumberValue}`);
+                }
+                const decNumberValue = decimal.numberValue();
+                assert.isAtLeast(decNumberValue, expectedNumberValue[0], `numberValue() not in range ${expectedNumberValue}`);
+                assert.isAtMost(decNumberValue, expectedNumberValue[1], `numberValue() not in range ${expectedNumberValue}`);
+            } else {
+                assert.equal(decimal.numberValue(), expectedNumberValue, 'numberValue()');
+            }
             assert.equal(util._sign(decimal.numberValue()), util._sign(expectedNumberValue), 'numberValue sign');
 
             assert.equal(decimal.toString(), expectedToString, 'toString()');
