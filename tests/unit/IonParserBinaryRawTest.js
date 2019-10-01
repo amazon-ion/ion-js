@@ -43,7 +43,7 @@ define([
     let readUnsignedIntTest = function(testName, bytes, expected, throwsException) {
       let test = function() {
         let binarySpan = new ion.BinarySpan(new Uint8Array(bytes));
-        let actual = ion.ParserBinaryRaw.readUnsignedIntFrom(binarySpan, bytes.length);
+        let actual = ion.ParserBinaryRaw._readUnsignedIntFrom(binarySpan, bytes.length);
         assert.equal(actual, expected)
       }
       registerTest(testName, test, throwsException);
@@ -117,7 +117,7 @@ define([
       let testThrows = false;
       let test = function() {
         let binarySpan = new ion.BinarySpan(new Uint8Array(bytes));
-        let actual = ion.ParserBinaryRaw.readUnsignedLongIntFrom(binarySpan, bytes.length);
+        let actual = ion.ParserBinaryRaw._readUnsignedLongIntFrom(binarySpan, bytes.length);
         assert.equal(actual, expected)
       }
       registerTest(testName, test, throwsException);
@@ -141,7 +141,7 @@ define([
     let readSignedIntTest = function(testName, bytes, expected, throwsException) {
       let test = function() {
         let binarySpan = new ion.BinarySpan(new Uint8Array(bytes));
-        let actual = ion.ParserBinaryRaw.readSignedIntFrom(binarySpan, bytes.length).numberValue();
+        let actual = ion.ParserBinaryRaw._readSignedIntFrom(binarySpan, bytes.length).numberValue();
         assert.equal(actual, expected)
       }
       registerTest(testName, test, throwsException);
@@ -190,7 +190,7 @@ define([
 
     let varUnsignedIntBytesMatchValue = function(bytes, expected) {
       let binarySpan = new ion.BinarySpan(new Uint8Array(bytes));
-      let actual = ion.ParserBinaryRaw.readVarUnsignedIntFrom(binarySpan);
+      let actual = ion.ParserBinaryRaw._readVarUnsignedIntFrom(binarySpan);
       assert.equal(actual, expected);
     }
 
@@ -246,7 +246,7 @@ define([
 
     let varSignedIntBytesMatchValue = function(bytes, expected) {
       let binarySpan = new ion.BinarySpan(new Uint8Array(bytes));
-      let actual = ion.ParserBinaryRaw.readVarSignedIntFrom(binarySpan);
+      let actual = ion.ParserBinaryRaw._readVarSignedIntFrom(binarySpan);
       assert.equal(actual, expected)
     };
 
@@ -333,7 +333,7 @@ define([
 
     let floatBytesMatchValue = function(bytes, expected, comparison) {
       let binarySpan = new ion.BinarySpan(bytes);
-      let actual = ion.ParserBinaryRaw.readFloatFrom(binarySpan, binarySpan.getRemaining());
+      let actual = ion.ParserBinaryRaw._readFloatFrom(binarySpan, binarySpan.getRemaining());
       // Default to asserting equality, but allow the comparison function to be overridden by a parameter
       comparison = comparison || function(actual, expected) {
         assert.equal(actual, expected)
