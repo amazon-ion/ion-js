@@ -324,7 +324,7 @@
       '"\\0"');
     writerTest('Writes string containing control character',
       writer => writer.writeString(String.fromCharCode(1)),
-      '"\\u0001"');
+      '"\\x01"');
 
     // Structs
 
@@ -360,6 +360,12 @@
           writer => { writer.stepIn(ion.IonTypes.STRUCT); writer.writeSymbol('foo') });
       badWriterTest('Cannot end struct with missing field value',
           writer => { writer.stepIn(ion.IonTypes.STRUCT); writer.writeFieldName('foo'); writer.stepOut() });
+      badWriterTest('Cannot step into struct with missing field value',
+          writer => { writer.stepIn(ion.IonTypes.STRUCT); writer.stepIn(ion.IonTypes.STRUCT);});
+      badWriterTest('Cannot step into sexp with missing field value',
+          writer => { writer.stepIn(ion.IonTypes.STRUCT); writer.stepIn(ion.IonTypes.SEXP);});
+      badWriterTest('Cannot step into list with missing field value',
+          writer => { writer.stepIn(ion.IonTypes.STRUCT); writer.stepIn(ion.IonTypes.LIST);});
 
     // Symbols
 
@@ -371,7 +377,7 @@
       "'\\0'");
     writerTest('Writes symbol containing control character',
       writer => writer.writeSymbol(String.fromCharCode(1)),
-      "'\\u0001'");
+      "'\\x01'");
 
     // Timestamps
 

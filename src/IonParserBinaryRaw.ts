@@ -136,7 +136,7 @@ export class ParserBinaryRaw {
         this._in = source;
     }
 
-    private static readFloatFrom(input: BinarySpan, numberOfBytes) : number {
+    static _readFloatFrom(input: BinarySpan, numberOfBytes) : number {
         let tempBuf : DataView;
         switch(numberOfBytes) {
             case 0:
@@ -155,10 +155,10 @@ export class ParserBinaryRaw {
     }
 
     private read_binary_float() : number {
-        return ParserBinaryRaw.readFloatFrom(this._in, this._len);
+        return ParserBinaryRaw._readFloatFrom(this._in, this._len);
     }
 
-    private static readVarUnsignedIntFrom(input: BinarySpan) : number {
+    static _readVarUnsignedIntFrom(input: BinarySpan) : number {
         let numberOfBits = 0;
         let byte;
         let magnitude = 0;
@@ -180,10 +180,10 @@ export class ParserBinaryRaw {
     }
 
     private readVarUnsignedInt() : number {
-        return ParserBinaryRaw.readVarUnsignedIntFrom(this._in);
+        return ParserBinaryRaw._readVarUnsignedIntFrom(this._in);
     }
 
-    private static readVarSignedIntFrom(input: BinarySpan) : number {
+    static _readVarSignedIntFrom(input: BinarySpan) : number {
         let v = input.next(), byte;
         let isNegative = v & 0x40;
         let stopBit = v & 0x80;
@@ -205,7 +205,7 @@ export class ParserBinaryRaw {
     }
 
     private readVarSignedInt() : number {
-        return ParserBinaryRaw.readVarSignedIntFrom(this._in);
+        return ParserBinaryRaw._readVarSignedIntFrom(this._in);
     }
 
     private readVarLongInt() : LongInt {
@@ -223,7 +223,7 @@ export class ParserBinaryRaw {
         return LongInt.fromVarIntBytes(bytes, isNegative);
     }
 
-    private static readSignedIntFrom(input: BinarySpan, numberOfBytes: number) : LongInt {
+    static _readSignedIntFrom(input: BinarySpan, numberOfBytes: number) : LongInt {
         if (numberOfBytes == 0) {
             return new LongInt(0);
         }
@@ -235,10 +235,10 @@ export class ParserBinaryRaw {
     }
 
     private readSignedInt() : LongInt {
-        return ParserBinaryRaw.readSignedIntFrom(this._in, this._len);
+        return ParserBinaryRaw._readSignedIntFrom(this._in, this._len);
     }
 
-    private static readUnsignedIntFrom(input: BinarySpan, numberOfBytes: number) : number {
+    static _readUnsignedIntFrom(input: BinarySpan, numberOfBytes: number) : number {
         let value = 0, bytesRead = 0, byte;
         if (numberOfBytes < 1)
             return 0;
@@ -265,15 +265,15 @@ export class ParserBinaryRaw {
     }
 
     private readUnsignedInt() : number {
-        return ParserBinaryRaw.readUnsignedIntFrom(this._in, this._len);
+        return ParserBinaryRaw._readUnsignedIntFrom(this._in, this._len);
     }
 
-    private static readUnsignedLongIntFrom(input: BinarySpan, numberOfBytes: number) : LongInt {
+    static _readUnsignedLongIntFrom(input: BinarySpan, numberOfBytes: number) : LongInt {
         return LongInt.fromUIntBytes(Array.prototype.slice.call(input.view(numberOfBytes)));
     }
 
     private readUnsignedLongInt() : LongInt {
-        return ParserBinaryRaw.readUnsignedLongIntFrom(this._in, this._len);
+        return ParserBinaryRaw._readUnsignedLongIntFrom(this._in, this._len);
     }
 
     /**
@@ -289,11 +289,11 @@ export class ParserBinaryRaw {
         let coefficient, exponent, d;
 
         let initialPosition = input.position();
-        exponent = ParserBinaryRaw.readVarSignedIntFrom(input);
+        exponent = ParserBinaryRaw._readVarSignedIntFrom(input);
         let numberOfExponentBytes = input.position() - initialPosition;
         let numberOfCoefficientBytes = numberOfBytes - numberOfExponentBytes;
 
-        coefficient = ParserBinaryRaw.readSignedIntFrom(input,  numberOfCoefficientBytes);
+        coefficient = ParserBinaryRaw._readSignedIntFrom(input,  numberOfCoefficientBytes);
         d = Decimal._fromLongIntCoefficient(coefficient, exponent);
 
         return d;
@@ -350,7 +350,7 @@ export class ParserBinaryRaw {
             let exponent = this.readVarSignedInt();
             let coefficient = LongInt._ZERO;
             if (this._in.position() < end) {
-                coefficient = ParserBinaryRaw.readSignedIntFrom(this._in, end - this._in.position());
+                coefficient = ParserBinaryRaw._readSignedIntFrom(this._in, end - this._in.position());
             }
             let dec = Decimal._fromLongIntCoefficient(coefficient, exponent);
             let [_, fractionStr] = Timestamp._splitSecondsDecimal(dec);
