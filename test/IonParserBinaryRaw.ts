@@ -15,14 +15,6 @@
 import {assert} from 'chai';
 import * as ion from '../src/IonTests';
 
-// Registers the provided test with the test suite.
-let registerTest = function(testName, test, throwsException = false) {
-  test = throwsException
-      ? function() { assert.throws(test, Error); }
-      : test;
-  it(testName, test);
-};
-
 /**
  * UInt
  *
@@ -179,32 +171,6 @@ let varUnsignedIntBytesMatchValue = function(bytes, expected) {
   assert.equal(actual, expected);
 };
 
-// The base test function called by the more specific flavors below.
-// Creates a test which will attempt to read the `expected` VarUInt from the provided input bytes, handling
-// any anticipated exceptions.
-let readVarUnsignedIntTest = function(testName, bytes, expected, throwsException) {
-  let test = function() {
-    varUnsignedIntBytesMatchValue(bytes, expected);
-  };
-  registerTest(testName, test, throwsException);
-};
-
-// Should read the `expected` VarUInt value from the provided input bytes.
-// Will fail if an exception is thrown or if the value that's read from the bytes is not equal to `expected`.
-let readVarUnsignedInt = function(bytes, expected) {
-  let testName = 'Read var unsigned int ' + expected + ' from bytes: ' + bytes;
-  let testThrows = false;
-  readVarUnsignedIntTest(testName, bytes, expected, testThrows);
-};
-
-// Should detect that overflow has occurred while reading and throw an exception.
-// Will fail if no exception is thrown.
-let overflowWhileReadingVarUnsignedInt = function(bytes, expected) {
-  let testName = 'Overflow while attempting to read var unsigned int ' + expected + ' from the bytes: ' + bytes;
-  let testThrows = true;
-  readVarUnsignedIntTest(testName, bytes, expected, testThrows);
-};
-
 let varUnsignedIntReadingTests = [
   {bytes: [0x80], expected: 0},
   {bytes: [0x00, 0x81], expected: 1},
@@ -221,11 +187,11 @@ let varUnsignedIntOverflowTests = [
 
 describe('Reading variable unsigned ints', () => {
   // Test all values that can be encoded in a single byte
-  registerTest('All single-byte encodings', function() {
+  it('All single-byte encodings', function() {
     for (let byte = 0; byte <= 0x7F; byte++) {
       varUnsignedIntBytesMatchValue([byte | 0x80], byte);
     }
-  }, false);
+  });
 
   describe('Ok', () => {
     varUnsignedIntReadingTests.forEach(({bytes, expected}) => {
