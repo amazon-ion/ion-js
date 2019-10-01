@@ -11,8 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-import { Writeable } from "./IonWriteable";
-import {_sign} from "./util";
+import {Writeable} from "./IonWriteable";
 
 /**
  * Values in the Ion binary format are serialized as a sequence of low-level fields. This
@@ -117,12 +116,14 @@ export class LowLevelBinaryWriter {
   }
 
   static getSignedIntSize(value : number) : number {
-      if (value === 0) return 1;
-      let absValue = Math.abs(value);
-      let numberOfBits = Math.floor(Math['log2'](absValue));
-      let numberOfBytes = Math.ceil(numberOfBits / 8);
-      if(numberOfBits % 8 === 0) numberOfBytes++;
-      return numberOfBytes;
+    if (value === 0) {
+      return 1;
+    }
+    const numberOfSignBits = 1;
+    const magnitude = Math.abs(value);
+    let numberOfMagnitudeBits = Math.ceil(Math.log2(magnitude + 1));
+    let numberOfBits = numberOfMagnitudeBits + numberOfSignBits;
+    return Math.ceil(numberOfBits / 8);
   }
 
   static getUnsignedIntSize(value: number) : number {
