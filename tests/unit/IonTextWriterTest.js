@@ -368,32 +368,33 @@
           writer => { writer.stepIn(ion.IonTypes.STRUCT); writer.stepIn(ion.IonTypes.LIST);});
 
       //  annotations
-
-      badWriterTest('Cannot pass single string as an annotation.',
+      badWriterTest('Should throw when setting annotations to null',
+          (writer) => { writer.setAnnotations(null); writer.writeInt(5) });
+      badWriterTest('Should throw when passing single string as an annotation.',
           (writer) => { writer.setAnnotations('taco'), writer.writeInt(5) });
-      badWriterTest('Cannot add int as annotation.',
+      badWriterTest('Should throw when adding int as annotation.',
           (writer) => { writer.addAnnotation(5), writer.writeInt(5) });
-      badWriterTest('Cannot add array of chars.',
+      badWriterTest('Should throw when adding array of chars.',
           (writer) => { writer.addAnnotation(['t', 'a', 'c', 'o']), writer.writeInt(5) });
-      badWriterTest('Cannot add a non string annotation.',
+      badWriterTest('Should throw when adding a non string annotation.',
           (writer) => { writer.addAnnotation(null), writer.writeInt(5) });
-      badWriterTest('Cannot add a non string annotation.',
+      badWriterTest('Should throw when adding a non string annotation.',
           (writer) => { writer.addAnnotation(undefined), writer.writeInt(5) });
-      badWriterTest('Cannot pass annotations array without a string.',
+      badWriterTest('Should throw when passing annotations array without a string.',
           (writer) => { writer.setAnnotations([5]), writer.writeInt(5) });
-      badWriterTest('Cannot pass annotations array containing a non string value.',
+      badWriterTest('Should throw when passing annotations array containing a non string value.',
           (writer) => { writer.setAnnotations(['a', 5,'t']), writer.writeInt(5) });
-      badWriterTest('Cannot pass annotations array containing undefined.',
+      badWriterTest('Should throw when passing annotations array containing undefined.',
           (writer) => { writer.setAnnotations([undefined]), writer.writeInt(5) });
-      badWriterTest('Cannot pass annotations array containing null',
+      badWriterTest('Should throw when passing annotations array containing null',
           (writer) => { writer.setAnnotations([null]), writer.writeInt(5) });
-      badWriterTest('Cannot pass undefined as annotations.',
+      badWriterTest('Should throw when passing undefined as annotations.',
           (writer) => { writer.setAnnotations(undefined), writer.writeInt(5) });
-      badWriterTest('Cannot write top-level field name',
+      badWriterTest('Should throw when writing top-level field name',
           (writer) => { writer.writeFieldName('foo') });
-      badWriterTest('Cannot exit container at top level',
+      badWriterTest('Should throw when exiting a container at top level',
           (writer) => { writer.stepOut() });
-      badWriterTest('Cannot double-exit container',
+      badWriterTest('Should throw when double-exiting a container',
           (writer) => {
               writer.stepIn(ion.IonTypes.LIST);
               writer.stepOut();
@@ -402,9 +403,6 @@
 
 
     // Symbols
-    writerTest('Writes null symbol by detecting null and allows user to pass null into set annotations',
-          (writer) => { writer.setAnnotations(null); writer.writeSymbol(null) },
-          "null.symbol");
     writerTest('Writes symbol containing single quote',
       writer => writer.writeSymbol("'"),
       "'\\''");

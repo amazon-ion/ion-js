@@ -169,7 +169,7 @@ export class IonEventStream {
                     }
                     case null : {
                         if (this.reader.depth() === 0) {
-                            this.eventStream.push(this.eventFactory.makeEvent(IonEventType.STREAM_END, IonTypes.NULL, null, this.reader.depth(), undefined, false,undefined));
+                            this.eventStream.push(this.eventFactory.makeEvent(IonEventType.STREAM_END, IonTypes.NULL, null, this.reader.depth(), [], false,undefined));
                             return;
                         } else {
                             this.reader.stepOut();
@@ -188,7 +188,7 @@ export class IonEventStream {
     }
 
     private endContainer(thisContainer : IonEvent, thisContainerIndex : number) {
-        this.eventStream.push(this.eventFactory.makeEvent(IonEventType.CONTAINER_END, thisContainer.ionType, null, thisContainer.depth, null,false, null));
+        this.eventStream.push(this.eventFactory.makeEvent(IonEventType.CONTAINER_END, thisContainer.ionType, null, thisContainer.depth, [],false, null));
         thisContainer.ionValue = this.eventStream.slice(thisContainerIndex, this.eventStream.length);
     }
 
@@ -289,6 +289,7 @@ export class IonEventStream {
                 throw new Error('Symbol tables unsupported');
         }
         let fieldname = (currentEvent['field_name'] !== undefined ? currentEvent['field_name'] : null);
+        if(!currentEvent['annotations']) currentEvent['annotations'] = [];
 
         let textEvent = this.eventFactory.makeEvent(
             eventType,

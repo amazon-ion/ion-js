@@ -30,10 +30,8 @@ export abstract class AbstractWriter implements Writer {
     }
 
     setAnnotations(annotations: string[]): void {
-        if (annotations === undefined) {
-            throw new Error('Annotations were undefined.');
-        } else if (annotations === null) {
-            this._annotations = [];
+        if (annotations === undefined || annotations === null) {
+            throw new Error('Annotations were undefined or null.');
         } else if (!this._validateAnnotations(annotations)) {
             throw new Error('Annotations must be of type string[].');
         } else {
