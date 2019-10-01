@@ -65,7 +65,7 @@ define([
     writeSignedIntTest(127, [0x7F]);
     writeSignedIntTest(-128, [0x80, 0x80]);
     writeSignedIntTest(-128, undefined, true);
-    writeSignedIntTest(128, [0x80]);
+    writeSignedIntTest(128, [0x00, 0x80]);
     writeSignedIntTest(-256, [0x81, 0x00]);
     writeSignedIntTest(256, [0x01, 0x00]);
 
