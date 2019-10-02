@@ -221,7 +221,7 @@ export class BinaryWriter extends AbstractWriter {
 
   writeSymbol(value: string) : void {
     this.checkWriteValue();
-    if (value === null) {
+    if (value === null || value === undefined) {
         this.writeNull(IonTypes.SYMBOL);
     } else {
         let symbolId: number = this.symbolTable.addSymbol(value);
