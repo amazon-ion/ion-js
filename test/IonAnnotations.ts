@@ -36,7 +36,8 @@ describe('Annotations', () => {
         assert.equal(readerToString(reader), 'a::b::123');
     });
 
-    it('Create annotations', () => {let data = "123";
+    it('Create annotations', () => {
+        let data = "123";
         let reader = ion.makeReader(data);
         reader.next();
         let writer = ion.makeTextWriter();
