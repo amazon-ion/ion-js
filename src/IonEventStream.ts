@@ -47,41 +47,45 @@ export class IonEventStream {
                 writer.writeFieldName(tempEvent.fieldName);
             }
             writer.setAnnotations(tempEvent.annotations);
-            switch(tempEvent.eventType){
+            switch (tempEvent.eventType) {
                 case IonEventType.SCALAR:
-                    switch(tempEvent.ionType) {
-                        case IonTypes.BOOL :
-                            writer.writeBoolean(tempEvent.ionValue);
-                            break;
-                        case IonTypes.STRING:
-                            writer.writeString(tempEvent.ionValue);
-                            break;
-                        case IonTypes.SYMBOL :
-                            writer.writeSymbol(tempEvent.ionValue);
-                            break;
-                        case IonTypes.INT :
-                            writer.writeInt(tempEvent.ionValue);
-                            break;
-                        case IonTypes.DECIMAL :
-                            writer.writeDecimal(tempEvent.ionValue);
-                            break;
-                        case IonTypes.FLOAT :
-                            writer.writeFloat64(tempEvent.ionValue);
-                            break;
-                        case IonTypes.NULL :
-                            writer.writeNull(tempEvent.ionType);
-                            break;
-                        case IonTypes.TIMESTAMP :
-                            writer.writeTimestamp(tempEvent.ionValue);
-                            break;
-                        case IonTypes.CLOB :
-                            writer.writeClob(tempEvent.ionValue);
-                            break;
-                        case IonTypes.BLOB :
-                            writer.writeBlob(tempEvent.ionValue);
-                            break;
-                        default :
-                            throw new Error("unexpected type: " + tempEvent.ionType.name);
+                    if(tempEvent.ionValue === null) {
+                        writer.writeNull(tempEvent.ionType);
+                    } else {
+                        switch (tempEvent.ionType) {
+                            case IonTypes.BOOL :
+                                writer.writeBoolean(tempEvent.ionValue);
+                                break;
+                            case IonTypes.STRING:
+                                writer.writeString(tempEvent.ionValue);
+                                break;
+                            case IonTypes.SYMBOL :
+                                writer.writeSymbol(tempEvent.ionValue);
+                                break;
+                            case IonTypes.INT :
+                                writer.writeInt(tempEvent.ionValue);
+                                break;
+                            case IonTypes.DECIMAL :
+                                writer.writeDecimal(tempEvent.ionValue);
+                                break;
+                            case IonTypes.FLOAT :
+                                writer.writeFloat64(tempEvent.ionValue);
+                                break;
+                            case IonTypes.NULL :
+                                writer.writeNull(tempEvent.ionType);
+                                break;
+                            case IonTypes.TIMESTAMP :
+                                writer.writeTimestamp(tempEvent.ionValue);
+                                break;
+                            case IonTypes.CLOB :
+                                writer.writeClob(tempEvent.ionValue);
+                                break;
+                            case IonTypes.BLOB :
+                                writer.writeBlob(tempEvent.ionValue);
+                                break;
+                            default :
+                                throw new Error("unexpected type: " + tempEvent.ionType.name);
+                        }
                     }
                     break;
                 case IonEventType.CONTAINER_START:
@@ -96,7 +100,7 @@ export class IonEventStream {
                 case IonEventType.SYMBOL_TABLE:
                     throw new Error("Symboltables unsupported.");
                 default:
-                    throw new Error("Unexpected event type: "+ tempEvent.eventType);
+                    throw new Error("Unexpected event type: " + tempEvent.eventType);
 
             }
         }
