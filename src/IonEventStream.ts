@@ -158,7 +158,7 @@ export class IonEventStream {
         let currentContainerIndex : number[] = [];
         while(true) {
             if(this.reader.isNull()){
-                this.eventStream.push(this.eventFactory.makeEvent(IonEventType.SCALAR, tid, this.reader.fieldName(), this.reader.depth(), this.reader.annotations(), true, this.reader.value()));
+                this.eventStream.push(this.eventFactory.makeEvent(IonEventType.SCALAR, tid, this.reader.fieldName(), this.reader.depth(), this.reader.annotations(), true, null));
             } else {
                 switch (tid) {
                     case IonTypes.LIST :
@@ -250,8 +250,8 @@ export class IonEventStream {
                     if(tempString.substr(0,5) === '$ion_') tempString = "$ion_user_value::" + tempString
                     let tempReader : Reader = makeReader(tempString);
                     tempReader.next();
-                    let tempValue = tempReader.value();
                     currentEvent['isNull'] =  tempReader.isNull();
+                    let tempValue = currentEvent['isNull'] ? null : tempReader.value();
                     currentEvent[fieldName] = tempValue;
                     break;
                 }
@@ -398,7 +398,7 @@ export class IonEventStream {
         this.reader.stepOut();
         let tempReader : Reader = makeReader(numBuffer);
         tempReader.next();
-        return tempReader.value();
+        return tempReader.isNull()? null : tempReader.value();
     }
 
     private parseImports() : any { //TODO needed for symboltoken support.

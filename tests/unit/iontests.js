@@ -98,7 +98,7 @@ define([
                     reader.stepIn();
                     exhaust(reader);
                     reader.stepOut();
-                } else {
+                } else if(!(reader.isNull() && reader.type().isContainer)) {
                     reader.value();
                 }
             }
@@ -234,16 +234,16 @@ define([
 
         function checkReaderValueMethods(r1, r2, type) {
             allValueMethods.forEach(methodName => {
-                let typeName = type == null ? 'null' : type.name;
-                if (type != null && nonThrowingMethods[typeName][methodName]) {
+                let typeName = type === null ? 'null' : type.name;
+                if (type !== null && nonThrowingMethods[typeName][methodName]) {
                     let v1 = r1[methodName]();
                     let v2 = r2[methodName]();
                     assert(v1 !== undefined, "unexpected 'undefined' response");
                     assert(v2 !== undefined, "unexpected 'undefined' response");
                     assert.deepEqual(v1, v2, methodName + '():  ' + v1 + ' != ' + v2);
                 } else {
-                    assert.throws(() => { r1[methodName]() }, '', '', 'Expected ' + methodName + '() to throw');
-                    assert.throws(() => { r2[methodName]() }, '', '', 'Expected ' + methodName + '() to throw');
+                    assert.throws(() => { r1[methodName]() }, '', '', 'Expected ' + methodName + '() to throw got:' + r1._parser._null + ' ' + typeName);
+                    assert.throws(() => { r2[methodName]() }, '', '', 'Expected ' + methodName + '() to throw' + typeName);
                 }
             });
 
@@ -442,8 +442,8 @@ let eventSkipList = toSkipList([
     'ion-tests/iontestdata/good/symbolExplicitZero.10n',
     'ion-tests/iontestdata/good/symbolImplicitZero.10n',
     'ion-tests/iontestdata/good/symbolZero.ion',
-    'ion-tests/iontestdata/good/testfile22.ion',
-    'ion-tests/iontestdata/good/testfile23.ion',
+    //'ion-tests/iontestdata/good/testfile22.ion',
+    'ion-tests/iontestdata/good/testfile23.ion',//bigint
     'ion-tests/iontestdata/good/utf16.ion',
     'ion-tests/iontestdata/good/utf32.ion',
 ]);

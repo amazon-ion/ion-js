@@ -328,9 +328,6 @@ export class TextReader implements Reader {
 
     value(): any {
         if (this._type && this._type.isContainer) {
-            if (this.isNull()) {
-                return null;
-            }
             throw new Error('Unable to provide a value for ' + this._type.name + ' containers.');
         }
         switch(this._type) {
