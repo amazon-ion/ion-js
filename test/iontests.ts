@@ -36,7 +36,7 @@ function exhaust(reader) {
             reader.stepIn();
             exhaust(reader);
             reader.stepOut();
-        } else {
+        } else if(!reader.type().isContainer) {
             reader.value();
         }
     }
@@ -177,8 +177,8 @@ function checkReaderValueMethods(r1, r2, type) {
     // It's used to allow assert.throws() to accept any Error that's thrown.
     const ANY_ERROR_MESSAGE = new RegExp('^');
     allValueMethods.forEach(methodName => {
-        let typeName = type == null ? 'null' : type.name;
-        if (type != null && nonThrowingMethods[typeName][methodName]) {
+        let typeName = type === null ? 'null' : type.name;
+        if (type !== null && nonThrowingMethods[typeName][methodName]) {
             let v1 = r1[methodName]();
             let v2 = r2[methodName]();
             assert(v1 !== undefined, "unexpected 'undefined' response");
@@ -386,7 +386,6 @@ let eventSkipList = toSkipList([
     'ion-tests/iontestdata/good/symbolExplicitZero.10n',
     'ion-tests/iontestdata/good/symbolImplicitZero.10n',
     'ion-tests/iontestdata/good/symbolZero.ion',
-    'ion-tests/iontestdata/good/testfile22.ion',
     'ion-tests/iontestdata/good/testfile23.ion',
     'ion-tests/iontestdata/good/utf16.ion',
     'ion-tests/iontestdata/good/utf32.ion',

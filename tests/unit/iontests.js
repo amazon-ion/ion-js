@@ -98,7 +98,7 @@ define([
                     reader.stepIn();
                     exhaust(reader);
                     reader.stepOut();
-                } else if(!(reader.isNull() && reader.type().isContainer)) {
+                } else if(!reader.type().isContainer) {
                     reader.value();
                 }
             }
@@ -242,7 +242,7 @@ define([
                     assert(v2 !== undefined, "unexpected 'undefined' response");
                     assert.deepEqual(v1, v2, methodName + '():  ' + v1 + ' != ' + v2);
                 } else {
-                    assert.throws(() => { r1[methodName]() }, '', '', 'Expected ' + methodName + '() to throw got:' + r1._parser._null + ' ' + typeName);
+                    assert.throws(() => { r1[methodName]() }, '', '', 'Expected ' + methodName + '() to throw' + typeName);
                     assert.throws(() => { r2[methodName]() }, '', '', 'Expected ' + methodName + '() to throw' + typeName);
                 }
             });
@@ -442,7 +442,6 @@ let eventSkipList = toSkipList([
     'ion-tests/iontestdata/good/symbolExplicitZero.10n',
     'ion-tests/iontestdata/good/symbolImplicitZero.10n',
     'ion-tests/iontestdata/good/symbolZero.ion',
-    //'ion-tests/iontestdata/good/testfile22.ion',
     'ion-tests/iontestdata/good/testfile23.ion',//bigint
     'ion-tests/iontestdata/good/utf16.ion',
     'ion-tests/iontestdata/good/utf32.ion',
