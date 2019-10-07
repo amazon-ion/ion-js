@@ -367,8 +367,42 @@
       badWriterTest('Cannot step into list with missing field value',
           writer => { writer.stepIn(ion.IonTypes.STRUCT); writer.stepIn(ion.IonTypes.LIST);});
 
-    // Symbols
+      //  annotations
+      badWriterTest('Should throw when setting annotations to null',
+          (writer) => { writer.setAnnotations(null); writer.writeInt(5) });
+      badWriterTest('Should throw when passing single string as an annotation.',
+          (writer) => { writer.setAnnotations('taco'), writer.writeInt(5) });
+      badWriterTest('Should throw when adding int as annotation.',
+          (writer) => { writer.addAnnotation(5), writer.writeInt(5) });
+      badWriterTest('Should throw when adding array of chars.',
+          (writer) => { writer.addAnnotation(['t', 'a', 'c', 'o']), writer.writeInt(5) });
+      badWriterTest('Should throw when adding a non string annotation.',
+          (writer) => { writer.addAnnotation(null), writer.writeInt(5) });
+      badWriterTest('Should throw when adding a non string annotation.',
+          (writer) => { writer.addAnnotation(undefined), writer.writeInt(5) });
+      badWriterTest('Should throw when passing annotations array without a string.',
+          (writer) => { writer.setAnnotations([5]), writer.writeInt(5) });
+      badWriterTest('Should throw when passing annotations array containing a non string value.',
+          (writer) => { writer.setAnnotations(['a', 5,'t']), writer.writeInt(5) });
+      badWriterTest('Should throw when passing annotations array containing undefined.',
+          (writer) => { writer.setAnnotations([undefined]), writer.writeInt(5) });
+      badWriterTest('Should throw when passing annotations array containing null',
+          (writer) => { writer.setAnnotations([null]), writer.writeInt(5) });
+      badWriterTest('Should throw when passing undefined as annotations.',
+          (writer) => { writer.setAnnotations(undefined), writer.writeInt(5) });
+      badWriterTest('Should throw when writing top-level field name',
+          (writer) => { writer.writeFieldName('foo') });
+      badWriterTest('Should throw when exiting a container at top level',
+          (writer) => { writer.stepOut() });
+      badWriterTest('Should throw when double-exiting a container',
+          (writer) => {
+              writer.stepIn(ion.IonTypes.LIST);
+              writer.stepOut();
+              writer.stepOut();
+          });
 
+
+    // Symbols
     writerTest('Writes symbol containing single quote',
       writer => writer.writeSymbol("'"),
       "'\\''");

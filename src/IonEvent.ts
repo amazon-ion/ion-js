@@ -231,7 +231,7 @@ export class IonEventFactory {
                 throw new Error("symbol tables unsupported.");
             case IonEventType.CONTAINER_END :
             case IonEventType.STREAM_END :
-                return new IonEndEvent(eventType, null, null, null, depth);
+                return new IonEndEvent(eventType, null, null, [], depth);
         }
     }
 }

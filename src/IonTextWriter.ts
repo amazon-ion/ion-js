@@ -354,7 +354,6 @@ export class TextWriter extends AbstractWriter {
     }
 
     protected writeAnnotations() : void {
-        if (this._annotations === null || this._annotations === undefined) return;
         for (let annotation of this._annotations) {
             this.writeSymbolToken(annotation);
             this.writeUtf8('::');

@@ -26,4 +26,3 @@ export function _sign(x: number): number {
 export function _hasValue(v: any): boolean {
     return v !== undefined && v !== null;
 }
-

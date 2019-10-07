@@ -640,7 +640,7 @@ define([
         // 's':
         0x92,
         // Struct
-        0xd0, // 96
+        0xd0, // 9
         // 's':
         0x92,
         // 'qux'
@@ -652,7 +652,6 @@ define([
       ]);
 
     // Symbols
-
     writerTest('Writes null symbol by detecting null',
       (writer) => { writer.writeSymbol(null) },
         [0x7f]);
@@ -846,11 +845,33 @@ define([
       }
     }
 
-    errorTest('Cannot write top-level field name',
+    errorTest('Should throw when passing a single string as an annotation.',
+        (writer) => { writer.setAnnotations('taco'), writer.writeInt(5) });
+    errorTest('Should throw when setting annotations to null',
+          (writer) => { writer.setAnnotations(null), writer.writeInt(5) });
+    errorTest('Should throw when passing annotations array without a string.',
+        (writer) => { writer.setAnnotations([5]), writer.writeInt(5) });
+    errorTest('Should throw when adding an int as annotation.',
+          (writer) => { writer.addAnnotation(5), writer.writeInt(5) });
+    errorTest('Should throw when adding array of chars.',
+          (writer) => { writer.addAnnotation(['t', 'a', 'c', 'o']), writer.writeInt(5) });
+    errorTest('Should throw when passing annotations array containing a non string value.',
+        (writer) => { writer.setAnnotations(['a', 5,'t']), writer.writeInt(5) });
+    errorTest('Should throw when adding a non string annotation.',
+          (writer) => { writer.addAnnotation(null), writer.writeInt(5) });
+    errorTest('Should throw when adding a non string annotation.',
+          (writer) => { writer.addAnnotation(undefined), writer.writeInt(5) });
+    errorTest('Should throw when passing annotations array containing undefined.',
+        (writer) => { writer.setAnnotations([undefined]), writer.writeInt(5) });
+    errorTest('Should throw when passing annotations array containing null',
+        (writer) => { writer.setAnnotations([null]), writer.writeInt(5) });
+    errorTest('Should throw when passing undefined as annotations.',
+        (writer) => { writer.setAnnotations(undefined), writer.writeInt(5) });
+    errorTest('Should throw when writing top-level field name',
       (writer) => { writer.writeFieldName('foo') });
-    errorTest('Cannot exit container at top level',
+    errorTest('Should throw when exiting containers at top level',
       (writer) => { writer.stepOut() });
-    errorTest('Cannot double-exit container',
+    errorTest('Should throw when double-exiting a container',
       (writer) => {
         writer.stepIn(ion.IonTypes.LIST);
         writer.stepOut();

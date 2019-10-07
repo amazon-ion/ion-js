@@ -317,10 +317,9 @@ export class BinaryWriter extends AbstractWriter {
   }
 
   private encodeAnnotations(annotations: string[]) : Uint8Array {
-    if (!annotations || annotations.length === 0) {
+    if (annotations.length === 0) {
       return new Uint8Array(0);
     }
-
     let writeable: Writeable = new Writeable();
     let writer: LowLevelBinaryWriter = new LowLevelBinaryWriter(writeable);
     for (let annotation of annotations) {
