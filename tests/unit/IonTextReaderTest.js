@@ -198,6 +198,30 @@ define(
             assert.isNull(ionReader.next()); // EOF
         };
 
+        suite['Read string value'] = function() {
+            var ionToRead = "\"string\"";
+            var ionReader = ion.makeReader(ionToRead);
+            ionReader.next();
+
+            assert.equal(ionReader.value(), "string");
+        };
+
+        suite['Parses escaped terminators correctly.'] = function() {
+            first_value_equal("'abc\\''", "abc'");
+            first_value_equal("'''abc\\''''", "abc'");
+            first_value_equal("'abc\\'' taco", "abc'");
+            first_value_equal("'''abc\\'''' taco", "abc'");
+            first_value_equal("'''abc\\'''' '''''' taco", "abc'");
+            first_value_equal('"abc\\""', 'abc"');
+            first_value_equal('"abc\\"" taco', 'abc"');
+        };
+
+        function first_value_equal(input, expected) {
+            let reader = ion.makeReader(input);
+            reader.next();
+            assert.equal(reader.value(), expected);
+        }
+
         suite['text IVM'] = function() {
             var textReader = ion.makeReader("");
             let isNotIVM = ["$ion_schema_1_0", "$ion_1", "$ion_1_a", "$ion_", "ion_1_"];
