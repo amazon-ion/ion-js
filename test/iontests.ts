@@ -367,7 +367,6 @@ let eventSkipList = toSkipList([
     'ion-tests/iontestdata/good/intLongMinValue.10n',
     'ion-tests/iontestdata/good/integer_values.ion',
     'ion-tests/iontestdata/good/intsWithUnderscores.ion',
-    //'ion-tests/iontestdata/good/lists.ion',
     'ion-tests/iontestdata/good/non-equivs/floats.ion',
     'ion-tests/iontestdata/good/nopPadInsideEmptyStructZeroSymbolId.10n',
     'ion-tests/iontestdata/good/nopPadInsideStructWithNopPadThenValueZeroSymbolId.10n',
