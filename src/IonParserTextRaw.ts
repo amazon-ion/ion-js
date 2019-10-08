@@ -1049,10 +1049,12 @@ export class ParserTextRaw {
             case T_STRING2:
             case T_STRING3:
                 for (index = this._start; index < this._end; index++) {
+                    let bs = false;
                     ch = this._in.valueAt(index);
                     if (ch == CH_BS) {
                         ch = this._read_escape_sequence(index, this._end);
                         index += this._esc_len;
+                        bs = true;
                     }
                     if (this.isHighSurrogate(ch)) {
                         index++;
@@ -1072,13 +1074,9 @@ export class ParserTextRaw {
                         }
                     } else if (this.isLowSurrogate(ch)) {
                         throw new Error("unexpected low surrogate: " + ch);
-                    } else if (t === T_STRING3 && ch === CH_SQ) {
-                        if (this.verifyTriple(index)) {
+                    } else if (t === T_STRING3 && ch === CH_SQ && bs && this.verifyTriple(index)) {
                             index = this._skip_triple_quote_gap(index, this._end, /*acceptComments*/ true);
-                        } else {
-                            s += String.fromCharCode(ch);
-                        }
-                    } else {
+                    } else if (ch >= 0) {
                         s += String.fromCharCode(ch);
                     }
                 }
