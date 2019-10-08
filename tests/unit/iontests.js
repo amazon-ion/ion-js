@@ -466,7 +466,6 @@ let equivsSkipList = toSkipList([
     'ion-tests/iontestdata/good/equivs/nopPadEmptyStruct.10n',
     'ion-tests/iontestdata/good/equivs/nopPadNonEmptyStruct.10n',
     'ion-tests/iontestdata/good/equivs/structsFieldsDiffOrder.ion',
-    'ion-tests/iontestdata/good/equivs/symbols.ion',
     'ion-tests/iontestdata/good/equivs/systemSymbols.ion',
     'ion-tests/iontestdata/good/equivs/systemSymbolsAsAnnotations.ion',
     'ion-tests/iontestdata/good/equivs/textNewlines.ion',
