@@ -1074,7 +1074,7 @@ export class ParserTextRaw {
                         }
                     } else if (this.isLowSurrogate(ch)) {
                         throw new Error("unexpected low surrogate: " + ch);
-                    } else if (t === T_STRING3 && ch === CH_SQ && bs && this.verifyTriple(index)) {
+                    } else if (t === T_STRING3 && ch === CH_SQ && !bs && this.verifyTriple(index)) {
                             index = this._skip_triple_quote_gap(index, this._end, /*acceptComments*/ true);
                     } else if (ch >= 0) {
                         s += String.fromCharCode(ch);
