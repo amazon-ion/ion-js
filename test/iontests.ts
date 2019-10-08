@@ -340,7 +340,6 @@ let badSkipList = toSkipList([
 ]);
 
 let eventSkipList = toSkipList([
-    'ion-tests/iontestdata/good/allNulls.ion',
     'ion-tests/iontestdata/good/clobWithNonAsciiCharacter.10n',
     'ion-tests/iontestdata/good/clobs.ion',
     'ion-tests/iontestdata/good/decimalsWithUnderscores.ion',
@@ -370,16 +369,10 @@ let eventSkipList = toSkipList([
     'ion-tests/iontestdata/good/intsWithUnderscores.ion',
     'ion-tests/iontestdata/good/lists.ion',
     'ion-tests/iontestdata/good/non-equivs/floats.ion',
-    'ion-tests/iontestdata/good/non-equivs/ints.ion',
-    'ion-tests/iontestdata/good/non-equivs/nulls.ion',
     'ion-tests/iontestdata/good/nopPadInsideEmptyStructZeroSymbolId.10n',
     'ion-tests/iontestdata/good/nopPadInsideStructWithNopPadThenValueZeroSymbolId.10n',
     'ion-tests/iontestdata/good/nopPadInsideStructWithValueThenNopPad.10n',
     'ion-tests/iontestdata/good/notVersionMarkers.ion',
-    'ion-tests/iontestdata/good/nullList.10n',
-    'ion-tests/iontestdata/good/nullSexp.10n',
-    'ion-tests/iontestdata/good/nullStruct.10n',
-    'ion-tests/iontestdata/good/nulls.ion',
     'ion-tests/iontestdata/good/sexpAnnotationQuotedOperator.ion',
     'ion-tests/iontestdata/good/subfieldUInt.ion',
     'ion-tests/iontestdata/good/subfieldVarInt.ion',
