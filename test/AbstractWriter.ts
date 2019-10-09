@@ -37,6 +37,10 @@ function depthTest (instructions, expectedDepth) {
 }
 
 describe('Depth tests', () => {
+    it('Stepping into a list and out results in a depth of 0.', () => {
+        depthTest((writer) => {writer.stepIn(ion.IonTypes.LIST); writer.stepOut()}, 0);
+    });
+
     it('Stepping into a list results in a depth of 1.', () => {
         depthTest((writer) => {writer.stepIn(ion.IonTypes.LIST)}, 1);
     });
