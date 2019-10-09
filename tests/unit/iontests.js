@@ -292,17 +292,13 @@ define([
             //second pass
 
             //text -> text -> eventstream
-            textWriter = ion.makeTextWriter();
-            streams.push(makeStream(text, textWriter));
+            streams.push(makeStream(text, ion.makeTextWriter()));
             //text -> binary -> eventstream
-            binaryWriter = ion.makeBinaryWriter();
-            streams.push(makeStream(text, binaryWriter));
+            streams.push(makeStream(text, ion.makeBinaryWriter()));
             //binary -> text -> eventstream
-            textWriter = ion.makeTextWriter();
-            streams.push(makeStream(binary, textWriter));
+            streams.push(makeStream(binary, ion.makeTextWriter()));
             //binary -> binary -> eventstream
-            binaryWriter = ion.makeBinaryWriter();
-            streams.push(makeStream(binary, binaryWriter));
+            streams.push(makeStream(binary, ion.makeBinaryWriter()));
 
             //eventstream -> eventstream
             textWriter = ion.makeTextWriter();
