@@ -273,8 +273,7 @@ define([
             return fs.readFileSync(path, options);
         }
 
-        function makeStream(src, makeWriter) {
-            let writer = makeWriter;
+        function makeStream(src, writer) {
             writer.writeValues(ion.makeReader(src));
             writer.close();
             return new es.IonEventStream(ion.makeReader(writer.getBytes()));
