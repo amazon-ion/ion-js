@@ -86,7 +86,8 @@ describe('Depth tests', () => {
             writer.stepIn(ion.IonTypes.LIST);
             writer.stepIn(ion.IonTypes.LIST);
             writer.stepOut();
-            writer.stepIn(ion.IonTypes.SEXP);}, 2);
+            writer.stepIn(ion.IonTypes.SEXP)},
+            2);
     });
 });
 
