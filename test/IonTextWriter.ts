@@ -18,17 +18,12 @@ import * as IonUnicode from '../src/IonUnicode';
 import * as IonTests from '../src/IonTests';
 import {TextWriter} from '../src/IonTextWriter';
 
-// FIXME: While implementations happen to have an 'isTopLevel' function, the Writer interface we expose does not.
-let isTopLevel = function (writer: ion.Writer): boolean {
-    return writer['isTopLevel'];
-};
-
 let writerTest = function (name: string, instructions, expected) {
     it(name, () => {
         let writeable = new IonTests.Writeable();
         let writer = new TextWriter(writeable);
         instructions(writer);
-        while (!isTopLevel(writer)) {
+        while (writer.depth() > 0) {
             writer.stepOut();
         }
         writer.close();
@@ -43,7 +38,7 @@ let prettyTest = function (name, instructions, expected) {
     it(name, () => {
         let writer = ion.makePrettyWriter(2);
         instructions(writer);
-        while (!isTopLevel(writer)) {
+        while (writer.depth() > 0) {
             writer.stepOut();
         }
         writer.close();
