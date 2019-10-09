@@ -37,6 +37,18 @@ function depthTest (instructions, expectedDepth) {
 }
 
 describe('Depth tests', () => {
+    it('Writing a null list results in a depth of 0.', () => {
+        depthTest((writer) => {writer.writeNull(ion.IonTypes.LIST)}, 0);
+    });
+
+    it('Writing a null struct results in a depth of 0.', () => {
+        depthTest((writer) => {writer.writeNull(ion.IonTypes.STRUCT)}, 0);
+    });
+
+    it('Writing a null sexp results in a depth of 0.', () => {
+        depthTest((writer) => {writer.writeNull(ion.IonTypes.SEXP)}, 0);
+    });
+
     it('Stepping into a list and out results in a depth of 0.', () => {
         depthTest((writer) => {writer.stepIn(ion.IonTypes.LIST); writer.stepOut()}, 0);
     });
