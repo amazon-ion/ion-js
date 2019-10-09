@@ -41,6 +41,14 @@ describe('Depth tests', () => {
         depthTest((writer) => {writer.stepIn(ion.IonTypes.LIST); writer.stepOut()}, 0);
     });
 
+    it('Stepping into an sexp and out results in a depth of 0.', () => {
+        depthTest((writer) => {writer.stepIn(ion.IonTypes.SEXP); writer.stepOut()}, 0);
+    });
+
+    it('Stepping into an struct and out results in a depth of 0.', () => {
+        depthTest((writer) => {writer.stepIn(ion.IonTypes.STRUCT); writer.stepOut()}, 0);
+    });
+
     it('Stepping into a list results in a depth of 1.', () => {
         depthTest((writer) => {writer.stepIn(ion.IonTypes.LIST)}, 1);
     });
