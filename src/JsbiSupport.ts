@@ -84,6 +84,12 @@ export class JsbiSupport {
         return JSBI.toNumber(value);
     }
 
+    /**
+     * Indicates whether the provided JSBI value is within the range[ Number.MIN_SAFE_INTEGER, Number.MAX_SAFE_INTEGER].
+     *
+     * @param value     The integer to test.
+     * @return          True if JSBI.toNumber(value) can be called without losing any precision.
+     */
     public static isSafeInteger(value: JSBI): boolean {
         return JSBI.greaterThanOrEqual(value, this.NUMBER_MIN_SAFE_INTEGER)
             && JSBI.lessThanOrEqual(value, this.NUMBER_MAX_SAFE_INTEGER);

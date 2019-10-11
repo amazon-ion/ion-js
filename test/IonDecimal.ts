@@ -34,8 +34,6 @@ function test(decimalString,
 
     let decimal = ion.Decimal.parse(decimalString);
 
-    // assert.deepEqual(decimal._getCoefficient(), new ion.LongInt(expectedCoefficient), '_getCoefficient()');
-    // assert.equal(decimal._getCoefficient().signum(), new ion.LongInt(expectedCoefficient).signum(), 'coefficient sign');
     assert.deepEqual(decimal._getCoefficient(), JSBI.BigInt(expectedCoefficient), '_getCoefficient()');
     assert.equal(decimal.isNegative(), Object.is(Number(expectedCoefficient), -0) || JsbiSupport.isNegative(JSBI.BigInt(expectedCoefficient)), 'coefficient sign');
 
