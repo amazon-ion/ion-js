@@ -15,6 +15,8 @@
 import { Decimal } from "./IonDecimal";
 import { IonType } from "./IonType";
 import { Timestamp } from "./IonTimestamp";
+import JSBI from "jsbi";
+import IntSize from "./IntSize";
 
 /** Represents the possible return values of [[Reader.value]]. */
 export type ReaderScalarValue = null | boolean | number | Decimal | Timestamp | string | Uint8Array;
@@ -120,9 +122,26 @@ export interface Reader {
      *  the range specified by `Number.MIN_SAFE_INTEGER` and `Number.MAX_SAFE_INTEGER`, this method
      *  will truncate the result.
      *
-     * @throw Error when the reader is not positioned on a `int` or `number` typed value.
+     * @throw Error when the reader is not positioned on an `int` or `float` typed value.
      */
     numberValue(): number | null;
+
+    /**
+     * Returns the current value as a `BigInt`.  This is only valid if `type() == IonTypes.INT`.
+     *
+     * @return `null` if the current Ion value [[isNull]] or a BigInt containing the deserialized integer.
+     *
+     * @throw Error when the reader is not positioned on an `int` typed value.
+     */
+    bigIntValue(): JSBI | null;
+
+    /**
+     * Indicates whether the current int value is small enough to be stored in a number without loss of precision
+     * or if a BigInt is required.
+     *
+     * @return [[IntSize.Number]] if the value will fit in a number, [[IntSize.BigInt]] otherwise.
+     */
+     intSize(): IntSize;
 
     /**
      * Returns the current value as a `string`.  This is only valid if `type() == IonTypes.STRING`

@@ -14,9 +14,10 @@
 
 import {assert} from 'chai';
 import * as ion from '../src/IonTests';
+import SignAndMagnitudeInt from "../src/SignAndMagnitudeInt";
 
 /**
- * UInt
+ * Tests for reading the UInt primitive follow.
  *
  * Spec: http://amzn.github.io/ion-docs/docs/binary.html#uint-and-int-fields
  */
@@ -46,12 +47,6 @@ let unsignedIntBytesMatchValue = function(bytes, expected) {
   assert.equal(actual, expected)
 };
 
-let unsignedLongIntBytesMatchValue = function(bytes, expected) {
-  let binarySpan = new ion.BinarySpan(new Uint8Array(bytes));
-  let actual = ion.ParserBinaryRaw._readUnsignedLongIntFrom(binarySpan, bytes.length);
-  assert.equal(actual, expected)
-}
-
 let unsignedIntReadingTests = [
   {bytes: [0x00], expected: 0},
   {bytes: [0x01], expected: 1},
@@ -80,19 +75,6 @@ describe('Reading unsigned ints', () => {
     });
   });
 
-  describe('Overflow', () => {
-    // Test reading unsigned ints requiring 4-10 bytes.
-    // Expected to fail.
-    for (let numberOfBytes = 4; numberOfBytes <= 10; numberOfBytes++) {
-      let bytes = maxValueByteArray(numberOfBytes);
-      let expected = maxValueForBytes(numberOfBytes);
-      it(
-          'Reading ' + expected + ' from bytes: ' + bytes.toString(),
-          () => assert.throws(() => unsignedIntBytesMatchValue(bytes, expected))
-      );
-    }
-  });
-
   describe('EOF', () => {
     unsignedIntEofTests.forEach(({bytes, expected}) => {
       it(
@@ -102,34 +84,34 @@ describe('Reading unsigned ints', () => {
     });
   });
 
-  describe('LongInt', () => {
+  describe('BigInt', () => {
     // Test reading unsigned ints requiring 4-10 bytes.
     // Expected to pass.
     for (let numberOfBytes = 4; numberOfBytes <= 10; numberOfBytes++) {
       let expected = maxValueForBytes(numberOfBytes);
       let bytes = maxValueByteArray(numberOfBytes);
       it('Reading ' + expected + ' from bytes: ' + bytes.toString(), () => {
-        unsignedLongIntBytesMatchValue(bytes, expected);
+        unsignedIntBytesMatchValue(bytes, expected);
       });
     }
   });
 });
 
 /**
- * Int
+ * Tests for reading the Int primitive follow.
  *
  * Spec: http://amzn.github.io/ion-docs/docs/binary.html#uint-and-int-fields
  */
 
-let signedIntBytesMatch = function(bytes, expected) {
+let signedIntBytesMatch = function(bytes, expected: SignAndMagnitudeInt) {
   let binarySpan = new ion.BinarySpan(new Uint8Array(bytes));
-  let actual = ion.ParserBinaryRaw._readSignedIntFrom(binarySpan, bytes.length).numberValue();
-  assert.equal(actual, expected);
+  let actual = ion.ParserBinaryRaw._readSignedIntFrom(binarySpan, bytes.length);
+  assert.isTrue(actual.equals(expected));
 };
 
 let signedIntReadingTests = [
   {bytes: [0x00], expected: 0},
-  {bytes: [0x80], expected: 0},
+  {bytes: [0x80], expected: -0},
   {bytes: [0x01], expected: 1},
   {bytes: [0x81], expected: -1},
   {bytes: [0x00 ,0x01], expected: 1},
@@ -153,14 +135,14 @@ describe('Reading signed ints', () => {
     signedIntReadingTests.forEach(({bytes, expected}) => {
       it(
           'Reading ' + expected + ' from bytes: ' + bytes.toString(),
-          () => signedIntBytesMatch(bytes, expected)
+          () => signedIntBytesMatch(bytes, SignAndMagnitudeInt.fromNumber(expected))
       );
     });
   });
 });
 
 /**
- * VarUInt
+ * Tests for reading the VarUInt primitive follow.
  *
  * Spec: http://amzn.github.io/ion-docs/docs/binary.html#varuint-and-varint-fields
  */
@@ -213,7 +195,7 @@ describe('Reading variable unsigned ints', () => {
 });
 
 /**
- * VarInt
+ * Tests for reading the VarInt primitive follow.
  *
  * Spec: http://amzn.github.io/ion-docs/docs/binary.html#varuint-and-varint-fields
  */
@@ -279,7 +261,7 @@ describe('Reading variable signed ints', () => {
 });
 
 /**
- * Float
+ * Tests for reading Float values follow.
  *
  * Spec: http://amzn.github.io/ion-docs/docs/binary.html#4-float
  */

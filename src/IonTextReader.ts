@@ -18,24 +18,21 @@
 // Handles system symbols, and conversion from the parsed
 // input string to the desired Javascript value (scalar or
 // object, such as IonValue).
-import { Catalog } from "./IonCatalog";
-import { Decimal } from "./IonDecimal";
-import { defaultLocalSymbolTable } from "./IonLocalSymbolTable";
-import { get_ion_type } from "./IonParserTextRaw";
-import { getSystemSymbolTable } from "./IonSystemSymbolTable";
-import { ion_symbol_table } from "./IonSymbols";
-import { IonType } from "./IonType";
-import { IonTypes } from "./IonTypes";
-import { IVM } from "./IonConstants";
-import { LocalSymbolTable } from "./IonLocalSymbolTable";
-import { makeSymbolTable } from "./IonSymbols";
-import { ParserTextRaw } from "./IonParserTextRaw";
-import { Reader } from "./IonReader";
-import { StringSpan } from "./IonSpan";
-import { Timestamp } from "./IonTimestamp";
-import { fromBase64 } from "./IonText";
-import { is_digit } from "./IonText";
-import { encodeUtf8 } from "./IonUnicode";
+import {Catalog} from "./IonCatalog";
+import {Decimal} from "./IonDecimal";
+import {defaultLocalSymbolTable, LocalSymbolTable} from "./IonLocalSymbolTable";
+import {get_ion_type, ParserTextRaw} from "./IonParserTextRaw";
+import {ion_symbol_table, makeSymbolTable} from "./IonSymbols";
+import {IonType} from "./IonType";
+import {IonTypes} from "./IonTypes";
+import {Reader} from "./IonReader";
+import {StringSpan} from "./IonSpan";
+import {Timestamp} from "./IonTimestamp";
+import {fromBase64} from "./IonText";
+import {encodeUtf8} from "./IonUnicode";
+import JSBI from "jsbi";
+import {JsbiSupport} from "./JsbiSupport";
+import IntSize from "./IntSize";
 
 const RAW_STRING = new IonType( -1, "raw_input", true,  false, false, false );
 
@@ -281,7 +278,22 @@ export class TextReader implements Reader {
         throw new Error('Current value is not a decimal.')
     }
 
-    numberValue() {
+    bigIntValue(): JSBI {
+        switch (this._type) {
+            case IonTypes.NULL: return null;
+            case IonTypes.INT: return this._parser.bigIntValue();
+        }
+        throw new Error('bigIntValue() was called when the current value was a(n) ' + this._type.name);
+    }
+
+    intSize(): IntSize {
+      if (JsbiSupport.isSafeInteger(this.bigIntValue())) {
+          return IntSize.Number;
+      }
+      return IntSize.BigInt;
+    }
+
+    numberValue(): number {
         switch (this._type) {
             case IonTypes.NULL: return null;
             case IonTypes.FLOAT:
@@ -343,8 +355,9 @@ export class TextReader implements Reader {
                 return this.booleanValue();
             case IonTypes.DECIMAL:
                 return this.decimalValue();
-            case IonTypes.FLOAT:
             case IonTypes.INT:
+                return this.bigIntValue();
+            case IonTypes.FLOAT:
                 return this.numberValue();
             case IonTypes.STRING:
             case IonTypes.SYMBOL:

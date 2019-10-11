@@ -312,7 +312,7 @@ export class IonEventStream {
                 currentEvent['value_binary']
             );
             if(!textEvent.equals(binaryEvent)) {
-                throw new Error(`${currentEvent['value_text']} does not equal ${currentEvent['value_binary']}`);
+                throw new Error(`Text event ${currentEvent['value_text']} does not equal binary event ${currentEvent['value_binary']}`);
             }
         }
         return textEvent;

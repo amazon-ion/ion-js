@@ -308,16 +308,6 @@ let goodSkipList = toSkipList([
     'ion-tests/iontestdata/good/symbolZero.ion',
     'ion-tests/iontestdata/good/utf16.ion',
     'ion-tests/iontestdata/good/utf32.ion',
-
-    // Support for reading LongInts was removed as part of: https://github.com/amzn/ion-js/issues/310
-    'ion-tests/iontestdata/good/equivs/paddedInts.10n',
-    'ion-tests/iontestdata/good/intBigSize1201.10n',
-    'ion-tests/iontestdata/good/intBigSize13.10n',
-    'ion-tests/iontestdata/good/intBigSize14.10n',
-    'ion-tests/iontestdata/good/intBigSize16.10n',
-    'ion-tests/iontestdata/good/intBigSize256.10n',
-    'ion-tests/iontestdata/good/intLongMaxValuePlusOne.10n',
-    'ion-tests/iontestdata/good/intLongMinValue.10n',
 ]);
 
 let badSkipList = toSkipList([
@@ -344,11 +334,9 @@ let eventSkipList = toSkipList([
     'ion-tests/iontestdata/good/clobWithNonAsciiCharacter.10n',
     'ion-tests/iontestdata/good/clobs.ion',
     'ion-tests/iontestdata/good/decimalsWithUnderscores.ion',
-    'ion-tests/iontestdata/good/equivs/bigInts.ion',
     'ion-tests/iontestdata/good/equivs/binaryInts.ion',
     'ion-tests/iontestdata/good/equivs/decimalsWithUnderscores.ion',
     'ion-tests/iontestdata/good/equivs/floatsWithUnderscores.ion',
-    'ion-tests/iontestdata/good/equivs/ints.ion',
     'ion-tests/iontestdata/good/equivs/intsWithUnderscores.ion',
     'ion-tests/iontestdata/good/equivs/nopPadEmptyStruct.10n',
     'ion-tests/iontestdata/good/equivs/nopPadNonEmptyStruct.10n',
@@ -356,21 +344,9 @@ let eventSkipList = toSkipList([
     'ion-tests/iontestdata/good/equivs/systemSymbols.ion',
     'ion-tests/iontestdata/good/floatsWithUnderscores.ion',
     'ion-tests/iontestdata/good/innerVersionIdentifiers.ion',
-    'ion-tests/iontestdata/good/intBigSize1201.10n',
-    'ion-tests/iontestdata/good/intBigSize13.10n',
-    'ion-tests/iontestdata/good/intBigSize14.10n',
-    'ion-tests/iontestdata/good/intBigSize16.10n',
-    'ion-tests/iontestdata/good/intBigSize256.10n',
-    'ion-tests/iontestdata/good/intBigSize256.ion',
-    'ion-tests/iontestdata/good/intBigSize512.ion',
     'ion-tests/iontestdata/good/intBinary.ion',
-    'ion-tests/iontestdata/good/intLongMaxValuePlusOne.10n',
-    'ion-tests/iontestdata/good/intLongMinValue.10n',
-    'ion-tests/iontestdata/good/integer_values.ion',
     'ion-tests/iontestdata/good/intsWithUnderscores.ion',
     'ion-tests/iontestdata/good/lists.ion',
-    'ion-tests/iontestdata/good/non-equivs/floats.ion',
-    'ion-tests/iontestdata/good/non-equivs/ints.ion',
     'ion-tests/iontestdata/good/non-equivs/nulls.ion',
     'ion-tests/iontestdata/good/nopPadInsideEmptyStructZeroSymbolId.10n',
     'ion-tests/iontestdata/good/nopPadInsideStructWithNopPadThenValueZeroSymbolId.10n',
@@ -381,13 +357,11 @@ let eventSkipList = toSkipList([
     'ion-tests/iontestdata/good/nullStruct.10n',
     'ion-tests/iontestdata/good/nulls.ion',
     'ion-tests/iontestdata/good/sexpAnnotationQuotedOperator.ion',
-    'ion-tests/iontestdata/good/subfieldUInt.ion',
     'ion-tests/iontestdata/good/subfieldVarInt.ion',
     'ion-tests/iontestdata/good/symbolExplicitZero.10n',
     'ion-tests/iontestdata/good/symbolImplicitZero.10n',
     'ion-tests/iontestdata/good/symbolZero.ion',
     'ion-tests/iontestdata/good/testfile22.ion',
-    'ion-tests/iontestdata/good/testfile23.ion',
     'ion-tests/iontestdata/good/utf16.ion',
     'ion-tests/iontestdata/good/utf32.ion',
 ]);
@@ -396,11 +370,9 @@ let readerCompareSkipList = toSkipList([]);
 
 let equivsSkipList = toSkipList([
     'ion-tests/iontestdata/good/equivs/annotatedIvms.ion',
-    'ion-tests/iontestdata/good/equivs/bigInts.ion',
     'ion-tests/iontestdata/good/equivs/binaryInts.ion',
     'ion-tests/iontestdata/good/equivs/decimalsWithUnderscores.ion',
     'ion-tests/iontestdata/good/equivs/floatsWithUnderscores.ion',
-    'ion-tests/iontestdata/good/equivs/ints.ion',
     'ion-tests/iontestdata/good/equivs/intsWithUnderscores.ion',
     'ion-tests/iontestdata/good/equivs/localSymbolTableAppend.ion',
     'ion-tests/iontestdata/good/equivs/localSymbolTableNullSlots.ion',
@@ -414,40 +386,27 @@ let equivsSkipList = toSkipList([
     'ion-tests/iontestdata/good/equivs/textNewlines.ion',
     'ion-tests/iontestdata/good/equivs/utf8/stringU0001D11E.ion',
     'ion-tests/iontestdata/good/equivs/utf8/stringUtf8.ion',
-
-    // See: https://github.com/amzn/ion-js/issues/310
-    'ion-tests/iontestdata/good/equivs/paddedInts.10n',
 ]);
 
 let nonEquivsSkipList = toSkipList([
     'ion-tests/iontestdata/good/non-equivs/clobs.ion',
     'ion-tests/iontestdata/good/non-equivs/floats.ion',
     'ion-tests/iontestdata/good/non-equivs/floatsVsDecimals.ion',
-
-    // See: https://github.com/amzn/ion-js/issues/310
-    'ion-tests/iontestdata/good/non-equivs/ints.ion',
-
-    // See: https://github.com/amzn/ion-js/issues/444
-    'ion-tests/iontestdata/good/non-equivs/decimals.ion',
 ]);
 
 ////// end of generated skiplists
-
 
 /*
   notes from the previous skipList mechanism:
     'good/intBinary.ion', //binaryInts unsupported.
     'good/integer_values.ion', //binary ints unsupported.
     'good/intsWithUnderscores.ion', //binary ints unsupported.
-    'good/intBigSize256.ion', //int maxsize limitation.
     'good/equivs/intsWithUnderscores.ion', //binary ints unsupported.
     'good/equivs/binaryInts.ion', //binary ints unsupported.
     'good/floatsWithUnderscores.ion', //numbers with underscores unsupported.
     'good/equivs/floatsWithUnderscores.ion', //numbers with underscores unsupported.
     'good/equivs/decimalsWithUnderscores.ion', //numbers with underscores unsupported.
     'good/decimalsWithUnderscores.ion', //numbers with underscores unsupported.
-    'good/equivs/bigInts.ion', //numbers unsupported by js's int or float are unsupported.
-    'good/intBigSize512.ion', //int maxsize limitation.
     'good/symbolZero.ion', //no symboltoken support as of yet.
     'good/testfile12.ion',
     'good/non-equivs/nonNulls.ion',

@@ -11,6 +11,7 @@
     "target": "es6",
     "module": "commonjs",
     "moduleResolution": "node",
+    "esModuleInterop": true,
     "lib": ["es6"],
     "declaration": true,
     "inlineSources": true,
