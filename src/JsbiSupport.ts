@@ -12,7 +12,7 @@
  * language governing permissions and limitations under the License.
  */
 
-import JSBI from 'jsbi';
+import JSBI from "jsbi";
 
 /**
  * This class provides helper methods and static values for working with JSBI integers.

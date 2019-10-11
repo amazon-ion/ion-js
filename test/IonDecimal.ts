@@ -12,11 +12,12 @@
  * language governing permissions and limitations under the License.
  */
 
-import {assert} from 'chai';
-import * as ion from '../src/IonTests';
-import * as util from '../src/util';
+import {assert} from "chai";
+import * as ion from "../src/IonTests";
+import * as util from "../src/util";
 import JSBI from "jsbi";
 import {JsbiSupport} from "../src/JsbiSupport";
+import {Decimal} from "../src/IonTests";
 
 /**
  * @param decimalString The text representation of the decimal to test.
@@ -172,8 +173,8 @@ let decimalComparisonTests = [
     {input1: '-1d-1', input2: '-0d0', expected: -1},
 ];
 
-let decimalEqualsTests = [
-    {input1: '0', input2: '0', expected: true, skip: false},
+let decimalEqualsTests: ({input1: string, input2: string, expected: boolean, skip?: boolean})[] = [
+    {input1: '0', input2: '0', expected: true},
     {input1: '0', input2: '0d0', expected: true},
     {input1: '0', input2: '0d1', expected: false},
     {input1: '0', input2: '0d-1', expected: false},
@@ -229,7 +230,8 @@ describe('Decimal', () => {
                     testName,
                     () => testEquals(input1, input2, expected)
                 );
-            });
+            }
+        );
     });
 
     describe('compareTo', () => {

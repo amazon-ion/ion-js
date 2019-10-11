@@ -12,7 +12,7 @@
  * language governing permissions and limitations under the License.
  */
 
-import JSBI from 'jsbi';
+import JSBI from "jsbi";
 import {_sign} from "./util";
 import {JsbiSupport} from "./JsbiSupport";
 
