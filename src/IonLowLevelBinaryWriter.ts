@@ -12,6 +12,8 @@
  * language governing permissions and limitations under the License.
  */
 import {Writeable} from "./IonWriteable";
+import JSBI from "jsbi";
+import {JsbiSerde} from "./JsbiSerde";
 
 /**
  * Values in the Ion binary format are serialized as a sequence of low-level fields. This
@@ -44,11 +46,15 @@ export class LowLevelBinaryWriter {
     this.writeable.writeBytes(tempBuf);
   }
 
-  writeUnsignedInt(originalValue: number) : void {
+  writeUnsignedInt(originalValue: number | JSBI) : void {
+    if (originalValue instanceof JSBI) {
+      let encodedBytes = JsbiSerde.toUnsignedIntBytes(originalValue);
+      this.writeable.writeBytes(encodedBytes);
+      return;
+    }
+
     let length = LowLevelBinaryWriter.getUnsignedIntSize(originalValue);
     let tempBuf = new Uint8Array(length);
-
-
     let value: number = originalValue;
     let i: number = tempBuf.length;
 
@@ -125,7 +131,10 @@ export class LowLevelBinaryWriter {
     return Math.ceil(numberOfBits / 8);
   }
 
-  static getUnsignedIntSize(value: number) : number {
+  static getUnsignedIntSize(value: number | JSBI) : number {
+    if (value instanceof JSBI) {
+      return JsbiSerde.getUnsignedIntSizeInBytes(value);
+    }
     if (value === 0) {
       return 1;
     }

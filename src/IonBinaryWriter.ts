@@ -204,11 +204,6 @@ export class BinaryWriter extends AbstractWriter {
       return;
     }
 
-    // FIXME: https://github.com/amzn/ion-js/issues/464
-    if (value instanceof JSBI) {
-      value = JsbiSupport.clampToSafeIntegerRange(value);
-    }
-
     this.addNode(new IntNode(this.writer, this.getCurrentContainer(), this.encodeAnnotations(this._annotations), value));
   }
 
@@ -656,7 +651,7 @@ class IntNode extends LeafNode {
   private readonly intTypeCode: TypeCodes;
   private readonly bytes: Uint8Array;
 
-  constructor(writer: LowLevelBinaryWriter, parent: Node, annotations: Uint8Array, private readonly value: number) {
+  constructor(writer: LowLevelBinaryWriter, parent: Node, annotations: Uint8Array, private readonly value: number | JSBI) {
     super(writer, parent, IonTypes.INT, annotations);
 
     if (this.value === 0) {
@@ -669,8 +664,17 @@ class IntNode extends LeafNode {
       this.bytes = writer.getBytes();
     } else {
       this.intTypeCode = TypeCodes.NEGATIVE_INT;
-      let writer: LowLevelBinaryWriter = new LowLevelBinaryWriter(new Writeable(LowLevelBinaryWriter.getUnsignedIntSize(Math.abs(this.value))));
-      writer.writeUnsignedInt(Math.abs(this.value));
+      let magnitude: number | JSBI;
+      let uintSize: number;
+      if (value instanceof JSBI) {
+        if(JsbiSupport.isNegative(value)) {
+          magnitude = JSBI.unaryMinus(value);
+        }
+      } else {
+        magnitude = Math.abs(value);
+      }
+      let writer: LowLevelBinaryWriter = new LowLevelBinaryWriter(new Writeable(LowLevelBinaryWriter.getUnsignedIntSize(magnitude)));
+      writer.writeUnsignedInt(magnitude);
       this.bytes = writer.getBytes();
     }
   }
