@@ -159,20 +159,6 @@ module.exports = function(grunt) {
             dest: './dist/browser/js/ion-bundle.min.js',
         }
     },
-    mochaTest: {
-      test: {
-        options: {
-          ui: 'mocha-typescript',
-          require: [
-              'ts-node/register',
-              'source-map-support/register',
-              'nyc'
-          ],
-          noFail: false // Run all tests even if an early test fails
-        },
-        src: ['test/**/*.ts']
-      }
-    },
     shell: {
       // Uses the nyc configuration from package.json and the mocha settings from test/mocha.opts
       "mochaWithCoverage": {
@@ -187,12 +173,10 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-clean');
   grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks('grunt-contrib-uglify');
-  grunt.loadNpmTasks('grunt-mocha-test');
   grunt.loadNpmTasks('grunt-shell');
   grunt.loadNpmTasks('grunt-ts');
   grunt.loadNpmTasks('grunt-typedoc');
   grunt.loadNpmTasks('remap-istanbul');
-  grunt.loadNpmTasks('intern');
 
   // Copy tasks
   grunt.registerTask('copy:all', ['copy:bundle', 'copy:tutorial']);
@@ -208,13 +192,11 @@ module.exports = function(grunt) {
   ]);
 
   // Temporary targets that will eventually replace 'test' and 'test:coverage'
-  grunt.registerTask('mocha', ['mochaTest']);
-  grunt.registerTask('mocha:coverage', ['shell:mochaWithCoverage']);
+  grunt.registerTask('mocha', ['shell:mochaWithCoverage']);
 
   // Tests
-  grunt.registerTask('test', ['build', 'intern:es6']);     // build and test
-  grunt.registerTask('test:run', ['intern:es6']);          // run test do not build
-  grunt.registerTask('test:coverage', ['remapIstanbul']);  // depends on `test:run`. Generates html output
+  grunt.registerTask('test', ['mocha', 'build']); // Test via ts-node. If all goes well, build.
+  grunt.registerTask('test:coverage', ['mocha']); // Run the tests and show coverage metrics, but do not build.
 
   // Documentation
   grunt.registerTask('nojekyll', 'Write an empty .nojekyll file to allow typedoc html output to be rendered',
@@ -229,7 +211,7 @@ module.exports = function(grunt) {
   });
 
   // release target used by Travis 
-  grunt.registerTask('release', ['build', 'test:run', 'test:coverage', 'cleanup', 'typedoc', 'nojekyll']);
+  grunt.registerTask('release', ['test:coverage', 'build', 'cleanup', 'typedoc', 'nojekyll']);
 
   // default for development
   grunt.registerTask('default', ['test', 'cleanup']);
