@@ -163,4 +163,9 @@ export interface Writer {
      * @throws Error if [[close]] has not been invoked.
      */
     getBytes(): Uint8Array;
+
+    /**
+     * Returns the current depth of the writer.
+     */
+    depth(): number;
 }
