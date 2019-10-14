@@ -27,6 +27,71 @@ function testWriteValues(reader, expected) {
     assert.equal(String.fromCharCode.apply(null, writer.getBytes()), expected);
 }
 
+function depthTest (instructions, expectedDepth) {
+        let textWriter = ion.makeTextWriter();
+        let binaryWriter = ion.makeBinaryWriter();
+        instructions(textWriter);
+        instructions(binaryWriter);
+        assert.equal(textWriter.depth(), expectedDepth);
+        assert.equal(binaryWriter.depth(), expectedDepth);
+}
+
+describe('Depth tests', () => {
+    it('Writing a null list results in a depth of 0.', () => {
+        depthTest((writer) => {writer.writeNull(ion.IonTypes.LIST)}, 0);
+    });
+
+    it('Writing a null struct results in a depth of 0.', () => {
+        depthTest((writer) => {writer.writeNull(ion.IonTypes.STRUCT)}, 0);
+    });
+
+    it('Writing a null sexp results in a depth of 0.', () => {
+        depthTest((writer) => {writer.writeNull(ion.IonTypes.SEXP)}, 0);
+    });
+
+    it('Stepping into a list and out results in a depth of 0.', () => {
+        depthTest((writer) => {writer.stepIn(ion.IonTypes.LIST); writer.stepOut()}, 0);
+    });
+
+    it('Stepping into an sexp and out results in a depth of 0.', () => {
+        depthTest((writer) => {writer.stepIn(ion.IonTypes.SEXP); writer.stepOut()}, 0);
+    });
+
+    it('Stepping into an struct and out results in a depth of 0.', () => {
+        depthTest((writer) => {writer.stepIn(ion.IonTypes.STRUCT); writer.stepOut()}, 0);
+    });
+
+    it('Stepping into a list results in a depth of 1.', () => {
+        depthTest((writer) => {writer.stepIn(ion.IonTypes.LIST)}, 1);
+    });
+
+    it('Stepping into a sexp results in a depth of 1.', () => {
+        depthTest((writer) => {writer.stepIn(ion.IonTypes.SEXP)}, 1);
+    });
+
+    it('Stepping into 2 lists results in a depth of 2.', () => {
+        depthTest((writer) => {writer.stepIn(ion.IonTypes.LIST); writer.stepIn(ion.IonTypes.LIST)}, 2);
+    });
+
+    it('Stepping into 2 lists and out results in a depth of 1.', () => {
+        depthTest((writer) => {
+                writer.stepIn(ion.IonTypes.LIST);
+                writer.stepIn(ion.IonTypes.LIST);
+                writer.stepOut()},
+            1);
+    });
+
+    it('Stepping into 2 lists, out and into an sexp results in a depth of 2.', () => {
+        depthTest((writer) => {
+            writer.stepIn(ion.IonTypes.LIST);
+            writer.stepIn(ion.IonTypes.LIST);
+            writer.stepOut();
+            writer.stepIn(ion.IonTypes.SEXP)},
+            2);
+    });
+});
+
+
 describe('Binary Timestamp', () => {
     it('writeValue(), reader.type() == null', () => {
         let reader = ion.makeReader('a');
