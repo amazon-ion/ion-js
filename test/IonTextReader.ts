@@ -189,6 +189,21 @@ class IonTextReaderTests {
         assert.isNull(ionReader.next());
         assert.isNull(ionReader.next()); // EOF
     }
+    @test "Parses escaped terminators correctly."() {
+        IonTextReaderTests.first_value_equal("'abc\\''", "abc'");
+        IonTextReaderTests.first_value_equal("'''abc\\''''", "abc'");
+        IonTextReaderTests.first_value_equal("'abc\\'' taco", "abc'");
+        IonTextReaderTests.first_value_equal("'''abc\\'''' taco", "abc'");
+        IonTextReaderTests.first_value_equal("'''abc\\'''' '''''' taco", "abc'");
+        IonTextReaderTests.first_value_equal('"abc\\""', 'abc"');
+        IonTextReaderTests.first_value_equal('"abc\\"" taco', 'abc"');
+    };
+
+    private static first_value_equal(input, expected) {
+        let reader = ion.makeReader(input);
+        reader.next();
+        assert.equal(reader.value(), expected);
+    }
 
     @test "text IVM"() {
         var textReader = ion.makeReader("");

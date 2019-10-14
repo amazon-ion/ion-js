@@ -30,6 +30,8 @@ import {IonTypes} from "./IonTypes";
 import {Timestamp} from "./IonTimestamp";
 import {Writeable} from "./IonWriteable";
 import {_sign} from "./util";
+import {JsbiSupport} from "./JsbiSupport";
+import JSBI from "jsbi";
 
 type Serializer<T> = (value: T) => void;
 
@@ -113,7 +115,7 @@ export class TextWriter extends AbstractWriter {
             } else {
                 let s = '';
                 let coefficient = value._getCoefficient();
-                if (coefficient.isZero() && coefficient.signum() === -1) {
+                if (JsbiSupport.isZero(coefficient) && value.isNegative()) {
                     s += '-';
                 }
                 s += coefficient.toString() + 'd';
@@ -216,8 +218,8 @@ export class TextWriter extends AbstractWriter {
         writer.writeUtf8(text);
     }
 
-    writeInt(value: number) : void {
-        this._serializeValue(IonTypes.INT, value, (value: number) => {
+    writeInt(value: number | JSBI) : void {
+        this._serializeValue(IonTypes.INT, value, (value: number | JSBI) => {
             this.writeUtf8(value.toString(10));
         });
     }
@@ -354,7 +356,6 @@ export class TextWriter extends AbstractWriter {
     }
 
     protected writeAnnotations() : void {
-        if (this._annotations === null || this._annotations === undefined) return;
         for (let annotation of this._annotations) {
             this.writeSymbolToken(annotation);
             this.writeUtf8('::');

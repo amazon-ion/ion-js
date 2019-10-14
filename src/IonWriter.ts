@@ -15,6 +15,7 @@ import {Decimal} from "./IonDecimal";
 import {IonType} from "./IonType";
 import {Reader} from "./IonReader";
 import {Timestamp} from "./IonTimestamp";
+import JSBI from "jsbi";
 
 /**
  * Serializes data in Ion text or binary format to an implementation defined buffer.
@@ -37,7 +38,7 @@ export interface Writer {
      *  If `number` is not an integer between the range specified by `Number.MIN_SAFE_INTEGER`
      *  and `Number.MAX_SAFE_INTEGER`, an implementation may truncate or round the value.
      */
-    writeInt(value: number | null) : void;
+    writeInt(value: number | JSBI | null) : void;
 
     /**
      * Writes a `number` value as an Ion 32-bit binary `float` value.

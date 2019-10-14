@@ -24,6 +24,8 @@ import { IonType } from "./IonType";
 import { IonTypes } from "./IonTypes";
 import { StringSpan } from "./IonSpan";
 import {is_keyword, is_whitespace} from "./IonText";
+import JSBI from "jsbi";
+import {JsbiSupport} from "./JsbiSupport";
 
 const EOF = -1;  // EOF is end of container, distinct from undefined which is value has been consumed
 const ERROR           = -2;
@@ -978,14 +980,27 @@ export class ParserTextRaw {
     return this._curr_null;
   }
 
-  numberValue() : number {
-    if(this.isNull()) return null;
-    var n, s = this.get_value_as_string(this._curr);
+  bigIntValue(): JSBI {
+    if(this.isNull()) {
+      return null;
+    }
+    let intText = this.get_value_as_string(this._curr);
     switch (this._curr) {
       case T_INT:
-          return parseInt(s, 10);
       case T_HEXINT:
-          return parseInt(s, 16);
+        return JsbiSupport.bigIntFromString(intText);
+      default:
+        throw new Error("intValue() was called when the current value was not an integer.");
+    }
+  }
+
+  numberValue() : number {
+    if(this.isNull()) return null;
+    let s = this.get_value_as_string(this._curr);
+    switch (this._curr) {
+      case T_INT:
+      case T_HEXINT:
+          return JsbiSupport.clampToSafeIntegerRange(JsbiSupport.bigIntFromString(s));
       case T_FLOAT:
           return Number(s);
       case T_FLOAT_SPECIAL:
@@ -1049,10 +1064,12 @@ export class ParserTextRaw {
             case T_STRING2:
             case T_STRING3:
                 for (index = this._start; index < this._end; index++) {
+                    let isEscaped = false;
                     ch = this._in.valueAt(index);
                     if (ch == CH_BS) {
                         ch = this._read_escape_sequence(index, this._end);
                         index += this._esc_len;
+                        isEscaped = true;
                     }
                     if (this.isHighSurrogate(ch)) {
                         index++;
@@ -1072,13 +1089,9 @@ export class ParserTextRaw {
                         }
                     } else if (this.isLowSurrogate(ch)) {
                         throw new Error("unexpected low surrogate: " + ch);
-                    } else if (t === T_STRING3 && ch === CH_SQ) {
-                        if (this.verifyTriple(index)) {
+                    } else if (t === T_STRING3 && ch === CH_SQ && !isEscaped && this.verifyTriple(index)) {
                             index = this._skip_triple_quote_gap(index, this._end, /*acceptComments*/ true);
-                        } else {
-                            s += String.fromCharCode(ch);
-                        }
-                    } else {
+                    } else if (ch >= 0) {
                         s += String.fromCharCode(ch);
                     }
                 }

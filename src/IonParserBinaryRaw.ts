@@ -44,15 +44,18 @@
 //    timestampValue
 //    byteValue
 
+import JSBI from "jsbi";
+import {JsbiSupport} from "./JsbiSupport";
 import * as IonBinary from "./IonBinary";
 import {decodeUtf8} from "./IonUnicode";
 import {Decimal} from "./IonDecimal";
 import {IonType} from "./IonType";
 import {IonTypes} from "./IonTypes";
 import {IVM} from "./IonConstants";
-import {LongInt} from "./IonLongInt";
 import {BinarySpan} from "./IonSpan";
-import {TimestampPrecision,Timestamp} from "./IonTimestamp";
+import {Timestamp, TimestampPrecision} from "./IonTimestamp";
+import SignAndMagnitudeInt from "./SignAndMagnitudeInt";
+import {JsbiSerde} from "./JsbiSerde";
 
 const DEBUG_FLAG = true;
 
@@ -208,72 +211,24 @@ export class ParserBinaryRaw {
         return ParserBinaryRaw._readVarSignedIntFrom(this._in);
     }
 
-    private readVarLongInt() : LongInt {
-        let bytes = [];
-        let byte = this._in.next();
-        let isNegative = (byte & 0x40) !== 0;
-        let stopBit = byte & 0x80;
-        bytes.push(byte & 0x3F);  // clears the sign/stop bit
-        while(!stopBit) {
-            byte = this._in.next();
-            stopBit = byte & 0x80;
-            byte &= 0x7F;
-            bytes.push(byte);
-        }
-        return LongInt.fromVarIntBytes(bytes, isNegative);
-    }
-
-    static _readSignedIntFrom(input: BinarySpan, numberOfBytes: number) : LongInt {
+    static _readSignedIntFrom(input: BinarySpan, numberOfBytes: number) : SignAndMagnitudeInt {
         if (numberOfBytes == 0) {
-            return new LongInt(0);
+            return new SignAndMagnitudeInt(JsbiSupport.ZERO);
         }
         let bytes: Uint8Array = input.view(numberOfBytes);
         let isNegative = (bytes[0] & 0x80) == 0x80;
         let numbers = Array.prototype.slice.call(bytes);
         numbers[0] = bytes[0] & 0x7F;
-        return LongInt.fromIntBytes(numbers, isNegative);
+        let magnitude: JSBI = JsbiSerde.fromUnsignedBytes(numbers);
+        return new SignAndMagnitudeInt(magnitude, isNegative);
     }
 
-    private readSignedInt() : LongInt {
-        return ParserBinaryRaw._readSignedIntFrom(this._in, this._len);
+    static _readUnsignedIntFrom(input: BinarySpan, numberOfBytes: number) : JSBI {
+        return JsbiSerde.fromUnsignedBytes(Array.prototype.slice.call(input.view(numberOfBytes)));
     }
 
-    static _readUnsignedIntFrom(input: BinarySpan, numberOfBytes: number) : number {
-        let value = 0, bytesRead = 0, byte;
-        if (numberOfBytes < 1)
-            return 0;
-
-        while (bytesRead < numberOfBytes) {
-            byte = input.next();
-            bytesRead++;
-            value = value << 8;
-            value = value | (byte & 0xff);
-        }
-
-        // We overflowed
-        if (numberOfBytes > 4 || value < 0) {
-            throw new Error("Attempted to read an unsigned int that was larger than 31 bits."
-                + " Use readUnsignedLongIntFrom instead. UInt size: " + numberOfBytes + ", value: " + value
-            );
-        }
-        // Fewer bytes than the required `numberOfBytes` were available in the input
-        if (byte === EOF) {
-            throw new Error("Ran out of data while reading a " + numberOfBytes + "-byte unsigned int.");
-        }
-
-        return value;
-    }
-
-    private readUnsignedInt() : number {
+    private readUnsignedInt() : JSBI {
         return ParserBinaryRaw._readUnsignedIntFrom(this._in, this._len);
-    }
-
-    static _readUnsignedLongIntFrom(input: BinarySpan, numberOfBytes: number) : LongInt {
-        return LongInt.fromUIntBytes(Array.prototype.slice.call(input.view(numberOfBytes)));
-    }
-
-    private readUnsignedLongInt() : LongInt {
-        return ParserBinaryRaw._readUnsignedLongIntFrom(this._in, this._len);
     }
 
     /**
@@ -286,17 +241,20 @@ export class ParserBinaryRaw {
         // Decimal representations have two components: exponent (a VarInt) and coefficient (an Int).
         // The decimal’s value is: coefficient * 10 ^ exponent
 
-        let coefficient, exponent, d;
-
         let initialPosition = input.position();
-        exponent = ParserBinaryRaw._readVarSignedIntFrom(input);
+
+        let exponent: number = ParserBinaryRaw._readVarSignedIntFrom(input);
         let numberOfExponentBytes = input.position() - initialPosition;
         let numberOfCoefficientBytes = numberOfBytes - numberOfExponentBytes;
 
-        coefficient = ParserBinaryRaw._readSignedIntFrom(input,  numberOfCoefficientBytes);
-        d = Decimal._fromLongIntCoefficient(coefficient, exponent);
-
-        return d;
+        let signedInt = ParserBinaryRaw._readSignedIntFrom(input,  numberOfCoefficientBytes);
+        let isNegative = signedInt.isNegative;
+        let coefficient = isNegative ? JSBI.unaryMinus(signedInt.magnitude) : signedInt.magnitude;
+        return Decimal._fromJsbiCoefficient(
+            isNegative,
+            coefficient,
+            exponent
+        );
     }
 
     private read_decimal_value() : Decimal {
@@ -347,12 +305,15 @@ export class ParserBinaryRaw {
             precision = TimestampPrecision.SECONDS;
         }
         if (this._in.position() < end) {
-            let exponent = this.readVarSignedInt();
-            let coefficient = LongInt._ZERO;
+            let exponent: number = this.readVarSignedInt();
+            let coefficient: JSBI = JsbiSupport.ZERO;
+            let isNegative = false;
             if (this._in.position() < end) {
-                coefficient = ParserBinaryRaw._readSignedIntFrom(this._in, end - this._in.position());
+                let deserializedSignedInt = ParserBinaryRaw._readSignedIntFrom(this._in, end - this._in.position());
+                isNegative = deserializedSignedInt._isNegative;
+                coefficient = deserializedSignedInt._magnitude;
             }
-            let dec = Decimal._fromLongIntCoefficient(coefficient, exponent);
+            let dec = Decimal._fromJsbiCoefficient(isNegative, coefficient, exponent);
             let [_, fractionStr] = Timestamp._splitSecondsDecimal(dec);
             fractionalSeconds = Decimal.parse(secondInt + '.' + fractionStr);
         }
@@ -494,16 +455,11 @@ export class ParserBinaryRaw {
      * Positive integers and negative integers are both encoded as an unsigned integer magnitude.
      * This function will read in the magnitude, leaving it to the caller to set the value's sign as appropriate.
      */
-    private _readIntegerMagnitude(): number {
+    private _readIntegerMagnitude(): JSBI {
         if (this._len === 0) {
-            return 0;
+            return JsbiSupport.ZERO;
         }
-        // We currently only support reading integers that can be stored in 31 bits or fewer.
-        // For details, see: https://github.com/amzn/ion-js/issues/210
-        if (this._len <= 3 || (this._len === 4 && this._in.peek() < 128)) {
-            return this.readUnsignedInt();
-        }
-        throw new Error("Attempted to read an integer that could not be stored in 31 bits.");
+        return this.readUnsignedInt();
     }
 
     private load_value() : void {
@@ -516,7 +472,7 @@ export class ParserBinaryRaw {
                 this._curr = this._readIntegerMagnitude();
                 break;
             case IonBinary.TB_NEG_INT:
-                this._curr = -this._readIntegerMagnitude();
+                this._curr = JSBI.unaryMinus(this._readIntegerMagnitude());
                 break;
             case IonBinary.TB_FLOAT:
                 this._curr = this.read_binary_float();
@@ -733,11 +689,33 @@ export class ParserBinaryRaw {
         throw new Error('Current value is not a decimal.');
     }
 
+    bigIntValue() : JSBI {
+        switch (this._raw_type) {
+            case IonBinary.TB_NULL:
+                return null;
+            case IonBinary.TB_INT:
+            case IonBinary.TB_NEG_INT:
+                if (this.isNull()) {
+                    return null;
+                }
+                this.load_value();
+                return this._curr;
+            default:
+                throw new Error('bigIntValue() was called when the current value was not an int.');
+        }
+    }
+
     numberValue() : number {
         switch(this._raw_type) {
             case IonBinary.TB_NULL: return null;
             case IonBinary.TB_INT:
             case IonBinary.TB_NEG_INT:
+                if(this.isNull()) {
+                    return null;
+                }
+                this.load_value();
+                let bigInt: JSBI = this._curr;
+                return JsbiSupport.clampToSafeIntegerRange(bigInt);
             case IonBinary.TB_FLOAT:
                 if (this.isNull()) {
                     return null;

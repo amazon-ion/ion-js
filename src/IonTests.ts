@@ -24,4 +24,3 @@ export { BinaryWriter } from "./IonBinaryWriter";
 export { ParserBinaryRaw } from "./IonParserBinaryRaw";
 export { BinarySpan } from "./IonSpan";
 export { Decimal } from "./IonDecimal";
-export { LongInt } from "./IonLongInt";

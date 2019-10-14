@@ -23,6 +23,7 @@ import { BinaryWriter } from "./IonBinaryWriter";
 import { Reader } from "./IonReader";
 import { defaultLocalSymbolTable } from "./IonLocalSymbolTable";
 import {decodeUtf8} from "./IonUnicode";
+import JSBI from "jsbi";
 
 export enum IonEventType {
     SCALAR = 0,
@@ -231,7 +232,7 @@ export class IonEventFactory {
                 throw new Error("symbol tables unsupported.");
             case IonEventType.CONTAINER_END :
             case IonEventType.STREAM_END :
-                return new IonEndEvent(eventType, null, null, null, depth);
+                return new IonEndEvent(eventType, null, null, [], depth);
         }
     }
 }
@@ -255,7 +256,7 @@ class IonIntEvent extends AbstractIonEvent {
 
     }
     valueEquals(expected : IonIntEvent) : boolean {
-        return expected instanceof IonIntEvent && this.ionValue === expected.ionValue;
+        return expected instanceof IonIntEvent && JSBI.equal(this.ionValue, expected.ionValue);
     }
     writeIonValue(writer : Writer) : void {
         writer.writeInt(this.ionValue);
