@@ -215,9 +215,6 @@ export class BinaryReader implements Reader {
   value() : any {
     let type = this.type();
     if (type && type.isContainer) {
-      if (this.isNull()) {
-        return null;
-      }
       throw new Error('Unable to provide a value for ' + type.name + ' containers.');
     }
     switch(type) {
