@@ -29,7 +29,7 @@ export class PrettyTextWriter extends TextWriter {
     constructor(writeable: Writeable, private readonly indentSize : number = 2) { super(writeable);}
 
     private writePrettyValue() : void {
-        if(!this.isTopLevel && this.currentContainer.containerType && this.currentContainer.containerType !== IonTypes.STRUCT){
+        if(this.depth() > 0 && this.currentContainer.containerType && this.currentContainer.containerType !== IonTypes.STRUCT){
             this.writePrettyIndent(0);
         }
     }
@@ -133,7 +133,7 @@ export class PrettyTextWriter extends TextWriter {
     }
 
     handleSeparator() : void {
-        if (this.isTopLevel) {
+        if (this.depth() === 0) {
             if (this.currentContainer.clean) {
                 this.currentContainer.clean = false;
             } else {
