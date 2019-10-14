@@ -160,6 +160,8 @@ Notes:
   carriage return `U+000D` (CR), newline character `U+000A` (LF), or combination of CR & LF `U+000D` `U+000A`.
   Which should not be confused with the backslash character `U+005C` followed by the `n` character (`U+006E`) or
   `r` character (`U+0072`).
+* [test/iontests.ts](https://github.com/amzn/ion-js/blob/master/test/iontests.ts) defines multiple skipList variables
+  referencing test vectors that are not expected to work at this time.
 
 ## Contributing
 

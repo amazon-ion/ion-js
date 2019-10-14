@@ -23,11 +23,20 @@ export abstract class AbstractWriter implements Writer {
     protected _annotations = [];
 
     addAnnotation(annotation: string): void {
+        if(!this._isString(annotation)) {
+            throw new Error('Annotation must be of type string.');
+        }
         this._annotations.push(annotation);
     }
 
     setAnnotations(annotations: string[]): void {
-        this._annotations = annotations;
+        if (annotations === undefined || annotations === null) {
+            throw new Error('Annotations were undefined or null.');
+        } else if (!this._validateAnnotations(annotations)) {
+            throw new Error('Annotations must be of type string[].');
+        } else {
+            this._annotations = annotations;
+        }
     }
 
     protected _clearAnnotations(): void {
@@ -89,6 +98,22 @@ export abstract class AbstractWriter implements Writer {
                 reader.stepOut();
             }
         }
+    }
+
+    private _validateAnnotations(input : string[]) : boolean {
+        if (!Array.isArray(input)) {
+            return false;
+        }
+        for (let i = 0; i < input.length; i++) {
+            if (!this._isString(input[i])) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private _isString(input : string) : boolean {
+        return typeof input === 'string';
     }
 }
 

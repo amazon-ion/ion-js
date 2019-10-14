@@ -18,22 +18,20 @@
 // Handles system symbols, and conversion from the parsed
 // input byte array  to the desired Javascript value (scalar or
 // object, such as IonValue).
-import { Catalog } from "./IonCatalog";
-import { Decimal } from "./IonDecimal";
-import { defaultLocalSymbolTable } from "./IonLocalSymbolTable";
-import { getSystemSymbolTable } from "./IonSystemSymbolTable";
-import { Import } from "./IonImport";
-import { ion_symbol_table_sid } from "./IonSymbols";
-import { IonType } from "./IonType";
-import { IonTypes } from "./IonTypes";
-import { IVM } from "./IonConstants";
-import { LocalSymbolTable } from "./IonLocalSymbolTable";
-import { makeSymbolTable } from "./IonSymbols";
-import { ParserBinaryRaw } from "./IonParserBinaryRaw";
-import { Reader } from "./IonReader";
-import { SharedSymbolTable } from "./IonSharedSymbolTable";
-import { BinarySpan } from "./IonSpan";
-import { Timestamp } from "./IonTimestamp";
+import {Catalog} from "./IonCatalog";
+import {Decimal} from "./IonDecimal";
+import {defaultLocalSymbolTable, LocalSymbolTable} from "./IonLocalSymbolTable";
+import {ion_symbol_table_sid, makeSymbolTable} from "./IonSymbols";
+import {IonType} from "./IonType";
+import {IonTypes} from "./IonTypes";
+import {IVM} from "./IonConstants";
+import {ParserBinaryRaw} from "./IonParserBinaryRaw";
+import {Reader} from "./IonReader";
+import {BinarySpan} from "./IonSpan";
+import {Timestamp} from "./IonTimestamp";
+import JSBI from "jsbi";
+import IntSize from "./IntSize";
+import {JsbiSupport} from "./JsbiSupport";
 
 const RAW_STRING = new IonType( -1, "raw_input", true,  false, false, false );
 
@@ -176,6 +174,17 @@ export class BinaryReader implements Reader {
     return this._parser.decimalValue();
   }
 
+  bigIntValue() : JSBI {
+    return this._parser.bigIntValue();
+  }
+
+  intSize(): IntSize {
+    if (JsbiSupport.isSafeInteger(this.bigIntValue())) {
+      return IntSize.Number;
+    }
+    return IntSize.BigInt;
+  }
+
   numberValue() : number {
     return this._parser.numberValue();
   }
@@ -221,8 +230,9 @@ export class BinaryReader implements Reader {
         return this.booleanValue();
       case IonTypes.DECIMAL:
         return this.decimalValue();
-      case IonTypes.FLOAT:
       case IonTypes.INT:
+        return this.bigIntValue();
+      case IonTypes.FLOAT:
         return this.numberValue();
       case IonTypes.STRING:
       case IonTypes.SYMBOL:

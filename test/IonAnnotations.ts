@@ -12,37 +12,31 @@
  * language governing permissions and limitations under the License.
  */
 
-define([
-  'intern!object',
-  'intern/chai!assert',
-  'dist/amd/es6/IonTests',
-  ],
-  function(registerSuite, assert, ion) {
-      let suite = {
-          name: 'Annotations'
-      };
+import {assert} from 'chai';
+import * as ion from '../src/IonTests';
 
-      function readerToBytes(reader) {
-        let writer = ion.makeTextWriter();
-        writer.writeValues(reader);
-        writer.close();
-        return writer.getBytes();        
-      }
+function readerToBytes(reader) {
+    let writer = ion.makeTextWriter();
+    writer.writeValues(reader);
+    writer.close();
+    return writer.getBytes();
+}
 
-      function readerToString(reader) {
-        return ion.decodeUtf8(readerToBytes(reader));
-      }
+function readerToString(reader) {
+    return ion.decodeUtf8(readerToBytes(reader));
+}
 
-      suite['Read annotations'] = function() {
+describe('Annotations', () => {
+    it('Read annotations', () => {
         let data = "a::b::123";
         let reader = ion.makeReader(data);
         reader.next();
         assert.deepEqual(reader.annotations(), ['a', 'b']);
         assert.equal(reader.value(), '123');
         assert.equal(readerToString(reader), 'a::b::123');
-      };
+    });
 
-      suite['Create annotation'] = function() {
+    it('Create annotations', () => {
         let data = "123";
         let reader = ion.makeReader(data);
         reader.next();
@@ -52,9 +46,9 @@ define([
         reader.next();
         writer.writeValues(reader);
         assert.equal(String.fromCharCode.apply(null, writer.getBytes()), 'a::123');
-      };
+    });
 
-      suite['Add annotation'] = function() {
+    it('Add annotation', () => {
         let data = "a::b::123";
         let reader = ion.makeReader(data);
         reader.next();
@@ -63,9 +57,9 @@ define([
         writer.addAnnotation('c');
         writer.writeInt(reader.numberValue());
         assert.equal(String.fromCharCode.apply(null, writer.getBytes()), 'a::b::c::123');
-      };
+    });
 
-      suite['Wrap annotation'] = function() {
+    it('Wrap annotation', () => {
         let data = "{ x: 1 }";
         let reader = ion.makeReader(data);
         let writer = ion.makeTextWriter();
@@ -76,14 +70,12 @@ define([
         reader.stepIn();
         reader.next();
 
-        writer._writeValues(reader, 1);
+        //FIXME: https://github.com/amzn/ion-js/issues/454
+        writer['_writeValues'](reader, 1);
 
         reader.stepOut();
 
         writer.stepOut();
         assert.equal(String.fromCharCode.apply(null, writer.getBytes()), 'a::b::{x:1}');
-      };
-
-      registerSuite(suite);
-  }
-);
+    });
+});

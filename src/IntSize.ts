@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -13,16 +13,11 @@
  */
 
 /**
- * Returns -1 if x is negative (including -0); otherwise returns 1.
+ * Represents whether a given Ion int value will fit safely within a Number or if it requires a BigInt.
  */
-export function _sign(x: number): number {
-    return (x < 0 || (x === 0 && (1 / x) === -Infinity)) ? -1 : 1
+enum IntSize {
+    Number,
+    BigInt
 }
 
-/**
- * Returns false if v is undefined or null; otherwise true.
- * @private
- */
-export function _hasValue(v: any): boolean {
-    return v !== undefined && v !== null;
-}
+export default IntSize;

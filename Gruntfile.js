@@ -91,30 +91,9 @@ module.exports = function(grunt) {
             dest: 'docs/',
           }
         ]
-      }, 
-      bigInt: {
-        files: [
-          {
-            expand: true,
-            src: ['BigInteger.js', 'src/BigInteger.d.ts'],
-            dest: 'dist/es6/es6/',
-            flatten: true
-          },
-          {
-            expand: true,
-            src: ['BigInteger.js','./src/BigInteger.d.ts'],
-            dest: 'dist/commonjs/es6/',
-            flatten: true
-          },
-          {
-            expand: true,
-            src: ['BigInteger.js','./src/BigInteger.d.ts'],
-            dest: 'dist/amd/es6/',
-            flatten: true
-          }
-        ]
-      }
+      },
     },
+
     babel: { 
       options: { 
         sourceMap: true, 
@@ -132,7 +111,7 @@ module.exports = function(grunt) {
     },
     /**
      * Two steps here
-     *   1. Take CommonJS and generates ES5 using Bable (babelify)
+     *   1. Take CommonJS and generates ES5 using Babel (babelify)
      *   2. Package the ES5 code to be used in the browser (browserify)
      */
     browserify: {
@@ -169,17 +148,23 @@ module.exports = function(grunt) {
         }
       }
     },
-      uglify: { 
-          options: { 
-              compress: true, 
-              mangle: true, 
-              sourceMap: false
-          }, 
-          target: { 
-              src: './dist/browser/js/ion-bundle.js',
-              dest: './dist/browser/js/ion-bundle.min.js',
-          }
+    uglify: {
+        options: {
+            compress: true,
+            mangle: true,
+            sourceMap: false
+        },
+        target: {
+            src: './dist/browser/js/ion-bundle.js',
+            dest: './dist/browser/js/ion-bundle.min.js',
+        }
+    },
+    shell: {
+      // Uses the nyc configuration from package.json and the mocha settings from test/mocha.opts
+      "mochaWithCoverage": {
+        command: "npx nyc mocha --colors"
       }
+    }
   });
 
   grunt.loadNpmTasks('grunt-babel');
@@ -188,10 +173,10 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-clean');
   grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks('grunt-contrib-uglify');
+  grunt.loadNpmTasks('grunt-shell');
   grunt.loadNpmTasks('grunt-ts');
   grunt.loadNpmTasks('grunt-typedoc');
   grunt.loadNpmTasks('remap-istanbul');
-  grunt.loadNpmTasks('intern');
 
   // Copy tasks
   grunt.registerTask('copy:all', ['copy:bundle', 'copy:tutorial']);
@@ -203,13 +188,15 @@ module.exports = function(grunt) {
   grunt.registerTask('build:cjs', ['ts:commonjs-es6']);
   grunt.registerTask('build:amd', ['ts:amd-es6']);
   grunt.registerTask('build', [
-      'clean', 'build:es6', 'build:amd', 'build:cjs', 'copy:bigInt', 'trans:browser', 'copy:all'
+      'clean', 'build:es6', 'build:amd', 'build:cjs', 'trans:browser', 'copy:all'
   ]);
 
+  // Temporary targets that will eventually replace 'test' and 'test:coverage'
+  grunt.registerTask('mocha', ['shell:mochaWithCoverage']);
+
   // Tests
-  grunt.registerTask('test', ['build', 'intern:es6']);     // build and test
-  grunt.registerTask('test:run', ['intern:es6']);          // run test do not build
-  grunt.registerTask('test:coverage', ['remapIstanbul']);  // depends on `test:run`. Generates html output
+  grunt.registerTask('test', ['mocha', 'build']); // Test via ts-node. If all goes well, build.
+  grunt.registerTask('test:coverage', ['mocha']); // Run the tests and show coverage metrics, but do not build.
 
   // Documentation
   grunt.registerTask('nojekyll', 'Write an empty .nojekyll file to allow typedoc html output to be rendered',
@@ -224,7 +211,7 @@ module.exports = function(grunt) {
   });
 
   // release target used by Travis 
-  grunt.registerTask('release', ['build', 'test:run', 'test:coverage', 'cleanup', 'typedoc', 'nojekyll']);
+  grunt.registerTask('release', ['test:coverage', 'build', 'cleanup', 'typedoc', 'nojekyll']);
 
   // default for development
   grunt.registerTask('default', ['test', 'cleanup']);

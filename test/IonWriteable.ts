@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2012 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -11,18 +11,15 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
+import {assert} from 'chai';
+import {suite, test} from "mocha-typescript";
+import {Writeable} from '../src/IonWriteable';
 
-/**
- * Returns -1 if x is negative (including -0); otherwise returns 1.
- */
-export function _sign(x: number): number {
-    return (x < 0 || (x === 0 && (1 / x) === -Infinity)) ? -1 : 1
-}
-
-/**
- * Returns false if v is undefined or null; otherwise true.
- * @private
- */
-export function _hasValue(v: any): boolean {
-    return v !== undefined && v !== null;
+@suite('Writeable')
+class WriteableTests {
+    @test "writePartialArray"() {
+        var writeable = new Writeable();
+        writeable.writeBytes(new Uint8Array([1,2,3,4,5,6,7,8]), 4, 4);
+        assert.deepEqual(writeable.getBytes(), new Uint8Array([5,6,7,8]));
+    }
 }

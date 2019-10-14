@@ -11,8 +11,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-import { Writeable } from "./IonWriteable";
-import {_sign} from "./util";
+import {Writeable} from "./IonWriteable";
+import JSBI from "jsbi";
+import {JsbiSerde} from "./JsbiSerde";
 
 /**
  * Values in the Ion binary format are serialized as a sequence of low-level fields. This
@@ -24,8 +25,7 @@ export class LowLevelBinaryWriter {
 
   constructor(writeable : Writeable) {
         this.writeable = writeable;
-    }
-
+  }
 
   writeSignedInt(originalValue: number) : void {//TODO this should flip to different modes based on the length calculation because bit shifting will drop to 32 bits.
     let length = LowLevelBinaryWriter.getSignedIntSize(originalValue);
@@ -46,11 +46,15 @@ export class LowLevelBinaryWriter {
     this.writeable.writeBytes(tempBuf);
   }
 
-  writeUnsignedInt(originalValue: number) : void {
+  writeUnsignedInt(originalValue: number | JSBI) : void {
+    if (originalValue instanceof JSBI) {
+      let encodedBytes = JsbiSerde.toUnsignedIntBytes(originalValue);
+      this.writeable.writeBytes(encodedBytes);
+      return;
+    }
+
     let length = LowLevelBinaryWriter.getUnsignedIntSize(originalValue);
     let tempBuf = new Uint8Array(length);
-
-
     let value: number = originalValue;
     let i: number = tempBuf.length;
 
@@ -88,21 +92,21 @@ export class LowLevelBinaryWriter {
     this.writeable.writeBytes(tempBuf);
   }
 
-    writeVariableLengthUnsignedInt(originalValue: number) : void {
-        let tempBuf = new Uint8Array(LowLevelBinaryWriter.getVariableLengthUnsignedIntSize(originalValue));
-        let value: number = originalValue;
-        let i = tempBuf.length;
+  writeVariableLengthUnsignedInt(originalValue: number) : void {
+      let tempBuf = new Uint8Array(LowLevelBinaryWriter.getVariableLengthUnsignedIntSize(originalValue));
+      let value: number = originalValue;
+      let i = tempBuf.length;
 
-        tempBuf[--i] = (value & 0x7F) | 0x80;
-        value >>>= 7;
+      tempBuf[--i] = (value & 0x7F) | 0x80;
+      value >>>= 7;
 
-        while (value > 0) {
-            tempBuf[--i] = value & 0x7F
-            value >>>= 7;
-        }
+      while (value > 0) {
+          tempBuf[--i] = value & 0x7F
+          value >>>= 7;
+      }
 
-        this.writeable.writeBytes(tempBuf);
-    }
+      this.writeable.writeBytes(tempBuf);
+  }
 
   writeByte(byte: number) : void {
     this.writeable.writeByte(byte);
@@ -117,15 +121,20 @@ export class LowLevelBinaryWriter {
   }
 
   static getSignedIntSize(value : number) : number {
-      if (value === 0) return 1;
-      let absValue = Math.abs(value);
-      let numberOfBits = Math.floor(Math['log2'](absValue));
-      let numberOfBytes = Math.ceil(numberOfBits / 8);
-      if(numberOfBits % 8 === 0) numberOfBytes++;
-      return numberOfBytes;
+    if (value === 0) {
+      return 1;
+    }
+    const numberOfSignBits = 1;
+    const magnitude = Math.abs(value);
+    let numberOfMagnitudeBits = Math.ceil(Math.log2(magnitude + 1));
+    let numberOfBits = numberOfMagnitudeBits + numberOfSignBits;
+    return Math.ceil(numberOfBits / 8);
   }
 
-  static getUnsignedIntSize(value: number) : number {
+  static getUnsignedIntSize(value: number | JSBI) : number {
+    if (value instanceof JSBI) {
+      return JsbiSerde.getUnsignedIntSizeInBytes(value);
+    }
     if (value === 0) {
       return 1;
     }
