@@ -237,7 +237,6 @@ let decimalWriterTests = [
     },
     {
         name: "Writes negative zero decimal",
-        skip: true, // FIXME: https://github.com/amzn/ion-js/issues/444
         instructions: (writer) => writer.writeDecimal(ion.Decimal.parse("-0")),
         expected: [0x52, 0x80, 0x80]
     },
