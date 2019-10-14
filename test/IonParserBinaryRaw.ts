@@ -42,9 +42,14 @@ let maxValueByteArray = function(numberOfBytes) {
 };
 
 let unsignedIntBytesMatchValue = function(bytes, expected) {
-  let binarySpan = new ion.BinarySpan(new Uint8Array(bytes));
-  let actual = ion.ParserBinaryRaw._readUnsignedIntFrom(binarySpan, bytes.length);
-  assert.equal(actual, expected)
+    let binarySpan = new ion.BinarySpan(new Uint8Array(bytes));
+    let actual = ion.ParserBinaryRaw._readUnsignedIntFrom(binarySpan, bytes.length);
+    assert.equal(actual, expected)
+    if (bytes.length < 5 && bytes[0] < 128) {
+        binarySpan = new ion.BinarySpan(new Uint8Array(bytes));
+        let actualNumber = ion.ParserBinaryRaw._readUnsignedIntAsNumberFrom(binarySpan, bytes.length);
+        assert.equal(actualNumber, expected);
+    }
 };
 
 let unsignedIntReadingTests = [

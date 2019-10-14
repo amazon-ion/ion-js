@@ -231,6 +231,36 @@ export class ParserBinaryRaw {
         return ParserBinaryRaw._readUnsignedIntFrom(this._in, this._len);
     }
 
+    static _readUnsignedIntAsNumberFrom(input: BinarySpan, numberOfBytes: number) : number {
+        let value = 0, bytesRead = 0, byte;
+        if (numberOfBytes < 1)
+            return 0;
+
+        while (bytesRead < numberOfBytes) {
+            byte = input.next();
+            bytesRead++;
+            value = value << 8;
+            value = value | (byte & 0xff);
+        }
+
+        // We overflowed
+        if (numberOfBytes > 4 || value < 0) {
+            throw new Error("Attempted to read an unsigned int that was larger than 31 bits."
+                + " Use readUnsignedLongIntFrom instead. UInt size: " + numberOfBytes + ", value: " + value
+            );
+        }
+        // Fewer bytes than the required `numberOfBytes` were available in the input
+        if (byte === EOF) {
+            throw new Error("Ran out of data while reading a " + numberOfBytes + "-byte unsigned int.");
+        }
+
+        return value;
+    }
+
+    private readUnsignedIntAsNumber() : number {
+        return ParserBinaryRaw._readUnsignedIntAsNumberFrom(this._in, this._len);
+    }
+
     /**
      * Reads a Decimal value from the provided BinarySpan.
      *
@@ -488,7 +518,7 @@ export class ParserBinaryRaw {
                 this._curr = this.read_timestamp_value();
                 break;
             case IonBinary.TB_SYMBOL:
-                this._curr = this.readUnsignedInt();
+                this._curr = this.readUnsignedIntAsNumber();
                 break;
             case IonBinary.TB_STRING:
                 this._curr = this.read_string_value();
