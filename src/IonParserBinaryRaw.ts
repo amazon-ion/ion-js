@@ -250,7 +250,7 @@ export class ParserBinaryRaw {
         let signedInt = ParserBinaryRaw._readSignedIntFrom(input,  numberOfCoefficientBytes);
         let isNegative = signedInt.isNegative;
         let coefficient = isNegative ? JSBI.unaryMinus(signedInt.magnitude) : signedInt.magnitude;
-        return Decimal._fromJsbiCoefficient(
+        return Decimal._fromBigIntCoefficient(
             isNegative,
             coefficient,
             exponent
@@ -313,7 +313,7 @@ export class ParserBinaryRaw {
                 isNegative = deserializedSignedInt._isNegative;
                 coefficient = deserializedSignedInt._magnitude;
             }
-            let dec = Decimal._fromJsbiCoefficient(isNegative, coefficient, exponent);
+            let dec = Decimal._fromBigIntCoefficient(isNegative, coefficient, exponent);
             let [_, fractionStr] = Timestamp._splitSecondsDecimal(dec);
             fractionalSeconds = Decimal.parse(secondInt + '.' + fractionStr);
         }

@@ -13,7 +13,7 @@
  */
 
 import JSBI from "jsbi";
-import {_sign} from "./util";
+import {_hasValue, _sign} from "./util";
 import {JsbiSupport} from "./JsbiSupport";
 
 /**
@@ -49,27 +49,68 @@ export class Decimal {
     public static readonly ONE = new Decimal(1, 0);
 
     /**
-     * Creates a new Decimal value.
-     * @param coefficient   See the {@link Decimal} class-level documentation for details.
-     * @param exponent      See the {@link Decimal} class-level documentation for details.
+     * Creates a new Decimal value. Three parameter sets are supported:
+     *
+     *  (text: string)
+     *      The provided text will be parsed into a Decimal value.
+     *
+     *  (coefficient: number, coefficient: number)
+     *      A Decimal value will be constructed using the provided coefficient and exponent values.
+     *
+     *  (coefficient: BigInt, coefficient: number, isNegative?: boolean)
+     *      A Decimal value will be constructed using the provided coefficient and exponent values.
+     *      Because the BigInt data type cannot represent -0, a third parameter called `isNegative` may be supplied
+     *      to explicitly set the sign of the Decimal following construction. If this flag is not specified,
+     *      the provided coefficient's sign will be used.
      */
-    constructor(coefficient: number, exponent: number) {
+    constructor(coefficient: number | JSBI | string,
+                exponent?: number,
+                isNegative?: boolean) {
+        if(typeof coefficient === "string") {
+            return Decimal.parse(coefficient);
+        }
+
+        if (!_hasValue(exponent)) {
+            throw new Error("Decimal's constructor was called with a numeric coefficient but no exponent.");
+        }
+
+        if (typeof coefficient === "number") {
+            return Decimal._fromNumberCoefficient(coefficient, exponent);
+        }
+
+        if(coefficient instanceof JSBI) {
+            if (!_hasValue(isNegative)) {
+                // If isNegative was not specified, infer isNegative from the coefficient.
+                // This will work for all values except -0.
+                isNegative = JsbiSupport.isNegative(coefficient);
+            } else if (isNegative && !JsbiSupport.isNegative(coefficient)) {
+                // If isNegative was specified, make sure that the coefficent's sign agrees with it.
+                coefficient = JSBI.unaryMinus(coefficient);
+            }
+            return Decimal._fromBigIntCoefficient(isNegative, coefficient, exponent);
+        }
+
+        throw new Error(`Unsupported parameter set (${coefficient}, ${exponent}, ${isNegative} passed to Decimal constructor.`);
+    }
+
+    /**
+     * Allows a Decimal to be constructed using a coefficient in the range
+     * [Number.MIN_SAFE_INTEGER, Number.MAX_SAFE_INTEGER].
+     * @hidden
+     */
+    static _fromNumberCoefficient(coefficient: number, exponent: number): Decimal {
         if (!Number.isInteger(coefficient)) {
             throw new Error("The provided coefficient was not an integer. (" + coefficient + ")");
         }
-        let isNegative: boolean = coefficient < 0 || Object.is(coefficient, -0);
-        this._initialize(
-            isNegative,
-            JSBI.BigInt(coefficient),
-            exponent
-        );
+        let isNegative = coefficient < 0 || Object.is(coefficient, -0);
+        return this._fromBigIntCoefficient(isNegative, JSBI.BigInt(coefficient), exponent);
     }
 
     /**
      * Allows a Decimal to be constructed using a coefficient of arbitrary size.
      * @hidden
      */
-    static _fromJsbiCoefficient(isNegative: boolean, coefficient: JSBI, exponent: number) {
+    static _fromBigIntCoefficient(isNegative: boolean, coefficient: JSBI, exponent: number): Decimal {
         let value = Object.create(this.prototype);
         value._initialize(isNegative, coefficient, exponent);
         return value;
@@ -295,6 +336,6 @@ export class Decimal {
 
         let coefficient: JSBI = JSBI.BigInt(coefficientText);
         let isNegative: boolean = JsbiSupport.isNegative(coefficient) || (coefficientText.startsWith("-0"));
-        return Decimal._fromJsbiCoefficient(isNegative, coefficient, exponent);
+        return Decimal._fromBigIntCoefficient(isNegative, coefficient, exponent);
     }
 }
