@@ -41,9 +41,12 @@ let maxValueByteArray = function(numberOfBytes) {
   return data;
 };
 
-let unsignedIntBytesMatchValue = function(bytes, expected) {
+let unsignedIntBytesMatchValue = (bytes,
+                                  expected,
+                                  readFrom: (input: ion.BinarySpan, numberOfBytes: number) => any =
+                                      ion.ParserBinaryRaw._readUnsignedIntAsBigIntFrom) => {
   let binarySpan = new ion.BinarySpan(new Uint8Array(bytes));
-  let actual = ion.ParserBinaryRaw._readUnsignedIntFrom(binarySpan, bytes.length);
+  let actual = readFrom(binarySpan, bytes.length);
   assert.equal(actual, expected)
 };
 
@@ -55,6 +58,9 @@ let unsignedIntReadingTests = [
   {bytes: maxValueByteArray(1), expected: maxValueForBytes(1)},
   {bytes: maxValueByteArray(2), expected: maxValueForBytes(2)},
   {bytes: maxValueByteArray(3), expected: maxValueForBytes(3)},
+  {bytes: maxValueByteArray(4), expected: maxValueForBytes(4)},
+  {bytes: maxValueByteArray(5), expected: maxValueForBytes(5)},
+  {bytes: maxValueByteArray(6), expected: maxValueForBytes(6)},
   {bytes: [0x7F, 0xFF, 0xFF, 0xFF], expected: maxValueForBits(31)},
 ];
 
@@ -82,6 +88,26 @@ describe('Reading unsigned ints', () => {
           () => assert.throws(() => unsignedIntBytesMatchValue(bytes, expected))
       );
     });
+  });
+
+  describe('Safe', () => {
+    unsignedIntReadingTests.forEach(({bytes, expected}) => {
+      it(
+          'Reading ' + expected + ' from bytes: ' + bytes.toString(),
+          () => unsignedIntBytesMatchValue(bytes, expected, ion.ParserBinaryRaw._readUnsignedIntAsNumberFrom)
+      );
+    });
+  });
+
+  describe('Throwing when ints are outside of the safe integer range', () => {
+    for (let numberOfBytes = 7; numberOfBytes <= 10; numberOfBytes++) {
+      let expected = maxValueForBytes(numberOfBytes);
+      let bytes = maxValueByteArray(numberOfBytes);
+      it(
+          'Reading ' + expected + ' from bytes: ' + bytes.toString(),
+          () => assert.throws(() => unsignedIntBytesMatchValue(bytes, expected, ion.ParserBinaryRaw._readUnsignedIntAsNumberFrom))
+      );
+    }
   });
 
   describe('BigInt', () => {
@@ -342,4 +368,3 @@ describe("Reading floats", () => {
     });
   });
 });
-
