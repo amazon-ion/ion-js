@@ -49,23 +49,28 @@ export class Decimal {
     public static readonly ONE = new Decimal(1, 0);
 
     /**
-     * Creates a new Decimal value. Three parameter sets are supported:
+     * Creates a new Decimal value by parsing the provided text.
      *
-     *  (text: string)
-     *      The provided text will be parsed into a Decimal value.
-     *
-     *  (coefficient: number, coefficient: number)
-     *      A Decimal value will be constructed using the provided coefficient and exponent values.
-     *
-     *  (coefficient: BigInt, coefficient: number, isNegative?: boolean)
-     *      A Decimal value will be constructed using the provided coefficient and exponent values.
-     *      Because the BigInt data type cannot represent -0, a third parameter called `isNegative` may be supplied
-     *      to explicitly set the sign of the Decimal following construction. If this flag is not specified,
-     *      the provided coefficient's sign will be used.
+     * @param decimalText   An Ion-encoded decimal value.
      */
-    constructor(coefficient: number | JSBI | string,
-                exponent?: number,
-                isNegative?: boolean) {
+    constructor(decimalText: string);
+
+    /**
+     * Creates a new Decimal value using the provided coefficient and exponent values.
+     */
+    constructor(coefficient: number, exponent: number);
+    
+    /**
+     * Creates a new Decimal value using the provided coefficient and exponent values.
+     * Because the BigInt data type cannot represent -0, a third parameter called `isNegative` may be supplied
+     * to explicitly set the sign of the Decimal following construction. If this flag is not specified,
+     * the provided coefficient's sign will be used. If isNegative is specified but is not in agreement with
+     * the coefficient's sign, the value of isNegative takes precedence.
+     */
+    constructor(coefficient: JSBI, exponent: number, isNegative?: boolean);
+
+    // This is the unified implementation of the above signatures and is not visible to users.
+    constructor(coefficient: number | JSBI | string, exponent?: number, isNegative?: boolean) {
         if(typeof coefficient === "string") {
             return Decimal.parse(coefficient);
         }
@@ -84,7 +89,7 @@ export class Decimal {
                 // This will work for all values except -0.
                 isNegative = JsbiSupport.isNegative(coefficient);
             } else if (isNegative && !JsbiSupport.isNegative(coefficient)) {
-                // If isNegative was specified, make sure that the coefficent's sign agrees with it.
+                // If isNegative was specified, make sure that the coefficient's sign agrees with it.
                 coefficient = JSBI.unaryMinus(coefficient);
             }
             return Decimal._fromBigIntCoefficient(isNegative, coefficient, exponent);

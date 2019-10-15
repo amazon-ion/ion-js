@@ -17,7 +17,7 @@ import * as ion from "../src/IonTests";
 import * as util from "../src/util";
 import JSBI from "jsbi";
 import {JsbiSupport} from "../src/JsbiSupport";
-import {Decimal} from "../src/IonTests";
+import {Decimal, decodeUtf8} from "../src/IonTests";
 
 /**
  * @param decimalString The text representation of the decimal to test.
@@ -232,17 +232,23 @@ let toStringWithSign = (value: number | JSBI, isNegative) => {
 let decimalConstructorTest = (coefficient, exponent, isNegative?) => {
     let coefficientText = toStringWithSign(coefficient, isNegative);
     let exponentText = toStringWithSign(exponent, isNegative);
-    let testName = `(${coefficientText}, ${exponentText})`;
+
+    let decimalValue = new Decimal(coefficient, exponent, isNegative);
+    let writer = ion.makeTextWriter();
+    writer.writeDecimal(decimalValue);
+    writer.close();
+    let textDecimal = decodeUtf8(writer.getBytes());
+    let reader = ion.makeReader(textDecimal);
+    assert.equal(ion.IonTypes.DECIMAL, reader.next());
+    let decimalFromText = reader.decimalValue();
+
+    let testName = `new Decimal(${coefficientText}, ${exponentText}`;
+    if (isNegative !== undefined) {
+        testName += ', ' + isNegative;
+    }
+    testName += ') is equal to ' + textDecimal;
 
     it(testName, () => {
-        let decimalValue = new Decimal(coefficient, exponent, isNegative);
-        let writer = ion.makeTextWriter();
-        writer.writeDecimal(decimalValue);
-        writer.close();
-        let ionData = writer.getBytes();
-        let reader = ion.makeReader(ionData);
-        assert.equal(ion.IonTypes.DECIMAL, reader.next());
-        let decimalFromText = reader.decimalValue();
         assert.isTrue(decimalFromText.equals(decimalValue));
     });
 };
