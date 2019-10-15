@@ -17,7 +17,7 @@ import * as ion from "../src/IonTests";
 import * as util from "../src/util";
 import JSBI from "jsbi";
 import {JsbiSupport} from "../src/JsbiSupport";
-import {Decimal} from "../src/IonTests";
+import {Decimal, decodeUtf8} from "../src/IonTests";
 
 /**
  * @param decimalString The text representation of the decimal to test.
@@ -206,7 +206,70 @@ let decimalEqualsTests: ({input1: string, input2: string, expected: boolean, ski
     {input1: '10000000000000000.00000000000000000', input2: '10000000000000000.0000000000000000', expected: false},
 ];
 
+let decimalFromNumberNumberTests: ({coefficient: number, exponent: number})[] = [
+    {coefficient: 0, exponent: 0},
+    {coefficient: -0, exponent: -0},
+    {coefficient: -0, exponent: 0},
+    {coefficient: 0, exponent: -0},
+    {coefficient: 314, exponent: 2},
+    {coefficient: -314, exponent: -2},
+    {coefficient: 314, exponent: -2},
+    {coefficient: -314, exponent: 2},
+    {coefficient: -10000000000000001, exponent: -9},
+    {coefficient: 10000000000000001, exponent: 9},
+    {coefficient: 10000000000000001, exponent: -9},
+    {coefficient: -10000000000000001, exponent: 9},
+];
+
+let toStringWithSign = (value: number | JSBI, isNegative) => {
+    if ((typeof value === 'number' && Object.is(-0, value))
+        || (value instanceof JSBI && isNegative === true && JsbiSupport.isZero(value))) {
+        return '-0';
+    }
+    return value.toString();
+};
+
+let decimalConstructorTest = (coefficient, exponent, isNegative?) => {
+    let coefficientText = toStringWithSign(coefficient, isNegative);
+    let exponentText = toStringWithSign(exponent, isNegative);
+
+    let decimalValue = new Decimal(coefficient, exponent, isNegative);
+    let writer = ion.makeTextWriter();
+    writer.writeDecimal(decimalValue);
+    writer.close();
+    let textDecimal = decodeUtf8(writer.getBytes());
+    let reader = ion.makeReader(textDecimal);
+    assert.equal(ion.IonTypes.DECIMAL, reader.next());
+    let decimalFromText = reader.decimalValue();
+
+    let testName = `new Decimal(${coefficientText}, ${exponentText}`;
+    if (isNegative !== undefined) {
+        testName += ', ' + isNegative;
+    }
+    testName += ') is equal to ' + textDecimal;
+
+    it(testName, () => {
+        assert.isTrue(decimalFromText.equals(decimalValue));
+    });
+};
+
 describe('Decimal', () => {
+    describe('Constructor variants', () => {
+        describe('(number, number)', () => {
+            decimalFromNumberNumberTests.forEach(({coefficient, exponent}) => {
+                decimalConstructorTest(coefficient, exponent);
+            });
+        });
+
+        describe('(BigInt, number, boolean)', () => {
+            decimalFromNumberNumberTests.forEach(({coefficient, exponent}) => {
+                let isNegative = coefficient < 0 || Object.is(-0, coefficient);
+                let bigIntCoefficient = JSBI.BigInt(coefficient);
+                decimalConstructorTest(bigIntCoefficient, exponent, isNegative);
+            });
+        });
+    });
+
     describe('Parsing', () => {
         decimalParsingTests.forEach(
             ({inputString, coefficient, exponent, numberValue, text}) => {
