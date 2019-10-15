@@ -223,12 +223,12 @@ export class ParserBinaryRaw {
         return new SignAndMagnitudeInt(magnitude, isNegative);
     }
 
-    static _readUnsignedIntFrom(input: BinarySpan, numberOfBytes: number) : JSBI {
+    static _readUnsignedIntAsBigIntFrom(input: BinarySpan, numberOfBytes: number) : JSBI {
         return JsbiSerde.fromUnsignedBytes(Array.prototype.slice.call(input.view(numberOfBytes)));
     }
 
-    private readUnsignedInt() : JSBI {
-        return ParserBinaryRaw._readUnsignedIntFrom(this._in, this._len);
+    private readUnsignedIntAsBigInt() : JSBI {
+        return ParserBinaryRaw._readUnsignedIntAsBigIntFrom(this._in, this._len);
     }
 
     /**
@@ -236,12 +236,12 @@ export class ParserBinaryRaw {
      * This is valuable for use cases like Symbol IDs, which are unlikely to grow beyond a few bytes.
      *
      * For simplicity, the current implementation supports reading integers up to 6 bytes (i.e. (2^48) - 1)
-     * rather than Number's maximum safe integer value, 2^53 - 1.     *
+     * rather than Number's maximum safe integer value, 2^53 - 1.
      *
      * @throws Error if the unsigned int was too large to store in a Number.
      * @hidden
      */
-    static _readSafeUnsignedIntFrom(input: BinarySpan, numberOfBytes: number) : number {
+    static _readUnsignedIntAsNumberFrom(input: BinarySpan, numberOfBytes: number) : number {
         let value = 0;
         let bytesRead = 0;
         let bytesAvailable = input.getRemaining();
@@ -265,6 +265,10 @@ export class ParserBinaryRaw {
         while (bytesRead < numberOfBytes) {
             byte = input.next();
             bytesRead++;
+            // TODO: Bitshifting is faster than multiplication because it converts numbers to integer values,
+            //  but it loses precision on values larger than 31 bits. Consider optimizing this code path
+            //  for smaller values of `numberOfBytes`.
+
             // Avoid using bitshifting to preserve Number's precision beyond 31 bits.
             value *= 256;
             value = value + byte;
@@ -273,8 +277,8 @@ export class ParserBinaryRaw {
         return value;
     }
 
-    private readSafeUnsignedInt(): number {
-        return ParserBinaryRaw._readSafeUnsignedIntFrom(this._in, this._len);
+    private readUnsignedIntAsNumber(): number {
+        return ParserBinaryRaw._readUnsignedIntAsNumberFrom(this._in, this._len);
     }
 
     /**
@@ -505,7 +509,7 @@ export class ParserBinaryRaw {
         if (this._len === 0) {
             return JsbiSupport.ZERO;
         }
-        return this.readUnsignedInt();
+        return this.readUnsignedIntAsBigInt();
     }
 
     private load_value() : void {
@@ -534,7 +538,7 @@ export class ParserBinaryRaw {
                 this._curr = this.read_timestamp_value();
                 break;
             case IonBinary.TB_SYMBOL:
-                this._curr = this.readSafeUnsignedInt();
+                this._curr = this.readUnsignedIntAsNumber();
                 break;
             case IonBinary.TB_STRING:
                 this._curr = this.read_string_value();
