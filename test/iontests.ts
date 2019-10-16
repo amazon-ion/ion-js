@@ -220,30 +220,38 @@ function getInput(path) {
     return fs.readFileSync(path, options);
 }
 
-function roundTripEventStreams(reader) {
+function makeStream(src, writer) {
+    writer.writeValues(ion.makeReader(src));
+    writer.close();
+    return new IonEventStream(ion.makeReader(writer.getBytes()));
+}
+
+function roundTripEventStreams(input) {
     let streams = [];
-    streams.push(new IonEventStream(reader));
-
-    let eventWriter = ion.makeTextWriter();
-    streams[0].writeEventStream(eventWriter);
-    eventWriter.close();
-    streams.push(new IonEventStream(ion.makeReader(eventWriter.getBytes())));
-
+    streams.push(new IonEventStream(ion.makeReader(input)));
     let textWriter = ion.makeTextWriter();
-    streams[0].writeIon(textWriter);
-    streams.push(new IonEventStream(ion.makeReader(textWriter.getBytes())));
-
+    streams.push(makeStream(input, textWriter));
+    let text = textWriter.getBytes();
     let binaryWriter = ion.makeBinaryWriter();
-    streams[0].writeIon(binaryWriter);
-    streams.push(new IonEventStream(ion.makeReader(binaryWriter.getBytes())));
+    streams.push(makeStream(input, binaryWriter));
+    let binary = binaryWriter.getBytes();
 
-    let eventTextWriter = ion.makeTextWriter();
-    streams[0].writeIon(eventTextWriter);
-    streams.push(new IonEventStream(ion.makeReader(eventTextWriter.getBytes())));
+    //second pass
 
-    let eventBinaryWriter = ion.makeBinaryWriter();
-    streams[0].writeIon(eventBinaryWriter);
-    streams.push(new IonEventStream(ion.makeReader(eventBinaryWriter.getBytes())));
+    //text -> text -> eventstream
+    streams.push(makeStream(text, ion.makeTextWriter()));
+    //text -> binary -> eventstream
+    streams.push(makeStream(text, ion.makeBinaryWriter()));
+    //binary -> text -> eventstream
+    streams.push(makeStream(binary, ion.makeTextWriter()));
+    //binary -> binary -> eventstream
+    streams.push(makeStream(binary, ion.makeBinaryWriter()));
+
+    //eventstream -> eventstream
+    textWriter = ion.makeTextWriter();
+    streams[0].writeEventStream(textWriter);
+    textWriter.close();
+    streams.push(new IonEventStream(ion.makeReader(textWriter.getBytes())));
 
     for (let i = 0; i < streams.length - 1; i++) {
         for (let j = i + 1; j < streams.length; j++) {
