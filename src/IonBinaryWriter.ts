@@ -654,7 +654,7 @@ class IntNode extends LeafNode {
   constructor(writer: LowLevelBinaryWriter, parent: Node, annotations: Uint8Array, private readonly value: number | JSBI) {
     super(writer, parent, IonTypes.INT, annotations);
 
-    if (this.value === 0) {
+    if (this.value == 0) {
       this.intTypeCode = TypeCodes.POSITIVE_INT;
       this.bytes = new Uint8Array(0);
     } else if (this.value > 0) {
@@ -665,7 +665,6 @@ class IntNode extends LeafNode {
     } else {
       this.intTypeCode = TypeCodes.NEGATIVE_INT;
       let magnitude: number | JSBI;
-      let uintSize: number;
       if (value instanceof JSBI) {
         if(JsbiSupport.isNegative(value)) {
           magnitude = JSBI.unaryMinus(value);
