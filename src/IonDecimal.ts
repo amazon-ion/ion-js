@@ -209,16 +209,19 @@ export class Decimal {
     }
 
     /**
-     * @hidden
+     * Returns a BigInt representing the coefficient of this Decimal value.
+     *
+     * Note that the BigInt data type is unable to represent -0 natively. If you wish to check for a -0 coefficient,
+     * test whether the coefficient is zero and then call [[isNegative]].
      */
-    _getCoefficient() : JSBI {
+    getCoefficient() : JSBI {
         return this._coefficient;
     }
 
     /**
-     * @hidden
+     * Returns a number representing the exponent of this Decimal value.
      */
-    _getExponent() : number {
+    getExponent() : number {
         return this._exponent;
     }
 
@@ -229,10 +232,10 @@ export class Decimal {
      * precision to match when returning 0.
      */
     equals(that : Decimal) : boolean {
-        return this._getExponent() === that._getExponent()
-            && _sign(this._getExponent()) === _sign(that._getExponent())
+        return this.getExponent() === that.getExponent()
+            && _sign(this.getExponent()) === _sign(that.getExponent())
             && this.isNegative() === that.isNegative()
-            && JSBI.equal(this._getCoefficient(), that._getCoefficient());
+            && JSBI.equal(this.getCoefficient(), that.getCoefficient());
     }
 
     /**

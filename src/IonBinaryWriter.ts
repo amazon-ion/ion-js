@@ -131,8 +131,8 @@ export class BinaryWriter extends AbstractWriter {
 
     if (typeof value == 'string') value = Decimal.parse(value);
 
-    let exponent: number = value._getExponent();
-    let coefficient: JSBI = value._getCoefficient();
+    let exponent: number = value.getExponent();
+    let coefficient: JSBI = value.getCoefficient();
     let isPositiveZero: boolean = JSBI.equal(coefficient, JsbiSupport.ZERO) && !value.isNegative();
     if (isPositiveZero && exponent === 0 && _sign(exponent) === 1) {
       // Special case per the spec: http://amzn.github.io/ion-docs/docs/binary.html#5-decimal
@@ -258,10 +258,10 @@ export class BinaryWriter extends AbstractWriter {
     if (value.getPrecision() >= TimestampPrecision.SECONDS) {
         writer.writeVariableLengthUnsignedInt(value.getSecondsInt());
         let fractionalSeconds = value._getFractionalSeconds();
-        if (fractionalSeconds._getExponent() !== 0) {
-            writer.writeVariableLengthSignedInt(fractionalSeconds._getExponent());
-            if (!JsbiSupport.isZero(fractionalSeconds._getCoefficient())) {
-              writer.writeBytes(JsbiSerde.toSignedIntBytes(fractionalSeconds._getCoefficient(), fractionalSeconds.isNegative()));
+        if (fractionalSeconds.getExponent() !== 0) {
+            writer.writeVariableLengthSignedInt(fractionalSeconds.getExponent());
+            if (!JsbiSupport.isZero(fractionalSeconds.getCoefficient())) {
+              writer.writeBytes(JsbiSerde.toSignedIntBytes(fractionalSeconds.getCoefficient(), fractionalSeconds.isNegative()));
             }
         }
     }
