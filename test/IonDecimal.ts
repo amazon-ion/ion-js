@@ -35,11 +35,11 @@ function test(decimalString,
 
     let decimal = ion.Decimal.parse(decimalString);
 
-    assert.deepEqual(decimal._getCoefficient(), JSBI.BigInt(expectedCoefficient), '_getCoefficient()');
+    assert.deepEqual(decimal.getCoefficient(), JSBI.BigInt(expectedCoefficient), '_getCoefficient()');
     assert.equal(decimal.isNegative(), Object.is(Number(expectedCoefficient), -0) || JsbiSupport.isNegative(JSBI.BigInt(expectedCoefficient)), 'coefficient sign');
 
-    assert.equal(decimal._getExponent(), expectedExponent, '_getExponent()');
-    assert.equal(util._sign(decimal._getExponent()), util._sign(expectedExponent), 'exponent sign');
+    assert.equal(decimal.getExponent(), expectedExponent, '_getExponent()');
+    assert.equal(util._sign(decimal.getExponent()), util._sign(expectedExponent), 'exponent sign');
 
     assert.equal(decimal.isNegative(), decimalString.trim()[0] === '-', 'isNegative()');
 
@@ -221,9 +221,13 @@ let decimalFromNumberNumberTests: ({coefficient: number, exponent: number})[] = 
     {coefficient: -10000000000000001, exponent: 9},
 ];
 
-let toStringWithSign = (value: number | JSBI, isNegative) => {
-    if ((typeof value === 'number' && Object.is(-0, value))
-        || (value instanceof JSBI && isNegative === true && JsbiSupport.isZero(value))) {
+let isNegativeZero = (value: number | JSBI, isNegative?: boolean): boolean => {
+    return (typeof value === 'number' && Object.is(-0, value))
+        || (value instanceof JSBI && isNegative === true && JsbiSupport.isZero(value));
+};
+
+let toStringWithSign = (value: number | JSBI, isNegative): string => {
+    if (isNegativeZero(value, isNegative)) {
         return '-0';
     }
     return value.toString();
@@ -250,6 +254,12 @@ let decimalConstructorTest = (coefficient, exponent, isNegative?) => {
 
     it(testName, () => {
         assert.isTrue(decimalFromText.equals(decimalValue));
+        assert.deepEqual(JSBI.BigInt(coefficient), decimalValue.getCoefficient());
+        assert.equal(exponent, decimalValue.getExponent());
+        assert.equal(
+            isNegativeZero(coefficient, isNegative),
+            isNegativeZero(decimalValue.getCoefficient(), decimalValue.isNegative())
+        );
     });
 };
 

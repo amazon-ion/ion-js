@@ -114,13 +114,13 @@ export class TextWriter extends AbstractWriter {
                 this.writeUtf8("null.decimal");
             } else {
                 let s = '';
-                let coefficient = value._getCoefficient();
+                let coefficient = value.getCoefficient();
                 if (JsbiSupport.isZero(coefficient) && value.isNegative()) {
                     s += '-';
                 }
                 s += coefficient.toString() + 'd';
 
-                let exponent = value._getExponent();
+                let exponent = value.getExponent();
                 if (exponent === 0 && _sign(exponent) === -1) {
                     s += '-';
                 }

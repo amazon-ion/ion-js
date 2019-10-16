@@ -326,15 +326,15 @@ export class Timestamp {
      * @hidden
      */
     static _splitSecondsDecimal(secondsDecimal: Decimal) : [string, string] {
-        let coefStr = secondsDecimal._getCoefficient().toString();
-        let exp = secondsDecimal._getExponent();
+        let coefStr = secondsDecimal.getCoefficient().toString();
+        let exp = secondsDecimal.getExponent();
         let secondsStr = '';
         let fractionStr = '';
         if (exp < 0) {
             let idx = Math.max(coefStr.length + exp, 0);
             secondsStr = coefStr.substr(0, idx);
             fractionStr = coefStr.substr(idx);
-            if (-secondsDecimal._getExponent() - coefStr.length > 0) {
+            if (-secondsDecimal.getExponent() - coefStr.length > 0) {
                 fractionStr = '0'.repeat(-exp - coefStr.length) + fractionStr;
             }
         } else if (exp > 0) {
