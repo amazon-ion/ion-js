@@ -78,7 +78,7 @@ export abstract class AbstractWriter implements Writer {
         } else {
             switch (type) {
                 case IonTypes.BOOL:      this.writeBoolean(reader.booleanValue()); break;
-                case IonTypes.INT:       this.writeInt(reader.numberValue()); break;
+                case IonTypes.INT:       this.writeInt(reader.bigIntValue()); break;
                 case IonTypes.FLOAT:     this.writeFloat64(reader.numberValue()); break;
                 case IonTypes.DECIMAL:   this.writeDecimal(reader.decimalValue()); break;
                 case IonTypes.TIMESTAMP: this.writeTimestamp(reader.timestampValue()); break;
