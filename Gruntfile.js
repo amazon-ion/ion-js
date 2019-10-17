@@ -15,18 +15,6 @@
 module.exports = function(grunt) {
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
-      /**
-       * Tests configuration
-       */
-    intern: {
-      es6: {
-        options: {
-          config: 'tests/intern',
-          reporters: ['Runner'],
-          ionVersion: 'es6',
-        },
-      },
-    },
     clean: ['dist/',
             'docs/',
             'coverage-final.json',
@@ -41,21 +29,6 @@ module.exports = function(grunt) {
     typedoc: {
       build: {
         src: 'src/**/*'
-      }
-    },
-      /**
-       * Coverage report that maps coverage results to .ts files instead
-       * of the generated .js files.
-       */
-    remapIstanbul: {
-      build: {
-        src: 'coverage-final.json',
-        options: {
-          reports: {
-            'html': 'docs/coverage/html',
-            'json': 'docs/coverage/coverage-final-mapped.json'
-          }
-        }
       }
     },
     ts: {
@@ -93,7 +66,6 @@ module.exports = function(grunt) {
         ]
       },
     },
-
     babel: { 
       options: { 
         sourceMap: true, 
@@ -176,7 +148,6 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-shell');
   grunt.loadNpmTasks('grunt-ts');
   grunt.loadNpmTasks('grunt-typedoc');
-  grunt.loadNpmTasks('remap-istanbul');
 
   // Copy tasks
   grunt.registerTask('copy:all', ['copy:bundle', 'copy:tutorial']);
