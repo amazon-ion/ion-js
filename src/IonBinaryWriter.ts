@@ -654,18 +654,19 @@ class IntNode extends LeafNode {
   constructor(writer: LowLevelBinaryWriter, parent: Node, annotations: Uint8Array, private readonly value: number | JSBI) {
     super(writer, parent, IonTypes.INT, annotations);
 
-    if (this.value === 0) {
-      this.intTypeCode = TypeCodes.POSITIVE_INT;
-      this.bytes = new Uint8Array(0);
-    } else if (this.value > 0) {
+    if (!(typeof this.value === 'number' || this.value instanceof JSBI)) {
+      throw new Error('Expected ' + this.value + ' to be a number or JSBI');
+    }
+
+    if (JSBI.GT(this.value, 0)) {
       this.intTypeCode = TypeCodes.POSITIVE_INT;
       let writer: LowLevelBinaryWriter = new LowLevelBinaryWriter(new Writeable(LowLevelBinaryWriter.getUnsignedIntSize(this.value)));
       writer.writeUnsignedInt(this.value);
       this.bytes = writer.getBytes();
-    } else {
+
+    } else if (JSBI.LT(this.value, 0)) {
       this.intTypeCode = TypeCodes.NEGATIVE_INT;
       let magnitude: number | JSBI;
-      let uintSize: number;
       if (value instanceof JSBI) {
         if(JsbiSupport.isNegative(value)) {
           magnitude = JSBI.unaryMinus(value);
@@ -676,6 +677,11 @@ class IntNode extends LeafNode {
       let writer: LowLevelBinaryWriter = new LowLevelBinaryWriter(new Writeable(LowLevelBinaryWriter.getUnsignedIntSize(magnitude)));
       writer.writeUnsignedInt(magnitude);
       this.bytes = writer.getBytes();
+
+    } else {
+      // this.value is 0
+      this.intTypeCode = TypeCodes.POSITIVE_INT;
+      this.bytes = new Uint8Array(0);
     }
   }
 

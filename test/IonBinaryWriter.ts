@@ -14,6 +14,7 @@
 
 import {assert} from 'chai';
 import * as ion from '../src/IonTests';
+import JSBI from 'jsbi';
 
 const ivm = [0xe0, 0x01, 0x00, 0xea];
 
@@ -383,6 +384,21 @@ let intWriterTests = [
         name: "Writes int 123456",
         instructions: (writer) => writer.writeInt(123456),
         expected: [0x23, 0x01, 0xe2, 0x40]
+    },
+    {
+        name: "Writes BigInt 0",
+        instructions: (writer) => writer.writeInt(JSBI.BigInt('0')),
+        expected: [0x20]
+    },
+    {
+        name: "Writes BigInt 12345678901234567890",
+        instructions: (writer) => writer.writeInt(JSBI.BigInt('12345678901234567890')),
+        expected: [0x28, 0xab, 0x54, 0xa9, 0x8c, 0xeb, 0x1f, 0x0a, 0xd2]
+    },
+    {
+        name: "Writes BigInt -12345678901234567890",
+        instructions: (writer) => writer.writeInt(JSBI.BigInt('-12345678901234567890')),
+        expected: [0x38, 0xab, 0x54, 0xa9, 0x8c, 0xeb, 0x1f, 0x0a, 0xd2]
     },
     {
         name: "Writes int 123456 with annotations",

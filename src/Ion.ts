@@ -24,6 +24,7 @@ import { Writeable } from "./IonWriteable";
 import { BinaryWriter } from "./IonBinaryWriter";
 import { defaultLocalSymbolTable } from "./IonLocalSymbolTable";
 import { decodeUtf8 } from "./IonUnicode";
+import IntSize from "./IntSize";
 
 /**
  * Indicates whether the provided buffer contains binary Ion data.
@@ -91,6 +92,7 @@ export { Writer } from "./IonWriter";
 export { Catalog } from "./IonCatalog";
 export { Decimal } from "./IonDecimal";
 export { defaultLocalSymbolTable } from "./IonLocalSymbolTable";
+export { IntSize };
 export { IonType } from "./IonType";
 export { IonTypes } from "./IonTypes";
 export { SharedSymbolTable } from "./IonSharedSymbolTable";

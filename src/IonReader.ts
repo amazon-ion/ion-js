@@ -19,7 +19,7 @@ import JSBI from "jsbi";
 import IntSize from "./IntSize";
 
 /** Represents the possible return values of [[Reader.value]]. */
-export type ReaderScalarValue = null | boolean | number | Decimal | Timestamp | string | Uint8Array;
+export type ReaderScalarValue = null | boolean | number | JSBI | Decimal | Timestamp | string | Uint8Array;
 
 /**
  * A pull parser interface over Ion data.
@@ -141,7 +141,7 @@ export interface Reader {
      *
      * @return [[IntSize.Number]] if the value will fit in a number, [[IntSize.BigInt]] otherwise.
      */
-     intSize(): IntSize;
+    intSize(): IntSize;
 
     /**
      * Returns the current value as a `string`.  This is only valid if `type() == IonTypes.STRING`
