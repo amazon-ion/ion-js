@@ -44,6 +44,14 @@ class IonTextReaderTests {
         assert.equal(ionReader.value(), true);
     }
 
+    @test "Read clob value"() {
+        let ionToRead = '{{"\\xc2\\x80"}}';
+        let ionReader = ion.makeReader(ionToRead);
+        ionReader.next();
+
+        assert.deepEqual(ionReader.value(), Uint8Array.from([194, 128]));
+    }
+
     @test "Read boolean value in struct"() {
         let ionToRead = "{ a: false }";
         let ionReader = ion.makeReader(ionToRead);

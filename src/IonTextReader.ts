@@ -40,6 +40,8 @@ const BEGINNING_OF_CONTAINER = -2; // cloned from IonParserTextRaw
 const EOF = -1;
 const T_IDENTIFIER = 9;
 const T_STRING1 = 11;
+const T_CLOB2 = 14;
+const T_CLOB3 = 15;
 const T_STRUCT = 19;
 
 export class TextReader implements Reader {
@@ -68,8 +70,11 @@ export class TextReader implements Reader {
   load_raw() {
     let t: TextReader = this;
     if (t._raw !== undefined) return;
-    t._raw = t._parser.get_value_as_string(t._raw_type);
-    return;
+    if (t._raw_type === T_CLOB2 || t._raw_type === T_CLOB3) {
+        t._raw = t._parser.get_value_as_uint8array(t._raw_type);
+    } else {
+        t._raw = t._parser.get_value_as_string(t._raw_type);
+    }
   }
 
   skip_past_container() {
@@ -265,7 +270,7 @@ export class TextReader implements Reader {
                 if (this.isNull()) {
                     return null;
                 }
-                return encodeUtf8(this._raw);
+                return this._raw;
         }
         throw new Error('Current value is not a blob or clob.');
     }

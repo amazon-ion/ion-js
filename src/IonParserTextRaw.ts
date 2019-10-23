@@ -1035,7 +1035,6 @@ export class ParserTextRaw {
     get_value_as_string(t: number) : string {
         let index : number;
         let ch : number;
-        let escaped : number;
         let s : string = "";
         switch (t) {
             case T_NULL:
@@ -1096,45 +1095,54 @@ export class ParserTextRaw {
                     }
                 }
                 break;
+            default:
+                throw new Error("can't get this value as a string");
+        }
+        return s;
+    }
+
+    get_value_as_uint8array(t: number) : Uint8Array {
+        let bytes = [];
+        switch (t) {
             case T_CLOB2:
-                for (index = this._start; index < this._end; index++) {
-                    ch = this._in.valueAt(index);
-                    if (ch == CH_BS) {
-                        s += String.fromCharCode(this.readClobEscapes(index, this._end));
+                for (let index = this._start; index < this._end; index++) {
+                    let ch = this._in.valueAt(index);
+                    if (ch === CH_BS) {
+                        bytes.push(this.readClobEscapes(index, this._end));
                         index += this._esc_len;
-                    } else if (ch < 128){
-                        s += String.fromCharCode(ch);
+                    } else if (ch < 128) {
+                        bytes.push(ch);
                     } else {
                         throw new Error("Non-Ascii values illegal within clob.");
                     }
                 }
                 break;
             case T_CLOB3:
-                for(index = this._start; index < this._end; index++) {
-                    ch = this._in.valueAt(index);
-                    if(ch === CH_BS) {
-                        escaped = this.readClobEscapes(index, this._end);
+                for (let index = this._start; index < this._end; index++) {
+                    let ch = this._in.valueAt(index);
+                    if (ch === CH_BS) {
+                        let escaped = this.readClobEscapes(index, this._end);
                         if (escaped >= 0) {
-                            s += String.fromCharCode(escaped);
+                            bytes.push(escaped);
                         }
                         index += this._esc_len;
-                    } else if ( ch === CH_SQ) {
+                    } else if (ch === CH_SQ) {
                         if (this.verifyTriple(index)) {
                             index = this._skip_triple_quote_gap(index, this._end, /*acceptComments*/ false);
                         } else {
-                            s += String.fromCharCode(ch);
+                            bytes.push(ch);
                         }
-                    } else if (ch < 128){
-                        s += String.fromCharCode(ch);
+                    } else if (ch < 128) {
+                        bytes.push(ch);
                     } else {
                         throw new Error("Non-Ascii values illegal within clob.");
                     }
                 }
                 break;
             default:
-                throw new Error("can't get this value as a string");
+                throw new Error("can't get this value as a Uint8Array");
         }
-        return s;
+        return Uint8Array.from(bytes);
     }
 
   private indexWhiteSpace(index : number, acceptComments : boolean) : number {
