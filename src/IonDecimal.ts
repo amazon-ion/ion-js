@@ -135,6 +135,11 @@ export class Decimal {
     private _initialize(isNegative: boolean, coefficient: JSBI, exponent: number) {
         this._isNegative = isNegative;
         this._coefficient = coefficient;
+        // If the exponent is -0, set it to 0, which is equivalent.
+        // See: https://github.com/amzn/ion-js/issues/474
+        if (Object.is(-0, exponent)) {
+            exponent = 0;
+        }
         this._exponent = exponent;
     }
 

@@ -75,8 +75,8 @@ function testCompareTo(decimalString1, decimalString2, expected) {
 let decimalParsingTests = [
     {inputString: '0d0', coefficient: '0', exponent: 0, numberValue: 0, text: '0'},
     {inputString: '-0d0', coefficient: '-0', exponent: 0, numberValue: -0, text: '-0'},
-    {inputString: '0d-0', coefficient: '0', exponent: -0, numberValue: 0, text: '0'},
-    {inputString: '-0d-0', coefficient: '-0', exponent: -0, numberValue: -0, text: '-0'},
+    {inputString: '0d-0', coefficient: '0', exponent: 0, numberValue: 0, text: '0'},
+    {inputString: '-0d-0', coefficient: '-0', exponent: 0, numberValue: -0, text: '-0'},
     {inputString: '0.', coefficient: '0', exponent: 0, numberValue: 0, text: '0'},
     {inputString: '-0.', coefficient: '-0', exponent: 0, numberValue: -0, text: '-0'},
     {inputString: '0d5', coefficient: '0', exponent: 5, numberValue: 0, text: '0E+5'},
@@ -179,13 +179,13 @@ let decimalEqualsTests: ({input1: string, input2: string, expected: boolean, ski
     {input1: '0', input2: '0d1', expected: false},
     {input1: '0', input2: '0d-1', expected: false},
 
-    {input1: '0', input2: '0d-0', expected: false},
+    {input1: '0', input2: '0d-0', expected: true},
     {input1: '-0', input2: '-0', expected: true},
     {input1: '-0', input2: '-0d0', expected: true},
 
     {input1: '-0', input2: '-0d1', expected: false},
     {input1: '-0', input2: '-0d-1', expected: false},
-    {input1: '-0', input2: '-0d-0', expected: false},
+    {input1: '-0', input2: '-0d-0', expected: true},
 
     {input1: '0', input2: '-0', expected: false},
     {input1: '0', input2: '-0d0', expected: false},

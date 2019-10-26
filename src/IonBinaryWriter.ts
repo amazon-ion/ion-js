@@ -133,6 +133,7 @@ export class BinaryWriter extends AbstractWriter {
 
     let exponent: number = value.getExponent();
     let coefficient: JSBI = value.getCoefficient();
+
     let isPositiveZero: boolean = JSBI.equal(coefficient, JsbiSupport.ZERO) && !value.isNegative();
     if (isPositiveZero && exponent === 0 && _sign(exponent) === 1) {
       // Special case per the spec: http://amzn.github.io/ion-docs/docs/binary.html#5-decimal
