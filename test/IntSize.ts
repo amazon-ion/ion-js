@@ -67,16 +67,14 @@ describe('IntSize', () => {
             assert.equal(reader.intSize(), IntSize.Number);
         });
 
-        // FIXME: https://github.com/amzn/ion-js/issues/464
-        it.skip('> MAX_SAFE_INTEGER: IntSize.BigInt', () => {
+        it('> MAX_SAFE_INTEGER: IntSize.BigInt', () => {
             let value = JSBI.add(JSBI.BigInt(Number.MAX_SAFE_INTEGER), JSBI.BigInt(1));
             let reader = ion.makeReader(intToBinaryIonBytes(value));
             assert.equal(IonTypes.INT, reader.next());
             assert.equal(reader.intSize(), IntSize.BigInt);
         });
-
-        // FIXME: https://github.com/amzn/ion-js/issues/464
-        it.skip('< MIN_SAFE_INTEGER: IntSize.BigInt', () => {
+        
+        it('< MIN_SAFE_INTEGER: IntSize.BigInt', () => {
             let value = JSBI.subtract(JSBI.BigInt(Number.MIN_SAFE_INTEGER), JSBI.BigInt(1));
             let reader = ion.makeReader(intToBinaryIonBytes(value));
             assert.equal(IonTypes.INT, reader.next());
