@@ -11,19 +11,19 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-import { asAscii } from "./IonText";
+import {asAscii} from "./IonText";
 
 export class Symbol {
-  sid: number;
-  name: string;
+    sid: number;
+    name: string;
 
-  constructor(id: number, val: string) {
-    this.sid = id;
-    this.name = val;
-  }
+    constructor(id: number, val: string) {
+        this.sid = id;
+        this.name = val;
+    }
 
-  toString() : string {
-    var s = "sym::{id:" + asAscii(this.sid) + ",val:\"" + asAscii(this.name) + "\"";
-    return s;
-  }
+    toString(): string {
+        var s = "sym::{id:" + asAscii(this.sid) + ",val:\"" + asAscii(this.name) + "\"";
+        return s;
+    }
 }

@@ -29,12 +29,11 @@ import {Reader} from "./IonReader";
 import {StringSpan} from "./IonSpan";
 import {Timestamp} from "./IonTimestamp";
 import {fromBase64} from "./IonText";
-import {encodeUtf8} from "./IonUnicode";
 import JSBI from "jsbi";
 import {JsbiSupport} from "./JsbiSupport";
 import IntSize from "./IntSize";
 
-const RAW_STRING = new IonType( -1, "raw_input", true,  false, false, false );
+const RAW_STRING = new IonType(-1, "raw_input", true, false, false, false);
 
 const BEGINNING_OF_CONTAINER = -2; // cloned from IonParserTextRaw
 const EOF = -1;
@@ -45,198 +44,198 @@ const T_CLOB3 = 15;
 const T_STRUCT = 19;
 
 export class TextReader implements Reader {
-  private _parser: ParserTextRaw;
-  private _depth: number;
-  private _cat: Catalog;
-  private _symtab: LocalSymbolTable;
-  private _type: IonType;
-  private _raw_type: number;
-  private _raw: any;
+    private _parser: ParserTextRaw;
+    private _depth: number;
+    private _cat: Catalog;
+    private _symtab: LocalSymbolTable;
+    private _type: IonType;
+    private _raw_type: number;
+    private _raw: any;
 
-  constructor(source: StringSpan, catalog?: Catalog) {
-    if (!source) {
-      throw new Error("a source Span is required to make a reader");
+    constructor(source: StringSpan, catalog?: Catalog) {
+        if (!source) {
+            throw new Error("a source Span is required to make a reader");
+        }
+
+        this._parser   = new ParserTextRaw(source);
+        this._depth    = 0;
+        this._cat      = catalog ? catalog : new Catalog();
+        this._symtab   = defaultLocalSymbolTable();
+        this._type     = null;
+        this._raw_type = undefined;
+        this._raw      = undefined;
     }
 
-    this._parser   = new ParserTextRaw(source);
-    this._depth    = 0;
-    this._cat      = catalog ? catalog : new Catalog();
-    this._symtab   = defaultLocalSymbolTable();
-    this._type     = null;
-    this._raw_type = undefined;
-    this._raw      = undefined;
-  }
-
-  load_raw() {
-    let t: TextReader = this;
-    if (t._raw !== undefined) return;
-    if (t._raw_type === T_CLOB2 || t._raw_type === T_CLOB3) {
-        t._raw = t._parser.get_value_as_uint8array(t._raw_type);
-    } else {
-        t._raw = t._parser.get_value_as_string(t._raw_type);
-    }
-  }
-
-  skip_past_container() {
-    let type;
-    let d = this.depth();  // we want to have read the EOC that matches the container we just saw
-    this.stepIn();
-    while (this.depth() > d) {
-      type = this.next();
-      if (type === null) { // end of container
-          this.stepOut();
-      } else if (type.isContainer && !this.isNull()) {
-          this.stepIn();
-      }
-    }
-  }
-
-  isIVM(input : string, depth : number, annotations : string[]) : boolean {
-    if (depth > 0) return false;
-    const ivm = "$ion_1_0";
-    const prefix = "$ion_";
-    if (input.length < ivm.length || annotations.length > 0) return false;
-
-    let i = 0;
-
-    while (i < prefix.length) {
-      if (prefix.charAt(i) !== input.charAt(i)) return false;
-      i++;
-    }
-
-    while (i < input.length && input.charAt(i) != '_') {
-      let ch = input.charAt(i);
-      if (ch < '0' || ch > '9') return false;
-      i++;
-    }
-    i++;
-
-    while (i < input.length) {
-      let ch = input.charAt(i);
-      if (ch < '0' || ch > '9') return false;
-      i++;
-    }
-    if (input !== ivm) throw new Error("Only Ion version 1.0 is supported.");
-    return true;
-  }
-
-    isLikeIVM() : boolean {
-      return false;
-    }
-
-  next() {
-    this._raw = undefined;
-    if (this._raw_type === EOF) return null;
-
-    let should_skip: boolean =
-    this._raw_type !== BEGINNING_OF_CONTAINER
-    && !this.isNull()
-    && this._type
-    && this._type.isContainer;
-    if (should_skip) this.skip_past_container();
-
-    let p: ParserTextRaw = this._parser;
-    for (;;) {
-        this._raw_type = p.next();
-        if (this._raw_type === T_IDENTIFIER) {
-            if (this._depth > 0) break;
-            this.load_raw();
-            if (!this.isIVM(this._raw, this.depth(), this.annotations())) break;
-            this._symtab = defaultLocalSymbolTable();
-            this._raw = undefined;
-            this._raw_type = undefined;
-        }else if (this._raw_type === T_STRING1) {
-            if (this._depth > 0) break;
-            this.load_raw();
-            if (this._raw !== "$ion_1_0") break;
-            this._raw = undefined;
-            this._raw_type = undefined;
-        } else if (this._raw_type === T_STRUCT) {
-            if (p.annotations().length !== 1) break;
-            if (p.annotations()[0] != ion_symbol_table) break;
-            this._type = get_ion_type(this._raw_type);
-            this._symtab = makeSymbolTable(this._cat, this);
-            this._raw = undefined;
-            this._raw_type = undefined;
+    load_raw() {
+        let t: TextReader = this;
+        if (t._raw !== undefined) return;
+        if (t._raw_type === T_CLOB2 || t._raw_type === T_CLOB3) {
+            t._raw = t._parser.get_value_as_uint8array(t._raw_type);
         } else {
-            break;
+            t._raw = t._parser.get_value_as_string(t._raw_type);
         }
     }
 
-    // for system value (IVM's and symbol table's) we continue
-    // around this
-    this._type = get_ion_type(this._raw_type);
-    return this._type;
-  }
-
-  stepIn() {
-    if (!this._type.isContainer) {
-      throw new Error("can't step in to a scalar value");
+    skip_past_container() {
+        let type;
+        let d = this.depth();  // we want to have read the EOC that matches the container we just saw
+        this.stepIn();
+        while (this.depth() > d) {
+            type = this.next();
+            if (type === null) { // end of container
+                this.stepOut();
+            } else if (type.isContainer && !this.isNull()) {
+                this.stepIn();
+            }
+        }
     }
-    if (this.isNull()) {
-      throw new Error("Can't step into a null container");
+
+    isIVM(input: string, depth: number, annotations: string[]): boolean {
+        if (depth > 0) return false;
+        const ivm = "$ion_1_0";
+        const prefix = "$ion_";
+        if (input.length < ivm.length || annotations.length > 0) return false;
+
+        let i = 0;
+
+        while (i < prefix.length) {
+            if (prefix.charAt(i) !== input.charAt(i)) return false;
+            i++;
+        }
+
+        while (i < input.length && input.charAt(i) != '_') {
+            let ch = input.charAt(i);
+            if (ch < '0' || ch > '9') return false;
+            i++;
+        }
+        i++;
+
+        while (i < input.length) {
+            let ch = input.charAt(i);
+            if (ch < '0' || ch > '9') return false;
+            i++;
+        }
+        if (input !== ivm) throw new Error("Only Ion version 1.0 is supported.");
+        return true;
     }
-    this._parser.clearFieldName();
-    this._type = null;
-    this._raw_type = BEGINNING_OF_CONTAINER;
-    this._depth++;
-  }
 
-  stepOut() {
-    this._parser.clearFieldName();
-    while ( this._raw_type != EOF ) {
-      this.next();
+    isLikeIVM(): boolean {
+        return false;
     }
-    this._raw_type = undefined;
-    this._depth--;
-  }
 
-  type() : IonType {
-    return this._type;
-  }
+    next() {
+        this._raw = undefined;
+        if (this._raw_type === EOF) return null;
 
-  depth() : number {
-    return this._depth;
-  }
+        let should_skip: boolean =
+            this._raw_type !== BEGINNING_OF_CONTAINER
+            && !this.isNull()
+            && this._type
+            && this._type.isContainer;
+        if (should_skip) this.skip_past_container();
 
-    fieldName() : string {
+        let p: ParserTextRaw = this._parser;
+        for (; ;) {
+            this._raw_type = p.next();
+            if (this._raw_type === T_IDENTIFIER) {
+                if (this._depth > 0) break;
+                this.load_raw();
+                if (!this.isIVM(this._raw, this.depth(), this.annotations())) break;
+                this._symtab = defaultLocalSymbolTable();
+                this._raw = undefined;
+                this._raw_type = undefined;
+            } else if (this._raw_type === T_STRING1) {
+                if (this._depth > 0) break;
+                this.load_raw();
+                if (this._raw !== "$ion_1_0") break;
+                this._raw = undefined;
+                this._raw_type = undefined;
+            } else if (this._raw_type === T_STRUCT) {
+                if (p.annotations().length !== 1) break;
+                if (p.annotations()[0] != ion_symbol_table) break;
+                this._type = get_ion_type(this._raw_type);
+                this._symtab = makeSymbolTable(this._cat, this);
+                this._raw = undefined;
+                this._raw_type = undefined;
+            } else {
+                break;
+            }
+        }
+
+        // for system value (IVM's and symbol table's) we continue
+        // around this
+        this._type = get_ion_type(this._raw_type);
+        return this._type;
+    }
+
+    stepIn() {
+        if (!this._type.isContainer) {
+            throw new Error("can't step in to a scalar value");
+        }
+        if (this.isNull()) {
+            throw new Error("Can't step into a null container");
+        }
+        this._parser.clearFieldName();
+        this._type = null;
+        this._raw_type = BEGINNING_OF_CONTAINER;
+        this._depth++;
+    }
+
+    stepOut() {
+        this._parser.clearFieldName();
+        while (this._raw_type != EOF) {
+            this.next();
+        }
+        this._raw_type = undefined;
+        this._depth--;
+    }
+
+    type(): IonType {
+        return this._type;
+    }
+
+    depth(): number {
+        return this._depth;
+    }
+
+    fieldName(): string {
         let str = this._parser.fieldName();
         let raw_type = this._parser.fieldNameType();
-        if(raw_type === T_IDENTIFIER && (str.length > 1 && str.charAt(0) === '$'.charAt(0))) {
+        if (raw_type === T_IDENTIFIER && (str.length > 1 && str.charAt(0) === '$'.charAt(0))) {
             let tempStr = str.substr(1, str.length);
             if (+tempStr === +tempStr) {//look up sid, +str === +str is a one line is integer hack
                 let symbol = this._symtab.getSymbolText(Number(tempStr));
-                if(symbol === undefined) throw new Error("Unresolveable symbol ID, symboltokens unsupported.");
+                if (symbol === undefined) throw new Error("Unresolveable symbol ID, symboltokens unsupported.");
                 return symbol;
             }
         }
         return str;
     }
 
-  annotations() : string[] {
-    return this._parser.annotations();
-  }
+    annotations(): string[] {
+        return this._parser.annotations();
+    }
 
-  isNull() : boolean {
-    if (this._type === IonTypes.NULL) return true;
-    return this._parser.isNull();
-  }
+    isNull(): boolean {
+        if (this._type === IonTypes.NULL) return true;
+        return this._parser.isNull();
+    }
 
-    _stringRepresentation() : string {
+    _stringRepresentation(): string {
         this.load_raw();
         if (this.isNull()) return (this._type === IonTypes.NULL) ? "null" : "null." + this._type.name;
         if (this._type.isScalar) {
             // BLOB is a scalar by you don't want to just use the string
             // value otherwise all other scalars are fine as is
-            switch(this._type) {
+            switch (this._type) {
                 case IonTypes.BLOB:
                     return this._raw;
                 case IonTypes.SYMBOL:
-                    if(this._raw_type === T_IDENTIFIER && (this._raw.length > 1 && this._raw.charAt(0) === '$'.charAt(0))){
+                    if (this._raw_type === T_IDENTIFIER && (this._raw.length > 1 && this._raw.charAt(0) === '$'.charAt(0))) {
                         let tempStr = this._raw.substr(1, this._raw.length);
                         if (+tempStr === +tempStr) {//look up sid, +str === +str is a one line is integer hack
                             let symbol = this._symtab.getSymbolText(Number(tempStr));
-                            if(symbol === undefined) throw new Error("Unresolvable symbol ID, symboltokens unsupported.");
+                            if (symbol === undefined) throw new Error("Unresolvable symbol ID, symboltokens unsupported.");
                             return symbol;
                         }
                     }
@@ -251,8 +250,10 @@ export class TextReader implements Reader {
 
     booleanValue() {
         switch (this._type) {
-            case IonTypes.NULL: return null;
-            case IonTypes.BOOL: return this._parser.booleanValue();
+            case IonTypes.NULL:
+                return null;
+            case IonTypes.BOOL:
+                return this._parser.booleanValue();
         }
         throw new Error('Current value is not a Boolean.')
     }
@@ -260,7 +261,8 @@ export class TextReader implements Reader {
     byteValue(): Uint8Array {
         this.load_raw();
         switch (this._type) {
-            case IonTypes.NULL: return null;
+            case IonTypes.NULL:
+                return null;
             case IonTypes.BLOB:
                 if (this.isNull()) {
                     return null;
@@ -275,42 +277,49 @@ export class TextReader implements Reader {
         throw new Error('Current value is not a blob or clob.');
     }
 
-    decimalValue() : Decimal {
+    decimalValue(): Decimal {
         switch (this._type) {
-            case IonTypes.NULL: return null;
-            case IonTypes.DECIMAL: return Decimal.parse(this._stringRepresentation());
+            case IonTypes.NULL:
+                return null;
+            case IonTypes.DECIMAL:
+                return Decimal.parse(this._stringRepresentation());
         }
         throw new Error('Current value is not a decimal.')
     }
 
     bigIntValue(): JSBI {
         switch (this._type) {
-            case IonTypes.NULL: return null;
-            case IonTypes.INT: return this._parser.bigIntValue();
+            case IonTypes.NULL:
+                return null;
+            case IonTypes.INT:
+                return this._parser.bigIntValue();
         }
         throw new Error('bigIntValue() was called when the current value was a(n) ' + this._type.name);
     }
 
     intSize(): IntSize {
-      if (JsbiSupport.isSafeInteger(this.bigIntValue())) {
-          return IntSize.Number;
-      }
-      return IntSize.BigInt;
+        if (JsbiSupport.isSafeInteger(this.bigIntValue())) {
+            return IntSize.Number;
+        }
+        return IntSize.BigInt;
     }
 
     numberValue(): number {
         switch (this._type) {
-            case IonTypes.NULL: return null;
+            case IonTypes.NULL:
+                return null;
             case IonTypes.FLOAT:
-            case IonTypes.INT: return this._parser.numberValue();
+            case IonTypes.INT:
+                return this._parser.numberValue();
         }
         throw new Error('Current value is not a float or int.');
     }
 
-    stringValue() : string {
+    stringValue(): string {
         this.load_raw();
         switch (this._type) {
-            case IonTypes.NULL: return null;
+            case IonTypes.NULL:
+                return null;
             case IonTypes.STRING:
                 if (this._parser.isNull()) {
                     return null;
@@ -320,12 +329,12 @@ export class TextReader implements Reader {
                 if (this._parser.isNull()) {
                     return null;
                 }
-                if(this._raw_type === T_IDENTIFIER && (this._raw.length > 1 && this._raw.charAt(0) === '$'.charAt(0))){
+                if (this._raw_type === T_IDENTIFIER && (this._raw.length > 1 && this._raw.charAt(0) === '$'.charAt(0))) {
                     let tempStr = this._raw.substr(1, this._raw.length);
                     if (+tempStr === +tempStr) {//look up sid, +str === +str is a one line is integer hack
                         let symbolId = Number(tempStr);
                         let symbol = this._symtab.getSymbolText(symbolId);
-                        if(symbol === undefined) throw new Error("Unresolvable symbol ID, symboltokens unsupported.");
+                        if (symbol === undefined) throw new Error("Unresolvable symbol ID, symboltokens unsupported.");
                         return symbol;
                     }
                 }
@@ -334,9 +343,10 @@ export class TextReader implements Reader {
         throw new Error('Current value is not a string or symbol.');
     }
 
-    timestampValue() : Timestamp {
+    timestampValue(): Timestamp {
         switch (this._type) {
-            case IonTypes.NULL: return null;
+            case IonTypes.NULL:
+                return null;
             case IonTypes.TIMESTAMP:
                 return Timestamp.parse(this._stringRepresentation());
         }
@@ -350,7 +360,7 @@ export class TextReader implements Reader {
             }
             throw new Error('Unable to provide a value for ' + this._type.name + ' containers.');
         }
-        switch(this._type) {
+        switch (this._type) {
             case IonTypes.NULL:
                 return null;
             case IonTypes.BLOB:
@@ -373,4 +383,4 @@ export class TextReader implements Reader {
                 throw new Error('There is no current value.');
         }
     }
-};
+}

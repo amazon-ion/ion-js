@@ -14,4 +14,6 @@
 /**
  * An interface representing a map of symbol names to symbol ids.
  */
-export interface SymbolIndex { [name: string]: number }
+export interface SymbolIndex {
+    [name: string]: number
+}

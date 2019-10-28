@@ -18,52 +18,53 @@
  */
 export class SharedSymbolTable {
 
-  protected _numberOfSymbols: number;
-  protected readonly _idsByText: Map<string, number>;
+    protected readonly _idsByText: Map<string, number>;
 
-  constructor(
-    private readonly _name: string,
-    private readonly _version: number,
-    private readonly _symbols: string[]
-  ) {
-    this._idsByText = new Map<string, number>();
-    this._numberOfSymbols = this._symbols.length;
-    // Iterate through the symbol array in reverse order so if the same string appears more than
-    // once the smaller symbol ID is stored.
-    for (let m = _symbols.length - 1; m >= 0; m--) {
-      this._idsByText[_symbols[m]] = m;
+    constructor(
+        private readonly _name: string,
+        private readonly _version: number,
+        private readonly _symbols: string[]
+    ) {
+        this._idsByText = new Map<string, number>();
+        this._numberOfSymbols = this._symbols.length;
+        // Iterate through the symbol array in reverse order so if the same string appears more than
+        // once the smaller symbol ID is stored.
+        for (let m = _symbols.length - 1; m >= 0; m--) {
+            this._idsByText[_symbols[m]] = m;
+        }
     }
-  }
 
-  getSymbolText(symbolId: number): string {
-    if (symbolId < 0) {
-      throw new Error(
-          `Index ${symbolId} is out of bounds for the SharedSymbolTable name=${this.name}, version=${this.version}`
-      );
+    protected _numberOfSymbols: number;
+
+    get numberOfSymbols(): number {
+        return this._numberOfSymbols;
     }
-    if (symbolId >= this.numberOfSymbols) {
-      return undefined;
+
+    get name(): string {
+        return this._name;
     }
-    return this._symbols[symbolId];
-  }
 
-  getSymbolId(text: string): number {
-    let symbolId = this._idsByText[text];
-    if (symbolId === undefined) {
-      return null;
+    get version(): number {
+        return this._version;
     }
-    return symbolId;
-  }
 
-  get name() : string {
-    return this._name;
-  }
+    getSymbolText(symbolId: number): string {
+        if (symbolId < 0) {
+            throw new Error(
+                `Index ${symbolId} is out of bounds for the SharedSymbolTable name=${this.name}, version=${this.version}`
+            );
+        }
+        if (symbolId >= this.numberOfSymbols) {
+            return undefined;
+        }
+        return this._symbols[symbolId];
+    }
 
-  get version() : number {
-    return this._version;
-  }
-
-  get numberOfSymbols(): number {
-    return this._numberOfSymbols;
-  }
+    getSymbolId(text: string): number {
+        let symbolId = this._idsByText[text];
+        if (symbolId === undefined) {
+            return null;
+        }
+        return symbolId;
+    }
 }

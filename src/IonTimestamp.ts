@@ -41,26 +41,13 @@ export class Timestamp {
     private static _MIN_YEAR = 1;
     private static _MAX_YEAR = 9999;
     private static _MIN_OFFSET = -23 * 60 - 59;
-    private static _MAX_OFFSET =  23 * 60 + 59;
-
-    /**
-     * Parses a string and returns a corresponding Timestamp object.
-     * The provided string must be a text-encoded Timestamp as specified
-     * in the Ion specification.
-     *
-     * @see https://amzn.github.io/ion-docs/docs/spec.html#timestamp
-     */
-    static parse(str: string) : Timestamp {
-        return _TimestampParser._parse(str);
-    }
-
-    private readonly _localOffset : number;
-    private readonly _year : number;
-    private readonly _month? : number;
-    private readonly _day? : number;
-    private readonly _hour? : number;
-    private readonly _minutes? : number;
-
+    private static _MAX_OFFSET = 23 * 60 + 59;
+    private readonly _localOffset: number;
+    private readonly _year: number;
+    private readonly _month?: number;
+    private readonly _day?: number;
+    private readonly _hour?: number;
+    private readonly _minutes?: number;
     private _precision: TimestampPrecision;
     private readonly _secondsDecimal: Decimal;
 
@@ -82,13 +69,13 @@ export class Timestamp {
      *                or a Decimal (range: [0.0-60.0)) in order to express whole seconds
      *                along with some fractional seconds
      */
-    constructor(localOffset : number,
-                year : number,
-                month? : number,
-                day? : number,
-                hour? : number,
-                minutes? : number,
-                seconds? : number | Decimal) {
+    constructor(localOffset: number,
+                year: number,
+                month?: number,
+                day?: number,
+                hour?: number,
+                minutes?: number,
+                seconds?: number | Decimal) {
 
         this._localOffset = localOffset;
         this._year = year;
@@ -142,71 +129,109 @@ export class Timestamp {
         this._checkFieldRange('Year', utcYear, Timestamp._MIN_YEAR, Timestamp._MAX_YEAR);
     }
 
-    private _checkRequiredField(fieldName: string, value: number, min: number, max: number) {
-        if (!_hasValue(value)) {
-            throw new Error(`${fieldName} cannot be ${value}`);
-        }
-        this._checkFieldRange(fieldName, value, min, max);
-    }
-
-    private _checkOptionalField(fieldName: string, value: number,
-                                min: number, max: number, defaultValue: number,
-                                precision: TimestampPrecision) : number {
-        if (!_hasValue(value)) {
-            return defaultValue;
-        }
-        this._checkFieldRange(fieldName, value, min, max);
-        this._precision = precision;
-        return value;
-    }
-
-    private _checkFieldRange(fieldName: string, value: number | Decimal, min: number | Decimal, max: number | Decimal) {
-        if (value instanceof Decimal) {
-            if (_hasValue(value)
-                    && (value.compareTo(min as Decimal) < 0
-                     || value.compareTo(max as Decimal) >= 0)) {
-                throw new Error(`${fieldName} ${value} must be between ${min} inclusive, and ${max} exclusive`);
-            }
-        } else {
-            if (!Number.isInteger(value)) {
-                throw new Error(`${fieldName} ${value} must be an integer`);
-            }
-            if (value < min || value > max) {
-                throw new Error(`${fieldName} ${value} must be between ${min} and ${max} inclusive`);
-            }
-        }
+    /**
+     * Parses a string and returns a corresponding Timestamp object.
+     * The provided string must be a text-encoded Timestamp as specified
+     * in the Ion specification.
+     *
+     * @see https://amzn.github.io/ion-docs/docs/spec.html#timestamp
+     */
+    static parse(str: string): Timestamp {
+        return _TimestampParser._parse(str);
     }
 
     /**
-     * For all years between 1 and 9999, inclusive, the result of this method agrees with
-     * that produced by the following Java code:
-     *
-     *     new java.util.GregorianCalendar().isLeapYear(year)
+     * For a year < 100, JavaScript Date's default behavior automatically adds 1900;
+     * this method compensates for that behavior
+     * @hidden
      */
-    private _isLeapYear(year: number) : boolean {
-        if (year % 4 !== 0) {
-            return false;
+    static _adjustMsSinceEpochIfNeeded(year: number, msSinceEpoch: number): number {
+        if (year >= 100) {
+            return msSinceEpoch;
         }
-        if (year % 400 === 0) {
-            return true;
+
+        let date = new Date(msSinceEpoch);
+        date.setUTCFullYear(year);     // yes, we really do mean some year < 100
+        return date.getTime();
+    }
+
+    /**
+     * Splits secondsDecimal into two strings representing the whole and fractional portions of the decimal.
+     * @hidden
+     */
+    static _splitSecondsDecimal(secondsDecimal: Decimal): [string, string] {
+        let coefStr = secondsDecimal.getCoefficient().toString();
+        let exp = secondsDecimal.getExponent();
+        let secondsStr = '';
+        let fractionStr = '';
+        if (exp < 0) {
+            let idx = Math.max(coefStr.length + exp, 0);
+            secondsStr = coefStr.substr(0, idx);
+            fractionStr = coefStr.substr(idx);
+            if (-secondsDecimal.getExponent() - coefStr.length > 0) {
+                fractionStr = '0'.repeat(-exp - coefStr.length) + fractionStr;
+            }
+        } else if (exp > 0) {
+            secondsStr = coefStr + '0'.repeat(exp);
+        } else {
+            secondsStr = coefStr;
         }
-        if (year % 100 === 0) {
-            return year < 1600;
+        return [secondsStr, fractionStr];
+    }
+
+    /**
+     * Enables construction of a Timestamp based on a Date.  If the correct parameters are provided,
+     * a Timestamp can be fully reconstituted as follows:
+     *
+     * ```typescript
+     * let ts = Timestamp.parse('2001-02-03T04:05:06.123456789-07:00');
+     * let date = ts.getDate();
+     * ...
+     * let ts2 = Timestamp._valueOf(date, ts.getLocalOffset(), ts._getFractionalSeconds(), ts.getPrecision());
+     * assert.deepEqual(ts2, ts);
+     * ```
+     * @hidden
+     */
+    static _valueOf(date: Date, localOffset: number, fractionalSeconds?: Decimal, precision?: TimestampPrecision): Timestamp {
+        let msSinceEpoch = date.getTime() + localOffset * 60 * 1000;
+        date = new Date(msSinceEpoch);
+
+        let secondsDecimal: Decimal;
+        if (fractionalSeconds != null) {
+            let [_, fractionStr] = Timestamp._splitSecondsDecimal(fractionalSeconds);
+            secondsDecimal = Decimal.parse(date.getUTCSeconds() + '.' + fractionStr);
+        } else {
+            secondsDecimal = Decimal.parse(date.getUTCSeconds() + '.' + date.getUTCMilliseconds());
         }
-        return true;
+
+        switch (precision) {
+            case TimestampPrecision.YEAR:
+                return new Timestamp(localOffset, date.getUTCFullYear());
+            case TimestampPrecision.MONTH:
+                return new Timestamp(localOffset, date.getUTCFullYear(), date.getUTCMonth() + 1);
+            case TimestampPrecision.DAY:
+                return new Timestamp(localOffset, date.getUTCFullYear(), date.getUTCMonth() + 1, date.getUTCDate());
+            case TimestampPrecision.HOUR_AND_MINUTE:
+                return new Timestamp(localOffset, date.getUTCFullYear(), date.getUTCMonth() + 1, date.getUTCDate(),
+                    date.getUTCHours(), date.getUTCMinutes());
+            case TimestampPrecision.SECONDS:
+            default:
+                return new Timestamp(localOffset, date.getUTCFullYear(), date.getUTCMonth() + 1, date.getUTCDate(),
+                    date.getUTCHours(), date.getUTCMinutes(), secondsDecimal);
+        }
     }
 
     /**
      * Returns this Timestamp's local offset from UTC, in minutes.
      */
-    getLocalOffset() : number {
+    getLocalOffset(): number {
         return this._localOffset;
     }
 
     /**
      * Returns the precision of this Timestamp.
      */
-    getPrecision() : TimestampPrecision {
+    getPrecision(): TimestampPrecision {
         return this._precision;
     }
 
@@ -225,15 +250,15 @@ export class Timestamp {
      * offset of the Timestamp.  The Date class also provides methods for retrieving the properties
      * of the instant in UTC.
      */
-    getDate() : Date {
+    getDate(): Date {
         let ms = null;
         if (this._precision === TimestampPrecision.SECONDS) {
             ms = Math.round((this._secondsDecimal.numberValue() - this.getSecondsInt()) * 1000);
         }
 
         let msSinceEpoch = Date.UTC(
-                this._year, (this._precision === TimestampPrecision.YEAR ? 0 : this._month - 1), this._day,
-                this._hour, this._minutes, this.getSecondsInt(), ms);
+            this._year, (this._precision === TimestampPrecision.YEAR ? 0 : this._month - 1), this._day,
+            this._hour, this._minutes, this.getSecondsInt(), ms);
 
         msSinceEpoch = Timestamp._adjustMsSinceEpochIfNeeded(this._year, msSinceEpoch);
 
@@ -242,31 +267,16 @@ export class Timestamp {
     }
 
     /**
-     * For a year < 100, JavaScript Date's default behavior automatically adds 1900;
-     * this method compensates for that behavior
-     * @hidden
-     */
-    static _adjustMsSinceEpochIfNeeded(year: number, msSinceEpoch: number) : number {
-        if (year >= 100) {
-            return msSinceEpoch;
-        }
-
-        let date = new Date(msSinceEpoch);
-        date.setUTCFullYear(year);     // yes, we really do mean some year < 100
-        return date.getTime();
-    }
-
-    /**
      * Returns the number of seconds as an integer value; any fractional seconds are truncated.
      */
-    getSecondsInt() : number {
+    getSecondsInt(): number {
         return this._secondsDecimal.intValue();
     }
 
     /**
      * Returns a decimal representing the number of seconds (including fractional seconds).
      */
-    getSecondsDecimal() : Decimal {
+    getSecondsDecimal(): Decimal {
         return this._secondsDecimal;
     }
 
@@ -274,7 +284,7 @@ export class Timestamp {
      * Returns a decimal representing only the fractional seconds.
      * @hidden
      */
-    _getFractionalSeconds() : Decimal {
+    _getFractionalSeconds(): Decimal {
         let [_, fractionStr] = Timestamp._splitSecondsDecimal(this._secondsDecimal);
         if (fractionStr === '') {
             return Decimal.ZERO;
@@ -287,7 +297,7 @@ export class Timestamp {
      * and have the same precision.  Note that this differs from compareTo(), which doesn't require
      * precision to match when returning 0.
      */
-    equals(that : Timestamp) : boolean {
+    equals(that: Timestamp): boolean {
         return this.getPrecision() === that.getPrecision()
             && this.getLocalOffset() === that.getLocalOffset()
             && _sign(this.getLocalOffset()) === _sign(that.getLocalOffset())
@@ -312,7 +322,7 @@ export class Timestamp {
      *   | 2001T                    | 2001-01-01T00:00:00.000Z |     0     | false  |
      *   | 2001-01-01T00:00Z        | 2000-12-31T23:59-00:01   |     0     | false  |
      */
-    compareTo(that : Timestamp) : number {
+    compareTo(that: Timestamp): number {
         let thisMs = this.getDate().getTime();
         let thatMs = that.getDate().getTime();
         if (thisMs === thatMs) {
@@ -322,36 +332,13 @@ export class Timestamp {
     }
 
     /**
-     * Splits secondsDecimal into two strings representing the whole and fractional portions of the decimal.
-     * @hidden
-     */
-    static _splitSecondsDecimal(secondsDecimal: Decimal) : [string, string] {
-        let coefStr = secondsDecimal.getCoefficient().toString();
-        let exp = secondsDecimal.getExponent();
-        let secondsStr = '';
-        let fractionStr = '';
-        if (exp < 0) {
-            let idx = Math.max(coefStr.length + exp, 0);
-            secondsStr = coefStr.substr(0, idx);
-            fractionStr = coefStr.substr(idx);
-            if (-secondsDecimal.getExponent() - coefStr.length > 0) {
-                fractionStr = '0'.repeat(-exp - coefStr.length) + fractionStr;
-            }
-        } else if (exp > 0) {
-            secondsStr = coefStr + '0'.repeat(exp);
-        } else {
-            secondsStr = coefStr;
-        }
-        return [secondsStr, fractionStr];
-    }
-
-    /**
      * Returns a string representation of this Timestamp.
      */
-    toString() : string {
+    toString(): string {
         let strVal: string = "";
         switch (this._precision) {
-            default: throw new Error("unrecognized timestamp precision " + this._precision);
+            default:
+                throw new Error("unrecognized timestamp precision " + this._precision);
             case TimestampPrecision.SECONDS:
                 let [secondsStr, fractionStr] = Timestamp._splitSecondsDecimal(this._secondsDecimal);
                 strVal = this._lpadZeros(secondsStr, 2);
@@ -390,54 +377,66 @@ export class Timestamp {
         return strVal;
     }
 
-    private _lpadZeros(v: number | string, size: number) : string {
+    private _checkRequiredField(fieldName: string, value: number, min: number, max: number) {
+        if (!_hasValue(value)) {
+            throw new Error(`${fieldName} cannot be ${value}`);
+        }
+        this._checkFieldRange(fieldName, value, min, max);
+    }
+
+    private _checkOptionalField(fieldName: string, value: number,
+                                min: number, max: number, defaultValue: number,
+                                precision: TimestampPrecision): number {
+        if (!_hasValue(value)) {
+            return defaultValue;
+        }
+        this._checkFieldRange(fieldName, value, min, max);
+        this._precision = precision;
+        return value;
+    }
+
+    private _checkFieldRange(fieldName: string, value: number | Decimal, min: number | Decimal, max: number | Decimal) {
+        if (value instanceof Decimal) {
+            if (_hasValue(value)
+                && (value.compareTo(min as Decimal) < 0
+                    || value.compareTo(max as Decimal) >= 0)) {
+                throw new Error(`${fieldName} ${value} must be between ${min} inclusive, and ${max} exclusive`);
+            }
+        } else {
+            if (!Number.isInteger(value)) {
+                throw new Error(`${fieldName} ${value} must be an integer`);
+            }
+            if (value < min || value > max) {
+                throw new Error(`${fieldName} ${value} must be between ${min} and ${max} inclusive`);
+            }
+        }
+    }
+
+    /**
+     * For all years between 1 and 9999, inclusive, the result of this method agrees with
+     * that produced by the following Java code:
+     *
+     *     new java.util.GregorianCalendar().isLeapYear(year)
+     */
+    private _isLeapYear(year: number): boolean {
+        if (year % 4 !== 0) {
+            return false;
+        }
+        if (year % 400 === 0) {
+            return true;
+        }
+        if (year % 100 === 0) {
+            return year < 1600;
+        }
+        return true;
+    }
+
+    private _lpadZeros(v: number | string, size: number): string {
         let s = v.toString();
         if (s.length <= size) {
             return '0'.repeat(size - s.length) + s;
         }
         throw new Error("Unable to fit '" + s + "' into " + size + " characters");
-    }
-
-    /**
-     * Enables construction of a Timestamp based on a Date.  If the correct parameters are provided,
-     * a Timestamp can be fully reconstituted as follows:
-     *
-     * ```typescript
-     * let ts = Timestamp.parse('2001-02-03T04:05:06.123456789-07:00');
-     * let date = ts.getDate();
-     * ...
-     * let ts2 = Timestamp._valueOf(date, ts.getLocalOffset(), ts._getFractionalSeconds(), ts.getPrecision());
-     * assert.deepEqual(ts2, ts);
-     * ```
-     * @hidden
-     */
-    static _valueOf(date: Date, localOffset: number, fractionalSeconds?: Decimal, precision?: TimestampPrecision) : Timestamp {
-        let msSinceEpoch = date.getTime() + localOffset * 60 * 1000;
-        date = new Date(msSinceEpoch);
-
-        let secondsDecimal: Decimal;
-        if (fractionalSeconds != null) {
-            let [_, fractionStr] = Timestamp._splitSecondsDecimal(fractionalSeconds);
-            secondsDecimal = Decimal.parse(date.getUTCSeconds() + '.' + fractionStr);
-        } else {
-            secondsDecimal = Decimal.parse(date.getUTCSeconds() + '.' + date.getUTCMilliseconds());
-        }
-
-        switch (precision) {
-            case TimestampPrecision.YEAR:
-                return new Timestamp(localOffset, date.getUTCFullYear());
-            case TimestampPrecision.MONTH:
-                return new Timestamp(localOffset, date.getUTCFullYear(), date.getUTCMonth() + 1);
-            case TimestampPrecision.DAY:
-                return new Timestamp(localOffset, date.getUTCFullYear(), date.getUTCMonth() + 1, date.getUTCDate());
-            case TimestampPrecision.HOUR_AND_MINUTE:
-                return new Timestamp(localOffset, date.getUTCFullYear(), date.getUTCMonth() + 1, date.getUTCDate(),
-                    date.getUTCHours(), date.getUTCMinutes());
-            case TimestampPrecision.SECONDS:
-            default:
-                return new Timestamp(localOffset, date.getUTCFullYear(), date.getUTCMonth() + 1, date.getUTCDate(),
-                    date.getUTCHours(), date.getUTCMinutes(), secondsDecimal);
-        }
     }
 }
 
@@ -469,7 +468,8 @@ class _TimeParserState {
         public readonly f: _States,
         public readonly len: number,
         public readonly t: _TransitionMap
-    ) {}
+    ) {
+    }
 }
 
 class _TimestampParser {
@@ -483,11 +483,25 @@ class _TimestampParser {
         [_States.HOUR]:
             new _TimeParserState(_States.HOUR, 2, {":": _States.MINUTE}),
         [_States.MINUTE]:
-            new _TimeParserState(_States.MINUTE, 2, {":": _States.SECONDS, "+": _States.OFFSET_POSITIVE, "-": _States.OFFSET_NEGATIVE, "Z": _States.OFFSET_ZULU}),
+            new _TimeParserState(_States.MINUTE, 2, {
+                ":": _States.SECONDS,
+                "+": _States.OFFSET_POSITIVE,
+                "-": _States.OFFSET_NEGATIVE,
+                "Z": _States.OFFSET_ZULU
+            }),
         [_States.SECONDS]:
-            new _TimeParserState(_States.SECONDS, 2, {".": _States.FRACTIONAL_SECONDS, "+": _States.OFFSET_POSITIVE, "-": _States.OFFSET_NEGATIVE, "Z": _States.OFFSET_ZULU}),
+            new _TimeParserState(_States.SECONDS, 2, {
+                ".": _States.FRACTIONAL_SECONDS,
+                "+": _States.OFFSET_POSITIVE,
+                "-": _States.OFFSET_NEGATIVE,
+                "Z": _States.OFFSET_ZULU
+            }),
         [_States.FRACTIONAL_SECONDS]:
-            new _TimeParserState(_States.FRACTIONAL_SECONDS, undefined, {"+": _States.OFFSET_POSITIVE, "-": _States.OFFSET_NEGATIVE, "Z": _States.OFFSET_ZULU}),
+            new _TimeParserState(_States.FRACTIONAL_SECONDS, undefined, {
+                "+": _States.OFFSET_POSITIVE,
+                "-": _States.OFFSET_NEGATIVE,
+                "Z": _States.OFFSET_ZULU
+            }),
         [_States.OFFSET_POSITIVE]:
             new _TimeParserState(_States.OFFSET_POSITIVE, 2, {":": _States.OFFSET_MINUTES}),
         [_States.OFFSET_NEGATIVE]:
@@ -500,7 +514,7 @@ class _TimestampParser {
             new _TimeParserState(_States.OFFSET_UNKNOWN, 0, undefined),
     };
 
-    static _parse(str: string) : Timestamp {
+    static _parse(str: string): Timestamp {
         if (str.length < 1) {
             return null;
         }
@@ -570,7 +584,7 @@ class _TimestampParser {
                     break;
                 case _States.OFFSET_MINUTES:
                     offset += v;
-                    if(v >= 60) throw new Error("Minute offset " + String(v) + " above maximum or equal to : 60");
+                    if (v >= 60) throw new Error("Minute offset " + String(v) + " above maximum or equal to : 60");
                     break;
                 case _States.OFFSET_ZULU:
                     offsetSign = 1;
@@ -613,7 +627,7 @@ class _TimestampParser {
         return new Timestamp(offset, year, month, day, hour, minute, seconds);
     }
 
-    private static _readUnknownDigits(str: string, pos: number) : string {
+    private static _readUnknownDigits(str: string, pos: number): string {
         let i: number = pos;
         for (; i < str.length; i++) {
             if (!isDigit(str.charCodeAt(i))) {
@@ -623,7 +637,7 @@ class _TimestampParser {
         return str.substring(pos, i);
     }
 
-    private static _readDigits(str: string, pos: number, len: number) : number {
+    private static _readDigits(str: string, pos: number, len: number): number {
         let v: number = 0;
         for (let i: number = pos; i < pos + len; i++) {
             let c: number = str.charCodeAt(i) - 48;
