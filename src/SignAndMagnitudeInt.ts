@@ -28,13 +28,7 @@ export default class SignAndMagnitudeInt {
     constructor(
         public readonly _magnitude: JSBI,
         public readonly _isNegative = JsbiSupport.isNegative(_magnitude)
-    ){}
-
-    public static fromNumber(value: number): SignAndMagnitudeInt {
-        let isNegative = value < 0 || Object.is(value, -0);
-        let absoluteValue = Math.abs(value);
-        let magnitude = JSBI.BigInt(absoluteValue);
-        return new SignAndMagnitudeInt(magnitude, isNegative);
+    ) {
     }
 
     get magnitude(): JSBI {
@@ -43,6 +37,13 @@ export default class SignAndMagnitudeInt {
 
     get isNegative(): boolean {
         return this._isNegative;
+    }
+
+    public static fromNumber(value: number): SignAndMagnitudeInt {
+        let isNegative = value < 0 || Object.is(value, -0);
+        let absoluteValue = Math.abs(value);
+        let magnitude = JSBI.BigInt(absoluteValue);
+        return new SignAndMagnitudeInt(magnitude, isNegative);
     }
 
     public equals(other: SignAndMagnitudeInt): boolean {

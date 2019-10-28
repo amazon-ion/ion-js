@@ -17,13 +17,14 @@ import {Reader} from "./IonReader";
 import {IonTypes} from "./IonTypes";
 
 // TS workaround that avoids the need to copy all Writer method signatures into AbstractWriter
-export interface AbstractWriter extends Writer {}
+export interface AbstractWriter extends Writer {
+}
 
 export abstract class AbstractWriter implements Writer {
     protected _annotations = [];
 
     addAnnotation(annotation: string): void {
-        if(!this._isString(annotation)) {
+        if (!this._isString(annotation)) {
             throw new Error('Annotation must be of type string.');
         }
         this._annotations.push(annotation);
@@ -39,12 +40,16 @@ export abstract class AbstractWriter implements Writer {
         }
     }
 
-    protected _clearAnnotations(): void {
-        this._annotations = [];
-    }
-
     writeValues(reader: Reader): void {
         this._writeValues(reader);
+    }
+
+    writeValue(reader: Reader): void {
+        this._writeValue(reader);
+    }
+
+    protected _clearAnnotations(): void {
+        this._annotations = [];
     }
 
     private _writeValues(reader: Reader, _depth = 0): void {
@@ -56,10 +61,6 @@ export abstract class AbstractWriter implements Writer {
             this._writeValue(reader, _depth);
             type = reader.next();
         }
-    }
-
-    writeValue(reader: Reader): void {
-        this._writeValue(reader);
     }
 
     private _writeValue(reader: Reader, _depth = 0): void {
@@ -77,19 +78,44 @@ export abstract class AbstractWriter implements Writer {
             this.writeNull(type);
         } else {
             switch (type) {
-                case IonTypes.BOOL:      this.writeBoolean(reader.booleanValue()); break;
-                case IonTypes.INT:       this.writeInt(reader.bigIntValue()); break;
-                case IonTypes.FLOAT:     this.writeFloat64(reader.numberValue()); break;
-                case IonTypes.DECIMAL:   this.writeDecimal(reader.decimalValue()); break;
-                case IonTypes.TIMESTAMP: this.writeTimestamp(reader.timestampValue()); break;
-                case IonTypes.SYMBOL:    this.writeSymbol(reader.stringValue()); break;
-                case IonTypes.STRING:    this.writeString(reader.stringValue()); break;
-                case IonTypes.CLOB:      this.writeClob(reader.byteValue()); break;
-                case IonTypes.BLOB:      this.writeBlob(reader.byteValue()); break;
-                case IonTypes.LIST:      this.stepIn(IonTypes.LIST); break;
-                case IonTypes.SEXP:      this.stepIn(IonTypes.SEXP); break;
-                case IonTypes.STRUCT:    this.stepIn(IonTypes.STRUCT); break;
-                default: throw new Error('Unrecognized type ' + (type !== null ? type.name : type));
+                case IonTypes.BOOL:
+                    this.writeBoolean(reader.booleanValue());
+                    break;
+                case IonTypes.INT:
+                    this.writeInt(reader.bigIntValue());
+                    break;
+                case IonTypes.FLOAT:
+                    this.writeFloat64(reader.numberValue());
+                    break;
+                case IonTypes.DECIMAL:
+                    this.writeDecimal(reader.decimalValue());
+                    break;
+                case IonTypes.TIMESTAMP:
+                    this.writeTimestamp(reader.timestampValue());
+                    break;
+                case IonTypes.SYMBOL:
+                    this.writeSymbol(reader.stringValue());
+                    break;
+                case IonTypes.STRING:
+                    this.writeString(reader.stringValue());
+                    break;
+                case IonTypes.CLOB:
+                    this.writeClob(reader.byteValue());
+                    break;
+                case IonTypes.BLOB:
+                    this.writeBlob(reader.byteValue());
+                    break;
+                case IonTypes.LIST:
+                    this.stepIn(IonTypes.LIST);
+                    break;
+                case IonTypes.SEXP:
+                    this.stepIn(IonTypes.SEXP);
+                    break;
+                case IonTypes.STRUCT:
+                    this.stepIn(IonTypes.STRUCT);
+                    break;
+                default:
+                    throw new Error('Unrecognized type ' + (type !== null ? type.name : type));
             }
             if (type.isContainer) {
                 reader.stepIn();
@@ -100,7 +126,7 @@ export abstract class AbstractWriter implements Writer {
         }
     }
 
-    private _validateAnnotations(input : string[]) : boolean {
+    private _validateAnnotations(input: string[]): boolean {
         if (!Array.isArray(input)) {
             return false;
         }
@@ -112,7 +138,7 @@ export abstract class AbstractWriter implements Writer {
         return true;
     }
 
-    private _isString(input : string) : boolean {
+    private _isString(input: string): boolean {
         return typeof input === 'string';
     }
 }

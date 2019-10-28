@@ -12,9 +12,9 @@
  * language governing permissions and limitations under the License.
  */
 
-import { Decimal } from "./IonDecimal";
-import { IonType } from "./IonType";
-import { Timestamp } from "./IonTimestamp";
+import {Decimal} from "./IonDecimal";
+import {IonType} from "./IonType";
+import {Timestamp} from "./IonTimestamp";
 import JSBI from "jsbi";
 import IntSize from "./IntSize";
 

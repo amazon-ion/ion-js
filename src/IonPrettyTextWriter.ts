@@ -25,30 +25,13 @@ type Serializer<T> = (value: T) => void;
  * Do not rely on this functionality for more than front end formatting.
  */
 export class PrettyTextWriter extends TextWriter {
-    private indentCount : number = 0;
-    constructor(writeable: Writeable, private readonly indentSize : number = 2) { super(writeable);}
+    private indentCount: number = 0;
 
-    private writePrettyValue() : void {
-        if(this.depth() > 0 && this.currentContainer.containerType && this.currentContainer.containerType !== IonTypes.STRUCT){
-            this.writePrettyIndent(0);
-        }
-    }
-    private writePrettyNewLine(incrementValue: number) : void {
-        this.indentCount = this.indentCount + incrementValue;
-        if(this.indentSize && this.indentSize > 0){
-            this.writeable.writeByte(CharCodes.LINE_FEED);
-        }
-    }
-    private writePrettyIndent(incrementValue: number) : void {
-        this.indentCount = this.indentCount + incrementValue;
-        if(this.indentSize && this.indentSize > 0){
-            for(var i = 0; i < (this.indentCount*this.indentSize); i++ ){
-                this.writeable.writeByte(CharCodes.SPACE);
-            }
-        }
+    constructor(writeable: Writeable, private readonly indentSize: number = 2) {
+        super(writeable);
     }
 
-    writeFieldName(fieldName: string) : void {
+    writeFieldName(fieldName: string): void {
         if (this.currentContainer.containerType !== IonTypes.STRUCT) {
             throw new Error("Cannot write field name outside of a struct");
         }
@@ -68,7 +51,7 @@ export class PrettyTextWriter extends TextWriter {
         this.currentContainer.state = State.VALUE;
     }
 
-    writeNull(type: IonType) : void {
+    writeNull(type: IonType): void {
         if (type === null || type === undefined || type.binaryTypeId < 0 || type.binaryTypeId > 13) {
             throw new Error(`Cannot write null for type ${type}`);
         }
@@ -79,7 +62,7 @@ export class PrettyTextWriter extends TextWriter {
         if (this.currentContainer.containerType === IonTypes.STRUCT) this.currentContainer.state = State.STRUCT_FIELD;
     }
 
-    stepOut() : void {
+    stepOut(): void {
         let currentContainer = this.containerContext.pop();
         if (!currentContainer || !currentContainer.containerType) {
             throw new Error("Can't step out when not in a container");
@@ -120,8 +103,8 @@ export class PrettyTextWriter extends TextWriter {
         if (this.currentContainer.containerType === IonTypes.STRUCT) this.currentContainer.state = State.STRUCT_FIELD;
     }
 
-    writeContainer(type: IonType, openingCharacter: number) : void {
-        if(this.currentContainer.containerType === IonTypes.STRUCT && this.currentContainer.state === State.VALUE){
+    writeContainer(type: IonType, openingCharacter: number): void {
+        if (this.currentContainer.containerType === IonTypes.STRUCT && this.currentContainer.state === State.VALUE) {
             this.currentContainer.state = State.STRUCT_FIELD;
         }
         this.handleSeparator();
@@ -132,7 +115,7 @@ export class PrettyTextWriter extends TextWriter {
         this._stepIn(type);
     }
 
-    handleSeparator() : void {
+    handleSeparator(): void {
         if (this.depth() === 0) {
             if (this.currentContainer.clean) {
                 this.currentContainer.clean = false;
@@ -155,6 +138,28 @@ export class PrettyTextWriter extends TextWriter {
                     default:
                     //no op
                 }
+            }
+        }
+    }
+
+    private writePrettyValue(): void {
+        if (this.depth() > 0 && this.currentContainer.containerType && this.currentContainer.containerType !== IonTypes.STRUCT) {
+            this.writePrettyIndent(0);
+        }
+    }
+
+    private writePrettyNewLine(incrementValue: number): void {
+        this.indentCount = this.indentCount + incrementValue;
+        if (this.indentSize && this.indentSize > 0) {
+            this.writeable.writeByte(CharCodes.LINE_FEED);
+        }
+    }
+
+    private writePrettyIndent(incrementValue: number): void {
+        this.indentCount = this.indentCount + incrementValue;
+        if (this.indentSize && this.indentSize > 0) {
+            for (var i = 0; i < (this.indentCount * this.indentSize); i++) {
+                this.writeable.writeByte(CharCodes.SPACE);
             }
         }
     }

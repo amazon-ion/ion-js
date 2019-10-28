@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-import { SharedSymbolTable } from "./IonSharedSymbolTable";
+import {SharedSymbolTable} from "./IonSharedSymbolTable";
 
 /**
  * A special case of shared symbol table whose entries are all undefined. Used in certain cases
@@ -19,26 +19,26 @@ import { SharedSymbolTable } from "./IonSharedSymbolTable";
  * @see http://amzn.github.io/ion-docs/symbols.html#imports
  */
 export class SubstituteSymbolTable extends SharedSymbolTable {
-  constructor(length: number) {
-    if (length < 0) {
-      throw new Error(
-        "Cannot instantiate a SubstituteSymbolTable with a negative length. (" + length + ")"
-      );
+    constructor(length: number) {
+        if (length < 0) {
+            throw new Error(
+                "Cannot instantiate a SubstituteSymbolTable with a negative length. (" + length + ")"
+            );
+        }
+        super("_substitute", undefined, []);
+        this._numberOfSymbols = length;
     }
-    super("_substitute", undefined, []);
-    this._numberOfSymbols = length;
-  }
 
-  getSymbolText(symbolId: number): string {
-    if (symbolId < 0) {
-      throw new Error(
-          `Index ${symbolId} is out of bounds for the SharedSymbolTable name=${this.name}, version=${this.version}`
-      );
+    getSymbolText(symbolId: number): string {
+        if (symbolId < 0) {
+            throw new Error(
+                `Index ${symbolId} is out of bounds for the SharedSymbolTable name=${this.name}, version=${this.version}`
+            );
+        }
+        return undefined;
     }
-    return undefined;
-  }
 
-  getSymbolId(text: string): number {
-    return undefined;
-  }
+    getSymbolId(text: string): number {
+        return undefined;
+    }
 }

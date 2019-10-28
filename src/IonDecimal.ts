@@ -40,13 +40,12 @@ import {JsbiSupport} from "./JsbiSupport";
 export class Decimal {
 
     // For more information about the (sign, coefficient, exponent) data model, see:
+    public static readonly ZERO = new Decimal(0, 0);
+    public static readonly ONE = new Decimal(1, 0);
     // https://amzn.github.io/ion-docs/docs/decimal.html#data-model
     private _coefficient: JSBI;
     private _exponent: number;
     private _isNegative: boolean;
-
-    public static readonly ZERO = new Decimal(0, 0);
-    public static readonly ONE = new Decimal(1, 0);
 
     /**
      * Creates a new Decimal value by parsing the provided text.
@@ -62,7 +61,7 @@ export class Decimal {
      * @param exponent      See the class-level [[Decimal]] documentation for details.
      */
     constructor(coefficient: number, exponent: number);
-    
+
     /**
      * Creates a new Decimal value using the provided coefficient and exponent values.
      * Because the BigInt data type cannot represent -0, a third parameter called `isNegative` may be supplied
@@ -78,7 +77,7 @@ export class Decimal {
 
     // This is the unified implementation of the above signatures and is not visible to users.
     constructor(coefficient: number | JSBI | string, exponent?: number, isNegative?: boolean) {
-        if(typeof coefficient === "string") {
+        if (typeof coefficient === "string") {
             return Decimal.parse(coefficient);
         }
 
@@ -90,7 +89,7 @@ export class Decimal {
             return Decimal._fromNumberCoefficient(coefficient, exponent);
         }
 
-        if(coefficient instanceof JSBI) {
+        if (coefficient instanceof JSBI) {
             if (!_hasValue(isNegative)) {
                 // If isNegative was not specified, infer isNegative from the coefficient.
                 // This will work for all values except -0.
@@ -129,28 +128,39 @@ export class Decimal {
     }
 
     /**
-     * Constructor helper shared by the public constructor and _fromJsbiCoefficient.
-     * @hidden
+     * Given a string containing the Ion text representation of a decimal value,
+     * returns a new Decimal object corresponding to the value.  If a string such as
+     * '5' is provided, a 'd0' suffix is assumed.
      */
-    private _initialize(isNegative: boolean, coefficient: JSBI, exponent: number) {
-        this._isNegative = isNegative;
-        this._coefficient = coefficient;
-        // If the exponent is -0, set it to 0, which is equivalent.
-        // See: https://github.com/amzn/ion-js/issues/474
-        if (Object.is(-0, exponent)) {
-            exponent = 0;
+    static parse(str: string): Decimal {
+        let exponent = 0;
+        if (str === 'null' || str === 'null.decimal') return null;
+        let d = str.match('[d|D]');
+        let exponentDelimiterIndex = str.length;
+        if (d) {
+            exponent = Number(str.substring(d.index + 1, str.length));
+            exponentDelimiterIndex = d.index;
         }
-        this._exponent = exponent;
-    }
+        let f = str.match('\\.');
+        let coefficientText: string;
+        if (f) {
+            let exponentShift = d ? (d.index - 1) - f.index : (str.length - 1) - f.index;
+            exponent -= exponentShift;
+            // Remove the '.' from the input string.
+            coefficientText = str.substring(0, f.index) + str.substring(f.index + 1, exponentDelimiterIndex);
+        } else {
+            coefficientText = str.substring(0, exponentDelimiterIndex);
+        }
 
-    private _isNegativeZero(): boolean {
-        return this.isNegative() && JsbiSupport.isZero(this._coefficient);
+        let coefficient: JSBI = JSBI.BigInt(coefficientText);
+        let isNegative: boolean = JsbiSupport.isNegative(coefficient) || (coefficientText.startsWith("-0"));
+        return Decimal._fromBigIntCoefficient(isNegative, coefficient, exponent);
     }
 
     /**
      * Returns true if this Decimal is negative; otherwise false.
      */
-    isNegative() : boolean {
+    isNegative(): boolean {
         return this._isNegative;
     }
 
@@ -182,7 +192,7 @@ export class Decimal {
         // based on the algorithm defined in https://docs.oracle.com/javase/8/docs/api/java/math/BigDecimal.html#toString--
         let cStr = this._coefficient.toString();
 
-        if(cStr[0] === '-') {
+        if (cStr[0] === '-') {
             cStr = cStr.substr(1, cStr.length);
         }
 
@@ -219,14 +229,14 @@ export class Decimal {
      * Note that the BigInt data type is unable to represent -0 natively. If you wish to check for a -0 coefficient,
      * test whether the coefficient is zero and then call [[isNegative]].
      */
-    getCoefficient() : JSBI {
+    getCoefficient(): JSBI {
         return this._coefficient;
     }
 
     /**
      * Returns a number representing the exponent of this Decimal value.
      */
-    getExponent() : number {
+    getExponent(): number {
         return this._exponent;
     }
 
@@ -236,7 +246,7 @@ export class Decimal {
      * Note that this differs from compareTo(), which doesn't require
      * precision to match when returning 0.
      */
-    equals(that : Decimal) : boolean {
+    equals(that: Decimal): boolean {
         return this.getExponent() === that.getExponent()
             && _sign(this.getExponent()) === _sign(that.getExponent())
             && this.isNegative() === that.isNegative()
@@ -253,7 +263,7 @@ export class Decimal {
      * Additionally, compareTo() treats 0. and -0. as equal, but equals()
      * does not.
      */
-    compareTo(that : Decimal) : number {
+    compareTo(that: Decimal): number {
         if (JsbiSupport.isZero(this._coefficient)
             && JsbiSupport.isZero(that._coefficient)) {
             return 0;
@@ -286,11 +296,30 @@ export class Decimal {
         let thatJsbi = JSBI.BigInt(thatCoefficientStr);
         if (JSBI.greaterThan(thisJsbi, thatJsbi)) {
             return neg ? -1 : 1;
-        } else if(JSBI.lessThan(thisJsbi, thatJsbi)) {
+        } else if (JSBI.lessThan(thisJsbi, thatJsbi)) {
             return neg ? 1 : -1;
         }
 
         return 0;
+    }
+
+    /**
+     * Constructor helper shared by the public constructor and _fromJsbiCoefficient.
+     * @hidden
+     */
+    private _initialize(isNegative: boolean, coefficient: JSBI, exponent: number) {
+        this._isNegative = isNegative;
+        this._coefficient = coefficient;
+        // If the exponent is -0, set it to 0, which is equivalent.
+        // See: https://github.com/amzn/ion-js/issues/474
+        if (Object.is(-0, exponent)) {
+            exponent = 0;
+        }
+        this._exponent = exponent;
+    }
+
+    private _isNegativeZero(): boolean {
+        return this.isNegative() && JsbiSupport.isZero(this._coefficient);
     }
 
     /**
@@ -314,8 +343,8 @@ export class Decimal {
      */
     private _compareToParams(): [string, number, number] {
         let coefficientStr = this.isNegative()
-                ? this._coefficient.toString().substring(1)
-                : this._coefficient.toString();
+            ? this._coefficient.toString().substring(1)
+            : this._coefficient.toString();
         let precision = coefficientStr.length;
         let magnitude = precision + this._exponent;
         if (magnitude <= 0) {
@@ -327,35 +356,5 @@ export class Decimal {
             magnitude = -Infinity;
         }
         return [coefficientStr, precision, magnitude];
-    }
-
-    /**
-     * Given a string containing the Ion text representation of a decimal value,
-     * returns a new Decimal object corresponding to the value.  If a string such as
-     * '5' is provided, a 'd0' suffix is assumed.
-     */
-    static parse(str: string) : Decimal {
-        let exponent = 0;
-        if (str === 'null' || str === 'null.decimal') return null;
-        let d = str.match('[d|D]');
-        let exponentDelimiterIndex = str.length;
-        if (d) {
-            exponent = Number(str.substring(d.index + 1, str.length));
-            exponentDelimiterIndex = d.index;
-        }
-        let f  = str.match('\\.');
-        let coefficientText: string;
-        if (f) {
-            let exponentShift = d ? (d.index - 1) - f.index : (str.length - 1) - f.index;
-            exponent -= exponentShift;
-            // Remove the '.' from the input string.
-            coefficientText = str.substring(0, f.index) + str.substring(f.index + 1, exponentDelimiterIndex);
-        } else {
-            coefficientText = str.substring(0, exponentDelimiterIndex);
-        }
-
-        let coefficient: JSBI = JSBI.BigInt(coefficientText);
-        let isNegative: boolean = JsbiSupport.isNegative(coefficient) || (coefficientText.startsWith("-0"));
-        return Decimal._fromBigIntCoefficient(isNegative, coefficient, exponent);
     }
 }

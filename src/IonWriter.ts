@@ -22,14 +22,14 @@ import JSBI from "jsbi";
  */
 export interface Writer {
     /** Writes a null value of the given [[IonType]]. */
-    writeNull(type: IonType) : void;
+    writeNull(type: IonType): void;
 
     /**
      * Writes a `boolean` as an Ion `bool` value.
      *
      * @param value The `boolean` to write, which may be `null` to write a `null.bool`.
      */
-    writeBoolean(value: boolean | null) : void;
+    writeBoolean(value: boolean | null): void;
 
     /**
      * Writes a `number` value as an Ion `int`.
@@ -38,7 +38,7 @@ export interface Writer {
      *  If `number` is not an integer between the range specified by `Number.MIN_SAFE_INTEGER`
      *  and `Number.MAX_SAFE_INTEGER`, an implementation may truncate or round the value.
      */
-    writeInt(value: number | JSBI | null) : void;
+    writeInt(value: number | JSBI | null): void;
 
     /**
      * Writes a `number` value as an Ion 32-bit binary `float` value.
@@ -47,69 +47,69 @@ export interface Writer {
      *  If the `number` cannot be represented exactly as a 32-bit binary floating point
      *  value, an implementation may truncate or round the value.
      */
-    writeFloat32(value: number | null) : void;
+    writeFloat32(value: number | null): void;
 
     /**
      * Writes a `number` value as an Ion 64-bit binary `float` value.
      *
      * @param value The `number` to write, which may be `null` to write a `null.float`.
      */
-    writeFloat64(value: number | null) : void;
+    writeFloat64(value: number | null): void;
 
     /**
      * Writes a [[Decimal]] value as an Ion `decimal` value.
      *
      * @param value The [[Decimal]] to write, which may be `null` to write a `null.decimal`.
      */
-    writeDecimal(value: Decimal | null) : void;
+    writeDecimal(value: Decimal | null): void;
 
     /**
      * Writes a [[Timestamp]] value as an Ion `timestamp` value.
      *
      * @param value The [[Timestamp]] to write, which may be `null` to write a `null.timestamp`.
      */
-    writeTimestamp(value: Timestamp | null) : void;
+    writeTimestamp(value: Timestamp | null): void;
 
     /**
      * Writes a `string` value as an Ion `string`.
      *
      * @param value The `string` to write, which may be `null` to write a `null.string`.
      */
-    writeString(value: string | null) : void;
+    writeString(value: string | null): void;
 
     /**
      * Writes a `string` value as an Ion `symbol`.
      *
      * @param value The `string` to write, which may be `null` to write a `null.symbol`.
      */
-    writeSymbol(value: string | null) : void;
+    writeSymbol(value: string | null): void;
 
     /**
      * Writes a `Uint8Array` as an Ion `blob` value.
      *
      * @param value The array to write, which may be `null` to write a `null.blob`.
      */
-    writeBlob(value: Uint8Array | null) : void;
+    writeBlob(value: Uint8Array | null): void;
 
     /**
      * Writes a `Uint8Array` as an Ion `clob` value.
      *
      * @param value The array to write, which may be `null` to write a `null.clob`.
      */
-    writeClob(value: Uint8Array | null) : void;
+    writeClob(value: Uint8Array | null): void;
 
     /**
      * Writes a reader's current value.  If there's no current value, this method
      * does nothing.
      */
-    writeValue(reader: Reader) : void;
+    writeValue(reader: Reader): void;
 
     /**
      * Writes a reader's current value and all following values until the end
      * of the current container.  If there's no current value then this method
      * calls {@link next()} to get started.
      */
-    writeValues(reader: Reader) : void;
+    writeValues(reader: Reader): void;
 
     /**
      * Writes the field name for a member of a `struct`.
@@ -117,7 +117,7 @@ export interface Writer {
      * @throws Error if the [[Writer]] is not within a `struct` or this method was already
      *  called before a value was written.
      */
-    writeFieldName(fieldName: string) : void;
+    writeFieldName(fieldName: string): void;
 
     /**
      * Starts a container and positions the writer within that container.
@@ -125,27 +125,27 @@ export interface Writer {
      * @throws Error if `type.container` is not one of `IonTypes.LIST`, `IonTypes.SEXP`,
      *  or `IonTypes.STRUCT`.
      */
-    stepIn(type: IonType) : void;
+    stepIn(type: IonType): void;
 
     /**
      * Steps out of a container and positions the writer after the container.
      *
      * @throws Error if the writer is not inside a container.
      */
-    stepOut() : void;
+    stepOut(): void;
 
     /**
      * Adds an annotation to the list of annotations to be used when
      * writing the next value.
      */
-    addAnnotation(annotation: string) : void;
+    addAnnotation(annotation: string): void;
 
     /**
      * Specifies the list of annotations to be used when writing
      * the next value.  This clears the current annotations set
      * for the next value.
      */
-    setAnnotations(annotations: string[]) : void;
+    setAnnotations(annotations: string[]): void;
 
     /**
      * Flushes data to the internal buffer and finalizes the Ion stream.
@@ -153,7 +153,7 @@ export interface Writer {
      * @throws Error if the [[Writer]] is already closed or the writer is not
      *  at the top-level (i.e. inside of a container).
      */
-    close() : void;
+    close(): void;
 
     /**
      * Retrieves the serialized buffer as an array of octets.  The buffer will
