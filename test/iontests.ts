@@ -433,8 +433,7 @@ function skipOrTest(paths: Array<string>, skipLists: Array<Map<string, number>>,
         let skipped = false;
         for (let skipList of skipLists) {
             if (skipList[path]) {
-                it.skip(path, () => {
-                });
+                it.skip(path, () => {});
                 skipped = true;
                 break;
             }

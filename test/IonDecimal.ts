@@ -296,8 +296,7 @@ describe('Decimal', () => {
                 let shouldEqual = expected ? ' equals ' : ' is not equal to ';
                 let testName = input1 + shouldEqual + input2;
                 if (skip) {
-                    it.skip(testName, () => {
-                    });
+                    it.skip(testName, () => {});
                     return;
                 }
                 it(

@@ -38,69 +38,46 @@ function depthTest(instructions, expectedDepth) {
 
 describe('Depth tests', () => {
     it('Writing a null list results in a depth of 0.', () => {
-        depthTest((writer) => {
-            writer.writeNull(ion.IonTypes.LIST)
-        }, 0);
+        depthTest((writer) => {writer.writeNull(ion.IonTypes.LIST)}, 0);
     });
 
     it('Writing a null struct results in a depth of 0.', () => {
-        depthTest((writer) => {
-            writer.writeNull(ion.IonTypes.STRUCT)
-        }, 0);
+        depthTest((writer) => {writer.writeNull(ion.IonTypes.STRUCT)}, 0);
     });
 
     it('Writing a null sexp results in a depth of 0.', () => {
-        depthTest((writer) => {
-            writer.writeNull(ion.IonTypes.SEXP)
-        }, 0);
+        depthTest((writer) => {writer.writeNull(ion.IonTypes.SEXP)}, 0);
     });
 
     it('Stepping into a list and out results in a depth of 0.', () => {
-        depthTest((writer) => {
-            writer.stepIn(ion.IonTypes.LIST);
-            writer.stepOut()
-        }, 0);
+        depthTest((writer) => {writer.stepIn(ion.IonTypes.LIST); writer.stepOut()}, 0);
     });
 
     it('Stepping into an sexp and out results in a depth of 0.', () => {
-        depthTest((writer) => {
-            writer.stepIn(ion.IonTypes.SEXP);
-            writer.stepOut()
-        }, 0);
+        depthTest((writer) => {writer.stepIn(ion.IonTypes.SEXP); writer.stepOut()}, 0);
     });
 
     it('Stepping into an struct and out results in a depth of 0.', () => {
-        depthTest((writer) => {
-            writer.stepIn(ion.IonTypes.STRUCT);
-            writer.stepOut()
-        }, 0);
+        depthTest((writer) => {writer.stepIn(ion.IonTypes.STRUCT); writer.stepOut()}, 0);
     });
 
     it('Stepping into a list results in a depth of 1.', () => {
-        depthTest((writer) => {
-            writer.stepIn(ion.IonTypes.LIST)
-        }, 1);
+        depthTest((writer) => {writer.stepIn(ion.IonTypes.LIST)}, 1);
     });
 
     it('Stepping into a sexp results in a depth of 1.', () => {
-        depthTest((writer) => {
-            writer.stepIn(ion.IonTypes.SEXP)
-        }, 1);
+        depthTest((writer) => {writer.stepIn(ion.IonTypes.SEXP)}, 1);
     });
 
     it('Stepping into 2 lists results in a depth of 2.', () => {
-        depthTest((writer) => {
-            writer.stepIn(ion.IonTypes.LIST);
-            writer.stepIn(ion.IonTypes.LIST)
-        }, 2);
+        depthTest((writer) => {writer.stepIn(ion.IonTypes.LIST); writer.stepIn(ion.IonTypes.LIST)}, 2);
     });
 
     it('Stepping into 2 lists and out results in a depth of 1.', () => {
         depthTest((writer) => {
                 writer.stepIn(ion.IonTypes.LIST);
                 writer.stepIn(ion.IonTypes.LIST);
-                writer.stepOut()
-            },
+                writer.stepOut()},
             1);
     });
 
@@ -109,8 +86,7 @@ describe('Depth tests', () => {
                 writer.stepIn(ion.IonTypes.LIST);
                 writer.stepIn(ion.IonTypes.LIST);
                 writer.stepOut();
-                writer.stepIn(ion.IonTypes.SEXP)
-            },
+                writer.stepIn(ion.IonTypes.SEXP)},
             2);
     });
 });

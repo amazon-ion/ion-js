@@ -1112,8 +1112,7 @@ let badWriterTests = [
 function runWriterTests(tests) {
     tests.forEach(({name, instructions, expected, skip}) => {
         if (skip) {
-            it.skip(name, () => {
-            });
+            it.skip(name, () => {});
             return;
         }
         writerTest(name, instructions, expected);
@@ -1123,8 +1122,7 @@ function runWriterTests(tests) {
 function runBadWriterTests(tests) {
     tests.forEach(({name, instructions, skip}) => {
         if (skip) {
-            it.skip(name, () => {
-            });
+            it.skip(name, () => {});
             return;
         }
         badWriterTest(name, instructions);

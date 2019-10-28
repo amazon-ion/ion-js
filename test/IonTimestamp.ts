@@ -118,121 +118,38 @@ let parsingTests = [
     {text: '2007-12T', test: () => testParsing('2007-12T', ion.TimestampPrecision.MONTH, -0, 2007, 12)},
     {text: '2007-01-01', test: () => testParsing('2007-01-01T', ion.TimestampPrecision.DAY, -0, 2007, 1, 1)},
     {text: '2007-01-31T', test: () => testParsing('2007-01-31T', ion.TimestampPrecision.DAY, -0, 2007, 1, 31)},
-    {
-        text: '2007-01-01T00:00Z',
-        test: () => testParsing('2007-01-01T00:00Z', ion.TimestampPrecision.HOUR_AND_MINUTE, 0, 2007, 1, 1, 0, 0)
-    },
-    {
-        text: '2007-01-01T23:59Z',
-        test: () => testParsing('2007-01-01T23:59Z', ion.TimestampPrecision.HOUR_AND_MINUTE, 0, 2007, 1, 1, 23, 59)
-    },
-    {
-        text: '2007-01-01T00:00:00Z',
-        test: () => testParsing('2007-01-01T00:00:00Z', ion.TimestampPrecision.SECONDS, 0, 2007, 1, 1, 0, 0, '0')
-    },
-    {
-        text: '2007-01-01T00:00:59Z',
-        test: () => testParsing('2007-01-01T00:00:59Z', ion.TimestampPrecision.SECONDS, 0, 2007, 1, 1, 0, 0, '59')
-    },
-    {
-        text: '2007-01-01T00:00:00.000Z',
-        test: () => testParsing('2007-01-01T00:00:00.000Z', ion.TimestampPrecision.SECONDS, 0, 2007, 1, 1, 0, 0, '0.000')
-    },
-    {
-        text: '2007-01-01T00:00:00.999Z',
-        test: () => testParsing('2007-01-01T00:00:00.999Z', ion.TimestampPrecision.SECONDS, 0, 2007, 1, 1, 0, 0, '0.999')
-    },
+    {text: '2007-01-01T00:00Z', test: () => testParsing('2007-01-01T00:00Z', ion.TimestampPrecision.HOUR_AND_MINUTE, 0, 2007, 1, 1, 0, 0)},
+    {text: '2007-01-01T23:59Z', test: () => testParsing('2007-01-01T23:59Z', ion.TimestampPrecision.HOUR_AND_MINUTE, 0, 2007, 1, 1, 23, 59)},
+    {text: '2007-01-01T00:00:00Z', test: () => testParsing('2007-01-01T00:00:00Z', ion.TimestampPrecision.SECONDS, 0, 2007, 1, 1, 0, 0, '0')},
+    {text: '2007-01-01T00:00:59Z', test: () => testParsing('2007-01-01T00:00:59Z', ion.TimestampPrecision.SECONDS, 0, 2007, 1, 1, 0, 0, '59')},
+    {text: '2007-01-01T00:00:00.000Z', test: () => testParsing('2007-01-01T00:00:00.000Z', ion.TimestampPrecision.SECONDS, 0, 2007, 1, 1, 0, 0, '0.000')},
+    {text: '2007-01-01T00:00:00.999Z', test: () => testParsing('2007-01-01T00:00:00.999Z', ion.TimestampPrecision.SECONDS, 0, 2007, 1, 1, 0, 0, '0.999')},
 
     // local offset boundary tests
-    {
-        text: '2007-01-01T00:00Z',
-        test: () => testParsing('2007-01-01T00:00Z', ion.TimestampPrecision.HOUR_AND_MINUTE, 0, 2007, 1, 1, 0)
-    },
-    {
-        text: '2007-01-01T00:00+00:00',
-        test: () => testParsing('2007-01-01T00:00+00:00', ion.TimestampPrecision.HOUR_AND_MINUTE, 0, 2007, 1, 1, 0)
-    },
-    {
-        text: '2007-01-01T00:00-00:00',
-        test: () => testParsing('2007-01-01T00:00-00:00', ion.TimestampPrecision.HOUR_AND_MINUTE, -0, 2007, 1, 1, 0)
-    },
-    {
-        text: '2007-01-01T00:00-23:59',
-        test: () => testParsing('2007-01-01T00:00-23:59', ion.TimestampPrecision.HOUR_AND_MINUTE, -(23 * 60 + 59), 2007, 1, 1, 0)
-    },
-    {
-        text: '2007-01-01T00:00+23:59',
-        test: () => testParsing('2007-01-01T00:00+23:59', ion.TimestampPrecision.HOUR_AND_MINUTE, 23 * 60 + 59, 2007, 1, 1, 0)
-    },
-    {
-        text: '2007-01-01T00:00:00Z',
-        test: () => testParsing('2007-01-01T00:00:00Z', ion.TimestampPrecision.SECONDS, 0, 2007, 1, 1, 0, 0, '0')
-    },
-    {
-        text: '2007-01-01T00:00:00+00:00',
-        test: () => testParsing('2007-01-01T00:00:00+00:00', ion.TimestampPrecision.SECONDS, 0, 2007, 1, 1, 0, 0, '0')
-    },
-    {
-        text: '2007-01-01T00:00:00-00:00',
-        test: () => testParsing('2007-01-01T00:00:00-00:00', ion.TimestampPrecision.SECONDS, -0, 2007, 1, 1, 0, 0, '0')
-    },
-    {
-        text: '2007-01-01T00:00:00-23:59',
-        test: () => testParsing('2007-01-01T00:00:00-23:59', ion.TimestampPrecision.SECONDS, -(23 * 60 + 59), 2007, 1, 1, 0, 0, '0')
-    },
-    {
-        text: '2007-01-01T00:00:00+23:59',
-        test: () => testParsing('2007-01-01T00:00:00+23:59', ion.TimestampPrecision.SECONDS, 23 * 60 + 59, 2007, 1, 1, 0, 0, '0')
-    },
-    {
-        text: '2008-01-01T00:00:00.000Z',
-        test: () => testParsing('2008-01-01T00:00:00.000Z', ion.TimestampPrecision.SECONDS, 0, 2008, 1, 1, 0, 0, '0.000')
-    },
-    {
-        text: '2008-01-01T00:00:00.000+00:00',
-        test: () => testParsing('2008-01-01T00:00:00.000+00:00', ion.TimestampPrecision.SECONDS, 0, 2008, 1, 1, 0, 0, '0.000')
-    },
-    {
-        text: '2008-01-01T00:00:00.000-00:00',
-        test: () => testParsing('2008-01-01T00:00:00.000-00:00', ion.TimestampPrecision.SECONDS, -0, 2008, 1, 1, 0, 0, '0.000')
-    },
-    {
-        text: '2008-01-01T00:00:00.000-23:59',
-        test: () => testParsing('2008-01-01T00:00:00.000-23:59', ion.TimestampPrecision.SECONDS, -(23 * 60 + 59), 2008, 1, 1, 0, 0, '0.000')
-    },
-    {
-        text: '2008-01-01T00:00:00.000+23:59',
-        test: () => testParsing('2008-01-01T00:00:00.000+23:59', ion.TimestampPrecision.SECONDS, 23 * 60 + 59, 2008, 1, 1, 0, 0, '0.000')
-    },
+    {text: '2007-01-01T00:00Z', test: () => testParsing('2007-01-01T00:00Z', ion.TimestampPrecision.HOUR_AND_MINUTE, 0, 2007, 1, 1, 0)},
+    {text: '2007-01-01T00:00+00:00', test: () => testParsing('2007-01-01T00:00+00:00', ion.TimestampPrecision.HOUR_AND_MINUTE, 0, 2007, 1, 1, 0)},
+    {text: '2007-01-01T00:00-00:00', test: () => testParsing('2007-01-01T00:00-00:00', ion.TimestampPrecision.HOUR_AND_MINUTE, -0, 2007, 1, 1, 0)},
+    {text: '2007-01-01T00:00-23:59', test: () => testParsing('2007-01-01T00:00-23:59', ion.TimestampPrecision.HOUR_AND_MINUTE, -(23 * 60 + 59), 2007, 1, 1, 0)},
+    {text: '2007-01-01T00:00+23:59', test: () => testParsing('2007-01-01T00:00+23:59', ion.TimestampPrecision.HOUR_AND_MINUTE, 23 * 60 + 59, 2007, 1, 1, 0)},
+    {text: '2007-01-01T00:00:00Z', test: () => testParsing('2007-01-01T00:00:00Z', ion.TimestampPrecision.SECONDS, 0, 2007, 1, 1, 0, 0, '0')},
+    {text: '2007-01-01T00:00:00+00:00', test: () => testParsing('2007-01-01T00:00:00+00:00', ion.TimestampPrecision.SECONDS, 0, 2007, 1, 1, 0, 0, '0')},
+    {text: '2007-01-01T00:00:00-00:00', test: () => testParsing('2007-01-01T00:00:00-00:00', ion.TimestampPrecision.SECONDS, -0, 2007, 1, 1, 0, 0, '0')},
+    {text: '2007-01-01T00:00:00-23:59', test: () => testParsing('2007-01-01T00:00:00-23:59', ion.TimestampPrecision.SECONDS, -(23 * 60 + 59), 2007, 1, 1, 0, 0, '0')},
+    {text: '2007-01-01T00:00:00+23:59', test: () => testParsing('2007-01-01T00:00:00+23:59', ion.TimestampPrecision.SECONDS, 23 * 60 + 59, 2007, 1, 1, 0, 0, '0')},
+    {text: '2008-01-01T00:00:00.000Z', test: () => testParsing('2008-01-01T00:00:00.000Z', ion.TimestampPrecision.SECONDS, 0, 2008, 1, 1, 0, 0, '0.000')},
+    {text: '2008-01-01T00:00:00.000+00:00', test: () => testParsing('2008-01-01T00:00:00.000+00:00', ion.TimestampPrecision.SECONDS, 0, 2008, 1, 1, 0, 0, '0.000')},
+    {text: '2008-01-01T00:00:00.000-00:00', test: () => testParsing('2008-01-01T00:00:00.000-00:00', ion.TimestampPrecision.SECONDS, -0, 2008, 1, 1, 0, 0, '0.000')},
+    {text: '2008-01-01T00:00:00.000-23:59', test: () => testParsing('2008-01-01T00:00:00.000-23:59', ion.TimestampPrecision.SECONDS, -(23 * 60 + 59), 2008, 1, 1, 0, 0, '0.000')},
+    {text: '2008-01-01T00:00:00.000+23:59', test: () => testParsing('2008-01-01T00:00:00.000+23:59', ion.TimestampPrecision.SECONDS, 23 * 60 + 59, 2008, 1, 1, 0, 0, '0.000')},
     // / boundary tests
-    {
-        text: '2007-02-23T20:14:33.079+00:00',
-        test: () => testParsing('2007-02-23T20:14:33.079+00:00', ion.TimestampPrecision.SECONDS, 0, 2007, 2, 23, 20, 14, '33.079')
-    },
-    {
-        text: '2007-02-23T00:14:33.079+00:00',
-        test: () => testParsing('2007-02-23T00:14:33.079+00:00', ion.TimestampPrecision.SECONDS, 0, 2007, 2, 23, 0, 14, '33.079')
-    },
-    {
-        text: '2007-02-23T20:14:33.079-00:00',
-        test: () => testParsing('2007-02-23T20:14:33.079-00:00', ion.TimestampPrecision.SECONDS, -0, 2007, 2, 23, 20, 14, '33.079')
-    },
-    {
-        text: '2007-02-23T00:14:33.079-00:00',
-        test: () => testParsing('2007-02-23T00:14:33.079-00:00', ion.TimestampPrecision.SECONDS, -0, 2007, 2, 23, 0, 14, '33.079')
-    },
-    {
-        text: '2007-02-23T12:14:33.079-08:00',
-        test: () => testParsing('2007-02-23T12:14:33.079-08:00', ion.TimestampPrecision.SECONDS, -8 * 60, 2007, 2, 23, 12, 14, '33.079')
-    },
-    {
-        text: '2007-02-23T00:14:33.079-08:00',
-        test: () => testParsing('2007-02-23T00:14:33.079-08:00', ion.TimestampPrecision.SECONDS, -8 * 60, 2007, 2, 23, 0, 14, '33.079')
-    },
-    {
-        text: '2001-02-03T04:05:06.123456789-07:53',
-        test: () => testParsing('2001-02-03T04:05:06.123456789-07:53', ion.TimestampPrecision.SECONDS, -(7 * 60 + 53), 2001, 2, 3, 4, 5, '6.123456789')
-    },
+
+    {text: '2007-02-23T20:14:33.079+00:00', test: () => testParsing('2007-02-23T20:14:33.079+00:00', ion.TimestampPrecision.SECONDS, 0, 2007, 2, 23, 20, 14, '33.079')},
+    {text: '2007-02-23T00:14:33.079+00:00', test: () => testParsing('2007-02-23T00:14:33.079+00:00', ion.TimestampPrecision.SECONDS, 0, 2007, 2, 23, 0, 14, '33.079')},
+    {text: '2007-02-23T20:14:33.079-00:00', test: () => testParsing('2007-02-23T20:14:33.079-00:00', ion.TimestampPrecision.SECONDS, -0, 2007, 2, 23, 20, 14, '33.079')},
+    {text: '2007-02-23T00:14:33.079-00:00', test: () => testParsing('2007-02-23T00:14:33.079-00:00', ion.TimestampPrecision.SECONDS, -0, 2007, 2, 23, 0, 14, '33.079')},
+    {text: '2007-02-23T12:14:33.079-08:00', test: () => testParsing('2007-02-23T12:14:33.079-08:00', ion.TimestampPrecision.SECONDS, -8 * 60, 2007, 2, 23, 12, 14, '33.079')},
+    {text: '2007-02-23T00:14:33.079-08:00', test: () => testParsing('2007-02-23T00:14:33.079-08:00', ion.TimestampPrecision.SECONDS, -8 * 60, 2007, 2, 23, 0, 14, '33.079')},
+    {text: '2001-02-03T04:05:06.123456789-07:53', test: () => testParsing('2001-02-03T04:05:06.123456789-07:53', ion.TimestampPrecision.SECONDS, -(7 * 60 + 53), 2001, 2, 3, 4, 5, '6.123456789')},
 ];
 
 let compareToTests = [
@@ -243,10 +160,7 @@ let compareToTests = [
     {text: 'compareToMinutes', test: () => testCompareTo('2001-01-01T00:00Z', '2001-01-01T00:01Z', -1)},
     {text: 'compareToSeconds', test: () => testCompareTo('2001-01-01T00:00:00Z', '2001-01-01T00:00:01Z', -1)},
     {text: 'compareToMs', test: () => testCompareTo('2001-01-01T00:00:00.000Z', '2001-01-01T00:00:00.001Z', -1)},
-    {
-        text: 'compareToNs',
-        test: () => testCompareTo('2001-01-01T00:00:00.000000000Z', '2001-01-01T00:00:00.000000001Z', -1)
-    },
+    {text: 'compareToNs', test: () => testCompareTo('2001-01-01T00:00:00.000000000Z', '2001-01-01T00:00:00.000000001Z', -1)},
 
     // different precision
     {text: 'compareToYear2', test: () => testCompareTo('2001T', '2002-01-01T00:00:00.000Z', -1)},
@@ -255,10 +169,7 @@ let compareToTests = [
     {text: 'compareToMinutes2', test: () => testCompareTo('2001-01-01T00:00Z', '2001-01-01T00:01:00.000Z', -1)},
     {text: 'compareToSeconds2', test: () => testCompareTo('2001-01-01T00:00:00Z', '2001-01-01T00:00:01.000Z', -1)},
     {text: 'compareToMs2', test: () => testCompareTo('2001-01-01T00:00:00.000Z', '2001-01-01T00:00:00.001000000Z', -1)},
-    {
-        text: 'compareToNs2',
-        test: () => testCompareTo('2001-01-01T00:00:00.000000000Z', '2001-01-01T00:00:00.000000001000Z', -1)
-    },
+    {text: 'compareToNs2', test: () => testCompareTo('2001-01-01T00:00:00.000000000Z', '2001-01-01T00:00:00.000000001000Z', -1)},
     {text: 'compareToWithOffset1', test: () => testCompareTo('2001-01-01T00:59-00:01', '2001-01-01T01:00Z', 0)},
     {text: 'compareToWithOffset2', test: () => testCompareTo('2001-01-01T01:01+00:01', '2001-01-01T01:00Z', 0)},
     {text: 'compareToWithOffset3', test: () => testCompareTo('2001-01-01T00:59-00:01', '2001-01-01T01:01+00:01', 0)},
@@ -268,17 +179,16 @@ let compareToTests = [
 
 let equalsTests = [
     {text: 'notEqualsYear', test: () => testEquals('2001T', '2002T', false)},
+
     // Date's default behavior converts 99 to 1999
     {text: 'notEqualsYear0099', test: () => testEquals('0099T', '1999T', false)},
+
     {text: 'notEqualsMonth', test: () => testEquals('2001-01T', '2001-02T', false)},
     {text: 'notEqualsDay', test: () => testEquals('2001-01-01T', '2001-01-02T', false)},
     {text: 'notEqualsMinutes', test: () => testEquals('2001-01-01T00:00Z', '2001-01-01T00:01Z', false)},
     {text: 'notEqualsSeconds', test: () => testEquals('2001-01-01T00:00:00Z', '2001-01-01T00:00:01Z', false)},
     {text: 'notEqualsMs', test: () => testEquals('2001-01-01T00:00:00.000Z', '2001-01-01T00:00:00.001Z', false)},
-    {
-        text: 'notEqualsNs',
-        test: () => testEquals('2001-01-01T00:00:00.000000000Z', '2001-01-01T00:00:00.000000001Z', false)
-    },
+    {text: 'notEqualsNs', test: () => testEquals('2001-01-01T00:00:00.000000000Z', '2001-01-01T00:00:00.000000001Z', false)},
 
     // same instants, but different offsets, so not equal:
     {text: 'notEqualsWithOffset1', test: () => testEquals('2001-01-01T00:59-00:01', '2001-01-01T01:00Z', false)},
