@@ -18,7 +18,7 @@ import JSBI from 'jsbi';
 
 const ivm = [0xe0, 0x01, 0x00, 0xea];
 
-let writerTest = function(name, instructions, expected) {
+let writerTest = function (name, instructions, expected) {
     it(name, () => {
         let symbolTable = new ion.LocalSymbolTable(ion.getSystemSymbolTableImport());
         let writeable = new ion.Writeable();
@@ -28,9 +28,9 @@ let writerTest = function(name, instructions, expected) {
         let actual = writeable.getBytes();
         assert.deepEqual(actual, new Uint8Array(ivm.concat(expected)));
     });
-}
+};
 
-let badWriterTest = function(name, instructions) {
+let badWriterTest = function (name, instructions) {
     let test = () => {
         let symbolTable = new ion.LocalSymbolTable(ion.getSystemSymbolTableImport());
         let writeable = new ion.Writeable();
@@ -39,7 +39,7 @@ let badWriterTest = function(name, instructions) {
         writer.close();
     };
     it(name, () => assert.throws(test, Error));
-}
+};
 
 let blobWriterTests = [
     {
@@ -1111,8 +1111,9 @@ let badWriterTests = [
 
 function runWriterTests(tests) {
     tests.forEach(({name, instructions, expected, skip}) => {
-        if(skip) {
-            it.skip(name, () => {});
+        if (skip) {
+            it.skip(name, () => {
+            });
             return;
         }
         writerTest(name, instructions, expected);
@@ -1121,8 +1122,9 @@ function runWriterTests(tests) {
 
 function runBadWriterTests(tests) {
     tests.forEach(({name, instructions, skip}) => {
-        if(skip) {
-            it.skip(name, () => {});
+        if (skip) {
+            it.skip(name, () => {
+            });
             return;
         }
         badWriterTest(name, instructions);

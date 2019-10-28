@@ -19,7 +19,7 @@ import {Writeable} from '../src/IonWriteable';
 class WriteableTests {
     @test "writePartialArray"() {
         var writeable = new Writeable();
-        writeable.writeBytes(new Uint8Array([1,2,3,4,5,6,7,8]), 4, 4);
-        assert.deepEqual(writeable.getBytes(), new Uint8Array([5,6,7,8]));
+        writeable.writeBytes(new Uint8Array([1, 2, 3, 4, 5, 6, 7, 8]), 4, 4);
+        assert.deepEqual(writeable.getBytes(), new Uint8Array([5, 6, 7, 8]));
     }
 }

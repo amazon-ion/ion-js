@@ -18,22 +18,22 @@ import {encodeUtf8} from '../src/IonUnicode';
 
 @suite('Unicode')
 class UnicodeTests {
-  @test "Encode dollar sign"() {
-    assert.deepEqual(encodeUtf8('$'), new Uint8Array([0x24]));
-  }
+    @test "Encode dollar sign"() {
+        assert.deepEqual(encodeUtf8('$'), new Uint8Array([0x24]));
+    }
 
-  @test "Encode cent sign"() {
-    assert.deepEqual(encodeUtf8('¢'), new Uint8Array([0xc2, 0xa2]));
-  }
+    @test "Encode cent sign"() {
+        assert.deepEqual(encodeUtf8('¢'), new Uint8Array([0xc2, 0xa2]));
+    }
 
-  @test "Encode euro sign"() {
-    assert.deepEqual(encodeUtf8('€'), new Uint8Array([0xe2, 0x82, 0xac]));
-  }
+    @test "Encode euro sign"() {
+        assert.deepEqual(encodeUtf8('€'), new Uint8Array([0xe2, 0x82, 0xac]));
+    }
 
-  @test "Gothic letter hwair"() {
-    assert.deepEqual(
-        encodeUtf8(String.fromCodePoint(0x10348)),
-        new Uint8Array([0xf0, 0x90, 0x8d, 0x88])
-    );
-  }
+    @test "Gothic letter hwair"() {
+        assert.deepEqual(
+            encodeUtf8(String.fromCodePoint(0x10348)),
+            new Uint8Array([0xf0, 0x90, 0x8d, 0x88])
+        );
+    }
 }

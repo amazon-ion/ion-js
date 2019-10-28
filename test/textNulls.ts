@@ -17,23 +17,23 @@ import * as ion from '../src/Ion';
 
 @suite('Reading nulls')
 class TextNullTests {
-  @test "Reading 'null'"() {
-    let reader = ion.makeReader("null");
-    assert.equal(reader.next(), ion.IonTypes.NULL);
-    assert.equal(reader.next(), undefined);
-  }
-
-  @test "Stepping into a null container"() {
-    let reader = ion.makeReader("null.list");
-    assert.equal(reader.next(), ion.IonTypes.LIST);
-    assert.isTrue(reader.isNull());
-
-    let fail = true;
-    try {
-      reader.stepIn();
-    } catch(e) {
-      fail = false;
+    @test "Reading 'null'"() {
+        let reader = ion.makeReader("null");
+        assert.equal(reader.next(), ion.IonTypes.NULL);
+        assert.equal(reader.next(), undefined);
     }
-    assert.isFalse(fail, "Stepped into null container");
-  }
+
+    @test "Stepping into a null container"() {
+        let reader = ion.makeReader("null.list");
+        assert.equal(reader.next(), ion.IonTypes.LIST);
+        assert.isTrue(reader.isNull());
+
+        let fail = true;
+        try {
+            reader.stepIn();
+        } catch (e) {
+            fail = false;
+        }
+        assert.isFalse(fail, "Stepped into null container");
+    }
 }
