@@ -38,10 +38,10 @@ import {JsbiSupport} from "./JsbiSupport";
  * Presently, the supported range of an exponent is limited to +/- 15 digits.
  */
 export class Decimal {
-
-    // For more information about the (sign, coefficient, exponent) data model, see:
     public static readonly ZERO = new Decimal(0, 0);
     public static readonly ONE = new Decimal(1, 0);
+
+    // For more information about the (sign, coefficient, exponent) data model, see:
     // https://amzn.github.io/ion-docs/docs/decimal.html#data-model
     private _coefficient: JSBI;
     private _exponent: number;

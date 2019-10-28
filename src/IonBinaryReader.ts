@@ -35,61 +35,46 @@ import {JsbiSupport} from "./JsbiSupport";
 
 const RAW_STRING = new IonType(-1, "raw_input", true, false, false, false);
 
-const ERROR = -3;
-const BOC = -2;//beginning of container?
-const EOF = -1;
-const TB_NULL = 0;
-const TB_BOOL = 1;
-const TB_INT = 2;
-const TB_NEG_INT = 3;
-const TB_FLOAT = 4;
-const TB_DECIMAL = 5;
-const TB_TIMESTAMP = 6;
-const TB_SYMBOL = 7;
-const TB_STRING = 8;
-const TB_CLOB = 9;
-const TB_BLOB = 10;
-const TB_LIST = 11;
-const TB_SEXP = 12;
-const TB_STRUCT = 13;
-const TB_ANNOTATION = 14;
-const TB_UNUSED__ = 15;
-const TB_SEXP_CLOSE = 21;
-const TB_LIST_CLOSE = 22;
-const TB_STRUCT_CLOSE = 23;
+const ERROR            = -3;
+const BOC              = -2;//beginning of container?
+const EOF              = -1;
+const TB_NULL          =  0;
+const TB_BOOL          =  1;
+const TB_INT           =  2;
+const TB_NEG_INT       =  3;
+const TB_FLOAT         =  4;
+const TB_DECIMAL       =  5;
+const TB_TIMESTAMP     =  6;
+const TB_SYMBOL        =  7;
+const TB_STRING        =  8;
+const TB_CLOB          =  9;
+const TB_BLOB          = 10;
+const TB_LIST          = 11;
+const TB_SEXP          = 12;
+const TB_STRUCT        = 13;
+const TB_ANNOTATION    = 14;
+const TB_UNUSED__      = 15;
+const TB_SEXP_CLOSE    = 21;
+const TB_LIST_CLOSE    = 22;
+const TB_STRUCT_CLOSE  = 23;
 
 function get_ion_type(t: number): IonType {
     switch (t) {
-        case TB_NULL:
-            return IonTypes.NULL;
-        case TB_BOOL:
-            return IonTypes.BOOL;
-        case TB_INT:
-            return IonTypes.INT;
-        case TB_NEG_INT:
-            return IonTypes.INT;
-        case TB_FLOAT:
-            return IonTypes.FLOAT;
-        case TB_DECIMAL:
-            return IonTypes.DECIMAL;
-        case TB_TIMESTAMP:
-            return IonTypes.TIMESTAMP;
-        case TB_SYMBOL:
-            return IonTypes.SYMBOL;
-        case TB_STRING:
-            return IonTypes.STRING;
-        case TB_CLOB:
-            return IonTypes.CLOB;
-        case TB_BLOB:
-            return IonTypes.BLOB;
-        case TB_LIST:
-            return IonTypes.LIST;
-        case TB_SEXP:
-            return IonTypes.SEXP;
-        case TB_STRUCT:
-            return IonTypes.STRUCT;
-        default:
-            return null;
+        case TB_NULL:      return IonTypes.NULL;
+        case TB_BOOL:      return IonTypes.BOOL;
+        case TB_INT:       return IonTypes.INT;
+        case TB_NEG_INT:   return IonTypes.INT;
+        case TB_FLOAT:     return IonTypes.FLOAT;
+        case TB_DECIMAL:   return IonTypes.DECIMAL;
+        case TB_TIMESTAMP: return IonTypes.TIMESTAMP;
+        case TB_SYMBOL:    return IonTypes.SYMBOL;
+        case TB_STRING:    return IonTypes.STRING;
+        case TB_CLOB:      return IonTypes.CLOB;
+        case TB_BLOB:      return IonTypes.BLOB;
+        case TB_LIST:      return IonTypes.LIST;
+        case TB_SEXP:      return IonTypes.SEXP;
+        case TB_STRUCT:    return IonTypes.STRUCT;
+        default:           return null;
     }
 }
 

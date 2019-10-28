@@ -28,78 +28,78 @@ import JSBI from "jsbi";
 import {JsbiSupport} from "./JsbiSupport";
 
 const EOF = -1;  // EOF is end of container, distinct from undefined which is value has been consumed
-const ERROR = -2;
-const T_NULL = 1;
-const T_BOOL = 2;
-const T_INT = 3;
-const T_HEXINT = 4;
-const T_FLOAT = 5;
+const ERROR           = -2;
+const T_NULL          = 1;
+const T_BOOL          = 2;
+const T_INT           = 3;
+const T_HEXINT        = 4;
+const T_FLOAT         = 5;
 const T_FLOAT_SPECIAL = 6;
-const T_DECIMAL = 7;
-const T_TIMESTAMP = 8;
-const T_IDENTIFIER = 9;
-const T_OPERATOR = 10;
-const T_STRING1 = 11;
-const T_STRING2 = 12;
-const T_STRING3 = 13;
-const T_CLOB2 = 14;
-const T_CLOB3 = 15;
-const T_BLOB = 16;
-const T_SEXP = 17;
-const T_LIST = 18;
-const T_STRUCT = 19;
+const T_DECIMAL       = 7;
+const T_TIMESTAMP     = 8;
+const T_IDENTIFIER    = 9;
+const T_OPERATOR      = 10;
+const T_STRING1       = 11;
+const T_STRING2       = 12;
+const T_STRING3       = 13;
+const T_CLOB2         = 14;
+const T_CLOB3         = 15;
+const T_BLOB          = 16;
+const T_SEXP          = 17;
+const T_LIST          = 18;
+const T_STRUCT        = 19;
 
-const CH_CR = 13; // '\r'
-const CH_NL = 10; // '\n'
-const CH_BS = 92; // '\\'
+const CH_CR =  13; // '\r'
+const CH_NL =  10; // '\n'
+const CH_BS =  92; // '\\'
 const CH_FORWARD_SLASH = "/".charCodeAt(0); // 47
-const CH_AS = 42; // '*'
-const CH_SQ = 39; // '\''
+const CH_AS =  42; // '*'
+const CH_SQ =  39; // '\''
 const CH_DOUBLE_QUOTE = "\"".charCodeAt(0); // 34
-const CH_CM = 44; // ';'
-const CH_OP = 40; // '('
-const CH_CP = 41; // ')'
+const CH_CM =  44; // ';'
+const CH_OP =  40; // '('
+const CH_CP =  41; // ')'
 const CH_LEFT_CURLY: number = "{".charCodeAt(0); // 123
 const CH_CC = 125; // '}'
-const CH_OS = 91; // '['
-const CH_CS = 93; // ']'
-const CH_CL = 58; // ':'
-const CH_DT = 46; // '.'
-const CH_EQ = 61; // '='
-const CH_PS = 43; // '+'
-const CH_MS = 45; // '-'
-const CH_0 = 48; // '0'
-const CH_D = 68; // 'D'
-const CH_E = 69; // 'E'
-const CH_F = 70; // 'F'
-const CH_T = 84; // 'T'
-const CH_X = 88; // 'X'
-const CH_Z = 90; // 'Z'
-const CH_d = 100; // 'd'
-const CH_e = 101; // 'e'
-const CH_f = 102; // 'f'
-const CH_i = 105; // 'i'
-const CH_n = 110; // 'n'
-const CH_x = 120; // 'x'
+const CH_OS =  91; // '['
+const CH_CS =  93; // ']'
+const CH_CL =  58; // ':'
+const CH_DT =  46; // '.'
+const CH_EQ =  61; // '='
+const CH_PS =  43; // '+'
+const CH_MS =  45; // '-'
+const CH_0  =  48; // '0'
+const CH_D  =  68; // 'D'
+const CH_E  =  69; // 'E'
+const CH_F  =  70; // 'F'
+const CH_T  =  84; // 'T'
+const CH_X  =  88; // 'X'
+const CH_Z  =  90; // 'Z'
+const CH_d  = 100; // 'd'
+const CH_e  = 101; // 'e'
+const CH_f  = 102; // 'f'
+const CH_i  = 105; // 'i'
+const CH_n  = 110; // 'n'
+const CH_x  = 120; // 'x'
 
-const ESC_0 = 48; //  values['0'] = 0;        //    \u0000  \0  alert NUL
-const ESC_a = 97; //  values['a'] = 7;        //    \u0007  \a  alert BEL
-const ESC_b = 98; //  values['b'] = 8;        //    \u0008  \b  backspace BS
-const ESC_t = 116; //  values['t'] = 9;        //    \u0009  \t  horizontal tab HT
-const ESC_nl = 110; //  values['n'] = '\n';     //    \ u000A  \ n  linefeed LF
-const ESC_ff = 102; //  values['f'] = 0x0c;     //    \u000C  \f  form feed FF
-const ESC_cr = 114; //  values['r'] = '\r';     //    \ u000D  \ r  carriage return CR
-const ESC_v = 118; //  values['v'] = 0x0b;     //    \u000B  \v  vertical tab VT
+const ESC_0 =     48; //  values['0'] = 0;        //    \u0000  \0  alert NUL
+const ESC_a =     97; //  values['a'] = 7;        //    \u0007  \a  alert BEL
+const ESC_b =     98; //  values['b'] = 8;        //    \u0008  \b  backspace BS
+const ESC_t =    116; //  values['t'] = 9;        //    \u0009  \t  horizontal tab HT
+const ESC_nl =   110; //  values['n'] = '\n';     //    \ u000A  \ n  linefeed LF
+const ESC_ff =   102; //  values['f'] = 0x0c;     //    \u000C  \f  form feed FF
+const ESC_cr =   114; //  values['r'] = '\r';     //    \ u000D  \ r  carriage return CR
+const ESC_v =    118; //  values['v'] = 0x0b;     //    \u000B  \v  vertical tab VT
 const ESC_dq = CH_DOUBLE_QUOTE; //  values['"'] = '"';      //    \u0022  \"  double quote
 const ESC_sq = CH_SQ; //  values['\''] = '\'';    //    \u0027  \'  single quote
-const ESC_qm = 63; //  values['?'] = '?';      //    \u003F  \?  question mark
-const ESC_bs = 92; //  values['\\'] = '\\';    //    \u005C  \\  backslash
-const ESC_fs = 47; //  values['/'] = '/';      //    \u002F  \/  forward slash nothing  \NL  escaped NL expands to nothing
-const ESC_nl2 = 10; //  values['\n'] = ESCAPE_REMOVES_NEWLINE;  // slash-new line the new line eater
-const ESC_nl3 = 13; //  values['\r'] = ESCAPE_REMOVES_NEWLINE2;  // slash-new line the new line eater
-const ESC_x = CH_x; //  values['x'] = ESCAPE_HEX;      //    any  \xHH  2-digit hexadecimal unicode character equivalent to \ u00HH
-const ESC_u = 117; //  values['u'] = ESCAPE_LITTLE_U; //    any  \ uHHHH  4-digit hexadecimal unicode character
-const ESC_U = 85; //  values['U'] = ESCAPE_BIG_U;    //    any  \ UHHHHHHHH  8-digit hexadecimal unicode character
+const ESC_qm =    63; //  values['?'] = '?';      //    \u003F  \?  question mark
+const ESC_bs =    92; //  values['\\'] = '\\';    //    \u005C  \\  backslash
+const ESC_fs =    47; //  values['/'] = '/';      //    \u002F  \/  forward slash nothing  \NL  escaped NL expands to nothing
+const ESC_nl2 =   10; //  values['\n'] = ESCAPE_REMOVES_NEWLINE;  // slash-new line the new line eater
+const ESC_nl3 =   13; //  values['\r'] = ESCAPE_REMOVES_NEWLINE2;  // slash-new line the new line eater
+const ESC_x =   CH_x; //  values['x'] = ESCAPE_HEX;      //    any  \xHH  2-digit hexadecimal unicode character equivalent to \ u00HH
+const ESC_u =    117; //  values['u'] = ESCAPE_LITTLE_U; //    any  \ uHHHH  4-digit hexadecimal unicode character
+const ESC_U =     85; //  values['U'] = ESCAPE_BIG_U;    //    any  \ UHHHHHHHH  8-digit hexadecimal unicode character
 
 const empty_array: any[] = [];
 
@@ -110,127 +110,83 @@ const _UTF16_MASK = 0x03ff;
 
 export function get_ion_type(t: number): IonType {
     switch (t) {
-        case EOF:
-            return null;
-        case ERROR:
-            return null;
-        case T_NULL:
-            return IonTypes.NULL;
-        case T_BOOL:
-            return IonTypes.BOOL;
-        case T_INT:
-            return IonTypes.INT;
-        case T_HEXINT:
-            return IonTypes.INT;
-        case T_FLOAT:
-            return IonTypes.FLOAT;
-        case T_FLOAT_SPECIAL:
-            return IonTypes.FLOAT;
-        case T_DECIMAL:
-            return IonTypes.DECIMAL;
-        case T_TIMESTAMP:
-            return IonTypes.TIMESTAMP;
-        case T_IDENTIFIER:
-            return IonTypes.SYMBOL;
-        case T_OPERATOR:
-            return IonTypes.SYMBOL;
-        case T_STRING1:
-            return IonTypes.SYMBOL;
-        case T_STRING2:
-            return IonTypes.STRING;
-        case T_STRING3:
-            return IonTypes.STRING;
-        case T_CLOB2:
-            return IonTypes.CLOB;
-        case T_CLOB3:
-            return IonTypes.CLOB;
-        case T_BLOB:
-            return IonTypes.BLOB;
-        case T_SEXP:
-            return IonTypes.SEXP;
-        case T_LIST:
-            return IonTypes.LIST;
-        case T_STRUCT:
-            return IonTypes.STRUCT;
-        default:
-            throw new Error("Unknown type: " + String(t) + ".");
+        case EOF:             return null;
+        case ERROR:           return null;
+        case T_NULL:          return IonTypes.NULL;
+        case T_BOOL:          return IonTypes.BOOL;
+        case T_INT:           return IonTypes.INT;
+        case T_HEXINT:        return IonTypes.INT;
+        case T_FLOAT:         return IonTypes.FLOAT;
+        case T_FLOAT_SPECIAL: return IonTypes.FLOAT;
+        case T_DECIMAL:       return IonTypes.DECIMAL;
+        case T_TIMESTAMP:     return IonTypes.TIMESTAMP;
+        case T_IDENTIFIER:    return IonTypes.SYMBOL;
+        case T_OPERATOR:      return IonTypes.SYMBOL;
+        case T_STRING1:       return IonTypes.SYMBOL;
+        case T_STRING2:       return IonTypes.STRING;
+        case T_STRING3:       return IonTypes.STRING;
+        case T_CLOB2:         return IonTypes.CLOB;
+        case T_CLOB3:         return IonTypes.CLOB;
+        case T_BLOB:          return IonTypes.BLOB;
+        case T_SEXP:          return IonTypes.SEXP;
+        case T_LIST:          return IonTypes.LIST;
+        case T_STRUCT:        return IonTypes.STRUCT;
+        default:              throw new Error("Unknown type: " + String(t) + ".");
     }
 }
 
 //needs to differentiate between quoted text of 'null' and the symbol keyword null
 function get_keyword_type(str: string): number {
-    if (str === "null") return T_NULL;
-    if (str === "true") return T_BOOL;
+    if (str === "null")  return T_NULL;
+    if (str === "true")  return T_BOOL;
     if (str === "false") return T_BOOL;
-    if (str === "nan") return T_FLOAT_SPECIAL;
-    if (str === "+inf") return T_FLOAT_SPECIAL;
-    if (str === "-inf") return T_FLOAT_SPECIAL;
+    if (str === "nan")   return T_FLOAT_SPECIAL;
+    if (str === "+inf")  return T_FLOAT_SPECIAL;
+    if (str === "-inf")  return T_FLOAT_SPECIAL;
     throw new Error("Unknown keyword: " + str + ".");
 }
 
 function get_type_from_name(str: string): number {
-    if (str === "null") return T_NULL;
-    if (str === "bool") return T_BOOL;
-    if (str === "int") return T_INT;
-    if (str === "float") return T_FLOAT;
-    if (str === "decimal") return T_DECIMAL;
+    if (str === "null")      return T_NULL;
+    if (str === "bool")      return T_BOOL;
+    if (str === "int")       return T_INT;
+    if (str === "float")     return T_FLOAT;
+    if (str === "decimal")   return T_DECIMAL;
     if (str === "timestamp") return T_TIMESTAMP;
-    if (str === "symbol") return T_IDENTIFIER;
-    if (str === "string") return T_STRING2;
-    if (str === "clob") return T_CLOB2;
-    if (str === "blob") return T_BLOB;
-    if (str === "sexp") return T_SEXP;
-    if (str === "list") return T_LIST;
-    if (str === "struct") return T_STRUCT;
+    if (str === "symbol")    return T_IDENTIFIER;
+    if (str === "string")    return T_STRING2;
+    if (str === "clob")      return T_CLOB2;
+    if (str === "blob")      return T_BLOB;
+    if (str === "sexp")      return T_SEXP;
+    if (str === "list")      return T_LIST;
+    if (str === "struct")    return T_STRUCT;
     throw new Error("Unknown type: " + str + ".");
 }
 
 function get_hex_value(ch: number): number {
     switch (ch) { // quick and dirty - we need a better impl TODO
-        case  48:
-            return 0; // '0'
-        case  49:
-            return 1; // '1'
-        case  50:
-            return 2; // '2'
-        case  51:
-            return 3; // '3'
-        case  52:
-            return 4; // '4'
-        case  53:
-            return 5; // '5'
-        case  54:
-            return 6; // '6'
-        case  55:
-            return 7; // '7'
-        case  56:
-            return 8; // '8'
-        case  57:
-            return 9; // '9'
-        case  97:
-            return 10; // 'a'
-        case  98:
-            return 11; // 'b'
-        case  99:
-            return 12; // 'c'
-        case 100:
-            return 13; // 'd'
-        case 101:
-            return 14; // 'e'
-        case 102:
-            return 15; // 'f'
-        case  65:
-            return 10; // 'A'
-        case  66:
-            return 11; // 'B'
-        case  67:
-            return 12; // 'C'
-        case  68:
-            return 13; // 'D'
-        case  69:
-            return 14; // 'E'
-        case  70:
-            return 15; // 'F'
+        case  48: return  0; // '0'
+        case  49: return  1; // '1'
+        case  50: return  2; // '2'
+        case  51: return  3; // '3'
+        case  52: return  4; // '4'
+        case  53: return  5; // '5'
+        case  54: return  6; // '6'
+        case  55: return  7; // '7'
+        case  56: return  8; // '8'
+        case  57: return  9; // '9'
+        case  97: return 10; // 'a'
+        case  98: return 11; // 'b'
+        case  99: return 12; // 'c'
+        case 100: return 13; // 'd'
+        case 101: return 14; // 'e'
+        case 102: return 15; // 'f'
+        case  65: return 10; // 'A'
+        case  66: return 11; // 'B'
+        case  67: return 12; // 'C'
+        case  68: return 13; // 'D'
+        case  69: return 14; // 'E'
+        case  70: return 15; // 'F'
     }
     throw new Error("Unexpected bad hex digit in checked data.");
 }
@@ -1313,34 +1269,20 @@ export class ParserTextRaw {
         ch = this._in.valueAt(ii + 1);
         this._esc_len = 1;
         switch (ch) {
-            case ESC_0:
-                return 0; // =  48, //  values['0']  = 0;       //    \u0000  \0  alert NUL
-            case ESC_a:
-                return 7; // =  97, //  values['a']  = 7;       //    \u0007  \a  alert BEL
-            case ESC_b:
-                return 8; // =  98, //  values['b']  = 8;       //    \u0008  \b  backspace BS
-            case ESC_t:
-                return 9; // = 116, //  values['t']  = 9;       //    \u0009  \t  horizontal tab HT
-            case ESC_nl:
-                return 10; // = 110, //  values['n']  = '\n';    //    \ u000A  \ n  linefeed LF
-            case ESC_ff:
-                return 12;  // = 102, //  values['f']  = 0x0c;    //    \u000C  \f  form feed FF
-            case ESC_cr:
-                return 13; // = 114, //  values['r']  = '\r';    //    \ u000D  \ r  carriage return CR
-            case ESC_v:
-                return 11; // = 118, //  values['v']  = 0x0b;    //    \u000B  \v  vertical tab VT
-            case ESC_dq:
-                return 34; // =  34, //  values['"']  = '"';     //    \u0022  \"  double quote
-            case ESC_sq:
-                return 39; // =  39, //  values['\''] = '\'';    //    \u0027  \'  single quote
-            case ESC_qm:
-                return 63; // =  63, //  values['?']  = '?';     //    \u003F  \?  question mark
-            case ESC_bs:
-                return 92; // =  92, //  values['\\'] = '\\';    //    \u005C  \\  backslash
-            case ESC_fs:
-                return 47; // =  47, //  values['/']  = '/';     //    \u002F  \/  forward slash nothing  \NL  escaped NL expands to nothing
-            case ESC_nl2:
-                return -1; // =  10, //  values['\n'] = ESCAPE_REMOVES_NEWLINE;  // slash-new line the new line eater
+            case ESC_0:   return 0;  // =  48, //  values['0']  = 0;       //    \u0000  \0  alert NUL
+            case ESC_a:   return 7;  // =  97, //  values['a']  = 7;       //    \u0007  \a  alert BEL
+            case ESC_b:   return 8;  // =  98, //  values['b']  = 8;       //    \u0008  \b  backspace BS
+            case ESC_t:   return 9;  // = 116, //  values['t']  = 9;       //    \u0009  \t  horizontal tab HT
+            case ESC_nl:  return 10; // = 110, //  values['n']  = '\n';    //    \ u000A  \ n  linefeed LF
+            case ESC_ff:  return 12; // = 102, //  values['f']  = 0x0c;    //    \u000C  \f  form feed FF
+            case ESC_cr:  return 13; // = 114, //  values['r']  = '\r';    //    \ u000D  \ r  carriage return CR
+            case ESC_v:   return 11; // = 118, //  values['v']  = 0x0b;    //    \u000B  \v  vertical tab VT
+            case ESC_dq:  return 34; // =  34, //  values['"']  = '"';     //    \u0022  \"  double quote
+            case ESC_sq:  return 39; // =  39, //  values['\''] = '\'';    //    \u0027  \'  single quote
+            case ESC_qm:  return 63; // =  63, //  values['?']  = '?';     //    \u003F  \?  question mark
+            case ESC_bs:  return 92; // =  92, //  values['\\'] = '\\';    //    \u005C  \\  backslash
+            case ESC_fs:  return 47; // =  47, //  values['/']  = '/';     //    \u002F  \/  forward slash nothing  \NL  escaped NL expands to nothing
+            case ESC_nl2: return -1; // =  10, //  values['\n'] = ESCAPE_REMOVES_NEWLINE;  // slash-new line the new line eater
             case ESC_nl3: // =  13, //  values['\r'] = ESCAPE_REMOVES_NEWLINE2;  // slash-new line the new line eater
                 if (ii + 3 < end && this._in.valueAt(ii + 3) == CH_NL) {
                     this._esc_len = 2;

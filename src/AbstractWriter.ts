@@ -78,44 +78,19 @@ export abstract class AbstractWriter implements Writer {
             this.writeNull(type);
         } else {
             switch (type) {
-                case IonTypes.BOOL:
-                    this.writeBoolean(reader.booleanValue());
-                    break;
-                case IonTypes.INT:
-                    this.writeInt(reader.bigIntValue());
-                    break;
-                case IonTypes.FLOAT:
-                    this.writeFloat64(reader.numberValue());
-                    break;
-                case IonTypes.DECIMAL:
-                    this.writeDecimal(reader.decimalValue());
-                    break;
-                case IonTypes.TIMESTAMP:
-                    this.writeTimestamp(reader.timestampValue());
-                    break;
-                case IonTypes.SYMBOL:
-                    this.writeSymbol(reader.stringValue());
-                    break;
-                case IonTypes.STRING:
-                    this.writeString(reader.stringValue());
-                    break;
-                case IonTypes.CLOB:
-                    this.writeClob(reader.byteValue());
-                    break;
-                case IonTypes.BLOB:
-                    this.writeBlob(reader.byteValue());
-                    break;
-                case IonTypes.LIST:
-                    this.stepIn(IonTypes.LIST);
-                    break;
-                case IonTypes.SEXP:
-                    this.stepIn(IonTypes.SEXP);
-                    break;
-                case IonTypes.STRUCT:
-                    this.stepIn(IonTypes.STRUCT);
-                    break;
-                default:
-                    throw new Error('Unrecognized type ' + (type !== null ? type.name : type));
+                case IonTypes.BOOL:      this.writeBoolean(reader.booleanValue()); break;
+                case IonTypes.INT:       this.writeInt(reader.bigIntValue()); break;
+                case IonTypes.FLOAT:     this.writeFloat64(reader.numberValue()); break;
+                case IonTypes.DECIMAL:   this.writeDecimal(reader.decimalValue()); break;
+                case IonTypes.TIMESTAMP: this.writeTimestamp(reader.timestampValue()); break;
+                case IonTypes.SYMBOL:    this.writeSymbol(reader.stringValue()); break;
+                case IonTypes.STRING:    this.writeString(reader.stringValue()); break;
+                case IonTypes.CLOB:      this.writeClob(reader.byteValue()); break;
+                case IonTypes.BLOB:      this.writeBlob(reader.byteValue()); break;
+                case IonTypes.LIST:      this.stepIn(IonTypes.LIST); break;
+                case IonTypes.SEXP:      this.stepIn(IonTypes.SEXP); break;
+                case IonTypes.STRUCT:    this.stepIn(IonTypes.STRUCT); break;
+                default: throw new Error('Unrecognized type ' + (type !== null ? type.name : type));
             }
             if (type.isContainer) {
                 reader.stepIn();

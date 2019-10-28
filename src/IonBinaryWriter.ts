@@ -435,11 +435,8 @@ export class BinaryWriter extends AbstractWriter {
 
 export interface Node {
     isContainer(): boolean;
-
     addChild(child: Node, name?: Uint8Array): void;
-
     write(): void;
-
     getLength(): number;
 }
 

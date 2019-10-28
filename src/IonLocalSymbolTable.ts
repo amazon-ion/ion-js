@@ -15,7 +15,6 @@ import {getSystemSymbolTableImport} from "./IonSystemSymbolTable";
 import {Import} from "./IonImport";
 import {SymbolIndex} from "./IonSymbolIndex";
 
-
 /**
  * A local symbol table defines all the symbols which aren't included in the system
  * symbol table or from a shared symbol table via an import.

@@ -57,13 +57,13 @@ export class TextReader implements Reader {
             throw new Error("a source Span is required to make a reader");
         }
 
-        this._parser = new ParserTextRaw(source);
-        this._depth = 0;
-        this._cat = catalog ? catalog : new Catalog();
-        this._symtab = defaultLocalSymbolTable();
-        this._type = null;
+        this._parser   = new ParserTextRaw(source);
+        this._depth    = 0;
+        this._cat      = catalog ? catalog : new Catalog();
+        this._symtab   = defaultLocalSymbolTable();
+        this._type     = null;
         this._raw_type = undefined;
-        this._raw = undefined;
+        this._raw      = undefined;
     }
 
     load_raw() {

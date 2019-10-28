@@ -59,51 +59,36 @@ import {JsbiSerde} from "./JsbiSerde";
 
 const DEBUG_FLAG = true;
 
-const EOF = -1;  // EOF is end of container; distinct from undefined which is value has been consumed
-const ERROR = -2;
-const TB_UNUSED__ = 15;
-const TB_DATAGRAM = 20;  // fake type of the top level
-const TB_SEXP_CLOSE = 21;
-const TB_LIST_CLOSE = 22;
-const TB_STRUCT_CLOSE = 23;
+const EOF              = -1;  // EOF is end of container; distinct from undefined which is value has been consumed
+const ERROR            = -2;
+const TB_UNUSED__      = 15;
+const TB_DATAGRAM      = 20;  // fake type of the top level
+const TB_SEXP_CLOSE    = 21;
+const TB_LIST_CLOSE    = 22;
+const TB_STRUCT_CLOSE  = 23;
 
 function get_ion_type(rt: number): IonType {
     switch (rt) {
-        case IonBinary.TB_NULL:
-            return IonTypes.NULL;
-        case IonBinary.TB_BOOL:
-            return IonTypes.BOOL;
-        case IonBinary.TB_INT:
-            return IonTypes.INT;
-        case IonBinary.TB_NEG_INT:
-            return IonTypes.INT;
-        case IonBinary.TB_FLOAT:
-            return IonTypes.FLOAT;
-        case IonBinary.TB_DECIMAL:
-            return IonTypes.DECIMAL;
-        case IonBinary.TB_TIMESTAMP:
-            return IonTypes.TIMESTAMP;
-        case IonBinary.TB_SYMBOL:
-            return IonTypes.SYMBOL;
-        case IonBinary.TB_STRING:
-            return IonTypes.STRING;
-        case IonBinary.TB_CLOB:
-            return IonTypes.CLOB;
-        case IonBinary.TB_BLOB:
-            return IonTypes.BLOB;
-        case IonBinary.TB_SEXP:
-            return IonTypes.SEXP;
-        case IonBinary.TB_LIST:
-            return IonTypes.LIST;
-        case IonBinary.TB_STRUCT:
-            return IonTypes.STRUCT;
-        default:
-            return undefined;
+        case IonBinary.TB_NULL:      return IonTypes.NULL;
+        case IonBinary.TB_BOOL:      return IonTypes.BOOL;
+        case IonBinary.TB_INT:       return IonTypes.INT;
+        case IonBinary.TB_NEG_INT:   return IonTypes.INT;
+        case IonBinary.TB_FLOAT:     return IonTypes.FLOAT;
+        case IonBinary.TB_DECIMAL:   return IonTypes.DECIMAL;
+        case IonBinary.TB_TIMESTAMP: return IonTypes.TIMESTAMP;
+        case IonBinary.TB_SYMBOL:    return IonTypes.SYMBOL;
+        case IonBinary.TB_STRING:    return IonTypes.STRING;
+        case IonBinary.TB_CLOB:      return IonTypes.CLOB;
+        case IonBinary.TB_BLOB:      return IonTypes.BLOB;
+        case IonBinary.TB_SEXP:      return IonTypes.SEXP;
+        case IonBinary.TB_LIST:      return IonTypes.LIST;
+        case IonBinary.TB_STRUCT:    return IonTypes.STRUCT;
+        default: return undefined;
     }
 }
 
-const TS_SHIFT = 5;
-const TS_MASK = 0x1f;
+const TS_SHIFT   =    5;
+const TS_MASK    = 0x1f;
 
 function encode_type_stack(type_, len) {
     var ts = (len << TS_SHIFT) | (type_ & TS_MASK);
@@ -118,9 +103,9 @@ function decode_type_stack_len(ts) {
     return ts >>> TS_SHIFT;
 }
 
-const VINT_SHIFT = 7;
-const VINT_MASK = 0x7f;
-const VINT_FLAG = 0x80;
+const VINT_SHIFT =    7;
+const VINT_MASK  = 0x7f;
+const VINT_FLAG  = 0x80;
 
 function high_nibble(tb) {
     return ((tb >> IonBinary.TYPE_SHIFT) & IonBinary.NIBBLE_MASK);
@@ -652,12 +637,12 @@ export class ParserBinaryRaw {
 
     private clear_value(): void {
         this._raw_type = EOF;
-        this._curr = undefined;
-        this._a = empty_array;
-        this._as = -1;
-        this._null = false;
-        this._fid = -1;
-        this._len = -1;
+        this._curr     = undefined;
+        this._a        = empty_array;
+        this._as       = -1;
+        this._null     = false;
+        this._fid      = -1;
+        this._len      = -1;
     }
 
     private load_length(tb: number) {
