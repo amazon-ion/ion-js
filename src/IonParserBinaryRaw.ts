@@ -128,7 +128,7 @@ export class ParserBinaryRaw {
     private _len: number = -1;
     private _curr = undefined;
     private _null: boolean = false;
-    private _fid: number = -1;
+    private _fid: number = null;
     private _as: number = -1;
     private _ae: number = -1;
     private _a = [];
@@ -384,7 +384,7 @@ export class ParserBinaryRaw {
         this._a = empty_array;
         this._as       = -1;
         this._null     = false;
-        this._fid      = -1;
+        this._fid      = null;
         this._len      = -1;
     }
 
