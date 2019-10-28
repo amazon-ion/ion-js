@@ -575,6 +575,7 @@ export class ParserTextRaw {
             let ch = this._read_after_whitespace(true);
             if (ch == CH_CL && this._peek() == CH_CL) {
                 this._read(); // consume the colon character
+                if(symbol === '$0') throw new Error('Symbol ID zero is not supported.');
                 this._ann.push(symbol);
                 this._ops.unshift( calling_op );
             } else {

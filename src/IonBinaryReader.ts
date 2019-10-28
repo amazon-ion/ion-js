@@ -251,6 +251,10 @@ export class BinaryReader implements Reader {
       if (typeof(s) == 'undefined') {
         s = "$" + symbolId.toString();
       }
+    } else if(symbolId === 0) {
+        throw new Error('Symbol ID zero is unsupported');
+    } else if(symbolId < 0) {
+        throw new Error('Negative symbol ID: ' + symbolId + ' is illegal.');
     }
     return s;
   }
