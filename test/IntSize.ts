@@ -14,8 +14,8 @@
 
 import {assert} from 'chai';
 import * as ion from '../src/IonTests';
+import {IonTypes} from '../src/IonTests';
 import IntSize from "../src/IntSize";
-import {IonTypes} from "../src/IonTests";
 import JSBI from "jsbi";
 
 function intToBinaryIonBytes(value: number | JSBI): Uint8Array {
@@ -73,7 +73,7 @@ describe('IntSize', () => {
             assert.equal(IonTypes.INT, reader.next());
             assert.equal(reader.intSize(), IntSize.BigInt);
         });
-        
+
         it('< MIN_SAFE_INTEGER: IntSize.BigInt', () => {
             let value = JSBI.subtract(JSBI.BigInt(Number.MIN_SAFE_INTEGER), JSBI.BigInt(1));
             let reader = ion.makeReader(intToBinaryIonBytes(value));

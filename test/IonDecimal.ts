@@ -14,10 +14,10 @@
 
 import {assert} from "chai";
 import * as ion from "../src/IonTests";
+import {Decimal, decodeUtf8} from "../src/IonTests";
 import * as util from "../src/util";
 import JSBI from "jsbi";
 import {JsbiSupport} from "../src/JsbiSupport";
-import {Decimal, decodeUtf8} from "../src/IonTests";
 
 /**
  * @param decimalString The text representation of the decimal to test.
@@ -173,7 +173,7 @@ let decimalComparisonTests = [
     {input1: '-1d-1', input2: '-0d0', expected: -1},
 ];
 
-let decimalEqualsTests: ({input1: string, input2: string, expected: boolean, skip?: boolean})[] = [
+let decimalEqualsTests: ({ input1: string, input2: string, expected: boolean, skip?: boolean })[] = [
     {input1: '0', input2: '0', expected: true},
     {input1: '0', input2: '0d0', expected: true},
     {input1: '0', input2: '0d1', expected: false},
@@ -206,7 +206,7 @@ let decimalEqualsTests: ({input1: string, input2: string, expected: boolean, ski
     {input1: '10000000000000000.00000000000000000', input2: '10000000000000000.0000000000000000', expected: false},
 ];
 
-let decimalFromNumberNumberTests: ({coefficient: number, exponent: number})[] = [
+let decimalFromNumberNumberTests: ({ coefficient: number, exponent: number })[] = [
     {coefficient: 0, exponent: 0},
     {coefficient: -0, exponent: -0},
     {coefficient: -0, exponent: 0},
@@ -283,11 +283,11 @@ describe('Decimal', () => {
     describe('Parsing', () => {
         decimalParsingTests.forEach(
             ({inputString, coefficient, exponent, numberValue, text}) => {
-            it(
-                inputString,
-                () => test(inputString, coefficient, exponent, numberValue, text)
-            );
-        });
+                it(
+                    inputString,
+                    () => test(inputString, coefficient, exponent, numberValue, text)
+                );
+            });
     });
 
     describe('equals', () => {
@@ -295,9 +295,9 @@ describe('Decimal', () => {
             ({input1, input2, expected, skip = false}) => {
                 let shouldEqual = expected ? ' equals ' : ' is not equal to ';
                 let testName = input1 + shouldEqual + input2;
-                if(skip) {
-                  it.skip(testName, () => {});
-                  return;
+                if (skip) {
+                    it.skip(testName, () => {});
+                    return;
                 }
                 it(
                     testName,
@@ -309,20 +309,20 @@ describe('Decimal', () => {
 
     describe('compareTo', () => {
         decimalComparisonTests.forEach(
-        ({input1, input2, expected}) => {
-            it(
-                input1 + ' compareTo ' + input2,
-                () => testCompareTo(input1, input2, expected)
-            );
-        });
+            ({input1, input2, expected}) => {
+                it(
+                    input1 + ' compareTo ' + input2,
+                    () => testCompareTo(input1, input2, expected)
+                );
+            });
     });
 
     it('intValue(5.0)', () => assert.equal(ion.Decimal.parse('5.0').intValue(), 5));
-    it('intValue(5.0000001)',  () => assert.equal(ion.Decimal.parse('5.0000001').intValue(), 5));
-    it('intValue(5.9999999)',  () => assert.equal(ion.Decimal.parse('5.9999999').intValue(), 5));
-    it('intValue(0)',  () => assert.equal(ion.Decimal.parse('0').intValue(), 0));
-    it('intValue(0.0000001)',  () => assert.equal(ion.Decimal.parse('0.0000001').intValue(), 0));
-    it('intValue(0.9999999)',  () => assert.equal(ion.Decimal.parse('0.9999999').intValue(), 0));
+    it('intValue(5.0000001)', () => assert.equal(ion.Decimal.parse('5.0000001').intValue(), 5));
+    it('intValue(5.9999999)', () => assert.equal(ion.Decimal.parse('5.9999999').intValue(), 5));
+    it('intValue(0)', () => assert.equal(ion.Decimal.parse('0').intValue(), 0));
+    it('intValue(0.0000001)', () => assert.equal(ion.Decimal.parse('0.0000001').intValue(), 0));
+    it('intValue(0.9999999)', () => assert.equal(ion.Decimal.parse('0.9999999').intValue(), 0));
     it('intValue(-0)', () => {
         let int = ion.Decimal.parse('-0').intValue();
         assert.equal(int, 0);

@@ -21,7 +21,7 @@ let stringToCharCodes = function (text: string): Uint8Array {
         charCodes[i] = text.charCodeAt(i);
     }
     return charCodes;
-}
+};
 
 let base64Test = function (text: string, expected: string) {
     let msg = text + ' encoded in base64 is ' + expected;
@@ -43,7 +43,7 @@ let isOperatorTest = function (text: string, expected) {
     it(name, () => {
         assert.equal(IonText.isOperator(text), expected);
     });
-}
+};
 
 let escapeTest = (ch, expected) => {
     let value = String.fromCharCode(ch);

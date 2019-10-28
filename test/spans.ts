@@ -17,21 +17,21 @@ import * as IonSpan from '../src/IonSpan';
 
 @suite('Spans')
 class UtilTests {
-  @test "null valueAt"() {
-    let span = new IonSpan.StringSpan("null");
-    assert.equal('n'.charCodeAt(0), span.valueAt(0));
-    assert.equal('u'.charCodeAt(0), span.valueAt(1));
-    assert.equal('l'.charCodeAt(0), span.valueAt(2));
-    assert.equal('l'.charCodeAt(0), span.valueAt(3));
-    assert.equal(-1, span.valueAt(4));
-  }
+    @test "null valueAt"() {
+        let span = new IonSpan.StringSpan("null");
+        assert.equal('n'.charCodeAt(0), span.valueAt(0));
+        assert.equal('u'.charCodeAt(0), span.valueAt(1));
+        assert.equal('l'.charCodeAt(0), span.valueAt(2));
+        assert.equal('l'.charCodeAt(0), span.valueAt(3));
+        assert.equal(-1, span.valueAt(4));
+    }
 
-  @test "null next"() {
-    let span = new IonSpan.StringSpan("null");
-    assert.equal('n'.charCodeAt(0), span.next());
-    assert.equal('u'.charCodeAt(0), span.next());
-    assert.equal('l'.charCodeAt(0), span.next());
-    assert.equal('l'.charCodeAt(0), span.next());
-    assert.equal(-1, span.next());
-  }
+    @test "null next"() {
+        let span = new IonSpan.StringSpan("null");
+        assert.equal('n'.charCodeAt(0), span.next());
+        assert.equal('u'.charCodeAt(0), span.next());
+        assert.equal('l'.charCodeAt(0), span.next());
+        assert.equal('l'.charCodeAt(0), span.next());
+        assert.equal(-1, span.next());
+    }
 }
