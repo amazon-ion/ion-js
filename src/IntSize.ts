@@ -15,8 +15,10 @@
 /**
  * Represents whether a given Ion int value will fit safely within a Number or if it requires a BigInt.
  */
-enum IntSize {
+export enum IntSize {
+    /** The Ion int value fits safely in a number. */
     Number,
+    /** The Ion int value requies a BigInt. */
     BigInt
 }
 
