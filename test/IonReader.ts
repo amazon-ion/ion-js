@@ -16,11 +16,21 @@ import {assert} from 'chai';
 import * as ion from '../src/IonTests';
 
 describe('Annotation tests', () => {
-    it('Annotations with sid0 throws.', () => {
+    it('Sid0 annotation in IonText throws.', () => {
         let test = () => {
             let input = '$0::taco';
             let reader = ion.makeReader(input);
             reader.next()
+        };
+        assert.throws(test);
+    });
+
+    it('Sid0 annotation in IonBinary throws.', () => {
+        let test = () => {
+            let input = new Uint8Array([0xe0, 0x01, 0x00, 0xea, 0xe4, 0x81, 0x80, 0x21, 0x01]);//$0::1
+            let reader = ion.makeReader(input);
+            reader.next();
+            reader.annotations();
         };
         assert.throws(test);
     });
