@@ -35,9 +35,7 @@ You can use this library either as a Node.js module or inside an HTML page.
     console.log(ion.concat(", ").concat(hello));
     ```
 
-**Warning:** RunKit has an old version of ion-js and the APIs have changed considerably since them. Please
-[install `ion-js` locally using NPM](https://github.com/amzn/ion-js/#npm) to try it out. For status
-updates, refer to this [issue](https://github.com/amzn/ion-js/issues/201).
+[Try it yourself](https://npm.runkit.com/ion-js).
 
 ### Web Browser
 
@@ -133,20 +131,19 @@ A distribution using `browserify` and `babelify` creates a browser friendly poly
 at `dist/browser/js/ion-bundle.js`.
 
 ## Ion Specification Support
-The current release in NPM is currently considered a beta.
 
 | Types                     | IonText       | IonBinary     | Limitations                                   |
 |:-------------------------:|:-------------:|:-------------:|:---------------------------------------------:|
 | `null`                    | yes           | yes           | none                                          |
 | `bool`                    | yes           | yes           | none                                          |
-| `int`                     | yes           | yes           | underscores, binary digits, signed 32-bit     |
+| `int`                     | yes           | yes           | underscores, binary digits                    |
 | `float`                   | yes           | yes           | underscores                                   |
 | `decimal`                 | yes           | yes           | none                                          |
 | `timestamp`               | yes           | yes           | none                                          |
-| `string`                  | yes           | yes           | verbatim newline escapes                      |
-| `symbol`                  | yes           | yes           | `$0`, symbol tokens, verbatim newline escapes |
+| `string`                  | yes           | yes           | none                                          |
+| `symbol`                  | yes           | yes           | `$0`, symbol tokens                           |
 | `blob`                    | yes           | yes           | none                                          |
-| `clob`                    | yes           | yes           | verbatim newline escapes                      |
+| `clob`                    | yes           | yes           | none                                          |
 | `struct`                  | yes           | yes           | none                                          |
 | `list`                    | yes           | yes           | none                                          |
 | `sexp`                    | yes           | yes           | none                                          |
@@ -155,11 +152,6 @@ The current release in NPM is currently considered a beta.
 | shared symbol tables      | no            | no            | none                                          |
 
 Notes:
-* *Signed 32-bit* `int` values are values inside the closed interval [`-2147483648`, `2147483647`].
-* *Verbatim newline escapes* are the backslash character `U+005C` followed by the code point of the
-  carriage return `U+000D` (CR), newline character `U+000A` (LF), or combination of CR & LF `U+000D` `U+000A`.
-  Which should not be confused with the backslash character `U+005C` followed by the `n` character (`U+006E`) or
-  `r` character (`U+0072`).
 * [test/iontests.ts](https://github.com/amzn/ion-js/blob/master/test/iontests.ts) defines multiple skipList variables
   referencing test vectors that are not expected to work at this time.
 
