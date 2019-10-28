@@ -237,8 +237,18 @@ let decimalWriterTests = [
         expected: [0x50]
     },
     {
+        name: "Writes 0d-0 as equiv 0d0 decimal",
+        instructions: (writer) => writer.writeDecimal(ion.Decimal.parse("0d-0")),
+        expected: [0x50]
+    },
+    {
         name: "Writes negative zero decimal",
         instructions: (writer) => writer.writeDecimal(ion.Decimal.parse("-0")),
+        expected: [0x52, 0x80, 0x80]
+    },
+    {
+        name: "Writes -0d-0 as equiv -0d0 decimal",
+        instructions: (writer) => writer.writeDecimal(ion.Decimal.parse("-0d-0")),
         expected: [0x52, 0x80, 0x80]
     },
     {
