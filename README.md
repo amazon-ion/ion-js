@@ -18,7 +18,7 @@ You can use this library either as a Node.js module or inside an HTML page.
 
 1. Add `ion-js` to your dependencies using `npm`
     ```
-    npm install --save-dev ion-js
+    npm install --save ion-js
     ```
 1. Use the library to read/write ion data. Here is an example that reads Ion data from a Javascript string
     ```javascript
