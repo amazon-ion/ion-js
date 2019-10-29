@@ -95,11 +95,13 @@
 							<h3>Methods</h3>
 							<ul class="tsd-index-list">
 								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_ionreader_.reader.html#annotations" class="tsd-kind-icon">annotations</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_ionreader_.reader.html#bigintvalue" class="tsd-kind-icon">big<wbr>Int<wbr>Value</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_ionreader_.reader.html#booleanvalue" class="tsd-kind-icon">boolean<wbr>Value</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_ionreader_.reader.html#bytevalue" class="tsd-kind-icon">byte<wbr>Value</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_ionreader_.reader.html#decimalvalue" class="tsd-kind-icon">decimal<wbr>Value</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_ionreader_.reader.html#depth" class="tsd-kind-icon">depth</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_ionreader_.reader.html#fieldname" class="tsd-kind-icon">field<wbr>Name</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_ionreader_.reader.html#intsize" class="tsd-kind-icon">int<wbr>Size</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_ionreader_.reader.html#isnull" class="tsd-kind-icon">is<wbr>Null</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_ionreader_.reader.html#next" class="tsd-kind-icon">next</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_ionreader_.reader.html#numbervalue" class="tsd-kind-icon">number<wbr>Value</a></li>
@@ -126,7 +128,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/0b2f6be/src/IonReader.ts#L68">IonReader.ts:68</a></li>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/ec40756/src/IonReader.ts#L70">IonReader.ts:70</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -140,6 +142,37 @@
 					</ul>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface">
+					<a name="bigintvalue" class="tsd-anchor"></a>
+					<h3>big<wbr>Int<wbr>Value</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
+						<li class="tsd-signature tsd-kind-icon">big<wbr>Int<wbr>Value<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">JSBI</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/ec40756/src/IonReader.ts#L136">IonReader.ts:136</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Returns the current value as a <code>BigInt</code>.  This is only valid if <code>type() == IonTypes.INT</code>.</p>
+								</div>
+								<dl class="tsd-comment-tags">
+									<dt>throw</dt>
+									<dd><p>Error when the reader is not positioned on an <code>int</code> typed value.</p>
+									</dd>
+								</dl>
+							</div>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">JSBI</span>
+								<span class="tsd-signature-symbol"> | </span>
+								<span class="tsd-signature-type">null</span>
+							</h4>
+							<p><code>null</code> if the current Ion value <a href="_ionreader_.reader.html#isnull">isNull</a> or a BigInt containing the deserialized integer.</p>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface">
 					<a name="booleanvalue" class="tsd-anchor"></a>
 					<h3>boolean<wbr>Value</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
@@ -149,7 +182,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/0b2f6be/src/IonReader.ts#L94">IonReader.ts:94</a></li>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/ec40756/src/IonReader.ts#L96">IonReader.ts:96</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -180,7 +213,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/0b2f6be/src/IonReader.ts#L104">IonReader.ts:104</a></li>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/ec40756/src/IonReader.ts#L106">IonReader.ts:106</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -212,7 +245,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/0b2f6be/src/IonReader.ts#L113">IonReader.ts:113</a></li>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/ec40756/src/IonReader.ts#L115">IonReader.ts:115</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -243,7 +276,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/0b2f6be/src/IonReader.ts#L60">IonReader.ts:60</a></li>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/ec40756/src/IonReader.ts#L62">IonReader.ts:62</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -265,7 +298,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/0b2f6be/src/IonReader.ts#L75">IonReader.ts:75</a></li>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/ec40756/src/IonReader.ts#L77">IonReader.ts:77</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -282,6 +315,30 @@
 					</ul>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface">
+					<a name="intsize" class="tsd-anchor"></a>
+					<h3>int<wbr>Size</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
+						<li class="tsd-signature tsd-kind-icon">int<wbr>Size<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../enums/_intsize_.intsize.html" class="tsd-signature-type">IntSize</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/ec40756/src/IonReader.ts#L144">IonReader.ts:144</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Indicates whether the current int value is small enough to be stored in a number without loss of precision
+									or if a BigInt is required.</p>
+								</div>
+							</div>
+							<h4 class="tsd-returns-title">Returns <a href="../enums/_intsize_.intsize.html" class="tsd-signature-type">IntSize</a></h4>
+							<p><a href="../enums/_intsize_.intsize.html#number">IntSize.Number</a> if the value will fit in a number, <a href="../enums/_intsize_.intsize.html#bigint">IntSize.BigInt</a> otherwise.</p>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface">
 					<a name="isnull" class="tsd-anchor"></a>
 					<h3>is<wbr>Null</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
@@ -291,7 +348,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/0b2f6be/src/IonReader.ts#L78">IonReader.ts:78</a></li>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/ec40756/src/IonReader.ts#L80">IonReader.ts:80</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -313,7 +370,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/0b2f6be/src/IonReader.ts#L39">IonReader.ts:39</a></li>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/ec40756/src/IonReader.ts#L41">IonReader.ts:41</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -340,7 +397,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/0b2f6be/src/IonReader.ts#L125">IonReader.ts:125</a></li>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/ec40756/src/IonReader.ts#L127">IonReader.ts:127</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -350,7 +407,7 @@
 								</div>
 								<dl class="tsd-comment-tags">
 									<dt>throw</dt>
-									<dd><p>Error when the reader is not positioned on a <code>int</code> or <code>number</code> typed value.</p>
+									<dd><p>Error when the reader is not positioned on an <code>int</code> or <code>float</code> typed value.</p>
 									</dd>
 								</dl>
 							</div>
@@ -374,7 +431,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/0b2f6be/src/IonReader.ts#L47">IonReader.ts:47</a></li>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/ec40756/src/IonReader.ts#L49">IonReader.ts:49</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -402,7 +459,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/0b2f6be/src/IonReader.ts#L57">IonReader.ts:57</a></li>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/ec40756/src/IonReader.ts#L59">IonReader.ts:59</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -432,7 +489,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/0b2f6be/src/IonReader.ts#L135">IonReader.ts:135</a></li>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/ec40756/src/IonReader.ts#L154">IonReader.ts:154</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -464,7 +521,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/0b2f6be/src/IonReader.ts#L144">IonReader.ts:144</a></li>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/ec40756/src/IonReader.ts#L163">IonReader.ts:163</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -495,7 +552,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/0b2f6be/src/IonReader.ts#L85">IonReader.ts:85</a></li>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/ec40756/src/IonReader.ts#L87">IonReader.ts:87</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -521,7 +578,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/0b2f6be/src/IonReader.ts#L154">IonReader.ts:154</a></li>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/ec40756/src/IonReader.ts#L173">IonReader.ts:173</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -547,6 +604,9 @@
 				<ul>
 					<li class="globals  ">
 						<a href="../globals.html"><em>Globals</em></a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="../modules/_intsize_.html">"<wbr>Int<wbr>Size"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
 						<a href="../modules/_ion_.html">"<wbr>Ion"</a>
@@ -582,6 +642,9 @@
 								<a href="_ionreader_.reader.html#annotations" class="tsd-kind-icon">annotations</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-interface">
+								<a href="_ionreader_.reader.html#bigintvalue" class="tsd-kind-icon">big<wbr>Int<wbr>Value</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-interface">
 								<a href="_ionreader_.reader.html#booleanvalue" class="tsd-kind-icon">boolean<wbr>Value</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-interface">
@@ -595,6 +658,9 @@
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-interface">
 								<a href="_ionreader_.reader.html#fieldname" class="tsd-kind-icon">field<wbr>Name</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-interface">
+								<a href="_ionreader_.reader.html#intsize" class="tsd-kind-icon">int<wbr>Size</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-interface">
 								<a href="_ionreader_.reader.html#isnull" class="tsd-kind-icon">is<wbr>Null</a>

@@ -24,22 +24,37 @@ function () {
   (0, _createClass2["default"])(AbstractWriter, [{
     key: "addAnnotation",
     value: function addAnnotation(annotation) {
+      if (!this._isString(annotation)) {
+        throw new Error('Annotation must be of type string.');
+      }
+
       this._annotations.push(annotation);
     }
   }, {
     key: "setAnnotations",
     value: function setAnnotations(annotations) {
-      this._annotations = annotations;
-    }
-  }, {
-    key: "_clearAnnotations",
-    value: function _clearAnnotations() {
-      this._annotations = [];
+      if (annotations === undefined || annotations === null) {
+        throw new Error('Annotations were undefined or null.');
+      } else if (!this._validateAnnotations(annotations)) {
+        throw new Error('Annotations must be of type string[].');
+      } else {
+        this._annotations = annotations;
+      }
     }
   }, {
     key: "writeValues",
     value: function writeValues(reader) {
       this._writeValues(reader);
+    }
+  }, {
+    key: "writeValue",
+    value: function writeValue(reader) {
+      this._writeValue(reader);
+    }
+  }, {
+    key: "_clearAnnotations",
+    value: function _clearAnnotations() {
+      this._annotations = [];
     }
   }, {
     key: "_writeValues",
@@ -57,11 +72,6 @@ function () {
 
         type = reader.next();
       }
-    }
-  }, {
-    key: "writeValue",
-    value: function writeValue(reader) {
-      this._writeValue(reader);
     }
   }, {
     key: "_writeValue",
@@ -91,7 +101,7 @@ function () {
             break;
 
           case IonTypes_1.IonTypes.INT:
-            this.writeInt(reader.numberValue());
+            this.writeInt(reader.bigIntValue());
             break;
 
           case IonTypes_1.IonTypes.FLOAT:
@@ -148,1684 +158,55 @@ function () {
         }
       }
     }
+  }, {
+    key: "_validateAnnotations",
+    value: function _validateAnnotations(input) {
+      if (!Array.isArray(input)) {
+        return false;
+      }
+
+      for (var i = 0; i < input.length; i++) {
+        if (!this._isString(input[i])) {
+          return false;
+        }
+      }
+
+      return true;
+    }
+  }, {
+    key: "_isString",
+    value: function _isString(input) {
+      return typeof input === 'string';
+    }
   }]);
   return AbstractWriter;
 }();
 
 exports.AbstractWriter = AbstractWriter;
 
-},{"./IonTypes":27,"@babel/runtime/helpers/classCallCheck":33,"@babel/runtime/helpers/createClass":34,"@babel/runtime/helpers/interopRequireDefault":40}],2:[function(require,module,exports){
+},{"./IonTypes":26,"@babel/runtime/helpers/classCallCheck":35,"@babel/runtime/helpers/createClass":36,"@babel/runtime/helpers/interopRequireDefault":42}],2:[function(require,module,exports){
 "use strict";
 
-var bigInt = function (undefined) {
-  "use strict";
-
-  var BASE = 1e7,
-      LOG_BASE = 7,
-      MAX_INT = 9007199254740992,
-      MAX_INT_ARR = smallToArray(MAX_INT),
-      LOG_MAX_INT = Math.log(MAX_INT);
-
-  function Integer(v, radix) {
-    if (typeof v === "undefined") return Integer[0];
-    if (typeof radix !== "undefined") return +radix === 10 ? parseValue(v) : parseBase(v, radix);
-    return parseValue(v);
-  }
-
-  function BigInteger(value, sign) {
-    this.value = value;
-    this.sign = sign;
-    this.isSmall = false;
-  }
-
-  BigInteger.prototype = Object.create(Integer.prototype);
-
-  function SmallInteger(value) {
-    this.value = value;
-    this.sign = value < 0;
-    this.isSmall = true;
-  }
-
-  SmallInteger.prototype = Object.create(Integer.prototype);
-
-  function isPrecise(n) {
-    return -MAX_INT < n && n < MAX_INT;
-  }
-
-  function smallToArray(n) {
-    // For performance reasons doesn't reference BASE, need to change this function if BASE changes
-    if (n < 1e7) return [n];
-    if (n < 1e14) return [n % 1e7, Math.floor(n / 1e7)];
-    return [n % 1e7, Math.floor(n / 1e7) % 1e7, Math.floor(n / 1e14)];
-  }
-
-  function arrayToSmall(arr) {
-    // If BASE changes this function may need to change
-    trim(arr);
-    var length = arr.length;
-
-    if (length < 4 && compareAbs(arr, MAX_INT_ARR) < 0) {
-      switch (length) {
-        case 0:
-          return 0;
-
-        case 1:
-          return arr[0];
-
-        case 2:
-          return arr[0] + arr[1] * BASE;
-
-        default:
-          return arr[0] + (arr[1] + arr[2] * BASE) * BASE;
-      }
-    }
-
-    return arr;
-  }
-
-  function trim(v) {
-    var i = v.length;
-
-    while (v[--i] === 0) {
-      ;
-    }
-
-    v.length = i + 1;
-  }
-
-  function createArray(length) {
-    // function shamelessly stolen from Yaffle's library https://github.com/Yaffle/BigInteger
-    var x = new Array(length);
-    var i = -1;
-
-    while (++i < length) {
-      x[i] = 0;
-    }
-
-    return x;
-  }
-
-  function truncate(n) {
-    if (n > 0) return Math.floor(n);
-    return Math.ceil(n);
-  }
-
-  function add(a, b) {
-    // assumes a and b are arrays with a.length >= b.length
-    var l_a = a.length,
-        l_b = b.length,
-        r = new Array(l_a),
-        carry = 0,
-        base = BASE,
-        sum,
-        i;
-
-    for (i = 0; i < l_b; i++) {
-      sum = a[i] + b[i] + carry;
-      carry = sum >= base ? 1 : 0;
-      r[i] = sum - carry * base;
-    }
-
-    while (i < l_a) {
-      sum = a[i] + carry;
-      carry = sum === base ? 1 : 0;
-      r[i++] = sum - carry * base;
-    }
-
-    if (carry > 0) r.push(carry);
-    return r;
-  }
-
-  function addAny(a, b) {
-    if (a.length >= b.length) return add(a, b);
-    return add(b, a);
-  }
-
-  function addSmall(a, carry) {
-    // assumes a is array, carry is number with 0 <= carry < MAX_INT
-    var l = a.length,
-        r = new Array(l),
-        base = BASE,
-        sum,
-        i;
-
-    for (i = 0; i < l; i++) {
-      sum = a[i] - base + carry;
-      carry = Math.floor(sum / base);
-      r[i] = sum - carry * base;
-      carry += 1;
-    }
-
-    while (carry > 0) {
-      r[i++] = carry % base;
-      carry = Math.floor(carry / base);
-    }
-
-    return r;
-  }
-
-  BigInteger.prototype.add = function (v) {
-    var n = parseValue(v);
-
-    if (this.sign !== n.sign) {
-      return this.subtract(n.negate());
-    }
-
-    var a = this.value,
-        b = n.value;
-
-    if (n.isSmall) {
-      return new BigInteger(addSmall(a, Math.abs(b)), this.sign);
-    }
-
-    return new BigInteger(addAny(a, b), this.sign);
-  };
-
-  BigInteger.prototype.plus = BigInteger.prototype.add;
-
-  SmallInteger.prototype.add = function (v) {
-    var n = parseValue(v);
-    var a = this.value;
-
-    if (a < 0 !== n.sign) {
-      return this.subtract(n.negate());
-    }
-
-    var b = n.value;
-
-    if (n.isSmall) {
-      if (isPrecise(a + b)) return new SmallInteger(a + b);
-      b = smallToArray(Math.abs(b));
-    }
-
-    return new BigInteger(addSmall(b, Math.abs(a)), a < 0);
-  };
-
-  SmallInteger.prototype.plus = SmallInteger.prototype.add;
-
-  function subtract(a, b) {
-    // assumes a and b are arrays with a >= b
-    var a_l = a.length,
-        b_l = b.length,
-        r = new Array(a_l),
-        borrow = 0,
-        base = BASE,
-        i,
-        difference;
-
-    for (i = 0; i < b_l; i++) {
-      difference = a[i] - borrow - b[i];
-
-      if (difference < 0) {
-        difference += base;
-        borrow = 1;
-      } else borrow = 0;
-
-      r[i] = difference;
-    }
-
-    for (i = b_l; i < a_l; i++) {
-      difference = a[i] - borrow;
-      if (difference < 0) difference += base;else {
-        r[i++] = difference;
-        break;
-      }
-      r[i] = difference;
-    }
-
-    for (; i < a_l; i++) {
-      r[i] = a[i];
-    }
-
-    trim(r);
-    return r;
-  }
-
-  function subtractAny(a, b, sign) {
-    var value;
-
-    if (compareAbs(a, b) >= 0) {
-      value = subtract(a, b);
-    } else {
-      value = subtract(b, a);
-      sign = !sign;
-    }
-
-    value = arrayToSmall(value);
-
-    if (typeof value === "number") {
-      if (sign) value = -value;
-      return new SmallInteger(value);
-    }
-
-    return new BigInteger(value, sign);
-  }
-
-  function subtractSmall(a, b, sign) {
-    // assumes a is array, b is number with 0 <= b < MAX_INT
-    var l = a.length,
-        r = new Array(l),
-        carry = -b,
-        base = BASE,
-        i,
-        difference;
-
-    for (i = 0; i < l; i++) {
-      difference = a[i] + carry;
-      carry = Math.floor(difference / base);
-      difference %= base;
-      r[i] = difference < 0 ? difference + base : difference;
-    }
-
-    r = arrayToSmall(r);
-
-    if (typeof r === "number") {
-      if (sign) r = -r;
-      return new SmallInteger(r);
-    }
-
-    return new BigInteger(r, sign);
-  }
-
-  BigInteger.prototype.subtract = function (v) {
-    var n = parseValue(v);
-
-    if (this.sign !== n.sign) {
-      return this.add(n.negate());
-    }
-
-    var a = this.value,
-        b = n.value;
-    if (n.isSmall) return subtractSmall(a, Math.abs(b), this.sign);
-    return subtractAny(a, b, this.sign);
-  };
-
-  BigInteger.prototype.minus = BigInteger.prototype.subtract;
-
-  SmallInteger.prototype.subtract = function (v) {
-    var n = parseValue(v);
-    var a = this.value;
-
-    if (a < 0 !== n.sign) {
-      return this.add(n.negate());
-    }
-
-    var b = n.value;
-
-    if (n.isSmall) {
-      return new SmallInteger(a - b);
-    }
-
-    return subtractSmall(b, Math.abs(a), a >= 0);
-  };
-
-  SmallInteger.prototype.minus = SmallInteger.prototype.subtract;
-
-  BigInteger.prototype.negate = function () {
-    return new BigInteger(this.value, !this.sign);
-  };
-
-  SmallInteger.prototype.negate = function () {
-    var sign = this.sign;
-    var small = new SmallInteger(-this.value);
-    small.sign = !sign;
-    return small;
-  };
-
-  BigInteger.prototype.abs = function () {
-    return new BigInteger(this.value, false);
-  };
-
-  SmallInteger.prototype.abs = function () {
-    return new SmallInteger(Math.abs(this.value));
-  };
-
-  function multiplyLong(a, b) {
-    var a_l = a.length,
-        b_l = b.length,
-        l = a_l + b_l,
-        r = createArray(l),
-        base = BASE,
-        product,
-        carry,
-        i,
-        a_i,
-        b_j;
-
-    for (i = 0; i < a_l; ++i) {
-      a_i = a[i];
-
-      for (var j = 0; j < b_l; ++j) {
-        b_j = b[j];
-        product = a_i * b_j + r[i + j];
-        carry = Math.floor(product / base);
-        r[i + j] = product - carry * base;
-        r[i + j + 1] += carry;
-      }
-    }
-
-    trim(r);
-    return r;
-  }
-
-  function multiplySmall(a, b) {
-    // assumes a is array, b is number with |b| < BASE
-    var l = a.length,
-        r = new Array(l),
-        base = BASE,
-        carry = 0,
-        product,
-        i;
-
-    for (i = 0; i < l; i++) {
-      product = a[i] * b + carry;
-      carry = Math.floor(product / base);
-      r[i] = product - carry * base;
-    }
-
-    while (carry > 0) {
-      r[i++] = carry % base;
-      carry = Math.floor(carry / base);
-    }
-
-    return r;
-  }
-
-  function shiftLeft(x, n) {
-    var r = [];
-
-    while (n-- > 0) {
-      r.push(0);
-    }
-
-    return r.concat(x);
-  }
-
-  function multiplyKaratsuba(x, y) {
-    var n = Math.max(x.length, y.length);
-    if (n <= 30) return multiplyLong(x, y);
-    n = Math.ceil(n / 2);
-    var b = x.slice(n),
-        a = x.slice(0, n),
-        d = y.slice(n),
-        c = y.slice(0, n);
-    var ac = multiplyKaratsuba(a, c),
-        bd = multiplyKaratsuba(b, d),
-        abcd = multiplyKaratsuba(addAny(a, b), addAny(c, d));
-    var product = addAny(addAny(ac, shiftLeft(subtract(subtract(abcd, ac), bd), n)), shiftLeft(bd, 2 * n));
-    trim(product);
-    return product;
-  } // The following function is derived from a surface fit of a graph plotting the performance difference
-  // between long multiplication and karatsuba multiplication versus the lengths of the two arrays.
-
-
-  function useKaratsuba(l1, l2) {
-    return -0.012 * l1 - 0.012 * l2 + 0.000015 * l1 * l2 > 0;
-  }
-
-  BigInteger.prototype.multiply = function (v) {
-    var n = parseValue(v),
-        a = this.value,
-        b = n.value,
-        sign = this.sign !== n.sign,
-        abs;
-
-    if (n.isSmall) {
-      if (b === 0) return Integer[0];
-      if (b === 1) return this;
-      if (b === -1) return this.negate();
-      abs = Math.abs(b);
-
-      if (abs < BASE) {
-        return new BigInteger(multiplySmall(a, abs), sign);
-      }
-
-      b = smallToArray(abs);
-    }
-
-    if (useKaratsuba(a.length, b.length)) // Karatsuba is only faster for certain array sizes
-      return new BigInteger(multiplyKaratsuba(a, b), sign);
-    return new BigInteger(multiplyLong(a, b), sign);
-  };
-
-  BigInteger.prototype.times = BigInteger.prototype.multiply;
-
-  function multiplySmallAndArray(a, b, sign) {
-    // a >= 0
-    if (a < BASE) {
-      return new BigInteger(multiplySmall(b, a), sign);
-    }
-
-    return new BigInteger(multiplyLong(b, smallToArray(a)), sign);
-  }
-
-  SmallInteger.prototype._multiplyBySmall = function (a) {
-    if (isPrecise(a.value * this.value)) {
-      return new SmallInteger(a.value * this.value);
-    }
-
-    return multiplySmallAndArray(Math.abs(a.value), smallToArray(Math.abs(this.value)), this.sign !== a.sign);
-  };
-
-  BigInteger.prototype._multiplyBySmall = function (a) {
-    if (a.value === 0) return Integer[0];
-    if (a.value === 1) return this;
-    if (a.value === -1) return this.negate();
-    return multiplySmallAndArray(Math.abs(a.value), this.value, this.sign !== a.sign);
-  };
-
-  SmallInteger.prototype.multiply = function (v) {
-    return parseValue(v)._multiplyBySmall(this);
-  };
-
-  SmallInteger.prototype.times = SmallInteger.prototype.multiply;
-
-  function square(a) {
-    //console.assert(2 * BASE * BASE < MAX_INT);
-    var l = a.length,
-        r = createArray(l + l),
-        base = BASE,
-        product,
-        carry,
-        i,
-        a_i,
-        a_j;
-
-    for (i = 0; i < l; i++) {
-      a_i = a[i];
-      carry = 0 - a_i * a_i;
-
-      for (var j = i; j < l; j++) {
-        a_j = a[j];
-        product = 2 * (a_i * a_j) + r[i + j] + carry;
-        carry = Math.floor(product / base);
-        r[i + j] = product - carry * base;
-      }
-
-      r[i + l] = carry;
-    }
-
-    trim(r);
-    return r;
-  }
-
-  BigInteger.prototype.square = function () {
-    return new BigInteger(square(this.value), false);
-  };
-
-  SmallInteger.prototype.square = function () {
-    var value = this.value * this.value;
-    if (isPrecise(value)) return new SmallInteger(value);
-    return new BigInteger(square(smallToArray(Math.abs(this.value))), false);
-  };
-
-  function divMod1(a, b) {
-    // Left over from previous version. Performs faster than divMod2 on smaller input sizes.
-    var a_l = a.length,
-        b_l = b.length,
-        base = BASE,
-        result = createArray(b.length),
-        divisorMostSignificantDigit = b[b_l - 1],
-        // normalization
-    lambda = Math.ceil(base / (2 * divisorMostSignificantDigit)),
-        remainder = multiplySmall(a, lambda),
-        divisor = multiplySmall(b, lambda),
-        quotientDigit,
-        shift,
-        carry,
-        borrow,
-        i,
-        l,
-        q;
-    if (remainder.length <= a_l) remainder.push(0);
-    divisor.push(0);
-    divisorMostSignificantDigit = divisor[b_l - 1];
-
-    for (shift = a_l - b_l; shift >= 0; shift--) {
-      quotientDigit = base - 1;
-
-      if (remainder[shift + b_l] !== divisorMostSignificantDigit) {
-        quotientDigit = Math.floor((remainder[shift + b_l] * base + remainder[shift + b_l - 1]) / divisorMostSignificantDigit);
-      } // quotientDigit <= base - 1
-
-
-      carry = 0;
-      borrow = 0;
-      l = divisor.length;
-
-      for (i = 0; i < l; i++) {
-        carry += quotientDigit * divisor[i];
-        q = Math.floor(carry / base);
-        borrow += remainder[shift + i] - (carry - q * base);
-        carry = q;
-
-        if (borrow < 0) {
-          remainder[shift + i] = borrow + base;
-          borrow = -1;
-        } else {
-          remainder[shift + i] = borrow;
-          borrow = 0;
-        }
-      }
-
-      while (borrow !== 0) {
-        quotientDigit -= 1;
-        carry = 0;
-
-        for (i = 0; i < l; i++) {
-          carry += remainder[shift + i] - base + divisor[i];
-
-          if (carry < 0) {
-            remainder[shift + i] = carry + base;
-            carry = 0;
-          } else {
-            remainder[shift + i] = carry;
-            carry = 1;
-          }
-        }
-
-        borrow += carry;
-      }
-
-      result[shift] = quotientDigit;
-    } // denormalization
-
-
-    remainder = divModSmall(remainder, lambda)[0];
-    return [arrayToSmall(result), arrayToSmall(remainder)];
-  }
-
-  function divMod2(a, b) {
-    // Implementation idea shamelessly stolen from Silent Matt's library http://silentmatt.com/biginteger/
-    // Performs faster than divMod1 on larger input sizes.
-    var a_l = a.length,
-        b_l = b.length,
-        result = [],
-        part = [],
-        base = BASE,
-        guess,
-        xlen,
-        highx,
-        highy,
-        check;
-
-    while (a_l) {
-      part.unshift(a[--a_l]);
-      trim(part);
-
-      if (compareAbs(part, b) < 0) {
-        result.push(0);
-        continue;
-      }
-
-      xlen = part.length;
-      highx = part[xlen - 1] * base + part[xlen - 2];
-      highy = b[b_l - 1] * base + b[b_l - 2];
-
-      if (xlen > b_l) {
-        highx = (highx + 1) * base;
-      }
-
-      guess = Math.ceil(highx / highy);
-
-      do {
-        check = multiplySmall(b, guess);
-        if (compareAbs(check, part) <= 0) break;
-        guess--;
-      } while (guess);
-
-      result.push(guess);
-      part = subtract(part, check);
-    }
-
-    result.reverse();
-    return [arrayToSmall(result), arrayToSmall(part)];
-  }
-
-  function divModSmall(value, lambda) {
-    var length = value.length,
-        quotient = createArray(length),
-        base = BASE,
-        i,
-        q,
-        remainder,
-        divisor;
-    remainder = 0;
-
-    for (i = length - 1; i >= 0; --i) {
-      divisor = remainder * base + value[i];
-      q = truncate(divisor / lambda);
-      remainder = divisor - q * lambda;
-      quotient[i] = q | 0;
-    }
-
-    return [quotient, remainder | 0];
-  }
-
-  function divModAny(self, v) {
-    var value,
-        n = parseValue(v);
-    var a = self.value,
-        b = n.value;
-    var quotient;
-    if (b === 0) throw new Error("Cannot divide by zero");
-
-    if (self.isSmall) {
-      if (n.isSmall) {
-        return [new SmallInteger(truncate(a / b)), new SmallInteger(a % b)];
-      }
-
-      return [Integer[0], self];
-    }
-
-    if (n.isSmall) {
-      if (b === 1) return [self, Integer[0]];
-      if (b == -1) return [self.negate(), Integer[0]];
-      var abs = Math.abs(b);
-
-      if (abs < BASE) {
-        value = divModSmall(a, abs);
-        quotient = arrayToSmall(value[0]);
-        var remainder = value[1];
-        if (self.sign) remainder = -remainder;
-
-        if (typeof quotient === "number") {
-          if (self.sign !== n.sign) quotient = -quotient;
-          return [new SmallInteger(quotient), new SmallInteger(remainder)];
-        }
-
-        return [new BigInteger(quotient, self.sign !== n.sign), new SmallInteger(remainder)];
-      }
-
-      b = smallToArray(abs);
-    }
-
-    var comparison = compareAbs(a, b);
-    if (comparison === -1) return [Integer[0], self];
-    if (comparison === 0) return [Integer[self.sign === n.sign ? 1 : -1], Integer[0]]; // divMod1 is faster on smaller input sizes
-
-    if (a.length + b.length <= 200) value = divMod1(a, b);else value = divMod2(a, b);
-    quotient = value[0];
-    var qSign = self.sign !== n.sign,
-        mod = value[1],
-        mSign = self.sign;
-
-    if (typeof quotient === "number") {
-      if (qSign) quotient = -quotient;
-      quotient = new SmallInteger(quotient);
-    } else quotient = new BigInteger(quotient, qSign);
-
-    if (typeof mod === "number") {
-      if (mSign) mod = -mod;
-      mod = new SmallInteger(mod);
-    } else mod = new BigInteger(mod, mSign);
-
-    return [quotient, mod];
-  }
-
-  BigInteger.prototype.divmod = function (v) {
-    var result = divModAny(this, v);
-    return {
-      quotient: result[0],
-      remainder: result[1]
-    };
-  };
-
-  SmallInteger.prototype.divmod = BigInteger.prototype.divmod;
-
-  BigInteger.prototype.divide = function (v) {
-    return divModAny(this, v)[0];
-  };
-
-  SmallInteger.prototype.over = SmallInteger.prototype.divide = BigInteger.prototype.over = BigInteger.prototype.divide;
-
-  BigInteger.prototype.mod = function (v) {
-    return divModAny(this, v)[1];
-  };
-
-  SmallInteger.prototype.remainder = SmallInteger.prototype.mod = BigInteger.prototype.remainder = BigInteger.prototype.mod;
-
-  BigInteger.prototype.pow = function (v) {
-    var n = parseValue(v),
-        a = this.value,
-        b = n.value,
-        value,
-        x,
-        y;
-    if (b === 0) return Integer[1];
-    if (a === 0) return Integer[0];
-    if (a === 1) return Integer[1];
-    if (a === -1) return n.isEven() ? Integer[1] : Integer[-1];
-
-    if (n.sign) {
-      return Integer[0];
-    }
-
-    if (!n.isSmall) throw new Error("The exponent " + n.toString() + " is too large.");
-
-    if (this.isSmall) {
-      if (isPrecise(value = Math.pow(a, b))) return new SmallInteger(truncate(value));
-    }
-
-    x = this;
-    y = Integer[1];
-
-    while (true) {
-      if (b & 1 === 1) {
-        y = y.times(x);
-        --b;
-      }
-
-      if (b === 0) break;
-      b /= 2;
-      x = x.square();
-    }
-
-    return y;
-  };
-
-  SmallInteger.prototype.pow = BigInteger.prototype.pow;
-
-  BigInteger.prototype.modPow = function (exp, mod) {
-    exp = parseValue(exp);
-    mod = parseValue(mod);
-    if (mod.isZero()) throw new Error("Cannot take modPow with modulus 0");
-    var r = Integer[1],
-        base = this.mod(mod);
-
-    while (exp.isPositive()) {
-      if (base.isZero()) return Integer[0];
-      if (exp.isOdd()) r = r.multiply(base).mod(mod);
-      exp = exp.divide(2);
-      base = base.square().mod(mod);
-    }
-
-    return r;
-  };
-
-  SmallInteger.prototype.modPow = BigInteger.prototype.modPow;
-
-  function compareAbs(a, b) {
-    if (a.length !== b.length) {
-      return a.length > b.length ? 1 : -1;
-    }
-
-    for (var i = a.length - 1; i >= 0; i--) {
-      if (a[i] !== b[i]) return a[i] > b[i] ? 1 : -1;
-    }
-
-    return 0;
-  }
-
-  BigInteger.prototype.compareAbs = function (v) {
-    var n = parseValue(v),
-        a = this.value,
-        b = n.value;
-    if (n.isSmall) return 1;
-    return compareAbs(a, b);
-  };
-
-  SmallInteger.prototype.compareAbs = function (v) {
-    var n = parseValue(v),
-        a = Math.abs(this.value),
-        b = n.value;
-
-    if (n.isSmall) {
-      b = Math.abs(b);
-      return a === b ? 0 : a > b ? 1 : -1;
-    }
-
-    return -1;
-  };
-
-  BigInteger.prototype.compare = function (v) {
-    // See discussion about comparison with Infinity:
-    // https://github.com/peterolson/BigInteger.js/issues/61
-    if (v === Infinity) {
-      return -1;
-    }
-
-    if (v === -Infinity) {
-      return 1;
-    }
-
-    var n = parseValue(v),
-        a = this.value,
-        b = n.value;
-
-    if (this.sign !== n.sign) {
-      return n.sign ? 1 : -1;
-    }
-
-    if (n.isSmall) {
-      return this.sign ? -1 : 1;
-    }
-
-    return compareAbs(a, b) * (this.sign ? -1 : 1);
-  };
-
-  BigInteger.prototype.compareTo = BigInteger.prototype.compare;
-
-  SmallInteger.prototype.compare = function (v) {
-    if (v === Infinity) {
-      return -1;
-    }
-
-    if (v === -Infinity) {
-      return 1;
-    }
-
-    var n = parseValue(v),
-        a = this.value,
-        b = n.value;
-
-    if (n.isSmall) {
-      return a == b ? 0 : a > b ? 1 : -1;
-    }
-
-    if (a < 0 !== n.sign) {
-      return a < 0 ? -1 : 1;
-    }
-
-    return a < 0 ? 1 : -1;
-  };
-
-  SmallInteger.prototype.compareTo = SmallInteger.prototype.compare;
-
-  BigInteger.prototype.equals = function (v) {
-    return this.compare(v) === 0;
-  };
-
-  SmallInteger.prototype.eq = SmallInteger.prototype.equals = BigInteger.prototype.eq = BigInteger.prototype.equals;
-
-  BigInteger.prototype.notEquals = function (v) {
-    return this.compare(v) !== 0;
-  };
-
-  SmallInteger.prototype.neq = SmallInteger.prototype.notEquals = BigInteger.prototype.neq = BigInteger.prototype.notEquals;
-
-  BigInteger.prototype.greater = function (v) {
-    return this.compare(v) > 0;
-  };
-
-  SmallInteger.prototype.gt = SmallInteger.prototype.greater = BigInteger.prototype.gt = BigInteger.prototype.greater;
-
-  BigInteger.prototype.lesser = function (v) {
-    return this.compare(v) < 0;
-  };
-
-  SmallInteger.prototype.lt = SmallInteger.prototype.lesser = BigInteger.prototype.lt = BigInteger.prototype.lesser;
-
-  BigInteger.prototype.greaterOrEquals = function (v) {
-    return this.compare(v) >= 0;
-  };
-
-  SmallInteger.prototype.geq = SmallInteger.prototype.greaterOrEquals = BigInteger.prototype.geq = BigInteger.prototype.greaterOrEquals;
-
-  BigInteger.prototype.lesserOrEquals = function (v) {
-    return this.compare(v) <= 0;
-  };
-
-  SmallInteger.prototype.leq = SmallInteger.prototype.lesserOrEquals = BigInteger.prototype.leq = BigInteger.prototype.lesserOrEquals;
-
-  BigInteger.prototype.isEven = function () {
-    return (this.value[0] & 1) === 0;
-  };
-
-  SmallInteger.prototype.isEven = function () {
-    return (this.value & 1) === 0;
-  };
-
-  BigInteger.prototype.isOdd = function () {
-    return (this.value[0] & 1) === 1;
-  };
-
-  SmallInteger.prototype.isOdd = function () {
-    return (this.value & 1) === 1;
-  };
-
-  BigInteger.prototype.isPositive = function () {
-    return !this.sign;
-  };
-
-  SmallInteger.prototype.isPositive = function () {
-    return this.value > 0;
-  };
-
-  BigInteger.prototype.isNegative = function () {
-    return this.sign;
-  };
-
-  SmallInteger.prototype.isNegative = function () {
-    return this.value < 0;
-  };
-
-  BigInteger.prototype.isUnit = function () {
-    return false;
-  };
-
-  SmallInteger.prototype.isUnit = function () {
-    return Math.abs(this.value) === 1;
-  };
-
-  BigInteger.prototype.isZero = function () {
-    return false;
-  };
-
-  SmallInteger.prototype.isZero = function () {
-    return this.value === 0;
-  };
-
-  BigInteger.prototype.isDivisibleBy = function (v) {
-    var n = parseValue(v);
-    var value = n.value;
-    if (value === 0) return false;
-    if (value === 1) return true;
-    if (value === 2) return this.isEven();
-    return this.mod(n).isZero();
-  };
-
-  SmallInteger.prototype.isDivisibleBy = BigInteger.prototype.isDivisibleBy;
-
-  function isBasicPrime(v) {
-    var n = v.abs();
-    if (n.isUnit()) return false;
-    if (n.equals(2) || n.equals(3) || n.equals(5)) return true;
-    if (n.isEven() || n.isDivisibleBy(3) || n.isDivisibleBy(5)) return false;
-    if (n.lesser(49)) return true; // we don't know if it's prime: let the other functions figure it out
-  }
-
-  function millerRabinTest(n, a) {
-    var nPrev = n.prev(),
-        b = nPrev,
-        r = 0,
-        d,
-        t,
-        i,
-        x;
-
-    while (b.isEven()) {
-      b = b.divide(2), r++;
-    }
-
-    next: for (i = 0; i < a.length; i++) {
-      if (n.lesser(a[i])) continue;
-      x = bigInt(a[i]).modPow(b, n);
-      if (x.isUnit() || x.equals(nPrev)) continue;
-
-      for (d = r - 1; d != 0; d--) {
-        x = x.square().mod(n);
-        if (x.isUnit()) return false;
-        if (x.equals(nPrev)) continue next;
-      }
-
-      return false;
-    }
-
-    return true;
-  } // Set "strict" to true to force GRH-supported lower bound of 2*log(N)^2
-
-
-  BigInteger.prototype.isPrime = function (strict) {
-    var isPrime = isBasicPrime(this);
-    if (isPrime !== undefined) return isPrime;
-    var n = this.abs();
-    var bits = n.bitLength();
-    if (bits <= 64) return millerRabinTest(n, [2, 325, 9375, 28178, 450775, 9780504, 1795265022]);
-    var logN = Math.log(2) * bits;
-    var t = Math.ceil(strict === true ? 2 * Math.pow(logN, 2) : logN);
-
-    for (var a = [], i = 0; i < t; i++) {
-      a.push(bigInt(i + 2));
-    }
-
-    return millerRabinTest(n, a);
-  };
-
-  SmallInteger.prototype.isPrime = BigInteger.prototype.isPrime;
-
-  BigInteger.prototype.isProbablePrime = function (iterations) {
-    var isPrime = isBasicPrime(this);
-    if (isPrime !== undefined) return isPrime;
-    var n = this.abs();
-    var t = iterations === undefined ? 5 : iterations;
-
-    for (var a = [], i = 0; i < t; i++) {
-      a.push(bigInt.randBetween(2, n.minus(2)));
-    }
-
-    return millerRabinTest(n, a);
-  };
-
-  SmallInteger.prototype.isProbablePrime = BigInteger.prototype.isProbablePrime;
-
-  BigInteger.prototype.modInv = function (n) {
-    var t = bigInt.zero,
-        newT = bigInt.one,
-        r = parseValue(n),
-        newR = this.abs(),
-        q,
-        lastT,
-        lastR;
-
-    while (!newR.isZero()) {
-      q = r.divide(newR);
-      lastT = t;
-      lastR = r;
-      t = newT;
-      r = newR;
-      newT = lastT.subtract(q.multiply(newT));
-      newR = lastR.subtract(q.multiply(newR));
-    }
-
-    if (!r.isUnit()) throw new Error(this.toString() + " and " + n.toString() + " are not co-prime");
-
-    if (t.compare(0) === -1) {
-      t = t.add(n);
-    }
-
-    if (this.isNegative()) {
-      return t.negate();
-    }
-
-    return t;
-  };
-
-  SmallInteger.prototype.modInv = BigInteger.prototype.modInv;
-
-  BigInteger.prototype.next = function () {
-    var value = this.value;
-
-    if (this.sign) {
-      return subtractSmall(value, 1, this.sign);
-    }
-
-    return new BigInteger(addSmall(value, 1), this.sign);
-  };
-
-  SmallInteger.prototype.next = function () {
-    var value = this.value;
-    if (value + 1 < MAX_INT) return new SmallInteger(value + 1);
-    return new BigInteger(MAX_INT_ARR, false);
-  };
-
-  BigInteger.prototype.prev = function () {
-    var value = this.value;
-
-    if (this.sign) {
-      return new BigInteger(addSmall(value, 1), true);
-    }
-
-    return subtractSmall(value, 1, this.sign);
-  };
-
-  SmallInteger.prototype.prev = function () {
-    var value = this.value;
-    if (value - 1 > -MAX_INT) return new SmallInteger(value - 1);
-    return new BigInteger(MAX_INT_ARR, true);
-  };
-
-  var powersOfTwo = [1];
-
-  while (2 * powersOfTwo[powersOfTwo.length - 1] <= BASE) {
-    powersOfTwo.push(2 * powersOfTwo[powersOfTwo.length - 1]);
-  }
-
-  var powers2Length = powersOfTwo.length,
-      highestPower2 = powersOfTwo[powers2Length - 1];
-
-  function shift_isSmall(n) {
-    return (typeof n === "number" || typeof n === "string") && +Math.abs(n) <= BASE || n instanceof BigInteger && n.value.length <= 1;
-  }
-
-  BigInteger.prototype.shiftLeft = function (n) {
-    if (!shift_isSmall(n)) {
-      throw new Error(String(n) + " is too large for shifting.");
-    }
-
-    n = +n;
-    if (n < 0) return this.shiftRight(-n);
-    var result = this;
-    if (result.isZero()) return result;
-
-    while (n >= powers2Length) {
-      result = result.multiply(highestPower2);
-      n -= powers2Length - 1;
-    }
-
-    return result.multiply(powersOfTwo[n]);
-  };
-
-  SmallInteger.prototype.shiftLeft = BigInteger.prototype.shiftLeft;
-
-  BigInteger.prototype.shiftRight = function (n) {
-    var remQuo;
-
-    if (!shift_isSmall(n)) {
-      throw new Error(String(n) + " is too large for shifting.");
-    }
-
-    n = +n;
-    if (n < 0) return this.shiftLeft(-n);
-    var result = this;
-
-    while (n >= powers2Length) {
-      if (result.isZero() || result.isNegative() && result.isUnit()) return result;
-      remQuo = divModAny(result, highestPower2);
-      result = remQuo[1].isNegative() ? remQuo[0].prev() : remQuo[0];
-      n -= powers2Length - 1;
-    }
-
-    remQuo = divModAny(result, powersOfTwo[n]);
-    return remQuo[1].isNegative() ? remQuo[0].prev() : remQuo[0];
-  };
-
-  SmallInteger.prototype.shiftRight = BigInteger.prototype.shiftRight;
-
-  function bitwise(x, y, fn) {
-    y = parseValue(y);
-    var xSign = x.isNegative(),
-        ySign = y.isNegative();
-    var xRem = xSign ? x.not() : x,
-        yRem = ySign ? y.not() : y;
-    var xDigit = 0,
-        yDigit = 0;
-    var xDivMod = null,
-        yDivMod = null;
-    var result = [];
-
-    while (!xRem.isZero() || !yRem.isZero()) {
-      xDivMod = divModAny(xRem, highestPower2);
-      xDigit = xDivMod[1].toJSNumber();
-
-      if (xSign) {
-        xDigit = highestPower2 - 1 - xDigit; // two's complement for negative numbers
-      }
-
-      yDivMod = divModAny(yRem, highestPower2);
-      yDigit = yDivMod[1].toJSNumber();
-
-      if (ySign) {
-        yDigit = highestPower2 - 1 - yDigit; // two's complement for negative numbers
-      }
-
-      xRem = xDivMod[0];
-      yRem = yDivMod[0];
-      result.push(fn(xDigit, yDigit));
-    }
-
-    var sum = fn(xSign ? 1 : 0, ySign ? 1 : 0) !== 0 ? bigInt(-1) : bigInt(0);
-
-    for (var i = result.length - 1; i >= 0; i -= 1) {
-      sum = sum.multiply(highestPower2).add(bigInt(result[i]));
-    }
-
-    return sum;
-  }
-
-  BigInteger.prototype.not = function () {
-    return this.negate().prev();
-  };
-
-  SmallInteger.prototype.not = BigInteger.prototype.not;
-
-  BigInteger.prototype.and = function (n) {
-    return bitwise(this, n, function (a, b) {
-      return a & b;
-    });
-  };
-
-  SmallInteger.prototype.and = BigInteger.prototype.and;
-
-  BigInteger.prototype.or = function (n) {
-    return bitwise(this, n, function (a, b) {
-      return a | b;
-    });
-  };
-
-  SmallInteger.prototype.or = BigInteger.prototype.or;
-
-  BigInteger.prototype.xor = function (n) {
-    return bitwise(this, n, function (a, b) {
-      return a ^ b;
-    });
-  };
-
-  SmallInteger.prototype.xor = BigInteger.prototype.xor;
-  var LOBMASK_I = 1 << 30,
-      LOBMASK_BI = (BASE & -BASE) * (BASE & -BASE) | LOBMASK_I;
-
-  function roughLOB(n) {
-    // get lowestOneBit (rough)
-    // SmallInteger: return Min(lowestOneBit(n), 1 << 30)
-    // BigInteger: return Min(lowestOneBit(n), 1 << 14) [BASE=1e7]
-    var v = n.value,
-        x = typeof v === "number" ? v | LOBMASK_I : v[0] + v[1] * BASE | LOBMASK_BI;
-    return x & -x;
-  }
-
-  function integerLogarithm(value, base) {
-    if (base.compareTo(value) <= 0) {
-      var tmp = integerLogarithm(value, base.square(base));
-      var p = tmp.p;
-      var e = tmp.e;
-      var t = p.multiply(base);
-      return t.compareTo(value) <= 0 ? {
-        p: t,
-        e: e * 2 + 1
-      } : {
-        p: p,
-        e: e * 2
-      };
-    }
-
-    return {
-      p: bigInt(1),
-      e: 0
-    };
-  }
-
-  BigInteger.prototype.bitLength = function () {
-    var n = this;
-
-    if (n.compareTo(bigInt(0)) < 0) {
-      n = n.negate().subtract(bigInt(1));
-    }
-
-    if (n.compareTo(bigInt(0)) === 0) {
-      return bigInt(0);
-    }
-
-    return bigInt(integerLogarithm(n, bigInt(2)).e).add(bigInt(1));
-  };
-
-  SmallInteger.prototype.bitLength = BigInteger.prototype.bitLength;
-
-  function max(a, b) {
-    a = parseValue(a);
-    b = parseValue(b);
-    return a.greater(b) ? a : b;
-  }
-
-  function min(a, b) {
-    a = parseValue(a);
-    b = parseValue(b);
-    return a.lesser(b) ? a : b;
-  }
-
-  function gcd(a, b) {
-    a = parseValue(a).abs();
-    b = parseValue(b).abs();
-    if (a.equals(b)) return a;
-    if (a.isZero()) return b;
-    if (b.isZero()) return a;
-    var c = Integer[1],
-        d,
-        t;
-
-    while (a.isEven() && b.isEven()) {
-      d = Math.min(roughLOB(a), roughLOB(b));
-      a = a.divide(d);
-      b = b.divide(d);
-      c = c.multiply(d);
-    }
-
-    while (a.isEven()) {
-      a = a.divide(roughLOB(a));
-    }
-
-    do {
-      while (b.isEven()) {
-        b = b.divide(roughLOB(b));
-      }
-
-      if (a.greater(b)) {
-        t = b;
-        b = a;
-        a = t;
-      }
-
-      b = b.subtract(a);
-    } while (!b.isZero());
-
-    return c.isUnit() ? a : a.multiply(c);
-  }
-
-  function lcm(a, b) {
-    a = parseValue(a).abs();
-    b = parseValue(b).abs();
-    return a.divide(gcd(a, b)).multiply(b);
-  }
-
-  function randBetween(a, b) {
-    a = parseValue(a);
-    b = parseValue(b);
-    var low = min(a, b),
-        high = max(a, b);
-    var range = high.subtract(low).add(1);
-    if (range.isSmall) return low.add(Math.floor(Math.random() * range));
-    var length = range.value.length - 1;
-    var result = [],
-        restricted = true;
-
-    for (var i = length; i >= 0; i--) {
-      var top = restricted ? range.value[i] : BASE;
-      var digit = truncate(Math.random() * top);
-      result.unshift(digit);
-      if (digit < top) restricted = false;
-    }
-
-    result = arrayToSmall(result);
-    return low.add(typeof result === "number" ? new SmallInteger(result) : new BigInteger(result, false));
-  }
-
-  var parseBase = function parseBase(text, base) {
-    var length = text.length;
-    var i;
-    var absBase = Math.abs(base);
-
-    for (var i = 0; i < length; i++) {
-      var c = text[i].toLowerCase();
-      if (c === "-") continue;
-
-      if (/[a-z0-9]/.test(c)) {
-        if (/[0-9]/.test(c) && +c >= absBase) {
-          if (c === "1" && absBase === 1) continue;
-          throw new Error(c + " is not a valid digit in base " + base + ".");
-        } else if (c.charCodeAt(0) - 87 >= absBase) {
-          throw new Error(c + " is not a valid digit in base " + base + ".");
-        }
-      }
-    }
-
-    if (2 <= base && base <= 36) {
-      if (length <= LOG_MAX_INT / Math.log(base)) {
-        var result = parseInt(text, base);
-
-        if (isNaN(result)) {
-          throw new Error(c + " is not a valid digit in base " + base + ".");
-        }
-
-        return new SmallInteger(parseInt(text, base));
-      }
-    }
-
-    base = parseValue(base);
-    var digits = [];
-    var isNegative = text[0] === "-";
-
-    for (i = isNegative ? 1 : 0; i < text.length; i++) {
-      var c = text[i].toLowerCase(),
-          charCode = c.charCodeAt(0);
-      if (48 <= charCode && charCode <= 57) digits.push(parseValue(c));else if (97 <= charCode && charCode <= 122) digits.push(parseValue(c.charCodeAt(0) - 87));else if (c === "<") {
-        var start = i;
-
-        do {
-          i++;
-        } while (text[i] !== ">");
-
-        digits.push(parseValue(text.slice(start + 1, i)));
-      } else throw new Error(c + " is not a valid character");
-    }
-
-    return parseBaseFromArray(digits, base, isNegative);
-  };
-
-  function parseBaseFromArray(digits, base, isNegative) {
-    var val = Integer[0],
-        pow = Integer[1],
-        i;
-
-    for (i = digits.length - 1; i >= 0; i--) {
-      val = val.add(digits[i].times(pow));
-      pow = pow.times(base);
-    }
-
-    return isNegative ? val.negate() : val;
-  }
-
-  function stringify(digit) {
-    if (digit <= 35) {
-      return "0123456789abcdefghijklmnopqrstuvwxyz".charAt(digit);
-    }
-
-    return "<" + digit + ">";
-  }
-
-  function toBase(n, base) {
-    base = bigInt(base);
-
-    if (base.isZero()) {
-      if (n.isZero()) return {
-        value: [0],
-        isNegative: false
-      };
-      throw new Error("Cannot convert nonzero numbers to base 0.");
-    }
-
-    if (base.equals(-1)) {
-      if (n.isZero()) return {
-        value: [0],
-        isNegative: false
-      };
-      if (n.isNegative()) return {
-        value: [].concat.apply([], Array.apply(null, Array(-n)).map(Array.prototype.valueOf, [1, 0])),
-        isNegative: false
-      };
-      var arr = Array.apply(null, Array(+n - 1)).map(Array.prototype.valueOf, [0, 1]);
-      arr.unshift([1]);
-      return {
-        value: [].concat.apply([], arr),
-        isNegative: false
-      };
-    }
-
-    var neg = false;
-
-    if (n.isNegative() && base.isPositive()) {
-      neg = true;
-      n = n.abs();
-    }
-
-    if (base.isUnit()) {
-      if (n.isZero()) return {
-        value: [0],
-        isNegative: false
-      };
-      return {
-        value: Array.apply(null, Array(+n)).map(Number.prototype.valueOf, 1),
-        isNegative: neg
-      };
-    }
-
-    var out = [];
-    var left = n,
-        divmod;
-
-    while (left.isNegative() || left.compareAbs(base) >= 0) {
-      divmod = left.divmod(base);
-      left = divmod.quotient;
-      var digit = divmod.remainder;
-
-      if (digit.isNegative()) {
-        digit = base.minus(digit).abs();
-        left = left.next();
-      }
-
-      out.push(digit.toJSNumber());
-    }
-
-    out.push(left.toJSNumber());
-    return {
-      value: out.reverse(),
-      isNegative: neg
-    };
-  }
-
-  function toBaseString(n, base) {
-    var arr = toBase(n, base);
-    return (arr.isNegative ? "-" : "") + arr.value.map(stringify).join('');
-  }
-
-  BigInteger.prototype.toArray = function (radix) {
-    return toBase(this, radix);
-  };
-
-  SmallInteger.prototype.toArray = function (radix) {
-    return toBase(this, radix);
-  };
-
-  BigInteger.prototype.toString = function (radix) {
-    if (radix === undefined) radix = 10;
-    if (radix !== 10) return toBaseString(this, radix);
-    var v = this.value,
-        l = v.length,
-        str = String(v[--l]),
-        zeros = "0000000",
-        digit;
-
-    while (--l >= 0) {
-      digit = String(v[l]);
-      str += zeros.slice(digit.length) + digit;
-    }
-
-    var sign = this.sign ? "-" : "";
-    return sign + str;
-  };
-
-  SmallInteger.prototype.toString = function (radix) {
-    if (radix === undefined) radix = 10;
-    if (radix != 10) return toBaseString(this, radix);
-    return String(this.value);
-  };
-
-  BigInteger.prototype.toJSON = SmallInteger.prototype.toJSON = function () {
-    return this.toString();
-  };
-
-  BigInteger.prototype.valueOf = function () {
-    return parseInt(this.toString(), 10);
-  };
-
-  BigInteger.prototype.toJSNumber = BigInteger.prototype.valueOf;
-
-  SmallInteger.prototype.valueOf = function () {
-    return this.value;
-  };
-
-  SmallInteger.prototype.toJSNumber = SmallInteger.prototype.valueOf;
-
-  function parseStringValue(v) {
-    if (isPrecise(+v)) {
-      var x = +v;
-      if (x === truncate(x)) return new SmallInteger(x);
-      throw new Error("Invalid integer: " + v);
-    }
-
-    var sign = v[0] === "-";
-    if (sign) v = v.slice(1);
-    var split = v.split(/e/i);
-    if (split.length > 2) throw new Error("Invalid integer: " + split.join("e"));
-
-    if (split.length === 2) {
-      var exp = split[1];
-      if (exp[0] === "+") exp = exp.slice(1);
-      exp = +exp;
-      if (exp !== truncate(exp) || !isPrecise(exp)) throw new Error("Invalid integer: " + exp + " is not a valid exponent.");
-      var text = split[0];
-      var decimalPlace = text.indexOf(".");
-
-      if (decimalPlace >= 0) {
-        exp -= text.length - decimalPlace - 1;
-        text = text.slice(0, decimalPlace) + text.slice(decimalPlace + 1);
-      }
-
-      if (exp < 0) throw new Error("Cannot include negative exponent part for integers");
-      text += new Array(exp + 1).join("0");
-      v = text;
-    }
-
-    var isValid = /^([0-9][0-9]*)$/.test(v);
-    if (!isValid) throw new Error("Invalid integer: " + v);
-    var r = [],
-        max = v.length,
-        l = LOG_BASE,
-        min = max - l;
-
-    while (max > 0) {
-      r.push(+v.slice(min, max));
-      min -= l;
-      if (min < 0) min = 0;
-      max -= l;
-    }
-
-    trim(r);
-    return new BigInteger(r, sign);
-  }
-
-  function parseNumberValue(v) {
-    if (isPrecise(v)) {
-      if (v !== truncate(v)) throw new Error(v + " is not an integer.");
-      return new SmallInteger(v);
-    }
-
-    return parseStringValue(v.toString());
-  }
-
-  function parseValue(v) {
-    if (typeof v === "number") {
-      return parseNumberValue(v);
-    }
-
-    if (typeof v === "string") {
-      return parseStringValue(v);
-    }
-
-    return v;
-  } // Pre-define numbers in range [-999,999]
-
-
-  for (var i = 0; i < 1000; i++) {
-    Integer[i] = new SmallInteger(i);
-    if (i > 0) Integer[-i] = new SmallInteger(-i);
-  } // Backwards compatibility
-
-
-  Integer.one = Integer[1];
-  Integer.zero = Integer[0];
-  Integer.minusOne = Integer[-1];
-  Integer.max = max;
-  Integer.min = min;
-  Integer.gcd = gcd;
-  Integer.lcm = lcm;
-
-  Integer.isInstance = function (x) {
-    return x instanceof BigInteger || x instanceof SmallInteger;
-  };
-
-  Integer.randBetween = randBetween;
-
-  Integer.fromArray = function (digits, base, isNegative) {
-    return parseBaseFromArray(digits.map(parseValue), parseValue(base || 10), isNegative);
-  };
-
-  return Integer;
-}(); // Node.js check
-
-
-if (typeof module !== "undefined" && module.hasOwnProperty("exports")) {
-  module.exports = bigInt;
-} //amd check
-
-
-if (typeof define === "function" && define.amd) {
-  define("big-integer", [], function () {
-    return bigInt;
-  });
-}
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+var IntSize;
+
+(function (IntSize) {
+  IntSize[IntSize["Number"] = 0] = "Number";
+  IntSize[IntSize["BigInt"] = 1] = "BigInt";
+})(IntSize = exports.IntSize || (exports.IntSize = {}));
+
+exports["default"] = IntSize;
 
 },{}],3:[function(require,module,exports){
 "use strict";
+
+var __importDefault = void 0 && (void 0).__importDefault || function (mod) {
+  return mod && mod.__esModule ? mod : {
+    "default": mod
+  };
+};
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -1850,6 +231,10 @@ var IonBinaryWriter_1 = require("./IonBinaryWriter");
 var IonLocalSymbolTable_1 = require("./IonLocalSymbolTable");
 
 var IonUnicode_1 = require("./IonUnicode");
+
+var IntSize_1 = __importDefault(require("./IntSize"));
+
+exports.IntSize = IntSize_1["default"];
 
 function isBinary(buffer) {
   if (buffer.length < 4) {
@@ -1937,7 +322,7 @@ var IonUnicode_2 = require("./IonUnicode");
 
 exports.decodeUtf8 = IonUnicode_2.decodeUtf8;
 
-},{"./IonBinaryReader":5,"./IonBinaryWriter":6,"./IonCatalog":7,"./IonConstants":8,"./IonDecimal":9,"./IonLocalSymbolTable":11,"./IonPrettyTextWriter":16,"./IonSharedSymbolTable":17,"./IonSpan":18,"./IonText":22,"./IonTextReader":23,"./IonTextWriter":24,"./IonTimestamp":25,"./IonType":26,"./IonTypes":27,"./IonUnicode":28,"./IonWriteable":29}],4:[function(require,module,exports){
+},{"./IntSize":2,"./IonBinaryReader":5,"./IonBinaryWriter":6,"./IonCatalog":7,"./IonConstants":8,"./IonDecimal":9,"./IonLocalSymbolTable":11,"./IonPrettyTextWriter":15,"./IonSharedSymbolTable":16,"./IonSpan":17,"./IonText":21,"./IonTextReader":22,"./IonTextWriter":23,"./IonTimestamp":24,"./IonType":25,"./IonTypes":26,"./IonUnicode":27,"./IonWriteable":28}],4:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1975,6 +360,12 @@ var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime/helpers/cl
 
 var _createClass2 = _interopRequireDefault(require("@babel/runtime/helpers/createClass"));
 
+var __importDefault = void 0 && (void 0).__importDefault || function (mod) {
+  return mod && mod.__esModule ? mod : {
+    "default": mod
+  };
+};
+
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
@@ -1991,9 +382,11 @@ var IonTypes_1 = require("./IonTypes");
 
 var IonConstants_1 = require("./IonConstants");
 
-var IonSymbols_2 = require("./IonSymbols");
-
 var IonParserBinaryRaw_1 = require("./IonParserBinaryRaw");
+
+var IntSize_1 = __importDefault(require("./IntSize"));
+
+var JsbiSupport_1 = require("./JsbiSupport");
 
 var RAW_STRING = new IonType_1.IonType(-1, "raw_input", true, false, false, false);
 var ERROR = -3;
@@ -2066,8 +459,6 @@ function get_ion_type(t) {
     default:
       return null;
   }
-
-  ;
 }
 
 var BinaryReader =
@@ -2097,7 +488,7 @@ function () {
         } else if (this._raw_type === TB_STRUCT) {
           if (!this._parser.hasAnnotations()) break;
           if (this._parser.getAnnotation(0) !== IonSymbols_1.ion_symbol_table_sid) break;
-          this._symtab = IonSymbols_2.makeSymbolTable(this._cat, this);
+          this._symtab = IonSymbols_1.makeSymbolTable(this._cat, this);
         } else {
           break;
         }
@@ -2142,19 +533,6 @@ function () {
       return this._parser.hasAnnotations();
     }
   }, {
-    key: "_loadAnnotations",
-    value: function _loadAnnotations() {
-      var _this = this;
-
-      if (this._annotations === null) {
-        this._annotations = [];
-
-        this._parser.getAnnotations().forEach(function (id) {
-          _this._annotations.push(_this.getSymbolString(id));
-        });
-      }
-    }
-  }, {
     key: "annotations",
     value: function annotations() {
       this._loadAnnotations();
@@ -2187,6 +565,20 @@ function () {
     key: "decimalValue",
     value: function decimalValue() {
       return this._parser.decimalValue();
+    }
+  }, {
+    key: "bigIntValue",
+    value: function bigIntValue() {
+      return this._parser.bigIntValue();
+    }
+  }, {
+    key: "intSize",
+    value: function intSize() {
+      if (JsbiSupport_1.JsbiSupport.isSafeInteger(this.bigIntValue())) {
+        return IntSize_1["default"].Number;
+      }
+
+      return IntSize_1["default"].BigInt;
     }
   }, {
     key: "numberValue",
@@ -2252,8 +644,10 @@ function () {
         case IonTypes_1.IonTypes.DECIMAL:
           return this.decimalValue();
 
-        case IonTypes_1.IonTypes.FLOAT:
         case IonTypes_1.IonTypes.INT:
+          return this.bigIntValue();
+
+        case IonTypes_1.IonTypes.FLOAT:
           return this.numberValue();
 
         case IonTypes_1.IonTypes.STRING:
@@ -2268,12 +662,25 @@ function () {
       }
     }
   }, {
+    key: "_loadAnnotations",
+    value: function _loadAnnotations() {
+      var _this = this;
+
+      if (this._annotations === null) {
+        this._annotations = [];
+
+        this._parser.getAnnotations().forEach(function (id) {
+          _this._annotations.push(_this.getSymbolString(id));
+        });
+      }
+    }
+  }, {
     key: "getSymbolString",
     value: function getSymbolString(symbolId) {
       var s = null;
 
       if (symbolId > 0) {
-        s = this._symtab.getSymbol(symbolId);
+        s = this._symtab.getSymbolText(symbolId);
 
         if (typeof s == 'undefined') {
           s = "$" + symbolId.toString();
@@ -2288,7 +695,7 @@ function () {
 
 exports.BinaryReader = BinaryReader;
 
-},{"./IonCatalog":7,"./IonConstants":8,"./IonLocalSymbolTable":11,"./IonParserBinaryRaw":14,"./IonSymbols":20,"./IonType":26,"./IonTypes":27,"@babel/runtime/helpers/classCallCheck":33,"@babel/runtime/helpers/createClass":34,"@babel/runtime/helpers/interopRequireDefault":40}],6:[function(require,module,exports){
+},{"./IntSize":2,"./IonCatalog":7,"./IonConstants":8,"./IonLocalSymbolTable":11,"./IonParserBinaryRaw":13,"./IonSymbols":19,"./IonType":25,"./IonTypes":26,"./JsbiSupport":30,"@babel/runtime/helpers/classCallCheck":35,"@babel/runtime/helpers/createClass":36,"@babel/runtime/helpers/interopRequireDefault":42}],6:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -2304,6 +711,12 @@ var _possibleConstructorReturn2 = _interopRequireDefault(require("@babel/runtime
 var _getPrototypeOf2 = _interopRequireDefault(require("@babel/runtime/helpers/getPrototypeOf"));
 
 var _inherits2 = _interopRequireDefault(require("@babel/runtime/helpers/inherits"));
+
+var __importDefault = void 0 && (void 0).__importDefault || function (mod) {
+  return mod && mod.__esModule ? mod : {
+    "default": mod
+  };
+};
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -2324,6 +737,12 @@ var IonTimestamp_1 = require("./IonTimestamp");
 var IonWriteable_1 = require("./IonWriteable");
 
 var util_1 = require("./util");
+
+var jsbi_1 = __importDefault(require("jsbi"));
+
+var JsbiSupport_1 = require("./JsbiSupport");
+
+var JsbiSerde_1 = require("./JsbiSerde");
 
 var MAJOR_VERSION = 1;
 var MINOR_VERSION = 0;
@@ -2430,20 +849,18 @@ function (_AbstractWriter_1$Abs) {
       }
 
       if (typeof value == 'string') value = IonDecimal_1.Decimal.parse(value);
-
-      var exponent = value._getExponent();
-
-      var coefficient = value._getCoefficient();
-
-      var isPositiveZero = coefficient.isZero() && !value.isNegative();
+      var exponent = value.getExponent();
+      var coefficient = value.getCoefficient();
+      var isPositiveZero = jsbi_1["default"].equal(coefficient, JsbiSupport_1.JsbiSupport.ZERO) && !value.isNegative();
 
       if (isPositiveZero && exponent === 0 && util_1._sign(exponent) === 1) {
         this.addNode(new BytesNode(this.writer, this.getCurrentContainer(), IonTypes_1.IonTypes.DECIMAL, this.encodeAnnotations(this._annotations), new Uint8Array(0)));
         return;
       }
 
-      var writeCoefficient = !(coefficient.isZero() && coefficient.signum() === 1);
-      var coefficientBytes = writeCoefficient ? coefficient.intBytes() : null;
+      var isNegative = value.isNegative();
+      var writeCoefficient = isNegative || jsbi_1["default"].notEqual(coefficient, JsbiSupport_1.JsbiSupport.ZERO);
+      var coefficientBytes = writeCoefficient ? JsbiSerde_1.JsbiSerde.toSignedIntBytes(coefficient, isNegative) : null;
       var bufLen = IonLowLevelBinaryWriter_1.LowLevelBinaryWriter.getVariableLengthSignedIntSize(exponent) + (writeCoefficient ? coefficientBytes.length : 0);
       var writer = new IonLowLevelBinaryWriter_1.LowLevelBinaryWriter(new IonWriteable_1.Writeable(bufLen));
       writer.writeVariableLengthSignedInt(exponent);
@@ -2536,7 +953,7 @@ function (_AbstractWriter_1$Abs) {
     value: function writeSymbol(value) {
       this.checkWriteValue();
 
-      if (value === null) {
+      if (value === null || value === undefined) {
         this.writeNull(IonTypes_1.IonTypes.SYMBOL);
       } else {
         var symbolId = this.symbolTable.addSymbol(value);
@@ -2578,11 +995,11 @@ function (_AbstractWriter_1$Abs) {
 
         var fractionalSeconds = value._getFractionalSeconds();
 
-        if (fractionalSeconds._getExponent() !== 0) {
-          writer.writeVariableLengthSignedInt(fractionalSeconds._getExponent());
+        if (fractionalSeconds.getExponent() !== 0) {
+          writer.writeVariableLengthSignedInt(fractionalSeconds.getExponent());
 
-          if (!fractionalSeconds._getCoefficient().isZero()) {
-            writer.writeBytes(fractionalSeconds._getCoefficient().intBytes());
+          if (!JsbiSupport_1.JsbiSupport.isZero(fractionalSeconds.getCoefficient())) {
+            writer.writeBytes(JsbiSerde_1.JsbiSerde.toSignedIntBytes(fractionalSeconds.getCoefficient(), fractionalSeconds.isNegative()));
           }
         }
       }
@@ -2612,7 +1029,7 @@ function (_AbstractWriter_1$Abs) {
   }, {
     key: "stepOut",
     value: function stepOut() {
-      if (this.isTopLevel()) {
+      if (this.depth() === 0) {
         throw new Error("Not currently in a container");
       }
 
@@ -2622,19 +1039,11 @@ function (_AbstractWriter_1$Abs) {
 
       this.containers.pop();
 
-      if (!this.isTopLevel()) {
+      if (this.depth() > 0) {
         this.state = this.getCurrentContainer() instanceof StructNode ? States.STRUCT_FIELD : States.VALUE;
       } else {
         this.state = States.VALUE;
       }
-    }
-  }, {
-    key: "writeIvm",
-    value: function writeIvm() {
-      this.writer.writeByte(0xE0);
-      this.writer.writeByte(MAJOR_VERSION);
-      this.writer.writeByte(MINOR_VERSION);
-      this.writer.writeByte(0xEA);
     }
   }, {
     key: "writeFieldName",
@@ -2647,23 +1056,31 @@ function (_AbstractWriter_1$Abs) {
       this.state = States.STRUCT_VALUE;
     }
   }, {
-    key: "encodeAnnotations",
-    value: function encodeAnnotations(annotations) {
-      if (!annotations || annotations.length === 0) {
-        return new Uint8Array(0);
+    key: "depth",
+    value: function depth() {
+      return this.containers.length;
+    }
+  }, {
+    key: "close",
+    value: function close() {
+      this.checkClosed();
+
+      if (this.depth() > 0) {
+        throw new Error("Writer has one or more open containers; call stepOut() for each container prior to close()");
       }
 
-      var writeable = new IonWriteable_1.Writeable();
-      var writer = new IonLowLevelBinaryWriter_1.LowLevelBinaryWriter(writeable);
+      this.writeIvm();
+      var datagram = this.datagram;
+      this.datagram = [];
+      this.writeSymbolTable();
       var _iteratorNormalCompletion = true;
       var _didIteratorError = false;
       var _iteratorError = undefined;
 
       try {
-        for (var _iterator = annotations[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-          var annotation = _step.value;
-          var symbolId = this.symbolTable.addSymbol(annotation);
-          writer.writeVariableLengthUnsignedInt(symbolId);
+        for (var _iterator = datagram[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+          var node = _step.value;
+          node.write();
         }
       } catch (err) {
         _didIteratorError = true;
@@ -2680,60 +1097,34 @@ function (_AbstractWriter_1$Abs) {
         }
       }
 
-      this._clearAnnotations();
-
-      return writeable.getBytes();
+      this.state = States.CLOSED;
     }
   }, {
-    key: "isTopLevel",
-    value: function isTopLevel() {
-      return this.containers.length === 0;
+    key: "writeIvm",
+    value: function writeIvm() {
+      this.writer.writeByte(0xE0);
+      this.writer.writeByte(MAJOR_VERSION);
+      this.writer.writeByte(MINOR_VERSION);
+      this.writer.writeByte(0xEA);
     }
   }, {
-    key: "getCurrentContainer",
-    value: function getCurrentContainer() {
-      return this.containers[this.containers.length - 1];
-    }
-  }, {
-    key: "addNode",
-    value: function addNode(node) {
-      if (this.isTopLevel()) {
-        this.datagram.push(node);
-      } else {
-        if (this.state === States.STRUCT_VALUE) {
-          this.getCurrentContainer().addChild(node, this.fieldName);
-          this.state = States.STRUCT_FIELD;
-        } else {
-          this.getCurrentContainer().addChild(node);
-        }
+    key: "encodeAnnotations",
+    value: function encodeAnnotations(annotations) {
+      if (annotations.length === 0) {
+        return new Uint8Array(0);
       }
 
-      if (node.isContainer()) {
-        this.containers.push(node);
-        this.state = States.VALUE;
-      }
-    }
-  }, {
-    key: "close",
-    value: function close() {
-      this.checkClosed();
-
-      if (!this.isTopLevel()) {
-        throw new Error("Writer has one or more open containers; call stepOut() for each container prior to close()");
-      }
-
-      this.writeIvm();
-      var datagram = this.datagram;
-      this.datagram = [];
-      this.writeSymbolTable();
+      var writeable = new IonWriteable_1.Writeable();
+      var writer = new IonLowLevelBinaryWriter_1.LowLevelBinaryWriter(writeable);
       var _iteratorNormalCompletion2 = true;
       var _didIteratorError2 = false;
       var _iteratorError2 = undefined;
 
       try {
-        for (var _iterator2 = datagram[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-          var node = _step2.value;
-          node.write();
+        for (var _iterator2 = annotations[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+          var annotation = _step2.value;
+          var symbolId = this.symbolTable.addSymbol(annotation);
+          writer.writeVariableLengthUnsignedInt(symbolId);
         }
       } catch (err) {
         _didIteratorError2 = true;
@@ -2750,7 +1141,33 @@ function (_AbstractWriter_1$Abs) {
         }
       }
 
-      this.state = States.CLOSED;
+      this._clearAnnotations();
+
+      return writeable.getBytes();
+    }
+  }, {
+    key: "getCurrentContainer",
+    value: function getCurrentContainer() {
+      return this.containers[this.containers.length - 1];
+    }
+  }, {
+    key: "addNode",
+    value: function addNode(node) {
+      if (this.depth() === 0) {
+        this.datagram.push(node);
+      } else {
+        if (this.state === States.STRUCT_VALUE) {
+          this.getCurrentContainer().addChild(node, this.fieldName);
+          this.state = States.STRUCT_FIELD;
+        } else {
+          this.getCurrentContainer().addChild(node);
+        }
+      }
+
+      if (node.isContainer()) {
+        this.containers.push(node);
+        this.state = States.VALUE;
+      }
     }
   }, {
     key: "checkWriteValue",
@@ -2758,7 +1175,7 @@ function (_AbstractWriter_1$Abs) {
       this.checkClosed();
 
       if (this.state === States.STRUCT_FIELD) {
-        throw new Error("Expected a struct field name instead of a value");
+        throw new Error("Expected a struct field name instead of a value, call writeFieldName(string) with the desired name before calling stepIn(IonType) or writeIonType()");
       }
     }
   }, {
@@ -2859,11 +1276,6 @@ function () {
   }
 
   (0, _createClass2["default"])(AbstractNode, [{
-    key: "hasAnnotations",
-    value: function hasAnnotations() {
-      return this.annotations.length > 0;
-    }
-  }, {
     key: "writeTypeDescriptorAndLength",
     value: function writeTypeDescriptorAndLength(typeCode, isNull, length) {
       var typeDescriptor = typeCode << 4;
@@ -2926,6 +1338,11 @@ function () {
       this.writeTypeDescriptorAndLength(TypeCodes.ANNOTATION, false, annotatedContainerLength);
       this.writer.writeVariableLengthUnsignedInt(this.annotations.length);
       this.writer.writeBytes(new Uint8Array(this.annotations));
+    }
+  }, {
+    key: "hasAnnotations",
+    value: function hasAnnotations() {
+      return this.annotations.length > 0;
     }
   }, {
     key: "typeCode",
@@ -3226,10 +1643,11 @@ function (_LeafNode2) {
     _this5 = (0, _possibleConstructorReturn2["default"])(this, (0, _getPrototypeOf2["default"])(IntNode).call(this, writer, parent, IonTypes_1.IonTypes.INT, annotations));
     _this5.value = value;
 
-    if (_this5.value === 0) {
-      _this5.intTypeCode = TypeCodes.POSITIVE_INT;
-      _this5.bytes = new Uint8Array(0);
-    } else if (_this5.value > 0) {
+    if (!(typeof _this5.value === 'number' || _this5.value instanceof jsbi_1["default"])) {
+      throw new Error('Expected ' + _this5.value + ' to be a number or JSBI');
+    }
+
+    if (jsbi_1["default"].GT(_this5.value, 0)) {
       _this5.intTypeCode = TypeCodes.POSITIVE_INT;
 
       var _writer2 = new IonLowLevelBinaryWriter_1.LowLevelBinaryWriter(new IonWriteable_1.Writeable(IonLowLevelBinaryWriter_1.LowLevelBinaryWriter.getUnsignedIntSize(_this5.value)));
@@ -3237,14 +1655,26 @@ function (_LeafNode2) {
       _writer2.writeUnsignedInt(_this5.value);
 
       _this5.bytes = _writer2.getBytes();
-    } else {
+    } else if (jsbi_1["default"].LT(_this5.value, 0)) {
       _this5.intTypeCode = TypeCodes.NEGATIVE_INT;
+      var magnitude;
 
-      var _writer3 = new IonLowLevelBinaryWriter_1.LowLevelBinaryWriter(new IonWriteable_1.Writeable(IonLowLevelBinaryWriter_1.LowLevelBinaryWriter.getUnsignedIntSize(Math.abs(_this5.value))));
+      if (value instanceof jsbi_1["default"]) {
+        if (JsbiSupport_1.JsbiSupport.isNegative(value)) {
+          magnitude = jsbi_1["default"].unaryMinus(value);
+        }
+      } else {
+        magnitude = Math.abs(value);
+      }
 
-      _writer3.writeUnsignedInt(Math.abs(_this5.value));
+      var _writer3 = new IonLowLevelBinaryWriter_1.LowLevelBinaryWriter(new IonWriteable_1.Writeable(IonLowLevelBinaryWriter_1.LowLevelBinaryWriter.getUnsignedIntSize(magnitude)));
+
+      _writer3.writeUnsignedInt(magnitude);
 
       _this5.bytes = _writer3.getBytes();
+    } else {
+      _this5.intTypeCode = TypeCodes.POSITIVE_INT;
+      _this5.bytes = new Uint8Array(0);
     }
 
     return _this5;
@@ -3323,7 +1753,7 @@ function (_LeafNode4) {
 
 exports.NullNode = NullNode;
 
-},{"./AbstractWriter":1,"./IonDecimal":9,"./IonLowLevelBinaryWriter":13,"./IonTimestamp":25,"./IonTypes":27,"./IonUnicode":28,"./IonWriteable":29,"./util":30,"@babel/runtime/helpers/classCallCheck":33,"@babel/runtime/helpers/createClass":34,"@babel/runtime/helpers/get":37,"@babel/runtime/helpers/getPrototypeOf":38,"@babel/runtime/helpers/inherits":39,"@babel/runtime/helpers/interopRequireDefault":40,"@babel/runtime/helpers/possibleConstructorReturn":43}],7:[function(require,module,exports){
+},{"./AbstractWriter":1,"./IonDecimal":9,"./IonLowLevelBinaryWriter":12,"./IonTimestamp":24,"./IonTypes":26,"./IonUnicode":27,"./IonWriteable":28,"./JsbiSerde":29,"./JsbiSupport":30,"./util":32,"@babel/runtime/helpers/classCallCheck":35,"@babel/runtime/helpers/createClass":36,"@babel/runtime/helpers/get":39,"@babel/runtime/helpers/getPrototypeOf":40,"@babel/runtime/helpers/inherits":41,"@babel/runtime/helpers/interopRequireDefault":42,"@babel/runtime/helpers/possibleConstructorReturn":45,"jsbi":50}],7:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -3382,7 +1812,7 @@ function () {
 
 exports.Catalog = Catalog;
 
-},{"./IonSystemSymbolTable":21,"@babel/runtime/helpers/classCallCheck":33,"@babel/runtime/helpers/createClass":34,"@babel/runtime/helpers/interopRequireDefault":40}],8:[function(require,module,exports){
+},{"./IonSystemSymbolTable":20,"@babel/runtime/helpers/classCallCheck":35,"@babel/runtime/helpers/createClass":36,"@babel/runtime/helpers/interopRequireDefault":42}],8:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3406,42 +1836,66 @@ var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime/helpers/cl
 
 var _createClass2 = _interopRequireDefault(require("@babel/runtime/helpers/createClass"));
 
+var __importDefault = void 0 && (void 0).__importDefault || function (mod) {
+  return mod && mod.__esModule ? mod : {
+    "default": mod
+  };
+};
+
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var IonLongInt_1 = require("./IonLongInt");
+var jsbi_1 = __importDefault(require("jsbi"));
 
 var util_1 = require("./util");
+
+var JsbiSupport_1 = require("./JsbiSupport");
 
 var Decimal =
 /*#__PURE__*/
 function () {
-  function Decimal(coefficient, exponent) {
+  function Decimal(coefficient, exponent, isNegative) {
     (0, _classCallCheck2["default"])(this, Decimal);
 
-    if (!Number.isInteger(coefficient)) {
-      throw new Error("The provided coefficient was not an integer. (" + coefficient + ")");
+    if (typeof coefficient === "string") {
+      return Decimal.parse(coefficient);
     }
 
-    this._initialize(new IonLongInt_1.LongInt(coefficient), exponent);
+    if (!util_1._hasValue(exponent)) {
+      throw new Error("Decimal's constructor was called with a numeric coefficient but no exponent.");
+    }
+
+    if (typeof coefficient === "number") {
+      return Decimal._fromNumberCoefficient(coefficient, exponent);
+    }
+
+    if (coefficient instanceof jsbi_1["default"]) {
+      if (!util_1._hasValue(isNegative)) {
+        isNegative = JsbiSupport_1.JsbiSupport.isNegative(coefficient);
+      } else if (isNegative != JsbiSupport_1.JsbiSupport.isNegative(coefficient)) {
+        coefficient = jsbi_1["default"].unaryMinus(coefficient);
+      }
+
+      return Decimal._fromBigIntCoefficient(isNegative, coefficient, exponent);
+    }
+
+    throw new Error("Unsupported parameter set (".concat(coefficient, ", ").concat(exponent, ", ").concat(isNegative, " passed to Decimal constructor."));
   }
 
   (0, _createClass2["default"])(Decimal, [{
-    key: "_initialize",
-    value: function _initialize(coefficient, exponent) {
-      this._coefficient = coefficient;
-      this._exponent = exponent;
-    }
-  }, {
     key: "isNegative",
     value: function isNegative() {
-      return this._coefficient.signum() === -1;
+      return this._isNegative;
     }
   }, {
     key: "numberValue",
     value: function numberValue() {
-      return this._coefficient.numberValue() * Math.pow(10, this._exponent);
+      if (this._isNegativeZero()) {
+        return -0;
+      }
+
+      return jsbi_1["default"].toNumber(this._coefficient) * Math.pow(10, this._exponent);
     }
   }, {
     key: "intValue",
@@ -3451,7 +1905,12 @@ function () {
   }, {
     key: "toString",
     value: function toString() {
-      var cStr = Math.abs(this._coefficient.numberValue()) + '';
+      var cStr = this._coefficient.toString();
+
+      if (cStr[0] === '-') {
+        cStr = cStr.substr(1, cStr.length);
+      }
+
       var precision = cStr.length;
       var adjustedExponent = this._exponent + (precision - 1);
       var s = '';
@@ -3477,27 +1936,27 @@ function () {
         s += 'E' + (adjustedExponent > 0 ? '+' : '') + adjustedExponent;
       }
 
-      return (this._coefficient.signum() === -1 ? '-' : '') + s;
+      return (this.isNegative() ? '-' : '') + s;
     }
   }, {
-    key: "_getCoefficient",
-    value: function _getCoefficient() {
+    key: "getCoefficient",
+    value: function getCoefficient() {
       return this._coefficient;
     }
   }, {
-    key: "_getExponent",
-    value: function _getExponent() {
+    key: "getExponent",
+    value: function getExponent() {
       return this._exponent;
     }
   }, {
     key: "equals",
     value: function equals(that) {
-      return this._getExponent() === that._getExponent() && util_1._sign(this._getExponent()) === util_1._sign(that._getExponent()) && this.isNegative() === that.isNegative() && this._getCoefficient().equals(that._getCoefficient());
+      return this.getExponent() === that.getExponent() && util_1._sign(this.getExponent()) === util_1._sign(that.getExponent()) && this.isNegative() === that.isNegative() && jsbi_1["default"].equal(this.getCoefficient(), that.getCoefficient());
     }
   }, {
     key: "compareTo",
     value: function compareTo(that) {
-      if (this._coefficient.isZero() && that._getCoefficient().isZero()) {
+      if (JsbiSupport_1.JsbiSupport.isZero(this._coefficient) && JsbiSupport_1.JsbiSupport.isZero(that._coefficient)) {
         return 0;
       }
 
@@ -3531,16 +1990,33 @@ function () {
         thatCoefficientStr += '0'.repeat(thisPrecision - thatPrecision);
       }
 
-      var thisLongInt = new IonLongInt_1.LongInt(thisCoefficientStr);
-      var thatLongInt = new IonLongInt_1.LongInt(thatCoefficientStr);
+      var thisJsbi = jsbi_1["default"].BigInt(thisCoefficientStr);
+      var thatJsbi = jsbi_1["default"].BigInt(thatCoefficientStr);
 
-      if (thisLongInt.greaterThan(thatLongInt)) {
+      if (jsbi_1["default"].greaterThan(thisJsbi, thatJsbi)) {
         return neg ? -1 : 1;
-      } else if (thisLongInt.lessThan(thatLongInt)) {
+      } else if (jsbi_1["default"].lessThan(thisJsbi, thatJsbi)) {
         return neg ? 1 : -1;
       }
 
       return 0;
+    }
+  }, {
+    key: "_initialize",
+    value: function _initialize(isNegative, coefficient, exponent) {
+      this._isNegative = isNegative;
+      this._coefficient = coefficient;
+
+      if (Object.is(-0, exponent)) {
+        exponent = 0;
+      }
+
+      this._exponent = exponent;
+    }
+  }, {
+    key: "_isNegativeZero",
+    value: function _isNegativeZero() {
+      return this.isNegative() && JsbiSupport_1.JsbiSupport.isZero(this._coefficient);
     }
   }, {
     key: "_compareToParams",
@@ -3553,18 +2029,28 @@ function () {
         magnitude -= 1;
       }
 
-      if (this._coefficient.isZero()) {
+      if (JsbiSupport_1.JsbiSupport.isZero(this._coefficient)) {
         magnitude = -Infinity;
       }
 
       return [coefficientStr, precision, magnitude];
     }
   }], [{
-    key: "_fromLongIntCoefficient",
-    value: function _fromLongIntCoefficient(coefficient, exponent) {
+    key: "_fromNumberCoefficient",
+    value: function _fromNumberCoefficient(coefficient, exponent) {
+      if (!Number.isInteger(coefficient)) {
+        throw new Error("The provided coefficient was not an integer. (" + coefficient + ")");
+      }
+
+      var isNegative = coefficient < 0 || Object.is(coefficient, -0);
+      return this._fromBigIntCoefficient(isNegative, jsbi_1["default"].BigInt(coefficient), exponent);
+    }
+  }, {
+    key: "_fromBigIntCoefficient",
+    value: function _fromBigIntCoefficient(isNegative, coefficient, exponent) {
       var value = Object.create(this.prototype);
 
-      value._initialize(coefficient, exponent);
+      value._initialize(isNegative, coefficient, exponent);
 
       return value;
     }
@@ -3582,13 +2068,19 @@ function () {
       }
 
       var f = str.match('\\.');
+      var coefficientText;
 
       if (f) {
         var exponentShift = d ? d.index - 1 - f.index : str.length - 1 - f.index;
-        return Decimal._fromLongIntCoefficient(new IonLongInt_1.LongInt(str.substring(0, f.index) + str.substring(f.index + 1, exponentDelimiterIndex)), exponent - exponentShift);
+        exponent -= exponentShift;
+        coefficientText = str.substring(0, f.index) + str.substring(f.index + 1, exponentDelimiterIndex);
       } else {
-        return Decimal._fromLongIntCoefficient(new IonLongInt_1.LongInt(str.substring(0, exponentDelimiterIndex)), exponent);
+        coefficientText = str.substring(0, exponentDelimiterIndex);
       }
+
+      var coefficient = jsbi_1["default"].BigInt(coefficientText);
+      var isNegative = JsbiSupport_1.JsbiSupport.isNegative(coefficient) || coefficientText.startsWith("-0");
+      return Decimal._fromBigIntCoefficient(isNegative, coefficient, exponent);
     }
   }]);
   return Decimal;
@@ -3598,7 +2090,7 @@ exports.Decimal = Decimal;
 Decimal.ZERO = new Decimal(0, 0);
 Decimal.ONE = new Decimal(1, 0);
 
-},{"./IonLongInt":12,"./util":30,"@babel/runtime/helpers/classCallCheck":33,"@babel/runtime/helpers/createClass":34,"@babel/runtime/helpers/interopRequireDefault":40,"@babel/runtime/helpers/slicedToArray":45}],10:[function(require,module,exports){
+},{"./JsbiSupport":30,"./util":32,"@babel/runtime/helpers/classCallCheck":35,"@babel/runtime/helpers/createClass":36,"@babel/runtime/helpers/interopRequireDefault":42,"@babel/runtime/helpers/slicedToArray":47,"jsbi":50}],10:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -3616,25 +2108,19 @@ var Import =
 function () {
   function Import(parent, symbolTable, length) {
     (0, _classCallCheck2["default"])(this, Import);
-    this.index = {};
     this._parent = parent;
     this._symbolTable = symbolTable;
     this._offset = this.parent ? this.parent.offset + this.parent.length : 1;
-    this._length = length || this.symbolTable.symbols.length;
-    var symbols = this.symbolTable.symbols;
-
-    for (var i = 0; i < this.length; i++) {
-      this.index[symbols[i]] = this.offset + i;
-    }
+    this._length = length || this.symbolTable.numberOfSymbols;
   }
 
   (0, _createClass2["default"])(Import, [{
-    key: "getSymbol",
-    value: function getSymbol(symbolId) {
+    key: "getSymbolText",
+    value: function getSymbolText(symbolId) {
       if (this.parent === undefined) throw new Error("Illegal parent state.");
 
       if (this.parent !== null) {
-        var parentSymbol = this.parent.getSymbol(symbolId);
+        var parentSymbol = this.parent.getSymbolText(symbolId);
 
         if (parentSymbol) {
           return parentSymbol;
@@ -3643,14 +2129,32 @@ function () {
 
       var index = symbolId - this.offset;
 
-      if (index < this.length) {
-        return this.symbolTable.symbols[index];
+      if (index >= 0 && index < this.length) {
+        return this.symbolTable.getSymbolText(index);
       }
+
+      return undefined;
     }
   }, {
     key: "getSymbolId",
-    value: function getSymbolId(symbol_) {
-      return this.parent && this._parent.getSymbolId(symbol_) || this.index[symbol_];
+    value: function getSymbolId(symbolText) {
+      var symbolId;
+
+      if (this.parent !== null) {
+        symbolId = this.parent.getSymbolId(symbolText);
+
+        if (symbolId) {
+          return symbolId;
+        }
+      }
+
+      symbolId = this.symbolTable.getSymbolId(symbolText);
+
+      if (symbolId !== null && symbolId !== undefined && symbolId < this.length) {
+        return symbolId + this.offset;
+      }
+
+      return undefined;
     }
   }, {
     key: "parent",
@@ -3678,7 +2182,7 @@ function () {
 
 exports.Import = Import;
 
-},{"@babel/runtime/helpers/classCallCheck":33,"@babel/runtime/helpers/createClass":34,"@babel/runtime/helpers/interopRequireDefault":40}],11:[function(require,module,exports){
+},{"@babel/runtime/helpers/classCallCheck":35,"@babel/runtime/helpers/createClass":36,"@babel/runtime/helpers/interopRequireDefault":42}],11:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -3702,8 +2206,8 @@ function () {
     var symbols = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
     (0, _classCallCheck2["default"])(this, LocalSymbolTable);
     this._import = _import;
-    this._symbols = [];
     this.index = {};
+    this._symbols = [];
     this.offset = _import.offset + _import.length;
     var _iteratorNormalCompletion = true;
     var _didIteratorError = false;
@@ -3746,13 +2250,18 @@ function () {
       return symbolId;
     }
   }, {
-    key: "getSymbol",
-    value: function getSymbol(symbolId) {
+    key: "getSymbolText",
+    value: function getSymbolText(symbolId) {
       if (symbolId > this.maxId) throw new Error("SymbolID greater than maxID.");
-      var importedSymbol = this["import"].getSymbol(symbolId);
+      var importedSymbol = this["import"].getSymbolText(symbolId);
       if (importedSymbol !== undefined) return importedSymbol;
       var index = symbolId - this.offset;
       return this.symbols[index];
+    }
+  }, {
+    key: "numberOfSymbols",
+    value: function numberOfSymbols() {
+      return this._symbols.length;
     }
   }, {
     key: "symbols",
@@ -3781,7 +2290,7 @@ function defaultLocalSymbolTable() {
 
 exports.defaultLocalSymbolTable = defaultLocalSymbolTable;
 
-},{"./IonSystemSymbolTable":21,"@babel/runtime/helpers/classCallCheck":33,"@babel/runtime/helpers/createClass":34,"@babel/runtime/helpers/interopRequireDefault":40}],12:[function(require,module,exports){
+},{"./IonSystemSymbolTable":20,"@babel/runtime/helpers/classCallCheck":35,"@babel/runtime/helpers/createClass":36,"@babel/runtime/helpers/interopRequireDefault":42}],12:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -3790,206 +2299,19 @@ var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime/helpers/cl
 
 var _createClass2 = _interopRequireDefault(require("@babel/runtime/helpers/createClass"));
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var bigInt = require("./BigInteger.js");
-
-var util_1 = require("./util");
-
-var LongInt =
-/*#__PURE__*/
-function () {
-  function LongInt(input) {
-    (0, _classCallCheck2["default"])(this, LongInt);
-
-    if (typeof input === 'string') {
-      var s = input.trim();
-
-      if (s[0] === '-') {
-        this["int"] = bigInt(s.substr(1)).negate();
-      } else {
-        this["int"] = bigInt(s);
-      }
-    } else if (typeof input === 'number') {
-      if (input === 0 && util_1._sign(input) === -1) {
-        this["int"] = bigInt(0).negate();
-      } else {
-        this["int"] = bigInt(input);
-      }
-    } else if (input instanceof bigInt) {
-      this["int"] = input;
-    } else {
-      throw new Error("Invalid LongInt parameters");
-    }
-  }
-
-  (0, _createClass2["default"])(LongInt, [{
-    key: "uIntBytes",
-    value: function uIntBytes() {
-      return new Uint8Array(this["int"].toArray(256).value);
-    }
-  }, {
-    key: "intBytes",
-    value: function intBytes() {
-      var array = this["int"].toArray(256).value;
-
-      if (array[0] > 127) {
-        array.splice(0, 0, 0);
-      }
-
-      if (this.signum() === -1) array[0] += 0x80;
-      return new Uint8Array(array);
-    }
-  }, {
-    key: "varIntBytes",
-    value: function varIntBytes() {
-      var array = this["int"].toArray(128).value;
-
-      if (array[0] > 0x20) {
-        array[0] -= 0x80;
-        array.splice(0, 0, 1);
-      }
-
-      if (this.signum() === -1) array[0] += 0x40;
-      array[array.length - 1] += 0x80;
-      return new Uint8Array(array);
-    }
-  }, {
-    key: "varUIntBytes",
-    value: function varUIntBytes() {
-      var buf = new Uint8Array(this["int"].toArray(128).value);
-      buf[buf.length - 1] += 0x80;
-      return buf;
-    }
-  }, {
-    key: "isZero",
-    value: function isZero() {
-      return this["int"].isZero();
-    }
-  }, {
-    key: "negate",
-    value: function negate() {
-      this["int"].negate();
-    }
-  }, {
-    key: "add",
-    value: function add(num) {
-      if (num instanceof LongInt) return new LongInt(this["int"].add(num["int"]));
-      return new LongInt(this["int"].add(num));
-    }
-  }, {
-    key: "subtract",
-    value: function subtract(num) {
-      if (num instanceof LongInt) return new LongInt(this["int"].add(num["int"]));
-      return new LongInt(this["int"].add(num));
-    }
-  }, {
-    key: "multiply",
-    value: function multiply(num) {
-      if (num instanceof LongInt) return new LongInt(this["int"].multiply(num["int"]));
-      return new LongInt(this["int"].multiply(num));
-    }
-  }, {
-    key: "divide",
-    value: function divide(num) {
-      if (num instanceof LongInt) return new LongInt(this["int"].divide(num["int"]));
-      return new LongInt(this["int"].divide(num));
-    }
-  }, {
-    key: "mathPow",
-    value: function mathPow(num) {
-      var val = bigInt(num);
-      return new LongInt(this["int"].pow(val));
-    }
-  }, {
-    key: "lessThan",
-    value: function lessThan(expected) {
-      return this["int"].lesser(expected["int"]);
-    }
-  }, {
-    key: "greaterThan",
-    value: function greaterThan(expected) {
-      return this["int"].greater(expected["int"]);
-    }
-  }, {
-    key: "equals",
-    value: function equals(expected) {
-      return this["int"].equals(expected["int"]);
-    }
-  }, {
-    key: "geq",
-    value: function geq(expected) {
-      return this["int"].geq(expected["int"]);
-    }
-  }, {
-    key: "leq",
-    value: function leq(expected) {
-      return this["int"].leq(expected["int"]);
-    }
-  }, {
-    key: "numberValue",
-    value: function numberValue() {
-      return this["int"].toJSNumber();
-    }
-  }, {
-    key: "toString",
-    value: function toString() {
-      return this["int"].toString(10);
-    }
-  }, {
-    key: "signum",
-    value: function signum() {
-      if (this["int"].isZero()) {
-        if (1 / this["int"].valueOf() > 0) {
-          return 1;
-        } else {
-          return -1;
-        }
-      } else {
-        return this["int"].isPositive() ? 1 : -1;
-      }
-    }
-  }], [{
-    key: "fromUIntBytes",
-    value: function fromUIntBytes(bytes) {
-      return new LongInt(bigInt.fromArray(bytes, 256, false));
-    }
-  }, {
-    key: "fromIntBytes",
-    value: function fromIntBytes(bytes, isNegative) {
-      return new LongInt(bigInt.fromArray(bytes, 256, isNegative));
-    }
-  }, {
-    key: "fromVarIntBytes",
-    value: function fromVarIntBytes(bytes, isNegative) {
-      return new LongInt(bigInt.fromArray(bytes, 128, isNegative));
-    }
-  }, {
-    key: "fromVarUIntBytes",
-    value: function fromVarUIntBytes(bytes) {
-      return new LongInt(bigInt.fromArray(bytes, 128, false));
-    }
-  }]);
-  return LongInt;
-}();
-
-exports.LongInt = LongInt;
-LongInt._ZERO = new LongInt(0);
-
-},{"./BigInteger.js":2,"./util":30,"@babel/runtime/helpers/classCallCheck":33,"@babel/runtime/helpers/createClass":34,"@babel/runtime/helpers/interopRequireDefault":40}],13:[function(require,module,exports){
-"use strict";
-
-var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
-
-var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime/helpers/classCallCheck"));
-
-var _createClass2 = _interopRequireDefault(require("@babel/runtime/helpers/createClass"));
+var __importDefault = void 0 && (void 0).__importDefault || function (mod) {
+  return mod && mod.__esModule ? mod : {
+    "default": mod
+  };
+};
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+
+var jsbi_1 = __importDefault(require("jsbi"));
+
+var JsbiSerde_1 = require("./JsbiSerde");
 
 var LowLevelBinaryWriter =
 /*#__PURE__*/
@@ -4019,6 +2341,12 @@ function () {
   }, {
     key: "writeUnsignedInt",
     value: function writeUnsignedInt(originalValue) {
+      if (originalValue instanceof jsbi_1["default"]) {
+        var encodedBytes = JsbiSerde_1.JsbiSerde.toUnsignedIntBytes(originalValue);
+        this.writeable.writeBytes(encodedBytes);
+        return;
+      }
+
       var length = LowLevelBinaryWriter.getUnsignedIntSize(originalValue);
       var tempBuf = new Uint8Array(length);
       var value = originalValue;
@@ -4086,16 +2414,23 @@ function () {
   }], [{
     key: "getSignedIntSize",
     value: function getSignedIntSize(value) {
-      if (value === 0) return 1;
-      var absValue = Math.abs(value);
-      var numberOfBits = Math.floor(Math['log2'](absValue));
-      var numberOfBytes = Math.ceil(numberOfBits / 8);
-      if (numberOfBits % 8 === 0) numberOfBytes++;
-      return numberOfBytes;
+      if (value === 0) {
+        return 1;
+      }
+
+      var numberOfSignBits = 1;
+      var magnitude = Math.abs(value);
+      var numberOfMagnitudeBits = Math.ceil(Math.log2(magnitude + 1));
+      var numberOfBits = numberOfMagnitudeBits + numberOfSignBits;
+      return Math.ceil(numberOfBits / 8);
     }
   }, {
     key: "getUnsignedIntSize",
     value: function getUnsignedIntSize(value) {
+      if (value instanceof jsbi_1["default"]) {
+        return JsbiSerde_1.JsbiSerde.getUnsignedIntSizeInBytes(value);
+      }
+
       if (value === 0) {
         return 1;
       }
@@ -4136,7 +2471,7 @@ function () {
 
 exports.LowLevelBinaryWriter = LowLevelBinaryWriter;
 
-},{"@babel/runtime/helpers/classCallCheck":33,"@babel/runtime/helpers/createClass":34,"@babel/runtime/helpers/interopRequireDefault":40}],14:[function(require,module,exports){
+},{"./JsbiSerde":29,"@babel/runtime/helpers/classCallCheck":35,"@babel/runtime/helpers/createClass":36,"@babel/runtime/helpers/interopRequireDefault":42,"jsbi":50}],13:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -4147,11 +2482,31 @@ var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime/helpers/cl
 
 var _createClass2 = _interopRequireDefault(require("@babel/runtime/helpers/createClass"));
 
+var __importDefault = void 0 && (void 0).__importDefault || function (mod) {
+  return mod && mod.__esModule ? mod : {
+    "default": mod
+  };
+};
+
+var __importStar = void 0 && (void 0).__importStar || function (mod) {
+  if (mod && mod.__esModule) return mod;
+  var result = {};
+  if (mod != null) for (var k in mod) {
+    if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
+  }
+  result["default"] = mod;
+  return result;
+};
+
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var IonBinary = require("./IonBinary");
+var jsbi_1 = __importDefault(require("jsbi"));
+
+var JsbiSupport_1 = require("./JsbiSupport");
+
+var IonBinary = __importStar(require("./IonBinary"));
 
 var IonUnicode_1 = require("./IonUnicode");
 
@@ -4161,9 +2516,11 @@ var IonTypes_1 = require("./IonTypes");
 
 var IonConstants_1 = require("./IonConstants");
 
-var IonLongInt_1 = require("./IonLongInt");
-
 var IonTimestamp_1 = require("./IonTimestamp");
+
+var SignAndMagnitudeInt_1 = __importDefault(require("./SignAndMagnitudeInt"));
+
+var JsbiSerde_1 = require("./JsbiSerde");
 
 var DEBUG_FLAG = true;
 var EOF = -1;
@@ -4221,8 +2578,6 @@ function get_ion_type(rt) {
     default:
       return undefined;
   }
-
-  ;
 }
 
 var TS_SHIFT = 5;
@@ -4279,348 +2634,6 @@ function () {
   }
 
   (0, _createClass2["default"])(ParserBinaryRaw, [{
-    key: "read_binary_float",
-    value: function read_binary_float() {
-      return ParserBinaryRaw.readFloatFrom(this._in, this._len);
-    }
-  }, {
-    key: "readVarUnsignedInt",
-    value: function readVarUnsignedInt() {
-      return ParserBinaryRaw.readVarUnsignedIntFrom(this._in);
-    }
-  }, {
-    key: "readVarSignedInt",
-    value: function readVarSignedInt() {
-      return ParserBinaryRaw.readVarSignedIntFrom(this._in);
-    }
-  }, {
-    key: "readVarLongInt",
-    value: function readVarLongInt() {
-      var bytes = [];
-
-      var _byte = this._in.next();
-
-      var isNegative = (_byte & 0x40) !== 0;
-      var stopBit = _byte & 0x80;
-      bytes.push(_byte & 0x3F);
-
-      while (!stopBit) {
-        _byte = this._in.next();
-        stopBit = _byte & 0x80;
-        _byte &= 0x7F;
-        bytes.push(_byte);
-      }
-
-      return IonLongInt_1.LongInt.fromVarIntBytes(bytes, isNegative);
-    }
-  }, {
-    key: "readSignedInt",
-    value: function readSignedInt() {
-      return ParserBinaryRaw.readSignedIntFrom(this._in, this._len);
-    }
-  }, {
-    key: "readUnsignedInt",
-    value: function readUnsignedInt() {
-      return ParserBinaryRaw.readUnsignedIntFrom(this._in, this._len);
-    }
-  }, {
-    key: "readUnsignedLongInt",
-    value: function readUnsignedLongInt() {
-      return ParserBinaryRaw.readUnsignedLongIntFrom(this._in, this._len);
-    }
-  }, {
-    key: "read_decimal_value",
-    value: function read_decimal_value() {
-      return ParserBinaryRaw.readDecimalValueFrom(this._in, this._len);
-    }
-  }, {
-    key: "read_timestamp_value",
-    value: function read_timestamp_value() {
-      if (!(this._len > 0)) {
-        return null;
-      }
-
-      var offset;
-      var year;
-      var month;
-      var day;
-      var hour;
-      var minute;
-      var secondInt;
-      var fractionalSeconds = IonDecimal_1.Decimal.ZERO;
-      var precision = IonTimestamp_1.TimestampPrecision.YEAR;
-
-      var end = this._in.position() + this._len;
-
-      offset = this.readVarSignedInt();
-
-      if (this._in.position() < end) {
-        year = this.readVarUnsignedInt();
-      } else {
-        throw new Error('Timestamps must include a year.');
-      }
-
-      if (this._in.position() < end) {
-        month = this.readVarUnsignedInt();
-        precision = IonTimestamp_1.TimestampPrecision.MONTH;
-      }
-
-      if (this._in.position() < end) {
-        day = this.readVarUnsignedInt();
-        precision = IonTimestamp_1.TimestampPrecision.DAY;
-      }
-
-      if (this._in.position() < end) {
-        hour = this.readVarUnsignedInt();
-
-        if (this._in.position() >= end) {
-          throw new Error('Timestamps with an hour must include a minute.');
-        } else {
-          minute = this.readVarUnsignedInt();
-        }
-
-        precision = IonTimestamp_1.TimestampPrecision.HOUR_AND_MINUTE;
-      }
-
-      if (this._in.position() < end) {
-        secondInt = this.readVarUnsignedInt();
-        precision = IonTimestamp_1.TimestampPrecision.SECONDS;
-      }
-
-      if (this._in.position() < end) {
-        var exponent = this.readVarSignedInt();
-        var coefficient = IonLongInt_1.LongInt._ZERO;
-
-        if (this._in.position() < end) {
-          coefficient = ParserBinaryRaw.readSignedIntFrom(this._in, end - this._in.position());
-        }
-
-        var dec = IonDecimal_1.Decimal._fromLongIntCoefficient(coefficient, exponent);
-
-        var _IonTimestamp_1$Times = IonTimestamp_1.Timestamp._splitSecondsDecimal(dec),
-            _IonTimestamp_1$Times2 = (0, _slicedToArray2["default"])(_IonTimestamp_1$Times, 2),
-            _ = _IonTimestamp_1$Times2[0],
-            fractionStr = _IonTimestamp_1$Times2[1];
-
-        fractionalSeconds = IonDecimal_1.Decimal.parse(secondInt + '.' + fractionStr);
-      }
-
-      var msSinceEpoch = Date.UTC(year, month ? month - 1 : 0, day ? day : 1, hour ? hour : 0, minute ? minute : 0, secondInt ? secondInt : 0, 0);
-      msSinceEpoch = IonTimestamp_1.Timestamp._adjustMsSinceEpochIfNeeded(year, msSinceEpoch);
-      var date = new Date(msSinceEpoch);
-      return IonTimestamp_1.Timestamp._valueOf(date, offset, fractionalSeconds, precision);
-    }
-  }, {
-    key: "read_string_value",
-    value: function read_string_value() {
-      return IonUnicode_1.decodeUtf8(this._in.chunk(this._len));
-    }
-  }, {
-    key: "clear_value",
-    value: function clear_value() {
-      this._raw_type = EOF;
-      this._curr = undefined;
-      this._a = empty_array;
-      this._as = -1;
-      this._null = false;
-      this._fid = -1;
-      this._len = -1;
-    }
-  }, {
-    key: "load_length",
-    value: function load_length(tb) {
-      var t = this;
-      t._len = low_nibble(tb);
-
-      switch (t._len) {
-        case 1:
-          if (high_nibble(tb) === IonBinary.TB_STRUCT) {
-            t._len = this.readVarUnsignedInt();
-          }
-
-          t._null = false;
-          break;
-
-        case IonBinary.LEN_VAR:
-          t._null = false;
-          t._len = this.readVarUnsignedInt();
-          break;
-
-        case IonBinary.LEN_NULL:
-          t._null = true;
-          t._len = 0;
-          break;
-
-        default:
-          t._null = false;
-          break;
-      }
-    }
-  }, {
-    key: "load_next",
-    value: function load_next() {
-      var t = this;
-      var rt, tb;
-      t._as = -1;
-
-      if (t._in.is_empty()) {
-        t.clear_value();
-        return undefined;
-      }
-
-      tb = t._in.next();
-      rt = high_nibble(tb);
-      t.load_length(tb);
-
-      if (rt === IonBinary.TB_ANNOTATION) {
-        if (t._len < 1 && t.depth() === 0) {
-          rt = t.load_ivm();
-        } else {
-          rt = t.load_annotations();
-        }
-      }
-
-      switch (rt) {
-        case IonBinary.TB_NULL:
-          t._null = true;
-          break;
-
-        case IonBinary.TB_BOOL:
-          if (t._len === 0 || t._len === 1) {
-            t._curr = t._len === 1;
-            t._len = 0;
-          }
-
-          break;
-      }
-
-      t._raw_type = rt;
-      return rt;
-    }
-  }, {
-    key: "load_annotations",
-    value: function load_annotations() {
-      var t = this;
-      var tb, type_, annotation_len;
-
-      if (t._len < 1 && t.depth() === 0) {
-        type_ = t.load_ivm();
-      } else {
-        annotation_len = this.readVarUnsignedInt();
-        t._as = t._in.position();
-
-        t._in.skip(annotation_len);
-
-        t._ae = t._in.position();
-        tb = t._in.next();
-        t.load_length(tb);
-        type_ = high_nibble(tb);
-      }
-
-      return type_;
-    }
-  }, {
-    key: "load_ivm",
-    value: function load_ivm() {
-      var t = this;
-      var span = t._in;
-      if (span.next() !== ivm_image_1) throw new Error("invalid binary Ion at " + span.position());
-      if (span.next() !== ivm_image_2) throw new Error("invalid binary Ion at " + span.position());
-      if (span.next() !== ivm_image_3) throw new Error("invalid binary Ion at " + span.position());
-      t._curr = ivm_sid;
-      t._len = 0;
-      return IonBinary.TB_SYMBOL;
-    }
-  }, {
-    key: "load_annotation_values",
-    value: function load_annotation_values() {
-      var t = this;
-      var a, b, pos, limit, arr;
-      if ((pos = t._as) < 0) return;
-      arr = [];
-      limit = t._ae;
-      a = 0;
-
-      while (pos < limit) {
-        b = t._in.valueAt(pos);
-        pos++;
-        a = a << VINT_SHIFT | b & VINT_MASK;
-
-        if ((b & VINT_FLAG) !== 0) {
-          arr.push(a);
-          a = 0;
-        }
-      }
-
-      t._a = arr;
-    }
-  }, {
-    key: "_readIntegerMagnitude",
-    value: function _readIntegerMagnitude() {
-      if (this._len === 0) {
-        return 0;
-      }
-
-      if (this._len <= 3 || this._len === 4 && this._in.peek() < 128) {
-        return this.readUnsignedInt();
-      }
-
-      throw new Error("Attempted to read an integer that could not be stored in 31 bits.");
-    }
-  }, {
-    key: "load_value",
-    value: function load_value() {
-      if (this._curr != undefined) return;
-      if (this.isNull()) return null;
-
-      switch (this._raw_type) {
-        case IonBinary.TB_BOOL:
-          break;
-
-        case IonBinary.TB_INT:
-          this._curr = this._readIntegerMagnitude();
-          break;
-
-        case IonBinary.TB_NEG_INT:
-          this._curr = -this._readIntegerMagnitude();
-          break;
-
-        case IonBinary.TB_FLOAT:
-          this._curr = this.read_binary_float();
-          break;
-
-        case IonBinary.TB_DECIMAL:
-          if (this._len === 0) {
-            this._curr = IonDecimal_1.Decimal.ZERO;
-          } else {
-            this._curr = this.read_decimal_value();
-          }
-
-          break;
-
-        case IonBinary.TB_TIMESTAMP:
-          this._curr = this.read_timestamp_value();
-          break;
-
-        case IonBinary.TB_SYMBOL:
-          this._curr = this.readUnsignedInt();
-          break;
-
-        case IonBinary.TB_STRING:
-          this._curr = this.read_string_value();
-          break;
-
-        case IonBinary.TB_CLOB:
-        case IonBinary.TB_BLOB:
-          if (this.isNull()) break;
-          this._curr = this._in.chunk(this._len);
-          break;
-
-        default:
-          throw new Error('Unexpected type: ' + this._raw_type);
-      }
-    }
-  }, {
     key: "next",
     value: function next() {
       if (this._curr === undefined && this._len > 0) {
@@ -4861,6 +2874,26 @@ function () {
       throw new Error('Current value is not a decimal.');
     }
   }, {
+    key: "bigIntValue",
+    value: function bigIntValue() {
+      switch (this._raw_type) {
+        case IonBinary.TB_NULL:
+          return null;
+
+        case IonBinary.TB_INT:
+        case IonBinary.TB_NEG_INT:
+          if (this.isNull()) {
+            return null;
+          }
+
+          this.load_value();
+          return this._curr;
+
+        default:
+          throw new Error('bigIntValue() was called when the current value was not an int.');
+      }
+    }
+  }, {
     key: "numberValue",
     value: function numberValue() {
       switch (this._raw_type) {
@@ -4869,6 +2902,14 @@ function () {
 
         case IonBinary.TB_INT:
         case IonBinary.TB_NEG_INT:
+          if (this.isNull()) {
+            return null;
+          }
+
+          this.load_value();
+          var bigInt = this._curr;
+          return JsbiSupport_1.JsbiSupport.clampToSafeIntegerRange(bigInt);
+
         case IonBinary.TB_FLOAT:
           if (this.isNull()) {
             return null;
@@ -4918,9 +2959,326 @@ function () {
 
       throw new Error('Current value is not a timestamp.');
     }
+  }, {
+    key: "read_binary_float",
+    value: function read_binary_float() {
+      return ParserBinaryRaw._readFloatFrom(this._in, this._len);
+    }
+  }, {
+    key: "readVarUnsignedInt",
+    value: function readVarUnsignedInt() {
+      return ParserBinaryRaw._readVarUnsignedIntFrom(this._in);
+    }
+  }, {
+    key: "readVarSignedInt",
+    value: function readVarSignedInt() {
+      return ParserBinaryRaw._readVarSignedIntFrom(this._in);
+    }
+  }, {
+    key: "readUnsignedIntAsBigInt",
+    value: function readUnsignedIntAsBigInt() {
+      return ParserBinaryRaw._readUnsignedIntAsBigIntFrom(this._in, this._len);
+    }
+  }, {
+    key: "readUnsignedIntAsNumber",
+    value: function readUnsignedIntAsNumber() {
+      return ParserBinaryRaw._readUnsignedIntAsNumberFrom(this._in, this._len);
+    }
+  }, {
+    key: "read_decimal_value",
+    value: function read_decimal_value() {
+      return ParserBinaryRaw.readDecimalValueFrom(this._in, this._len);
+    }
+  }, {
+    key: "read_timestamp_value",
+    value: function read_timestamp_value() {
+      if (!(this._len > 0)) {
+        return null;
+      }
+
+      var offset;
+      var year;
+      var month;
+      var day;
+      var hour;
+      var minute;
+      var secondInt;
+      var fractionalSeconds = IonDecimal_1.Decimal.ZERO;
+      var precision = IonTimestamp_1.TimestampPrecision.YEAR;
+
+      var end = this._in.position() + this._len;
+
+      offset = this.readVarSignedInt();
+
+      if (this._in.position() < end) {
+        year = this.readVarUnsignedInt();
+      } else {
+        throw new Error('Timestamps must include a year.');
+      }
+
+      if (this._in.position() < end) {
+        month = this.readVarUnsignedInt();
+        precision = IonTimestamp_1.TimestampPrecision.MONTH;
+      }
+
+      if (this._in.position() < end) {
+        day = this.readVarUnsignedInt();
+        precision = IonTimestamp_1.TimestampPrecision.DAY;
+      }
+
+      if (this._in.position() < end) {
+        hour = this.readVarUnsignedInt();
+
+        if (this._in.position() >= end) {
+          throw new Error('Timestamps with an hour must include a minute.');
+        } else {
+          minute = this.readVarUnsignedInt();
+        }
+
+        precision = IonTimestamp_1.TimestampPrecision.HOUR_AND_MINUTE;
+      }
+
+      if (this._in.position() < end) {
+        secondInt = this.readVarUnsignedInt();
+        precision = IonTimestamp_1.TimestampPrecision.SECONDS;
+      }
+
+      if (this._in.position() < end) {
+        var exponent = this.readVarSignedInt();
+        var coefficient = JsbiSupport_1.JsbiSupport.ZERO;
+        var isNegative = false;
+
+        if (this._in.position() < end) {
+          var deserializedSignedInt = ParserBinaryRaw._readSignedIntFrom(this._in, end - this._in.position());
+
+          isNegative = deserializedSignedInt._isNegative;
+          coefficient = deserializedSignedInt._magnitude;
+        }
+
+        var dec = IonDecimal_1.Decimal._fromBigIntCoefficient(isNegative, coefficient, exponent);
+
+        var _IonTimestamp_1$Times = IonTimestamp_1.Timestamp._splitSecondsDecimal(dec),
+            _IonTimestamp_1$Times2 = (0, _slicedToArray2["default"])(_IonTimestamp_1$Times, 2),
+            _ = _IonTimestamp_1$Times2[0],
+            fractionStr = _IonTimestamp_1$Times2[1];
+
+        fractionalSeconds = IonDecimal_1.Decimal.parse(secondInt + '.' + fractionStr);
+      }
+
+      var msSinceEpoch = Date.UTC(year, month ? month - 1 : 0, day ? day : 1, hour ? hour : 0, minute ? minute : 0, secondInt ? secondInt : 0, 0);
+      msSinceEpoch = IonTimestamp_1.Timestamp._adjustMsSinceEpochIfNeeded(year, msSinceEpoch);
+      var date = new Date(msSinceEpoch);
+      return IonTimestamp_1.Timestamp._valueOf(date, offset, fractionalSeconds, precision);
+    }
+  }, {
+    key: "read_string_value",
+    value: function read_string_value() {
+      return IonUnicode_1.decodeUtf8(this._in.chunk(this._len));
+    }
+  }, {
+    key: "clear_value",
+    value: function clear_value() {
+      this._raw_type = EOF;
+      this._curr = undefined;
+      this._a = empty_array;
+      this._as = -1;
+      this._null = false;
+      this._fid = -1;
+      this._len = -1;
+    }
+  }, {
+    key: "load_length",
+    value: function load_length(tb) {
+      var t = this;
+      t._len = low_nibble(tb);
+
+      switch (t._len) {
+        case 1:
+          if (high_nibble(tb) === IonBinary.TB_STRUCT) {
+            t._len = this.readVarUnsignedInt();
+          }
+
+          t._null = false;
+          break;
+
+        case IonBinary.LEN_VAR:
+          t._null = false;
+          t._len = this.readVarUnsignedInt();
+          break;
+
+        case IonBinary.LEN_NULL:
+          t._null = true;
+          t._len = 0;
+          break;
+
+        default:
+          t._null = false;
+          break;
+      }
+    }
+  }, {
+    key: "load_next",
+    value: function load_next() {
+      var t = this;
+      var rt, tb;
+      t._as = -1;
+
+      if (t._in.is_empty()) {
+        t.clear_value();
+        return undefined;
+      }
+
+      tb = t._in.next();
+      rt = high_nibble(tb);
+      t.load_length(tb);
+
+      if (rt === IonBinary.TB_ANNOTATION) {
+        if (t._len < 1 && t.depth() === 0) {
+          rt = t.load_ivm();
+        } else {
+          rt = t.load_annotations();
+        }
+      }
+
+      switch (rt) {
+        case IonBinary.TB_NULL:
+          t._null = true;
+          break;
+
+        case IonBinary.TB_BOOL:
+          if (t._len === 0 || t._len === 1) {
+            t._curr = t._len === 1;
+            t._len = 0;
+          }
+
+          break;
+      }
+
+      t._raw_type = rt;
+      return rt;
+    }
+  }, {
+    key: "load_annotations",
+    value: function load_annotations() {
+      var t = this;
+      var tb, type_, annotation_len;
+
+      if (t._len < 1 && t.depth() === 0) {
+        type_ = t.load_ivm();
+      } else {
+        annotation_len = this.readVarUnsignedInt();
+        t._as = t._in.position();
+
+        t._in.skip(annotation_len);
+
+        t._ae = t._in.position();
+        tb = t._in.next();
+        t.load_length(tb);
+        type_ = high_nibble(tb);
+      }
+
+      return type_;
+    }
+  }, {
+    key: "load_ivm",
+    value: function load_ivm() {
+      var t = this;
+      var span = t._in;
+      if (span.next() !== ivm_image_1) throw new Error("invalid binary Ion at " + span.position());
+      if (span.next() !== ivm_image_2) throw new Error("invalid binary Ion at " + span.position());
+      if (span.next() !== ivm_image_3) throw new Error("invalid binary Ion at " + span.position());
+      t._curr = ivm_sid;
+      t._len = 0;
+      return IonBinary.TB_SYMBOL;
+    }
+  }, {
+    key: "load_annotation_values",
+    value: function load_annotation_values() {
+      var t = this;
+      var a, b, pos, limit, arr;
+      if ((pos = t._as) < 0) return;
+      arr = [];
+      limit = t._ae;
+      a = 0;
+
+      while (pos < limit) {
+        b = t._in.valueAt(pos);
+        pos++;
+        a = a << VINT_SHIFT | b & VINT_MASK;
+
+        if ((b & VINT_FLAG) !== 0) {
+          arr.push(a);
+          a = 0;
+        }
+      }
+
+      t._a = arr;
+    }
+  }, {
+    key: "_readIntegerMagnitude",
+    value: function _readIntegerMagnitude() {
+      if (this._len === 0) {
+        return JsbiSupport_1.JsbiSupport.ZERO;
+      }
+
+      return this.readUnsignedIntAsBigInt();
+    }
+  }, {
+    key: "load_value",
+    value: function load_value() {
+      if (this._curr != undefined) return;
+      if (this.isNull()) return null;
+
+      switch (this._raw_type) {
+        case IonBinary.TB_BOOL:
+          break;
+
+        case IonBinary.TB_INT:
+          this._curr = this._readIntegerMagnitude();
+          break;
+
+        case IonBinary.TB_NEG_INT:
+          this._curr = jsbi_1["default"].unaryMinus(this._readIntegerMagnitude());
+          break;
+
+        case IonBinary.TB_FLOAT:
+          this._curr = this.read_binary_float();
+          break;
+
+        case IonBinary.TB_DECIMAL:
+          if (this._len === 0) {
+            this._curr = IonDecimal_1.Decimal.ZERO;
+          } else {
+            this._curr = this.read_decimal_value();
+          }
+
+          break;
+
+        case IonBinary.TB_TIMESTAMP:
+          this._curr = this.read_timestamp_value();
+          break;
+
+        case IonBinary.TB_SYMBOL:
+          this._curr = this.readUnsignedIntAsNumber();
+          break;
+
+        case IonBinary.TB_STRING:
+          this._curr = this.read_string_value();
+          break;
+
+        case IonBinary.TB_CLOB:
+        case IonBinary.TB_BLOB:
+          if (this.isNull()) break;
+          this._curr = this._in.chunk(this._len);
+          break;
+
+        default:
+          throw new Error('Unexpected type: ' + this._raw_type);
+      }
+    }
   }], [{
-    key: "readFloatFrom",
-    value: function readFloatFrom(input, numberOfBytes) {
+    key: "_readFloatFrom",
+    value: function _readFloatFrom(input, numberOfBytes) {
       var tempBuf;
 
       switch (numberOfBytes) {
@@ -4943,20 +3301,20 @@ function () {
       }
     }
   }, {
-    key: "readVarUnsignedIntFrom",
-    value: function readVarUnsignedIntFrom(input) {
+    key: "_readVarUnsignedIntFrom",
+    value: function _readVarUnsignedIntFrom(input) {
       var numberOfBits = 0;
 
-      var _byte2;
+      var _byte;
 
       var magnitude = 0;
 
       while (true) {
-        _byte2 = input.next();
-        magnitude = magnitude << 7 | _byte2 & 0x7F;
+        _byte = input.next();
+        magnitude = magnitude << 7 | _byte & 0x7F;
         numberOfBits += 7;
 
-        if (_byte2 & 0x80) {
+        if (_byte & 0x80) {
           break;
         }
       }
@@ -4968,10 +3326,10 @@ function () {
       return magnitude;
     }
   }, {
-    key: "readVarSignedIntFrom",
-    value: function readVarSignedIntFrom(input) {
+    key: "_readVarSignedIntFrom",
+    value: function _readVarSignedIntFrom(input) {
       var v = input.next(),
-          _byte3;
+          _byte2;
 
       var isNegative = v & 0x40;
       var stopBit = v & 0x80;
@@ -4979,11 +3337,11 @@ function () {
       var bits = 6;
 
       while (!stopBit) {
-        _byte3 = input.next();
-        stopBit = _byte3 & 0x80;
-        _byte3 &= 0x7F;
+        _byte2 = input.next();
+        stopBit = _byte2 & 0x80;
+        _byte2 &= 0x7F;
         v <<= 7;
-        v |= _byte3;
+        v |= _byte2;
         bits += 7;
       }
 
@@ -4994,60 +3352,67 @@ function () {
       return isNegative ? -v : v;
     }
   }, {
-    key: "readSignedIntFrom",
-    value: function readSignedIntFrom(input, numberOfBytes) {
+    key: "_readSignedIntFrom",
+    value: function _readSignedIntFrom(input, numberOfBytes) {
       if (numberOfBytes == 0) {
-        return new IonLongInt_1.LongInt(0);
+        return new SignAndMagnitudeInt_1["default"](JsbiSupport_1.JsbiSupport.ZERO);
       }
 
       var bytes = input.view(numberOfBytes);
       var isNegative = (bytes[0] & 0x80) == 0x80;
       var numbers = Array.prototype.slice.call(bytes);
       numbers[0] = bytes[0] & 0x7F;
-      return IonLongInt_1.LongInt.fromIntBytes(numbers, isNegative);
+      var magnitude = JsbiSerde_1.JsbiSerde.fromUnsignedBytes(numbers);
+      return new SignAndMagnitudeInt_1["default"](magnitude, isNegative);
     }
   }, {
-    key: "readUnsignedIntFrom",
-    value: function readUnsignedIntFrom(input, numberOfBytes) {
-      var value = 0,
-          bytesRead = 0,
-          _byte4;
+    key: "_readUnsignedIntAsBigIntFrom",
+    value: function _readUnsignedIntAsBigIntFrom(input, numberOfBytes) {
+      return JsbiSerde_1.JsbiSerde.fromUnsignedBytes(Array.prototype.slice.call(input.view(numberOfBytes)));
+    }
+  }, {
+    key: "_readUnsignedIntAsNumberFrom",
+    value: function _readUnsignedIntAsNumberFrom(input, numberOfBytes) {
+      var value = 0;
+      var bytesRead = 0;
+      var bytesAvailable = input.getRemaining();
 
-      if (numberOfBytes < 1) return 0;
+      var _byte3;
+
+      if (numberOfBytes < 1) {
+        return 0;
+      } else if (numberOfBytes > 6) {
+        throw new Error("Attempted to read a ".concat(numberOfBytes, "-byte unsigned integer,") + " which is too large for a to be stored in a number without losing precision.");
+      }
+
+      if (bytesAvailable < numberOfBytes) {
+        throw new Error("Attempted to read a ".concat(numberOfBytes, "-byte unsigned integer,") + " but only ".concat(bytesAvailable, " bytes were available."));
+      }
 
       while (bytesRead < numberOfBytes) {
-        _byte4 = input.next();
+        _byte3 = input.next();
         bytesRead++;
-        value = value << 8;
-        value = value | _byte4 & 0xff;
-      }
-
-      if (numberOfBytes > 4 || value < 0) {
-        throw new Error("Attempted to read an unsigned int that was larger than 31 bits." + " Use readUnsignedLongIntFrom instead. UInt size: " + numberOfBytes + ", value: " + value);
-      }
-
-      if (_byte4 === EOF) {
-        throw new Error("Ran out of data while reading a " + numberOfBytes + "-byte unsigned int.");
+        value *= 256;
+        value = value + _byte3;
       }
 
       return value;
     }
   }, {
-    key: "readUnsignedLongIntFrom",
-    value: function readUnsignedLongIntFrom(input, numberOfBytes) {
-      return IonLongInt_1.LongInt.fromUIntBytes(Array.prototype.slice.call(input.view(numberOfBytes)));
-    }
-  }, {
     key: "readDecimalValueFrom",
     value: function readDecimalValueFrom(input, numberOfBytes) {
-      var coefficient, exponent, d;
       var initialPosition = input.position();
-      exponent = ParserBinaryRaw.readVarSignedIntFrom(input);
+
+      var exponent = ParserBinaryRaw._readVarSignedIntFrom(input);
+
       var numberOfExponentBytes = input.position() - initialPosition;
       var numberOfCoefficientBytes = numberOfBytes - numberOfExponentBytes;
-      coefficient = ParserBinaryRaw.readSignedIntFrom(input, numberOfCoefficientBytes);
-      d = IonDecimal_1.Decimal._fromLongIntCoefficient(coefficient, exponent);
-      return d;
+
+      var signedInt = ParserBinaryRaw._readSignedIntFrom(input, numberOfCoefficientBytes);
+
+      var isNegative = signedInt.isNegative;
+      var coefficient = isNegative ? jsbi_1["default"].unaryMinus(signedInt.magnitude) : signedInt.magnitude;
+      return IonDecimal_1.Decimal._fromBigIntCoefficient(isNegative, coefficient, exponent);
     }
   }]);
   return ParserBinaryRaw;
@@ -5055,7 +3420,7 @@ function () {
 
 exports.ParserBinaryRaw = ParserBinaryRaw;
 
-},{"./IonBinary":4,"./IonConstants":8,"./IonDecimal":9,"./IonLongInt":12,"./IonTimestamp":25,"./IonTypes":27,"./IonUnicode":28,"@babel/runtime/helpers/classCallCheck":33,"@babel/runtime/helpers/createClass":34,"@babel/runtime/helpers/interopRequireDefault":40,"@babel/runtime/helpers/slicedToArray":45}],15:[function(require,module,exports){
+},{"./IonBinary":4,"./IonConstants":8,"./IonDecimal":9,"./IonTimestamp":24,"./IonTypes":26,"./IonUnicode":27,"./JsbiSerde":29,"./JsbiSupport":30,"./SignAndMagnitudeInt":31,"@babel/runtime/helpers/classCallCheck":35,"@babel/runtime/helpers/createClass":36,"@babel/runtime/helpers/interopRequireDefault":42,"@babel/runtime/helpers/slicedToArray":47,"jsbi":50}],14:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -5064,15 +3429,27 @@ var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime/helpers/cl
 
 var _createClass2 = _interopRequireDefault(require("@babel/runtime/helpers/createClass"));
 
+var __importStar = void 0 && (void 0).__importStar || function (mod) {
+  if (mod && mod.__esModule) return mod;
+  var result = {};
+  if (mod != null) for (var k in mod) {
+    if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
+  }
+  result["default"] = mod;
+  return result;
+};
+
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var IonText = require("./IonText");
+var IonText = __importStar(require("./IonText"));
+
+var IonText_1 = require("./IonText");
 
 var IonTypes_1 = require("./IonTypes");
 
-var IonText_1 = require("./IonText");
+var JsbiSupport_1 = require("./JsbiSupport");
 
 var EOF = -1;
 var ERROR = -2;
@@ -5147,6 +3524,7 @@ var ESC_u = 117;
 var ESC_U = 85;
 var empty_array = [];
 var INF = [CH_i, CH_n, CH_f];
+var _UTF16_MASK = 0x03ff;
 
 function get_ion_type(t) {
   switch (t) {
@@ -5440,6 +3818,233 @@ function () {
       return this._ann;
     }
   }, {
+    key: "clearFieldName",
+    value: function clearFieldName() {
+      this._fieldname = null;
+      this._fieldnameType = null;
+    }
+  }, {
+    key: "isNull",
+    value: function isNull() {
+      return this._curr_null;
+    }
+  }, {
+    key: "bigIntValue",
+    value: function bigIntValue() {
+      if (this.isNull()) {
+        return null;
+      }
+
+      var intText = this.get_value_as_string(this._curr);
+
+      switch (this._curr) {
+        case T_INT:
+        case T_HEXINT:
+          return JsbiSupport_1.JsbiSupport.bigIntFromString(intText);
+
+        default:
+          throw new Error("intValue() was called when the current value was not an integer.");
+      }
+    }
+  }, {
+    key: "numberValue",
+    value: function numberValue() {
+      if (this.isNull()) return null;
+      var s = this.get_value_as_string(this._curr);
+
+      switch (this._curr) {
+        case T_INT:
+        case T_HEXINT:
+          return JsbiSupport_1.JsbiSupport.clampToSafeIntegerRange(JsbiSupport_1.JsbiSupport.bigIntFromString(s));
+
+        case T_FLOAT:
+          return Number(s);
+
+        case T_FLOAT_SPECIAL:
+          if (s == "+inf") return Number.POSITIVE_INFINITY;else if (s == "-inf") return Number.NEGATIVE_INFINITY;else if (s == "nan") return Number.NaN;
+
+        default:
+          throw new Error("can't convert to number");
+      }
+    }
+  }, {
+    key: "booleanValue",
+    value: function booleanValue() {
+      if (this.isNull()) return null;
+      var s = this.get_value_as_string(T_BOOL);
+
+      if (s == "true") {
+        return true;
+      } else if (s == "false") {
+        return false;
+      } else {
+        return undefined;
+      }
+    }
+  }, {
+    key: "get_value_as_string",
+    value: function get_value_as_string(t) {
+      var index;
+      var ch;
+      var s = "";
+
+      switch (t) {
+        case T_NULL:
+        case T_BOOL:
+        case T_INT:
+        case T_HEXINT:
+        case T_FLOAT:
+        case T_FLOAT_SPECIAL:
+        case T_DECIMAL:
+        case T_TIMESTAMP:
+        case T_IDENTIFIER:
+        case T_OPERATOR:
+          for (index = this._start; index < this._end; index++) {
+            s += String.fromCharCode(this._in.valueAt(index));
+          }
+
+          break;
+
+        case T_BLOB:
+          for (index = this._start; index < this._end; index++) {
+            ch = this._in.valueAt(index);
+
+            if (IonText.is_base64_char(ch)) {
+              s += String.fromCharCode(ch);
+            }
+          }
+
+          break;
+
+        case T_STRING1:
+        case T_STRING2:
+        case T_STRING3:
+          for (index = this._start; index < this._end; index++) {
+            var isEscaped = false;
+            ch = this._in.valueAt(index);
+
+            if (ch == CH_BS) {
+              ch = this._read_escape_sequence(index, this._end);
+              index += this._esc_len;
+              isEscaped = true;
+            }
+
+            if (this.isHighSurrogate(ch)) {
+              index++;
+
+              var tempChar = this._in.valueAt(index);
+
+              if (tempChar == CH_BS) {
+                tempChar = this._read_escape_sequence(index, this._end);
+                index += this._esc_len;
+              }
+
+              if (this.isLowSurrogate(tempChar)) {
+                var hiSurrogate = ch;
+                var loSurrogate = tempChar;
+                var codepoint = 0x10000 + ((hiSurrogate & _UTF16_MASK) << 10) + (loSurrogate & _UTF16_MASK);
+                s += String.fromCodePoint(codepoint);
+              } else {
+                throw new Error("expected a low surrogate, but found: " + ch);
+              }
+            } else if (this.isLowSurrogate(ch)) {
+              throw new Error("unexpected low surrogate: " + ch);
+            } else if (t === T_STRING3 && ch === CH_SQ && !isEscaped && this.verifyTriple(index)) {
+              index = this._skip_triple_quote_gap(index, this._end, true);
+            } else if (ch >= 0) {
+              s += String.fromCharCode(ch);
+            }
+          }
+
+          break;
+
+        default:
+          throw new Error("can't get this value as a string");
+      }
+
+      return s;
+    }
+  }, {
+    key: "get_value_as_uint8array",
+    value: function get_value_as_uint8array(t) {
+      var bytes = [];
+
+      switch (t) {
+        case T_CLOB2:
+          for (var index = this._start; index < this._end; index++) {
+            var ch = this._in.valueAt(index);
+
+            if (ch === CH_BS) {
+              bytes.push(this.readClobEscapes(index, this._end));
+              index += this._esc_len;
+            } else if (ch < 128) {
+              bytes.push(ch);
+            } else {
+              throw new Error("Non-Ascii values illegal within clob.");
+            }
+          }
+
+          break;
+
+        case T_CLOB3:
+          for (var _index = this._start; _index < this._end; _index++) {
+            var _ch = this._in.valueAt(_index);
+
+            if (_ch === CH_BS) {
+              var escaped = this.readClobEscapes(_index, this._end);
+
+              if (escaped >= 0) {
+                bytes.push(escaped);
+              }
+
+              _index += this._esc_len;
+            } else if (_ch === CH_SQ) {
+              if (this.verifyTriple(_index)) {
+                _index = this._skip_triple_quote_gap(_index, this._end, false);
+              } else {
+                bytes.push(_ch);
+              }
+            } else if (_ch < 128) {
+              bytes.push(_ch);
+            } else {
+              throw new Error("Non-Ascii values illegal within clob.");
+            }
+          }
+
+          break;
+
+        default:
+          throw new Error("can't get this value as a Uint8Array");
+      }
+
+      return Uint8Array.from(bytes);
+    }
+  }, {
+    key: "next",
+    value: function next() {
+      this.clearFieldName();
+      this._ann = [];
+
+      if (this._value_type === ERROR) {
+        this._run();
+      }
+
+      this._curr = this._value_pop();
+      var t;
+
+      if (this._curr === ERROR) {
+        this._value.push(ERROR);
+
+        t = undefined;
+      } else {
+        t = this._curr;
+      }
+
+      this._curr_null = this._value_null;
+      this._value_null = false;
+      return t;
+    }
+  }, {
     key: "_read_datagram_values",
     value: function _read_datagram_values() {
       var ch = this._peek();
@@ -5575,12 +4180,6 @@ function () {
       } else {
         this._error("expected ',' or '}'");
       }
-    }
-  }, {
-    key: "clearFieldName",
-    value: function clearFieldName() {
-      this._fieldname = null;
-      this._fieldnameType = null;
     }
   }, {
     key: "_load_field_name",
@@ -5762,9 +4361,9 @@ function () {
 
         this._value_push(kwt);
       } else {
-        var _ch = this._read_after_whitespace(true);
+        var _ch2 = this._read_after_whitespace(true);
 
-        if (_ch == CH_CL && this._peek() == CH_CL) {
+        if (_ch2 == CH_CL && this._peek() == CH_CL) {
           this._read();
 
           this._ann.push(symbol);
@@ -5773,7 +4372,7 @@ function () {
         } else {
           var _kwt = T_IDENTIFIER;
 
-          this._unread(_ch);
+          this._unread(_ch2);
 
           this._value_push(_kwt);
         }
@@ -6271,49 +4870,6 @@ function () {
       }
     }
   }, {
-    key: "isNull",
-    value: function isNull() {
-      return this._curr_null;
-    }
-  }, {
-    key: "numberValue",
-    value: function numberValue() {
-      if (this.isNull()) return null;
-      var n,
-          s = this.get_value_as_string(this._curr);
-
-      switch (this._curr) {
-        case T_INT:
-          return parseInt(s, 10);
-
-        case T_HEXINT:
-          return parseInt(s, 16);
-
-        case T_FLOAT:
-          return Number(s);
-
-        case T_FLOAT_SPECIAL:
-          if (s == "+inf") return Number.POSITIVE_INFINITY;else if (s == "-inf") return Number.NEGATIVE_INFINITY;else if (s == "nan") return Number.NaN;
-
-        default:
-          throw new Error("can't convert to number");
-      }
-    }
-  }, {
-    key: "booleanValue",
-    value: function booleanValue() {
-      if (this.isNull()) return null;
-      var s = this.get_value_as_string(T_BOOL);
-
-      if (s == "true") {
-        return true;
-      } else if (s == "false") {
-        return false;
-      } else {
-        return undefined;
-      }
-    }
-  }, {
     key: "isHighSurrogate",
     value: function isHighSurrogate(ch) {
       return ch >= 0xD800 && ch <= 0xDBFF;
@@ -6322,171 +4878,6 @@ function () {
     key: "isLowSurrogate",
     value: function isLowSurrogate(ch) {
       return ch >= 0xDC00 && ch <= 0xDFFF;
-    }
-  }, {
-    key: "get_value_as_string",
-    value: function get_value_as_string(t) {
-      var index;
-      var ch;
-      var escaped;
-      var acceptComments;
-      var s = "";
-
-      switch (t) {
-        case T_NULL:
-        case T_BOOL:
-        case T_INT:
-        case T_HEXINT:
-        case T_FLOAT:
-        case T_FLOAT_SPECIAL:
-        case T_DECIMAL:
-        case T_TIMESTAMP:
-        case T_IDENTIFIER:
-        case T_OPERATOR:
-          for (index = this._start; index < this._end; index++) {
-            s += String.fromCharCode(this._in.valueAt(index));
-          }
-
-          break;
-
-        case T_BLOB:
-          for (index = this._start; index < this._end; index++) {
-            ch = this._in.valueAt(index);
-
-            if (IonText.is_base64_char(ch)) {
-              s += String.fromCharCode(ch);
-            }
-          }
-
-          break;
-
-        case T_STRING1:
-        case T_STRING2:
-          for (index = this._start; index < this._end; index++) {
-            ch = this._in.valueAt(index);
-
-            if (ch == CH_BS) {
-              ch = this._read_escape_sequence(index, this._end);
-              index += this._esc_len;
-            }
-
-            if (this.isHighSurrogate(ch)) {
-              index++;
-
-              var tempChar = this._in.valueAt(index);
-
-              if (tempChar == CH_BS) {
-                tempChar = this._read_escape_sequence(index, this._end);
-                index += this._esc_len;
-              }
-
-              if (this.isLowSurrogate(tempChar)) {
-                s += ch + tempChar;
-                index++;
-              } else {
-                throw new Error("illegal high surrogate" + ch);
-              }
-            } else if (this.isLowSurrogate(ch)) {
-              throw new Error("illegal low surrogate: " + ch);
-            } else {
-              s += String.fromCharCode(ch);
-            }
-          }
-
-          break;
-
-        case T_STRING3:
-          acceptComments = true;
-
-          for (index = this._start; index < this._end; index++) {
-            ch = this._in.valueAt(index);
-
-            if (ch == CH_BS) {
-              ch = this._read_escape_sequence(index, this._end);
-              index += this._esc_len;
-            }
-
-            if (this.isHighSurrogate(ch)) {
-              index++;
-
-              var _tempChar = this._in.valueAt(index);
-
-              if (_tempChar == CH_BS) {
-                _tempChar = this._read_escape_sequence(index, this._end);
-                index += this._esc_len;
-              }
-
-              if (this.isLowSurrogate(_tempChar)) {
-                s += ch + _tempChar;
-                index++;
-              } else {
-                throw new Error("illegal high surrogate" + ch);
-              }
-            } else if (this.isLowSurrogate(ch)) {
-              throw new Error("illegal low surrogate: " + ch);
-            } else if (ch === CH_SQ) {
-              if (this.verifyTriple(index)) {
-                index = this._skip_triple_quote_gap(index, this._end, acceptComments);
-              } else {
-                s += String.fromCharCode(ch);
-              }
-            } else {
-              s += String.fromCharCode(ch);
-            }
-          }
-
-          break;
-
-        case T_CLOB2:
-          for (index = this._start; index < this._end; index++) {
-            ch = this._in.valueAt(index);
-
-            if (ch == CH_BS) {
-              s += String.fromCharCode(this.readClobEscapes(index, this._end));
-              index += this._esc_len;
-            } else if (ch < 128) {
-              s += String.fromCharCode(ch);
-            } else {
-              throw new Error("Non-Ascii values illegal within clob.");
-            }
-          }
-
-          break;
-
-        case T_CLOB3:
-          acceptComments = false;
-
-          for (index = this._start; index < this._end; index++) {
-            ch = this._in.valueAt(index);
-
-            if (ch === CH_BS) {
-              escaped = this.readClobEscapes(index, this._end);
-
-              if (escaped >= 0) {
-                s += String.fromCharCode(escaped);
-              }
-
-              index += this._esc_len;
-            } else if (ch === CH_SQ) {
-              if (this.verifyTriple(index)) {
-                index = this._skip_triple_quote_gap(index, this._end, acceptComments);
-              } else {
-                s += String.fromCharCode(ch);
-              }
-            } else if (ch < 128) {
-              s += String.fromCharCode(ch);
-            } else {
-              throw new Error("Non-Ascii values illegal within clob.");
-            }
-          }
-
-          break;
-
-        default:
-          throw new Error("can't get this value as a string");
-      }
-
-      return s;
     }
   }, {
     key: "indexWhiteSpace",
@@ -6767,31 +5158,6 @@ function () {
     value: function _value_pop() {
       var t = this._value_type;
       this._value_type = ERROR;
-      return t;
-    }
-  }, {
-    key: "next",
-    value: function next() {
-      this.clearFieldName();
-      this._ann = [];
-
-      if (this._value_type === ERROR) {
-        this._run();
-      }
-
-      this._curr = this._value_pop();
-      var t;
-
-      if (this._curr === ERROR) {
-        this._value.push(ERROR);
-
-        t = undefined;
-      } else {
-        t = this._curr;
-      }
-
-      this._curr_null = this._value_null;
-      this._value_null = false;
       return t;
     }
   }, {
@@ -7079,7 +5445,7 @@ function () {
 
 exports.ParserTextRaw = ParserTextRaw;
 
-},{"./IonText":22,"./IonTypes":27,"@babel/runtime/helpers/classCallCheck":33,"@babel/runtime/helpers/createClass":34,"@babel/runtime/helpers/interopRequireDefault":40}],16:[function(require,module,exports){
+},{"./IonText":21,"./IonTypes":26,"./JsbiSupport":30,"@babel/runtime/helpers/classCallCheck":35,"@babel/runtime/helpers/createClass":36,"@babel/runtime/helpers/interopRequireDefault":42}],15:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -7121,33 +5487,6 @@ function (_IonTextWriter_1$Text) {
   }
 
   (0, _createClass2["default"])(PrettyTextWriter, [{
-    key: "writePrettyValue",
-    value: function writePrettyValue() {
-      if (!this.isTopLevel && this.currentContainer.containerType && this.currentContainer.containerType !== IonTypes_1.IonTypes.STRUCT) {
-        this.writePrettyIndent(0);
-      }
-    }
-  }, {
-    key: "writePrettyNewLine",
-    value: function writePrettyNewLine(incrementValue) {
-      this.indentCount = this.indentCount + incrementValue;
-
-      if (this.indentSize && this.indentSize > 0) {
-        this.writeable.writeByte(IonText_1.CharCodes.LINE_FEED);
-      }
-    }
-  }, {
-    key: "writePrettyIndent",
-    value: function writePrettyIndent(incrementValue) {
-      this.indentCount = this.indentCount + incrementValue;
-
-      if (this.indentSize && this.indentSize > 0) {
-        for (var i = 0; i < this.indentCount * this.indentSize; i++) {
-          this.writeable.writeByte(IonText_1.CharCodes.SPACE);
-        }
-      }
-    }
-  }, {
     key: "writeFieldName",
     value: function writeFieldName(fieldName) {
       if (this.currentContainer.containerType !== IonTypes_1.IonTypes.STRUCT) {
@@ -7249,7 +5588,7 @@ function (_IonTextWriter_1$Text) {
   }, {
     key: "handleSeparator",
     value: function handleSeparator() {
-      if (this.isTopLevel) {
+      if (this.depth() === 0) {
         if (this.currentContainer.clean) {
           this.currentContainer.clean = false;
         } else {
@@ -7275,13 +5614,40 @@ function (_IonTextWriter_1$Text) {
         }
       }
     }
+  }, {
+    key: "writePrettyValue",
+    value: function writePrettyValue() {
+      if (this.depth() > 0 && this.currentContainer.containerType && this.currentContainer.containerType !== IonTypes_1.IonTypes.STRUCT) {
+        this.writePrettyIndent(0);
+      }
+    }
+  }, {
+    key: "writePrettyNewLine",
+    value: function writePrettyNewLine(incrementValue) {
+      this.indentCount = this.indentCount + incrementValue;
+
+      if (this.indentSize && this.indentSize > 0) {
+        this.writeable.writeByte(IonText_1.CharCodes.LINE_FEED);
+      }
+    }
+  }, {
+    key: "writePrettyIndent",
+    value: function writePrettyIndent(incrementValue) {
+      this.indentCount = this.indentCount + incrementValue;
+
+      if (this.indentSize && this.indentSize > 0) {
+        for (var i = 0; i < this.indentCount * this.indentSize; i++) {
+          this.writeable.writeByte(IonText_1.CharCodes.SPACE);
+        }
+      }
+    }
   }]);
   return PrettyTextWriter;
 }(IonTextWriter_1.TextWriter);
 
 exports.PrettyTextWriter = PrettyTextWriter;
 
-},{"./IonText":22,"./IonTextWriter":24,"./IonTypes":27,"@babel/runtime/helpers/classCallCheck":33,"@babel/runtime/helpers/createClass":34,"@babel/runtime/helpers/getPrototypeOf":38,"@babel/runtime/helpers/inherits":39,"@babel/runtime/helpers/interopRequireDefault":40,"@babel/runtime/helpers/possibleConstructorReturn":43}],17:[function(require,module,exports){
+},{"./IonText":21,"./IonTextWriter":23,"./IonTypes":26,"@babel/runtime/helpers/classCallCheck":35,"@babel/runtime/helpers/createClass":36,"@babel/runtime/helpers/getPrototypeOf":40,"@babel/runtime/helpers/inherits":41,"@babel/runtime/helpers/interopRequireDefault":42,"@babel/runtime/helpers/possibleConstructorReturn":45}],16:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -7302,9 +5668,44 @@ function () {
     this._name = _name;
     this._version = _version;
     this._symbols = _symbols;
+    this._idsByText = new Map();
+    this._numberOfSymbols = this._symbols.length;
+
+    for (var m = _symbols.length - 1; m >= 0; m--) {
+      this._idsByText[_symbols[m]] = m;
+    }
   }
 
   (0, _createClass2["default"])(SharedSymbolTable, [{
+    key: "getSymbolText",
+    value: function getSymbolText(symbolId) {
+      if (symbolId < 0) {
+        throw new Error("Index ".concat(symbolId, " is out of bounds for the SharedSymbolTable name=").concat(this.name, ", version=").concat(this.version));
+      }
+
+      if (symbolId >= this.numberOfSymbols) {
+        return undefined;
+      }
+
+      return this._symbols[symbolId];
+    }
+  }, {
+    key: "getSymbolId",
+    value: function getSymbolId(text) {
+      var symbolId = this._idsByText[text];
+
+      if (symbolId === undefined) {
+        return null;
+      }
+
+      return symbolId;
+    }
+  }, {
+    key: "numberOfSymbols",
+    get: function get() {
+      return this._numberOfSymbols;
+    }
+  }, {
     key: "name",
     get: function get() {
       return this._name;
@@ -7314,18 +5715,13 @@ function () {
     get: function get() {
       return this._version;
     }
-  }, {
-    key: "symbols",
-    get: function get() {
-      return this._symbols;
-    }
   }]);
   return SharedSymbolTable;
 }();
 
 exports.SharedSymbolTable = SharedSymbolTable;
 
-},{"@babel/runtime/helpers/classCallCheck":33,"@babel/runtime/helpers/createClass":34,"@babel/runtime/helpers/interopRequireDefault":40}],18:[function(require,module,exports){
+},{"@babel/runtime/helpers/classCallCheck":35,"@babel/runtime/helpers/createClass":36,"@babel/runtime/helpers/interopRequireDefault":42}],17:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -7632,12 +6028,14 @@ function (_Span2) {
 
 exports.BinarySpan = BinarySpan;
 
-},{"./IonConstants":8,"@babel/runtime/helpers/classCallCheck":33,"@babel/runtime/helpers/createClass":34,"@babel/runtime/helpers/getPrototypeOf":38,"@babel/runtime/helpers/inherits":39,"@babel/runtime/helpers/interopRequireDefault":40,"@babel/runtime/helpers/possibleConstructorReturn":43}],19:[function(require,module,exports){
+},{"./IonConstants":8,"@babel/runtime/helpers/classCallCheck":35,"@babel/runtime/helpers/createClass":36,"@babel/runtime/helpers/getPrototypeOf":40,"@babel/runtime/helpers/inherits":41,"@babel/runtime/helpers/interopRequireDefault":42,"@babel/runtime/helpers/possibleConstructorReturn":45}],18:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
 
 var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime/helpers/classCallCheck"));
+
+var _createClass2 = _interopRequireDefault(require("@babel/runtime/helpers/createClass"));
 
 var _possibleConstructorReturn2 = _interopRequireDefault(require("@babel/runtime/helpers/possibleConstructorReturn"));
 
@@ -7657,16 +6055,40 @@ function (_IonSharedSymbolTable) {
   (0, _inherits2["default"])(SubstituteSymbolTable, _IonSharedSymbolTable);
 
   function SubstituteSymbolTable(length) {
+    var _this;
+
     (0, _classCallCheck2["default"])(this, SubstituteSymbolTable);
-    return (0, _possibleConstructorReturn2["default"])(this, (0, _getPrototypeOf2["default"])(SubstituteSymbolTable).call(this, null, undefined, new Array(length)));
+
+    if (length < 0) {
+      throw new Error("Cannot instantiate a SubstituteSymbolTable with a negative length. (" + length + ")");
+    }
+
+    _this = (0, _possibleConstructorReturn2["default"])(this, (0, _getPrototypeOf2["default"])(SubstituteSymbolTable).call(this, "_substitute", undefined, []));
+    _this._numberOfSymbols = length;
+    return _this;
   }
 
+  (0, _createClass2["default"])(SubstituteSymbolTable, [{
+    key: "getSymbolText",
+    value: function getSymbolText(symbolId) {
+      if (symbolId < 0) {
+        throw new Error("Index ".concat(symbolId, " is out of bounds for the SharedSymbolTable name=").concat(this.name, ", version=").concat(this.version));
+      }
+
+      return undefined;
+    }
+  }, {
+    key: "getSymbolId",
+    value: function getSymbolId(text) {
+      return undefined;
+    }
+  }]);
   return SubstituteSymbolTable;
 }(IonSharedSymbolTable_1.SharedSymbolTable);
 
 exports.SubstituteSymbolTable = SubstituteSymbolTable;
 
-},{"./IonSharedSymbolTable":17,"@babel/runtime/helpers/classCallCheck":33,"@babel/runtime/helpers/getPrototypeOf":38,"@babel/runtime/helpers/inherits":39,"@babel/runtime/helpers/interopRequireDefault":40,"@babel/runtime/helpers/possibleConstructorReturn":43}],20:[function(require,module,exports){
+},{"./IonSharedSymbolTable":16,"@babel/runtime/helpers/classCallCheck":35,"@babel/runtime/helpers/createClass":36,"@babel/runtime/helpers/getPrototypeOf":40,"@babel/runtime/helpers/inherits":41,"@babel/runtime/helpers/interopRequireDefault":42,"@babel/runtime/helpers/possibleConstructorReturn":45}],19:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -7781,7 +6203,7 @@ function makeSymbolTable(catalog, reader) {
 
 exports.makeSymbolTable = makeSymbolTable;
 
-},{"./IonImport":10,"./IonLocalSymbolTable":11,"./IonSubstituteSymbolTable":19,"./IonSystemSymbolTable":21}],21:[function(require,module,exports){
+},{"./IonImport":10,"./IonLocalSymbolTable":11,"./IonSubstituteSymbolTable":18,"./IonSystemSymbolTable":20}],20:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -7806,7 +6228,7 @@ function getSystemSymbolTableImport() {
 
 exports.getSystemSymbolTableImport = getSystemSymbolTableImport;
 
-},{"./IonImport":10,"./IonSharedSymbolTable":17}],22:[function(require,module,exports){
+},{"./IonImport":10,"./IonSharedSymbolTable":16}],21:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -8041,16 +6463,6 @@ function is_hex_digit(ch) {
 exports.is_hex_digit = is_hex_digit;
 var base64chars = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '+', '/'];
 var base64inv = {
-  '0': 52,
-  '1': 53,
-  '2': 54,
-  '3': 55,
-  '4': 56,
-  '5': 57,
-  '6': 58,
-  '7': 59,
-  '8': 60,
-  '9': 61,
   'A': 0,
   'B': 1,
   'C': 2,
@@ -8103,6 +6515,16 @@ var base64inv = {
   'x': 49,
   'y': 50,
   'z': 51,
+  '0': 52,
+  '1': 53,
+  '2': 54,
+  '3': 55,
+  '4': 56,
+  '5': 57,
+  '6': 58,
+  '7': 59,
+  '8': 60,
+  '9': 61,
   '+': 62,
   '/': 63
 };
@@ -8189,7 +6611,7 @@ var CharCodes;
   CharCodes[CharCodes["RIGHT_BRACKET"] = 93] = "RIGHT_BRACKET";
   CharCodes[CharCodes["COMMA"] = 44] = "COMMA";
   CharCodes[CharCodes["SPACE"] = 32] = "SPACE";
-  CharCodes[CharCodes["LOWERCASE_U"] = 117] = "LOWERCASE_U";
+  CharCodes[CharCodes["LOWERCASE_X"] = 120] = "LOWERCASE_X";
   CharCodes[CharCodes["COLON"] = 58] = "COLON";
 })(CharCodes = exports.CharCodes || (exports.CharCodes = {}));
 
@@ -8207,45 +6629,31 @@ function toCharCodes(s) {
   return charCodes;
 }
 
-function unicodeEscape(codePoint) {
-  var prefix = [CharCodes.BACKSLASH, CharCodes.LOWERCASE_U];
+var _HEX_ESCAPE_PREFIX = [CharCodes.BACKSLASH, CharCodes.LOWERCASE_X];
+
+function hexEscape(codePoint) {
   var hexEscape = codePoint.toString(16);
 
-  while (hexEscape.length < 4) {
+  while (hexEscape.length < 2) {
     hexEscape = "0" + hexEscape;
   }
 
-  return prefix.concat(toCharCodes(hexEscape));
+  return _HEX_ESCAPE_PREFIX.concat(toCharCodes(hexEscape));
 }
 
-exports.ClobEscapes = {};
-exports.ClobEscapes[CharCodes.NULL] = backslashEscape("0");
-exports.ClobEscapes[CharCodes.BELL] = backslashEscape("a");
-exports.ClobEscapes[CharCodes.BACKSPACE] = backslashEscape("b");
-exports.ClobEscapes[CharCodes.HORIZONTAL_TAB] = backslashEscape("t");
-exports.ClobEscapes[CharCodes.LINE_FEED] = backslashEscape("n");
-exports.ClobEscapes[CharCodes.VERTICAL_TAB] = backslashEscape("v");
-exports.ClobEscapes[CharCodes.FORM_FEED] = backslashEscape("f");
-exports.ClobEscapes[CharCodes.CARRIAGE_RETURN] = backslashEscape("r");
-exports.ClobEscapes[CharCodes.DOUBLE_QUOTE] = backslashEscape('"');
-exports.ClobEscapes[CharCodes.SINGLE_QUOTE] = backslashEscape("'");
-exports.ClobEscapes[CharCodes.FORWARD_SLASH] = backslashEscape("/");
-exports.ClobEscapes[CharCodes.QUESTION_MARK] = backslashEscape("?");
-exports.ClobEscapes[CharCodes.BACKSLASH] = backslashEscape("\\");
-
-function unicodeEscapes(escapes, start, end) {
+function populateWithHexEscapes(escapes, start, end) {
   if (end === undefined) {
-    escapes[start] = unicodeEscape(start);
+    escapes[start] = hexEscape(start);
   } else {
     for (var i = start; i < end; i++) {
-      escapes[i] = unicodeEscape(i);
+      escapes[i] = hexEscape(i);
     }
   }
 }
 
 var CommonEscapes = {};
 CommonEscapes[CharCodes.NULL] = backslashEscape('0');
-unicodeEscapes(CommonEscapes, 1, 6);
+populateWithHexEscapes(CommonEscapes, 1, 7);
 CommonEscapes[CharCodes.BELL] = backslashEscape('a');
 CommonEscapes[CharCodes.BACKSPACE] = backslashEscape('b');
 CommonEscapes[CharCodes.HORIZONTAL_TAB] = backslashEscape('t');
@@ -8253,7 +6661,14 @@ CommonEscapes[CharCodes.LINE_FEED] = backslashEscape('n');
 CommonEscapes[CharCodes.VERTICAL_TAB] = backslashEscape('v');
 CommonEscapes[CharCodes.FORM_FEED] = backslashEscape('f');
 CommonEscapes[CharCodes.CARRIAGE_RETURN] = backslashEscape('r');
+populateWithHexEscapes(CommonEscapes, 14, 32);
 CommonEscapes[CharCodes.BACKSLASH] = backslashEscape('\\');
+populateWithHexEscapes(CommonEscapes, 0x7f, 0xa0);
+exports.ClobEscapes = (0, _extends2["default"])({}, CommonEscapes);
+exports.ClobEscapes[CharCodes.DOUBLE_QUOTE] = backslashEscape('"');
+exports.ClobEscapes[CharCodes.SINGLE_QUOTE] = backslashEscape("'");
+exports.ClobEscapes[CharCodes.FORWARD_SLASH] = backslashEscape("/");
+exports.ClobEscapes[CharCodes.QUESTION_MARK] = backslashEscape("?");
 exports.StringEscapes = (0, _extends2["default"])({}, CommonEscapes);
 exports.StringEscapes[CharCodes.DOUBLE_QUOTE] = backslashEscape('"');
 exports.SymbolEscapes = (0, _extends2["default"])({}, CommonEscapes);
@@ -8326,7 +6741,7 @@ function escape(input, escapes) {
 
 exports.escape = escape;
 
-},{"@babel/runtime/helpers/extends":36,"@babel/runtime/helpers/interopRequireDefault":40}],23:[function(require,module,exports){
+},{"@babel/runtime/helpers/extends":38,"@babel/runtime/helpers/interopRequireDefault":42}],22:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -8334,6 +6749,12 @@ var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefau
 var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime/helpers/classCallCheck"));
 
 var _createClass2 = _interopRequireDefault(require("@babel/runtime/helpers/createClass"));
+
+var __importDefault = void 0 && (void 0).__importDefault || function (mod) {
+  return mod && mod.__esModule ? mod : {
+    "default": mod
+  };
+};
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -8353,21 +6774,21 @@ var IonType_1 = require("./IonType");
 
 var IonTypes_1 = require("./IonTypes");
 
-var IonSymbols_2 = require("./IonSymbols");
-
-var IonParserTextRaw_2 = require("./IonParserTextRaw");
-
 var IonTimestamp_1 = require("./IonTimestamp");
 
 var IonText_1 = require("./IonText");
 
-var IonUnicode_1 = require("./IonUnicode");
+var JsbiSupport_1 = require("./JsbiSupport");
+
+var IntSize_1 = __importDefault(require("./IntSize"));
 
 var RAW_STRING = new IonType_1.IonType(-1, "raw_input", true, false, false, false);
 var BEGINNING_OF_CONTAINER = -2;
 var EOF = -1;
 var T_IDENTIFIER = 9;
 var T_STRING1 = 11;
+var T_CLOB2 = 14;
+var T_CLOB3 = 15;
 var T_STRUCT = 19;
 
 var TextReader =
@@ -8380,7 +6801,7 @@ function () {
       throw new Error("a source Span is required to make a reader");
     }
 
-    this._parser = new IonParserTextRaw_2.ParserTextRaw(source);
+    this._parser = new IonParserTextRaw_1.ParserTextRaw(source);
     this._depth = 0;
     this._cat = catalog ? catalog : new IonCatalog_1.Catalog();
     this._symtab = IonLocalSymbolTable_1.defaultLocalSymbolTable();
@@ -8394,8 +6815,12 @@ function () {
     value: function load_raw() {
       var t = this;
       if (t._raw !== undefined) return;
-      t._raw = t._parser.get_value_as_string(t._raw_type);
-      return;
+
+      if (t._raw_type === T_CLOB2 || t._raw_type === T_CLOB3) {
+        t._raw = t._parser.get_value_as_uint8array(t._raw_type);
+      } else {
+        t._raw = t._parser.get_value_as_string(t._raw_type);
+      }
     }
   }, {
     key: "skip_past_container",
@@ -8480,7 +6905,7 @@ function () {
           if (p.annotations().length !== 1) break;
           if (p.annotations()[0] != IonSymbols_1.ion_symbol_table) break;
           this._type = IonParserTextRaw_1.get_ion_type(this._raw_type);
-          this._symtab = IonSymbols_2.makeSymbolTable(this._cat, this);
+          this._symtab = IonSymbols_1.makeSymbolTable(this._cat, this);
           this._raw = undefined;
           this._raw_type = undefined;
         } else {
@@ -8541,7 +6966,7 @@ function () {
         var tempStr = str.substr(1, str.length);
 
         if (+tempStr === +tempStr) {
-          var symbol = this._symtab.getSymbol(Number(tempStr));
+          var symbol = this._symtab.getSymbolText(Number(tempStr));
 
           if (symbol === undefined) throw new Error("Unresolveable symbol ID, symboltokens unsupported.");
           return symbol;
@@ -8577,7 +7002,7 @@ function () {
               var tempStr = this._raw.substr(1, this._raw.length);
 
               if (+tempStr === +tempStr) {
-                var symbol = this._symtab.getSymbol(Number(tempStr));
+                var symbol = this._symtab.getSymbolText(Number(tempStr));
 
                 if (symbol === undefined) throw new Error("Unresolvable symbol ID, symboltokens unsupported.");
                 return symbol;
@@ -8627,7 +7052,7 @@ function () {
             return null;
           }
 
-          return IonUnicode_1.encodeUtf8(this._raw);
+          return this._raw;
       }
 
       throw new Error('Current value is not a blob or clob.');
@@ -8644,6 +7069,28 @@ function () {
       }
 
       throw new Error('Current value is not a decimal.');
+    }
+  }, {
+    key: "bigIntValue",
+    value: function bigIntValue() {
+      switch (this._type) {
+        case IonTypes_1.IonTypes.NULL:
+          return null;
+
+        case IonTypes_1.IonTypes.INT:
+          return this._parser.bigIntValue();
+      }
+
+      throw new Error('bigIntValue() was called when the current value was a(n) ' + this._type.name);
+    }
+  }, {
+    key: "intSize",
+    value: function intSize() {
+      if (JsbiSupport_1.JsbiSupport.isSafeInteger(this.bigIntValue())) {
+        return IntSize_1["default"].Number;
+      }
+
+      return IntSize_1["default"].BigInt;
     }
   }, {
     key: "numberValue",
@@ -8684,7 +7131,9 @@ function () {
             var tempStr = this._raw.substr(1, this._raw.length);
 
             if (+tempStr === +tempStr) {
-              var symbol = this._symtab.getSymbol(Number(tempStr));
+              var symbolId = Number(tempStr);
+
+              var symbol = this._symtab.getSymbolText(symbolId);
 
               if (symbol === undefined) throw new Error("Unresolvable symbol ID, symboltokens unsupported.");
               return symbol;
@@ -8734,8 +7183,10 @@ function () {
         case IonTypes_1.IonTypes.DECIMAL:
           return this.decimalValue();
 
-        case IonTypes_1.IonTypes.FLOAT:
         case IonTypes_1.IonTypes.INT:
+          return this.bigIntValue();
+
+        case IonTypes_1.IonTypes.FLOAT:
           return this.numberValue();
 
         case IonTypes_1.IonTypes.STRING:
@@ -8754,9 +7205,8 @@ function () {
 }();
 
 exports.TextReader = TextReader;
-;
 
-},{"./IonCatalog":7,"./IonDecimal":9,"./IonLocalSymbolTable":11,"./IonParserTextRaw":15,"./IonSymbols":20,"./IonText":22,"./IonTimestamp":25,"./IonType":26,"./IonTypes":27,"./IonUnicode":28,"@babel/runtime/helpers/classCallCheck":33,"@babel/runtime/helpers/createClass":34,"@babel/runtime/helpers/interopRequireDefault":40}],24:[function(require,module,exports){
+},{"./IntSize":2,"./IonCatalog":7,"./IonDecimal":9,"./IonLocalSymbolTable":11,"./IonParserTextRaw":14,"./IonSymbols":19,"./IonText":21,"./IonTimestamp":24,"./IonType":25,"./IonTypes":26,"./JsbiSupport":30,"@babel/runtime/helpers/classCallCheck":35,"@babel/runtime/helpers/createClass":36,"@babel/runtime/helpers/interopRequireDefault":42}],23:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -8786,6 +7236,8 @@ var IonText_1 = require("./IonText");
 var IonTypes_1 = require("./IonTypes");
 
 var util_1 = require("./util");
+
+var JsbiSupport_1 = require("./JsbiSupport");
 
 var State;
 
@@ -8897,16 +7349,14 @@ function (_AbstractWriter_1$Abs) {
           _this5.writeUtf8("null.decimal");
         } else {
           var s = '';
+          var coefficient = value.getCoefficient();
 
-          var coefficient = value._getCoefficient();
-
-          if (coefficient.isZero() && coefficient.signum() === -1) {
+          if (JsbiSupport_1.JsbiSupport.isZero(coefficient) && value.isNegative()) {
             s += '-';
           }
 
           s += coefficient.toString() + 'd';
-
-          var exponent = value._getExponent();
+          var exponent = value.getExponent();
 
           if (exponent === 0 && util_1._sign(exponent) === -1) {
             s += '-';
@@ -8946,11 +7396,6 @@ function (_AbstractWriter_1$Abs) {
     key: "writeFloat64",
     value: function writeFloat64(value) {
       this._writeFloat(value);
-    }
-  }, {
-    key: "_writeFloat",
-    value: function _writeFloat(value) {
-      this._serializeValue(IonTypes_1.IonTypes.FLOAT, value, this._floatSerializer);
     }
   }, {
     key: "writeInt",
@@ -9003,6 +7448,10 @@ function (_AbstractWriter_1$Abs) {
   }, {
     key: "stepIn",
     value: function stepIn(type) {
+      if (this.currentContainer.state === State.STRUCT_FIELD) {
+        throw new Error("Started writing a ".concat(this.currentContainer.containerType.name, " inside a struct without writing the field name first. Call writeFieldName(string) with the desired name before calling stepIn(").concat(this.currentContainer.containerType.name, ")."));
+      }
+
       switch (type) {
         case IonTypes_1.IonTypes.LIST:
           this.writeContainer(type, IonText_1.CharCodes.LEFT_BRACKET);
@@ -9055,9 +7504,14 @@ function (_AbstractWriter_1$Abs) {
   }, {
     key: "close",
     value: function close() {
-      if (!this.isTopLevel) {
+      if (this.depth() > 0) {
         throw new Error("Writer has one or more open containers; call stepOut() for each container prior to close()");
       }
+    }
+  }, {
+    key: "depth",
+    value: function depth() {
+      return this.containerContext.length - 1;
     }
   }, {
     key: "_serializeValue",
@@ -9090,7 +7544,7 @@ function (_AbstractWriter_1$Abs) {
   }, {
     key: "handleSeparator",
     value: function handleSeparator() {
-      if (this.isTopLevel) {
+      if (this.depth() === 0) {
         if (this.currentContainer.clean) {
           this.currentContainer.clean = false;
         } else {
@@ -9122,7 +7576,6 @@ function (_AbstractWriter_1$Abs) {
   }, {
     key: "writeAnnotations",
     value: function writeAnnotations() {
-      if (this._annotations === null || this._annotations === undefined) return;
       var _iteratorNormalCompletion = true;
       var _didIteratorError = false;
       var _iteratorError = undefined;
@@ -9151,14 +7604,23 @@ function (_AbstractWriter_1$Abs) {
       this._clearAnnotations();
     }
   }, {
-    key: "depth",
-    value: function depth() {
-      return this.containerContext.length - 1;
-    }
-  }, {
     key: "_stepIn",
     value: function _stepIn(container) {
       this.containerContext.push(new Context(container));
+    }
+  }, {
+    key: "writeSymbolToken",
+    value: function writeSymbolToken(s) {
+      if (s.length === 0 || IonText_1.is_keyword(s) || this.isSid(s) || !IonText_1.isIdentifier(s) && !IonText_1.isOperator(s) || IonText_1.isOperator(s) && this.currentContainer.containerType != IonTypes_1.IonTypes.SEXP) {
+        this.writeable.writeBytes(IonUnicode_1.encodeUtf8("'" + IonText_1.escape(s, IonText_1.SymbolEscapes) + "'"));
+      } else {
+        this.writeUtf8(s);
+      }
+    }
+  }, {
+    key: "_writeFloat",
+    value: function _writeFloat(value) {
+      this._serializeValue(IonTypes_1.IonTypes.FLOAT, value, this._floatSerializer);
     }
   }, {
     key: "isSid",
@@ -9169,15 +7631,6 @@ function (_AbstractWriter_1$Abs) {
       }
 
       return false;
-    }
-  }, {
-    key: "writeSymbolToken",
-    value: function writeSymbolToken(s) {
-      if (s.length === 0 || IonText_1.is_keyword(s) || this.isSid(s) || !IonText_1.isIdentifier(s) && !IonText_1.isOperator(s) || IonText_1.isOperator(s) && this.currentContainer.containerType != IonTypes_1.IonTypes.SEXP) {
-        this.writeable.writeBytes(IonUnicode_1.encodeUtf8("'" + IonText_1.escape(s, IonText_1.SymbolEscapes) + "'"));
-      } else {
-        this.writeUtf8(s);
-      }
     }
   }, {
     key: "isTopLevel",
@@ -9198,7 +7651,7 @@ function (_AbstractWriter_1$Abs) {
         text = "+inf";
       } else if (value === Number.NEGATIVE_INFINITY) {
         text = "-inf";
-      } else if (value === Number.NaN) {
+      } else if (Object.is(value, Number.NaN)) {
         text = "nan";
       } else if (Object.is(value, -0)) {
         text = "-0e0";
@@ -9219,7 +7672,7 @@ function (_AbstractWriter_1$Abs) {
 
 exports.TextWriter = TextWriter;
 
-},{"./AbstractWriter":1,"./IonText":22,"./IonTypes":27,"./IonUnicode":28,"./util":30,"@babel/runtime/helpers/assertThisInitialized":32,"@babel/runtime/helpers/classCallCheck":33,"@babel/runtime/helpers/createClass":34,"@babel/runtime/helpers/getPrototypeOf":38,"@babel/runtime/helpers/inherits":39,"@babel/runtime/helpers/interopRequireDefault":40,"@babel/runtime/helpers/possibleConstructorReturn":43}],25:[function(require,module,exports){
+},{"./AbstractWriter":1,"./IonText":21,"./IonTypes":26,"./IonUnicode":27,"./JsbiSupport":30,"./util":32,"@babel/runtime/helpers/assertThisInitialized":34,"@babel/runtime/helpers/classCallCheck":35,"@babel/runtime/helpers/createClass":36,"@babel/runtime/helpers/getPrototypeOf":40,"@babel/runtime/helpers/inherits":41,"@babel/runtime/helpers/interopRequireDefault":42,"@babel/runtime/helpers/possibleConstructorReturn":45}],24:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -9315,61 +7768,6 @@ function () {
   }
 
   (0, _createClass2["default"])(Timestamp, [{
-    key: "_checkRequiredField",
-    value: function _checkRequiredField(fieldName, value, min, max) {
-      if (!util_1._hasValue(value)) {
-        throw new Error("".concat(fieldName, " cannot be ").concat(value));
-      }
-
-      this._checkFieldRange(fieldName, value, min, max);
-    }
-  }, {
-    key: "_checkOptionalField",
-    value: function _checkOptionalField(fieldName, value, min, max, defaultValue, precision) {
-      if (!util_1._hasValue(value)) {
-        return defaultValue;
-      }
-
-      this._checkFieldRange(fieldName, value, min, max);
-
-      this._precision = precision;
-      return value;
-    }
-  }, {
-    key: "_checkFieldRange",
-    value: function _checkFieldRange(fieldName, value, min, max) {
-      if (value instanceof IonDecimal_1.Decimal) {
-        if (util_1._hasValue(value) && (value.compareTo(min) < 0 || value.compareTo(max) >= 0)) {
-          throw new Error("".concat(fieldName, " ").concat(value, " must be between ").concat(min, " inclusive, and ").concat(max, " exclusive"));
-        }
-      } else {
-        if (!Number.isInteger(value)) {
-          throw new Error("".concat(fieldName, " ").concat(value, " must be an integer"));
-        }
-
-        if (value < min || value > max) {
-          throw new Error("".concat(fieldName, " ").concat(value, " must be between ").concat(min, " and ").concat(max, " inclusive"));
-        }
-      }
-    }
-  }, {
-    key: "_isLeapYear",
-    value: function _isLeapYear(year) {
-      if (year % 4 !== 0) {
-        return false;
-      }
-
-      if (year % 400 === 0) {
-        return true;
-      }
-
-      if (year % 100 === 0) {
-        return year < 1600;
-      }
-
-      return true;
-    }
-  }, {
     key: "getLocalOffset",
     value: function getLocalOffset() {
       return this._localOffset;
@@ -9489,6 +7887,61 @@ function () {
       return strVal;
     }
   }, {
+    key: "_checkRequiredField",
+    value: function _checkRequiredField(fieldName, value, min, max) {
+      if (!util_1._hasValue(value)) {
+        throw new Error("".concat(fieldName, " cannot be ").concat(value));
+      }
+
+      this._checkFieldRange(fieldName, value, min, max);
+    }
+  }, {
+    key: "_checkOptionalField",
+    value: function _checkOptionalField(fieldName, value, min, max, defaultValue, precision) {
+      if (!util_1._hasValue(value)) {
+        return defaultValue;
+      }
+
+      this._checkFieldRange(fieldName, value, min, max);
+
+      this._precision = precision;
+      return value;
+    }
+  }, {
+    key: "_checkFieldRange",
+    value: function _checkFieldRange(fieldName, value, min, max) {
+      if (value instanceof IonDecimal_1.Decimal) {
+        if (util_1._hasValue(value) && (value.compareTo(min) < 0 || value.compareTo(max) >= 0)) {
+          throw new Error("".concat(fieldName, " ").concat(value, " must be between ").concat(min, " inclusive, and ").concat(max, " exclusive"));
+        }
+      } else {
+        if (!Number.isInteger(value)) {
+          throw new Error("".concat(fieldName, " ").concat(value, " must be an integer"));
+        }
+
+        if (value < min || value > max) {
+          throw new Error("".concat(fieldName, " ").concat(value, " must be between ").concat(min, " and ").concat(max, " inclusive"));
+        }
+      }
+    }
+  }, {
+    key: "_isLeapYear",
+    value: function _isLeapYear(year) {
+      if (year % 4 !== 0) {
+        return false;
+      }
+
+      if (year % 400 === 0) {
+        return true;
+      }
+
+      if (year % 100 === 0) {
+        return year < 1600;
+      }
+
+      return true;
+    }
+  }, {
     key: "_lpadZeros",
     value: function _lpadZeros(v, size) {
       var s = v.toString();
@@ -9518,10 +7971,8 @@ function () {
   }, {
     key: "_splitSecondsDecimal",
     value: function _splitSecondsDecimal(secondsDecimal) {
-      var coefStr = secondsDecimal._getCoefficient().toString();
-
-      var exp = secondsDecimal._getExponent();
-
+      var coefStr = secondsDecimal.getCoefficient().toString();
+      var exp = secondsDecimal.getExponent();
       var secondsStr = '';
       var fractionStr = '';
 
@@ -9530,7 +7981,7 @@ function () {
         secondsStr = coefStr.substr(0, idx);
         fractionStr = coefStr.substr(idx);
 
-        if (-secondsDecimal._getExponent() - coefStr.length > 0) {
+        if (-secondsDecimal.getExponent() - coefStr.length > 0) {
           fractionStr = '0'.repeat(-exp - coefStr.length) + fractionStr;
         }
       } else if (exp > 0) {
@@ -9827,7 +8278,7 @@ _TimestampParser._timeParserStates = (_TimestampParser$_tim = {}, (0, _definePro
   ":": _States.OFFSET_MINUTES
 })), (0, _defineProperty2["default"])(_TimestampParser$_tim, _States.OFFSET_MINUTES, new _TimeParserState(_States.OFFSET_MINUTES, 2, undefined)), (0, _defineProperty2["default"])(_TimestampParser$_tim, _States.OFFSET_ZULU, new _TimeParserState(_States.OFFSET_ZULU, 0, undefined)), (0, _defineProperty2["default"])(_TimestampParser$_tim, _States.OFFSET_UNKNOWN, new _TimeParserState(_States.OFFSET_UNKNOWN, 0, undefined)), _TimestampParser$_tim);
 
-},{"./IonDecimal":9,"./IonText":22,"./util":30,"@babel/runtime/helpers/classCallCheck":33,"@babel/runtime/helpers/createClass":34,"@babel/runtime/helpers/defineProperty":35,"@babel/runtime/helpers/interopRequireDefault":40,"@babel/runtime/helpers/slicedToArray":45}],26:[function(require,module,exports){
+},{"./IonDecimal":9,"./IonText":21,"./util":32,"@babel/runtime/helpers/classCallCheck":35,"@babel/runtime/helpers/createClass":36,"@babel/runtime/helpers/defineProperty":37,"@babel/runtime/helpers/interopRequireDefault":42,"@babel/runtime/helpers/slicedToArray":47}],25:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -9850,7 +8301,7 @@ var IonType = function IonType(binaryTypeId, name, isScalar, isLob, isNumeric, i
 
 exports.IonType = IonType;
 
-},{"@babel/runtime/helpers/classCallCheck":33,"@babel/runtime/helpers/interopRequireDefault":40}],27:[function(require,module,exports){
+},{"@babel/runtime/helpers/classCallCheck":35,"@babel/runtime/helpers/interopRequireDefault":42}],26:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -9875,7 +8326,7 @@ exports.IonTypes = {
   STRUCT: new IonType_1.IonType(13, "struct", false, false, false, true)
 };
 
-},{"./IonType":26}],28:[function(require,module,exports){
+},{"./IonType":25}],27:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -9951,7 +8402,7 @@ function decodeUtf8(bytes) {
 
 exports.decodeUtf8 = decodeUtf8;
 
-},{}],29:[function(require,module,exports){
+},{}],28:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -10044,7 +8495,284 @@ function () {
 
 exports.Writeable = Writeable;
 
-},{"@babel/runtime/helpers/classCallCheck":33,"@babel/runtime/helpers/createClass":34,"@babel/runtime/helpers/interopRequireDefault":40}],30:[function(require,module,exports){
+},{"@babel/runtime/helpers/classCallCheck":35,"@babel/runtime/helpers/createClass":36,"@babel/runtime/helpers/interopRequireDefault":42}],29:[function(require,module,exports){
+"use strict";
+
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
+
+var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime/helpers/classCallCheck"));
+
+var _createClass2 = _interopRequireDefault(require("@babel/runtime/helpers/createClass"));
+
+var __importDefault = void 0 && (void 0).__importDefault || function (mod) {
+  return mod && mod.__esModule ? mod : {
+    "default": mod
+  };
+};
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var jsbi_1 = __importDefault(require("jsbi"));
+
+var JsbiSupport_1 = require("./JsbiSupport");
+
+var JsbiSerde =
+/*#__PURE__*/
+function () {
+  function JsbiSerde() {
+    (0, _classCallCheck2["default"])(this, JsbiSerde);
+  }
+
+  (0, _createClass2["default"])(JsbiSerde, null, [{
+    key: "toSignedIntBytes",
+    value: function toSignedIntBytes(value, isNegative) {
+      var bytes = this.toUnsignedIntBytes(value);
+
+      if (bytes[0] >= 128) {
+        var extendedBytes = new Uint8Array(bytes.length + 1);
+        extendedBytes.set(bytes, 1);
+        bytes = extendedBytes;
+      }
+
+      if (isNegative) {
+        bytes[0] += 0x80;
+      }
+
+      return bytes;
+    }
+  }, {
+    key: "fromUnsignedBytes",
+    value: function fromUnsignedBytes(bytes) {
+      var magnitude = JsbiSupport_1.JsbiSupport.ZERO;
+
+      for (var m = 0; m < bytes.length; m++) {
+        var _byte = jsbi_1["default"].BigInt(bytes[m]);
+
+        magnitude = jsbi_1["default"].leftShift(magnitude, this.BITS_PER_BYTE);
+        magnitude = jsbi_1["default"].bitwiseOr(magnitude, _byte);
+      }
+
+      return magnitude;
+    }
+  }, {
+    key: "toUnsignedIntBytes",
+    value: function toUnsignedIntBytes(value) {
+      if (JsbiSupport_1.JsbiSupport.isNegative(value)) {
+        value = jsbi_1["default"].unaryMinus(value);
+      }
+
+      var sizeInBytes = this.getUnsignedIntSizeInBytes(value);
+      var bytes = new Uint8Array(sizeInBytes);
+
+      for (var m = sizeInBytes - 1; m >= 0; m--) {
+        var lastByte = jsbi_1["default"].toNumber(jsbi_1["default"].bitwiseAnd(value, this.BYTE_MAX_VALUE));
+        value = jsbi_1["default"].signedRightShift(value, this.BITS_PER_BYTE);
+        bytes[m] = lastByte;
+      }
+
+      return bytes;
+    }
+  }, {
+    key: "getUnsignedIntSizeInBytes",
+    value: function getUnsignedIntSizeInBytes(value) {
+      for (var m = 0; m < this.SIZE_THRESHOLDS.length; m++) {
+        var _threshold = this.SIZE_THRESHOLDS[m];
+
+        if (jsbi_1["default"].lessThanOrEqual(value, _threshold)) {
+          return m + 1;
+        }
+      }
+
+      var sizeInBytes = this.SIZE_THRESHOLDS.length;
+      var threshold = this.calculateSizeThreshold(sizeInBytes);
+
+      while (jsbi_1["default"].greaterThan(value, threshold)) {
+        sizeInBytes++;
+        threshold = this.calculateSizeThreshold(sizeInBytes);
+      }
+
+      return sizeInBytes;
+    }
+  }, {
+    key: "calculateSizeThresholds",
+    value: function calculateSizeThresholds() {
+      var thresholds = [];
+
+      for (var m = 1; m <= this.SERIALIZED_JSBI_SIZES_TO_PRECOMPUTE; m++) {
+        thresholds.push(this.calculateSizeThreshold(m));
+      }
+
+      return thresholds;
+    }
+  }, {
+    key: "calculateSizeThreshold",
+    value: function calculateSizeThreshold(numberOfBytes) {
+      var exponent = jsbi_1["default"].multiply(jsbi_1["default"].BigInt(numberOfBytes), this.BITS_PER_BYTE);
+      var threshold = jsbi_1["default"].exponentiate(JsbiSupport_1.JsbiSupport.TWO, exponent);
+      return jsbi_1["default"].subtract(threshold, JsbiSupport_1.JsbiSupport.ONE);
+    }
+  }]);
+  return JsbiSerde;
+}();
+
+exports.JsbiSerde = JsbiSerde;
+JsbiSerde.SERIALIZED_JSBI_SIZES_TO_PRECOMPUTE = 64;
+JsbiSerde.BITS_PER_BYTE = jsbi_1["default"].BigInt(8);
+JsbiSerde.BYTE_MAX_VALUE = jsbi_1["default"].BigInt(0xFF);
+JsbiSerde.SIZE_THRESHOLDS = JsbiSerde.calculateSizeThresholds();
+
+},{"./JsbiSupport":30,"@babel/runtime/helpers/classCallCheck":35,"@babel/runtime/helpers/createClass":36,"@babel/runtime/helpers/interopRequireDefault":42,"jsbi":50}],30:[function(require,module,exports){
+"use strict";
+
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
+
+var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime/helpers/classCallCheck"));
+
+var _createClass2 = _interopRequireDefault(require("@babel/runtime/helpers/createClass"));
+
+var __importDefault = void 0 && (void 0).__importDefault || function (mod) {
+  return mod && mod.__esModule ? mod : {
+    "default": mod
+  };
+};
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var jsbi_1 = __importDefault(require("jsbi"));
+
+var JsbiSupport =
+/*#__PURE__*/
+function () {
+  function JsbiSupport() {
+    (0, _classCallCheck2["default"])(this, JsbiSupport);
+  }
+
+  (0, _createClass2["default"])(JsbiSupport, null, [{
+    key: "isZero",
+    value: function isZero(value) {
+      return jsbi_1["default"].equal(value, JsbiSupport.ZERO);
+    }
+  }, {
+    key: "isNegative",
+    value: function isNegative(value) {
+      return jsbi_1["default"].lessThan(value, JsbiSupport.ZERO);
+    }
+  }, {
+    key: "bigIntFromString",
+    value: function bigIntFromString(text) {
+      var isNegative = false;
+      var magnitudeText = text.trimLeft();
+
+      if (text.startsWith('-')) {
+        isNegative = true;
+        magnitudeText = text.substring(1);
+      }
+
+      var bigInt = jsbi_1["default"].BigInt(magnitudeText);
+
+      if (isNegative) {
+        bigInt = jsbi_1["default"].unaryMinus(bigInt);
+      }
+
+      return bigInt;
+    }
+  }, {
+    key: "clampToSafeIntegerRange",
+    value: function clampToSafeIntegerRange(value) {
+      if (jsbi_1["default"].greaterThan(value, this.NUMBER_MAX_SAFE_INTEGER)) {
+        return Number.MAX_SAFE_INTEGER;
+      }
+
+      if (jsbi_1["default"].lessThan(value, this.NUMBER_MIN_SAFE_INTEGER)) {
+        return Number.MIN_SAFE_INTEGER;
+      }
+
+      return jsbi_1["default"].toNumber(value);
+    }
+  }, {
+    key: "isSafeInteger",
+    value: function isSafeInteger(value) {
+      return jsbi_1["default"].greaterThanOrEqual(value, this.NUMBER_MIN_SAFE_INTEGER) && jsbi_1["default"].lessThanOrEqual(value, this.NUMBER_MAX_SAFE_INTEGER);
+    }
+  }]);
+  return JsbiSupport;
+}();
+
+exports.JsbiSupport = JsbiSupport;
+JsbiSupport.ZERO = jsbi_1["default"].BigInt(0);
+JsbiSupport.ONE = jsbi_1["default"].BigInt(1);
+JsbiSupport.TWO = jsbi_1["default"].BigInt(2);
+JsbiSupport.NUMBER_MAX_SAFE_INTEGER = jsbi_1["default"].BigInt(Number.MAX_SAFE_INTEGER);
+JsbiSupport.NUMBER_MIN_SAFE_INTEGER = jsbi_1["default"].BigInt(Number.MIN_SAFE_INTEGER);
+
+},{"@babel/runtime/helpers/classCallCheck":35,"@babel/runtime/helpers/createClass":36,"@babel/runtime/helpers/interopRequireDefault":42,"jsbi":50}],31:[function(require,module,exports){
+"use strict";
+
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
+
+var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime/helpers/classCallCheck"));
+
+var _createClass2 = _interopRequireDefault(require("@babel/runtime/helpers/createClass"));
+
+var __importDefault = void 0 && (void 0).__importDefault || function (mod) {
+  return mod && mod.__esModule ? mod : {
+    "default": mod
+  };
+};
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var jsbi_1 = __importDefault(require("jsbi"));
+
+var JsbiSupport_1 = require("./JsbiSupport");
+
+var SignAndMagnitudeInt =
+/*#__PURE__*/
+function () {
+  function SignAndMagnitudeInt(_magnitude) {
+    var _isNegative = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : JsbiSupport_1.JsbiSupport.isNegative(_magnitude);
+
+    (0, _classCallCheck2["default"])(this, SignAndMagnitudeInt);
+    this._magnitude = _magnitude;
+    this._isNegative = _isNegative;
+  }
+
+  (0, _createClass2["default"])(SignAndMagnitudeInt, [{
+    key: "equals",
+    value: function equals(other) {
+      return jsbi_1["default"].equal(this._magnitude, other._magnitude) && this._isNegative === other._isNegative;
+    }
+  }, {
+    key: "magnitude",
+    get: function get() {
+      return this._magnitude;
+    }
+  }, {
+    key: "isNegative",
+    get: function get() {
+      return this._isNegative;
+    }
+  }], [{
+    key: "fromNumber",
+    value: function fromNumber(value) {
+      var isNegative = value < 0 || Object.is(value, -0);
+      var absoluteValue = Math.abs(value);
+      var magnitude = jsbi_1["default"].BigInt(absoluteValue);
+      return new SignAndMagnitudeInt(magnitude, isNegative);
+    }
+  }]);
+  return SignAndMagnitudeInt;
+}();
+
+exports["default"] = SignAndMagnitudeInt;
+
+},{"./JsbiSupport":30,"@babel/runtime/helpers/classCallCheck":35,"@babel/runtime/helpers/createClass":36,"@babel/runtime/helpers/interopRequireDefault":42,"jsbi":50}],32:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -10063,13 +8791,13 @@ function _hasValue(v) {
 
 exports._hasValue = _hasValue;
 
-},{}],31:[function(require,module,exports){
+},{}],33:[function(require,module,exports){
 function _arrayWithHoles(arr) {
   if (Array.isArray(arr)) return arr;
 }
 
 module.exports = _arrayWithHoles;
-},{}],32:[function(require,module,exports){
+},{}],34:[function(require,module,exports){
 function _assertThisInitialized(self) {
   if (self === void 0) {
     throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
@@ -10079,7 +8807,7 @@ function _assertThisInitialized(self) {
 }
 
 module.exports = _assertThisInitialized;
-},{}],33:[function(require,module,exports){
+},{}],35:[function(require,module,exports){
 function _classCallCheck(instance, Constructor) {
   if (!(instance instanceof Constructor)) {
     throw new TypeError("Cannot call a class as a function");
@@ -10087,7 +8815,7 @@ function _classCallCheck(instance, Constructor) {
 }
 
 module.exports = _classCallCheck;
-},{}],34:[function(require,module,exports){
+},{}],36:[function(require,module,exports){
 function _defineProperties(target, props) {
   for (var i = 0; i < props.length; i++) {
     var descriptor = props[i];
@@ -10105,7 +8833,7 @@ function _createClass(Constructor, protoProps, staticProps) {
 }
 
 module.exports = _createClass;
-},{}],35:[function(require,module,exports){
+},{}],37:[function(require,module,exports){
 function _defineProperty(obj, key, value) {
   if (key in obj) {
     Object.defineProperty(obj, key, {
@@ -10122,7 +8850,7 @@ function _defineProperty(obj, key, value) {
 }
 
 module.exports = _defineProperty;
-},{}],36:[function(require,module,exports){
+},{}],38:[function(require,module,exports){
 function _extends() {
   module.exports = _extends = Object.assign || function (target) {
     for (var i = 1; i < arguments.length; i++) {
@@ -10142,7 +8870,7 @@ function _extends() {
 }
 
 module.exports = _extends;
-},{}],37:[function(require,module,exports){
+},{}],39:[function(require,module,exports){
 var superPropBase = require("./superPropBase");
 
 function _get(target, property, receiver) {
@@ -10166,7 +8894,7 @@ function _get(target, property, receiver) {
 }
 
 module.exports = _get;
-},{"./superPropBase":46}],38:[function(require,module,exports){
+},{"./superPropBase":48}],40:[function(require,module,exports){
 function _getPrototypeOf(o) {
   module.exports = _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) {
     return o.__proto__ || Object.getPrototypeOf(o);
@@ -10175,7 +8903,7 @@ function _getPrototypeOf(o) {
 }
 
 module.exports = _getPrototypeOf;
-},{}],39:[function(require,module,exports){
+},{}],41:[function(require,module,exports){
 var setPrototypeOf = require("./setPrototypeOf");
 
 function _inherits(subClass, superClass) {
@@ -10194,7 +8922,7 @@ function _inherits(subClass, superClass) {
 }
 
 module.exports = _inherits;
-},{"./setPrototypeOf":44}],40:[function(require,module,exports){
+},{"./setPrototypeOf":46}],42:[function(require,module,exports){
 function _interopRequireDefault(obj) {
   return obj && obj.__esModule ? obj : {
     "default": obj
@@ -10202,7 +8930,7 @@ function _interopRequireDefault(obj) {
 }
 
 module.exports = _interopRequireDefault;
-},{}],41:[function(require,module,exports){
+},{}],43:[function(require,module,exports){
 function _iterableToArrayLimit(arr, i) {
   if (!(Symbol.iterator in Object(arr) || Object.prototype.toString.call(arr) === "[object Arguments]")) {
     return;
@@ -10234,13 +8962,13 @@ function _iterableToArrayLimit(arr, i) {
 }
 
 module.exports = _iterableToArrayLimit;
-},{}],42:[function(require,module,exports){
+},{}],44:[function(require,module,exports){
 function _nonIterableRest() {
   throw new TypeError("Invalid attempt to destructure non-iterable instance");
 }
 
 module.exports = _nonIterableRest;
-},{}],43:[function(require,module,exports){
+},{}],45:[function(require,module,exports){
 var _typeof = require("../helpers/typeof");
 
 var assertThisInitialized = require("./assertThisInitialized");
@@ -10254,7 +8982,7 @@ function _possibleConstructorReturn(self, call) {
 }
 
 module.exports = _possibleConstructorReturn;
-},{"../helpers/typeof":47,"./assertThisInitialized":32}],44:[function(require,module,exports){
+},{"../helpers/typeof":49,"./assertThisInitialized":34}],46:[function(require,module,exports){
 function _setPrototypeOf(o, p) {
   module.exports = _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) {
     o.__proto__ = p;
@@ -10265,7 +8993,7 @@ function _setPrototypeOf(o, p) {
 }
 
 module.exports = _setPrototypeOf;
-},{}],45:[function(require,module,exports){
+},{}],47:[function(require,module,exports){
 var arrayWithHoles = require("./arrayWithHoles");
 
 var iterableToArrayLimit = require("./iterableToArrayLimit");
@@ -10277,7 +9005,7 @@ function _slicedToArray(arr, i) {
 }
 
 module.exports = _slicedToArray;
-},{"./arrayWithHoles":31,"./iterableToArrayLimit":41,"./nonIterableRest":42}],46:[function(require,module,exports){
+},{"./arrayWithHoles":33,"./iterableToArrayLimit":43,"./nonIterableRest":44}],48:[function(require,module,exports){
 var getPrototypeOf = require("./getPrototypeOf");
 
 function _superPropBase(object, property) {
@@ -10290,7 +9018,7 @@ function _superPropBase(object, property) {
 }
 
 module.exports = _superPropBase;
-},{"./getPrototypeOf":38}],47:[function(require,module,exports){
+},{"./getPrototypeOf":40}],49:[function(require,module,exports){
 function _typeof2(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof2 = function _typeof2(obj) { return typeof obj; }; } else { _typeof2 = function _typeof2(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof2(obj); }
 
 function _typeof(obj) {
@@ -10308,5 +9036,8 @@ function _typeof(obj) {
 }
 
 module.exports = _typeof;
+},{}],50:[function(require,module,exports){
+(function(e,t){"object"==typeof exports&&"undefined"!=typeof module?module.exports=t():"function"==typeof define&&define.amd?define(t):(e=e||self,e.JSBI=t())})(this,function(){'use strict';function e(t){return e="function"==typeof Symbol&&"symbol"==typeof Symbol.iterator?function(e){return typeof e}:function(e){return e&&"function"==typeof Symbol&&e.constructor===Symbol&&e!==Symbol.prototype?"symbol":typeof e},e(t)}function t(e,t){if(!(e instanceof t))throw new TypeError("Cannot call a class as a function")}function i(e,t){for(var _,n=0;n<t.length;n++)_=t[n],_.enumerable=_.enumerable||!1,_.configurable=!0,"value"in _&&(_.writable=!0),Object.defineProperty(e,_.key,_)}function _(e,t,_){return t&&i(e.prototype,t),_&&i(e,_),e}function n(e,t){if("function"!=typeof t&&null!==t)throw new TypeError("Super expression must either be null or a function");e.prototype=Object.create(t&&t.prototype,{constructor:{value:e,writable:!0,configurable:!0}}),t&&l(e,t)}function g(e){return g=Object.setPrototypeOf?Object.getPrototypeOf:function(e){return e.__proto__||Object.getPrototypeOf(e)},g(e)}function l(e,t){return l=Object.setPrototypeOf||function(e,t){return e.__proto__=t,e},l(e,t)}function o(){if("undefined"==typeof Reflect||!Reflect.construct)return!1;if(Reflect.construct.sham)return!1;if("function"==typeof Proxy)return!0;try{return Date.prototype.toString.call(Reflect.construct(Date,[],function(){})),!0}catch(t){return!1}}function a(){return a=o()?Reflect.construct:function(e,t,i){var _=[null];_.push.apply(_,t);var n=Function.bind.apply(e,_),g=new n;return i&&l(g,i.prototype),g},a.apply(null,arguments)}function s(e){return-1!==Function.toString.call(e).indexOf("[native code]")}function u(e){var t="function"==typeof Map?new Map:void 0;return u=function(e){function i(){return a(e,arguments,g(this).constructor)}if(null===e||!s(e))return e;if("function"!=typeof e)throw new TypeError("Super expression must either be null or a function");if("undefined"!=typeof t){if(t.has(e))return t.get(e);t.set(e,i)}return i.prototype=Object.create(e.prototype,{constructor:{value:i,enumerable:!1,writable:!0,configurable:!0}}),l(i,e)},u(e)}function r(e){if(void 0===e)throw new ReferenceError("this hasn't been initialised - super() hasn't been called");return e}function d(e,t){return t&&("object"==typeof t||"function"==typeof t)?t:r(e)}var h=function(i){var o=Math.abs,a=Math.max,s=Math.imul,u=Math.clz32;function l(e,i){var _;if(t(this,l),e>l.__kMaxLength)throw new RangeError("Maximum BigInt size exceeded");return _=d(this,g(l).call(this,e)),_.sign=i,_}return n(l,i),_(l,[{key:"toDebugString",value:function(){var e=["BigInt["],t=!0,i=!1,_=void 0;try{for(var n,g,l=this[Symbol.iterator]();!(t=(n=l.next()).done);t=!0)g=n.value,e.push((g?(g>>>0).toString(16):g)+", ")}catch(e){i=!0,_=e}finally{try{t||null==l.return||l.return()}finally{if(i)throw _}}return e.push("]"),e.join("")}},{key:"toString",value:function(){var e=0<arguments.length&&void 0!==arguments[0]?arguments[0]:10;if(2>e||36<e)throw new RangeError("toString() radix argument must be between 2 and 36");return 0===this.length?"0":0==(e&e-1)?l.__toStringBasePowerOfTwo(this,e):l.__toStringGeneric(this,e,!1)}},{key:"__copy",value:function(){for(var e=new l(this.length,this.sign),t=0;t<this.length;t++)e[t]=this[t];return e}},{key:"__trim",value:function(){for(var e=this.length,t=this[e-1];0===t;)e--,t=this[e-1],this.pop();return 0===e&&(this.sign=!1),this}},{key:"__initializeDigits",value:function(){for(var e=0;e<this.length;e++)this[e]=0}},{key:"__clzmsd",value:function(){return u(this[this.length-1])}},{key:"__inplaceMultiplyAdd",value:function(e,t,_){_>this.length&&(_=this.length);for(var n=65535&e,g=e>>>16,l=0,o=65535&t,a=t>>>16,u=0;u<_;u++){var r=this.__digit(u),d=65535&r,h=r>>>16,b=s(d,n),m=s(d,g),c=s(h,n),v=s(h,g),y=o+(65535&b),f=a+l+(y>>>16)+(b>>>16)+(65535&m)+(65535&c);o=(m>>>16)+(c>>>16)+(65535&v)+(f>>>16),l=o>>>16,o&=65535,a=v>>>16;this.__setDigit(u,65535&y|f<<16)}if(0!==l||0!==o||0!==a)throw new Error("implementation bug")}},{key:"__inplaceAdd",value:function(e,t,_){for(var n,g=0,l=0;l<_;l++)n=this.__halfDigit(t+l)+e.__halfDigit(l)+g,g=n>>>16,this.__setHalfDigit(t+l,n);return g}},{key:"__inplaceSub",value:function(e,t,_){var n=0;if(1&t){t>>=1;for(var g=this.__digit(t),l=65535&g,o=0;o<_-1>>>1;o++){var a=e.__digit(o),s=(g>>>16)-(65535&a)-n;n=1&s>>>16,this.__setDigit(t+o,s<<16|65535&l),g=this.__digit(t+o+1),l=(65535&g)-(a>>>16)-n,n=1&l>>>16}var u=e.__digit(o),r=(g>>>16)-(65535&u)-n;n=1&r>>>16,this.__setDigit(t+o,r<<16|65535&l);if(t+o+1>=this.length)throw new RangeError("out of bounds");0==(1&_)&&(g=this.__digit(t+o+1),l=(65535&g)-(u>>>16)-n,n=1&l>>>16,this.__setDigit(t+e.length,4294901760&g|65535&l))}else{t>>=1;for(var d=0;d<e.length-1;d++){var h=this.__digit(t+d),b=e.__digit(d),m=(65535&h)-(65535&b)-n;n=1&m>>>16;var c=(h>>>16)-(b>>>16)-n;n=1&c>>>16,this.__setDigit(t+d,c<<16|65535&m)}var v=this.__digit(t+d),y=e.__digit(d),f=(65535&v)-(65535&y)-n;n=1&f>>>16;var k=0;0==(1&_)&&(k=(v>>>16)-(y>>>16)-n,n=1&k>>>16),this.__setDigit(t+d,k<<16|65535&f)}return n}},{key:"__inplaceRightShift",value:function(e){if(0!==e){for(var t,_=this.__digit(0)>>>e,n=this.length-1,g=0;g<n;g++)t=this.__digit(g+1),this.__setDigit(g,t<<32-e|_),_=t>>>e;this.__setDigit(n,_)}}},{key:"__digit",value:function(e){return this[e]}},{key:"__unsignedDigit",value:function(e){return this[e]>>>0}},{key:"__setDigit",value:function(e,t){this[e]=0|t}},{key:"__setDigitGrow",value:function(e,t){this[e]=0|t}},{key:"__halfDigitLength",value:function(){var e=this.length;return 65535>=this.__unsignedDigit(e-1)?2*e-1:2*e}},{key:"__halfDigit",value:function(e){return 65535&this[e>>>1]>>>((1&e)<<4)}},{key:"__setHalfDigit",value:function(e,t){var i=e>>>1,_=this.__digit(i),n=1&e?65535&_|t<<16:4294901760&_|65535&t;this.__setDigit(i,n)}}],[{key:"BigInt",value:function(t){var i=Math.floor,_=Number.isFinite;if("number"==typeof t){if(0===t)return l.__zero();if((0|t)===t)return 0>t?l.__oneDigit(-t,!0):l.__oneDigit(t,!1);if(!_(t)||i(t)!==t)throw new RangeError("The number "+t+" cannot be converted to BigInt because it is not an integer");return l.__fromDouble(t)}if("string"==typeof t){var n=l.__fromString(t);if(null===n)throw new SyntaxError("Cannot convert "+t+" to a BigInt");return n}if("boolean"==typeof t)return!0===t?l.__oneDigit(1,!1):l.__zero();if("object"===e(t)){if(t.constructor===l)return t;var g=l.__toPrimitive(t);return l.BigInt(g)}throw new TypeError("Cannot convert "+t+" to a BigInt")}},{key:"toNumber",value:function(e){var t=e.length;if(0===t)return 0;if(1===t){var i=e.__unsignedDigit(0);return e.sign?-i:i}var _=e.__digit(t-1),n=u(_),g=32*t-n;if(1024<g)return e.sign?-Infinity:1/0;var o=g-1,a=_,s=t-1,r=n+1,d=32===r?0:a<<r;d>>>=12;var h=r-12,b=12<=r?0:a<<20+r,m=20+r;0<h&&0<s&&(s--,a=e.__digit(s),d|=a>>>32-h,b=a<<h,m=h),0<m&&0<s&&(s--,a=e.__digit(s),b|=a>>>32-m,m-=32);var c=l.__decideRounding(e,m,s,a);if((1===c||0===c&&1==(1&b))&&(b=b+1>>>0,0===b&&(d++,0!=d>>>20&&(d=0,o++,1023<o))))return e.sign?-Infinity:1/0;var v=e.sign?-2147483648:0;return o=o+1023<<20,l.__kBitConversionInts[1]=v|o|d,l.__kBitConversionInts[0]=b,l.__kBitConversionDouble[0]}},{key:"unaryMinus",value:function(e){if(0===e.length)return e;var t=e.__copy();return t.sign=!e.sign,t}},{key:"bitwiseNot",value:function(e){return e.sign?l.__absoluteSubOne(e).__trim():l.__absoluteAddOne(e,!0)}},{key:"exponentiate",value:function(e,t){if(t.sign)throw new RangeError("Exponent must be positive");if(0===t.length)return l.__oneDigit(1,!1);if(0===e.length)return e;if(1===e.length&&1===e.__digit(0))return e.sign&&0==(1&t.__digit(0))?l.unaryMinus(e):e;if(1<t.length)throw new RangeError("BigInt too big");var i=t.__unsignedDigit(0);if(1===i)return e;if(i>=l.__kMaxLengthBits)throw new RangeError("BigInt too big");if(1===e.length&&2===e.__digit(0)){var _=1+(i>>>5),n=e.sign&&0!=(1&i),g=new l(_,n);g.__initializeDigits();var o=1<<(31&i);return g.__setDigit(_-1,o),g}var a=null,s=e;for(0!=(1&i)&&(a=e),i>>=1;0!==i;i>>=1)s=l.multiply(s,s),0!=(1&i)&&(null===a?a=s:a=l.multiply(a,s));return a}},{key:"multiply",value:function(e,t){if(0===e.length)return e;if(0===t.length)return t;var _=e.length+t.length;32<=e.__clzmsd()+t.__clzmsd()&&_--;var n=new l(_,e.sign!==t.sign);n.__initializeDigits();for(var g=0;g<e.length;g++)l.__multiplyAccumulate(t,e.__digit(g),n,g);return n.__trim()}},{key:"divide",value:function(e,t){if(0===t.length)throw new RangeError("Division by zero");if(0>l.__absoluteCompare(e,t))return l.__zero();var i,_=e.sign!==t.sign,n=t.__unsignedDigit(0);if(1===t.length&&65535>=n){if(1===n)return _===e.sign?e:l.unaryMinus(e);i=l.__absoluteDivSmall(e,n,null)}else i=l.__absoluteDivLarge(e,t,!0,!1);return i.sign=_,i.__trim()}},{key:"remainder",value:function e(t,i){if(0===i.length)throw new RangeError("Division by zero");if(0>l.__absoluteCompare(t,i))return t;var _=i.__unsignedDigit(0);if(1===i.length&&65535>=_){if(1===_)return l.__zero();var n=l.__absoluteModSmall(t,_);return 0===n?l.__zero():l.__oneDigit(n,t.sign)}var e=l.__absoluteDivLarge(t,i,!1,!0);return e.sign=t.sign,e.__trim()}},{key:"add",value:function(e,t){var i=e.sign;return i===t.sign?l.__absoluteAdd(e,t,i):0<=l.__absoluteCompare(e,t)?l.__absoluteSub(e,t,i):l.__absoluteSub(t,e,!i)}},{key:"subtract",value:function(e,t){var i=e.sign;return i===t.sign?0<=l.__absoluteCompare(e,t)?l.__absoluteSub(e,t,i):l.__absoluteSub(t,e,!i):l.__absoluteAdd(e,t,i)}},{key:"leftShift",value:function(e,t){return 0===t.length||0===e.length?e:t.sign?l.__rightShiftByAbsolute(e,t):l.__leftShiftByAbsolute(e,t)}},{key:"signedRightShift",value:function(e,t){return 0===t.length||0===e.length?e:t.sign?l.__leftShiftByAbsolute(e,t):l.__rightShiftByAbsolute(e,t)}},{key:"unsignedRightShift",value:function(){throw new TypeError("BigInts have no unsigned right shift; use >> instead")}},{key:"lessThan",value:function(e,t){return 0>l.__compareToBigInt(e,t)}},{key:"lessThanOrEqual",value:function(e,t){return 0>=l.__compareToBigInt(e,t)}},{key:"greaterThan",value:function(e,t){return 0<l.__compareToBigInt(e,t)}},{key:"greaterThanOrEqual",value:function(e,t){return 0<=l.__compareToBigInt(e,t)}},{key:"equal",value:function(e,t){if(e.sign!==t.sign)return!1;if(e.length!==t.length)return!1;for(var _=0;_<e.length;_++)if(e.__digit(_)!==t.__digit(_))return!1;return!0}},{key:"notEqual",value:function(e,t){return!l.equal(e,t)}},{key:"bitwiseAnd",value:function(e,t){if(!e.sign&&!t.sign)return l.__absoluteAnd(e,t).__trim();if(e.sign&&t.sign){var i=a(e.length,t.length)+1,_=l.__absoluteSubOne(e,i),n=l.__absoluteSubOne(t);return _=l.__absoluteOr(_,n,_),l.__absoluteAddOne(_,!0,_).__trim()}if(e.sign){var g=[t,e];e=g[0],t=g[1]}return l.__absoluteAndNot(e,l.__absoluteSubOne(t)).__trim()}},{key:"bitwiseXor",value:function(e,t){if(!e.sign&&!t.sign)return l.__absoluteXor(e,t).__trim();if(e.sign&&t.sign){var i=a(e.length,t.length),_=l.__absoluteSubOne(e,i),n=l.__absoluteSubOne(t);return l.__absoluteXor(_,n,_).__trim()}var g=a(e.length,t.length)+1;if(e.sign){var o=[t,e];e=o[0],t=o[1]}var s=l.__absoluteSubOne(t,g);return s=l.__absoluteXor(s,e,s),l.__absoluteAddOne(s,!0,s).__trim()}},{key:"bitwiseOr",value:function(e,t){var i=a(e.length,t.length);if(!e.sign&&!t.sign)return l.__absoluteOr(e,t).__trim();if(e.sign&&t.sign){var _=l.__absoluteSubOne(e,i),n=l.__absoluteSubOne(t);return _=l.__absoluteAnd(_,n,_),l.__absoluteAddOne(_,!0,_).__trim()}if(e.sign){var g=[t,e];e=g[0],t=g[1]}var o=l.__absoluteSubOne(t,i);return o=l.__absoluteAndNot(o,e,o),l.__absoluteAddOne(o,!0,o).__trim()}},{key:"asIntN",value:function(e,t){if(0===t.length)return t;if(0===e)return l.__zero();if(e>=l.__kMaxLengthBits)return t;var _=e+31>>>5;if(t.length<_)return t;var n=t.__unsignedDigit(_-1),g=1<<(31&e-1);if(t.length===_&&n<g)return t;if(!((n&g)===g))return l.__truncateToNBits(e,t);if(!t.sign)return l.__truncateAndSubFromPowerOfTwo(e,t,!0);if(0==(n&g-1)){for(var o=_-2;0<=o;o--)if(0!==t.__digit(o))return l.__truncateAndSubFromPowerOfTwo(e,t,!1);return t.length===_&&n===g?t:l.__truncateToNBits(e,t)}return l.__truncateAndSubFromPowerOfTwo(e,t,!1)}},{key:"asUintN",value:function(e,t){if(0===t.length)return t;if(0===e)return l.__zero();if(t.sign){if(e>l.__kMaxLengthBits)throw new RangeError("BigInt too big");return l.__truncateAndSubFromPowerOfTwo(e,t,!1)}if(e>=l.__kMaxLengthBits)return t;var i=e+31>>>5;if(t.length<i)return t;var _=31&e;if(t.length==i){if(0==_)return t;var n=t.__digit(i-1);if(0==n>>>_)return t}return l.__truncateToNBits(e,t)}},{key:"ADD",value:function(e,t){if(e=l.__toPrimitive(e),t=l.__toPrimitive(t),"string"==typeof e)return"string"!=typeof t&&(t=t.toString()),e+t;if("string"==typeof t)return e.toString()+t;if(e=l.__toNumeric(e),t=l.__toNumeric(t),l.__isBigInt(e)&&l.__isBigInt(t))return l.add(e,t);if("number"==typeof e&&"number"==typeof t)return e+t;throw new TypeError("Cannot mix BigInt and other types, use explicit conversions")}},{key:"LT",value:function(e,t){return l.__compare(e,t,0)}},{key:"LE",value:function(e,t){return l.__compare(e,t,1)}},{key:"GT",value:function(e,t){return l.__compare(e,t,2)}},{key:"GE",value:function(e,t){return l.__compare(e,t,3)}},{key:"EQ",value:function(t,i){for(;;){if(l.__isBigInt(t))return l.__isBigInt(i)?l.equal(t,i):l.EQ(i,t);if("number"==typeof t){if(l.__isBigInt(i))return l.__equalToNumber(i,t);if("object"!==e(i))return t==i;i=l.__toPrimitive(i)}else if("string"==typeof t){if(l.__isBigInt(i))return t=l.__fromString(t),null!==t&&l.equal(t,i);if("object"!==e(i))return t==i;i=l.__toPrimitive(i)}else if("boolean"==typeof t){if(l.__isBigInt(i))return l.__equalToNumber(i,+t);if("object"!==e(i))return t==i;i=l.__toPrimitive(i)}else if("symbol"===e(t)){if(l.__isBigInt(i))return!1;if("object"!==e(i))return t==i;i=l.__toPrimitive(i)}else if("object"===e(t)){if("object"===e(i)&&i.constructor!==l)return t==i;t=l.__toPrimitive(t)}else return t==i}}},{key:"NE",value:function(e,t){return!l.EQ(e,t)}},{key:"__zero",value:function(){return new l(0,!1)}},{key:"__oneDigit",value:function(e,t){var i=new l(1,t);return i.__setDigit(0,e),i}},{key:"__decideRounding",value:function(e,t,i,_){if(0<t)return-1;var n;if(0>t)n=-t-1;else{if(0===i)return-1;i--,_=e.__digit(i),n=31}var g=1<<n;if(0==(_&g))return-1;if(g-=1,0!=(_&g))return 1;for(;0<i;)if(i--,0!==e.__digit(i))return 1;return 0}},{key:"__fromDouble",value:function(e){l.__kBitConversionDouble[0]=e;var t,i=2047&l.__kBitConversionInts[1]>>>20,_=i-1023,n=(_>>>5)+1,g=new l(n,0>e),o=1048575&l.__kBitConversionInts[1]|1048576,a=l.__kBitConversionInts[0],s=20,u=31&_,r=0;if(u<s){var d=s-u;r=d+32,t=o>>>d,o=o<<32-d|a>>>d,a<<=32-d}else if(u===s)r=32,t=o,o=a;else{var h=u-s;r=32-h,t=o<<h|a>>>32-h,o=a<<h}g.__setDigit(n-1,t);for(var b=n-2;0<=b;b--)0<r?(r-=32,t=o,o=a):t=0,g.__setDigit(b,t);return g.__trim()}},{key:"__isWhitespace",value:function(e){return!!(13>=e&&9<=e)||(159>=e?32==e:131071>=e?160==e||5760==e:196607>=e?(e&=131071,10>=e||40==e||41==e||47==e||95==e||4096==e):65279==e)}},{key:"__fromString",value:function(e){var t=1<arguments.length&&void 0!==arguments[1]?arguments[1]:0,i=0,_=e.length,n=0;if(n===_)return l.__zero();for(var g=e.charCodeAt(n);l.__isWhitespace(g);){if(++n===_)return l.__zero();g=e.charCodeAt(n)}if(43===g){if(++n===_)return null;g=e.charCodeAt(n),i=1}else if(45===g){if(++n===_)return null;g=e.charCodeAt(n),i=-1}if(0===t){if(t=10,48===g){if(++n===_)return l.__zero();if(g=e.charCodeAt(n),88===g||120===g){if(t=16,++n===_)return null;g=e.charCodeAt(n)}else if(79===g||111===g){if(t=8,++n===_)return null;g=e.charCodeAt(n)}else if(66===g||98===g){if(t=2,++n===_)return null;g=e.charCodeAt(n)}}}else if(16===t&&48===g){if(++n===_)return l.__zero();if(g=e.charCodeAt(n),88===g||120===g){if(++n===_)return null;g=e.charCodeAt(n)}}for(;48===g;){if(++n===_)return l.__zero();g=e.charCodeAt(n)}var o=_-n,a=l.__kMaxBitsPerChar[t],s=l.__kBitsPerCharTableMultiplier-1;if(o>1073741824/a)return null;var u=a*o+s>>>l.__kBitsPerCharTableShift,r=new l(u+31>>>5,!1),h=10>t?t:10,b=10<t?t-10:0;if(0==(t&t-1)){a>>=l.__kBitsPerCharTableShift;var c=[],v=[],y=!1;do{for(var f,k=0,D=0;;){if(f=void 0,g-48>>>0<h)f=g-48;else if((32|g)-97>>>0<b)f=(32|g)-87;else{y=!0;break}if(D+=a,k=k<<a|f,++n===_){y=!0;break}if(g=e.charCodeAt(n),32<D+a)break}c.push(k),v.push(D)}while(!y);l.__fillFromParts(r,c,v)}else{r.__initializeDigits();var p=!1,B=0;do{for(var S,C=0,A=1;;){if(S=void 0,g-48>>>0<h)S=g-48;else if((32|g)-97>>>0<b)S=(32|g)-87;else{p=!0;break}var T=A*t;if(4294967295<T)break;if(A=T,C=C*t+S,B++,++n===_){p=!0;break}g=e.charCodeAt(n)}s=32*l.__kBitsPerCharTableMultiplier-1;var m=a*B+s>>>l.__kBitsPerCharTableShift+5;r.__inplaceMultiplyAdd(A,C,m)}while(!p)}for(;n!==_;){if(!l.__isWhitespace(g))return null;g=e.charCodeAt(n++)}return 0!==i&&10!==t?null:(r.sign=-1===i,r.__trim())}},{key:"__fillFromParts",value:function(e,t,_){for(var n=0,g=0,l=0,o=t.length-1;0<=o;o--){var a=t[o],s=_[o];g|=a<<l,l+=s,32===l?(e.__setDigit(n++,g),l=0,g=0):32<l&&(e.__setDigit(n++,g),l-=32,g=a>>>s-l)}if(0!==g){if(n>=e.length)throw new Error("implementation bug");e.__setDigit(n++,g)}for(;n<e.length;n++)e.__setDigit(n,0)}},{key:"__toStringBasePowerOfTwo",value:function(e,t){var _=e.length,n=t-1;n=(85&n>>>1)+(85&n),n=(51&n>>>2)+(51&n),n=(15&n>>>4)+(15&n);var g=n,o=t-1,a=e.__digit(_-1),s=u(a),r=0|(32*_-s+g-1)/g;if(e.sign&&r++,268435456<r)throw new Error("string too long");for(var d=Array(r),h=r-1,b=0,m=0,c=0;c<_-1;c++){var v=e.__digit(c),y=(b|v<<m)&o;d[h--]=l.__kConversionChars[y];var f=g-m;for(b=v>>>f,m=32-f;m>=g;)d[h--]=l.__kConversionChars[b&o],b>>>=g,m-=g}var k=(b|a<<m)&o;for(d[h--]=l.__kConversionChars[k],b=a>>>g-m;0!==b;)d[h--]=l.__kConversionChars[b&o],b>>>=g;if(e.sign&&(d[h--]="-"),-1!==h)throw new Error("implementation bug");return d.join("")}},{key:"__toStringGeneric",value:function(e,t,_){var n=e.length;if(0===n)return"";if(1===n){var g=e.__unsignedDigit(0).toString(t);return!1===_&&e.sign&&(g="-"+g),g}var o=32*n-u(e.__digit(n-1)),a=l.__kMaxBitsPerChar[t],s=a-1,r=o*l.__kBitsPerCharTableMultiplier;r+=s-1,r=0|r/s;var d,h,b=r+1>>1,m=l.exponentiate(l.__oneDigit(t,!1),l.__oneDigit(b,!1)),c=m.__unsignedDigit(0);if(1===m.length&&65535>=c){d=new l(e.length,!1),d.__initializeDigits();for(var v,y=0,f=2*e.length-1;0<=f;f--)v=y<<16|e.__halfDigit(f),d.__setHalfDigit(f,0|v/c),y=0|v%c;h=y.toString(t)}else{var k=l.__absoluteDivLarge(e,m,!0,!0);d=k.quotient;var D=k.remainder.__trim();h=l.__toStringGeneric(D,t,!0)}d.__trim();for(var p=l.__toStringGeneric(d,t,!0);h.length<b;)h="0"+h;return!1===_&&e.sign&&(p="-"+p),p+h}},{key:"__unequalSign",value:function(e){return e?-1:1}},{key:"__absoluteGreater",value:function(e){return e?-1:1}},{key:"__absoluteLess",value:function(e){return e?1:-1}},{key:"__compareToBigInt",value:function(e,t){var i=e.sign;if(i!==t.sign)return l.__unequalSign(i);var _=l.__absoluteCompare(e,t);return 0<_?l.__absoluteGreater(i):0>_?l.__absoluteLess(i):0}},{key:"__compareToNumber",value:function(e,t){if(!0|t){var i=e.sign,_=0>t;if(i!==_)return l.__unequalSign(i);if(0===e.length){if(_)throw new Error("implementation bug");return 0===t?0:-1}if(1<e.length)return l.__absoluteGreater(i);var n=o(t),g=e.__unsignedDigit(0);return g>n?l.__absoluteGreater(i):g<n?l.__absoluteLess(i):0}return l.__compareToDouble(e,t)}},{key:"__compareToDouble",value:function(e,t){if(t!==t)return t;if(t===1/0)return-1;if(t===-Infinity)return 1;var i=e.sign;if(i!==0>t)return l.__unequalSign(i);if(0===t)throw new Error("implementation bug: should be handled elsewhere");if(0===e.length)return-1;l.__kBitConversionDouble[0]=t;var _=2047&l.__kBitConversionInts[1]>>>20;if(2047==_)throw new Error("implementation bug: handled elsewhere");var n=_-1023;if(0>n)return l.__absoluteGreater(i);var g=e.length,o=e.__digit(g-1),a=u(o),s=32*g-a,r=n+1;if(s<r)return l.__absoluteLess(i);if(s>r)return l.__absoluteGreater(i);var d=1048576|1048575&l.__kBitConversionInts[1],h=l.__kBitConversionInts[0],b=20,m=31-a;if(m!==(s-1)%31)throw new Error("implementation bug");var c,v=0;if(m<b){var y=b-m;v=y+32,c=d>>>y,d=d<<32-y|h>>>y,h<<=32-y}else if(m===b)v=32,c=d,d=h;else{var f=m-b;v=32-f,c=d<<f|h>>>32-f,d=h<<f}if(o>>>=0,c>>>=0,o>c)return l.__absoluteGreater(i);if(o<c)return l.__absoluteLess(i);for(var k=g-2;0<=k;k--){0<v?(v-=32,c=d>>>0,d=h,h=0):c=0;var D=e.__unsignedDigit(k);if(D>c)return l.__absoluteGreater(i);if(D<c)return l.__absoluteLess(i)}if(0!==d||0!==h){if(0===v)throw new Error("implementation bug");return l.__absoluteLess(i)}return 0}},{key:"__equalToNumber",value:function(e,t){return t|0===t?0===t?0===e.length:1===e.length&&e.sign===0>t&&e.__unsignedDigit(0)===o(t):0===l.__compareToDouble(e,t)}},{key:"__comparisonResultToBool",value:function(e,t){switch(t){case 0:return 0>e;case 1:return 0>=e;case 2:return 0<e;case 3:return 0<=e;}throw new Error("unreachable")}},{key:"__compare",value:function(e,t,i){if(e=l.__toPrimitive(e),t=l.__toPrimitive(t),"string"==typeof e&&"string"==typeof t)switch(i){case 0:return e<t;case 1:return e<=t;case 2:return e>t;case 3:return e>=t;}if(l.__isBigInt(e)&&"string"==typeof t)return t=l.__fromString(t),null!==t&&l.__comparisonResultToBool(l.__compareToBigInt(e,t),i);if("string"==typeof e&&l.__isBigInt(t))return e=l.__fromString(e),null!==e&&l.__comparisonResultToBool(l.__compareToBigInt(e,t),i);if(e=l.__toNumeric(e),t=l.__toNumeric(t),l.__isBigInt(e)){if(l.__isBigInt(t))return l.__comparisonResultToBool(l.__compareToBigInt(e,t),i);if("number"!=typeof t)throw new Error("implementation bug");return l.__comparisonResultToBool(l.__compareToNumber(e,t),i)}if("number"!=typeof e)throw new Error("implementation bug");if(l.__isBigInt(t))return l.__comparisonResultToBool(l.__compareToNumber(t,e),2^i);if("number"!=typeof t)throw new Error("implementation bug");return 0===i?e<t:1===i?e<=t:2===i?e>t:3===i?e>=t:void 0}},{key:"__absoluteAdd",value:function(e,t,_){if(e.length<t.length)return l.__absoluteAdd(t,e,_);if(0===e.length)return e;if(0===t.length)return e.sign===_?e:l.unaryMinus(e);var n=e.length;(0===e.__clzmsd()||t.length===e.length&&0===t.__clzmsd())&&n++;for(var g=new l(n,_),o=0,a=0;a<t.length;a++){var s=t.__digit(a),u=e.__digit(a),r=(65535&u)+(65535&s)+o,d=(u>>>16)+(s>>>16)+(r>>>16);o=d>>>16,g.__setDigit(a,65535&r|d<<16)}for(;a<e.length;a++){var h=e.__digit(a),b=(65535&h)+o,m=(h>>>16)+(b>>>16);o=m>>>16,g.__setDigit(a,65535&b|m<<16)}return a<g.length&&g.__setDigit(a,o),g.__trim()}},{key:"__absoluteSub",value:function(e,t,_){if(0===e.length)return e;if(0===t.length)return e.sign===_?e:l.unaryMinus(e);for(var n=new l(e.length,_),g=0,o=0;o<t.length;o++){var a=e.__digit(o),s=t.__digit(o),u=(65535&a)-(65535&s)-g;g=1&u>>>16;var r=(a>>>16)-(s>>>16)-g;g=1&r>>>16,n.__setDigit(o,65535&u|r<<16)}for(;o<e.length;o++){var d=e.__digit(o),h=(65535&d)-g;g=1&h>>>16;var b=(d>>>16)-g;g=1&b>>>16,n.__setDigit(o,65535&h|b<<16)}return n.__trim()}},{key:"__absoluteAddOne",value:function(e,t){var _=2<arguments.length&&void 0!==arguments[2]?arguments[2]:null,n=e.length;null===_?_=new l(n,t):_.sign=t;for(var g=!0,o=0;o<n;o++){var a=e.__digit(o),s=-1===a;g&&(a=0|a+1),g=s,_.__setDigit(o,a)}return g&&_.__setDigitGrow(n,1),_}},{key:"__absoluteSubOne",value:function(e,t){var _=e.length;t=t||_;for(var n=new l(t,!1),g=!0,o=0;o<_;o++){var a=e.__digit(o),s=0===a;g&&(a=0|a-1),g=s,n.__setDigit(o,a)}for(var u=_;u<t;u++)n.__setDigit(u,0);return n}},{key:"__absoluteAnd",value:function(e,t){var _=2<arguments.length&&void 0!==arguments[2]?arguments[2]:null,n=e.length,g=t.length,o=g;if(n<g){o=n;var a=e,s=n;e=t,n=g,t=a,g=s}var u=o;null===_?_=new l(u,!1):u=_.length;for(var r=0;r<o;r++)_.__setDigit(r,e.__digit(r)&t.__digit(r));for(;r<u;r++)_.__setDigit(r,0);return _}},{key:"__absoluteAndNot",value:function(e,t){var _=2<arguments.length&&void 0!==arguments[2]?arguments[2]:null,n=e.length,g=t.length,o=g;n<g&&(o=n);var a=n;null===_?_=new l(a,!1):a=_.length;for(var s=0;s<o;s++)_.__setDigit(s,e.__digit(s)&~t.__digit(s));for(;s<n;s++)_.__setDigit(s,e.__digit(s));for(;s<a;s++)_.__setDigit(s,0);return _}},{key:"__absoluteOr",value:function(e,t){var _=2<arguments.length&&void 0!==arguments[2]?arguments[2]:null,n=e.length,g=t.length,o=g;if(n<g){o=n;var a=e,s=n;e=t,n=g,t=a,g=s}var u=n;null===_?_=new l(u,!1):u=_.length;for(var r=0;r<o;r++)_.__setDigit(r,e.__digit(r)|t.__digit(r));for(;r<n;r++)_.__setDigit(r,e.__digit(r));for(;r<u;r++)_.__setDigit(r,0);return _}},{key:"__absoluteXor",value:function(e,t){var _=2<arguments.length&&void 0!==arguments[2]?arguments[2]:null,n=e.length,g=t.length,o=g;if(n<g){o=n;var a=e,s=n;e=t,n=g,t=a,g=s}var u=n;null===_?_=new l(u,!1):u=_.length;for(var r=0;r<o;r++)_.__setDigit(r,e.__digit(r)^t.__digit(r));for(;r<n;r++)_.__setDigit(r,e.__digit(r));for(;r<u;r++)_.__setDigit(r,0);return _}},{key:"__absoluteCompare",value:function(e,t){var _=e.length-t.length;if(0!=_)return _;for(var n=e.length-1;0<=n&&e.__digit(n)===t.__digit(n);)n--;return 0>n?0:e.__unsignedDigit(n)>t.__unsignedDigit(n)?1:-1}},{key:"__multiplyAccumulate",value:function(e,t,_,n){if(0!==t){for(var g=65535&t,l=t>>>16,o=0,a=0,u=0,r=0;r<e.length;r++,n++){var d=_.__digit(n),h=65535&d,b=d>>>16,m=e.__digit(r),c=65535&m,v=m>>>16,y=s(c,g),f=s(c,l),k=s(v,g),D=s(v,l);h+=a+(65535&y),b+=u+o+(h>>>16)+(y>>>16)+(65535&f)+(65535&k),o=b>>>16,a=(f>>>16)+(k>>>16)+(65535&D)+o,o=a>>>16,a&=65535,u=D>>>16,d=65535&h|b<<16,_.__setDigit(n,d)}for(;0!==o||0!==a||0!==u;n++){var p=_.__digit(n),B=(65535&p)+a,S=(p>>>16)+(B>>>16)+u+o;a=0,u=0,o=S>>>16,p=65535&B|S<<16,_.__setDigit(n,p)}}}},{key:"__internalMultiplyAdd",value:function(e,t,_,g,l){for(var o=_,a=0,u=0;u<g;u++){var r=e.__digit(u),d=s(65535&r,t),h=(65535&d)+a+o;o=h>>>16;var b=s(r>>>16,t),m=(65535&b)+(d>>>16)+o;o=m>>>16,a=b>>>16,l.__setDigit(u,m<<16|65535&h)}if(l.length>g)for(l.__setDigit(g++,o+a);g<l.length;)l.__setDigit(g++,0);else if(0!==o+a)throw new Error("implementation bug")}},{key:"__absoluteDivSmall",value:function(e,t,_){null===_&&(_=new l(e.length,!1));for(var n=0,g=2*e.length-1;0<=g;g-=2){var o=(n<<16|e.__halfDigit(g))>>>0,a=0|o/t;n=0|o%t,o=(n<<16|e.__halfDigit(g-1))>>>0;var s=0|o/t;n=0|o%t,_.__setDigit(g>>>1,a<<16|s)}return _}},{key:"__absoluteModSmall",value:function(e,t){for(var _,n=0,g=2*e.length-1;0<=g;g--)_=(n<<16|e.__halfDigit(g))>>>0,n=0|_%t;return n}},{key:"__absoluteDivLarge",value:function(e,t,i,_){var g=t.__halfDigitLength(),n=t.length,o=e.__halfDigitLength()-g,a=null;i&&(a=new l(o+2>>>1,!1),a.__initializeDigits());var r=new l(g+2>>>1,!1);r.__initializeDigits();var d=l.__clz16(t.__halfDigit(g-1));0<d&&(t=l.__specialLeftShift(t,d,0));for(var h=l.__specialLeftShift(e,d,1),u=t.__halfDigit(g-1),b=0,m=o;0<=m;m--){var v=65535,y=h.__halfDigit(m+g);if(y!==u){var f=(y<<16|h.__halfDigit(m+g-1))>>>0;v=0|f/u;for(var k=0|f%u,D=t.__halfDigit(g-2),p=h.__halfDigit(m+g-2);s(v,D)>>>0>(k<<16|p)>>>0&&(v--,k+=u,!(65535<k)););}l.__internalMultiplyAdd(t,v,0,n,r);var B=h.__inplaceSub(r,m,g+1);0!==B&&(B=h.__inplaceAdd(t,m,g),h.__setHalfDigit(m+g,h.__halfDigit(m+g)+B),v--),i&&(1&m?b=v<<16:a.__setDigit(m>>>1,b|v))}return _?(h.__inplaceRightShift(d),i?{quotient:a,remainder:h}:h):i?a:void 0}},{key:"__clz16",value:function(e){return u(e)-16}},{key:"__specialLeftShift",value:function(e,t,_){var g=e.length,n=new l(g+_,!1);if(0===t){for(var o=0;o<g;o++)n.__setDigit(o,e.__digit(o));return 0<_&&n.__setDigit(g,0),n}for(var a,s=0,u=0;u<g;u++)a=e.__digit(u),n.__setDigit(u,a<<t|s),s=a>>>32-t;return 0<_&&n.__setDigit(g,s),n}},{key:"__leftShiftByAbsolute",value:function(e,t){var _=l.__toShiftAmount(t);if(0>_)throw new RangeError("BigInt too big");var n=_>>>5,g=31&_,o=e.length,a=0!==g&&0!=e.__digit(o-1)>>>32-g,s=o+n+(a?1:0),u=new l(s,e.sign);if(0===g){for(var r=0;r<n;r++)u.__setDigit(r,0);for(;r<s;r++)u.__setDigit(r,e.__digit(r-n))}else{for(var h=0,b=0;b<n;b++)u.__setDigit(b,0);for(var m,c=0;c<o;c++)m=e.__digit(c),u.__setDigit(c+n,m<<g|h),h=m>>>32-g;if(a)u.__setDigit(o+n,h);else if(0!==h)throw new Error("implementation bug")}return u.__trim()}},{key:"__rightShiftByAbsolute",value:function(e,t){var _=e.length,n=e.sign,g=l.__toShiftAmount(t);if(0>g)return l.__rightShiftByMaximum(n);var o=g>>>5,a=31&g,s=_-o;if(0>=s)return l.__rightShiftByMaximum(n);var u=!1;if(n){if(0!=(e.__digit(o)&(1<<a)-1))u=!0;else for(var r=0;r<o;r++)if(0!==e.__digit(r)){u=!0;break}}if(u&&0===a){var h=e.__digit(_-1);0==~h&&s++}var b=new l(s,n);if(0===a)for(var m=o;m<_;m++)b.__setDigit(m-o,e.__digit(m));else{for(var c,v=e.__digit(o)>>>a,y=_-o-1,f=0;f<y;f++)c=e.__digit(f+o+1),b.__setDigit(f,c<<32-a|v),v=c>>>a;b.__setDigit(y,v)}return u&&(b=l.__absoluteAddOne(b,!0,b)),b.__trim()}},{key:"__rightShiftByMaximum",value:function(e){return e?l.__oneDigit(1,!0):l.__zero()}},{key:"__toShiftAmount",value:function(e){if(1<e.length)return-1;var t=e.__unsignedDigit(0);return t>l.__kMaxLengthBits?-1:t}},{key:"__toPrimitive",value:function(t){var i=1<arguments.length&&void 0!==arguments[1]?arguments[1]:"default";if("object"!==e(t))return t;if(t.constructor===l)return t;var _=t[Symbol.toPrimitive];if(_){var n=_(i);if("object"!==e(n))return n;throw new TypeError("Cannot convert object to primitive value")}var g=t.valueOf;if(g){var o=g.call(t);if("object"!==e(o))return o}var a=t.toString;if(a){var s=a.call(t);if("object"!==e(s))return s}throw new TypeError("Cannot convert object to primitive value")}},{key:"__toNumeric",value:function(e){return l.__isBigInt(e)?e:+e}},{key:"__isBigInt",value:function(t){return"object"===e(t)&&t.constructor===l}},{key:"__truncateToNBits",value:function(e,t){for(var _=e+31>>>5,n=new l(_,t.sign),g=_-1,o=0;o<g;o++)n.__setDigit(o,t.__digit(o));var a=t.__digit(g);if(0!=(31&e)){var s=32-(31&e);a=a<<s>>>s}return n.__setDigit(g,a),n.__trim()}},{key:"__truncateAndSubFromPowerOfTwo",value:function(e,t,_){for(var n=Math.min,g=e+31>>>5,o=new l(g,_),a=0,s=g-1,u=0,r=n(s,t.length);a<r;a++){var d=t.__digit(a),h=0-(65535&d)-u;u=1&h>>>16;var b=0-(d>>>16)-u;u=1&b>>>16,o.__setDigit(a,65535&h|b<<16)}for(;a<s;a++)o.__setDigit(a,0|-u);var m,c=s<t.length?t.__digit(s):0,v=31&e;if(0===v){var y=0-(65535&c)-u;u=1&y>>>16;var f=0-(c>>>16)-u;m=65535&y|f<<16}else{var k=32-v;c=c<<k>>>k;var D=1<<32-k,p=(65535&D)-(65535&c)-u;u=1&p>>>16;var B=(D>>>16)-(c>>>16)-u;m=65535&p|B<<16,m&=D-1}return o.__setDigit(s,m),o.__trim()}},{key:"__digitPow",value:function(e,t){for(var i=1;0<t;)1&t&&(i*=e),t>>>=1,e*=e;return i}}]),l}(u(Array));return h.__kMaxLength=33554432,h.__kMaxLengthBits=h.__kMaxLength<<5,h.__kMaxBitsPerChar=[0,0,32,51,64,75,83,90,96,102,107,111,115,119,122,126,128,131,134,136,139,141,143,145,147,149,151,153,154,156,158,159,160,162,163,165,166],h.__kBitsPerCharTableShift=5,h.__kBitsPerCharTableMultiplier=1<<h.__kBitsPerCharTableShift,h.__kConversionChars=["0","1","2","3","4","5","6","7","8","9","a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z"],h.__kBitConversionBuffer=new ArrayBuffer(8),h.__kBitConversionDouble=new Float64Array(h.__kBitConversionBuffer),h.__kBitConversionInts=new Int32Array(h.__kBitConversionBuffer),h});
+
 },{}]},{},[3])(3)
 });

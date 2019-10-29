@@ -115,6 +115,8 @@
 							<ul class="tsd-index-list">
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_iondecimal_.decimal.html#compareto" class="tsd-kind-icon">compare<wbr>To</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_iondecimal_.decimal.html#equals" class="tsd-kind-icon">equals</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_iondecimal_.decimal.html#getcoefficient" class="tsd-kind-icon">get<wbr>Coefficient</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_iondecimal_.decimal.html#getexponent" class="tsd-kind-icon">get<wbr>Exponent</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_iondecimal_.decimal.html#intvalue" class="tsd-kind-icon">int<wbr>Value</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_iondecimal_.decimal.html#isnegative" class="tsd-kind-icon">is<wbr>Negative</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_iondecimal_.decimal.html#numbervalue" class="tsd-kind-icon">number<wbr>Value</a></li>
@@ -131,18 +133,44 @@
 					<a name="constructor" class="tsd-anchor"></a>
 					<h3>constructor</h3>
 					<ul class="tsd-signatures tsd-kind-constructor tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">new <wbr>Decimal<span class="tsd-signature-symbol">(</span>decimalText<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_iondecimal_.decimal.html" class="tsd-signature-type">Decimal</a></li>
 						<li class="tsd-signature tsd-kind-icon">new <wbr>Decimal<span class="tsd-signature-symbol">(</span>coefficient<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, exponent<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_iondecimal_.decimal.html" class="tsd-signature-type">Decimal</a></li>
+						<li class="tsd-signature tsd-kind-icon">new <wbr>Decimal<span class="tsd-signature-symbol">(</span>coefficient<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">JSBI</span>, exponent<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, isNegative<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_iondecimal_.decimal.html" class="tsd-signature-type">Decimal</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/0b2f6be/src/IonDecimal.ts#L44">IonDecimal.ts:44</a></li>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/ec40756/src/IonDecimal.ts#L48">IonDecimal.ts:48</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
-									<p>Creates a new Decimal value.</p>
+									<p>Creates a new Decimal value by parsing the provided text.</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>decimalText: <span class="tsd-signature-type">string</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<div class="lead">
+											<p>An Ion-encoded decimal value.</p>
+										</div>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="_iondecimal_.decimal.html" class="tsd-signature-type">Decimal</a></h4>
+						</li>
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/ec40756/src/IonDecimal.ts#L55">IonDecimal.ts:55</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Creates a new Decimal value using the provided coefficient and exponent values.</p>
 								</div>
 							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -151,7 +179,7 @@
 									<h5>coefficient: <span class="tsd-signature-type">number</span></h5>
 									<div class="tsd-comment tsd-typography">
 										<div class="lead">
-											<p>See the <a href="_iondecimal_.decimal.html">Decimal</a> class-level documentation for details.</p>
+											<p>See the class-level <a href="_iondecimal_.decimal.html">Decimal</a> documentation for details.</p>
 										</div>
 									</div>
 								</li>
@@ -159,7 +187,51 @@
 									<h5>exponent: <span class="tsd-signature-type">number</span></h5>
 									<div class="tsd-comment tsd-typography">
 										<div class="lead">
-											<p>See the <a href="_iondecimal_.decimal.html">Decimal</a> class-level documentation for details.</p>
+											<p>See the class-level <a href="_iondecimal_.decimal.html">Decimal</a> documentation for details.</p>
+										</div>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="_iondecimal_.decimal.html" class="tsd-signature-type">Decimal</a></h4>
+						</li>
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/ec40756/src/IonDecimal.ts#L63">IonDecimal.ts:63</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Creates a new Decimal value using the provided coefficient and exponent values.
+										Because the BigInt data type cannot represent -0, a third parameter called <code>isNegative</code> may be supplied
+										to explicitly set the sign of the Decimal following construction. If this flag is not specified,
+										the provided coefficient&#39;s sign will be used. If isNegative is specified but is not in agreement with
+									the coefficient&#39;s sign, the value of isNegative takes precedence.</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>coefficient: <span class="tsd-signature-type">JSBI</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<div class="lead">
+											<p>See the class-level <a href="_iondecimal_.decimal.html">Decimal</a> documentation for details.</p>
+										</div>
+									</div>
+								</li>
+								<li>
+									<h5>exponent: <span class="tsd-signature-type">number</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<div class="lead">
+											<p>See the class-level <a href="_iondecimal_.decimal.html">Decimal</a> documentation for details.</p>
+										</div>
+									</div>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> isNegative: <span class="tsd-signature-type">boolean</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<div class="lead">
+											<p>Must be set to &#39;true&#39; when constructing -0. May be omitted otherwise.</p>
 										</div>
 									</div>
 								</li>
@@ -177,7 +249,7 @@
 					<div class="tsd-signature tsd-kind-icon">ONE<span class="tsd-signature-symbol">:</span> <a href="_iondecimal_.decimal.html" class="tsd-signature-type">Decimal</a><span class="tsd-signature-symbol"> =&nbsp;new Decimal(1, 0)</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/amzn/ion-js/blob/0b2f6be/src/IonDecimal.ts#L44">IonDecimal.ts:44</a></li>
+							<li>Defined in <a href="https://github.com/amzn/ion-js/blob/ec40756/src/IonDecimal.ts#L42">IonDecimal.ts:42</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -187,7 +259,7 @@
 					<div class="tsd-signature tsd-kind-icon">ZERO<span class="tsd-signature-symbol">:</span> <a href="_iondecimal_.decimal.html" class="tsd-signature-type">Decimal</a><span class="tsd-signature-symbol"> =&nbsp;new Decimal(0, 0)</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/amzn/ion-js/blob/0b2f6be/src/IonDecimal.ts#L43">IonDecimal.ts:43</a></li>
+							<li>Defined in <a href="https://github.com/amzn/ion-js/blob/ec40756/src/IonDecimal.ts#L41">IonDecimal.ts:41</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -204,7 +276,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/0b2f6be/src/IonDecimal.ts#L173">IonDecimal.ts:173</a></li>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/ec40756/src/IonDecimal.ts#L266">IonDecimal.ts:266</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -238,7 +310,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/0b2f6be/src/IonDecimal.ts#L156">IonDecimal.ts:156</a></li>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/ec40756/src/IonDecimal.ts#L249">IonDecimal.ts:249</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -260,6 +332,52 @@
 					</ul>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="getcoefficient" class="tsd-anchor"></a>
+					<h3>get<wbr>Coefficient</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">get<wbr>Coefficient<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">JSBI</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/ec40756/src/IonDecimal.ts#L232">IonDecimal.ts:232</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Returns a BigInt representing the coefficient of this Decimal value.</p>
+								</div>
+								<p>Note that the BigInt data type is unable to represent -0 natively. If you wish to check for a -0 coefficient,
+								test whether the coefficient is zero and then call <a href="_iondecimal_.decimal.html#isnegative">isNegative</a>.</p>
+							</div>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">JSBI</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="getexponent" class="tsd-anchor"></a>
+					<h3>get<wbr>Exponent</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">get<wbr>Exponent<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/ec40756/src/IonDecimal.ts#L239">IonDecimal.ts:239</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Returns a number representing the exponent of this Decimal value.</p>
+								</div>
+							</div>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
 					<a name="intvalue" class="tsd-anchor"></a>
 					<h3>int<wbr>Value</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
@@ -269,7 +387,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/0b2f6be/src/IonDecimal.ts#L98">IonDecimal.ts:98</a></li>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/ec40756/src/IonDecimal.ts#L183">IonDecimal.ts:183</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -292,7 +410,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/0b2f6be/src/IonDecimal.ts#L81">IonDecimal.ts:81</a></li>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/ec40756/src/IonDecimal.ts#L163">IonDecimal.ts:163</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -314,7 +432,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/0b2f6be/src/IonDecimal.ts#L90">IonDecimal.ts:90</a></li>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/ec40756/src/IonDecimal.ts#L172">IonDecimal.ts:172</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -338,7 +456,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/0b2f6be/src/IonDecimal.ts#L106">IonDecimal.ts:106</a></li>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/ec40756/src/IonDecimal.ts#L191">IonDecimal.ts:191</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -361,7 +479,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/0b2f6be/src/IonDecimal.ts#L254">IonDecimal.ts:254</a></li>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/ec40756/src/IonDecimal.ts#L135">IonDecimal.ts:135</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -388,6 +506,9 @@
 				<ul>
 					<li class="globals  ">
 						<a href="../globals.html"><em>Globals</em></a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="../modules/_intsize_.html">"<wbr>Int<wbr>Size"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
 						<a href="../modules/_ion_.html">"<wbr>Ion"</a>
@@ -433,6 +554,12 @@
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
 								<a href="_iondecimal_.decimal.html#equals" class="tsd-kind-icon">equals</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_iondecimal_.decimal.html#getcoefficient" class="tsd-kind-icon">get<wbr>Coefficient</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_iondecimal_.decimal.html#getexponent" class="tsd-kind-icon">get<wbr>Exponent</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
 								<a href="_iondecimal_.decimal.html#intvalue" class="tsd-kind-icon">int<wbr>Value</a>
