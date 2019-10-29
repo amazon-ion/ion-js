@@ -71,11 +71,13 @@
     "mocha": "^6.2.0",
     "mocha-typescript": "^1.1.17",
     "nyc": "^14.1.1",
-    "jsbi": "^3.1.1",
     "semantic-release": "^15.13.24",
     "source-map-support": "^0.5.13",
     "ts-node": "^8.4.1",
     "typedoc": "^0.15.0",
     "typescript": "^3.6.2"
+  },
+  "dependencies": {
+    "jsbi": "^3.1.1"
   }
 }
