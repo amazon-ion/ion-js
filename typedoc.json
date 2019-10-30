@@ -36,5 +36,7 @@
     "src/SignAndMagnitudeInt.ts"
   ],
 
-  "out": "docs/api/"
+  "out": "docs/api/",
+
+  "hideGenerator": true
 }
