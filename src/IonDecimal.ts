@@ -43,6 +43,11 @@ export class Decimal {
 
     // For more information about the (sign, coefficient, exponent) data model, see:
     // https://amzn.github.io/ion-docs/docs/decimal.html#data-model
+    // Note that while the scheme described in the above link uses an unsigned integer to represent its coefficient,
+    // this class uses a signed integer. The sign of the value returned by `getCoefficient()` will always agree
+    // with the sign returned by `isNegative()` except in the case of -0, which cannot be natively represented
+    // by the JSBI and BigInt data types. In the case of -0, `isNegative()` will return `true` and `getCoefficient()`
+    // will return a positive zero.
     private _coefficient: JSBI;
     private _exponent: number;
     private _isNegative: boolean;
