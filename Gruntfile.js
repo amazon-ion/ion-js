@@ -178,7 +178,7 @@ module.exports = function(grunt) {
   grunt.registerTask('doc', ['typedoc']);
 
   grunt.registerTask('cleanup', 'Removes extraneous files from distributions', function() {
-    grunt.file.expand('dist/**/IonEvent*', 'dist/**/IonTests.*').forEach((file) => grunt.file.delete(file));
+    //grunt.file.expand('dist/**/IonEvent*', 'dist/**/IonTests.*').forEach((file) => grunt.file.delete(file));
   });
 
   // release target used by Travis 

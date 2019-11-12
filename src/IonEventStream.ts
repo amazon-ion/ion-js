@@ -106,7 +106,7 @@ export class IonEventStream {
         return this.eventStream;
     }
 
-    equals(expected: IonEventStream) {
+    equals(expected: IonEventStream, result?: CLIResult) {
         let actualIndex: number = 0;
         let expectedIndex: number = 0;
         while (actualIndex < this.eventStream.length && expectedIndex < expected.eventStream.length) {
@@ -117,11 +117,13 @@ export class IonEventStream {
             if (actualEvent.eventType === IonEventType.SYMBOL_TABLE || expectedEvent.eventType === IonEventType.SYMBOL_TABLE) continue;
             switch (actualEvent.eventType) {
                 case IonEventType.SCALAR : {
-                    if (!actualEvent.equals(expectedEvent)) return false;
+                    if (!actualEvent.equals(expectedEvent, result)) {
+                        return false;
+                    }
                     break;
                 }
                 case IonEventType.CONTAINER_START : {
-                    if (actualEvent.equals(expectedEvent)) {
+                    if (actualEvent.equals(expectedEvent,  result)) {
                         actualIndex = actualIndex + actualEvent.ionValue.length;
                         expectedIndex = expectedIndex + expectedEvent.ionValue.length;
                     } else {
@@ -154,13 +156,13 @@ export class IonEventStream {
         let currentContainerIndex: number[] = [];
         while (true) {
             if (this.reader.isNull()) {
-                this.eventStream.push(this.eventFactory.makeEvent(IonEventType.SCALAR, tid, this.reader.fieldName(), this.reader.depth(), this.reader.annotations(), true, this.reader.value()));
+                this.eventStream.push(this.eventFactory.makeEvent(IonEventType.SCALAR, tid, this.reader.fieldName(), this.reader.depth(), this.reader.annotations(), true, this.eventStream.length, this.reader.value()));
             } else {
                 switch (tid) {
                     case IonTypes.LIST :
                     case IonTypes.SEXP :
                     case IonTypes.STRUCT : {
-                        let containerEvent = this.eventFactory.makeEvent(IonEventType.CONTAINER_START, tid, this.reader.fieldName(), this.reader.depth(), this.reader.annotations(), false, null);
+                        let containerEvent = this.eventFactory.makeEvent(IonEventType.CONTAINER_START, tid, this.reader.fieldName(), this.reader.depth(), this.reader.annotations(), false, this.eventStream.length, null);
                         this.eventStream.push(containerEvent);
                         currentContainer.push(containerEvent);
                         currentContainerIndex.push(this.eventStream.length);
@@ -169,7 +171,7 @@ export class IonEventStream {
                     }
                     case null : {
                         if (this.reader.depth() === 0) {
-                            this.eventStream.push(this.eventFactory.makeEvent(IonEventType.STREAM_END, IonTypes.NULL, null, this.reader.depth(), [], false, undefined));
+                            this.eventStream.push(this.eventFactory.makeEvent(IonEventType.STREAM_END, IonTypes.NULL, null, this.reader.depth(), [], false, this.eventStream.length, undefined));
                             return;
                         } else {
                             this.reader.stepOut();
@@ -178,7 +180,7 @@ export class IonEventStream {
                         break;
                     }
                     default : {
-                        this.eventStream.push(this.eventFactory.makeEvent(IonEventType.SCALAR, tid, this.reader.fieldName(), this.reader.depth(), this.reader.annotations(), false, this.reader.value()));
+                        this.eventStream.push(this.eventFactory.makeEvent(IonEventType.SCALAR, tid, this.reader.fieldName(), this.reader.depth(), this.reader.annotations(), false, this.eventStream.length, this.reader.value()));
                         break;
                     }
                 }
@@ -188,7 +190,7 @@ export class IonEventStream {
     }
 
     private endContainer(thisContainer: IonEvent, thisContainerIndex: number) {
-        this.eventStream.push(this.eventFactory.makeEvent(IonEventType.CONTAINER_END, thisContainer.ionType, null, thisContainer.depth, [], false, null));
+        this.eventStream.push(this.eventFactory.makeEvent(IonEventType.CONTAINER_END, thisContainer.ionType, null, thisContainer.depth, [], false, this.eventStream.length, null));
         thisContainer.ionValue = this.eventStream.slice(thisContainerIndex, this.eventStream.length);
     }
 
@@ -298,6 +300,7 @@ export class IonEventStream {
             currentEvent['depth'],
             currentEvent['annotations'],
             currentEvent['isNull'],
+            null,
             currentEvent['value_text']
         );
 
@@ -309,6 +312,7 @@ export class IonEventStream {
                 currentEvent['depth'],
                 currentEvent['annotations'],
                 currentEvent['isNull'],
+                null,
                 currentEvent['value_binary']
             );
             if (!textEvent.equals(binaryEvent)) {
@@ -400,5 +404,20 @@ export class IonEventStream {
 
     private parseImports(): any { //TODO needed for symboltoken support.
         return this.reader.value();
+    }
+}
+
+export class CLIResult {
+    public leftLocation : string;
+    public rightLocation : string;
+    public result : boolean; //equal === true, !equal === false, ERROR === null
+    public leftEvent : IonEvent;
+    public rightEvent : IonEvent;
+    public writer : Writer;
+    constructor(inputWriter: Writer, inputLeftLocation: string, inputRightLocation: string) {
+        this.writer = inputWriter;
+        this.leftLocation = inputLeftLocation;
+        this.rightLocation = inputRightLocation;
+
     }
 }
