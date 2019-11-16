@@ -23,7 +23,7 @@ export class Symbol {
     }
 
     toString(): string {
-        var s = "sym::{id:" + asAscii(this.sid) + ",val:\"" + asAscii(this.name) + "\"";
+        let s = "sym::{id:" + asAscii(this.sid) + ",val:\"" + asAscii(this.name) + "\"";
         return s;
     }
 }

@@ -7,8 +7,7 @@
   "scripts": {
     "commit": "git-cz",
     "test": "nyc mocha",
-    "release": "grunt release",
-    "semantic-release": "semantic-release pre && npm publish && semantic-release post"
+    "release": "grunt release"
   },
   "repository": {
     "type": "git",

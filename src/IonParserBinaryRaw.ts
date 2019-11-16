@@ -91,7 +91,7 @@ const TS_SHIFT   =    5;
 const TS_MASK    = 0x1f;
 
 function encode_type_stack(type_, len) {
-    var ts = (len << TS_SHIFT) | (type_ & TS_MASK);
+    let ts = (len << TS_SHIFT) | (type_ & TS_MASK);
     return ts;
 }
 
@@ -300,7 +300,7 @@ export class ParserBinaryRaw {
     }
 
     stepIn() {
-        var len, ts, t = this;
+        let len, ts, t = this;
         // _ts : [ T_DATAGRAM ], // (old _in limit << 4) & container type
         switch (t._raw_type) {
             case IonBinary.TB_STRUCT:
@@ -319,7 +319,7 @@ export class ParserBinaryRaw {
     }
 
     stepOut() {
-        var parent_type, ts, l, r, t = this;
+        let parent_type, ts, l, r, t = this;
         if (t._ts.length < 2) {
             throw new Error("you can't stepOut unless you stepped in");
         }
@@ -356,7 +356,7 @@ export class ParserBinaryRaw {
     }
 
     getAnnotations(): any {
-        var a, t = this;
+        let a, t = this;
         if ((t._a === undefined) || (t._a.length === 0)) {
             t.load_annotation_values();
         }
@@ -364,7 +364,7 @@ export class ParserBinaryRaw {
     }
 
     getAnnotation(index: number): any {
-        var a, t = this;
+        let a, t = this;
         if ((t._a === undefined) || (t._a.length === 0)) {
             t.load_annotation_values();
         }
@@ -627,7 +627,7 @@ export class ParserBinaryRaw {
     private load_next(): number {
         let t: ParserBinaryRaw = this;
 
-        var rt, tb;
+        let rt, tb;
         t._as = -1;
         if (t._in.is_empty()) {
             t.clear_value();
@@ -661,7 +661,7 @@ export class ParserBinaryRaw {
     private load_annotations() {
         let t: ParserBinaryRaw = this;
 
-        var tb, type_, annotation_len;
+        let tb, type_, annotation_len;
         if (t._len < 1 && t.depth() === 0) {
             type_ = t.load_ivm();
         } else {
@@ -678,7 +678,7 @@ export class ParserBinaryRaw {
 
     private load_ivm(): number {
         let t: ParserBinaryRaw = this;
-        var span = t._in;
+        let span = t._in;
         if (span.next() !== ivm_image_1) throw new Error("invalid binary Ion at " + span.position());
         if (span.next() !== ivm_image_2) throw new Error("invalid binary Ion at " + span.position());
         if (span.next() !== ivm_image_3) throw new Error("invalid binary Ion at " + span.position());
@@ -690,7 +690,7 @@ export class ParserBinaryRaw {
     private load_annotation_values(): void {
         let t: ParserBinaryRaw = this;
 
-        var a, b, pos, limit, arr;
+        let a, b, pos, limit, arr;
         if ((pos = t._as) < 0) return;  // nothing to do,
         arr = [];
         limit = t._ae;

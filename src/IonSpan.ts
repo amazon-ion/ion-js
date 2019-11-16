@@ -104,7 +104,7 @@ export class StringSpan extends Span {
     }
 
     next(): number {
-        var ch;
+        let ch;
         if (this.is_empty()) {
             if (this._pos > MAX_POS) {
                 throw new Error("span position is out of bounds");
