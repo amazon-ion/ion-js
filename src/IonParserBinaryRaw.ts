@@ -383,56 +383,6 @@ export class ParserBinaryRaw {
         return null;
     }
 
-    _stringRepresentation(): string {
-        let t = this;
-        switch (t._raw_type) {
-            case IonBinary.TB_NULL:
-            case IonBinary.TB_BOOL:
-            case IonBinary.TB_INT:
-            case IonBinary.TB_NEG_INT:
-            case IonBinary.TB_FLOAT:
-            case IonBinary.TB_DECIMAL:
-            case IonBinary.TB_TIMESTAMP:
-            case IonBinary.TB_SYMBOL:
-            case IonBinary.TB_STRING:
-                break;
-            default:
-                throw new Error("Cannot convert to string.");//this might cause errors which is good because we want to rat out all undefined behavior masking.
-        }
-        if (t.isNull()) {
-            switch (t._raw_type) {
-                case IonBinary.TB_BOOL:
-                case IonBinary.TB_INT:
-                case IonBinary.TB_NEG_INT:
-                case IonBinary.TB_FLOAT:
-                case IonBinary.TB_DECIMAL:
-                case IonBinary.TB_TIMESTAMP:
-                case IonBinary.TB_SYMBOL:
-                case IonBinary.TB_STRING:
-                    "null." + t.ionType().name;
-                    break;
-            }
-        } else {
-            t.load_value();
-            switch (t._raw_type) {
-                case IonBinary.TB_BOOL:
-                case IonBinary.TB_INT:
-                case IonBinary.TB_NEG_INT:
-                case IonBinary.TB_DECIMAL:
-                case IonBinary.TB_TIMESTAMP:
-                    return t._curr.toString();
-                case IonBinary.TB_FLOAT:
-                    let s = t.numberValue().toString();//this is really slow
-                    if (s.indexOf("e") === -1) return s + "e0"; // force this to exponent form so we recognize it as binary float
-                case IonBinary.TB_STRING:
-                    if (t._null) {
-                        return null;
-                    }
-                    return t._curr;
-            }
-        }
-    }
-
     byteValue(): Uint8Array {
         switch (this._raw_type) {
             case IonBinary.TB_NULL:
