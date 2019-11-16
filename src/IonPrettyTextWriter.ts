@@ -58,7 +58,7 @@ export class PrettyTextWriter extends TextWriter {
         this.handleSeparator();
         this.writePrettyValue();
         this.writeAnnotations();
-        this.writeUtf8("null." + type.name);
+        this._writeNull(type);
         if (this.currentContainer.containerType === IonTypes.STRUCT) this.currentContainer.state = State.STRUCT_FIELD;
     }
 
@@ -158,7 +158,7 @@ export class PrettyTextWriter extends TextWriter {
     private writePrettyIndent(incrementValue: number): void {
         this.indentCount = this.indentCount + incrementValue;
         if (this.indentSize && this.indentSize > 0) {
-            for (var i = 0; i < (this.indentCount * this.indentSize); i++) {
+            for (let i = 0; i < (this.indentCount * this.indentSize); i++) {
                 this.writeable.writeByte(CharCodes.SPACE);
             }
         }

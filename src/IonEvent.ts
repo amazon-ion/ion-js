@@ -106,7 +106,7 @@ abstract class AbstractIonEvent implements IonEvent {
             return;
         }
         writer.stepIn(IonTypes.LIST);
-        for (var i = 0; i < this.annotations.length; i++) {
+        for (let i = 0; i < this.annotations.length; i++) {
             writer.writeString(this.annotations[i]);
         }
         writer.stepOut();
@@ -153,7 +153,7 @@ abstract class AbstractIonEvent implements IonEvent {
         tempBinaryWriter.close();
         let binaryBuffer = tempBinaryWriter.getBytes();
         writer.stepIn(IonTypes.LIST);
-        for (var i = 0; i < binaryBuffer.length; i++) {
+        for (let i = 0; i < binaryBuffer.length; i++) {
             writer.writeInt(binaryBuffer[i]);
         }
         writer.stepOut();

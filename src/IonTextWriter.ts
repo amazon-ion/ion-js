@@ -210,13 +210,21 @@ export class TextWriter extends AbstractWriter {
         });
     }
 
+    protected _writeNull(type: IonType): void {
+        if (type === IonTypes.NULL) {
+            this.writeUtf8("null");
+        } else {
+            this.writeUtf8("null." + type.name);
+        }
+    }
+
     writeNull(type: IonType): void {
         if (type === null || type === undefined || type.binaryTypeId < 0 || type.binaryTypeId > 13) {
             throw new Error(`Cannot write null for type ${type}`);
         }
         this.handleSeparator();
         this.writeAnnotations();
-        this.writeUtf8("null." + type.name);
+        this._writeNull(type);
         if (this.currentContainer.containerType === IonTypes.STRUCT) this.currentContainer.state = State.STRUCT_FIELD;
     }
 

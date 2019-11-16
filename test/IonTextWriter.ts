@@ -300,13 +300,13 @@ describe("Text Writer", () => {
     describe("Writing nulls", () => {
         writerTest('Writes null',
             writer => writer.writeNull(ion.IonTypes.NULL),
-            'null.null');
+            'null');
         writerTest('Writes null with annotations',
             writer => {
                 writer.setAnnotations(['foo', 'bar']);
                 writer.writeNull(ion.IonTypes.NULL)
             },
-            'foo::bar::null.null');
+            'foo::bar::null');
     });
 
     describe("Writing s-expressions", () => {
@@ -550,7 +550,7 @@ describe("Text Writer", () => {
   sexp:a23::(
     a24::null.symbol 
     a25::null.string 
-    a26::null.null
+    a26::null
   )
 }`);
     });

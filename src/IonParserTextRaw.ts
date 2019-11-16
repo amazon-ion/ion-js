@@ -253,7 +253,7 @@ export class ParserTextRaw {
             34: this._read_value_helper_double, // '\"' == CH_DQ
         };
         let set_helper = function (str: string, fn: ReadValueHelper) {
-            var i = str.length, ch;
+            let i = str.length, ch;
             while (i > 0) {
                 i--;
                 ch = str.charCodeAt(i);
@@ -471,7 +471,7 @@ export class ParserTextRaw {
     }
 
     private _read_datagram_values() {
-        var ch = this._peek();
+        let ch = this._peek();
         if (ch == EOF) {
             this._value_push(EOF);
         } else {
@@ -495,7 +495,7 @@ export class ParserTextRaw {
     }
 
     private _read_list_values() {
-        var ch = this._read_after_whitespace(true);
+        let ch = this._read_after_whitespace(true);
         if (ch == CH_CS) {
             // degenerate case of an empty list
             this._value_push(EOF);
@@ -508,7 +508,7 @@ export class ParserTextRaw {
     }
 
     private _read_struct_values() {
-        var op = this._done_with_error,
+        let op = this._done_with_error,
             ch = this._read_after_whitespace(true);
 
         switch (ch) {
@@ -544,7 +544,7 @@ export class ParserTextRaw {
     }
 
     private _read_list_comma(): void {
-        var ch = this._read_after_whitespace(true);
+        let ch = this._read_after_whitespace(true);
         if (ch == CH_CM) {
             ch = this._read_after_whitespace(true);
             if (ch == CH_CS) {
@@ -562,7 +562,7 @@ export class ParserTextRaw {
     }
 
     private _read_struct_comma(): void {
-        var ch = this._read_after_whitespace(true);
+        let ch = this._read_after_whitespace(true);
         if (ch == CH_CM) {
             ch = this._read_after_whitespace(true);
             if (ch == CH_CC) {
@@ -633,7 +633,7 @@ export class ParserTextRaw {
     }
 
     private _read_value_helper_curly(ch1: number, accept_operator_symbols: boolean, calling_op: ReadValueHelper) {
-        var ch3, ch2 = this._read();
+        let ch3, ch2 = this._read();
         if (ch2 == CH_LEFT_CURLY) {
             ch3 = this._read_after_whitespace(false);
             if (ch3 == CH_SQ) {
@@ -652,7 +652,7 @@ export class ParserTextRaw {
     }
 
     private _read_value_helper_plus(ch1: number, accept_operator_symbols: boolean, calling_op: ReadValueHelper) {
-        var ch2 = this._peek("inf");
+        let ch2 = this._peek("inf");
         this._unread(ch1); // in any case we'll leave this character for the next function to use
         if (IonText.isNumericTerminator(ch2)) {
             this._ops.unshift(this._read_plus_inf);
@@ -664,7 +664,7 @@ export class ParserTextRaw {
     }
 
     private _read_value_helper_minus = function (ch1: number, accept_operator_symbols: boolean, calling_op: ReadValueHelper) {
-        var op = undefined,
+        let op = undefined,
             ch2 = this._peek();
         if (ch2 == CH_i) {
             ch2 = this._peek("inf");
@@ -687,7 +687,7 @@ export class ParserTextRaw {
     };
 
     private _read_value_helper_digit(ch1: number, accept_operator_symbols: boolean, calling_op: ReadValueHelper) {
-        var ch2 = this._peek_4_digits(ch1);
+        let ch2 = this._peek_4_digits(ch1);
         this._unread(ch1);
         if (ch2 == CH_T || ch2 == CH_MS) {
             this._ops.unshift(this._readTimestamp);
@@ -697,7 +697,7 @@ export class ParserTextRaw {
     }
 
     private _read_value_helper_single(ch1: number, accept_operator_symbols: boolean, calling_op: ReadValueHelper) {
-        var op;
+        let op;
         if (this._peek("\'\'") != ERROR) {
             op = this._read_string3;
             op.call(this);
@@ -773,7 +773,7 @@ export class ParserTextRaw {
     }
 
     private _read_number() {
-        var ch, t;
+        let ch, t;
         this._start = this._in.position();
         ch = this._read();
         if (ch == CH_MS) ch = this._read();
@@ -813,7 +813,7 @@ export class ParserTextRaw {
     }
 
     private _read_hex_int(): void {
-        var ch = this._read(); // re-read the 'x' we peeked at earlier
+        let ch = this._read(); // re-read the 'x' we peeked at earlier
         if (ch == CH_x || ch == CH_X) {
             ch = this._read(); // read the first hex digits
             ch = this._read_required_hex_digits(ch);
@@ -828,7 +828,7 @@ export class ParserTextRaw {
     }
 
     private _read_exponent(): number {
-        var ch = this._read();
+        let ch = this._read();
         if (ch == CH_MS || ch == CH_PS) {
             ch = this._read();
         }
@@ -855,7 +855,7 @@ export class ParserTextRaw {
     }
 
     private _read_inf_helper() {
-        var ii, ch;
+        let ii, ch;
         for (ii = 0; ii < 3; ii++) {
             ch = this._read();
             if (ch != INF[ii]) {
@@ -944,7 +944,7 @@ export class ParserTextRaw {
     }
 
     private _read_symbol(): void {
-        var ch;
+        let ch;
         this._start = this._in.position() - 1;
         for (; ;) {
             ch = this._read();
@@ -956,7 +956,7 @@ export class ParserTextRaw {
     }
 
     private _read_operator_symbol(): void {
-        var ch;
+        let ch;
         this._start = this._in.position();
         for (; ;) {
             ch = this._read();
@@ -1019,7 +1019,7 @@ export class ParserTextRaw {
     }
 
     private _read_string_helper = function (terminator: number, allow_new_line: boolean): void {
-        var ch;
+        let ch;
         this._start = this._in.position();
         for (; ;) {
             ch = this._read();
@@ -1033,7 +1033,7 @@ export class ParserTextRaw {
 
     private _read_string_escape_sequence(): void {
         // just reads the code points in the escape
-        var ch = this._read();
+        let ch = this._read();
         switch (ch) {
             case ESC_0:   // =  48, //  values['0']  = 0;       //    \u0000  \0  alert NUL
             case ESC_a:   // =  97, //  values['a']  = 7;       //    \u0007  \a  alert BEL
@@ -1072,7 +1072,7 @@ export class ParserTextRaw {
     }
 
     private _test_string_as_annotation(op): boolean {  // we could use op to validate the string type (1 or 3) vs the op - meh
-        var s, ch, is_ann, t = this._value_pop();
+        let s, ch, is_ann, t = this._value_pop();
         if (t != T_STRING1 && t != T_STRING3) this._error("expecting quoted symbol here");
         s = this.get_value_as_string(t);
         ch = this._read_after_whitespace(true);
@@ -1089,7 +1089,7 @@ export class ParserTextRaw {
     }
 
     private _read_clob_string2(): void {
-        var t;
+        let t;
         this._read_string2();
         t = this._value_pop();
         if (t != T_STRING2) this._error("string expected");
@@ -1098,7 +1098,7 @@ export class ParserTextRaw {
     }
 
     private _read_clob_string3(): void {
-        var t;
+        let t;
         this._read_string3(false);
         t = this._value_pop();
         if (t != T_STRING3) this._error("string expected");
@@ -1129,12 +1129,12 @@ export class ParserTextRaw {
     }
 
     private _read_comma(): void {
-        var ch = this._read_after_whitespace(true);
+        let ch = this._read_after_whitespace(true);
         if (ch != CH_CM) this._error("expected ','");
     }
 
     private _read_close_double_brace(): void {
-        var ch = this._read_after_whitespace(false);
+        let ch = this._read_after_whitespace(false);
         if (ch != CH_CC || this._read() != CH_CC) {
             this._error("expected '}}'");
         }
@@ -1207,7 +1207,7 @@ export class ParserTextRaw {
 
     private readClobEscapes(ii: number, end: number): number {
         // actually converts the escape sequence to a byte
-        var ch;
+        let ch;
         if (ii + 1 >= end) {
             this._error("invalid escape sequence");
             return;
@@ -1264,7 +1264,7 @@ export class ParserTextRaw {
 
     private _read_escape_sequence(ii: number, end: number): number {
         // actually converts the escape sequence to the code point
-        var ch;
+        let ch;
         if (ii + 1 >= end) throw new Error("Invalid escape sequence.");
         ch = this._in.valueAt(ii + 1);
         this._esc_len = 1;
@@ -1319,7 +1319,7 @@ export class ParserTextRaw {
     }
 
     private _get_N_hexdigits(ii: number, end: number): number {
-        var ch, v = 0;
+        let ch, v = 0;
         while (ii < end) {
             ch = this._in.valueAt(ii);
             v = v * 16 + get_hex_value(ch);
@@ -1336,13 +1336,13 @@ export class ParserTextRaw {
     }
 
     private _value_pop() {
-        var t = this._value_type;
+        let t = this._value_type;
         this._value_type = ERROR;
         return t;
     }
 
     private _run() {
-        var op;
+        let op;
         while (this._ops.length > 0 && (this._value_type === ERROR)) {
             op = this._ops.shift();
             op.call(this);
@@ -1350,12 +1350,12 @@ export class ParserTextRaw {
     }
 
     private _read(): number {
-        var ch = this._in.next();
+        let ch = this._in.next();
         return ch;
     }
 
     private _read_skipping_comments() {
-        var ch = this._read();
+        let ch = this._read();
         if (ch == CH_FORWARD_SLASH) {
             ch = this._read();
             if (ch == CH_FORWARD_SLASH) {
@@ -1373,7 +1373,7 @@ export class ParserTextRaw {
     }
 
     private _read_to_newline() {
-        var ch;
+        let ch;
         for (; ;) {
             ch = this._read(); // since this only happens in _read, after reading a double forward slash we can go straight to the input Span
             if (ch == EOF) break;
@@ -1387,7 +1387,7 @@ export class ParserTextRaw {
     }
 
     private _read_to_close_comment() {
-        var ch;
+        let ch;
         for (; ;) {
             ch = this._read(); // since this only happens in _read, after reading a forward slash asterisk we can go straight to the input Span
             if (ch == EOF) break;
@@ -1420,7 +1420,7 @@ export class ParserTextRaw {
 
     //peek does not work with the different types of string input.
     private _peek(expected?: string): number {
-        var ch, ii = 0;
+        let ch, ii = 0;
         if (expected === undefined || expected.length < 1) {
             return this._in.valueAt(this._in.position());
         }
@@ -1443,13 +1443,13 @@ export class ParserTextRaw {
     }
 
     private _peek_after_whitespace(recognize_comments: boolean): number {
-        var ch = this._read_after_whitespace(recognize_comments);
+        let ch = this._read_after_whitespace(recognize_comments);
         this._unread(ch);
         return ch;
     }
 
     private _peek_4_digits(ch1: number): number {
-        var ii, ch, is_digits = true, chars = [];
+        let ii, ch, is_digits = true, chars = [];
         if (!IonText.is_digit(ch1)) return ERROR;
         for (ii = 0; ii < 3; ii++) {
             ch = this._read();
@@ -1506,7 +1506,7 @@ export class ParserTextRaw {
     }
 
     private _read_N_hexdigits(n: number): number {
-        var ch, ii = 0;
+        let ch, ii = 0;
         while (ii < n) {
             ch = this._read();
             if (!IonText.is_hex_digit(ch)) {
@@ -1530,7 +1530,7 @@ export class ParserTextRaw {
     }
 
     private _check_for_keywords(): void {
-        var len, s, v = this._value_pop();
+        let len, s, v = this._value_pop();
         if (v == T_IDENTIFIER) {
             len = this._end - this._start;
             if (len >= 3 && len <= 5) {

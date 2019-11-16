@@ -5,7 +5,6 @@ An implementation of [Amazon Ion](https://amzn.github.io/ion-docs/) for JavaScri
 [![License](https://img.shields.io/hexpm/l/plug.svg)](https://github.com/amzn/ion-js/blob/master/LICENSE)
 [![Travis CI Status](https://api.travis-ci.org/amzn/ion-js.svg?branch=master)](https://travis-ci.org/amzn/ion-js)
 [![Documentation](https://img.shields.io/badge/docs-api-green.svg)](https://amzn.github.io/ion-js/api/index.html)
-[![Semantic Releases](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg)](https://github.com/amzn/ion-js/releases)
 
 This package is designed with work with Node JS major versions **8**, **10**, and **12**.  Browser compatibility
 should be anything that supports **ES5+**.
