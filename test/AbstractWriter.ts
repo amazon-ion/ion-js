@@ -36,7 +36,7 @@ function depthTest(instructions, expectedDepth) {
     assert.equal(binaryWriter.depth(), expectedDepth);
 }
 
-describe('Depth tests', () => {
+describe('AbstractWriter depth tests', () => {
     it('Writing a null list results in a depth of 0.', () => {
         depthTest((writer) => {writer.writeNull(ion.IonTypes.LIST)}, 0);
     });
@@ -92,7 +92,7 @@ describe('Depth tests', () => {
 });
 
 
-describe('Binary Timestamp', () => {
+describe('AbstractWriter writeValue()', () => {
     it('writeValue(), reader.type() == null', () => {
         let reader = ion.makeReader('a');
         testWriteValue(reader, '');
@@ -111,7 +111,7 @@ describe('Binary Timestamp', () => {
     it('writeValues(), reader.type() == null', () => {
         let expected = 'abc::{a:a::true,b:b::[two::2,three::3e3,'
             + 'sexp::(four::4d4 five::2019T six::hello seven::"hello" eight::{{"hello"}}'
-            + ' nine::{{aGVsbGA=}})],c:c::null.symbol,d:d::null.null}';
+            + ' nine::{{aGVsbGA=}})],c:c::null.symbol,d:d::null}';
         let reader = ion.makeReader(expected);
         assert.isNull(reader.type());
         testWriteValues(reader, expected);
@@ -120,7 +120,7 @@ describe('Binary Timestamp', () => {
     it('writeValues(), reader.type() != null', () => {
         let expected = 'abc::{a:a::true,b:b::[two::2,three::3e3,'
             + 'sexp::(four::4d4 five::2019T six::hello seven::"hello" eight::{{"hello"}}'
-            + ' nine::{{aGVsbGA=}})],c:c::null.symbol,d:d::null.null}';
+            + ' nine::{{aGVsbGA=}})],c:c::null.symbol,d:d::null}';
         let reader = ion.makeReader(expected);
         reader.next();
         assert.isNotNull(reader.type());

@@ -58,7 +58,7 @@ export class PrettyTextWriter extends TextWriter {
         this.handleSeparator();
         this.writePrettyValue();
         this.writeAnnotations();
-        this.writeUtf8("null." + type.name);
+        this._writeNull(type);
         if (this.currentContainer.containerType === IonTypes.STRUCT) this.currentContainer.state = State.STRUCT_FIELD;
     }
 
