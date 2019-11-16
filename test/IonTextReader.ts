@@ -96,8 +96,8 @@ class IonTextReaderTests {
     }
 
     @test "Parse through struct"() {
-        var ionToRead = "{ key : \"string\" }";
-        var ionReader = ion.makeReader(ionToRead);
+        let ionToRead = "{ key : \"string\" }";
+        let ionReader = ion.makeReader(ionToRead);
         ionReader.next();
 
         assert.equal(ion.IonTypes.STRUCT, ionReader.type());
@@ -112,8 +112,8 @@ class IonTextReaderTests {
     }
 
     @test "Parse through struct can skip over container"() {
-        var ionToRead = "{ a: { key1 : \"string1\" }, b: { key2 : \"string2\" } }";
-        var ionReader = ion.makeReader(ionToRead);
+        let ionToRead = "{ a: { key1 : \"string1\" }, b: { key2 : \"string2\" } }";
+        let ionReader = ion.makeReader(ionToRead);
         ionReader.next();
 
         assert.equal(ion.IonTypes.STRUCT, ionReader.type());
@@ -137,8 +137,8 @@ class IonTextReaderTests {
     }
 
     @test "Parse through struct can skip over nested containers"() {
-        var ionToRead = "{ outerkey1 : { innerkey1 : {a1: \"a1\", b1: \"b1\"} }, outerkey2 : { innerkey2 : {a2: \"a2\", b2: \"b2\"} } }";
-        var ionReader = ion.makeReader(ionToRead);
+        let ionToRead = "{ outerkey1 : { innerkey1 : {a1: \"a1\", b1: \"b1\"} }, outerkey2 : { innerkey2 : {a2: \"a2\", b2: \"b2\"} } }";
+        let ionReader = ion.makeReader(ionToRead);
         ionReader.next();
 
         assert.equal(ion.IonTypes.STRUCT, ionReader.type());
@@ -161,8 +161,8 @@ class IonTextReaderTests {
     }
 
     @test "Reads an array"() {
-        var ionToRead = "{ key : ['v1', 'v2'] }";
-        var ionReader = ion.makeReader(ionToRead);
+        let ionToRead = "{ key : ['v1', 'v2'] }";
+        let ionReader = ion.makeReader(ionToRead);
         ionReader.next();
 
         assert.equal(ion.IonTypes.STRUCT, ionReader.type());
@@ -184,8 +184,8 @@ class IonTextReaderTests {
     }
 
     @test "Reads a nested array"() {
-        var ionToRead = "{ key : [['v1', 'v2']] }";
-        var ionReader = ion.makeReader(ionToRead);
+        let ionToRead = "{ key : [['v1', 'v2']] }";
+        let ionReader = ion.makeReader(ionToRead);
         ionReader.next();
 
         assert.equal(ion.IonTypes.STRUCT, ionReader.type());
@@ -209,8 +209,8 @@ class IonTextReaderTests {
     }
 
     @test "Returns null on EOF"() {
-        var ionToRead = "";
-        var ionReader = ion.makeReader(ionToRead);
+        let ionToRead = "";
+        let ionReader = ion.makeReader(ionToRead);
         assert.isNull(ionReader.next());
         assert.isNull(ionReader.next()); // EOF
     }
@@ -226,7 +226,7 @@ class IonTextReaderTests {
     };
 
     @test "text IVM"() {
-        var textReader = ion.makeReader("");
+        let textReader = ion.makeReader("");
         let isNotIVM = ["$ion_schema_1_0", "$ion_1", "$ion_1_a", "$ion_", "ion_1_"];
         let unsupportedIVM = ["$ion_2_0", "$ion_1_999", "$ion_999_0", "$ion_1_1", "$ion_1_00"];
 
