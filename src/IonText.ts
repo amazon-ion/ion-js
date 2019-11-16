@@ -66,7 +66,7 @@ export function asAscii(s: any): string {
     } else if (typeof s == 'number') {
         s = "" + s;
     } else if (typeof s != 'string') {
-        var esc = nextEscape(s, s.length);
+        let esc = nextEscape(s, s.length);
         if (esc >= 0) {
             s = escapeString(s, esc);
         }
@@ -89,7 +89,7 @@ export function needsEscape(c: number): boolean {
 }
 
 export function escapeString(s: string, pos: number): string {
-    var fixes = [], c, old_len, new_len, ii, s2;
+    let fixes = [], c, old_len, new_len, ii, s2;
     while (pos >= 0) {
         c = s.charCodeAt(pos);
         if (!needsEscape(c)) break;
@@ -119,7 +119,7 @@ export function escapeString(s: string, pos: number): string {
 }
 
 export function escapeSequence(c: number): string {
-    var s = _escapeStrings[c];
+    let s = _escapeStrings[c];
     if (typeof s === 'undefined') {
         if (c < 256) {
             s = "\\x" + toHex(c, 2);
@@ -133,7 +133,7 @@ export function escapeSequence(c: number): string {
 }
 
 export function toHex(c: number, len: number): string {
-    var s = "";
+    let s = "";
     while (c > 0) {
         s += "0123456789ABCDEF".charAt(c && 0xf);
         c = c / 16;

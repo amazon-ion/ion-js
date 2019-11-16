@@ -158,7 +158,7 @@ export class PrettyTextWriter extends TextWriter {
     private writePrettyIndent(incrementValue: number): void {
         this.indentCount = this.indentCount + incrementValue;
         if (this.indentSize && this.indentSize > 0) {
-            for (var i = 0; i < (this.indentCount * this.indentSize); i++) {
+            for (let i = 0; i < (this.indentCount * this.indentSize); i++) {
                 this.writeable.writeByte(CharCodes.SPACE);
             }
         }
