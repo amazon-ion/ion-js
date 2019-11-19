@@ -24,9 +24,9 @@ module.exports = function(grunt) {
     jshint: {
       files: []
     },
-      /**
-       * Typescript document generator
-       */
+    /**
+     * Typescript document generator
+     */
     typedoc: {
       build: {
         src: 'src/**/*'
@@ -43,11 +43,16 @@ module.exports = function(grunt) {
         tsconfig: 'tsconfig.commonjs.json'
       }
     },
-      /**
-       * Copy of generated .js files to
-       *  1. the dist folder
-       *  2. the browser folder for use within a browser
-       */
+    tslint: {
+      all: ['src/**/*.ts', 'test/**/*.ts'],
+      src: 'src/**/*.ts',
+      test: 'test/**/*.ts',
+    },
+    /**
+     * Copy of generated .js files to
+     *  1. the dist folder
+     *  2. the browser folder for use within a browser
+     */
     copy: {
       bundle: {
         files: [
@@ -148,6 +153,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-shell');
   grunt.loadNpmTasks('grunt-ts');
+  grunt.loadNpmTasks('grunt-tslint');
   grunt.loadNpmTasks('grunt-typedoc');
 
   // Copy tasks
