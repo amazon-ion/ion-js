@@ -66,6 +66,7 @@
     "grunt-contrib-uglify": "^4.0.1",
     "grunt-shell": "^3.0.1",
     "grunt-ts": "^6.0.0-beta.21",
+    "grunt-tslint": "^5.0.2",
     "grunt-typedoc": "^0.2.4",
     "mocha": "^6.2.0",
     "mocha-typescript": "^1.1.17",
@@ -73,6 +74,7 @@
     "semantic-release": "^15.13.24",
     "source-map-support": "^0.5.13",
     "ts-node": "^8.4.1",
+    "tslint": "^5.20.1",
     "typedoc": "^0.15.0",
     "typescript": "^3.6.2"
   },
