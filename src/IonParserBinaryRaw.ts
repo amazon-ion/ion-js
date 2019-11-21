@@ -494,7 +494,9 @@ export class ParserBinaryRaw {
             a = (a << VINT_SHIFT) | (b & VINT_MASK);  // OR in the 7 useful bits
             if ((b & VINT_FLAG) !== 0) {
                 // once we have the last byte, add it to our list and start the next
-                if(a === 0) throw new Error('Symbol ID zero is unsupported.');
+                if (a === 0) {
+                    throw new Error('Symbol ID zero is unsupported.');
+                }
                 arr.push(a);
                 a = 0;
             }
