@@ -72,9 +72,6 @@ describe("Text Writer", () => {
         writerTest('Writes null blob using null',
             writer => writer.writeBlob(null),
             'null.blob');
-        writerTest('Writes null blob using undefined',
-            writer => writer.writeBlob(),
-            'null.blob');
         writerTest('Writes null blob using type',
             writer => writer.writeNull(ion.IonTypes.BLOB),
             'null.blob');
@@ -102,9 +99,6 @@ describe("Text Writer", () => {
         writerTest('Writes null boolean using null',
             writer => writer.writeBoolean(null),
             'null.bool');
-        writerTest('Writes null boolean using undefined',
-            writer => writer.writeBoolean(),
-            'null.bool');
         writerTest('Writes null boolean using type',
             writer => writer.writeNull(ion.IonTypes.BOOL),
             'null.bool');
@@ -122,9 +116,6 @@ describe("Text Writer", () => {
             '{{"A"}}');
         writerTest('Writes null clob using null',
             writer => writer.writeClob(null),
-            'null.clob');
-        writerTest('Writes null clob using undefined',
-            writer => writer.writeClob(),
             'null.clob');
         writerTest('Writes null clob using type',
             writer => writer.writeNull(ion.IonTypes.CLOB),
@@ -155,9 +146,6 @@ describe("Text Writer", () => {
         writerTest('Writes null decimal using null',
             writer => writer.writeDecimal(null),
             'null.decimal');
-        writerTest('Writes null decimal using undefined',
-            writer => writer.writeDecimal(),
-            'null.decimal');
         writerTest('Writes null decimal using type',
             writer => writer.writeNull(ion.IonTypes.DECIMAL),
             'null.decimal');
@@ -175,9 +163,6 @@ describe("Text Writer", () => {
             '8.125e0');
         writerTest('Writes null 32-bit float using null',
             writer => writer.writeFloat32(null),
-            'null.float');
-        writerTest('Writes null 32-bit float using undefined',
-            writer => writer.writeFloat32(),
             'null.float');
         writerTest('Writes 32-bit float with annotations',
             writer => {
@@ -209,9 +194,6 @@ describe("Text Writer", () => {
             '8.125e0');
         writerTest('Writes null 64-bit float using null',
             writer => writer.writeFloat64(null),
-            'null.float');
-        writerTest('Writes null 64-bit float using undefined',
-            writer => writer.writeFloat64(),
             'null.float');
         writerTest('Writes 64-bit float with annotations',
             writer => {
@@ -251,9 +233,6 @@ describe("Text Writer", () => {
             '-123456');
         writerTest('Writes null int using null',
             writer => writer.writeInt(null),
-            'null.int');
-        writerTest('Writes null int using undefined',
-            writer => writer.writeInt(),
             'null.int');
         writerTest('Writes null using type',
             writer => writer.writeNull(ion.IonTypes.INT),

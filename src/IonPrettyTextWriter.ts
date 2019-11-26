@@ -53,8 +53,8 @@ export class PrettyTextWriter extends TextWriter {
     }
 
     writeNull(type: IonType): void {
-        if (type === null || type === undefined || type.binaryTypeId < 0 || type.binaryTypeId > 13) {
-            throw new Error(`Cannot write null for type ${type}`);
+        if (type === undefined || type === null) {
+            type = IonTypes.NULL;
         }
         this.handleSeparator();
         this.writePrettyValue();
@@ -92,7 +92,7 @@ export class PrettyTextWriter extends TextWriter {
 
     _serializeValue<T>(type: IonType, value: T, serialize: Serializer<T>) {
         if (this.currentContainer.state === State.STRUCT_FIELD) throw new Error("Expecting a struct field");
-        if (value === null || value === undefined) {
+        if (value === null) {
             this.writeNull(type);
             return;
         }
