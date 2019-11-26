@@ -228,7 +228,10 @@ export class TextWriter extends AbstractWriter {
         }
     }
 
-    writeNull(type: IonType = IonTypes.NULL): void {
+    writeNull(type: IonType): void {
+        if (type === undefined || type === null) {
+            type = IonTypes.NULL;
+        }
         this.handleSeparator();
         this.writeAnnotations();
         this._writeNull(type);

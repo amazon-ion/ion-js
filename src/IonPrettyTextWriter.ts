@@ -52,7 +52,10 @@ export class PrettyTextWriter extends TextWriter {
         this.currentContainer.state = State.VALUE;
     }
 
-    writeNull(type: IonType = IonTypes.NULL): void {
+    writeNull(type: IonType): void {
+        if (type === undefined || type === null) {
+            type = IonTypes.NULL;
+        }
         this.handleSeparator();
         this.writePrettyValue();
         this.writeAnnotations();

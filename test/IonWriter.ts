@@ -74,6 +74,9 @@ describe('IonWriter interface', () => {
             it("writeNull(undefined) doesn't throw", function() {
                 writer.writeNull(undefined);
             });
+            it("writeNull(null) doesn't throw", function() {
+                writer.writeNull(null);
+            });
         });
     });
 });

@@ -217,7 +217,10 @@ export class BinaryWriter extends AbstractWriter {
         this.addNode(new IntNode(this.writer, this.getCurrentContainer(), this.encodeAnnotations(this._annotations), value));
     }
 
-    writeNull(type: IonType = IonTypes.NULL) {
+    writeNull(type: IonType) {
+        if (type === undefined || type === null) {
+            type = IonTypes.NULL;
+        }
         this.checkWriteValue();
         this.addNode(new NullNode(this.writer, this.getCurrentContainer(), type, this.encodeAnnotations(this._annotations)));
     }
