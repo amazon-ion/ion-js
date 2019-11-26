@@ -15,12 +15,12 @@
 
 import {assert} from "chai";
 import * as ion from "../src/IonTests";
-import {Decimal, IonType, IonTypes, Reader, Timestamp} from "../src/IonTests";
+import {Decimal, IonType, IonTypes, Reader, Timestamp, Writer} from "../src/IonTests";
 import JSBI from "jsbi";
 
 // This dummy impl exists as a substitute for reflection directly against
 // the Writer interface (which TypeScript doesn't currently support)
-class TestWriter implements ion.Writer {
+class NoopWriter implements Writer {
     addAnnotation(annotation: string): void { }
     close(): void { }
     depth(): number { return 0; }
@@ -44,8 +44,8 @@ class TestWriter implements ion.Writer {
     writeValues(reader: Reader): void { }
 }
 
-describe('IonWriter interface', () => {
-    let testMethods = Reflect.ownKeys(TestWriter.prototype)
+describe('IonWriterUndefinedParameters', () => {
+    let testMethods = Reflect.ownKeys(NoopWriter.prototype)
         .map(method => method.toString())
         .filter(name => name.startsWith('write'))
         .filter(name => name !== 'writeNull')

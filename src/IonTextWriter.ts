@@ -158,23 +158,19 @@ export class TextWriter extends AbstractWriter {
     writeDecimal(value: Decimal): void {
         _assertDefined(value);
         this._serializeValue(IonTypes.DECIMAL, value, (value: Decimal) => {
-            if (value === null) {
-                this.writeUtf8("null.decimal");
-            } else {
-                let s = '';
-                let coefficient = value.getCoefficient();
-                if (JsbiSupport.isZero(coefficient) && value.isNegative()) {
-                    s += '-';
-                }
-                s += coefficient.toString() + 'd';
-
-                let exponent = value.getExponent();
-                if (exponent === 0 && _sign(exponent) === -1) {
-                    s += '-';
-                }
-                s += exponent;
-                this.writeUtf8(s);
+            let s = '';
+            let coefficient = value.getCoefficient();
+            if (JsbiSupport.isZero(coefficient) && value.isNegative()) {
+                s += '-';
             }
+            s += coefficient.toString() + 'd';
+
+            let exponent = value.getExponent();
+            if (exponent === 0 && _sign(exponent) === -1) {
+                s += '-';
+            }
+            s += exponent;
+            this.writeUtf8(s);
         });
     }
 
@@ -316,7 +312,7 @@ export class TextWriter extends AbstractWriter {
 
     protected _serializeValue<T>(type: IonType, value: T, serialize: Serializer<T>) {
         if (this.currentContainer.state === State.STRUCT_FIELD) throw new Error("Expecting a struct field");
-        if (value === null || value === undefined) {
+        if (value === null) {
             this.writeNull(type);
             return;
         }

@@ -98,7 +98,7 @@ export class BinaryWriter extends AbstractWriter {
     writeBlob(value: Uint8Array): void {
         _assertDefined(value);
         this.checkWriteValue();
-        if (value === null || value === undefined) {
+        if (value === null) {
             this.writeNull(IonTypes.BLOB);
             return;
         }
@@ -108,7 +108,7 @@ export class BinaryWriter extends AbstractWriter {
     writeBoolean(value: boolean): void {
         _assertDefined(value);
         this.checkWriteValue();
-        if (value === null || value === undefined) {
+        if (value === null) {
             this.writeNull(IonTypes.BOOL);
             return;
         }
@@ -119,7 +119,7 @@ export class BinaryWriter extends AbstractWriter {
     writeClob(value: Uint8Array): void {
         _assertDefined(value);
         this.checkWriteValue();
-        if (value === null || value === undefined) {
+        if (value === null) {
             this.writeNull(IonTypes.CLOB);
             return;
         }
@@ -130,7 +130,7 @@ export class BinaryWriter extends AbstractWriter {
     writeDecimal(value: Decimal | string): void {
         _assertDefined(value);
         this.checkWriteValue();
-        if (value === null || value === undefined) {
+        if (value === null) {
             this.writeNull(IonTypes.DECIMAL);
             return;
         }
@@ -163,7 +163,7 @@ export class BinaryWriter extends AbstractWriter {
     writeFloat32(value: number): void {
         _assertDefined(value);
         this.checkWriteValue();
-        if (value === null || value === undefined) {
+        if (value === null) {
             this.writeNull(IonTypes.FLOAT);
             return;
         }
@@ -186,7 +186,7 @@ export class BinaryWriter extends AbstractWriter {
     writeFloat64(value: number): void {
         _assertDefined(value);
         this.checkWriteValue();
-        if (value === null || value === undefined) {
+        if (value === null) {
             this.writeNull(IonTypes.FLOAT);
             return;
         }
@@ -209,7 +209,7 @@ export class BinaryWriter extends AbstractWriter {
     writeInt(value: number | JSBI | null): void {
         _assertDefined(value);
         this.checkWriteValue();
-        if (value === null || value === undefined) {
+        if (value === null) {
             this.writeNull(IonTypes.INT);
             return;
         }
@@ -228,7 +228,7 @@ export class BinaryWriter extends AbstractWriter {
     writeString(value: string): void {
         _assertDefined(value);
         this.checkWriteValue();
-        if (value === null || value === undefined) {
+        if (value === null) {
             this.writeNull(IonTypes.STRING);
             return;
         }
@@ -239,7 +239,7 @@ export class BinaryWriter extends AbstractWriter {
     writeSymbol(value: string): void {
         _assertDefined(value);
         this.checkWriteValue();
-        if (value === null || value === undefined) {
+        if (value === null) {
             this.writeNull(IonTypes.SYMBOL);
         } else {
             let symbolId: number = this.symbolTable.addSymbol(value);
@@ -252,7 +252,7 @@ export class BinaryWriter extends AbstractWriter {
     writeTimestamp(value: Timestamp): void {
         _assertDefined(value);
         this.checkWriteValue();
-        if (value === null || value === undefined) {
+        if (value === null) {
             this.writeNull(IonTypes.TIMESTAMP);
             return;
         }

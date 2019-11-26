@@ -92,7 +92,7 @@ export class PrettyTextWriter extends TextWriter {
 
     _serializeValue<T>(type: IonType, value: T, serialize: Serializer<T>) {
         if (this.currentContainer.state === State.STRUCT_FIELD) throw new Error("Expecting a struct field");
-        if (value === null || value === undefined) {
+        if (value === null) {
             this.writeNull(type);
             return;
         }
