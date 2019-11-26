@@ -27,3 +27,12 @@ export function _sign(x: number): number {
 export function _hasValue(v: any): boolean {
     return v !== undefined && v !== null;
 }
+
+/**
+ * Throws if value is not defined.
+ */
+export function _assertDefined(value: any): void {
+    if (value === undefined) {
+        throw new Error("Expected value to be defined");
+    }
+}

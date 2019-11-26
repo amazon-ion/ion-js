@@ -111,11 +111,6 @@ let booleanWriterTests = [
         expected: [0x1f]
     },
     {
-        name: "Writes null boolean by detecting undefined",
-        instructions: (writer) => writer.writeBoolean(undefined),
-        expected: [0x1f]
-    },
-    {
         name: "Writes null boolean by direct call",
         instructions: (writer) => writer.writeNull(ion.IonTypes.BOOL),
         expected: [0x1f]
@@ -166,11 +161,6 @@ let clobWriterTests = [
         expected: [0x9f]
     },
     {
-        name: "Writes null clob by detecting undefined",
-        instructions: (writer) => writer.writeClob(undefined),
-        expected: [0x9f]
-    },
-    {
         name: "Writes null clob by direct call",
         instructions: (writer) => writer.writeNull(ion.IonTypes.CLOB),
         expected: [0x9f]
@@ -215,11 +205,6 @@ let decimalWriterTests = [
     {
         name: "Writes null decimal by detecting null",
         instructions: (writer) => writer.writeDecimal(null),
-        expected: [0x5f]
-    },
-    {
-        name: "Writes null decimal by detecting undefined",
-        instructions: (writer) => writer.writeDecimal(undefined),
         expected: [0x5f]
     },
     {
@@ -292,11 +277,6 @@ let floatWriterTests = [
         expected: [0x4f]
     },
     {
-        name: "Writes null 32-bit float by detecting undefined",
-        instructions: (writer) => writer.writeFloat32(undefined),
-        expected: [0x4f]
-    },
-    {
         name: "Writes null 32-bit float with annotations",
         instructions: (writer) => {
             writer.setAnnotations(['a']);
@@ -330,11 +310,6 @@ let floatWriterTests = [
     {
         name: "Writes null 64-bit float by detecting null",
         instructions: (writer) => writer.writeFloat64(null),
-        expected: [0x4f]
-    },
-    {
-        name: "Writes null 64-bit float by detecting undefined",
-        instructions: (writer) => writer.writeFloat64(undefined),
         expected: [0x4f]
     },
     {
@@ -374,11 +349,6 @@ let intWriterTests = [
     {
         name: "Writes null int by detecting null",
         instructions: (writer) => writer.writeInt(null),
-        expected: [0x2f]
-    },
-    {
-        name: "Writes null int by detecting undefined",
-        instructions: (writer) => writer.writeInt(undefined),
         expected: [0x2f]
     },
     {
@@ -619,13 +589,6 @@ let stringWriterTests = [
         name: "Writes null string by detecting null",
         instructions: (writer) => {
             writer.writeString(null);
-        },
-        expected: [0x8f]
-    },
-    {
-        name: "Writes null string by detecting undefined",
-        instructions: (writer) => {
-            writer.writeString(undefined);
         },
         expected: [0x8f]
     },
@@ -877,13 +840,6 @@ let symbolWriterTests = [
         expected: [0x7f]
     },
     {
-        name: "Writes null symbol by detecting undefined",
-        instructions: (writer) => {
-            writer.writeSymbol(undefined);
-        },
-        expected: [0x7f]
-    },
-    {
         name: "Writes null symbol by direct call",
         instructions: (writer) => {
             writer.writeNull(ion.IonTypes.SYMBOL);
@@ -923,13 +879,6 @@ let timestampWriterTests = [
         name: "Writes null timestamp by detecting null",
         instructions: (writer) => {
             writer.writeTimestamp(null);
-        },
-        expected: [0x6f]
-    },
-    {
-        name: "Writes null timestamp by detecting undefined",
-        instructions: (writer) => {
-            writer.writeTimestamp(undefined);
         },
         expected: [0x6f]
     },

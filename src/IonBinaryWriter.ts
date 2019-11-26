@@ -23,7 +23,7 @@ import {LocalSymbolTable} from "./IonLocalSymbolTable";
 import {LowLevelBinaryWriter} from "./IonLowLevelBinaryWriter";
 import {Timestamp, TimestampPrecision} from "./IonTimestamp";
 import {Writeable} from "./IonWriteable";
-import {_sign} from "./util";
+import {_assertDefined, _sign} from "./util";
 import JSBI from "jsbi";
 import {JsbiSupport} from "./JsbiSupport";
 import {JsbiSerde} from "./JsbiSerde";
@@ -96,6 +96,7 @@ export class BinaryWriter extends AbstractWriter {
     }
 
     writeBlob(value: Uint8Array): void {
+        _assertDefined(value);
         this.checkWriteValue();
         if (value === null || value === undefined) {
             this.writeNull(IonTypes.BLOB);
@@ -105,6 +106,7 @@ export class BinaryWriter extends AbstractWriter {
     }
 
     writeBoolean(value: boolean): void {
+        _assertDefined(value);
         this.checkWriteValue();
         if (value === null || value === undefined) {
             this.writeNull(IonTypes.BOOL);
@@ -115,6 +117,7 @@ export class BinaryWriter extends AbstractWriter {
     }
 
     writeClob(value: Uint8Array): void {
+        _assertDefined(value);
         this.checkWriteValue();
         if (value === null || value === undefined) {
             this.writeNull(IonTypes.CLOB);
@@ -125,6 +128,7 @@ export class BinaryWriter extends AbstractWriter {
     }
 
     writeDecimal(value: Decimal | string): void {
+        _assertDefined(value);
         this.checkWriteValue();
         if (value === null || value === undefined) {
             this.writeNull(IonTypes.DECIMAL);
@@ -157,6 +161,7 @@ export class BinaryWriter extends AbstractWriter {
     }
 
     writeFloat32(value: number): void {
+        _assertDefined(value);
         this.checkWriteValue();
         if (value === null || value === undefined) {
             this.writeNull(IonTypes.FLOAT);
@@ -179,6 +184,7 @@ export class BinaryWriter extends AbstractWriter {
     }
 
     writeFloat64(value: number): void {
+        _assertDefined(value);
         this.checkWriteValue();
         if (value === null || value === undefined) {
             this.writeNull(IonTypes.FLOAT);
@@ -201,6 +207,7 @@ export class BinaryWriter extends AbstractWriter {
     }
 
     writeInt(value: number | JSBI | null): void {
+        _assertDefined(value);
         this.checkWriteValue();
         if (value === null || value === undefined) {
             this.writeNull(IonTypes.INT);
@@ -216,6 +223,7 @@ export class BinaryWriter extends AbstractWriter {
     }
 
     writeString(value: string): void {
+        _assertDefined(value);
         this.checkWriteValue();
         if (value === null || value === undefined) {
             this.writeNull(IonTypes.STRING);
@@ -226,6 +234,7 @@ export class BinaryWriter extends AbstractWriter {
     }
 
     writeSymbol(value: string): void {
+        _assertDefined(value);
         this.checkWriteValue();
         if (value === null || value === undefined) {
             this.writeNull(IonTypes.SYMBOL);
@@ -238,6 +247,7 @@ export class BinaryWriter extends AbstractWriter {
     }
 
     writeTimestamp(value: Timestamp): void {
+        _assertDefined(value);
         this.checkWriteValue();
         if (value === null || value === undefined) {
             this.writeNull(IonTypes.TIMESTAMP);
@@ -307,6 +317,7 @@ export class BinaryWriter extends AbstractWriter {
     }
 
     writeFieldName(fieldName: string): void {
+        _assertDefined(fieldName);
         if (this.state !== States.STRUCT_FIELD) {
             throw new Error("Cannot write a field name outside of a struct");
         }

@@ -31,7 +31,7 @@ import {IonType} from "./IonType";
 import {IonTypes} from "./IonTypes";
 import {Timestamp} from "./IonTimestamp";
 import {Writeable} from "./IonWriteable";
-import {_sign} from "./util";
+import {_assertDefined, _sign} from "./util";
 import {JsbiSupport} from "./JsbiSupport";
 import JSBI from "jsbi";
 
@@ -110,18 +110,21 @@ export class TextWriter extends AbstractWriter {
     }
 
     writeBlob(value: Uint8Array): void {
+        _assertDefined(value);
         this._serializeValue(IonTypes.BLOB, value, (value: Uint8Array) => {
             this.writeable.writeBytes(encodeUtf8('{{' + toBase64(value) + '}}'));
         });
     }
 
     writeBoolean(value: boolean): void {
+        _assertDefined(value);
         this._serializeValue(IonTypes.BOOL, value, (value: boolean) => {
             this.writeUtf8(value ? "true" : "false");
         });
     }
 
     writeClob(value: Uint8Array): void {
+        _assertDefined(value);
         this._serializeValue(IonTypes.CLOB, value, (value: Uint8Array) => {
             let hexStr: string;
             this.writeUtf8('{{"');
@@ -153,6 +156,7 @@ export class TextWriter extends AbstractWriter {
     }
 
     writeDecimal(value: Decimal): void {
+        _assertDefined(value);
         this._serializeValue(IonTypes.DECIMAL, value, (value: Decimal) => {
             if (value === null) {
                 this.writeUtf8("null.decimal");
@@ -181,6 +185,7 @@ export class TextWriter extends AbstractWriter {
     I can't think of a reason why it HAS to be done that way right now, but if that feels cleaner to you, then consider it.
      */
     writeFieldName(fieldName: string): void {
+        _assertDefined(fieldName);
         if (this.currentContainer.containerType !== IonTypes.STRUCT) {
             throw new Error("Cannot write field name outside of a struct");
         }
@@ -199,14 +204,17 @@ export class TextWriter extends AbstractWriter {
     }
 
     writeFloat32(value: number): void {
+        _assertDefined(value);
         this._writeFloat(value);
     }
 
     writeFloat64(value: number): void {
+        _assertDefined(value);
         this._writeFloat(value);
     }
 
     writeInt(value: number | JSBI): void {
+        _assertDefined(value);
         this._serializeValue(IonTypes.INT, value, (value: number | JSBI) => {
             this.writeUtf8(value.toString(10));
         });
@@ -220,10 +228,7 @@ export class TextWriter extends AbstractWriter {
         }
     }
 
-    writeNull(type: IonType): void {
-        if (type === null || type === undefined || type.binaryTypeId < 0 || type.binaryTypeId > 13) {
-            throw new Error(`Cannot write null for type ${type}`);
-        }
+    writeNull(type: IonType = IonTypes.NULL): void {
         this.handleSeparator();
         this.writeAnnotations();
         this._writeNull(type);
@@ -231,18 +236,21 @@ export class TextWriter extends AbstractWriter {
     }
 
     writeString(value: string): void {
+        _assertDefined(value);
         this._serializeValue(IonTypes.STRING, value, (value: string) => {
             this.writeable.writeBytes(encodeUtf8('"' + escape(value, StringEscapes) + '"'));
         });
     }
 
     writeSymbol(value: string): void {
+        _assertDefined(value);
         this._serializeValue(IonTypes.SYMBOL, value, (value: string) => {
             this.writeSymbolToken(value);
         });
     }
 
     writeTimestamp(value: Timestamp): void {
+        _assertDefined(value);
         this._serializeValue(IonTypes.TIMESTAMP, value, (value: Timestamp) => {
             this.writeUtf8(value.toString());
         });
