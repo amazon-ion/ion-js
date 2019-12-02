@@ -214,7 +214,18 @@ export class TextReader implements Reader {
     }
 
     annotations(): string[] {
-        return this._parser.annotations();
+        let ann = this._parser.annotations();
+        for (let i = 0; i < ann.length; i++) {
+            if(ann[i].length > 1 && ann[i].charAt(0) === '$'.charAt(0)) {
+                let tempStr = ann[i].substr(1, ann[i].length);
+                if (+tempStr === +tempStr) {//look up sid, +str === +str is a one line is integer hack
+                    let symbol = this._symtab.getSymbolText(Number(tempStr));
+                    if(symbol === undefined) throw new Error("Unresolveable symbol ID, symboltokens unsupported.");
+                    ann[i] = symbol;
+                }
+            }
+        }
+        return ann;
     }
 
     isNull(): boolean {
