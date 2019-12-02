@@ -84,9 +84,12 @@ abstract class AbstractIonEvent implements IonEvent {
         }
         if (this.fieldName !== null && this.fieldName !== undefined) {
             writer.writeFieldName('field_name');
+            writer.stepIn(IonTypes.STRUCT);
+            writer.writeFieldName('text');
             writer.writeString(this.fieldName);
+            writer.stepOut();
         }
-        if (this.annotations !== null) {
+        if (this.annotations !== null && this.annotations.length > 0) {
             writer.writeFieldName('annotations');
             this.writeAnnotations(writer);
         }
@@ -137,7 +140,10 @@ abstract class AbstractIonEvent implements IonEvent {
         }
         writer.stepIn(IonTypes.LIST);
         for (var i = 0; i < this.annotations.length; i++) {
+            writer.stepIn(IonTypes.STRUCT);
+            writer.writeFieldName('text');
             writer.writeString(this.annotations[i]);
+            writer.stepOut();
         }
         writer.stepOut();
     }

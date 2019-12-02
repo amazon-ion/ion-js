@@ -33,7 +33,7 @@ export class IonEventStream {
     }
 
     writeEventStream(writer: Writer) {
-        writer.writeSymbol("ion_event_stream");
+        writer.writeSymbol("$ion_event_stream");
         for (let i: number = 0; i < this.eventStream.length; i++) {
             this.eventStream[i].write(writer);
         }
@@ -148,7 +148,7 @@ export class IonEventStream {
 
     private generateStream(): void {
         let tid: IonType = this.reader.next();
-        if (tid === IonTypes.SYMBOL && this.reader.stringValue() === "ion_event_stream") {
+        if (tid === IonTypes.SYMBOL && this.reader.stringValue() === "$ion_event_stream") {
             this.marshalStream();
             return;
         }
@@ -234,7 +234,7 @@ export class IonEventStream {
                 }
 
                 case 'field_name' : {
-                    currentEvent[fieldName] = this.reader.stringValue();
+                    currentEvent[fieldName] = this.parseSymbolToken();
                     break;
                 }
 
@@ -371,6 +371,15 @@ export class IonEventStream {
         }
     }
 
+    private parseSymbolToken(): string {
+        this.reader.stepIn();
+        this.reader.next();
+        let sym = this.reader.stringValue();
+        this.reader.stepOut();
+        return sym;
+
+    }
+
     private parseAnnotations(): string[] {
         let annotations: string[] = [];
         if (this.reader.isNull()) {
@@ -378,7 +387,7 @@ export class IonEventStream {
         } else {
             this.reader.stepIn();
             for (let tid; tid = this.reader.next();) {
-                annotations.push(this.reader.stringValue());
+                annotations.push(this.parseSymbolToken());
             }
             this.reader.stepOut();
             return annotations;
@@ -403,6 +412,7 @@ export class IonEventStream {
     }
 
     private parseImports(): any { //TODO needed for symboltoken support.
+        throw new Error('imports unsupported');
         return this.reader.value();
     }
 }

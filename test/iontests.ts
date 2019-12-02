@@ -16,6 +16,8 @@ import * as ion from '../src/Ion';
 import * as fs from 'fs';
 import * as path from 'path';
 import {IonEventStream} from '../src/IonEventStream';
+import {TextWriter} from "../src/IonTextWriter";
+import cp = require('child_process');
 
 function findFiles(folder, files = []) {
     fs.readdirSync(folder).forEach(file => {
@@ -218,6 +220,16 @@ function checkReaderValueMethods(r1, r2, type) {
 function getInput(path) {
     let options = path.endsWith(".10n") ? null : "utf8";
     return fs.readFileSync(path, options);
+}
+
+function CLIProcess(filePath, dirPath) {
+    let buffer = fs.readFileSync(filePath);
+    let stream = new IonEventStream(ion.makeReader(buffer));
+    let processed = ion.makeTextWriter();
+    stream.writeEventStream(processed);
+    let outputBuffer = cp.execFileSync('/Users/wesboyt/Dev/ion-c/cmake-build-debug/tools/cli/ion', ['process', '--output-format', 'events', '-'], {input: buffer});
+    let stream2 = new IonEventStream(ion.makeReader(outputBuffer.buffer));
+    assert.isTrue(stream.equals(stream2));
 }
 
 function roundTripEventStreams(reader) {
@@ -485,6 +497,17 @@ describe('ion-tests', () => {
         );
     });
 
+    describe('EventStream CLI', () => {
+        let cwd = process.cwd();
+        let tempDir = fs.mkdtempSync(cwd);
+        skipOrTest(
+            // Re-use the 'good' file set
+            goodTestFiles,
+            [eventSkipList],
+            (filePath) => CLIProcess(filePath, tempDir)
+        );
+    });
+
     describe('EventStream', () => {
         skipOrTest(
             // Re-use the 'good' file set
@@ -493,6 +516,7 @@ describe('ion-tests', () => {
             (path) => roundTripEventStreams(ion.makeReader(getInput(path)))
         );
     });
+
 
     describe('ReaderCompare', () => {
         skipOrTest(
