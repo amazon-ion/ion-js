@@ -133,10 +133,6 @@ export class BinaryWriter extends AbstractWriter {
         _assertDefined(value);
         this.checkWriteValue();
 
-        if (typeof value == 'string') {
-            value = Decimal.parse(value);
-        }
-
         if (value === null) {
             this.writeNull(IonTypes.DECIMAL);
             return;
