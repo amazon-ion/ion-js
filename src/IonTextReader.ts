@@ -34,8 +34,6 @@ import JSBI from "jsbi";
 import {JsbiSupport} from "./JsbiSupport";
 import IntSize from "./IntSize";
 
-const RAW_STRING = new IonType(-1, "raw_input", true, false, false, false);
-
 const BEGINNING_OF_CONTAINER = -2; // cloned from IonParserTextRaw
 const EOF = -1;
 const T_IDENTIFIER = 9;
@@ -45,13 +43,13 @@ const T_CLOB3 = 15;
 const T_STRUCT = 19;
 
 export class TextReader implements Reader {
-    private _parser: ParserTextRaw;
+    private readonly _parser: ParserTextRaw;
     private _depth: number;
-    private _cat: Catalog;
+    private readonly _cat: Catalog;
     private _symtab: LocalSymbolTable;
-    private _type: IonType;
-    private _raw_type: number;
-    private _raw: any;
+    private _type: IonType | null;
+    private _raw_type: number | undefined;
+    private _raw: any | undefined;
 
     constructor(source: StringSpan, catalog?: Catalog) {
         if (!source) {
@@ -73,7 +71,7 @@ export class TextReader implements Reader {
         if (t._raw_type === T_CLOB2 || t._raw_type === T_CLOB3) {
             t._raw = t._parser.get_value_as_uint8array(t._raw_type);
         } else {
-            t._raw = t._parser.get_value_as_string(t._raw_type);
+            t._raw = t._parser.get_value_as_string(t._raw_type!);
         }
     }
 
@@ -128,12 +126,12 @@ export class TextReader implements Reader {
         this._raw = undefined;
         if (this._raw_type === EOF) return null;
 
-        let should_skip: boolean =
-            this._raw_type !== BEGINNING_OF_CONTAINER
-            && !this.isNull()
-            && this._type
-            && this._type.isContainer;
-        if (should_skip) this.skip_past_container();
+        if (this._raw_type !== BEGINNING_OF_CONTAINER
+                && !this.isNull()
+                && this._type
+                && this._type.isContainer) {
+            this.skip_past_container();
+        }
 
         let p: ParserTextRaw = this._parser;
         for (; ;) {
@@ -165,12 +163,12 @@ export class TextReader implements Reader {
 
         // for system value (IVM's and symbol table's) we continue
         // around this
-        this._type = get_ion_type(this._raw_type);
+        this._type = get_ion_type(this._raw_type!);
         return this._type;
     }
 
     stepIn() {
-        if (!this._type.isContainer) {
+        if (!this._type!.isContainer) {
             throw new Error("can't step in to a scalar value");
         }
         if (this.isNull()) {
@@ -191,7 +189,7 @@ export class TextReader implements Reader {
         this._depth--;
     }
 
-    type(): IonType {
+    type(): IonType | null {
         return this._type;
     }
 
@@ -199,15 +197,17 @@ export class TextReader implements Reader {
         return this._depth;
     }
 
-    fieldName(): string {
+    fieldName(): string | null {
         let str = this._parser.fieldName();
-        let raw_type = this._parser.fieldNameType();
-        if (raw_type === T_IDENTIFIER && (str.length > 1 && str.charAt(0) === '$'.charAt(0))) {
-            let tempStr = str.substr(1, str.length);
-            if (+tempStr === +tempStr) {//look up sid, +str === +str is a one line is integer hack
-                let symbol = this._symtab.getSymbolText(Number(tempStr));
-                if (symbol === undefined) throw new Error("Unresolveable symbol ID, symboltokens unsupported.");
-                return symbol;
+        if (str !== null) {
+            let raw_type = this._parser.fieldNameType();
+            if (raw_type === T_IDENTIFIER && (str.length > 1 && str.charAt(0) === '$'.charAt(0))) {
+                let tempStr = str.substr(1, str.length);
+                if (+tempStr === +tempStr) {//look up sid, +str === +str is a one line is integer hack
+                    let symbol = this._symtab.getSymbolText(Number(tempStr));
+                    if (symbol === undefined) throw new Error("Unresolveable symbol ID, symboltokens unsupported.");
+                    return symbol;
+                }
             }
         }
         return str;
@@ -222,10 +222,10 @@ export class TextReader implements Reader {
         return this._parser.isNull();
     }
 
-    _stringRepresentation(): string {
+    _stringRepresentation(): string | null {
         this.load_raw();
-        if (this.isNull()) return (this._type === IonTypes.NULL) ? "null" : "null." + this._type.name;
-        if (this._type.isScalar) {
+        if (this.isNull()) return (this._type === IonTypes.NULL) ? "null" : "null." + this._type!.name;
+        if (this._type!.isScalar) {
             // BLOB is a scalar by you don't want to just use the string
             // value otherwise all other scalars are fine as is
             switch (this._type) {
@@ -249,7 +249,7 @@ export class TextReader implements Reader {
         }
     }
 
-    booleanValue() {
+    booleanValue(): boolean | null {
         switch (this._type) {
             case IonTypes.NULL:
                 return null;
@@ -259,7 +259,7 @@ export class TextReader implements Reader {
         throw new Error('Current value is not a Boolean.')
     }
 
-    byteValue(): Uint8Array {
+    byteValue(): Uint8Array | null {
         this.load_raw();
         switch (this._type) {
             case IonTypes.NULL:
@@ -278,34 +278,34 @@ export class TextReader implements Reader {
         throw new Error('Current value is not a blob or clob.');
     }
 
-    decimalValue(): Decimal {
+    decimalValue(): Decimal | null {
         switch (this._type) {
             case IonTypes.NULL:
                 return null;
             case IonTypes.DECIMAL:
-                return Decimal.parse(this._stringRepresentation());
+                return Decimal.parse(this._stringRepresentation()!);
         }
         throw new Error('Current value is not a decimal.')
     }
 
-    bigIntValue(): JSBI {
+    bigIntValue(): JSBI | null {
         switch (this._type) {
             case IonTypes.NULL:
                 return null;
             case IonTypes.INT:
                 return this._parser.bigIntValue();
         }
-        throw new Error('bigIntValue() was called when the current value was a(n) ' + this._type.name);
+        throw new Error('bigIntValue() was called when the current value was a(n) ' + this._type!.name);
     }
 
     intSize(): IntSize {
-        if (JsbiSupport.isSafeInteger(this.bigIntValue())) {
+        if (JsbiSupport.isSafeInteger(this.bigIntValue()!)) {
             return IntSize.Number;
         }
         return IntSize.BigInt;
     }
 
-    numberValue(): number {
+    numberValue(): number | null {
         switch (this._type) {
             case IonTypes.NULL:
                 return null;
@@ -316,7 +316,7 @@ export class TextReader implements Reader {
         throw new Error('Current value is not a float or int.');
     }
 
-    stringValue(): string {
+    stringValue(): string | null {
         this.load_raw();
         switch (this._type) {
             case IonTypes.NULL:
@@ -344,12 +344,12 @@ export class TextReader implements Reader {
         throw new Error('Current value is not a string or symbol.');
     }
 
-    timestampValue(): Timestamp {
+    timestampValue(): Timestamp | null {
         switch (this._type) {
             case IonTypes.NULL:
                 return null;
             case IonTypes.TIMESTAMP:
-                return Timestamp.parse(this._stringRepresentation());
+                return Timestamp.parse(this._stringRepresentation()!);
         }
         throw new Error('Current value is not a timestamp.')
     }

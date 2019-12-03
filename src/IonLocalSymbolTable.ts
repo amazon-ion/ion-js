@@ -22,20 +22,26 @@ import {SymbolIndex} from "./IonSymbolIndex";
  * symbol table or from a shared symbol table via an import.
  */
 export class LocalSymbolTable {
-    private offset: number;
+    private readonly _import: Import;
+    private readonly offset: number;
     private index: SymbolIndex = {};
 
-    constructor(private _import: Import = getSystemSymbolTableImport(), symbols: string[] = []) {
-        this.offset = _import.offset + _import.length;
+    constructor(theImport: Import | null, symbols: (string | null)[] = []) {
+        if (theImport === null) {
+            this._import = getSystemSymbolTableImport();
+        } else {
+            this._import = theImport;
+        }
+        this.offset = this._import.offset + this._import.length;
 
         for (let symbol_ of symbols) {
             this.addSymbol(symbol_);
         }
     }
 
-    private _symbols: string[] = [];
+    private _symbols: (string | null)[] = [];
 
-    get symbols(): string[] {
+    get symbols(): (string | null)[] {
         return this._symbols;
     }
 
@@ -51,18 +57,22 @@ export class LocalSymbolTable {
         return this._import.getSymbolId(symbol_) || this.index[symbol_];
     }
 
-    addSymbol(symbol_: string): number {
-        let existingSymbolId = this.getSymbolId(symbol_);
-        if (existingSymbolId !== undefined) return existingSymbolId;
+    addSymbol(symbol_: string | null): number {
+        if (symbol_ !== null) {
+            let existingSymbolId = this.getSymbolId(symbol_);
+            if (existingSymbolId !== undefined) return existingSymbolId;
+        }
         let symbolId = this.offset + this.symbols.length;
         this.symbols.push(symbol_);
-        this.index[symbol_] = symbolId;
+        if (symbol_ !== null) {
+            this.index[symbol_] = symbolId;
+        }
         return symbolId;
     }
 
-    getSymbolText(symbolId: number): string {
+    getSymbolText(symbolId: number): string | null {
         if (symbolId > this.maxId) throw new Error("SymbolID greater than maxID.");
-        let importedSymbol: string = this.import.getSymbolText(symbolId);
+        let importedSymbol: string | undefined = this.import.getSymbolText(symbolId);
         if (importedSymbol !== undefined) return importedSymbol;
         let index = symbolId - this.offset;
         return this.symbols[index];

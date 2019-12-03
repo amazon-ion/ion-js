@@ -33,9 +33,9 @@ function load_imports(reader: Reader, catalog: Catalog): Import {
     while (reader.next()) {
         reader.stepIn(); // into the struct of 1 import
 
-        let name: string;
-        let version: number = 1;
-        let maxId: number;
+        let name: string | null = null;
+        let version: number | null = 1;
+        let maxId: number | null = null;
 
         while (reader.next()) {
             switch (reader.fieldName()) {
@@ -50,12 +50,12 @@ function load_imports(reader: Reader, catalog: Catalog): Import {
             }
         }
 
-        if (version < 1) {
+        if (version === null || version < 1) {
             version = 1;
         }
 
         if (name && name !== "$ion") {
-            let symbolTable: SharedSymbolTable = catalog.getVersion(name, version);
+            let symbolTable: SharedSymbolTable | null = catalog.getVersion(name, version!);
             if (!symbolTable) {
                 if (maxId === undefined) {
                     throw new Error(`No exact match found when trying to import symbol table ${name} version ${version}`);
@@ -65,10 +65,10 @@ function load_imports(reader: Reader, catalog: Catalog): Import {
             }
 
             if (!symbolTable) {
-                symbolTable = new SubstituteSymbolTable(maxId);
+                symbolTable = new SubstituteSymbolTable(maxId!);
             }
 
-            import_ = new Import(import_, symbolTable, maxId);
+            import_ = new Import(import_, symbolTable!, maxId);
         }
 
         reader.stepOut(); // out of one import struct
@@ -78,8 +78,8 @@ function load_imports(reader: Reader, catalog: Catalog): Import {
     return import_;
 }
 
-function load_symbols(reader: Reader): string[] {
-    let symbols: string[] = [];
+function load_symbols(reader: Reader): (string | null)[] {
+    let symbols: (string | null)[] = [];
 
     reader.stepIn();
     while (reader.next()) {
@@ -97,9 +97,8 @@ function load_symbols(reader: Reader): string[] {
  * @param reader The Ion {Reader} over the local symbol table in its serialized form.
  */
 export function makeSymbolTable(catalog: Catalog, reader: Reader): LocalSymbolTable {
-    let import_: Import;
-    let symbols: string[];
-    let maxId: number;
+    let import_: Import | null = null;
+    let symbols: (string | null)[] = [];
     let foundSymbols: boolean = false;
     let foundImports: boolean = false;
 

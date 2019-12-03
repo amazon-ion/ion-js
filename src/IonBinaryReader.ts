@@ -34,9 +34,6 @@ import JSBI from "jsbi";
 import IntSize from "./IntSize";
 import {JsbiSupport} from "./JsbiSupport";
 
-const RAW_STRING = new IonType(-1, "raw_input", true, false, false, false);
-
-const ERROR            = -3;
 const BOC              = -2;//beginning of container?
 const EOF              = -1;
 const TB_NULL          =  0;
@@ -53,13 +50,8 @@ const TB_BLOB          = 10;
 const TB_LIST          = 11;
 const TB_SEXP          = 12;
 const TB_STRUCT        = 13;
-const TB_ANNOTATION    = 14;
-const TB_UNUSED__      = 15;
-const TB_SEXP_CLOSE    = 21;
-const TB_LIST_CLOSE    = 22;
-const TB_STRUCT_CLOSE  = 23;
 
-function get_ion_type(t: number): IonType {
+function get_ion_type(t: number): IonType | null {
     switch (t) {
         case TB_NULL:      return IonTypes.NULL;
         case TB_BOOL:      return IonTypes.BOOL;
@@ -81,10 +73,10 @@ function get_ion_type(t: number): IonType {
 
 export class BinaryReader implements Reader {
     private _parser: ParserBinaryRaw;
-    private _cat: Catalog;
+    private readonly _cat: Catalog;
     private _symtab: LocalSymbolTable;
     private _raw_type: number;
-    private _annotations: string[] = null;
+    private _annotations: string[] | null = null;
 
     constructor(source: BinarySpan, catalog?: Catalog) {
         this._parser = new ParserBinaryRaw(source);
@@ -93,13 +85,13 @@ export class BinaryReader implements Reader {
         this._raw_type = BOC;
     }
 
-    next(): IonType {
+    next(): IonType | null {
         this._annotations = null;
 
         if (this._raw_type === EOF) return null;
         for (this._raw_type = this._parser.next(); this.depth() === 0; this._raw_type = this._parser.next()) {
             if (this._raw_type === TB_SYMBOL) {
-                let raw: number = this._parser._getSid();
+                let raw: number | null = this._parser._getSid();
                 if (raw !== IVM.sid) break;
                 this._symtab = defaultLocalSymbolTable();
             } else if (this._raw_type === TB_STRUCT) {
@@ -114,7 +106,7 @@ export class BinaryReader implements Reader {
     }
 
     stepIn(): void {
-        if (!get_ion_type(this._raw_type).isContainer) throw new Error("Can't step in to a scalar value");
+        if (!get_ion_type(this._raw_type)!.isContainer) throw new Error("Can't step in to a scalar value");
         this._parser.stepIn();
         this._raw_type = BOC;
     }
@@ -124,7 +116,7 @@ export class BinaryReader implements Reader {
         this._raw_type = BOC;
     }
 
-    type(): IonType {
+    type(): IonType | null {
         return get_ion_type(this._raw_type);
     }
 
@@ -132,7 +124,7 @@ export class BinaryReader implements Reader {
         return this._parser.depth();
     }
 
-    fieldName(): string {
+    fieldName(): string | null {
         return this.getSymbolString(this._parser.getFieldId())
     }
 
@@ -142,46 +134,46 @@ export class BinaryReader implements Reader {
 
     annotations(): string[] {
         this._loadAnnotations();
-        return this._annotations;
+        return this._annotations !== null ? this._annotations : [];
     }
 
     getAnnotation(index: number): string {
         this._loadAnnotations();
-        return this._annotations[index];
+        return this._annotations![index];
     }
 
     isNull(): boolean {
         return this._raw_type === TB_NULL || this._parser.isNull();
     }
 
-    byteValue(): Uint8Array {
+    byteValue(): Uint8Array | null {
         return this._parser.byteValue();
     }
 
-    booleanValue(): boolean {
+    booleanValue(): boolean  | null{
         return this._parser.booleanValue();
     }
 
-    decimalValue(): Decimal {
+    decimalValue(): Decimal  | null{
         return this._parser.decimalValue();
     }
 
-    bigIntValue(): JSBI {
+    bigIntValue(): JSBI  | null{
         return this._parser.bigIntValue();
     }
 
     intSize(): IntSize {
-        if (JsbiSupport.isSafeInteger(this.bigIntValue())) {
+        if (JsbiSupport.isSafeInteger(this.bigIntValue()!)) {
             return IntSize.Number;
         }
         return IntSize.BigInt;
     }
 
-    numberValue(): number {
+    numberValue(): number | null {
         return this._parser.numberValue();
     }
 
-    stringValue(): string {
+    stringValue(): string | null {
         let t: BinaryReader = this;
         let p = t._parser;
         switch (get_ion_type(t._raw_type)) {
@@ -196,12 +188,15 @@ export class BinaryReader implements Reader {
                 if (this.isNull()) {
                     return null;
                 }
-                return this.getSymbolString(p._getSid());
+                let sid = p._getSid();
+                if (sid !== null) {
+                    return this.getSymbolString(sid);
+                }
         }
         throw new Error('Current value is not a string or symbol.')
     }
 
-    timestampValue(): Timestamp {
+    timestampValue(): Timestamp | null {
         return this._parser.timestampValue();
     }
 
@@ -241,13 +236,13 @@ export class BinaryReader implements Reader {
         if (this._annotations === null) {
             this._annotations = [];
             this._parser.getAnnotations().forEach(id => {
-                this._annotations.push(this.getSymbolString(id));
+                this._annotations!.push(this.getSymbolString(id)!);
             });
         }
     }
 
-    private getSymbolString(symbolId: number): string {
-        let s: string = null;
+    private getSymbolString(symbolId: number): string | null {
+        let s: string | null = null;
         if (symbolId > 0) {
             s = this._symtab.getSymbolText(symbolId);
             if (typeof (s) == 'undefined') {

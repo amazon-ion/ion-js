@@ -24,7 +24,7 @@ class NoopWriter implements Writer {
     addAnnotation(annotation: string): void { }
     close(): void { }
     depth(): number { return 0; }
-    getBytes(): Uint8Array { return undefined; }
+    getBytes(): Uint8Array { return new Uint8Array(); }
     setAnnotations(annotations: string[]): void { }
     stepIn(type: IonType): void { }
     stepOut(): void { }
@@ -63,19 +63,6 @@ describe('IonWriterUndefinedParameters', () => {
                 it(method + '(undefined) throws', function() {
                     assert.throws(() => writer[method](undefined));
                 });
-            });
-
-            it('writeFieldName(undefined) within a struct throws', function() {
-                writer.stepIn(IonTypes.STRUCT);
-                assert.throws(() => writer.writeFieldName(undefined));
-                writer.stepOut();
-            });
-
-            it("writeNull(undefined) doesn't throw", function() {
-                writer.writeNull(undefined);
-            });
-            it("writeNull(null) doesn't throw", function() {
-                writer.writeNull(null);
             });
         });
     });

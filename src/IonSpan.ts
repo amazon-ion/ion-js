@@ -149,7 +149,7 @@ export class StringSpan extends Span {
     }
 
     peek(): number {
-        return this.valueAt(this._pos);
+        return this.valueAt(this._pos)!;
     }
 
     skip(dist: number): void {
@@ -259,7 +259,7 @@ export class BinarySpan extends Span {
     }
 
     valueAt(ii: number): number {
-        if (ii < this._start || ii >= this._limit) return undefined;
+        if (ii < this._start || ii >= this._limit) return EOF;
         return (this._src[ii]);
     }
 
