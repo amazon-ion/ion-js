@@ -15,6 +15,7 @@
 
 import {assert} from 'chai';
 import * as ion from '../src/IonTests';
+import {LocalSymbolTable} from "../src/IonTests";
 
 let defaultCatalog = function () {
     let catalog = new ion.Catalog();
@@ -24,7 +25,7 @@ let defaultCatalog = function () {
 };
 
 
-let assertSystemSymbols = function (symbolTable) {
+let assertSystemSymbols = function (symbolTable: LocalSymbolTable) {
     assert.equal(symbolTable.getSymbolId('$ion'), 1);
     assert.equal(symbolTable.getSymbolId('$ion_1_0'), 2);
     assert.equal(symbolTable.getSymbolId('$ion_symbol_table'), 3);
@@ -45,8 +46,8 @@ describe('Local symbol table', () => {
 
     it('Imports are added in order', () => {
         let catalog = defaultCatalog();
-        let import1 = new ion.Import(ion.getSystemSymbolTableImport(), catalog.getVersion('foo', 1));
-        let import2 = new ion.Import(import1, catalog.getVersion('bar', 1));
+        let import1 = new ion.Import(ion.getSystemSymbolTableImport(), catalog.getVersion('foo', 1)!);
+        let import2 = new ion.Import(import1, catalog.getVersion('bar', 1)!);
         let symbolTable = new ion.LocalSymbolTable(import2);
 
         assert.isDefined(symbolTable.getSymbolText(13));
@@ -60,8 +61,8 @@ describe('Local symbol table', () => {
 
     it('Local symbols are added last', () => {
         let catalog = defaultCatalog();
-        let import1 = new ion.Import(ion.getSystemSymbolTableImport(), catalog.getVersion('foo', 1));
-        let import2 = new ion.Import(import1, catalog.getVersion('bar', 1));
+        let import1 = new ion.Import(ion.getSystemSymbolTableImport(), catalog.getVersion('foo', 1)!);
+        let import2 = new ion.Import(import1, catalog.getVersion('bar', 1)!);
         let symbolTable = new ion.LocalSymbolTable(import2, ['e', 'f']);
 
         assertSystemSymbols(symbolTable);
@@ -76,8 +77,8 @@ describe('Local symbol table', () => {
 
     it('MaxId less than symbol table length restricts imports', () => {
         let catalog = defaultCatalog();
-        let import1 = new ion.Import(ion.getSystemSymbolTableImport(), catalog.getVersion('foo', 1), 1);
-        let import2 = new ion.Import(import1, catalog.getVersion('bar', 1), 1);
+        let import1 = new ion.Import(ion.getSystemSymbolTableImport(), catalog.getVersion('foo', 1)!, 1);
+        let import2 = new ion.Import(import1, catalog.getVersion('bar', 1)!, 1);
         let symbolTable = new ion.LocalSymbolTable(import2, ['e', 'f']);
 
         assert.isDefined(symbolTable.getSymbolText(13));
@@ -94,8 +95,8 @@ describe('Local symbol table', () => {
 
     it('Maxid greater than symbol table length extends imports', () => {
         let catalog = defaultCatalog();
-        let import1 = new ion.Import(ion.getSystemSymbolTableImport(), catalog.getVersion('foo', 1), 3);
-        let import2 = new ion.Import(import1, catalog.getVersion('bar', 1), 3);
+        let import1 = new ion.Import(ion.getSystemSymbolTableImport(), catalog.getVersion('foo', 1)!, 3);
+        let import2 = new ion.Import(import1, catalog.getVersion('bar', 1)!, 3);
         let symbolTable = new ion.LocalSymbolTable(import2, ['e', 'f']);
 
         assert.isDefined(symbolTable.getSymbolText(17));

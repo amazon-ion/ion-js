@@ -49,7 +49,7 @@ export class SharedSymbolTable {
         return this._version;
     }
 
-    getSymbolText(symbolId: number): string {
+    getSymbolText(symbolId: number): string | undefined {
         if (symbolId < 0) {
             throw new Error(
                 `Index ${symbolId} is out of bounds for the SharedSymbolTable name=${this.name}, version=${this.version}`
@@ -61,11 +61,7 @@ export class SharedSymbolTable {
         return this._symbols[symbolId];
     }
 
-    getSymbolId(text: string): number {
-        let symbolId = this._idsByText[text];
-        if (symbolId === undefined) {
-            return null;
-        }
-        return symbolId;
+    getSymbolId(text: string): number | undefined {
+        return this._idsByText[text];
     }
 }

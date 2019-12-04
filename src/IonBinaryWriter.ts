@@ -38,6 +38,8 @@ const NULL_VALUE_FLAG: number = 15;
 
 const TYPE_DESCRIPTOR_LENGTH: number = 1;
 
+let EMPTY_UINT8ARRAY = new Uint8Array();
+
 /** Possible writer states */
 enum States {
     /** The writer expects a value (a call to writeInt(), writeString(), etc.) or a transition (stepOut(), close()) */
@@ -95,7 +97,7 @@ export class BinaryWriter extends AbstractWriter {
         return this.writer.getBytes();
     }
 
-    writeBlob(value: Uint8Array): void {
+    writeBlob(value: Uint8Array | null): void {
         _assertDefined(value);
         this.checkWriteValue();
         if (value === null) {
@@ -105,7 +107,7 @@ export class BinaryWriter extends AbstractWriter {
         this.addNode(new BytesNode(this.writer, this.getCurrentContainer(), IonTypes.BLOB, this.encodeAnnotations(this._annotations), value));
     }
 
-    writeBoolean(value: boolean): void {
+    writeBoolean(value: boolean | null): void {
         _assertDefined(value);
         this.checkWriteValue();
         if (value === null) {
@@ -116,7 +118,7 @@ export class BinaryWriter extends AbstractWriter {
         this.addNode(new BooleanNode(this.writer, this.getCurrentContainer(), this.encodeAnnotations(this._annotations), value));
     }
 
-    writeClob(value: Uint8Array): void {
+    writeClob(value: Uint8Array | null): void {
         _assertDefined(value);
         this.checkWriteValue();
         if (value === null) {
@@ -127,15 +129,14 @@ export class BinaryWriter extends AbstractWriter {
         this.addNode(new BytesNode(this.writer, this.getCurrentContainer(), IonTypes.CLOB, this.encodeAnnotations(this._annotations), value));
     }
 
-    writeDecimal(value: Decimal | string): void {
+    writeDecimal(value: Decimal | null): void {
         _assertDefined(value);
         this.checkWriteValue();
+
         if (value === null) {
             this.writeNull(IonTypes.DECIMAL);
             return;
         }
-
-        if (typeof value == 'string') value = Decimal.parse(value);
 
         let exponent: number = value.getExponent();
         let coefficient: JSBI = value.getCoefficient();
@@ -149,7 +150,7 @@ export class BinaryWriter extends AbstractWriter {
 
         let isNegative = value.isNegative();
         let writeCoefficient = isNegative || JSBI.notEqual(coefficient, JsbiSupport.ZERO);
-        let coefficientBytes: Uint8Array | null = writeCoefficient ? JsbiSerde.toSignedIntBytes(coefficient, isNegative) : null;
+        let coefficientBytes: Uint8Array = writeCoefficient ? JsbiSerde.toSignedIntBytes(coefficient, isNegative) : EMPTY_UINT8ARRAY;
 
         let bufLen = LowLevelBinaryWriter.getVariableLengthSignedIntSize(exponent) + (writeCoefficient ? coefficientBytes.length : 0);
         let writer: LowLevelBinaryWriter = new LowLevelBinaryWriter(new Writeable(bufLen));
@@ -160,7 +161,7 @@ export class BinaryWriter extends AbstractWriter {
         this.addNode(new BytesNode(this.writer, this.getCurrentContainer(), IonTypes.DECIMAL, this.encodeAnnotations(this._annotations), writer.getBytes()));
     }
 
-    writeFloat32(value: number): void {
+    writeFloat32(value: number | null): void {
         _assertDefined(value);
         this.checkWriteValue();
         if (value === null) {
@@ -183,7 +184,7 @@ export class BinaryWriter extends AbstractWriter {
         this.addNode(new BytesNode(this.writer, this.getCurrentContainer(), IonTypes.FLOAT, this.encodeAnnotations(this._annotations), bytes));
     }
 
-    writeFloat64(value: number): void {
+    writeFloat64(value: number | null): void {
         _assertDefined(value);
         this.checkWriteValue();
         if (value === null) {
@@ -225,7 +226,7 @@ export class BinaryWriter extends AbstractWriter {
         this.addNode(new NullNode(this.writer, this.getCurrentContainer(), type, this.encodeAnnotations(this._annotations)));
     }
 
-    writeString(value: string): void {
+    writeString(value: string | null): void {
         _assertDefined(value);
         this.checkWriteValue();
         if (value === null) {
@@ -236,7 +237,7 @@ export class BinaryWriter extends AbstractWriter {
         this.addNode(new BytesNode(this.writer, this.getCurrentContainer(), IonTypes.STRING, this.encodeAnnotations(this._annotations), encodeUtf8(value)));
     }
 
-    writeSymbol(value: string): void {
+    writeSymbol(value: string | null): void {
         _assertDefined(value);
         this.checkWriteValue();
         if (value === null) {
@@ -249,7 +250,7 @@ export class BinaryWriter extends AbstractWriter {
         }
     }
 
-    writeTimestamp(value: Timestamp): void {
+    writeTimestamp(value: Timestamp | null): void {
         _assertDefined(value);
         this.checkWriteValue();
         if (value === null) {
@@ -433,7 +434,7 @@ export class BinaryWriter extends AbstractWriter {
         this.datagram[0].write();
     }
 
-    private writeImport(import_: Import) {
+    private writeImport(import_: Import | null) {
         if (!import_) {
             return;
         }
@@ -459,7 +460,7 @@ export interface Node {
 export abstract class AbstractNode implements Node {
     protected constructor(
         private readonly _writer: LowLevelBinaryWriter,
-        private readonly parent: Node,
+        private readonly parent: Node | null,
         private readonly _type: IonType,
         private readonly annotations: Uint8Array
     ) {
@@ -688,6 +689,8 @@ class IntNode extends LeafNode {
             if (value instanceof JSBI) {
                 if (JsbiSupport.isNegative(value)) {
                     magnitude = JSBI.unaryMinus(value);
+                } else {
+                    magnitude = value;
                 }
             } else {
                 magnitude = Math.abs(value);
@@ -731,7 +734,7 @@ class BytesNode extends LeafNode {
 }
 
 export class NullNode extends LeafNode {
-    constructor(writer: LowLevelBinaryWriter, parent: Node, type: IonType, annotations: Uint8Array) {
+    constructor(writer: LowLevelBinaryWriter, parent: Node | null, type: IonType, annotations: Uint8Array) {
         super(writer, parent, type, annotations);
     }
 

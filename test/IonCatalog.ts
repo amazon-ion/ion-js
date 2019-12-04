@@ -54,7 +54,8 @@ describe('Catalog', () => {
         catalog.add(version3);
         catalog.add(version4);
         let match = catalog.getTable('foo');
-        assert.strictEqual(4, match.version);
+        assert.isNotNull(match);
+        assert.strictEqual(4, match!.version);
     });
 
     it('Find latest version returns null if no version exists', () => {

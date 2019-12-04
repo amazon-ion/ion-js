@@ -18,8 +18,9 @@ import * as ion from '../src/Ion';
 import * as fs from 'fs';
 import * as path from 'path';
 import {IonEventStream} from '../src/IonEventStream';
+import {IonType, Reader, Timestamp, Writer} from '../src/Ion';
 
-function findFiles(folder, files = []) {
+function findFiles(folder: string, files: string[] = []) {
     fs.readdirSync(folder).forEach(file => {
         let filePath = path.join(folder, file);
         let stats = fs.lstatSync(filePath);
@@ -32,7 +33,7 @@ function findFiles(folder, files = []) {
     return files;
 }
 
-function exhaust(reader) {
+function exhaust(reader: Reader) {
     for (let type; type = reader.next();) {
         if (type.isContainer && !reader.isNull()) {
             reader.stepIn();
@@ -44,9 +45,9 @@ function exhaust(reader) {
     }
 }
 
-function loadValues(path, newWriter) {
+function loadValues(path: string, newWriter: () => Writer) {
     let reader = ion.makeReader(getInput(path));
-    let values = [];
+    let values: Uint8Array[][] = [];
     let containerIdx = 0;
 
     for (let topLevelType; topLevelType = reader.next();) {
@@ -70,7 +71,7 @@ function loadValues(path, newWriter) {
     return values;
 }
 
-function bytesToString(c, idx, bytes) {
+function bytesToString(c: number, idx: number, bytes: Uint8Array) {
     let sb = '[' + c + '][' + idx + ']';
     if (bytes.length >= 4 && bytes[0] === 224 && bytes[1] === 1 && bytes[2] === 0 && bytes[3] === 234) {
         // Ion binary, convert to hex string
@@ -83,7 +84,7 @@ function bytesToString(c, idx, bytes) {
     return sb + ' ' + String.fromCharCode.apply(null, bytes);
 }
 
-function equivsTestCompare(c, i, j, bytesI, bytesJ, expectedEquivalence) {
+function equivsTestCompare(c: number, i: number, j: number, bytesI: Uint8Array, bytesJ: Uint8Array, expectedEquivalence: boolean) {
     let eventStreamI = new IonEventStream(ion.makeReader(bytesI));
     let eventStreamJ = new IonEventStream(ion.makeReader(bytesJ));
     let result = eventStreamI.equals(eventStreamJ);
@@ -93,7 +94,7 @@ function equivsTestCompare(c, i, j, bytesI, bytesJ, expectedEquivalence) {
         + ' be equivalent to ' + bytesToString(c, j, bytesJ));
 }
 
-function equivsTest(path, expectedEquivalence = true, compare = equivsTestCompare) {
+function equivsTest(path: string, expectedEquivalence = true, compare = equivsTestCompare) {
     let binaryValues = loadValues(path, () => ion.makeBinaryWriter());
     let textValues = loadValues(path, () => ion.makeTextWriter());
 
@@ -108,13 +109,13 @@ function equivsTest(path, expectedEquivalence = true, compare = equivsTestCompar
     }
 }
 
-function nonEquivsTest(path) {
+function nonEquivsTest(path: string) {
     equivsTest(path, false);
 }
 
-function equivTimelinesTest(path) {
-    function timelinesCompare(c, i, j, bytesI, bytesJ) {
-        function readTimestamp(bytes) {
+function equivTimelinesTest(path: string) {
+    function timelinesCompare(c: number, i: number, j: number, bytesI: Uint8Array, bytesJ: Uint8Array) {
+        function readTimestamp(bytes: Uint8Array): Timestamp | null {
             let reader = ion.makeReader(bytes);
             reader.next();
             return reader.timestampValue();
@@ -123,14 +124,14 @@ function equivTimelinesTest(path) {
         let tsI = readTimestamp(bytesI);
         let tsJ = readTimestamp(bytesJ);
         // assert that the timestamps represent the same instant (but not necessarily data-model equivalent):
-        assert(tsI.compareTo(tsJ) === 0, 'Expected ' + tsI + ' to be instant-equivalent to ' + tsJ);
+        assert(tsI!.compareTo(tsJ!) === 0, 'Expected ' + tsI + ' to be instant-equivalent to ' + tsJ);
     }
 
     equivsTest(path, true, timelinesCompare);
 }
 
-function readerCompareTest(source) {
-    function toBytes(source, writer) {
+function readerCompareTest(source: string | Buffer) {
+    function toBytes(source: string | Buffer, writer: Writer) {
         let reader = ion.makeReader(source);
         writer.writeValues(reader);
         writer.close();
@@ -143,7 +144,7 @@ function readerCompareTest(source) {
     readerCompare(ion.makeReader(ionBinary), ion.makeReader(ionText));
 }
 
-function readerCompare(r1, r2) {
+function readerCompare(r1: Reader, r2: Reader) {
     checkReaderValueMethods(r1, r2, null);
 
     while (true) {
@@ -174,7 +175,7 @@ function readerCompare(r1, r2) {
     }
 }
 
-function checkReaderValueMethods(r1, r2, type) {
+function checkReaderValueMethods(r1: Reader, r2: Reader, type: IonType | null) {
     // This RegEx will immediately match any string that's passed to it.
     // It's used to allow assert.throws() to accept any Error that's thrown.
     const ANY_ERROR_MESSAGE = new RegExp('^');
@@ -217,13 +218,13 @@ function checkReaderValueMethods(r1, r2, type) {
     assert.equal(r1.type(), r2.type(), "types don't match");
 }
 
-function getInput(path) {
+function getInput(path: string) {
     let options = path.endsWith(".10n") ? null : "utf8";
     return fs.readFileSync(path, options);
 }
 
-function roundTripEventStreams(reader) {
-    let streams = [];
+function roundTripEventStreams(reader: Reader) {
+    let streams: IonEventStream[] = [];
     streams.push(new IonEventStream(reader));
 
     let eventWriter = ion.makeTextWriter();
@@ -430,7 +431,7 @@ let equivTestFiles = findFiles(equivTestsPath);
 let nonEquivTestFiles = findFiles(nonEquivTestsPath);
 let equivTimelineTestFiles = findFiles(equivTimelineTestsPath);
 
-function skipOrTest(paths: Array<string>, skipLists: Array<Map<string, number>>, test: (string) => void): void {
+function skipOrTest(paths: Array<string>, skipLists: Array<Map<string, number>>, test: (s: string) => void): void {
     for (let path of paths) {
         let skipped = false;
         for (let skipList of skipLists) {

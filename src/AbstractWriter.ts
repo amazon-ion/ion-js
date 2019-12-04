@@ -23,7 +23,7 @@ export interface AbstractWriter extends Writer {
 }
 
 export abstract class AbstractWriter implements Writer {
-    protected _annotations = [];
+    protected _annotations: string[] = [];
 
     addAnnotation(annotation: string): void {
         if (!this._isString(annotation)) {
@@ -55,7 +55,7 @@ export abstract class AbstractWriter implements Writer {
     }
 
     private _writeValues(reader: Reader, _depth = 0): void {
-        let type: IonType = reader.type();
+        let type: IonType | null = reader.type();
         if (type === null) {
             type = reader.next();
         }
@@ -66,13 +66,14 @@ export abstract class AbstractWriter implements Writer {
     }
 
     private _writeValue(reader: Reader, _depth = 0): void {
-        let type: IonType = reader.type();
+        let type: IonType | null = reader.type();
         if (type === null) {
             return;
         }
         if (_depth > 0) {
-            if (reader.fieldName() != null) {
-                this.writeFieldName(reader.fieldName());
+            let fieldName = reader.fieldName();
+            if (fieldName !== null) {
+                this.writeFieldName(fieldName);
             }
         }
         this.setAnnotations(reader.annotations());
