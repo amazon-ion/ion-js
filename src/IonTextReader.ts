@@ -188,6 +188,9 @@ export class TextReader implements Reader {
             this.next();
         }
         this._raw_type = undefined;
+        if (this._depth <= 0) {
+            throw new Error('Cannot stepOut any further, already at top level');
+        }
         this._depth--;
     }
 
