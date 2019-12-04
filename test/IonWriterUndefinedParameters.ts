@@ -58,7 +58,7 @@ describe('IonWriterUndefinedParameters', () => {
     ];
     writerTypes.forEach(writerType => {
         let writer = writerType.instance;
-        describe(writerType.name + ' writer', () =>{
+        describe(writerType.name + ' writer', () => {
             testMethods.forEach(function(method) {
                 it(method + '(undefined) throws', function() {
                     assert.throws(() => writer[method](undefined));
