@@ -72,7 +72,7 @@ describe('IonReaderConsistency', () => {
                         reader.stepIn();
                         while (type = reader.next()) {
                             if (reader.fieldName() === 'quantity') {
-                                sum += reader.numberValue();
+                                sum += reader.numberValue()!;
                                 break;
                             }
                         }
