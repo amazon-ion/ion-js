@@ -291,9 +291,8 @@ export class ParserBinaryRaw {
     next(): any {
         if (this._curr === undefined && this._len > 0) {
             this._in.skip(this._len);
-        } else {
-            this.clear_value();
         }
+        this.clear_value();
         if (this._in_struct) {
             this._fid = this.readVarUnsignedInt();
         }
