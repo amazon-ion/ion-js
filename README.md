@@ -36,6 +36,11 @@ You can use this library either as a Node.js module or inside an HTML page.
 
 [Try it yourself](https://npm.runkit.com/ion-js).
 
+**Note:** if your package's public interface exposes part of this library, this library should be specified
+as a peer dependency in your package's package.json file.  Otherwise, packages that depend on your package
+*and* this library may experience unexpected behavior, as two installations of this library (even if the same
+version) are not designed or tested to behave correctly.
+
 ### Web Browser
 
 You can include the Ion-js bundle (ES5 compatible) using the URLs
