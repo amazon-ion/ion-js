@@ -322,7 +322,7 @@ export class ParserBinaryRaw {
     stepOut() {
         let parent_type, ts, l, r, t = this;
         if (t._ts.length < 2) {
-            throw new Error("you can't stepOut unless you stepped in");
+            throw new Error('Cannot stepOut any further, already at top level');
         }
         ts = t._ts.pop();
         l = decode_type_stack_len(ts);
