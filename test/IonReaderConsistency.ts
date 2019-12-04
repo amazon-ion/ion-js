@@ -68,7 +68,6 @@ describe('IonReaderConsistency', () => {
             while (type = reader.next()) {
                 if (type === IonTypes.STRUCT) {
                     let annotations = reader.annotations();
-                    console.log(annotations);
                     if (annotations.length > 0 && annotations[0] === 'foo') {
                         reader.stepIn();
                         while (type = reader.next()) {
