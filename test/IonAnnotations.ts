@@ -37,6 +37,13 @@ describe('Annotations', () => {
         assert.equal(readerToString(reader), 'a::b::123');
     });
 
+    it('Resolves ID annotations', () => {
+        let data = "$3::123";
+        let reader = ion.makeReader(data);
+        reader.next();
+        assert.deepEqual(reader.annotations(), ['$ion_symbol_table']);
+    });
+
     it('Create annotations', () => {
         let data = "123";
         let reader = ion.makeReader(data);

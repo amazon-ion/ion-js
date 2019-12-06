@@ -310,6 +310,7 @@ let goodSkipList = toSkipList([
     'ion-tests/iontestdata/good/symbolZero.ion',
     'ion-tests/iontestdata/good/utf16.ion',
     'ion-tests/iontestdata/good/utf32.ion',
+    'ion-tests/iontestdata/good/item1.10n',
 ]);
 
 let badSkipList = toSkipList([
@@ -366,6 +367,7 @@ let eventSkipList = toSkipList([
     'ion-tests/iontestdata/good/testfile22.ion',
     'ion-tests/iontestdata/good/utf16.ion',
     'ion-tests/iontestdata/good/utf32.ion',
+    'ion-tests/iontestdata/good/item1.10n',
 ]);
 
 let readerCompareSkipList = toSkipList([]);
