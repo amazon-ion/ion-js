@@ -44,6 +44,13 @@ describe('Annotations', () => {
         assert.deepEqual(reader.annotations(), ['$ion_symbol_table']);
     });
 
+    it('Does not resolve non-ID annotations', () => {
+        let data = "'$3'::123";
+        let reader = ion.makeReader(data);
+        reader.next();
+        assert.deepEqual(reader.annotations(), ["'$3'"]);
+    });
+
     it('Create annotations', () => {
         let data = "123";
         let reader = ion.makeReader(data);
