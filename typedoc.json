@@ -29,8 +29,14 @@
     "src/IonLowLevel*.ts",
 
     "src/IonTest*.ts",
-    "src/IonEvent*.ts"
+    "src/IonEvent*.ts",
+
+    "src/JsbiSerde.ts",
+    "src/JsbiSupport.ts",
+    "src/SignAndMagnitudeInt.ts"
   ],
 
-  "out": "docs/api/"
+  "out": "docs/api/",
+
+  "hideGenerator": true
 }

@@ -1,22 +1,41 @@
-/*
- * Copyright 2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
- *
+/*!
+ * Copyright 2012 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
- * A copy of the License is located at:
- *
- *     http://aws.amazon.com/apache2.0/
- *
- * or in the "license" file accompanying this file. This file is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific
- * language governing permissions and limitations under the License.
+ * A copy of the License is located at
+ *  
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *  
+ * or in the "license" file accompanying this file. This file is distributed
+ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
  */
+
 import {assert} from 'chai';
 import {suite, test} from "mocha-typescript";
 import * as ion from '../src/Ion';
 
 @suite('Text Reader')
 class IonTextReaderTests {
+    private static first_value_equal(input, expected) {
+        let reader = ion.makeReader(input);
+        reader.next();
+        assert.equal(reader.value(), expected);
+    }
+
+    private static ivmTest(reader, value, expected, depth, annotations) {
+        if (expected === "throw") {
+            assert.throws(() => {
+                reader.isIVM(value, depth, annotations)
+            });
+        } else {
+            let actual = reader.isIVM(value, depth, annotations);
+            assert.equal(actual, expected);
+        }
+    }
+
     @test "Read string value"() {
         let ionToRead = "\"string\"";
         let ionReader = ion.makeReader(ionToRead);
@@ -42,6 +61,14 @@ class IonTextReaderTests {
         ionReader.next();
 
         assert.equal(ionReader.value(), true);
+    }
+
+    @test "Read clob value"() {
+        let ionToRead = '{{"\\xc2\\x80"}}';
+        let ionReader = ion.makeReader(ionToRead);
+        ionReader.next();
+
+        assert.deepEqual(ionReader.value(), Uint8Array.from([194, 128]));
     }
 
     @test "Read boolean value in struct"() {
@@ -71,8 +98,8 @@ class IonTextReaderTests {
     }
 
     @test "Parse through struct"() {
-        var ionToRead = "{ key : \"string\" }";
-        var ionReader = ion.makeReader(ionToRead);
+        let ionToRead = "{ key : \"string\" }";
+        let ionReader = ion.makeReader(ionToRead);
         ionReader.next();
 
         assert.equal(ion.IonTypes.STRUCT, ionReader.type());
@@ -87,8 +114,8 @@ class IonTextReaderTests {
     }
 
     @test "Parse through struct can skip over container"() {
-        var ionToRead = "{ a: { key1 : \"string1\" }, b: { key2 : \"string2\" } }";
-        var ionReader = ion.makeReader(ionToRead);
+        let ionToRead = "{ a: { key1 : \"string1\" }, b: { key2 : \"string2\" } }";
+        let ionReader = ion.makeReader(ionToRead);
         ionReader.next();
 
         assert.equal(ion.IonTypes.STRUCT, ionReader.type());
@@ -112,8 +139,8 @@ class IonTextReaderTests {
     }
 
     @test "Parse through struct can skip over nested containers"() {
-        var ionToRead = "{ outerkey1 : { innerkey1 : {a1: \"a1\", b1: \"b1\"} }, outerkey2 : { innerkey2 : {a2: \"a2\", b2: \"b2\"} } }";
-        var ionReader = ion.makeReader(ionToRead);
+        let ionToRead = "{ outerkey1 : { innerkey1 : {a1: \"a1\", b1: \"b1\"} }, outerkey2 : { innerkey2 : {a2: \"a2\", b2: \"b2\"} } }";
+        let ionReader = ion.makeReader(ionToRead);
         ionReader.next();
 
         assert.equal(ion.IonTypes.STRUCT, ionReader.type());
@@ -136,8 +163,8 @@ class IonTextReaderTests {
     }
 
     @test "Reads an array"() {
-        var ionToRead = "{ key : ['v1', 'v2'] }";
-        var ionReader = ion.makeReader(ionToRead);
+        let ionToRead = "{ key : ['v1', 'v2'] }";
+        let ionReader = ion.makeReader(ionToRead);
         ionReader.next();
 
         assert.equal(ion.IonTypes.STRUCT, ionReader.type());
@@ -159,8 +186,8 @@ class IonTextReaderTests {
     }
 
     @test "Reads a nested array"() {
-        var ionToRead = "{ key : [['v1', 'v2']] }";
-        var ionReader = ion.makeReader(ionToRead);
+        let ionToRead = "{ key : [['v1', 'v2']] }";
+        let ionReader = ion.makeReader(ionToRead);
         ionReader.next();
 
         assert.equal(ion.IonTypes.STRUCT, ionReader.type());
@@ -184,11 +211,12 @@ class IonTextReaderTests {
     }
 
     @test "Returns null on EOF"() {
-        var ionToRead = "";
-        var ionReader = ion.makeReader(ionToRead);
+        let ionToRead = "";
+        let ionReader = ion.makeReader(ionToRead);
         assert.isNull(ionReader.next());
         assert.isNull(ionReader.next()); // EOF
     }
+
     @test "Parses escaped terminators correctly."() {
         IonTextReaderTests.first_value_equal("'abc\\''", "abc'");
         IonTextReaderTests.first_value_equal("'''abc\\''''", "abc'");
@@ -199,20 +227,14 @@ class IonTextReaderTests {
         IonTextReaderTests.first_value_equal('"abc\\"" taco', 'abc"');
     };
 
-    private static first_value_equal(input, expected) {
-        let reader = ion.makeReader(input);
-        reader.next();
-        assert.equal(reader.value(), expected);
-    }
-
     @test "text IVM"() {
-        var textReader = ion.makeReader("");
+        let textReader = ion.makeReader("");
         let isNotIVM = ["$ion_schema_1_0", "$ion_1", "$ion_1_a", "$ion_", "ion_1_"];
         let unsupportedIVM = ["$ion_2_0", "$ion_1_999", "$ion_999_0", "$ion_1_1", "$ion_1_00"];
 
-        IonTextReaderTests.ivmTest(textReader,"$ion_1_0", true, 0, []);
-        IonTextReaderTests.ivmTest(textReader,"$ion_1_0", false, 1, []);
-        IonTextReaderTests.ivmTest(textReader,"$ion_1_0", false, 0, ["taco"]);
+        IonTextReaderTests.ivmTest(textReader, "$ion_1_0", true, 0, []);
+        IonTextReaderTests.ivmTest(textReader, "$ion_1_0", false, 1, []);
+        IonTextReaderTests.ivmTest(textReader, "$ion_1_0", false, 0, ["taco"]);
         for (let i = 0; i < isNotIVM.length; i++) {
             IonTextReaderTests.ivmTest(textReader, isNotIVM[i], false, 0, []);
         }
@@ -220,15 +242,6 @@ class IonTextReaderTests {
             IonTextReaderTests.ivmTest(textReader, unsupportedIVM[i], "throw", 0, []);
             IonTextReaderTests.ivmTest(textReader, unsupportedIVM[i], false, 1, []);
             IonTextReaderTests.ivmTest(textReader, unsupportedIVM[i], false, 0, ["taco"]);
-        }
-    }
-
-    private static ivmTest(reader, value, expected, depth, annotations) {
-        if (expected === "throw") {
-            assert.throws(() => { reader.isIVM(value, depth, annotations)});
-        } else {
-            let actual = reader.isIVM(value, depth, annotations);
-            assert.equal(actual, expected);
         }
     }
 }

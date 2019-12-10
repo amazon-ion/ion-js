@@ -1,15 +1,16 @@
-/*
- * Copyright 2012-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
- *
+/*!
+ * Copyright 2012 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
- * A copy of the License is located at:
- *
- *     http://aws.amazon.com/apache2.0/
- *
- * or in the "license" file accompanying this file. This file is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific
- * language governing permissions and limitations under the License.
+ * A copy of the License is located at
+ *  
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *  
+ * or in the "license" file accompanying this file. This file is distributed
+ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
  */
 
 import {State, TextWriter} from "./IonTextWriter";
@@ -25,30 +26,13 @@ type Serializer<T> = (value: T) => void;
  * Do not rely on this functionality for more than front end formatting.
  */
 export class PrettyTextWriter extends TextWriter {
-    private indentCount : number = 0;
-    constructor(writeable: Writeable, private readonly indentSize : number = 2) { super(writeable);}
+    private indentCount: number = 0;
 
-    private writePrettyValue() : void {
-        if(this.depth() > 0 && this.currentContainer.containerType && this.currentContainer.containerType !== IonTypes.STRUCT){
-            this.writePrettyIndent(0);
-        }
-    }
-    private writePrettyNewLine(incrementValue: number) : void {
-        this.indentCount = this.indentCount + incrementValue;
-        if(this.indentSize && this.indentSize > 0){
-            this.writeable.writeByte(CharCodes.LINE_FEED);
-        }
-    }
-    private writePrettyIndent(incrementValue: number) : void {
-        this.indentCount = this.indentCount + incrementValue;
-        if(this.indentSize && this.indentSize > 0){
-            for(var i = 0; i < (this.indentCount*this.indentSize); i++ ){
-                this.writeable.writeByte(CharCodes.SPACE);
-            }
-        }
+    constructor(writeable: Writeable, private readonly indentSize: number = 2) {
+        super(writeable);
     }
 
-    writeFieldName(fieldName: string) : void {
+    writeFieldName(fieldName: string): void {
         if (this.currentContainer.containerType !== IonTypes.STRUCT) {
             throw new Error("Cannot write field name outside of a struct");
         }
@@ -68,18 +52,18 @@ export class PrettyTextWriter extends TextWriter {
         this.currentContainer.state = State.VALUE;
     }
 
-    writeNull(type: IonType) : void {
-        if (type === null || type === undefined || type.binaryTypeId < 0 || type.binaryTypeId > 13) {
-            throw new Error(`Cannot write null for type ${type}`);
+    writeNull(type: IonType): void {
+        if (type === undefined || type === null) {
+            type = IonTypes.NULL;
         }
         this.handleSeparator();
         this.writePrettyValue();
         this.writeAnnotations();
-        this.writeUtf8("null." + type.name);
+        this._writeNull(type);
         if (this.currentContainer.containerType === IonTypes.STRUCT) this.currentContainer.state = State.STRUCT_FIELD;
     }
 
-    stepOut() : void {
+    stepOut(): void {
         let currentContainer = this.containerContext.pop();
         if (!currentContainer || !currentContainer.containerType) {
             throw new Error("Can't step out when not in a container");
@@ -108,7 +92,7 @@ export class PrettyTextWriter extends TextWriter {
 
     _serializeValue<T>(type: IonType, value: T, serialize: Serializer<T>) {
         if (this.currentContainer.state === State.STRUCT_FIELD) throw new Error("Expecting a struct field");
-        if (value === null || value === undefined) {
+        if (value === null) {
             this.writeNull(type);
             return;
         }
@@ -120,8 +104,8 @@ export class PrettyTextWriter extends TextWriter {
         if (this.currentContainer.containerType === IonTypes.STRUCT) this.currentContainer.state = State.STRUCT_FIELD;
     }
 
-    writeContainer(type: IonType, openingCharacter: number) : void {
-        if(this.currentContainer.containerType === IonTypes.STRUCT && this.currentContainer.state === State.VALUE){
+    writeContainer(type: IonType, openingCharacter: number): void {
+        if (this.currentContainer.containerType === IonTypes.STRUCT && this.currentContainer.state === State.VALUE) {
             this.currentContainer.state = State.STRUCT_FIELD;
         }
         this.handleSeparator();
@@ -132,7 +116,7 @@ export class PrettyTextWriter extends TextWriter {
         this._stepIn(type);
     }
 
-    handleSeparator() : void {
+    handleSeparator(): void {
         if (this.depth() === 0) {
             if (this.currentContainer.clean) {
                 this.currentContainer.clean = false;
@@ -155,6 +139,28 @@ export class PrettyTextWriter extends TextWriter {
                     default:
                     //no op
                 }
+            }
+        }
+    }
+
+    private writePrettyValue(): void {
+        if (this.depth() > 0 && this.currentContainer.containerType && this.currentContainer.containerType !== IonTypes.STRUCT) {
+            this.writePrettyIndent(0);
+        }
+    }
+
+    private writePrettyNewLine(incrementValue: number): void {
+        this.indentCount = this.indentCount + incrementValue;
+        if (this.indentSize && this.indentSize > 0) {
+            this.writeable.writeByte(CharCodes.LINE_FEED);
+        }
+    }
+
+    private writePrettyIndent(incrementValue: number): void {
+        this.indentCount = this.indentCount + incrementValue;
+        if (this.indentSize && this.indentSize > 0) {
+            for (let i = 0; i < (this.indentCount * this.indentSize); i++) {
+                this.writeable.writeByte(CharCodes.SPACE);
             }
         }
     }

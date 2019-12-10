@@ -1,24 +1,38 @@
-/*
+/*!
  * Copyright 2012 Amazon.com, Inc. or its affiliates. All Rights Reserved.
- *
+ *  
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
- * A copy of the License is located at:
- *
- *     http://aws.amazon.com/apache2.0/
- *
- * or in the "license" file accompanying this file. This file is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific
- * language governing permissions and limitations under the License.
+ * A copy of the License is located at
+ *  
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *  
+ * or in the "license" file accompanying this file. This file is distributed
+ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
  */
 
 import {assert} from 'chai';
 import * as ion from '../src/IonTests';
 import JSBI from 'jsbi';
+import {Decimal, Writer} from "../src/IonTests";
 
 const ivm = [0xe0, 0x01, 0x00, 0xea];
 
-let writerTest = function(name, instructions, expected) {
+interface Test {
+    name: string;
+    instructions: (writer: Writer) => void;
+    expected: number[];
+    skip?: boolean;
+}
+interface BadTest {
+    name: string;
+    instructions: (writer: Writer) => void;
+    skip?: boolean;
+}
+
+let writerTest = function (name: string, instructions: (writer: Writer) => void, expected: number[]) {
     it(name, () => {
         let symbolTable = new ion.LocalSymbolTable(ion.getSystemSymbolTableImport());
         let writeable = new ion.Writeable();
@@ -28,9 +42,9 @@ let writerTest = function(name, instructions, expected) {
         let actual = writeable.getBytes();
         assert.deepEqual(actual, new Uint8Array(ivm.concat(expected)));
     });
-}
+};
 
-let badWriterTest = function(name, instructions) {
+let badWriterTest = function (name: string, instructions: (writer: Writer) => void) {
     let test = () => {
         let symbolTable = new ion.LocalSymbolTable(ion.getSystemSymbolTableImport());
         let writeable = new ion.Writeable();
@@ -39,9 +53,9 @@ let badWriterTest = function(name, instructions) {
         writer.close();
     };
     it(name, () => assert.throws(test, Error));
-}
+};
 
-let blobWriterTests = [
+let blobWriterTests: Test[] = [
     {
         name: "Writes blob",
         instructions: (writer) => writer.writeBlob(new Uint8Array([1, 2, 3])),
@@ -93,7 +107,7 @@ let blobWriterTests = [
     },
 ];
 
-let booleanWriterTests = [
+let booleanWriterTests: Test[] = [
     {
         name: "Writes boolean true",
         instructions: (writer) => writer.writeBoolean(true),
@@ -107,11 +121,6 @@ let booleanWriterTests = [
     {
         name: "Writes null boolean by detecting null",
         instructions: (writer) => writer.writeBoolean(null),
-        expected: [0x1f]
-    },
-    {
-        name: "Writes null boolean by detecting undefined",
-        instructions: (writer) => writer.writeBoolean(undefined),
         expected: [0x1f]
     },
     {
@@ -153,7 +162,7 @@ let booleanWriterTests = [
     },
 ];
 
-let clobWriterTests = [
+let clobWriterTests: Test[] = [
     {
         name: "Writes clob",
         instructions: (writer) => writer.writeClob(new Uint8Array([1, 2, 3])),
@@ -162,11 +171,6 @@ let clobWriterTests = [
     {
         name: "Writes null clob by detecting null",
         instructions: (writer) => writer.writeClob(null),
-        expected: [0x9f]
-    },
-    {
-        name: "Writes null clob by detecting undefined",
-        instructions: (writer) => writer.writeClob(undefined),
         expected: [0x9f]
     },
     {
@@ -210,15 +214,10 @@ let clobWriterTests = [
     },
 ];
 
-let decimalWriterTests = [
+let decimalWriterTests: Test[] = [
     {
         name: "Writes null decimal by detecting null",
         instructions: (writer) => writer.writeDecimal(null),
-        expected: [0x5f]
-    },
-    {
-        name: "Writes null decimal by detecting undefined",
-        instructions: (writer) => writer.writeDecimal(undefined),
         expected: [0x5f]
     },
     {
@@ -237,8 +236,18 @@ let decimalWriterTests = [
         expected: [0x50]
     },
     {
+        name: "Writes 0d-0 as equiv 0d0 decimal",
+        instructions: (writer) => writer.writeDecimal(ion.Decimal.parse("0d-0")),
+        expected: [0x50]
+    },
+    {
         name: "Writes negative zero decimal",
         instructions: (writer) => writer.writeDecimal(ion.Decimal.parse("-0")),
+        expected: [0x52, 0x80, 0x80]
+    },
+    {
+        name: "Writes -0d-0 as equiv -0d0 decimal",
+        instructions: (writer) => writer.writeDecimal(ion.Decimal.parse("-0d-0")),
         expected: [0x52, 0x80, 0x80]
     },
     {
@@ -269,7 +278,7 @@ let decimalWriterTests = [
     },
 ];
 
-let floatWriterTests = [
+let floatWriterTests: Test[] = [
     {
         name: "Writes null float by direct call",
         instructions: (writer) => writer.writeNull(ion.IonTypes.FLOAT),
@@ -278,11 +287,6 @@ let floatWriterTests = [
     {
         name: "Writes null 32-bit float by detecting null",
         instructions: (writer) => writer.writeFloat32(null),
-        expected: [0x4f]
-    },
-    {
-        name: "Writes null 32-bit float by detecting undefined",
-        instructions: (writer) => writer.writeFloat32(undefined),
         expected: [0x4f]
     },
     {
@@ -322,11 +326,6 @@ let floatWriterTests = [
         expected: [0x4f]
     },
     {
-        name: "Writes null 64-bit float by detecting undefined",
-        instructions: (writer) => writer.writeFloat64(undefined),
-        expected: [0x4f]
-    },
-    {
         name: "Writes null 64-bit float with annotations",
         instructions: (writer) => {
             writer.setAnnotations(['a']);
@@ -359,15 +358,10 @@ let floatWriterTests = [
     },
 ];
 
-let intWriterTests = [
+let intWriterTests: Test[] = [
     {
         name: "Writes null int by detecting null",
         instructions: (writer) => writer.writeInt(null),
-        expected: [0x2f]
-    },
-    {
-        name: "Writes null int by detecting undefined",
-        instructions: (writer) => writer.writeInt(undefined),
         expected: [0x2f]
     },
     {
@@ -413,7 +407,7 @@ let intWriterTests = [
     },
 ];
 
-let listWriterTests = [
+let listWriterTests: Test[] = [
     {
         name: "Writes null list by direct call",
         instructions: (writer) => writer.writeNull(ion.IonTypes.LIST),
@@ -547,20 +541,15 @@ let listWriterTests = [
     },
 ];
 
-let nullWriterTests = [
+let nullWriterTests: Test[] = [
     {
         name: "Writes explicit null",
         instructions: (writer) => writer.writeNull(ion.IonTypes.NULL),
         expected: [0x0f]
     },
-    {
-        name: "Writes implicit null",
-        instructions: (writer) => writer.writeNull(),
-        expected: [0x0f]
-    },
 ];
 
-let sexpWriterTests = [
+let sexpWriterTests: Test[] = [
     {
         name: "Writes null sexp by direct call",
         instructions: (writer) => writer.writeNull(ion.IonTypes.SEXP),
@@ -603,18 +592,11 @@ let sexpWriterTests = [
     },
 ];
 
-let stringWriterTests = [
+let stringWriterTests: Test[] = [
     {
         name: "Writes null string by detecting null",
         instructions: (writer) => {
             writer.writeString(null);
-        },
-        expected: [0x8f]
-    },
-    {
-        name: "Writes null string by detecting undefined",
-        instructions: (writer) => {
-            writer.writeString(undefined);
         },
         expected: [0x8f]
     },
@@ -660,7 +642,7 @@ let stringWriterTests = [
     },
 ];
 
-let structWriterTests = [
+let structWriterTests: Test[] = [
     {
         name: "Writes null struct by direct call",
         instructions: (writer) => {
@@ -723,7 +705,7 @@ let structWriterTests = [
             writer.writeFieldName('c');
             writer.writeClob(ion.encodeUtf8('bar'));
             writer.writeFieldName('d');
-            writer.writeDecimal("123.456");
+            writer.writeDecimal(Decimal.parse("123.456"));
             writer.writeFieldName('f');
             writer.writeFloat32(8.125);
             writer.writeFieldName('f');
@@ -857,18 +839,11 @@ let structWriterTests = [
     },
 ];
 
-let symbolWriterTests = [
+let symbolWriterTests: Test[] = [
     {
         name: "Writes null symbol by detecting null",
         instructions: (writer) => {
             writer.writeSymbol(null);
-        },
-        expected: [0x7f]
-    },
-    {
-        name: "Writes null symbol by detecting undefined",
-        instructions: (writer) => {
-            writer.writeSymbol(undefined);
         },
         expected: [0x7f]
     },
@@ -907,18 +882,11 @@ let symbolWriterTests = [
     },
 ];
 
-let timestampWriterTests = [
+let timestampWriterTests: Test[] = [
     {
         name: "Writes null timestamp by detecting null",
         instructions: (writer) => {
             writer.writeTimestamp(null);
-        },
-        expected: [0x6f]
-    },
-    {
-        name: "Writes null timestamp by detecting undefined",
-        instructions: (writer) => {
-            writer.writeTimestamp(undefined);
         },
         expected: [0x6f]
     },
@@ -1048,7 +1016,7 @@ let timestampWriterTests = [
     },
 ];
 
-let badWriterTests = [
+let badWriterTests: BadTest[] = [
     {
         name: "Cannot step into struct with missing field value",
         instructions: (writer) => {
@@ -1099,9 +1067,9 @@ let badWriterTests = [
     },
 ];
 
-function runWriterTests(tests) {
+function runWriterTests(tests: Test[]) {
     tests.forEach(({name, instructions, expected, skip}) => {
-        if(skip) {
+        if (skip) {
             it.skip(name, () => {});
             return;
         }
@@ -1109,9 +1077,9 @@ function runWriterTests(tests) {
     });
 }
 
-function runBadWriterTests(tests) {
+function runBadWriterTests(tests: BadTest[]) {
     tests.forEach(({name, instructions, skip}) => {
-        if(skip) {
+        if (skip) {
             it.skip(name, () => {});
             return;
         }

@@ -1,22 +1,24 @@
-/*
-* Copyright 2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
-*
-* Licensed under the Apache License, Version 2.0 (the "License").
-* You may not use this file except in compliance with the License.
-* A copy of the License is located at:
-*
-*     http://aws.amazon.com/apache2.0/
-*
-* or in the "license" file accompanying this file. This file is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific
-* language governing permissions and limitations under the License.
-*/
+/*!
+ * Copyright 2012 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * A copy of the License is located at
+ *  
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *  
+ * or in the "license" file accompanying this file. This file is distributed
+ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
+
 /**
-* @file Constants and helper methods for Unicode.
-* @see https://amzn.github.io/ion-docs/stringclob.html
-* @see http://www.unicode.org/versions/Unicode5.0.0/
-*/
-export function encodeUtf8(s: string) : Uint8Array {
+ * @file Constants and helper methods for Unicode.
+ * @see https://amzn.github.io/ion-docs/stringclob.html
+ * @see http://www.unicode.org/versions/Unicode5.0.0/
+ */
+export function encodeUtf8(s: string): Uint8Array {
     let i = 0, bytes = new Uint8Array(s.length * 4), c;
     for (let ci = 0; ci < s.length; ci++) {
         c = s.charCodeAt(ci);
@@ -44,7 +46,7 @@ export function encodeUtf8(s: string) : Uint8Array {
     return bytes.subarray(0, i);
 }
 
-export function decodeUtf8(bytes: Uint8Array) : string {
+export function decodeUtf8(bytes: Uint8Array): string {
     let i = 0, s = '', c;
     while (i < bytes.length) {
         c = bytes[i++];
@@ -66,7 +68,7 @@ export function decodeUtf8(bytes: Uint8Array) : string {
         if (c <= 0xffff) s += String.fromCharCode(c);
         else if (c <= 0x10ffff) {
             c -= 0x10000;
-            s += String.fromCharCode(c >> 10 | 0xd800)
+            s += String.fromCharCode(c >> 10 | 0xd800);
             s += String.fromCharCode(c & 0x3FF | 0xdc00)
         } else throw new Error('UTF-8 decode: code point 0x' + c.toString(16) + ' exceeds UTF-16 reach');
     }

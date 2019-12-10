@@ -1,21 +1,22 @@
-/*
+/*!
  * Copyright 2012 Amazon.com, Inc. or its affiliates. All Rights Reserved.
- *
+ *  
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
- * A copy of the License is located at:
- *
- *     http://aws.amazon.com/apache2.0/
- *
- * or in the "license" file accompanying this file. This file is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific
- * language governing permissions and limitations under the License.
+ * A copy of the License is located at
+ *  
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *  
+ * or in the "license" file accompanying this file. This file is distributed
+ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
  */
 
 import {assert} from 'chai';
 import * as ion from '../src/IonTests';
+import {IonTypes} from '../src/IonTests';
 import IntSize from "../src/IntSize";
-import {IonTypes} from "../src/IonTests";
 import JSBI from "jsbi";
 
 function intToBinaryIonBytes(value: number | JSBI): Uint8Array {
@@ -67,16 +68,14 @@ describe('IntSize', () => {
             assert.equal(reader.intSize(), IntSize.Number);
         });
 
-        // FIXME: https://github.com/amzn/ion-js/issues/464
-        it.skip('> MAX_SAFE_INTEGER: IntSize.BigInt', () => {
+        it('> MAX_SAFE_INTEGER: IntSize.BigInt', () => {
             let value = JSBI.add(JSBI.BigInt(Number.MAX_SAFE_INTEGER), JSBI.BigInt(1));
             let reader = ion.makeReader(intToBinaryIonBytes(value));
             assert.equal(IonTypes.INT, reader.next());
             assert.equal(reader.intSize(), IntSize.BigInt);
         });
 
-        // FIXME: https://github.com/amzn/ion-js/issues/464
-        it.skip('< MIN_SAFE_INTEGER: IntSize.BigInt', () => {
+        it('< MIN_SAFE_INTEGER: IntSize.BigInt', () => {
             let value = JSBI.subtract(JSBI.BigInt(Number.MIN_SAFE_INTEGER), JSBI.BigInt(1));
             let reader = ion.makeReader(intToBinaryIonBytes(value));
             assert.equal(IonTypes.INT, reader.next());

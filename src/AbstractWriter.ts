@@ -1,29 +1,32 @@
-/*
- * Copyright 2012-2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
- *
+/*!
+ * Copyright 2012 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
- * A copy of the License is located at:
- *
- *     http://aws.amazon.com/apache2.0/
- *
- * or in the "license" file accompanying this file. This file is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific
- * language governing permissions and limitations under the License.
+ * A copy of the License is located at
+ *  
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *  
+ * or in the "license" file accompanying this file. This file is distributed
+ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
  */
+
 import {Writer} from "./IonWriter";
 import {IonType} from "./IonType";
 import {Reader} from "./IonReader";
 import {IonTypes} from "./IonTypes";
 
 // TS workaround that avoids the need to copy all Writer method signatures into AbstractWriter
-export interface AbstractWriter extends Writer {}
+export interface AbstractWriter extends Writer {
+}
 
 export abstract class AbstractWriter implements Writer {
-    protected _annotations = [];
+    protected _annotations: string[] = [];
 
     addAnnotation(annotation: string): void {
-        if(!this._isString(annotation)) {
+        if (!this._isString(annotation)) {
             throw new Error('Annotation must be of type string.');
         }
         this._annotations.push(annotation);
@@ -39,16 +42,20 @@ export abstract class AbstractWriter implements Writer {
         }
     }
 
-    protected _clearAnnotations(): void {
-        this._annotations = [];
-    }
-
     writeValues(reader: Reader): void {
         this._writeValues(reader);
     }
 
+    writeValue(reader: Reader): void {
+        this._writeValue(reader);
+    }
+
+    protected _clearAnnotations(): void {
+        this._annotations = [];
+    }
+
     private _writeValues(reader: Reader, _depth = 0): void {
-        let type: IonType = reader.type();
+        let type: IonType | null = reader.type();
         if (type === null) {
             type = reader.next();
         }
@@ -58,18 +65,15 @@ export abstract class AbstractWriter implements Writer {
         }
     }
 
-    writeValue(reader: Reader): void {
-        this._writeValue(reader);
-    }
-
     private _writeValue(reader: Reader, _depth = 0): void {
-        let type: IonType = reader.type();
+        let type: IonType | null = reader.type();
         if (type === null) {
             return;
         }
         if (_depth > 0) {
-            if (reader.fieldName() != null) {
-                this.writeFieldName(reader.fieldName());
+            let fieldName = reader.fieldName();
+            if (fieldName !== null) {
+                this.writeFieldName(fieldName);
             }
         }
         this.setAnnotations(reader.annotations());
@@ -100,7 +104,7 @@ export abstract class AbstractWriter implements Writer {
         }
     }
 
-    private _validateAnnotations(input : string[]) : boolean {
+    private _validateAnnotations(input: string[]): boolean {
         if (!Array.isArray(input)) {
             return false;
         }
@@ -112,7 +116,7 @@ export abstract class AbstractWriter implements Writer {
         return true;
     }
 
-    private _isString(input : string) : boolean {
+    private _isString(input: string): boolean {
         return typeof input === 'string';
     }
 }
