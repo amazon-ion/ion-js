@@ -387,8 +387,6 @@ let equivsSkipList = toSkipList([
     'ion-tests/iontestdata/good/equivs/systemSymbols.ion',
     'ion-tests/iontestdata/good/equivs/systemSymbolsAsAnnotations.ion',
     'ion-tests/iontestdata/good/equivs/textNewlines.ion',
-    'ion-tests/iontestdata/good/equivs/utf8/stringU0001D11E.ion',
-    'ion-tests/iontestdata/good/equivs/utf8/stringUtf8.ion',
 ]);
 
 let nonEquivsSkipList = toSkipList([
@@ -413,7 +411,6 @@ let nonEquivsSkipList = toSkipList([
     'good/symbolZero.ion', //no symboltoken support as of yet.
     'good/testfile12.ion',
     'good/non-equivs/nonNulls.ion',
-    'good/equivs/utf8/stringU0001D11E.ion',
     'good/equivs/structComments.ion',
     'good/equivs/sexps.ion',
     'good/equivs/lists.ion',
