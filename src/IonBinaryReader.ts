@@ -254,7 +254,7 @@ export class BinaryReader implements Reader {
             }
             s = this._symtab.getSymbolText(symbolId);
             if (s === undefined) {
-                throw new Error('symbol is unresolveable');
+                throw new Error('symbol is unresolvable');
                 //s = "$" + symbolId.toString();
                 //todo turn this back on once symbol table imports are supported and lst context transfer is supported.
             }
