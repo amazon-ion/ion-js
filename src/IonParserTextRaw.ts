@@ -102,14 +102,12 @@ const ESC_x =   CH_x; //  values['x'] = ESCAPE_HEX;      //    any  \xHH  2-digi
 const ESC_u =    117; //  values['u'] = ESCAPE_LITTLE_U; //    any  \ uHHHH  4-digit hexadecimal unicode character
 const ESC_U =     85; //  values['U'] = ESCAPE_BIG_U;    //    any  \ UHHHHHHHH  8-digit hexadecimal unicode character
 
-const empty_array: any[] = [];
-
 const INF = [CH_i, CH_n, CH_f];
 
 // mask the 6 hi-order bits of a UTF-16 surrogate; the 10 low-order bits are the ones of interest
 const _UTF16_MASK = 0x03ff;
 
-export function get_ion_type(t: number): IonType {
+export function get_ion_type(t: number): IonType | null {
     switch (t) {
         case EOF:             return null;
         case ERROR:           return null;
@@ -224,8 +222,8 @@ export class ParserTextRaw {
     private _ann: any[];
     private _msg: string;
     private _error_msg: string;
-    private _fieldname: string;
-    private _fieldnameType: number;
+    private _fieldname: string | null;
+    private _fieldnameType: number | null;
 
     private readonly _read_value_helper_helpers: ReadValueHelpers;
 
@@ -272,11 +270,11 @@ export class ParserTextRaw {
         this._read_value_helper_helpers = helpers;
     }
 
-    fieldName(): string {
+    fieldName(): string | null {
         return this._fieldname;
     }
 
-    fieldNameType(): number {
+    fieldNameType(): number | null {
         return this._fieldnameType;
     }
 
@@ -293,7 +291,7 @@ export class ParserTextRaw {
         return this._curr_null;
     }
 
-    bigIntValue(): JSBI {
+    bigIntValue(): JSBI | null {
         if (this.isNull()) {
             return null;
         }
@@ -307,7 +305,7 @@ export class ParserTextRaw {
         }
     }
 
-    numberValue(): number {
+    numberValue(): number | null {
         if (this.isNull()) return null;
         let s = this.get_value_as_string(this._curr);
         switch (this._curr) {
@@ -325,16 +323,15 @@ export class ParserTextRaw {
         }
     }
 
-    booleanValue(): boolean {
+    booleanValue(): boolean | null {
         if (this.isNull()) return null;
         let s: string = this.get_value_as_string(T_BOOL);
-        if (s == "true") {
+        if (s === "true") {
             return true;
-        } else if (s == "false") {
+        } else if (s === "false") {
             return false;
-        } else {
-            return undefined;
         }
+        throw new Error("Unrecognized Boolean value '" + s + "'");
     }
 
     get_value_as_string(t: number): string {
@@ -396,7 +393,11 @@ export class ParserTextRaw {
                     } else if (t === T_STRING3 && ch === CH_SQ && !isEscaped && this.verifyTriple(index)) {
                         index = this._skip_triple_quote_gap(index, this._end, /*acceptComments*/ true);
                     } else if (ch >= 0) {
-                        s += String.fromCharCode(ch);
+                        if (isEscaped) {
+                            s += String.fromCodePoint(ch);
+                        } else {
+                            s += String.fromCharCode(ch);
+                        }
                     }
                 }
                 break;
@@ -407,7 +408,7 @@ export class ParserTextRaw {
     }
 
     get_value_as_uint8array(t: number): Uint8Array {
-        let bytes = [];
+        let bytes: number[] = [];
         switch (t) {
             case T_CLOB2:
                 for (let index = this._start; index < this._end; index++) {
@@ -450,7 +451,7 @@ export class ParserTextRaw {
         return Uint8Array.from(bytes);
     }
 
-    next(): number {
+    next(): number | undefined {
         this.clearFieldName();
         this._ann = [];
         if (this._value_type === ERROR) {
@@ -461,7 +462,7 @@ export class ParserTextRaw {
         let t: number;
         if (this._curr === ERROR) {
             this._value.push(ERROR);
-            t = undefined;
+            return undefined;
         } else {
             t = this._curr;
         }
@@ -581,7 +582,7 @@ export class ParserTextRaw {
 
     private _load_field_name() {
         this._fieldnameType = this._value_pop();
-        let s = this.get_value_as_string(this._fieldnameType);
+        let s = this.get_value_as_string(this._fieldnameType!);
 
         switch (this._fieldnameType) {
             case T_IDENTIFIER:
@@ -717,7 +718,6 @@ export class ParserTextRaw {
     }
 
     private _read_value_helper_letter(ch1: number, accept_operator_symbols: boolean, calling_op: ReadValueHelper) {
-        let tempNullStart = this._start;
         this._read_symbol();
         let type = this._value_pop();
         if (type != T_IDENTIFIER) throw new Error("Expecting symbol here.");
@@ -1135,11 +1135,6 @@ export class ParserTextRaw {
         this._value_push(T_BLOB);
     }
 
-    private _read_comma(): void {
-        let ch = this._read_after_whitespace(true);
-        if (ch != CH_CM) this._error("expected ','");
-    }
-
     private _read_close_double_brace(): void {
         let ch = this._read_after_whitespace(false);
         if (ch != CH_CC || this._read() != CH_CC) {
@@ -1203,7 +1198,6 @@ export class ParserTextRaw {
 
     private _skip_triple_quote_gap(entryIndex: number, end: number, acceptComments: boolean): number {
         let tempIndex: number = entryIndex + 3;
-        let ch: number = this._in.valueAt(tempIndex);
         tempIndex = this.indexWhiteSpace(tempIndex, acceptComments);
         if (tempIndex + 2 <= end && this.verifyTriple(tempIndex)) {//index === ' index + 1 === ' index + 2 === ' and not at the end of the value
             return tempIndex + 4;//indexes us past the triple quote we just found
@@ -1216,8 +1210,7 @@ export class ParserTextRaw {
         // actually converts the escape sequence to a byte
         let ch;
         if (ii + 1 >= end) {
-            this._error("invalid escape sequence");
-            return;
+            throw new Error("invalid escape sequence");
         }
         ch = this._in.valueAt(ii + 1);
         this._esc_len = 1;
@@ -1257,8 +1250,7 @@ export class ParserTextRaw {
                 return IonText.ESCAPED_NEWLINE;
             case ESC_x: // = CH_x, //  values['x'] = ESCAPE_HEX; //    any  \xHH  2-digit hexadecimal unicode character equivalent to \ u00HH
                 if (ii + 3 >= end) {
-                    this._error("invalid escape sequence");
-                    return;
+                    throw new Error("invalid escape sequence");
                 }
                 ch = this._get_N_hexdigits(ii + 2, ii + 4);
                 this._esc_len = 3;
@@ -1297,30 +1289,27 @@ export class ParserTextRaw {
                 return IonText.ESCAPED_NEWLINE;
             case ESC_x: // = CH_x, //  values['x'] = ESCAPE_HEX; //    any  \xHH  2-digit hexadecimal unicode character equivalent to \ u00HH
                 if (ii + 3 >= end) {
-                    this._error("invalid escape sequence");
-                    return;
+                    throw new Error("invalid escape sequence");
                 }
                 ch = this._get_N_hexdigits(ii + 2, ii + 4);
                 this._esc_len = 3;
                 break;
             case ESC_u: // = 117, //  values['u'] = ESCAPE_LITTLE_U; //    any  \ uHHHH  4-digit hexadecimal unicode character
                 if (ii + 5 >= end) {
-                    this._error("invalid escape sequence");
-                    return;
+                    throw new Error("invalid escape sequence");
                 }
                 ch = this._get_N_hexdigits(ii + 2, ii + 6);
                 this._esc_len = 5;
                 break;
             case ESC_U: // = 85, //  values['U'] = ESCAPE_BIG_U; //    any  \ UHHHHHHHH  8-digit hexa
                 if (ii + 9 >= end) {
-                    this._error("invalid escape sequence");
-                    return;
+                    throw new Error("invalid escape sequence");
                 }
                 ch = this._get_N_hexdigits(ii + 2, ii + 10);
                 this._esc_len = 9;
                 break;
             default:
-                this._error("unexpected character after escape slash");
+                throw new Error("unexpected character after escape slash");
         }
         return ch;
     }
@@ -1449,14 +1438,8 @@ export class ParserTextRaw {
         return ch;
     }
 
-    private _peek_after_whitespace(recognize_comments: boolean): number {
-        let ch = this._read_after_whitespace(recognize_comments);
-        this._unread(ch);
-        return ch;
-    }
-
     private _peek_4_digits(ch1: number): number {
-        let ii, ch, is_digits = true, chars = [];
+        let ii: number, ch: number, is_digits = true, chars: number[] = [];
         if (!IonText.is_digit(ch1)) return ERROR;
         for (ii = 0; ii < 3; ii++) {
             ch = this._read();
@@ -1468,7 +1451,7 @@ export class ParserTextRaw {
         }
         ch = (is_digits && ii == 3) ? this._peek() : ERROR;
         while (chars.length > 0) {
-            this._unread(chars.pop());
+            this._unread(chars.pop()!);
         }
         return ch;
     }
@@ -1495,7 +1478,7 @@ export class ParserTextRaw {
         while (n--) {
             if (!IonText.is_digit(ch = this._read())) throw new Error("Expected digit, got: " + String.fromCharCode(ch));
         }
-        return ch;
+        return ch!;
     }
 
     private _readPastNDigits(n: number): number {//This is clearly bugged it reads n + 1 digits.
@@ -1523,29 +1506,6 @@ export class ParserTextRaw {
             ii++;
         }
         return ch;
-    }
-
-    private _read_hours_and_minutes(ch: number): number {
-        if (!IonText.is_digit(ch)) return ERROR;
-        ch = this._readPastNDigits(1);   // rest of hours
-        if (ch == CH_CL) {
-            ch = this._readPastNDigits(2); // minutes
-        } else {
-            ch = ERROR; // if there are hours you have to include minutes
-        }
-        return ch;
-    }
-
-    private _check_for_keywords(): void {
-        let len, s, v = this._value_pop();
-        if (v == T_IDENTIFIER) {
-            len = this._end - this._start;
-            if (len >= 3 && len <= 5) {
-                s = this.get_value_as_string(v);
-                v = get_keyword_type(s);
-            }
-        }
-        this._value_push(v);
     }
 
     private _error(msg: string): void {

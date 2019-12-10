@@ -58,15 +58,8 @@ import {Timestamp, TimestampPrecision} from "./IonTimestamp";
 import SignAndMagnitudeInt from "./SignAndMagnitudeInt";
 import {JsbiSerde} from "./JsbiSerde";
 
-const DEBUG_FLAG = true;
-
 const EOF              = -1;  // EOF is end of container; distinct from undefined which is value has been consumed
-const ERROR            = -2;
-const TB_UNUSED__      = 15;
 const TB_DATAGRAM      = 20;  // fake type of the top level
-const TB_SEXP_CLOSE    = 21;
-const TB_LIST_CLOSE    = 22;
-const TB_STRUCT_CLOSE  = 23;
 
 function get_ion_type(rt: number): IonType {
     switch (rt) {
@@ -84,7 +77,7 @@ function get_ion_type(rt: number): IonType {
         case IonBinary.TB_SEXP:      return IonTypes.SEXP;
         case IonBinary.TB_LIST:      return IonTypes.LIST;
         case IonBinary.TB_STRUCT:    return IonTypes.STRUCT;
-        default: return undefined;
+        default: throw new Error('Unrecognized type code ' + rt);
     }
 }
 
@@ -127,7 +120,7 @@ export class ParserBinaryRaw {
     private _in: BinarySpan;
     private _raw_type: number = EOF;
     private _len: number = -1;
-    private _curr = undefined;
+    private _curr: any = undefined;
     private _null: boolean = false;
     private _fid: number = -1;
     private _as: number = -1;
@@ -140,7 +133,7 @@ export class ParserBinaryRaw {
         this._in = source;
     }
 
-    static _readFloatFrom(input: BinarySpan, numberOfBytes): number {
+    static _readFloatFrom(input: BinarySpan, numberOfBytes): number | null {
         let tempBuf: DataView;
         switch (numberOfBytes) {
             case 0:
@@ -291,9 +284,8 @@ export class ParserBinaryRaw {
     next(): any {
         if (this._curr === undefined && this._len > 0) {
             this._in.skip(this._len);
-        } else {
-            this.clear_value();
         }
+        this.clear_value();
         if (this._in_struct) {
             this._fid = this.readVarUnsignedInt();
         }
@@ -322,7 +314,7 @@ export class ParserBinaryRaw {
     stepOut() {
         let parent_type, ts, l, r, t = this;
         if (t._ts.length < 2) {
-            throw new Error("you can't stepOut unless you stepped in");
+            throw new Error('Cannot stepOut any further, already at top level');
         }
         ts = t._ts.pop();
         l = decode_type_stack_len(ts);
@@ -376,15 +368,15 @@ export class ParserBinaryRaw {
         return get_ion_type(this._raw_type);
     }
 
-    _getSid(): number {
+    _getSid(): number | null {
         this.load_value();
         if (this._raw_type == IonBinary.TB_SYMBOL) {
-            return this._curr === undefined ? null : this._curr;
+            return this._curr === undefined || this._curr === null ? null : this._curr!;
         }
         return null;
     }
 
-    byteValue(): Uint8Array {
+    byteValue(): Uint8Array | null {
         switch (this._raw_type) {
             case IonBinary.TB_NULL:
                 return null;
@@ -394,13 +386,13 @@ export class ParserBinaryRaw {
                     return null;
                 }
                 this.load_value();
-                return this._curr;
+                return this._curr!;
             default:
                 throw new Error('Current value is not a blob or clob.');
         }
     }
 
-    booleanValue(): boolean {
+    booleanValue(): boolean | null {
         switch (this._raw_type) {
             case IonBinary.TB_NULL:
                 return null;
@@ -408,12 +400,12 @@ export class ParserBinaryRaw {
                 if (this.isNull()) {
                     return null;
                 }
-                return this._curr;
+                return this._curr!;
         }
         throw new Error('Current value is not a Boolean.')
     }
 
-    decimalValue(): Decimal {
+    decimalValue(): Decimal | null {
         switch (this._raw_type) {
             case IonBinary.TB_NULL:
                 return null;
@@ -422,12 +414,12 @@ export class ParserBinaryRaw {
                     return null;
                 }
                 this.load_value();
-                return this._curr;
+                return this._curr!;
         }
         throw new Error('Current value is not a decimal.');
     }
 
-    bigIntValue(): JSBI {
+    bigIntValue(): JSBI | null {
         switch (this._raw_type) {
             case IonBinary.TB_NULL:
                 return null;
@@ -437,13 +429,13 @@ export class ParserBinaryRaw {
                     return null;
                 }
                 this.load_value();
-                return this._curr;
+                return this._curr!;
             default:
                 throw new Error('bigIntValue() was called when the current value was not an int.');
         }
     }
 
-    numberValue(): number {
+    numberValue(): number | null {
         switch (this._raw_type) {
             case IonBinary.TB_NULL:
                 return null;
@@ -453,20 +445,20 @@ export class ParserBinaryRaw {
                     return null;
                 }
                 this.load_value();
-                let bigInt: JSBI = this._curr;
+                let bigInt: JSBI = this._curr!;
                 return JsbiSupport.clampToSafeIntegerRange(bigInt);
             case IonBinary.TB_FLOAT:
                 if (this.isNull()) {
                     return null;
                 }
                 this.load_value();
-                return this._curr;
+                return this._curr!;
             default:
                 throw new Error('Current value is not a float or int.');
         }
     }
 
-    stringValue(): string {
+    stringValue(): string | null {
         switch (this._raw_type) {
             case IonBinary.TB_NULL:
                 return null;
@@ -476,12 +468,12 @@ export class ParserBinaryRaw {
                     return null;
                 }
                 this.load_value();
-                return this._curr;
+                return this._curr!;
         }
         throw new Error('Current value is not a string or symbol.');
     }
 
-    timestampValue(): Timestamp {
+    timestampValue(): Timestamp | null {
         switch (this._raw_type) {
             case IonBinary.TB_NULL:
                 return null;
@@ -490,12 +482,12 @@ export class ParserBinaryRaw {
                     return null;
                 }
                 this.load_value();
-                return this._curr;
+                return this._curr!;
         }
         throw new Error('Current value is not a timestamp.');
     }
 
-    private read_binary_float(): number {
+    private read_binary_float(): number | null {
         return ParserBinaryRaw._readFloatFrom(this._in, this._len);
     }
 
@@ -519,18 +511,18 @@ export class ParserBinaryRaw {
         return ParserBinaryRaw.readDecimalValueFrom(this._in, this._len);
     }
 
-    private read_timestamp_value(): Timestamp {
+    private read_timestamp_value(): Timestamp | null {
         if (!(this._len > 0)) {
             return null;
         }
 
         let offset: number;
         let year: number;
-        let month: number;
-        let day: number;
-        let hour: number;
-        let minute: number;
-        let secondInt: number;
+        let month: number | null = null;
+        let day: number | null = null;
+        let hour: number | null = null;
+        let minute: number | null = null;
+        let secondInt: number | null = null;
         let fractionalSeconds = Decimal.ZERO;
         let precision = TimestampPrecision.YEAR;
 
@@ -573,7 +565,7 @@ export class ParserBinaryRaw {
             }
             let dec = Decimal._fromBigIntCoefficient(isNegative, coefficient, exponent);
             let [_, fractionStr] = Timestamp._splitSecondsDecimal(dec);
-            fractionalSeconds = Decimal.parse(secondInt + '.' + fractionStr);
+            fractionalSeconds = Decimal.parse(secondInt! + '.' + fractionStr)!;
         }
 
         let msSinceEpoch = Date.UTC(year, month ? month - 1 : 0, day ? day : 1, hour ? hour : 0, minute ? minute : 0, secondInt ? secondInt : 0, 0);
@@ -625,7 +617,7 @@ export class ParserBinaryRaw {
         }
     }
 
-    private load_next(): number {
+    private load_next(): number | undefined {
         let t: ParserBinaryRaw = this;
 
         let rt, tb;
@@ -722,7 +714,7 @@ export class ParserBinaryRaw {
 
     private load_value(): void {
         if (this._curr != undefined) return;   // current value is already loaded
-        if (this.isNull()) return null;
+        if (this.isNull()) return;
         switch (this._raw_type) {
             case IonBinary.TB_BOOL:
                 break;

@@ -82,9 +82,9 @@ export class Decimal {
     constructor(coefficient: JSBI, exponent: number, isNegative?: boolean);
 
     // This is the unified implementation of the above signatures and is not visible to users.
-    constructor(coefficient: number | JSBI | string, exponent?: number, isNegative?: boolean) {
+    constructor(coefficient: number | JSBI | string, exponent?: number, isNegative: boolean = false) {
         if (typeof coefficient === "string") {
-            return Decimal.parse(coefficient);
+            return Decimal.parse(coefficient)!;
         }
 
         if (!_hasValue(exponent)) {
@@ -92,7 +92,7 @@ export class Decimal {
         }
 
         if (typeof coefficient === "number") {
-            return Decimal._fromNumberCoefficient(coefficient, exponent);
+            return Decimal._fromNumberCoefficient(coefficient, exponent!);
         }
 
         if (coefficient instanceof JSBI) {
@@ -104,7 +104,7 @@ export class Decimal {
                 // If isNegative was specified, make sure that the coefficient's sign agrees with it.
                 coefficient = JSBI.unaryMinus(coefficient);
             }
-            return Decimal._fromBigIntCoefficient(isNegative, coefficient, exponent);
+            return Decimal._fromBigIntCoefficient(isNegative, coefficient, exponent!);
         }
 
         throw new Error(`Unsupported parameter set (${coefficient}, ${exponent}, ${isNegative} passed to Decimal constructor.`);
@@ -138,22 +138,22 @@ export class Decimal {
      * returns a new Decimal object corresponding to the value.  If a string such as
      * '5' is provided, a 'd0' suffix is assumed.
      */
-    static parse(str: string): Decimal {
+    static parse(str: string): Decimal | null {
         let exponent = 0;
         if (str === 'null' || str === 'null.decimal') return null;
         let d = str.match('[d|D]');
         let exponentDelimiterIndex = str.length;
-        if (d) {
-            exponent = Number(str.substring(d.index + 1, str.length));
-            exponentDelimiterIndex = d.index;
+        if (d !== undefined && d !== null) {
+            exponent = Number(str.substring(d.index! + 1, str.length));
+            exponentDelimiterIndex = d.index!;
         }
         let f = str.match('\\.');
         let coefficientText: string;
         if (f) {
-            let exponentShift = d ? (d.index - 1) - f.index : (str.length - 1) - f.index;
+            let exponentShift = d ? (d.index! - 1) - f.index! : (str.length - 1) - f.index!;
             exponent -= exponentShift;
             // Remove the '.' from the input string.
-            coefficientText = str.substring(0, f.index) + str.substring(f.index + 1, exponentDelimiterIndex);
+            coefficientText = str.substring(0, f.index) + str.substring(f.index! + 1, exponentDelimiterIndex);
         } else {
             coefficientText = str.substring(0, exponentDelimiterIndex);
         }

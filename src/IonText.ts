@@ -90,7 +90,7 @@ export function needsEscape(c: number): boolean {
 }
 
 export function escapeString(s: string, pos: number): string {
-    let fixes = [], c, old_len, new_len, ii, s2;
+    let fixes: number[][] = [], c, ii, s2;
     while (pos >= 0) {
         c = s.charCodeAt(pos);
         if (!needsEscape(c)) break;

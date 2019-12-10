@@ -45,9 +45,9 @@ export enum State {
 export class Context {
     state: State;
     clean: boolean;
-    containerType: IonType;
+    containerType: IonType | null;
 
-    constructor(myType: IonType) {
+    constructor(myType: IonType | null) {
         this.state = myType === IonTypes.STRUCT ? State.STRUCT_FIELD : State.VALUE;
         this.clean = true;
         this.containerType = myType;
@@ -60,7 +60,7 @@ export class TextWriter extends AbstractWriter {
 
     constructor(protected readonly writeable: Writeable) {
         super();
-        this.containerContext = [new Context(undefined)];
+        this.containerContext = [new Context(null)];
     }
 
     get isTopLevel(): boolean {
@@ -257,7 +257,9 @@ export class TextWriter extends AbstractWriter {
 
     stepIn(type: IonType): void {
         if (this.currentContainer.state === State.STRUCT_FIELD) {
-            throw new Error(`Started writing a ${this.currentContainer.containerType.name} inside a struct without writing the field name first. Call writeFieldName(string) with the desired name before calling stepIn(${this.currentContainer.containerType.name}).`);
+            throw new Error(`Started writing a ${this.currentContainer.containerType!.name} inside a struct"
+                + " without writing the field name first. Call writeFieldName(string) with the desired name"
+                + " before calling stepIn(${this.currentContainer.containerType!.name}).`);
         }
         switch (type) {
             case IonTypes.LIST:

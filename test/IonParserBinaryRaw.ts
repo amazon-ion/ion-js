@@ -24,26 +24,26 @@ import SignAndMagnitudeInt from "../src/SignAndMagnitudeInt";
  */
 
 // Returns the largest unsigned integer value that can be stored in `numberOfBits` bits.
-let maxValueForBits = function (numberOfBits) {
+let maxValueForBits = function (numberOfBits: number) {
     return Math.pow(2, numberOfBits) - 1;
 };
 
 // Returns the largest unsigned integer value that can be stored in `numberOfBytes` bytes.
-let maxValueForBytes = function (numberOfBytes) {
+let maxValueForBytes = function (numberOfBytes: number) {
     return maxValueForBits(numberOfBytes * 8);
 };
 
 // Returns an array containing `numberOfBytes` bytes with value of 0xFF.
-let maxValueByteArray = function (numberOfBytes) {
-    let data = [];
+let maxValueByteArray = function (numberOfBytes: number) {
+    let data: number[] = [];
     for (let m = 0; m < numberOfBytes; m++) {
         data.push(0xFF);
     }
     return data;
 };
 
-let unsignedIntBytesMatchValue = (bytes,
-                                  expected,
+let unsignedIntBytesMatchValue = (bytes: number[],
+                                  expected: number,
                                   readFrom: (input: ion.BinarySpan, numberOfBytes: number) => any =
                                       ion.ParserBinaryRaw._readUnsignedIntAsBigIntFrom) => {
     let binarySpan = new ion.BinarySpan(new Uint8Array(bytes));
@@ -130,7 +130,7 @@ describe('Reading unsigned ints', () => {
  * Spec: http://amzn.github.io/ion-docs/docs/binary.html#uint-and-int-fields
  */
 
-let signedIntBytesMatch = function (bytes, expected: SignAndMagnitudeInt) {
+let signedIntBytesMatch = function (bytes: number[], expected: SignAndMagnitudeInt) {
     let binarySpan = new ion.BinarySpan(new Uint8Array(bytes));
     let actual = ion.ParserBinaryRaw._readSignedIntFrom(binarySpan, bytes.length);
     assert.isTrue(actual.equals(expected));
@@ -174,7 +174,7 @@ describe('Reading signed ints', () => {
  * Spec: http://amzn.github.io/ion-docs/docs/binary.html#varuint-and-varint-fields
  */
 
-let varUnsignedIntBytesMatchValue = function (bytes, expected) {
+let varUnsignedIntBytesMatchValue = function (bytes: number[], expected: number) {
     let binarySpan = new ion.BinarySpan(new Uint8Array(bytes));
     let actual = ion.ParserBinaryRaw._readVarUnsignedIntFrom(binarySpan);
     assert.equal(actual, expected);
@@ -227,7 +227,7 @@ describe('Reading variable unsigned ints', () => {
  * Spec: http://amzn.github.io/ion-docs/docs/binary.html#varuint-and-varint-fields
  */
 
-let varSignedIntBytesMatchValue = function (bytes, expected) {
+let varSignedIntBytesMatchValue = function (bytes: number[], expected: number) {
     let binarySpan = new ion.BinarySpan(new Uint8Array(bytes));
     let actual = ion.ParserBinaryRaw._readVarSignedIntFrom(binarySpan);
     assert.equal(actual, expected)
@@ -293,7 +293,7 @@ describe('Reading variable signed ints', () => {
  * Spec: http://amzn.github.io/ion-docs/docs/binary.html#4-float
  */
 
-let serializeFloat = function (value, viewType, numberOfBytes) {
+let serializeFloat = function (value: number, viewType: Float32ArrayConstructor | Float64ArrayConstructor, numberOfBytes: number) {
     let buffer = new ArrayBuffer(numberOfBytes);
     let view = new viewType(buffer);
     view[0] = value;
@@ -302,18 +302,18 @@ let serializeFloat = function (value, viewType, numberOfBytes) {
     return bytes;
 };
 
-let serializeFloat32 = function (value) {
+let serializeFloat32 = function (value: number) {
     return serializeFloat(value, Float32Array, 4);
 };
 
-let serializeFloat64 = function (value) {
+let serializeFloat64 = function (value: number) {
     return serializeFloat(value, Float64Array, 8);
 };
 
-let floatBytesMatchValue = function (bytes, expected, comparison = (x, y) => assert.equal(x, y)) {
+let floatBytesMatchValue = function (bytes: Uint8Array, expected: number, comparison = (x: number, y: number) => assert.equal(x, y)) {
     let binarySpan = new ion.BinarySpan(bytes);
     let actual = ion.ParserBinaryRaw._readFloatFrom(binarySpan, binarySpan.getRemaining());
-    comparison(actual, expected);
+    comparison(actual!, expected);
 };
 
 let float32TestValues = [

@@ -36,8 +36,8 @@ export enum IonEventType {
 
 export interface IonEvent {
     eventType: IonEventType;
-    ionType: IonType;
-    fieldName: string;
+    ionType: IonType | null;
+    fieldName: string | null;
     annotations: string[];
     depth: number;
     ionValue: any;
@@ -51,14 +51,14 @@ export interface IonEvent {
 
 abstract class AbstractIonEvent implements IonEvent {
     eventType: IonEventType;
-    ionType: IonType;
-    fieldName: string;
+    ionType: IonType | null;
+    fieldName: string | null;
     annotations: string[];
     depth: number;
     ionValue: any;
 
 
-    constructor(eventType: IonEventType, ionType: IonType, fieldName: string, annotations: string[], depth: number, ionValue: any) {
+    constructor(eventType: IonEventType, ionType: IonType | null, fieldName: string | null, annotations: string[], depth: number, ionValue: any) {
         this.eventType = eventType;
         this.ionType = ionType;
         this.fieldName = fieldName;
@@ -183,7 +183,7 @@ abstract class AbstractIonEvent implements IonEvent {
 
 export class IonEventFactory {
 
-    makeEvent(eventType: IonEventType, ionType: IonType, fieldName: string, depth: number, annotations: string[], isNull: boolean, value: any): IonEvent {
+    makeEvent(eventType: IonEventType, ionType: IonType, fieldName: string | null, depth: number, annotations: string[], isNull: boolean, value: any): IonEvent {
         if (isNull) {
             return new IonNullEvent(eventType, ionType, fieldName, annotations, depth);
         }
@@ -235,15 +235,14 @@ export class IonEventFactory {
                 throw new Error("symbol tables unsupported.");
             case IonEventType.CONTAINER_END :
             case IonEventType.STREAM_END :
-                return new IonEndEvent(eventType, null, null, [], depth);
+                return new IonEndEvent(eventType, depth);
         }
     }
 }
 
 class IonNullEvent extends AbstractIonEvent {
-    constructor(eventType: IonEventType, ionType: IonType, fieldName: string, annotations: string[], depth: number) {
+    constructor(eventType: IonEventType, ionType: IonType, fieldName: string | null, annotations: string[], depth: number) {
         super(eventType, ionType, fieldName, annotations, depth, null);
-
     }
 
     valueEquals(expected: IonNullEvent): boolean {
@@ -251,12 +250,12 @@ class IonNullEvent extends AbstractIonEvent {
     }
 
     writeIonValue(writer: Writer): void {
-        writer.writeNull(this.ionType);
+        writer.writeNull(this.ionType !== null ? this.ionType : IonTypes.NULL );
     }
 }
 
 class IonIntEvent extends AbstractIonEvent {
-    constructor(eventType: IonEventType, ionType: IonType, fieldName: string, annotations: string[], depth: number, ionValue: number) {
+    constructor(eventType: IonEventType, ionType: IonType, fieldName: string | null, annotations: string[], depth: number, ionValue: number) {
         super(eventType, ionType, fieldName, annotations, depth, ionValue);
 
     }
@@ -271,7 +270,7 @@ class IonIntEvent extends AbstractIonEvent {
 }
 
 class IonBoolEvent extends AbstractIonEvent {
-    constructor(eventType: IonEventType, ionType: IonType, fieldName: string, annotations: string[], depth: number, ionValue: boolean) {
+    constructor(eventType: IonEventType, ionType: IonType, fieldName: string | null, annotations: string[], depth: number, ionValue: boolean) {
         super(eventType, ionType, fieldName, annotations, depth, ionValue);
 
     }
@@ -286,7 +285,7 @@ class IonBoolEvent extends AbstractIonEvent {
 }
 
 class IonFloatEvent extends AbstractIonEvent {
-    constructor(eventType: IonEventType, ionType: IonType, fieldName: string, annotations: string[], depth: number, ionValue: number) {
+    constructor(eventType: IonEventType, ionType: IonType, fieldName: string | null, annotations: string[], depth: number, ionValue: number) {
         super(eventType, ionType, fieldName, annotations, depth, ionValue);
 
     }
@@ -302,7 +301,7 @@ class IonFloatEvent extends AbstractIonEvent {
 }
 
 class IonDecimalEvent extends AbstractIonEvent {
-    constructor(eventType: IonEventType, ionType: IonType, fieldName: string, annotations: string[], depth: number, ionValue: Decimal) {
+    constructor(eventType: IonEventType, ionType: IonType, fieldName: string | null, annotations: string[], depth: number, ionValue: Decimal) {
         super(eventType, ionType, fieldName, annotations, depth, ionValue);
 
     }
@@ -317,7 +316,7 @@ class IonDecimalEvent extends AbstractIonEvent {
 }
 
 class IonSymbolEvent extends AbstractIonEvent {
-    constructor(eventType: IonEventType, ionType: IonType, fieldName: string, annotations: string[], depth: number, ionValue: string) {
+    constructor(eventType: IonEventType, ionType: IonType, fieldName: string | null, annotations: string[], depth: number, ionValue: string) {
         //if(ionValue === '$ion_1_0') ionValue = "$ion_user_value::" + ionValue;
         super(eventType, ionType, fieldName, annotations, depth, ionValue);
     }
@@ -333,7 +332,7 @@ class IonSymbolEvent extends AbstractIonEvent {
 }
 
 class IonStringEvent extends AbstractIonEvent {
-    constructor(eventType: IonEventType, ionType: IonType, fieldName: string, annotations: string[], depth: number, ionValue: string) {
+    constructor(eventType: IonEventType, ionType: IonType, fieldName: string | null, annotations: string[], depth: number, ionValue: string) {
         super(eventType, ionType, fieldName, annotations, depth, ionValue);
 
     }
@@ -349,7 +348,7 @@ class IonStringEvent extends AbstractIonEvent {
 }
 
 class IonTimestampEvent extends AbstractIonEvent {
-    constructor(eventType: IonEventType, ionType: IonType, fieldName: string, annotations: string[], depth: number, ionValue: Timestamp) {
+    constructor(eventType: IonEventType, ionType: IonType, fieldName: string | null, annotations: string[], depth: number, ionValue: Timestamp) {
         super(eventType, ionType, fieldName, annotations, depth, ionValue);
 
     }
@@ -364,7 +363,7 @@ class IonTimestampEvent extends AbstractIonEvent {
 }
 
 class IonBlobEvent extends AbstractIonEvent {
-    constructor(eventType: IonEventType, ionType: IonType, fieldName: string, annotations: string[], depth: number, ionValue: string) {
+    constructor(eventType: IonEventType, ionType: IonType, fieldName: string | null, annotations: string[], depth: number, ionValue: string) {
         super(eventType, ionType, fieldName, annotations, depth, ionValue);
     }
 
@@ -383,7 +382,7 @@ class IonBlobEvent extends AbstractIonEvent {
 }
 
 class IonClobEvent extends AbstractIonEvent {
-    constructor(eventType: IonEventType, ionType: IonType, fieldName: string, annotations: string[], depth: number, ionValue: Uint8Array) {
+    constructor(eventType: IonEventType, ionType: IonType, fieldName: string | null, annotations: string[], depth: number, ionValue: Uint8Array) {
         super(eventType, ionType, fieldName, annotations, depth, ionValue);
     }
 
@@ -402,7 +401,7 @@ class IonClobEvent extends AbstractIonEvent {
 
 abstract class AbsIonContainerEvent extends AbstractIonEvent {
 
-    constructor(eventType: IonEventType, ionType: IonType, fieldName: string, annotations: string[], depth: number) {
+    constructor(eventType: IonEventType, ionType: IonType, fieldName: string | null, annotations: string[], depth: number) {
         super(eventType, ionType, fieldName, annotations, depth, null);
     }
 
@@ -414,7 +413,7 @@ abstract class AbsIonContainerEvent extends AbstractIonEvent {
 }
 
 class IonStructEvent extends AbsIonContainerEvent {//no embed support as of yet.
-    constructor(eventType: IonEventType, ionType: IonType, fieldName: string, annotations: string[], depth: number) {
+    constructor(eventType: IonEventType, ionType: IonType, fieldName: string | null, annotations: string[], depth: number) {
         super(eventType, ionType, fieldName, annotations, depth);
 
     }
@@ -452,7 +451,7 @@ class IonStructEvent extends AbsIonContainerEvent {//no embed support as of yet.
 }
 
 class IonListEvent extends AbsIonContainerEvent {
-    constructor(eventType: IonEventType, ionType: IonType, fieldName: string, annotations: string[], depth: number) {
+    constructor(eventType: IonEventType, ionType: IonType, fieldName: string | null, annotations: string[], depth: number) {
         super(eventType, ionType, fieldName, annotations, depth);
 
     }
@@ -475,7 +474,7 @@ class IonListEvent extends AbsIonContainerEvent {
 }
 
 class IonSexpEvent extends AbsIonContainerEvent {
-    constructor(eventType: IonEventType, ionType: IonType, fieldName: string, annotations: string[], depth: number) {
+    constructor(eventType: IonEventType, ionType: IonType, fieldName: string | null, annotations: string[], depth: number) {
         super(eventType, ionType, fieldName, annotations, depth);
 
     }
@@ -498,8 +497,8 @@ class IonSexpEvent extends AbsIonContainerEvent {
 }
 
 class IonEndEvent extends AbstractIonEvent {
-    constructor(eventType: IonEventType, ionType: IonType, fieldName: string, annotations: string[], depth: number) {
-        super(eventType, ionType, fieldName, annotations, depth, undefined);
+    constructor(eventType: IonEventType, depth: number) {
+        super(eventType, null, null, [], depth, undefined);
 
     }
 

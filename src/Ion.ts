@@ -57,16 +57,14 @@ export type ReaderBuffer = ReaderOctetBuffer | string;
  *                  binary buffer.
  */
 export function makeReader(buf: ReaderBuffer): Reader {
-    // TODO #387 make the catalog an optional parameter
-    const catalog = null;
     if ((typeof buf) === "string") {
-        return new TextReader(new StringSpan(<string>buf), catalog);
+        return new TextReader(new StringSpan(<string>buf));
     }
     const bufArray = new Uint8Array(buf as ReaderOctetBuffer);
     if (isBinary(bufArray)) {
-        return new BinaryReader(new BinarySpan(bufArray), catalog);
+        return new BinaryReader(new BinarySpan(bufArray));
     } else {
-        return new TextReader(new StringSpan(decodeUtf8(bufArray)), catalog);
+        return new TextReader(new StringSpan(decodeUtf8(bufArray)));
     }
 }
 

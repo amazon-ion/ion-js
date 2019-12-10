@@ -34,6 +34,6 @@ describe('Binary Timestamp', () => {
         let reader = ion.makeReader(writer.getBytes());
         reader.next();
         let timestampValue = reader.value();
-        assert.equal(timestamp.toString(), timestampValue.toString());
+        assert.equal(timestamp.toString(), timestampValue!.toString());
     });
 });

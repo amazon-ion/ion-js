@@ -16,10 +16,23 @@
 import {assert} from 'chai';
 import * as ion from '../src/IonTests';
 import JSBI from 'jsbi';
+import {Decimal, Writer} from "../src/IonTests";
 
 const ivm = [0xe0, 0x01, 0x00, 0xea];
 
-let writerTest = function (name, instructions, expected) {
+interface Test {
+    name: string;
+    instructions: (writer: Writer) => void;
+    expected: number[];
+    skip?: boolean;
+}
+interface BadTest {
+    name: string;
+    instructions: (writer: Writer) => void;
+    skip?: boolean;
+}
+
+let writerTest = function (name: string, instructions: (writer: Writer) => void, expected: number[]) {
     it(name, () => {
         let symbolTable = new ion.LocalSymbolTable(ion.getSystemSymbolTableImport());
         let writeable = new ion.Writeable();
@@ -31,7 +44,7 @@ let writerTest = function (name, instructions, expected) {
     });
 };
 
-let badWriterTest = function (name, instructions) {
+let badWriterTest = function (name: string, instructions: (writer: Writer) => void) {
     let test = () => {
         let symbolTable = new ion.LocalSymbolTable(ion.getSystemSymbolTableImport());
         let writeable = new ion.Writeable();
@@ -42,7 +55,7 @@ let badWriterTest = function (name, instructions) {
     it(name, () => assert.throws(test, Error));
 };
 
-let blobWriterTests = [
+let blobWriterTests: Test[] = [
     {
         name: "Writes blob",
         instructions: (writer) => writer.writeBlob(new Uint8Array([1, 2, 3])),
@@ -94,7 +107,7 @@ let blobWriterTests = [
     },
 ];
 
-let booleanWriterTests = [
+let booleanWriterTests: Test[] = [
     {
         name: "Writes boolean true",
         instructions: (writer) => writer.writeBoolean(true),
@@ -149,7 +162,7 @@ let booleanWriterTests = [
     },
 ];
 
-let clobWriterTests = [
+let clobWriterTests: Test[] = [
     {
         name: "Writes clob",
         instructions: (writer) => writer.writeClob(new Uint8Array([1, 2, 3])),
@@ -201,7 +214,7 @@ let clobWriterTests = [
     },
 ];
 
-let decimalWriterTests = [
+let decimalWriterTests: Test[] = [
     {
         name: "Writes null decimal by detecting null",
         instructions: (writer) => writer.writeDecimal(null),
@@ -265,7 +278,7 @@ let decimalWriterTests = [
     },
 ];
 
-let floatWriterTests = [
+let floatWriterTests: Test[] = [
     {
         name: "Writes null float by direct call",
         instructions: (writer) => writer.writeNull(ion.IonTypes.FLOAT),
@@ -345,7 +358,7 @@ let floatWriterTests = [
     },
 ];
 
-let intWriterTests = [
+let intWriterTests: Test[] = [
     {
         name: "Writes null int by detecting null",
         instructions: (writer) => writer.writeInt(null),
@@ -394,7 +407,7 @@ let intWriterTests = [
     },
 ];
 
-let listWriterTests = [
+let listWriterTests: Test[] = [
     {
         name: "Writes null list by direct call",
         instructions: (writer) => writer.writeNull(ion.IonTypes.LIST),
@@ -528,20 +541,15 @@ let listWriterTests = [
     },
 ];
 
-let nullWriterTests = [
+let nullWriterTests: Test[] = [
     {
         name: "Writes explicit null",
         instructions: (writer) => writer.writeNull(ion.IonTypes.NULL),
         expected: [0x0f]
     },
-    {
-        name: "Writes implicit null",
-        instructions: (writer) => writer.writeNull(),
-        expected: [0x0f]
-    },
 ];
 
-let sexpWriterTests = [
+let sexpWriterTests: Test[] = [
     {
         name: "Writes null sexp by direct call",
         instructions: (writer) => writer.writeNull(ion.IonTypes.SEXP),
@@ -584,7 +592,7 @@ let sexpWriterTests = [
     },
 ];
 
-let stringWriterTests = [
+let stringWriterTests: Test[] = [
     {
         name: "Writes null string by detecting null",
         instructions: (writer) => {
@@ -634,7 +642,7 @@ let stringWriterTests = [
     },
 ];
 
-let structWriterTests = [
+let structWriterTests: Test[] = [
     {
         name: "Writes null struct by direct call",
         instructions: (writer) => {
@@ -697,7 +705,7 @@ let structWriterTests = [
             writer.writeFieldName('c');
             writer.writeClob(ion.encodeUtf8('bar'));
             writer.writeFieldName('d');
-            writer.writeDecimal("123.456");
+            writer.writeDecimal(Decimal.parse("123.456"));
             writer.writeFieldName('f');
             writer.writeFloat32(8.125);
             writer.writeFieldName('f');
@@ -831,7 +839,7 @@ let structWriterTests = [
     },
 ];
 
-let symbolWriterTests = [
+let symbolWriterTests: Test[] = [
     {
         name: "Writes null symbol by detecting null",
         instructions: (writer) => {
@@ -874,7 +882,7 @@ let symbolWriterTests = [
     },
 ];
 
-let timestampWriterTests = [
+let timestampWriterTests: Test[] = [
     {
         name: "Writes null timestamp by detecting null",
         instructions: (writer) => {
@@ -1008,7 +1016,7 @@ let timestampWriterTests = [
     },
 ];
 
-let badWriterTests = [
+let badWriterTests: BadTest[] = [
     {
         name: "Cannot step into struct with missing field value",
         instructions: (writer) => {
@@ -1059,7 +1067,7 @@ let badWriterTests = [
     },
 ];
 
-function runWriterTests(tests) {
+function runWriterTests(tests: Test[]) {
     tests.forEach(({name, instructions, expected, skip}) => {
         if (skip) {
             it.skip(name, () => {});
@@ -1069,7 +1077,7 @@ function runWriterTests(tests) {
     });
 }
 
-function runBadWriterTests(tests) {
+function runBadWriterTests(tests: BadTest[]) {
     tests.forEach(({name, instructions, skip}) => {
         if (skip) {
             it.skip(name, () => {});
