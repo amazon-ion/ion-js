@@ -122,7 +122,7 @@ export class ParserBinaryRaw {
     private _len: number = -1;
     private _curr: any = undefined;
     private _null: boolean = false;
-    private _fid: number = -1;
+    private _fid: number | null = null;
     private _as: number = -1;
     private _ae: number = -1;
     private _a = [];
@@ -340,7 +340,7 @@ export class ParserBinaryRaw {
         return this._ts.length - 1;
     }
 
-    getFieldId(): number {
+    getFieldId(): number | null {
         return this._fid;
     }
 
@@ -584,7 +584,7 @@ export class ParserBinaryRaw {
         this._a        = empty_array;
         this._as       = -1;
         this._null     = false;
-        this._fid      = -1;
+        this._fid      = null;
         this._len      = -1;
     }
 
@@ -694,6 +694,9 @@ export class ParserBinaryRaw {
             a = (a << VINT_SHIFT) | (b & VINT_MASK);  // OR in the 7 useful bits
             if ((b & VINT_FLAG) !== 0) {
                 // once we have the last byte, add it to our list and start the next
+                if (a === 0) {
+                    throw new Error('Symbol ID zero is unsupported.');
+                }
                 arr.push(a);
                 a = 0;
             }

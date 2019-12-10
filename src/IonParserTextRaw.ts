@@ -22,10 +22,10 @@
 import * as IonText from "./IonText";
 import {is_keyword, is_whitespace} from "./IonText";
 
+import JSBI from "jsbi";
+import {StringSpan} from "./IonSpan";
 import {IonType} from "./IonType";
 import {IonTypes} from "./IonTypes";
-import {StringSpan} from "./IonSpan";
-import JSBI from "jsbi";
 import {JsbiSupport} from "./JsbiSupport";
 
 const EOF = -1;  // EOF is end of container, distinct from undefined which is value has been consumed
@@ -745,6 +745,7 @@ export class ParserTextRaw {
             let ch = this._read_after_whitespace(true);
             if (ch == CH_CL && this._peek() == CH_CL) {
                 this._read(); // consume the colon character
+                if(symbol === '$0') throw new Error('Symbol ID zero is not supported.');
                 this._ann.push(symbol);
                 this._ops.unshift(calling_op);
             } else {

@@ -241,8 +241,9 @@ export class BinaryReader implements Reader {
         }
     }
 
-    private getSymbolString(symbolId: number): string | null {
+    private getSymbolString(symbolId: number | null): string | null {
         let s: string | null = null;
+        if (symbolId === null) return null;
         if (symbolId > 0) {
             if (symbolId > this._symtab.maxId) {
                 throw new Error('Symbol $' + symbolId.toString() + ' greater than maxID.');
@@ -253,6 +254,10 @@ export class BinaryReader implements Reader {
                 //s = "$" + symbolId.toString();
                 //todo turn this back on once symbol table imports are supported and lst context transfer is supported.
             }
+        } else if(symbolId === 0) {
+            throw new Error('Symbol ID zero is unsupported');
+        } else if(symbolId < 0) {
+            throw new Error('Negative symbol ID: ' + symbolId + ' is illegal.');
         }
         return s;
     }
