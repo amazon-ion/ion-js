@@ -393,7 +393,11 @@ export class ParserTextRaw {
                     } else if (t === T_STRING3 && ch === CH_SQ && !isEscaped && this.verifyTriple(index)) {
                         index = this._skip_triple_quote_gap(index, this._end, /*acceptComments*/ true);
                     } else if (ch >= 0) {
-                        s += String.fromCharCode(ch);
+                        if (isEscaped) {
+                            s += String.fromCodePoint(ch);
+                        } else {
+                            s += String.fromCharCode(ch);
+                        }
                     }
                 }
                 break;
