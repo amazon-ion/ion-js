@@ -206,7 +206,7 @@ export class TextReader implements Reader {
             let tempStr = str.substr(1, str.length);
             if (+tempStr === +tempStr) {//look up sid, +str === +str is a one line is integer hack
                 let symbol = this._symtab.getSymbolText(Number(tempStr));
-                if (symbol === undefined) throw new Error("Unresolveable symbol ID, symboltokens unsupported.");
+                if (symbol === undefined) throw new Error("Unresolvable symbol ID, symboltokens unsupported.");
                 return symbol;
             }
         }
@@ -219,11 +219,11 @@ export class TextReader implements Reader {
             ann.push(str);
         }
         for (let i = 0; i < ann.length; i++) {
-            if(ann[i].length > 1 && ann[i].charAt(0) === '$'.charAt(0)) {
+            if(ann[i].length > 1 && ann[i][0] === '$') {
                 let tempStr = ann[i].substr(1, ann[i].length);
                 if (+tempStr === +tempStr) {//look up sid, +str === +str is a one line is integer hack
                     let symbol = this._symtab.getSymbolText(Number(tempStr));
-                    if(symbol === undefined || symbol === null) throw new Error("Unresolveable symbol ID, symboltokens unsupported.");
+                    if(symbol === undefined || symbol === null) throw new Error("Unresolvable symbol ID, symboltokens unsupported.");
                     ann[i] = symbol;
                 }
             }

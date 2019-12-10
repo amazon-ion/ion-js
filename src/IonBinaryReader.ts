@@ -249,11 +249,11 @@ export class BinaryReader implements Reader {
     private getSymbolString(symbolId: number): string {
         let s: string = null;
         if (symbolId > 0) {
-            if(symbolId > this._symtab.maxId) {
+            if (symbolId > this._symtab.maxId) {
                 throw new Error('Symbol $' + symbolId.toString() + ' greater than maxID.');
             }
             s = this._symtab.getSymbolText(symbolId);
-            if (typeof (s) === 'undefined') {
+            if (s === undefined) {
                 throw new Error('symbol is unresolveable');
                 //s = "$" + symbolId.toString();
                 //todo turn this back on once symbol table imports are supported and lst context transfer is supported.

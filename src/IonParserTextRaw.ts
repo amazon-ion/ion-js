@@ -1079,7 +1079,7 @@ export class ParserTextRaw {
         ch = this._read_after_whitespace(true);
         if (ch == CH_CL && this._peek() == CH_CL) {
             this._read(); // consume the colon character
-            if(s[0] === '$'[0]) {
+            if(s[0] === '$') {
                 let tempStr = s.substr(1, s.length)
                 if (+tempStr === +tempStr) {
                     s = "'" + s + "'";
