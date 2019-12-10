@@ -204,11 +204,11 @@ export class TextReader implements Reader {
         let str = this._parser.fieldName();
         if (str !== null) {
             let raw_type = this._parser.fieldNameType();
-            if (raw_type === T_IDENTIFIER && (str.length > 1 && str.charAt(0) === '$'.charAt(0))) {
+            if (raw_type === T_IDENTIFIER && (str.length > 1 && str[0] === '$')) {
                 let tempStr = str.substr(1, str.length);
                 if (+tempStr === +tempStr) {//look up sid, +str === +str is a one line is integer hack
                     let symbol = this._symtab.getSymbolText(Number(tempStr));
-                    if (symbol === undefined) throw new Error("Unresolveable symbol ID, symboltokens unsupported.");
+                    if (symbol === undefined) throw new Error("Unresolvable symbol ID, symboltokens unsupported.");
                     return symbol;
                 }
             }
@@ -217,7 +217,21 @@ export class TextReader implements Reader {
     }
 
     annotations(): string[] {
-        return this._parser.annotations();
+        let ann : string[] = [];
+        for (let str of this._parser.annotations()) {
+            ann.push(str);
+        }
+        for (let i = 0; i < ann.length; i++) {
+            if(ann[i].length > 1 && ann[i][0] === '$') {
+                let tempStr = ann[i].substr(1, ann[i].length);
+                if (+tempStr === +tempStr) {//look up sid, +str === +str is a one line is integer hack
+                    let symbol = this._symtab.getSymbolText(Number(tempStr));
+                    if(symbol === undefined || symbol === null) throw new Error("Unresolvable symbol ID, symboltokens unsupported.");
+                    ann[i] = symbol;
+                }
+            }
+        }
+        return ann;
     }
 
     isNull(): boolean {
@@ -228,28 +242,7 @@ export class TextReader implements Reader {
     _stringRepresentation(): string | null {
         this.load_raw();
         if (this.isNull()) return (this._type === IonTypes.NULL) ? "null" : "null." + this._type!.name;
-        if (this._type!.isScalar) {
-            // BLOB is a scalar by you don't want to just use the string
-            // value otherwise all other scalars are fine as is
-            switch (this._type) {
-                case IonTypes.BLOB:
-                    return this._raw;
-                case IonTypes.SYMBOL:
-                    if (this._raw_type === T_IDENTIFIER && (this._raw.length > 1 && this._raw.charAt(0) === '$'.charAt(0))) {
-                        let tempStr = this._raw.substr(1, this._raw.length);
-                        if (+tempStr === +tempStr) {//look up sid, +str === +str is a one line is integer hack
-                            let symbol = this._symtab.getSymbolText(Number(tempStr));
-                            if (symbol === undefined) throw new Error("Unresolvable symbol ID, symboltokens unsupported.");
-                            return symbol;
-                        }
-                    }
-                    return this._raw;
-                default:
-                    return this._raw;
-            }
-        } else {
-            throw new Error("Cannot create string representation of non-scalar values.");
-        }
+        return this._raw;
     }
 
     booleanValue(): boolean | null {
