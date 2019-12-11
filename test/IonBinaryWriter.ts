@@ -1052,6 +1052,99 @@ let badWriterTests: BadTest[] = [
         }
     },
     {
+        name:'Should throw when passing a single string as an annotation.',
+        instructions: (writer) => {
+            // @ts-ignore
+            writer.setAnnotations('taco');
+            writer.writeInt(5);
+        }
+    },
+    {
+        name:'Should throw when setting annotations to null.',
+        instructions: (writer) => {
+            // @ts-ignore
+            writer.setAnnotations(null);
+            writer.writeInt(5);
+        }
+    },
+    {
+        name:'Should throw when passing annotations array without a string.',
+        instructions: (writer) => {
+            // @ts-ignore
+            writer.setAnnotations([5]);
+            writer.writeInt(5)
+        }
+    },
+    {
+        name:'Should throw when adding an int as annotation.',
+        instructions: (writer) => {
+            // @ts-ignore
+            writer.addAnnotation(5), writer.writeInt(5)
+        }
+    },
+    {
+        name:'Should throw when adding array of chars.',
+        instructions: (writer) => {
+            // @ts-ignore
+            writer.addAnnotation(['t', 'a', 'c', 'o']);
+            writer.writeInt(5);
+        }
+    },
+    {
+        name:'Should throw when passing annotations array containing a non string value.',
+        instructions: (writer) => {
+            // @ts-ignore
+            writer.setAnnotations(['a', 5,'t']);
+            writer.writeInt(5);
+        }
+    },
+    {
+        name:'Should throw when adding a non string annotation.',
+        instructions: (writer) => {
+            // @ts-ignore
+            writer.addAnnotation(null);
+            writer.writeInt(5);
+        }
+    },
+    {
+        name:'Should throw when adding a non string annotation.',
+        instructions: (writer) => {
+            // @ts-ignore
+            writer.addAnnotation(undefined);
+            writer.writeInt(5);
+        }
+    },
+    {
+        name:'Should throw when passing annotations array containing undefined.',
+        instructions: (writer) => {
+            // @ts-ignore
+            writer.setAnnotations([undefined]);
+            writer.writeInt(5);
+        }
+    },
+    {
+        name:'Should throw when passing annotations array containing null.',
+        instructions: (writer) => {
+            // @ts-ignore
+            writer.setAnnotations([null]);
+            writer.writeInt(5);
+        }
+    },
+    {
+        name:'Should throw when passing undefined as annotations.',
+        instructions: (writer) => {
+            // @ts-ignore
+            writer.setAnnotations(undefined);
+            writer.writeInt(5);
+        }
+    },
+    {
+        name:'Should throw when writing top-level field name.',
+        instructions: (writer) => {
+            writer.writeFieldName('foo');
+        }
+    },
+    {
         name: "Cannot stepOut() of the top level",
         instructions: (writer) => {
             writer.stepOut();
