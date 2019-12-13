@@ -396,6 +396,10 @@ export class ParserTextRaw {
                         if (isEscaped) {
                             s += String.fromCodePoint(ch);
                         } else {
+                            if(t === T_STRING3 && ch === ESC_nl3 && this._in.valueAt(index + 1) === ESC_nl2) {
+                                ch = ESC_nl2;
+                                index++;
+                            }
                             s += String.fromCharCode(ch);
                         }
                     }
@@ -1245,7 +1249,7 @@ export class ParserTextRaw {
             case ESC_nl2:
                 return -1; // =  10, //  values['\n'] = ESCAPE_REMOVES_NEWLINE;  // slash-new line the new line eater
             case ESC_nl3: // =  13, //  values['\r'] = ESCAPE_REMOVES_NEWLINE2;  // slash-new line the new line eater
-                if (ii + 3 < end && this._in.valueAt(ii + 3) == CH_NL) {
+                if (ii + 2 < end && this._in.valueAt(ii + 2) == CH_NL) {
                     this._esc_len = 2;
                 }
                 return IonText.ESCAPED_NEWLINE;
@@ -1284,7 +1288,7 @@ export class ParserTextRaw {
             case ESC_fs:  return 47; // =  47, //  values['/']  = '/';     //    \u002F  \/  forward slash nothing  \NL  escaped NL expands to nothing
             case ESC_nl2: return -1; // =  10, //  values['\n'] = ESCAPE_REMOVES_NEWLINE;  // slash-new line the new line eater
             case ESC_nl3: // =  13, //  values['\r'] = ESCAPE_REMOVES_NEWLINE2;  // slash-new line the new line eater
-                if (ii + 3 < end && this._in.valueAt(ii + 3) == CH_NL) {
+                if (ii + 2 < end && this._in.valueAt(ii + 2) == CH_NL) {
                     this._esc_len = 2;
                 }
                 return IonText.ESCAPED_NEWLINE;
