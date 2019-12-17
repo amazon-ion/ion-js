@@ -225,7 +225,12 @@ class IonTextReaderTests {
         IonTextReaderTests.first_value_equal("'''abc\\'''' '''''' taco", "abc'");
         IonTextReaderTests.first_value_equal('"abc\\""', 'abc"');
         IonTextReaderTests.first_value_equal('"abc\\"" taco', 'abc"');
+        IonTextReaderTests.first_value_equal("'\\\n'", "");
+        IonTextReaderTests.first_value_equal("'''short1\\\n'''\n\n'''\\\nmulti-line string\nwith embedded\\nnew line\ncharacters\\\n'''", "short1multi-line string\nwith embedded\nnew line\ncharacters");
+
     };
+
+
 
     @test "text IVM"() {
         let textReader = ion.makeReader("");
