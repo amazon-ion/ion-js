@@ -42,6 +42,10 @@ export abstract class AbstractWriter implements Writer {
         }
     }
 
+    // This method is not part of the Writer interface, but subclasses of AbstractWriter must implement it
+    // in order to use the default implementations of writeValue() and writeValues()
+    protected abstract _isInStruct(): boolean
+
     writeValues(reader: Reader): void {
         this._writeValues(reader);
     }
@@ -54,53 +58,58 @@ export abstract class AbstractWriter implements Writer {
         this._annotations = [];
     }
 
-    private _writeValues(reader: Reader, _depth = 0): void {
+    private _writeValues(reader: Reader): void {
         let type: IonType | null = reader.type();
         if (type === null) {
             type = reader.next();
         }
         while (type !== null) {
-            this._writeValue(reader, _depth);
+            this._writeValue(reader);
             type = reader.next();
         }
     }
 
-    private _writeValue(reader: Reader, _depth = 0): void {
+    private _writeValue(reader: Reader): void {
         let type: IonType | null = reader.type();
         if (type === null) {
             return;
         }
-        if (_depth > 0) {
+
+        if (this._isInStruct()) {
             let fieldName = reader.fieldName();
-            if (fieldName !== null) {
-                this.writeFieldName(fieldName);
+            if (fieldName === null) {
+                throw new Error("Cannot call writeValue() when the Writer is in a Struct but the Reader is not.");
             }
+            this.writeFieldName(fieldName);
         }
+
         this.setAnnotations(reader.annotations());
+
         if (reader.isNull()) {
             this.writeNull(type);
-        } else {
-            switch (type) {
-                case IonTypes.BOOL:      this.writeBoolean(reader.booleanValue()); break;
-                case IonTypes.INT:       this.writeInt(reader.bigIntValue()); break;
-                case IonTypes.FLOAT:     this.writeFloat64(reader.numberValue()); break;
-                case IonTypes.DECIMAL:   this.writeDecimal(reader.decimalValue()); break;
-                case IonTypes.TIMESTAMP: this.writeTimestamp(reader.timestampValue()); break;
-                case IonTypes.SYMBOL:    this.writeSymbol(reader.stringValue()); break;
-                case IonTypes.STRING:    this.writeString(reader.stringValue()); break;
-                case IonTypes.CLOB:      this.writeClob(reader.byteValue()); break;
-                case IonTypes.BLOB:      this.writeBlob(reader.byteValue()); break;
-                case IonTypes.LIST:      this.stepIn(IonTypes.LIST); break;
-                case IonTypes.SEXP:      this.stepIn(IonTypes.SEXP); break;
-                case IonTypes.STRUCT:    this.stepIn(IonTypes.STRUCT); break;
-                default: throw new Error('Unrecognized type ' + (type !== null ? type.name : type));
-            }
-            if (type.isContainer) {
-                reader.stepIn();
-                this._writeValues(reader, _depth + 1);
-                this.stepOut();
-                reader.stepOut();
-            }
+            return;
+        }
+
+        switch (type) {
+            case IonTypes.BOOL:      this.writeBoolean(reader.booleanValue()); break;
+            case IonTypes.INT:       this.writeInt(reader.bigIntValue()); break;
+            case IonTypes.FLOAT:     this.writeFloat64(reader.numberValue()); break;
+            case IonTypes.DECIMAL:   this.writeDecimal(reader.decimalValue()); break;
+            case IonTypes.TIMESTAMP: this.writeTimestamp(reader.timestampValue()); break;
+            case IonTypes.SYMBOL:    this.writeSymbol(reader.stringValue()); break;
+            case IonTypes.STRING:    this.writeString(reader.stringValue()); break;
+            case IonTypes.CLOB:      this.writeClob(reader.byteValue()); break;
+            case IonTypes.BLOB:      this.writeBlob(reader.byteValue()); break;
+            case IonTypes.LIST:      this.stepIn(IonTypes.LIST); break;
+            case IonTypes.SEXP:      this.stepIn(IonTypes.SEXP); break;
+            case IonTypes.STRUCT:    this.stepIn(IonTypes.STRUCT); break;
+            default: throw new Error('Unrecognized type ' + (type !== null ? type.name : type));
+        }
+        if (type.isContainer) {
+            reader.stepIn();
+            this._writeValues(reader);
+            this.stepOut();
+            reader.stepOut();
         }
     }
 

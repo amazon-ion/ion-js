@@ -174,6 +174,10 @@ export class TextWriter extends AbstractWriter {
         });
     }
 
+    protected _isInStruct(): boolean {
+        return this.currentContainer.containerType === IonTypes.STRUCT;
+    }
+
     /*
     Another way to handle this is simply to store the field name here, and actually write it in _serializeValue.
     This is how the other implementations I know of handle it.

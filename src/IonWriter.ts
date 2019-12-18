@@ -101,15 +101,27 @@ export interface Writer {
     writeClob(value: Uint8Array | null): void;
 
     /**
-     * Writes a reader's current value.  If there's no current value, this method
-     * does nothing.
+     * Writes a reader's current value.
+     *
+     * If there's no current value, this method does nothing.
+     * If the current value is a container, this method will stepIn() recursively,
+     * writing each nested value that it encounters.
+     *
+     * It is illegal to call this method if this Writer is positioned within a Struct
+     * while the Reader is not.
      */
     writeValue(reader: Reader): void;
 
     /**
      * Writes a reader's current value and all following values until the end
-     * of the current container.  If there's no current value then this method
-     * calls {@link next()} to get started.
+     * of the current container.
+     *
+     * If there's no current value then this method calls {@link next()} to get started.
+     * This method will stepIn() to containers recursively, writing each nested value that it
+     * encounters.
+     *
+     * It is illegal to call this method if this Writer is positioned within a Struct
+     * while the Reader is not.
      */
     writeValues(reader: Reader): void;
 
