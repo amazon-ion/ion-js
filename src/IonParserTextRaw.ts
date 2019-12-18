@@ -22,10 +22,10 @@
 import * as IonText from "./IonText";
 import {is_keyword, is_whitespace} from "./IonText";
 
+import JSBI from "jsbi";
+import {StringSpan} from "./IonSpan";
 import {IonType} from "./IonType";
 import {IonTypes} from "./IonTypes";
-import {StringSpan} from "./IonSpan";
-import JSBI from "jsbi";
 import {JsbiSupport} from "./JsbiSupport";
 
 const EOF = -1;  // EOF is end of container, distinct from undefined which is value has been consumed
@@ -396,6 +396,10 @@ export class ParserTextRaw {
                         if (isEscaped) {
                             s += String.fromCodePoint(ch);
                         } else {
+                            if(t === T_STRING3 && ch === ESC_nl3 && this._in.valueAt(index + 1) === ESC_nl2) {
+                                ch = ESC_nl2;
+                                index++;
+                            }
                             s += String.fromCharCode(ch);
                         }
                     }
@@ -745,6 +749,7 @@ export class ParserTextRaw {
             let ch = this._read_after_whitespace(true);
             if (ch == CH_CL && this._peek() == CH_CL) {
                 this._read(); // consume the colon character
+                if(symbol === '$0') throw new Error('Symbol ID zero is not supported.');
                 this._ann.push(symbol);
                 this._ops.unshift(calling_op);
             } else {
@@ -1079,6 +1084,12 @@ export class ParserTextRaw {
         ch = this._read_after_whitespace(true);
         if (ch == CH_CL && this._peek() == CH_CL) {
             this._read(); // consume the colon character
+            if(s[0] === '$') {
+                let tempStr = s.substr(1, s.length)
+                if (+tempStr === +tempStr) {
+                    s = "'" + s + "'";
+                }
+            }
             this._ann.push(s);
             is_ann = true;
         } else {
@@ -1238,7 +1249,7 @@ export class ParserTextRaw {
             case ESC_nl2:
                 return -1; // =  10, //  values['\n'] = ESCAPE_REMOVES_NEWLINE;  // slash-new line the new line eater
             case ESC_nl3: // =  13, //  values['\r'] = ESCAPE_REMOVES_NEWLINE2;  // slash-new line the new line eater
-                if (ii + 3 < end && this._in.valueAt(ii + 3) == CH_NL) {
+                if (ii + 2 < end && this._in.valueAt(ii + 2) == CH_NL) {
                     this._esc_len = 2;
                 }
                 return IonText.ESCAPED_NEWLINE;
@@ -1277,7 +1288,7 @@ export class ParserTextRaw {
             case ESC_fs:  return 47; // =  47, //  values['/']  = '/';     //    \u002F  \/  forward slash nothing  \NL  escaped NL expands to nothing
             case ESC_nl2: return -1; // =  10, //  values['\n'] = ESCAPE_REMOVES_NEWLINE;  // slash-new line the new line eater
             case ESC_nl3: // =  13, //  values['\r'] = ESCAPE_REMOVES_NEWLINE2;  // slash-new line the new line eater
-                if (ii + 3 < end && this._in.valueAt(ii + 3) == CH_NL) {
+                if (ii + 2 < end && this._in.valueAt(ii + 2) == CH_NL) {
                     this._esc_len = 2;
                 }
                 return IonText.ESCAPED_NEWLINE;

@@ -6,8 +6,9 @@ An implementation of [Amazon Ion](https://amzn.github.io/ion-docs/) for JavaScri
 [![Travis CI Status](https://api.travis-ci.org/amzn/ion-js.svg?branch=master)](https://travis-ci.org/amzn/ion-js)
 [![Documentation](https://img.shields.io/badge/docs-api-green.svg)](https://amzn.github.io/ion-js/api/index.html)
 
-This package is designed with work with Node JS major versions **8**, **10**, and **12**.  Browser compatibility
-should be anything that supports **ES5+**.
+This package is designed to work with Node JS major versions **8**, **10**, and **12**.  While this library
+should be usable within browsers that support **ES5+**, please note that it is not currently being tested
+in any browser environments.
 
 ## Getting Started
 
