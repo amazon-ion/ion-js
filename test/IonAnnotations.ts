@@ -85,8 +85,7 @@ describe('Annotations', () => {
         reader.stepIn();
         reader.next();
 
-        //FIXME: https://github.com/amzn/ion-js/issues/454
-        writer['_writeValues'](reader, 1);
+        writer.writeValues(reader);
 
         reader.stepOut();
 

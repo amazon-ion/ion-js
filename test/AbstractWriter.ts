@@ -15,6 +15,7 @@
 
 import {assert} from 'chai';
 import * as ion from '../src/IonTests';
+import {IonTypes} from '../src/IonTests';
 
 function testWriteValue(reader, expected) {
     let writer = ion.makeTextWriter();
@@ -135,12 +136,93 @@ describe('AbstractWriter writeValue()', () => {
         testWriteValues(reader, expected);
     });
 
-    it('writeValues(), start within container', () => {
+    it('writeValues(), reader starts in a struct, writer starts at top level', () => {
         let s = 'abc::{a:a::1,b:b::[two::2,three::3,sexp::(four::4)],c:c::null.symbol}';
         let reader = ion.makeReader(s);
         reader.next();
         reader.stepIn();
         testWriteValues(reader, 'a::1\nb::[two::2,three::3,sexp::(four::4)]\nc::null.symbol');
+        reader.stepOut();
+    });
+
+    it('writeValues(), reader starts in a list, writer starts at top level', () => {
+        let ionText = '[two::2,three::3,sexp::(four::4)]';
+        let expectedIonText = 'two::2\nthree::3\nsexp::(four::4)'
+        let reader = ion.makeReader(ionText);
+        reader.next();
+        reader.stepIn();
+
+        let writer = ion.makeTextWriter();
+        writer.writeValues(reader);
+        assert.equal(String.fromCharCode.apply(null, writer.getBytes()), expectedIonText);
+
+        reader.stepOut();
+    });
+
+    it('writeValues(), reader starts in a struct, writer starts in a struct', () => {
+        let ionText = '{name:"Joe",age:22}';
+        let expectedIonText = ionText;
+        let reader = ion.makeReader(ionText);
+        reader.next();
+        reader.stepIn();
+
+        let writer = ion.makeTextWriter();
+        writer.stepIn(IonTypes.STRUCT);
+        writer.writeValues(reader);
+        writer.stepOut();
+        writer.close();
+        assert.equal(String.fromCharCode.apply(null, writer.getBytes()), expectedIonText);
+
+        reader.stepOut();
+    });
+
+    it('writeValues(), reader starts in a list, writer starts in a list', () => {
+        let ionText = '["foo","bar","baz"]';
+        let expectedIonText = ionText;
+        let reader = ion.makeReader(ionText);
+        reader.next();
+        reader.stepIn();
+
+        let writer = ion.makeTextWriter();
+        writer.stepIn(IonTypes.LIST);
+        writer.writeValues(reader);
+        writer.stepOut();
+        writer.close();
+        assert.equal(String.fromCharCode.apply(null, writer.getBytes()), expectedIonText);
+
+        reader.stepOut();
+    });
+
+    it('writeValues(), reader starts inside a list, writer starts in a struct', () => {
+        let ionText = '[two::2,three::3,sexp::(four::4)]';
+        let reader = ion.makeReader(ionText);
+        reader.next();
+        reader.stepIn();
+
+        let writer = ion.makeTextWriter();
+        writer.stepIn(IonTypes.STRUCT);
+        // The writer needs a field name for each value it writes in a struct, but the reader isn't in a struct
+        // and doesn't have a field name to offer.
+        assert.throws(() => writer.writeValues(reader));
+        writer.stepOut();
+
+        reader.stepOut();
+    });
+
+    it('writeValues(), reader starts inside a struct, writer starts in a list', () => {
+        let ionText = '{a:{foo:"bar"},b:"baz"}';
+        let expectedIonText = '[{foo:"bar"},"baz"]';
+        let reader = ion.makeReader(ionText);
+        reader.next();
+        reader.stepIn();
+
+        let writer = ion.makeTextWriter();
+        writer.stepIn(IonTypes.LIST);
+        writer.writeValues(reader);
+        writer.stepOut();
+        writer.close();
+        assert.equal(String.fromCharCode.apply(null, writer.getBytes()), expectedIonText);
+
         reader.stepOut();
     });
 });

@@ -320,6 +320,10 @@ export class BinaryWriter extends AbstractWriter {
         }
     }
 
+    protected _isInStruct(): boolean {
+        return this.getCurrentContainer() instanceof StructNode;
+    }
+
     writeFieldName(fieldName: string): void {
         _assertDefined(fieldName);
         if (this.state !== States.STRUCT_FIELD) {
