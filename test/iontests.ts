@@ -18,6 +18,7 @@ import * as ion from '../src/Ion';
 import * as fs from 'fs';
 import * as path from 'path';
 import {IonEventStream} from '../src/IonEventStream';
+import {IonEvent} from '../src/IonEvent';
 import {IonType, Reader, Timestamp, Writer} from '../src/Ion';
 
 function findFiles(folder: string, files: string[] = []) {
@@ -49,12 +50,14 @@ function loadValues(path: string, newWriter: () => Writer) {
     let reader = ion.makeReader(getInput(path));
     let values: Uint8Array[][] = [];
     let containerIdx = 0;
+    let embeddedDocument = false;
 
     for (let topLevelType; topLevelType = reader.next();) {
         if (!topLevelType.isContainer) {
             throw Error('Expected top-level value to be a container, was ' + topLevelType);
         }
-
+        let ann = reader.annotations();
+        embeddedDocument = ann.length === 1 && ann[0] === 'embedded_documents';
         reader.stepIn();
         values.push([]);
 
@@ -68,6 +71,7 @@ function loadValues(path: string, newWriter: () => Writer) {
         containerIdx += 1;
         reader.stepOut();
     }
+    if(embeddedDocument) values.unshift([])
     return values;
 }
 
@@ -84,26 +88,42 @@ function bytesToString(c: number, idx: number, bytes: Uint8Array) {
     return sb + ' ' + String.fromCharCode.apply(null, bytes);
 }
 
-function equivsTestCompare(c: number, i: number, j: number, bytesI: Uint8Array, bytesJ: Uint8Array, expectedEquivalence: boolean) {
-    let eventStreamI = new IonEventStream(ion.makeReader(bytesI));
-    let eventStreamJ = new IonEventStream(ion.makeReader(bytesJ));
-    let result = eventStreamI.equals(eventStreamJ);
-    assert(expectedEquivalence ? result : !result,
-        'Expected ' + bytesToString(c, i, bytesI)
-        + ' to' + (expectedEquivalence ? '' : ' not')
-        + ' be equivalent to ' + bytesToString(c, j, bytesJ));
-}
+function equivsTest(path: string, expectedEquivalence = true) {
+    let bytes = getInput(path)
+    let originalEvents = (new IonEventStream(ion.makeReader(bytes))).getEvents();
+    let textWriter = ion.makeTextWriter();
+    textWriter.writeValues(ion.makeReader(bytes));
+    let textBytes = textWriter.getBytes();
+    let textEvents = (new IonEventStream(ion.makeReader(textBytes))).getEvents();
+    let binWriter = ion.makeBinaryWriter();
+    binWriter.writeValues(ion.makeReader(bytes));
+    let binBytes = binWriter.getBytes();
+    let binEvents = (new IonEventStream(ion.makeReader(binBytes))).getEvents();
+    for (let i = 0; i < originalEvents[i].ionValue.length; i += originalEvents[i].ionValue.length - 1) {
+        let event = originalEvents[i];
+        let textEvent = textEvents[i];
+        let binEvent = binEvents[i];
+        //if were equal everybody equals everybody
+        //if were not equal we want to make sure nobody equals us except other values at our index
+        let comparisons : any = [];
+        if (event.annotations[0] === 'embedded_documents') {
+            for (let j = 0; j < event.ionValue.length - 1; j++) {
+                comparisons.push([new IonEventStream(ion.makeReader(event.ionValue)), new IonEventStream(ion.makeReader(textEvent.ionValue)), new IonEventStream(ion.makeReader(binEvent.ionValue))]);
+            }
+        } else {//were in an sexp
+            for (let j = 0; j < event.ionValue.length - 1; j++) {
+                comparisons.push([originalEvents[j], textEvents[j], binEvents[j]]);
+            }
+        }
 
-function equivsTest(path: string, expectedEquivalence = true, compare = equivsTestCompare) {
-    let binaryValues = loadValues(path, () => ion.makeBinaryWriter());
-    let textValues = loadValues(path, () => ion.makeTextWriter());
-
-    for (let c = 0; c < binaryValues.length; c++) {
-        for (let i = 0; i < binaryValues[c].length; i++) {
-            for (let j = i + 1; j < binaryValues[c].length; j++) {
-                compare(c, i, j, binaryValues[c][i], binaryValues[c][j], expectedEquivalence);
-                compare(c, i, j, binaryValues[c][i], textValues[c][j], expectedEquivalence);
-                compare(c, i, j, textValues[c][i], textValues[c][j], expectedEquivalence);
+        let width = comparisons[0].length;//should be 3 unless we change the impl
+        for (let j = 0; j < comparisons.length - 1; j++) {
+            for (let k = j + 1; k < comparisons.length; k++) {
+                for (let l = 0; l < width; l++) {
+                    for (let m = l + 1; m < width; m++) {
+                        assert.isTrue(comparisons[j][l].equals(comparisons[k][m]) === expectedEquivalence);
+                    }
+                }
             }
         }
     }
@@ -127,7 +147,7 @@ function equivTimelinesTest(path: string) {
         assert(tsI!.compareTo(tsJ!) === 0, 'Expected ' + tsI + ' to be instant-equivalent to ' + tsJ);
     }
 
-    equivsTest(path, true, timelinesCompare);
+    equivsTest(path, true);
 }
 
 function readerCompareTest(source: string | Buffer) {
