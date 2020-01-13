@@ -93,10 +93,12 @@ function equivsTest(path: string, expectedEquivalence = true) {
     let originalEvents = (new IonEventStream(ion.makeReader(bytes))).getEvents();
     let textWriter = ion.makeTextWriter();
     textWriter.writeValues(ion.makeReader(bytes));
+    textWriter.close();
     let textBytes = textWriter.getBytes();
     let textEvents = (new IonEventStream(ion.makeReader(textBytes))).getEvents();
     let binWriter = ion.makeBinaryWriter();
     binWriter.writeValues(ion.makeReader(bytes));
+    binWriter.close();
     let binBytes = binWriter.getBytes();
     let binEvents = (new IonEventStream(ion.makeReader(binBytes))).getEvents();
     for (let i = 0; i < originalEvents[i].ionValue.length; i += originalEvents[i].ionValue.length - 1) {
