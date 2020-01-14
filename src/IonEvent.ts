@@ -354,7 +354,7 @@ class IonTimestampEvent extends AbstractIonEvent {
     }
 
     valueEquals(expected: IonTimestampEvent): boolean {
-        return expected instanceof IonTimestampEvent && this.ionValue.equals(expected.ionValue);
+        return expected instanceof IonTimestampEvent && this.ionValue.compareTo(expected.ionValue) === 0;
     }
 
     writeIonValue(writer: Writer): void {

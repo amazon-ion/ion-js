@@ -18,7 +18,7 @@ import * as ion from '../src/Ion';
 import * as fs from 'fs';
 import * as path from 'path';
 import {IonEventStream} from '../src/IonEventStream';
-import {IonEvent} from '../src/IonEvent';
+import {IonEvent, IonEventType} from '../src/IonEvent';
 import {IonType, Reader, Timestamp, Writer} from '../src/Ion';
 
 function findFiles(folder: string, files: string[] = []) {
@@ -101,7 +101,7 @@ function equivsTest(path: string, expectedEquivalence = true) {
     binWriter.close();
     let binBytes = binWriter.getBytes();
     let binEvents = (new IonEventStream(ion.makeReader(binBytes))).getEvents();
-    for (let i = 0; i < originalEvents[i].ionValue.length; i += originalEvents[i].ionValue.length - 1) {
+    for (let i = 0; i < originalEvents.length - 2; i += originalEvents[i].ionValue.length + 1) {
         let event = originalEvents[i];
         let textEvent = textEvents[i];
         let binEvent = binEvents[i];
@@ -113,8 +113,8 @@ function equivsTest(path: string, expectedEquivalence = true) {
                 comparisons.push([new IonEventStream(ion.makeReader(event.ionValue)), new IonEventStream(ion.makeReader(textEvent.ionValue)), new IonEventStream(ion.makeReader(binEvent.ionValue))]);
             }
         } else {//were in an sexp
-            for (let j = 0; j < event.ionValue.length - 1; j++) {
-                comparisons.push([originalEvents[j], textEvents[j], binEvents[j]]);
+            for (let j = 0; j < event.ionValue.length - 1; event.ionValue[j].eventType === IonEventType.SCALAR ? j++ : j += event.ionValue[j].ionValue.length) {
+                comparisons.push([event.ionValue[j], textEvent.ionValue[j], binEvent.ionValue[j]]);
             }
         }
 
