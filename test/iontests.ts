@@ -110,11 +110,14 @@ function equivsTest(path: string, expectedEquivalence = true) {
         let comparisons : any = [];
         if (event.annotations[0] === 'embedded_documents') {
             for (let j = 0; j < event.ionValue.length - 1; j++) {
-                comparisons.push([new IonEventStream(ion.makeReader(event.ionValue)), new IonEventStream(ion.makeReader(textEvent.ionValue)), new IonEventStream(ion.makeReader(binEvent.ionValue))]);
+                comparisons.push([new IonEventStream(ion.makeReader(event.ionValue[j].ionValue)), new IonEventStream(ion.makeReader(textEvent.ionValue[j].ionValue)), new IonEventStream(ion.makeReader(binEvent.ionValue[j].ionValue))]);
             }
         } else {//were in an sexp
-            for (let j = 0; j < event.ionValue.length - 1; event.ionValue[j].eventType === IonEventType.SCALAR ? j++ : j += event.ionValue[j].ionValue.length) {
+            for (let j = 0; j < event.ionValue.length - 1; j++) {
                 comparisons.push([event.ionValue[j], textEvent.ionValue[j], binEvent.ionValue[j]]);
+                if (event.ionValue[j].eventType === IonEventType.CONTAINER_START) {
+                    j += event.ionValue[j].ionValue.length
+                }
             }
         }
 
@@ -122,7 +125,7 @@ function equivsTest(path: string, expectedEquivalence = true) {
         for (let j = 0; j < comparisons.length - 1; j++) {
             for (let k = j + 1; k < comparisons.length; k++) {
                 for (let l = 0; l < width; l++) {
-                    for (let m = l + 1; m < width; m++) {
+                    for (let m = 0; m < width; m++) {
                         assert.isTrue(comparisons[j][l].equals(comparisons[k][m]) === expectedEquivalence);
                     }
                 }
