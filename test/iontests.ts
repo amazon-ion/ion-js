@@ -19,7 +19,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import {IonEventStream} from '../src/IonEventStream';
 import {IonEventType} from '../src/IonEvent';
-import {IonType, Reader, Timestamp, Writer} from '../src/Ion';
+import {IonType, Reader, Writer} from '../src/Ion';
 
 function findFiles(folder: string, files: string[] = []) {
     fs.readdirSync(folder).forEach(file => {
