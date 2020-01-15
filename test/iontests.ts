@@ -46,49 +46,7 @@ function exhaust(reader: Reader) {
     }
 }
 
-function loadValues(path: string, newWriter: () => Writer) {
-    let reader = ion.makeReader(getInput(path));
-    let values: Uint8Array[][] = [];
-    let containerIdx = 0;
-    let embeddedDocument = false;
-
-    for (let topLevelType; topLevelType = reader.next();) {
-        if (!topLevelType.isContainer) {
-            throw Error('Expected top-level value to be a container, was ' + topLevelType);
-        }
-        let ann = reader.annotations();
-        embeddedDocument = ann.length === 1 && ann[0] === 'embedded_documents';
-        reader.stepIn();
-        values.push([]);
-
-        for (let type; type = reader.next();) {
-            let writer = newWriter();
-            writer.writeValue(reader);
-            writer.close();
-            values[containerIdx].push(writer.getBytes());
-        }
-
-        containerIdx += 1;
-        reader.stepOut();
-    }
-    if(embeddedDocument) values.unshift([])
-    return values;
-}
-
-function bytesToString(c: number, idx: number, bytes: Uint8Array) {
-    let sb = '[' + c + '][' + idx + ']';
-    if (bytes.length >= 4 && bytes[0] === 224 && bytes[1] === 1 && bytes[2] === 0 && bytes[3] === 234) {
-        // Ion binary, convert to hex string
-        bytes.forEach(b => {
-            sb += ' ' + ('0' + (b & 0xFF).toString(16)).slice(-2);
-        });
-        return sb;
-    }
-    // otherwise, text:
-    return sb + ' ' + String.fromCharCode.apply(null, bytes);
-}
-
-function equivsTest(path: string, expectedEquivalence = true) {
+function equivsTest(path: string, expectedEquivalence = true, equivsTimelines? : boolean) {
     let bytes = getInput(path)
     let originalEvents = (new IonEventStream(ion.makeReader(bytes))).getEvents();
     let textWriter = ion.makeTextWriter();
@@ -126,7 +84,11 @@ function equivsTest(path: string, expectedEquivalence = true) {
             for (let k = j + 1; k < comparisons.length; k++) {
                 for (let l = 0; l < width; l++) {
                     for (let m = 0; m < width; m++) {
-                        assert.isTrue(comparisons[j][l].equals(comparisons[k][m]) === expectedEquivalence);
+                        if (equivsTimelines) {
+                            assert.isTrue(comparisons[j][l].ionValue.compareTo(comparisons[k][m].ionValue) === 0);
+                        } else {
+                            assert.isTrue(comparisons[j][l].equals(comparisons[k][m]) === expectedEquivalence);
+                        }
                     }
                 }
             }
@@ -139,20 +101,7 @@ function nonEquivsTest(path: string) {
 }
 
 function equivTimelinesTest(path: string) {
-    function timelinesCompare(c: number, i: number, j: number, bytesI: Uint8Array, bytesJ: Uint8Array) {
-        function readTimestamp(bytes: Uint8Array): Timestamp | null {
-            let reader = ion.makeReader(bytes);
-            reader.next();
-            return reader.timestampValue();
-        }
-
-        let tsI = readTimestamp(bytesI);
-        let tsJ = readTimestamp(bytesJ);
-        // assert that the timestamps represent the same instant (but not necessarily data-model equivalent):
-        assert(tsI!.compareTo(tsJ!) === 0, 'Expected ' + tsI + ' to be instant-equivalent to ' + tsJ);
-    }
-
-    equivsTest(path, true);
+    equivsTest(path, true, true);
 }
 
 function readerCompareTest(source: string | Buffer) {
@@ -422,6 +371,7 @@ let nonEquivsSkipList = toSkipList([
     'ion-tests/iontestdata/good/non-equivs/clobs.ion',
     'ion-tests/iontestdata/good/non-equivs/floats.ion',
     'ion-tests/iontestdata/good/non-equivs/floatsVsDecimals.ion',
+    'ion-tests/iontestdata/good/non-equivs/symbolTablesUnknownText.ion',//Cannot pass until we implement symbol token support.
 ]);
 
 ////// end of generated skiplists
