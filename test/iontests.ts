@@ -64,7 +64,6 @@ function equivsTest(path: string, expectedEquivalence = true, equivsTimelines? :
         let textEvent = textEvents[i];
         let binEvent = binEvents[i];
         //if were equal everybody equals everybody
-        //if were not equal we want to make sure nobody equals us except other values at our index
         let comparisons : any = [];
         if (event.annotations[0] === 'embedded_documents') {
             for (let j = 0; j < event.ionValue.length - 1; j++) {
@@ -79,7 +78,7 @@ function equivsTest(path: string, expectedEquivalence = true, equivsTimelines? :
             }
         }
 
-        let width = comparisons[0].length;//should be 3 unless we change the impl
+        let width = comparisons[0].length;
         for (let j = 0; j < comparisons.length - 1; j++) {
             for (let k = j + 1; k < comparisons.length; k++) {
                 for (let l = 0; l < width; l++) {
