@@ -87,7 +87,7 @@ function equivsTest(path: string, expectedEquivalence = true, equivsTimelines? :
         let width = comparisons[0].length;
         //if we're equal everybody equals everybody
         //if !eq only the copies in our row are equal
-        // every value in row j must compare with every other row
+        //every value in row j must compare with every other row
         for (let j = 0; j < comparisons.length; j++) {
             for (let k = j + 1; k < comparisons.length; k++) {
                 //l tracks our index within row j
@@ -95,9 +95,9 @@ function equivsTest(path: string, expectedEquivalence = true, equivsTimelines? :
                     //m tracks our index within row k
                     for (let m = 0; m < width; m++) {
                         if (equivsTimelines) {
-                            assert.isTrue(comparisons[j][l].ionValue.compareTo(comparisons[k][m].ionValue) === 0);
+                            assert.equal(comparisons[j][l].ionValue.compareTo(comparisons[k][m].ionValue), 0);
                         } else {
-                            assert.isTrue(comparisons[j][l].equals(comparisons[k][m]) === expectedEquivalence);
+                            assert.equal(comparisons[j][l].equals(comparisons[k][m]), expectedEquivalence);
                         }
                     }
                 }
