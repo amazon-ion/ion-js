@@ -46,30 +46,36 @@ function exhaust(reader: Reader) {
     }
 }
 
+function makeStream(src, writer) {
+    writer.writeValues(ion.makeReader(src));
+    writer.close();
+    return new IonEventStream(ion.makeReader(writer.getBytes()));
+}
+
 function equivsTest(path: string, expectedEquivalence = true, equivsTimelines? : boolean) {
     let bytes = getInput(path)
     let originalEvents = (new IonEventStream(ion.makeReader(bytes))).getEvents();
-    let textWriter = ion.makeTextWriter();
-    textWriter.writeValues(ion.makeReader(bytes));
-    textWriter.close();
-    let textBytes = textWriter.getBytes();
-    let textEvents = (new IonEventStream(ion.makeReader(textBytes))).getEvents();
-    let binWriter = ion.makeBinaryWriter();
-    binWriter.writeValues(ion.makeReader(bytes));
-    binWriter.close();
-    let binBytes = binWriter.getBytes();
-    let binEvents = (new IonEventStream(ion.makeReader(binBytes))).getEvents();
+    let textEvents = makeStream(bytes, ion.makeTextWriter()).getEvents();
+    let binEvents = makeStream(bytes, ion.makeBinaryWriter()).getEvents();
+
+    //i is the index of each toplevel container start event
     for (let i = 0; i < originalEvents.length - 2; i += originalEvents[i].ionValue.length + 1) {
         let event = originalEvents[i];
         let textEvent = textEvents[i];
         let binEvent = binEvents[i];
-        //if were equal everybody equals everybody
         let comparisons : any = [];
         if (event.annotations[0] === 'embedded_documents') {
+            //we found a list of strings that we need to interpret as top level ion text streams.
             for (let j = 0; j < event.ionValue.length - 1; j++) {
-                comparisons.push([new IonEventStream(ion.makeReader(event.ionValue[j].ionValue)), new IonEventStream(ion.makeReader(textEvent.ionValue[j].ionValue)), new IonEventStream(ion.makeReader(binEvent.ionValue[j].ionValue))]);
+                comparisons.push(
+                    [
+                        new IonEventStream(ion.makeReader(event.ionValue[j].ionValue)),
+                        new IonEventStream(ion.makeReader(textEvent.ionValue[j].ionValue)),
+                        new IonEventStream(ion.makeReader(binEvent.ionValue[j].ionValue))
+                    ]
+                );
             }
-        } else {//were in an sexp
+        } else {//we're in an sexp
             for (let j = 0; j < event.ionValue.length - 1; j++) {
                 comparisons.push([event.ionValue[j], textEvent.ionValue[j], binEvent.ionValue[j]]);
                 if (event.ionValue[j].eventType === IonEventType.CONTAINER_START) {
@@ -77,11 +83,16 @@ function equivsTest(path: string, expectedEquivalence = true, equivsTimelines? :
                 }
             }
         }
-
+        //width is the number of "copies"  of each value (original, text, binary)
         let width = comparisons[0].length;
-        for (let j = 0; j < comparisons.length - 1; j++) {
+        //if we're equal everybody equals everybody
+        //if !eq only the copies in our row are equal
+        // every value in row j must compare with every other row
+        for (let j = 0; j < comparisons.length; j++) {
             for (let k = j + 1; k < comparisons.length; k++) {
+                //l tracks our index within row j
                 for (let l = 0; l < width; l++) {
+                    //m tracks our index within row k
                     for (let m = 0; m < width; m++) {
                         if (equivsTimelines) {
                             assert.isTrue(comparisons[j][l].ionValue.compareTo(comparisons[k][m].ionValue) === 0);
