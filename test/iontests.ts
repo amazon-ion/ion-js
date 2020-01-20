@@ -52,9 +52,9 @@ function makeStream(src, writer) {
     return new IonEventStream(ion.makeReader(writer.getBytes()));
 }
 
-function equivsTest(path: string, expectedEquivalence = true, equivsTimelines? : boolean) {
+function equivsTest(path: string, expectedEquivalence = true, equivsTimelines = false) {
     let bytes = getInput(path)
-    let originalEvents = (new IonEventStream(ion.makeReader(bytes))).getEvents();
+    let originalEvents = new IonEventStream(ion.makeReader(bytes)).getEvents();
     let textEvents = makeStream(bytes, ion.makeTextWriter()).getEvents();
     let binEvents = makeStream(bytes, ion.makeBinaryWriter()).getEvents();
 
