@@ -63,6 +63,8 @@ function equivsTest(path: string, expectedEquivalence = true, equivsTimelines = 
         let event = originalEvents[i];
         let textEvent = textEvents[i];
         let binEvent = binEvents[i];
+        //Comparisons can be either IonEventStream[](Embedded Documents List of strings interpreted as top level streams).
+        //Or an IonEvent[](contents of an sexp of equivalent Ion values).
         let comparisons : any = [];
         if (event.annotations[0] === 'embedded_documents') {
             //we found a list of strings that we need to interpret as top level ion text streams.
