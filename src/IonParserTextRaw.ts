@@ -311,7 +311,7 @@ export class ParserTextRaw {
         switch (this._curr) {
             case T_INT:
             case T_HEXINT:
-                return JsbiSupport.clampToSafeIntegerRange(JsbiSupport.bigIntFromString(s));
+                return JSBI.toNumber(JsbiSupport.bigIntFromString(s));
             case T_FLOAT:
                 return Number(s);
             case T_FLOAT_SPECIAL:
