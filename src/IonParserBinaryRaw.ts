@@ -166,7 +166,7 @@ export class ParserBinaryRaw {
         }
 
         if (numberOfBits > 31) {
-            throw new Error("VarUInt values larger than 31 bits must be read using LongInt.");
+            throw new Error("VarUInt values larger than 31 bits must be read using SignAndMagnitudeInt.");
         }
 
         return magnitude;
@@ -187,7 +187,7 @@ export class ParserBinaryRaw {
             bits += 7;
         }
         if (bits > 32) {
-            throw new Error("VarInt values larger than 32 bits must be read using LongInt");
+            throw new Error("VarInt values larger than 32 bits must be read using SignAndMagnitudeInt");
         }
         // now we put the sign on, if it's needed
         return isNegative ? -v : v;

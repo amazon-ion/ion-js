@@ -22,8 +22,8 @@ import {JsbiSupport} from "../src/JsbiSupport";
 
 /**
  * @param decimalString The text representation of the decimal to test.
- * @param expectedCoefficient The expected `number` or `string` (LongInt) for the coefficient.
- * @param expectedExponent The expected `number` or `string` (LongInt) for the exponent part.
+ * @param expectedCoefficient The expected `string` for the coefficient.
+ * @param expectedExponent The expected `number` for the exponent part.
  * @param expectedNumberValue The expected number or an array of size two indicating the inclusive range of
  *   possible values (due to platform dependent rounding of `Math.pow()`).
  * @param expectedToString The expected text image of `Decimal.toString()`
