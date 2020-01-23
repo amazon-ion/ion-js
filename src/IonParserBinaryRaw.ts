@@ -446,7 +446,7 @@ export class ParserBinaryRaw {
                 }
                 this.load_value();
                 let bigInt: JSBI = this._curr!;
-                return JsbiSupport.clampToSafeIntegerRange(bigInt);
+                return JSBI.toNumber(bigInt);
             case IonBinary.TB_FLOAT:
                 if (this.isNull()) {
                     return null;

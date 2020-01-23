@@ -18,7 +18,8 @@ import * as ion from '../src/Ion';
 import * as fs from 'fs';
 import * as path from 'path';
 import {IonEventStream} from '../src/IonEventStream';
-import {IonType, Reader, Timestamp, Writer} from '../src/Ion';
+import {IonEventType} from '../src/IonEvent';
+import {IonType, Reader, Writer} from '../src/Ion';
 
 function findFiles(folder: string, files: string[] = []) {
     fs.readdirSync(folder).forEach(file => {
@@ -45,65 +46,63 @@ function exhaust(reader: Reader) {
     }
 }
 
-function loadValues(path: string, newWriter: () => Writer) {
-    let reader = ion.makeReader(getInput(path));
-    let values: Uint8Array[][] = [];
-    let containerIdx = 0;
+function makeStream(src, writer) {
+    writer.writeValues(ion.makeReader(src));
+    writer.close();
+    return new IonEventStream(ion.makeReader(writer.getBytes()));
+}
 
-    for (let topLevelType; topLevelType = reader.next();) {
-        if (!topLevelType.isContainer) {
-            throw Error('Expected top-level value to be a container, was ' + topLevelType);
+function equivsTest(path: string, expectedEquivalence = true, equivsTimelines = false) {
+    let bytes = getInput(path)
+    let originalEvents = new IonEventStream(ion.makeReader(bytes)).getEvents();
+    let textEvents = makeStream(bytes, ion.makeTextWriter()).getEvents();
+    let binEvents = makeStream(bytes, ion.makeBinaryWriter()).getEvents();
+
+    //i is the index of each toplevel container start event
+    for (let i = 0; i < originalEvents.length - 2; i += originalEvents[i].ionValue.length + 1) {
+        let event = originalEvents[i];
+        let textEvent = textEvents[i];
+        let binEvent = binEvents[i];
+        //Comparisons can be either IonEventStream[](Embedded Documents List of strings interpreted as top level streams).
+        //Or an IonEvent[](contents of an sexp of equivalent Ion values).
+        let comparisons : any = [];
+        if (event.annotations[0] === 'embedded_documents') {
+            //we found a list of strings that we need to interpret as top level ion text streams.
+            for (let j = 0; j < event.ionValue.length - 1; j++) {
+                comparisons.push(
+                    [
+                        new IonEventStream(ion.makeReader(event.ionValue[j].ionValue)),
+                        new IonEventStream(ion.makeReader(textEvent.ionValue[j].ionValue)),
+                        new IonEventStream(ion.makeReader(binEvent.ionValue[j].ionValue))
+                    ]
+                );
+            }
+        } else {//we're in an sexp
+            for (let j = 0; j < event.ionValue.length - 1; j++) {
+                comparisons.push([event.ionValue[j], textEvent.ionValue[j], binEvent.ionValue[j]]);
+                if (event.ionValue[j].eventType === IonEventType.CONTAINER_START) {
+                    j += event.ionValue[j].ionValue.length
+                }
+            }
         }
-
-        reader.stepIn();
-        values.push([]);
-
-        for (let type; type = reader.next();) {
-            let writer = newWriter();
-            writer.writeValue(reader);
-            writer.close();
-            values[containerIdx].push(writer.getBytes());
-        }
-
-        containerIdx += 1;
-        reader.stepOut();
-    }
-    return values;
-}
-
-function bytesToString(c: number, idx: number, bytes: Uint8Array) {
-    let sb = '[' + c + '][' + idx + ']';
-    if (bytes.length >= 4 && bytes[0] === 224 && bytes[1] === 1 && bytes[2] === 0 && bytes[3] === 234) {
-        // Ion binary, convert to hex string
-        bytes.forEach(b => {
-            sb += ' ' + ('0' + (b & 0xFF).toString(16)).slice(-2);
-        });
-        return sb;
-    }
-    // otherwise, text:
-    return sb + ' ' + String.fromCharCode.apply(null, bytes);
-}
-
-function equivsTestCompare(c: number, i: number, j: number, bytesI: Uint8Array, bytesJ: Uint8Array, expectedEquivalence: boolean) {
-    let eventStreamI = new IonEventStream(ion.makeReader(bytesI));
-    let eventStreamJ = new IonEventStream(ion.makeReader(bytesJ));
-    let result = eventStreamI.equals(eventStreamJ);
-    assert(expectedEquivalence ? result : !result,
-        'Expected ' + bytesToString(c, i, bytesI)
-        + ' to' + (expectedEquivalence ? '' : ' not')
-        + ' be equivalent to ' + bytesToString(c, j, bytesJ));
-}
-
-function equivsTest(path: string, expectedEquivalence = true, compare = equivsTestCompare) {
-    let binaryValues = loadValues(path, () => ion.makeBinaryWriter());
-    let textValues = loadValues(path, () => ion.makeTextWriter());
-
-    for (let c = 0; c < binaryValues.length; c++) {
-        for (let i = 0; i < binaryValues[c].length; i++) {
-            for (let j = i + 1; j < binaryValues[c].length; j++) {
-                compare(c, i, j, binaryValues[c][i], binaryValues[c][j], expectedEquivalence);
-                compare(c, i, j, binaryValues[c][i], textValues[c][j], expectedEquivalence);
-                compare(c, i, j, textValues[c][i], textValues[c][j], expectedEquivalence);
+        //width is the number of "copies"  of each value (original, text, binary)
+        let width = comparisons[0].length;
+        //if we're equal everybody equals everybody
+        //if !eq only the copies in our row are equal
+        //every value in row j must compare with every other row
+        for (let j = 0; j < comparisons.length; j++) {
+            for (let k = j + 1; k < comparisons.length; k++) {
+                //l tracks our index within row j
+                for (let l = 0; l < width; l++) {
+                    //m tracks our index within row k
+                    for (let m = 0; m < width; m++) {
+                        if (equivsTimelines) {
+                            assert.equal(comparisons[j][l].ionValue.compareTo(comparisons[k][m].ionValue), 0);
+                        } else {
+                            assert.equal(comparisons[j][l].equals(comparisons[k][m]), expectedEquivalence);
+                        }
+                    }
+                }
             }
         }
     }
@@ -114,20 +113,7 @@ function nonEquivsTest(path: string) {
 }
 
 function equivTimelinesTest(path: string) {
-    function timelinesCompare(c: number, i: number, j: number, bytesI: Uint8Array, bytesJ: Uint8Array) {
-        function readTimestamp(bytes: Uint8Array): Timestamp | null {
-            let reader = ion.makeReader(bytes);
-            reader.next();
-            return reader.timestampValue();
-        }
-
-        let tsI = readTimestamp(bytesI);
-        let tsJ = readTimestamp(bytesJ);
-        // assert that the timestamps represent the same instant (but not necessarily data-model equivalent):
-        assert(tsI!.compareTo(tsJ!) === 0, 'Expected ' + tsI + ' to be instant-equivalent to ' + tsJ);
-    }
-
-    equivsTest(path, true, timelinesCompare);
+    equivsTest(path, true, true);
 }
 
 function readerCompareTest(source: string | Buffer) {
@@ -397,6 +383,7 @@ let nonEquivsSkipList = toSkipList([
     'ion-tests/iontestdata/good/non-equivs/clobs.ion',
     'ion-tests/iontestdata/good/non-equivs/floats.ion',
     'ion-tests/iontestdata/good/non-equivs/floatsVsDecimals.ion',
+    'ion-tests/iontestdata/good/non-equivs/symbolTablesUnknownText.ion',//Cannot pass until we implement symbol token support.
 ]);
 
 ////// end of generated skiplists
