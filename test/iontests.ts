@@ -1,12 +1,12 @@
 /*!
  * Copyright 2012 Amazon.com, Inc. or its affiliates. All Rights Reserved.
- *  
+ *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
  * A copy of the License is located at
- *  
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- *  
+ *
  * or in the "license" file accompanying this file. This file is distributed
  * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
  * express or implied. See the License for the specific language governing
@@ -283,8 +283,6 @@ function toSkipList(paths: Array<string>): Map<string, number> {
     return skipList;
 }
 
-////// beginning of generated skiplists
-
 let goodSkipList = toSkipList([
     'ion-tests/iontestdata/good/decimalsWithUnderscores.ion',
     'ion-tests/iontestdata/good/equivs/binaryInts.ion',
@@ -300,6 +298,8 @@ let goodSkipList = toSkipList([
     'ion-tests/iontestdata/good/utf16.ion',
     'ion-tests/iontestdata/good/utf32.ion',
     'ion-tests/iontestdata/good/item1.10n',
+    'ion-tests/iontestdata/good/typecodes/T7-large.10n', // https://github.com/amzn/ion-js/issues/541
+    'ion-tests/iontestdata/good/typecodes/T7-small.10n', // https://github.com/amzn/ion-js/issues/541
 ]);
 
 let badSkipList = toSkipList([
@@ -319,6 +319,44 @@ let badSkipList = toSkipList([
     'ion-tests/iontestdata/bad/timestamp/timestampSept31.10n',
     'ion-tests/iontestdata/bad/timestamp/outOfRange/leapDayNonLeapYear_1.10n',
     'ion-tests/iontestdata/bad/timestamp/outOfRange/leapDayNonLeapYear_2.10n',
+    'ion-tests/iontestdata/bad/annotationSymbolIDUnmapped.10n', // https://github.com/amzn/ion-js/issues/542
+    'ion-tests/iontestdata/bad/annotationSymbolIDUnmapped.ion', // https://github.com/amzn/ion-js/issues/542
+    'ion-tests/iontestdata/bad/fieldNameSymbolIDUnmapped.10n', // https://github.com/amzn/ion-js/issues/542
+    'ion-tests/iontestdata/bad/fieldNameSymbolIDUnmapped.ion', // https://github.com/amzn/ion-js/issues/542
+    'ion-tests/iontestdata/bad/timestamp/timestampFraction10d-1.10n', // https://github.com/amzn/ion-js/issues/543
+    'ion-tests/iontestdata/bad/timestamp/timestampFraction11d-1.10n', // https://github.com/amzn/ion-js/issues/543
+    'ion-tests/iontestdata/bad/timestamp/timestampFraction1d0.10n', // https://github.com/amzn/ion-js/issues/543
+    'ion-tests/iontestdata/bad/typecodes/type_15_length_0.10n', // https://github.com/amzn/ion-js/issues/544
+    'ion-tests/iontestdata/bad/typecodes/type_15_length_1.10n', // https://github.com/amzn/ion-js/issues/544
+    'ion-tests/iontestdata/bad/typecodes/type_15_length_10.10n', // https://github.com/amzn/ion-js/issues/544
+    'ion-tests/iontestdata/bad/typecodes/type_15_length_11.10n', // https://github.com/amzn/ion-js/issues/544
+    'ion-tests/iontestdata/bad/typecodes/type_15_length_12.10n', // https://github.com/amzn/ion-js/issues/544
+    'ion-tests/iontestdata/bad/typecodes/type_15_length_13.10n', // https://github.com/amzn/ion-js/issues/544
+    'ion-tests/iontestdata/bad/typecodes/type_15_length_14.10n', // https://github.com/amzn/ion-js/issues/544
+    'ion-tests/iontestdata/bad/typecodes/type_15_length_15.10n', // https://github.com/amzn/ion-js/issues/544
+    'ion-tests/iontestdata/bad/typecodes/type_15_length_2.10n', // https://github.com/amzn/ion-js/issues/544
+    'ion-tests/iontestdata/bad/typecodes/type_15_length_3.10n', // https://github.com/amzn/ion-js/issues/544
+    'ion-tests/iontestdata/bad/typecodes/type_15_length_4.10n', // https://github.com/amzn/ion-js/issues/544
+    'ion-tests/iontestdata/bad/typecodes/type_15_length_5.10n', // https://github.com/amzn/ion-js/issues/544
+    'ion-tests/iontestdata/bad/typecodes/type_15_length_6.10n', // https://github.com/amzn/ion-js/issues/544
+    'ion-tests/iontestdata/bad/typecodes/type_15_length_7.10n', // https://github.com/amzn/ion-js/issues/544
+    'ion-tests/iontestdata/bad/typecodes/type_15_length_8.10n', // https://github.com/amzn/ion-js/issues/544
+    'ion-tests/iontestdata/bad/typecodes/type_15_length_9.10n', // https://github.com/amzn/ion-js/issues/544
+    'ion-tests/iontestdata/bad/typecodes/type_1_length_10.10n', // https://github.com/amzn/ion-js/issues/545
+    'ion-tests/iontestdata/bad/typecodes/type_1_length_11.10n', // https://github.com/amzn/ion-js/issues/545
+    'ion-tests/iontestdata/bad/typecodes/type_1_length_12.10n', // https://github.com/amzn/ion-js/issues/545
+    'ion-tests/iontestdata/bad/typecodes/type_1_length_13.10n', // https://github.com/amzn/ion-js/issues/545
+    'ion-tests/iontestdata/bad/typecodes/type_1_length_14.10n', // https://github.com/amzn/ion-js/issues/545
+    'ion-tests/iontestdata/bad/typecodes/type_1_length_2.10n', // https://github.com/amzn/ion-js/issues/545
+    'ion-tests/iontestdata/bad/typecodes/type_1_length_3.10n', // https://github.com/amzn/ion-js/issues/545
+    'ion-tests/iontestdata/bad/typecodes/type_1_length_4.10n', // https://github.com/amzn/ion-js/issues/545
+    'ion-tests/iontestdata/bad/typecodes/type_1_length_5.10n', // https://github.com/amzn/ion-js/issues/545
+    'ion-tests/iontestdata/bad/typecodes/type_1_length_6.10n', // https://github.com/amzn/ion-js/issues/545
+    'ion-tests/iontestdata/bad/typecodes/type_1_length_7.10n', // https://github.com/amzn/ion-js/issues/545
+    'ion-tests/iontestdata/bad/typecodes/type_1_length_8.10n', // https://github.com/amzn/ion-js/issues/545
+    'ion-tests/iontestdata/bad/typecodes/type_1_length_9.10n', // https://github.com/amzn/ion-js/issues/545
+    'ion-tests/iontestdata/bad/typecodes/type_3_length_0.10n', // https://github.com/amzn/ion-js/issues/546
+    'ion-tests/iontestdata/bad/typecodes/type_6_length_0.10n', // https://github.com/amzn/ion-js/issues/547
 ]);
 
 let eventSkipList = toSkipList([
@@ -357,6 +395,11 @@ let eventSkipList = toSkipList([
     'ion-tests/iontestdata/good/utf16.ion',
     'ion-tests/iontestdata/good/utf32.ion',
     'ion-tests/iontestdata/good/item1.10n',
+    'ion-tests/iontestdata/good/typecodes/T11.10n', // https://github.com/amzn/ion-js/issues/548
+    'ion-tests/iontestdata/good/typecodes/T12.10n', // https://github.com/amzn/ion-js/issues/548
+    'ion-tests/iontestdata/good/typecodes/T13.10n', // https://github.com/amzn/ion-js/issues/548
+    'ion-tests/iontestdata/good/typecodes/T7-large.10n', // https://github.com/amzn/ion-js/issues/549
+    'ion-tests/iontestdata/good/typecodes/T7-small.10n', // https://github.com/amzn/ion-js/issues/549
 ]);
 
 let readerCompareSkipList = toSkipList([]);
@@ -377,6 +420,10 @@ let equivsSkipList = toSkipList([
     'ion-tests/iontestdata/good/equivs/systemSymbols.ion',
     'ion-tests/iontestdata/good/equivs/systemSymbolsAsAnnotations.ion',
     'ion-tests/iontestdata/good/equivs/textNewlines.ion',
+
+    'ion-tests/iontestdata/good/equivs/clobNewlines.ion', // https://github.com/amzn/ion-js/issues/550
+    'ion-tests/iontestdata/good/equivs/localSymbolTableWithAnnotations.ion', // https://github.com/amzn/ion-js/issues/551
+    'ion-tests/iontestdata/good/equivs/longStringsWithComments.ion', // https://github.com/amzn/ion-js/issues/552
 ]);
 
 let nonEquivsSkipList = toSkipList([
@@ -385,27 +432,6 @@ let nonEquivsSkipList = toSkipList([
     'ion-tests/iontestdata/good/non-equivs/floatsVsDecimals.ion',
     'ion-tests/iontestdata/good/non-equivs/symbolTablesUnknownText.ion',//Cannot pass until we implement symbol token support.
 ]);
-
-////// end of generated skiplists
-
-/*
-  notes from the previous skipList mechanism:
-    'good/intBinary.ion', //binaryInts unsupported.
-    'good/integer_values.ion', //binary ints unsupported.
-    'good/intsWithUnderscores.ion', //binary ints unsupported.
-    'good/equivs/intsWithUnderscores.ion', //binary ints unsupported.
-    'good/equivs/binaryInts.ion', //binary ints unsupported.
-    'good/floatsWithUnderscores.ion', //numbers with underscores unsupported.
-    'good/equivs/floatsWithUnderscores.ion', //numbers with underscores unsupported.
-    'good/equivs/decimalsWithUnderscores.ion', //numbers with underscores unsupported.
-    'good/decimalsWithUnderscores.ion', //numbers with underscores unsupported.
-    'good/symbolZero.ion', //no symboltoken support as of yet.
-    'good/testfile12.ion',
-    'good/non-equivs/nonNulls.ion',
-    'good/equivs/structComments.ion',
-    'good/equivs/sexps.ion',
-    'good/equivs/lists.ion',
- */
 
 let goodTestsPath = path.join('ion-tests', 'iontestdata', 'good');
 let badTestsPath = path.join('ion-tests', 'iontestdata', 'bad');
@@ -422,11 +448,17 @@ let equivTimelineTestFiles = findFiles(equivTimelineTestsPath);
 function skipOrTest(paths: Array<string>, skipLists: Array<Map<string, number>>, test: (s: string) => void): void {
     for (let path of paths) {
         let skipped = false;
-        for (let skipList of skipLists) {
-            if (skipList[path]) {
-                it.skip(path, () => {});
-                skipped = true;
-                break;
+
+        if(path.endsWith('.md')) {
+            skipped = true;
+        }
+        else {
+            for (let skipList of skipLists) {
+                if (skipList[path]) {
+                    it.skip(path, () => {});
+                    skipped = true;
+                    break;
+                }
             }
         }
         if (!skipped) {
@@ -494,4 +526,3 @@ describe('ion-tests', () => {
         );
     });
 });
-
