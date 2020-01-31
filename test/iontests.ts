@@ -452,8 +452,7 @@ function skipOrTest(paths: Array<string>, skipLists: Array<Map<string, number>>,
 
         if (path.endsWith('.md')) {
             skipped = true;
-        }
-        else {
+        } else {
             for (let skipList of skipLists) {
                 if (skipList[path]) {
                     it.skip(path, () => {});
