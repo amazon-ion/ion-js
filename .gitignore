@@ -103,9 +103,9 @@ fabric.properties
 ### Intellij Patch ###
 # Comment Reason: https://github.com/joeblau/gitignore.io/issues/186#issuecomment-215987721
 
-## Ignoring iml files breaks when using IntelliJ modules. We do not at the moment. 
+## Ignoring iml files breaks when using IntelliJ modules. We do not at the moment.
  *.iml
- .idea 
+ .idea
 
 # modules.xml
 # .idea/misc.xml
@@ -124,3 +124,5 @@ Session.vim
 .netrwhist
 # auto-generated tag files
 tags
+
+.nyc_output/
