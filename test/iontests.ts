@@ -395,6 +395,7 @@ let eventSkipList = toSkipList([
     'ion-tests/iontestdata/good/utf16.ion',
     'ion-tests/iontestdata/good/utf32.ion',
     'ion-tests/iontestdata/good/item1.10n',
+    'ion-tests/iontestdata/good/typecodes/T6-large.10n', // https://github.com/amzn/ion-js/issues/554
     'ion-tests/iontestdata/good/typecodes/T11.10n', // https://github.com/amzn/ion-js/issues/548
     'ion-tests/iontestdata/good/typecodes/T12.10n', // https://github.com/amzn/ion-js/issues/548
     'ion-tests/iontestdata/good/typecodes/T13.10n', // https://github.com/amzn/ion-js/issues/548
@@ -449,7 +450,7 @@ function skipOrTest(paths: Array<string>, skipLists: Array<Map<string, number>>,
     for (let path of paths) {
         let skipped = false;
 
-        if(path.endsWith('.md')) {
+        if (path.endsWith('.md')) {
             skipped = true;
         }
         else {
