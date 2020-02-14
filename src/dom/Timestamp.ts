@@ -14,7 +14,7 @@ export class Timestamp extends DomValue(Date, IonTypes.TIMESTAMP) {
     /**
      * Constructor.
      * @param dateOrTimestamp   A `Date` or `Timestamp` to represent as a timestamp.
-     * @param annotations       An optional array of strings to associate with this null value.
+     * @param annotations       An optional array of strings to associate with this timestamp.
      */
     constructor(dateOrTimestamp: Date | ion.Timestamp, annotations: string[] = []) {
         let date: Date;
@@ -25,7 +25,6 @@ export class Timestamp extends DomValue(Date, IonTypes.TIMESTAMP) {
         } else {
             timestamp = dateOrTimestamp;
             date = timestamp.getDate();
-
         }
         super(date);
         this._date = date;
@@ -45,7 +44,7 @@ export class Timestamp extends DomValue(Date, IonTypes.TIMESTAMP) {
         );
     }
 
-    timestampValue():ion.Timestamp {
+    timestampValue(): ion.Timestamp {
         return this._timestamp;
     }
 

@@ -40,8 +40,8 @@ export function Sequence(ionType: IonType) {
             return child.get(...pathTail);
         }
 
-        values(): IterableIterator<Value> {
-            return Object.values(this)[Symbol.iterator]();
+        elements(): Value[] {
+            return Object.values(this);
         }
 
         toString(): string {

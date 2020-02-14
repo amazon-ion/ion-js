@@ -22,7 +22,6 @@ import {DomValue} from "./DomValue";
  *          // this code WILL be executed
  *      }
  *
- *
  * [1] http://amzn.github.io/ion-docs/docs/spec.html#bool
  * [2] https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean#Description
  */

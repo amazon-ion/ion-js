@@ -18,7 +18,7 @@ export class Integer extends DomValue(Number, IonTypes.INT) {
      */
     constructor(value: JSBI | number, annotations: string[] = []) {
         // If the provided value is a JS number, we will defer constructing a BigInt representation
-        // of it until it requested later by a call to bigIntValue().
+        // of it until it's requested later by a call to bigIntValue().
         if (typeof value === "number") {
             super(value);
             this._numberValue = value;
@@ -33,7 +33,7 @@ export class Integer extends DomValue(Number, IonTypes.INT) {
     }
 
     bigIntValue(): JSBI {
-        if(this._bigIntValue === null) {
+        if (this._bigIntValue === null) {
             this._bigIntValue = JSBI.BigInt(this.numberValue());
         }
         return this._bigIntValue;

@@ -13,12 +13,12 @@ export class Float extends DomValue(Number, IonTypes.FLOAT) {
      * @param value         The numeric value to represent as a float.
      * @param annotations   An optional array of strings to associate with `value`.
      */
-    constructor(protected readonly value: number, annotations: string[] = []) {
+    constructor(value: number, annotations: string[] = []) {
         super(value);
         this._setAnnotations(annotations);
     }
 
     public numberValue(): number {
-        return this.valueOf() as number;
+        return +this.valueOf();
     }
 }

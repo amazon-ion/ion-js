@@ -11,7 +11,7 @@ export class Blob extends DomValue(Uint8Array, IonTypes.BLOB) {
     /**
      * Constructor.
      * @param data          Raw, unsigned bytes to represent as a blob.
-     * @param annotations   An optional array of strings to associate with `bytes`.
+     * @param annotations   An optional array of strings to associate with `data`.
      */
     constructor(data: Uint8Array, annotations: string[] = []) {
         super(data);

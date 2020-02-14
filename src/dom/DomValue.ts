@@ -1,5 +1,5 @@
-import {Decimal, IonType} from "../Ion";
-import {Value, PathElement} from "./Value";
+import {Decimal, IonType, Timestamp} from "../Ion";
+import {PathElement, Value} from "./Value";
 import JSBI from "jsbi";
 
 /**
@@ -23,7 +23,7 @@ export type Constructor<T = {}> = new (...args: any[]) => T;
 export function DomValue<Clazz extends Constructor>(BaseClass: Clazz, ionType: IonType) {
     return class extends BaseClass implements Value {
         _ionType: IonType;
-        _annotations: string[];
+        _ionAnnotations: string[];
 
         /* TODO:
          *  Ideally, this mixin's constructor would require subclasses to specify the desired annotations list
@@ -44,13 +44,17 @@ export function DomValue<Clazz extends Constructor>(BaseClass: Clazz, ionType: I
         constructor(...args: any[]) {
             super(...args);
             this._ionType = ionType;
-            this._annotations = [];
+            this._ionAnnotations = [];
             // Setting the 'enumerable' attribute of these properties to `false` prevents them
             // from appearing in the iterators returned by Object.keys(), Object.entries(), etc.
             // This guarantees that users iterating over the fields of a struct or values in a list
             // will see only Values from the source data or that they have created themselves.
             Object.defineProperty(this, "_ionType", {enumerable: false});
-            Object.defineProperty(this, "_annotations", {enumerable: false});
+            Object.defineProperty(this, "_ionAnnotations", {enumerable: false});
+        }
+
+        _unsupportedOperation<T extends Value>(functionName: string): never {
+            throw new Error(`Value#${functionName}() is not supported by Ion type ${this.getType().name}`);
         }
 
         getType(): IonType {
@@ -59,14 +63,14 @@ export function DomValue<Clazz extends Constructor>(BaseClass: Clazz, ionType: I
 
         // Class expressions (like this mixin) cannot have private or protected methods.
         _setAnnotations(annotations: string[]) {
-            this._annotations = annotations;
+            this._ionAnnotations = annotations;
         }
 
         getAnnotations(): string[] {
-            if (this._annotations === null) {
+            if (this._ionAnnotations === null) {
                 return [];
             }
-            return this._annotations;
+            return this._ionAnnotations;
         }
 
         isNull(): boolean {
@@ -74,54 +78,58 @@ export function DomValue<Clazz extends Constructor>(BaseClass: Clazz, ionType: I
         }
 
         booleanValue(): boolean | null {
-            return null;
+            this._unsupportedOperation('booleanValue');
         }
 
         numberValue(): number | null {
-            return null;
+            this._unsupportedOperation('numberValue');
         }
 
         bigIntValue(): JSBI | null {
-            return null;
+            this._unsupportedOperation('bigIntValue');
         }
 
         decimalValue(): Decimal | null {
-            return null;
+            this._unsupportedOperation('decimalValue');
         }
 
         stringValue(): string | null {
-            return null;
+            this._unsupportedOperation('stringValue');
         }
 
         dateValue(): Date | null {
-            return null;
+            this._unsupportedOperation('dateValue');
+        }
+
+        timestampValue(): Timestamp | null {
+            this._unsupportedOperation('timestampValue');
         }
 
         uInt8ArrayValue(): Uint8Array | null {
-            return null;
+            this._unsupportedOperation('uInt8ArrayValue');
         }
 
-        fieldNames(): IterableIterator<string> | null {
-            return null;
+        fieldNames(): string[] {
+            this._unsupportedOperation('fieldNames');
         }
 
-        fields(): IterableIterator<[string, Value]> | null {
-            return null;
+        fields(): [string, Value][] {
+            this._unsupportedOperation('fields');
         }
 
-        values(): IterableIterator<Value> | null {
-            return null;
+        elements(): Value[] {
+            this._unsupportedOperation('elements');
         }
 
         get(...pathElements: PathElement[]): Value | null {
             return null;
         }
 
-        as<T extends Value>(ionValueType: Constructor<T>): T | null {
+        as<T extends Value>(ionValueType: Constructor<T>): T {
             if (this instanceof ionValueType) {
                 return this as unknown as T;
             }
-            return null;
+            throw new Error(`${this.constructor.name} is not an instance of ${ionValueType.name}`);
         }
     };
 }

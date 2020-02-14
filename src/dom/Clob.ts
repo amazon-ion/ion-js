@@ -12,12 +12,12 @@ export class Clob extends DomValue(Uint8Array, IonTypes.CLOB) {
      * @param bytes         Raw, unsigned bytes to represent as a clob.
      * @param annotations   An optional array of strings to associate with `bytes`.
      */
-    constructor(protected readonly bytes: Uint8Array, annotations: string[] = []) {
+    constructor(bytes: Uint8Array, annotations: string[] = []) {
         super(bytes);
         this._setAnnotations(annotations);
     }
 
     uInt8ArrayValue(): Uint8Array {
-        return this.bytes;
+        return this;
     }
 }

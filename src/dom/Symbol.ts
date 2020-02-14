@@ -14,14 +14,14 @@ export class Symbol extends DomValue(String, IonTypes.SYMBOL) {
     /**
      * Constructor.
      * @param symbolText    The text to represent as a symbol.
-     * @param annotations   An optional array of strings to associate with this null value.
+     * @param annotations   An optional array of strings to associate with this symbol.
      */
-    constructor(protected readonly symbolText: string, annotations: string[] = []) {
+    constructor(symbolText: string, annotations: string[] = []) {
         super(symbolText);
         this._setAnnotations(annotations);
     }
 
     stringValue(): string {
-        return this.valueOf() as string;
+        return this.toString();
     }
 }

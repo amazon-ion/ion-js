@@ -9,19 +9,15 @@ import {DomValue} from "./DomValue";
 export class String extends DomValue(global.String, IonTypes.STRING) {
     /**
      * Constructor.
-     * @param _text          The text value to represent as a string.
+     * @param text          The text value to represent as a string.
      * @param annotations   An optional array of strings to associate with the provided text.
      */
-    constructor(protected readonly _text: string, annotations: string[] = []) {
-        super(_text);
+    constructor(text: string, annotations: string[] = []) {
+        super(text);
         this._setAnnotations(annotations);
     }
 
     stringValue(): string {
-        return this._text;
-    }
-
-    toString(): string {
-        return this._text;
+        return this.toString();
     }
 }

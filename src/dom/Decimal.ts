@@ -35,8 +35,6 @@ export class Decimal extends DomValue(Number, IonTypes.DECIMAL) {
         return this._decimalValue.toString();
     }
 
-    // Required to produce sensible output for toString().
-    // Without it, toString() relies on the underlying Decimal value's coefficient.
     valueOf(): number {
         return this._numberValue;
     }

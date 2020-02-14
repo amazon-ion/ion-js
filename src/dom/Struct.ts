@@ -5,6 +5,11 @@ import {DomValue} from "./DomValue";
 /**
  * Represents a struct[1] value in an Ion stream.
  *
+ * Struct fields can be accessed as properties on this object. For example:
+ *
+ *    let s: any = ion.load('{foo: 1, bar: 2, baz: qux::3}');
+ *    assert.equal(6, s.foo + s['bar'] + s.baz);
+ *
  * [1] http://amzn.github.io/ion-docs/docs/spec.html#struct
  */
 export class Struct extends DomValue(Object, IonTypes.STRUCT) implements Value {
@@ -13,15 +18,15 @@ export class Struct extends DomValue(Object, IonTypes.STRUCT) implements Value {
      * @param fields        An iterator of field name/value pairs to represent as a struct.
      * @param annotations   An optional array of strings to associate with this null value.
      */
-    constructor(fields: IterableIterator<[string, Value]>, annotations: string[] = []) {
+    constructor(fields: Iterable<[string, Value]>, annotations: string[] = []) {
         super();
-        for(let [fieldName, value] of fields) {
-            Object.defineProperty(this, ''+fieldName, {
+        for (let [fieldName, value] of fields) {
+            Object.defineProperty(this, fieldName, {
                 configurable: true,
                 enumerable: true,
                 value: value,
                 writable: true
-            })
+            });
         }
         this._setAnnotations(annotations);
     }
@@ -41,20 +46,20 @@ export class Struct extends DomValue(Object, IonTypes.STRUCT) implements Value {
         return child.get(...pathTail);
     }
 
-    fieldNames(): IterableIterator<string> {
-        return Object.keys(this)[Symbol.iterator]();
+    fieldNames(): string[] {
+        return Object.keys(this);
     }
 
-    fields(): IterableIterator<[string, Value]> {
-        return Object.entries(this)[Symbol.iterator]();
+    fields(): [string, Value][] {
+        return Object.entries(this);
     }
 
-    values(): IterableIterator<Value> {
-        return Object.values(this)[Symbol.iterator]();
+    elements(): Value[] {
+        return Object.values(this);
     }
 
     [Symbol.iterator](): IterableIterator<[string, Value]> {
-        return this.fields();
+        return this.fields()[Symbol.iterator]();
     }
 
     _getField(fieldName: string): Value | null {

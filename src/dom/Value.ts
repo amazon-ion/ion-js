@@ -1,4 +1,4 @@
-import {Decimal, IonType} from "../Ion";
+import {Decimal, Timestamp, IonType} from "../Ion";
 import JSBI from "jsbi";
 import {Constructor} from "./DomValue";
 
@@ -25,55 +25,62 @@ export interface Value {
     isNull(): boolean;
 
     /**
-     * Returns null if the Value is not a Boolean.
-     * Otherwise, returns the boolean value of the Boolean.
+     * For the Boolean type, returns a JS boolean representation of the Value; otherwise
+     * throws an Error.
      */
     booleanValue(): boolean | null;
 
     /**
-     * Returns null if the Value is not an Integer, Float, or Decimal.
-     * Otherwise, returns the JS number representation of the Value.
+     * For the Integer, Float, and Decimal types, returns a JS number representation of the
+     * Value; otherwise throws an Error.
+     *
      * In some cases, this method will perform conversions that inherently involve loss of
      * precision. See bigIntValue() and decimalValue() for lossless alternatives.
      */
     numberValue(): number | null;
 
     /**
-     * Returns null if the Value is not an Integer.
-     * Otherwise, returns a lossless BigInt representation of the Value.
+     * For the Integer type, returns a BigInt representation of the Value; otherwise throws
+     * an Error.
      */
     bigIntValue(): JSBI | null;
 
     /**
-     * Returns null if the Value is not a Decimal.
-     * Otherwise, returns a lossless Decimal representation of the Value.
+     * For the Decimal type, returns an ion.Decimal representation of the Value; otherwise
+     * throws an Error.
      */
     decimalValue(): Decimal | null;
 
     /**
-     * Returns null if the Value is not a String or Symbol.
-     * Otherwise, returns a string representation of the Value's text.
+     * For the String and Symbol types, returns a JS string representation of the Value's
+     * text; otherwise throws an Error.
      */
     stringValue(): string | null;
 
     /**
-     * Returns null if the Value is not a Timestamp.
-     * Otherwise, returns a Date representation of the Value.
+     * For the Timestamp type, returns a JS Date representation of the Value; otherwise throws
+     * an Error.
      */
     dateValue(): Date | null;
 
     /**
-     * Returns null if the Value is not a Blob or Clob.
-     * Otherwise, returns a Uint8Array representation of the Value's bytes.
+     * For the Timestamp type, returns an ion.Timestamp representation of the Value; otherwise throws
+     * an Error.
+     */
+    timestampValue(): Timestamp | null;
+
+    /**
+     * For the Blob and Clob types, returns a Uint8Array representation of the Value's bytes;
+     * otherwise throws an Error.
      */
     uInt8ArrayValue(): Uint8Array | null;
 
     /**
-     * Returns null if the Value is not a Struct, List, or SExpression.
-     * Otherwise, will attempt to index into the Value with each pathElement in turn
-     * until:
+     * Attempts to index into the Value with each pathElement in turn until:
+     *  - The current Value is of a type that cannot be indexed into.
+     *    (e.g. The current value is an Integer or Timestamp.)
      *  - A value is found that cannot use the current PathElement as an index.
-     *    (e.g. The current Value is a List but the current PathElement is a number.)
+     *    (e.g. The current Value is a List but the current PathElement is a string.)
      *  - An undefined value is encountered.
      *    (e.g. The current Value is a Struct and the current PathElement is a string,
      *          but the current PathElement is not a fieldName that exists in the Struct.)
@@ -85,30 +92,30 @@ export interface Value {
     get(...pathElements: PathElement[]): Value | null;
 
     /**
-     * Returns null if the Value is not a Struct.
-     * Otherwise, returns an iterator over the names of the fields in the Struct.
+     * For the Struct type, returns an array containing the names of the fields in the Struct;
+     * otherwise throws an Error.
      */
-    fieldNames(): IterableIterator<string> | null;
+    fieldNames(): string[];
 
     /**
-     * Returns null if the Value is not a Struct.
-     * Otherwise, returns an iterator over the field name/value pairs in the Struct.
+     * For the Struct type, returns an array containing the field name/value pairs in the Struct;
+     * otherwise throws an Error.
      */
-    fields(): IterableIterator<[string, Value]> | null;
+    fields(): [string, Value][];
 
     /**
-     * Returns null if the Value is not a Struct, List, or SExpression.
-     * Otherwise, returns an iterator over the container's children.
+     * For the Struct, List, and SExpression types, returns an array containing the container's
+     * nested values; otherwise throws an Error.
      */
-    values(): IterableIterator<Value> | null;
+    elements(): Value[];
 
     /**
      * Allows for easy type casting from Value to a particular implementation of Value.
      *
-     * Returns null if the Value is not an instance of the class type represented by the provided
-     * constructor. Otherwise, casts the Value as type 'T' and returns it.
+     * If the Value is an instance of the type `T` represented by the provided constructor, this
+     * function will cast it as type `T` and return it; otherwise throws an Error.
      */
-    as<T extends Value>(ionValueType: Constructor<T>): T | null;
+    as<T extends Value>(ionValueType: Constructor<T>): T;
 }
 
 /**

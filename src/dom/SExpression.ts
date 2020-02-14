@@ -16,4 +16,8 @@ export class SExpression extends Sequence(IonTypes.SEXP) {
     constructor(children: Value[], annotations: string[] = []) {
         super(children, annotations);
     }
+
+    toString(): string {
+        return '(' + this.join(' ') + ')';
+    }
 }

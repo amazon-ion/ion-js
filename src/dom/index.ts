@@ -27,15 +27,17 @@ import {BinaryReader} from "../IonBinaryReader";
  * If `ionData` is a ReaderBuffer, a new Reader will be created to process it.
  * If it is already a Reader, it will be consumed fully.
  *
+ * If `ionData` does not contain any values, an empty array will be returned.
+ *
  * @param ionData   A source of Ion data (text or binary) to load into memory.
  * @returns         An array of Value objects representing the values found in the stream.
  */
 export function loadAll(ionData: ReaderBuffer | Reader): Value[] {
-    let reader = createReader(ionData);
+    let reader = _createReader(ionData);
     let ionValues: Value[] = [];
     let ionType: IonType | null = reader.next();
     while (ionType !== null) {
-        ionValues.push(loadValue(reader));
+        ionValues.push(_loadValue(reader));
         ionType = reader.next();
     }
     return ionValues;
@@ -49,19 +51,26 @@ export function loadAll(ionData: ReaderBuffer | Reader): Value[] {
  * (next(), stepIn(), stepOut(), etc), but is often much simpler to use.
  *
  * If `ionData` is a ReaderBuffer, a new Reader will be created to process it.
- * If it is already a Reader, next() will be called once at the top level to consume the
- * first value found in the data.
+ * If `ionData` is already a Reader, it will be used as-is.
+ *
+ * `load` will check to see if the Reader is already positioned over a value. If it is,
+ * that value will be loaded. If it is not, `load` will call `next()` once.
+ *
+ * If no value is found, `load` will return null.
  *
  * @param ionData   A source of Ion data (text or binary) to load into memory.
- * @returns         An array of Value objects representing the values found in the stream.
+ * @returns         A Value object representing the first value found in the stream
+ *                  or null if the stream is empty.
  */
 export function load(ionData: ReaderBuffer | Reader): Value | null {
-    let reader = createReader(ionData);
-    let ionType: IonType | null = reader.next();
-    return ionType === null ? null : loadValue(reader);
+    let reader = _createReader(ionData);
+    if (reader.type() === null) {
+        reader.next();
+    }
+    return reader.type() === null ? null : _loadValue(reader);
 }
 
-function createReader(ionData: ReaderBuffer | Reader): Reader {
+function _createReader(ionData: ReaderBuffer | Reader): Reader {
     // If the provided parameter is already a reader, no new work is required.
     // However, we cannot simply test `ionData instanceof Reader` because `Reader`
     // is an interface.
@@ -72,7 +81,7 @@ function createReader(ionData: ReaderBuffer | Reader): Reader {
 }
 
 // Loads the Reader's current value, returning it as a DOM Value
-function loadValue(reader: Reader): Value {
+function _loadValue(reader: Reader): Value {
     let ionType = reader.type();
     if (ionType === null) {
         throw new Error("loadValue() called when no further values were available to read.");
@@ -96,43 +105,39 @@ function loadValue(reader: Reader): Value {
         case IonTypes.CLOB: return new Clob(reader.byteValue()!, annotations);
         case IonTypes.BLOB: return new Blob(reader.byteValue()!, annotations);
         // Containers
-        case IonTypes.LIST: return loadList(reader);
-        case IonTypes.SEXP: return loadSExpression(reader);
-        case IonTypes.STRUCT: return loadStruct(reader);
+        case IonTypes.LIST: return _loadList(reader);
+        case IonTypes.SEXP: return _loadSExpression(reader);
+        case IonTypes.STRUCT: return _loadStruct(reader);
         default: throw new Error(`Unrecognized IonType '${ionType}' found.`);
     }
 }
 
-function loadStruct(reader: Reader): Struct {
+function _loadStruct(reader: Reader): Struct {
     let children: Map<string, Value> = new Map();
     let annotations: string[] = reader.annotations();
     reader.stepIn();
-    let ionType: IonType | null = reader.next();
-    while (ionType !== null) {
-        children.set(reader.fieldName()!, loadValue(reader));
-        ionType = reader.next();
+    while (reader.next()) {
+        children.set(reader.fieldName()!, _loadValue(reader));
     }
     reader.stepOut();
     return new Struct(children.entries(), annotations);
 }
 
-function loadList(reader: Reader): List {
+function _loadList(reader: Reader): List {
     let annotations = reader.annotations();
-    return new List(loadSequence(reader), annotations);
+    return new List(_loadSequence(reader), annotations);
 }
 
-function loadSExpression(reader: Reader): SExpression {
+function _loadSExpression(reader: Reader): SExpression {
     let annotations = reader.annotations();
-    return new SExpression(loadSequence(reader), annotations);
+    return new SExpression(_loadSequence(reader), annotations);
 }
 
-function loadSequence(reader: Reader): Value[] {
+function _loadSequence(reader: Reader): Value[] {
     let children: Value[] = [];
     reader.stepIn();
-    let ionType: IonType | null = reader.next();
-    while (ionType !== null) {
-        children.push(loadValue(reader));
-        ionType = reader.next();
+    while (reader.next()) {
+        children.push(_loadValue(reader));
     }
     reader.stepOut();
     return children;

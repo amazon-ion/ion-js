@@ -95,17 +95,19 @@ describe('DOM', () => {
       let n = ion.load('null.blob')!;
 
       assert.isTrue(n.isNull());
-      assert.equal(IonTypes.BLOB, n.getType());
-      assert.isNull(n.booleanValue());
-      assert.isNull(n.numberValue());
-      assert.isNull(n.bigIntValue());
-      assert.isNull(n.decimalValue());
-      assert.isNull(n.stringValue());
-      assert.isNull(n.dateValue());
       assert.isNull(n.uInt8ArrayValue());
-      assert.isNull(n.fieldNames());
-      assert.isNull(n.fields());
-      assert.isNull(n.values());
+      assert.equal(IonTypes.BLOB, n.getType());
+      assert.isTrue(n instanceof ion.dom.Null);
+
+      assert.throws(() => n.booleanValue());
+      assert.throws(() => n.numberValue());
+      assert.throws(() => n.bigIntValue());
+      assert.throws(() => n.decimalValue());
+      assert.throws(() => n.stringValue());
+      assert.throws(() => n.dateValue());
+      assert.throws(() => n.fieldNames());
+      assert.throws(() => n.fields());
+      assert.throws(() => n.elements());
    });
 
    // load() `Null` as `any` would be identical to the above.
@@ -232,7 +234,7 @@ describe('DOM', () => {
       assert.equal(101.5, d);
       assert.equal(101.5, +d);
       assert.isTrue(new ion.Decimal('101.5').equals(d.decimalValue()));
-      assert.equal(1015, +d.decimalValue().getCoefficient());
+      assert.equal(1015, +d.decimalValue()!.getCoefficient());
    });
 
    it('load() Timestamp as Value', () => {
@@ -350,17 +352,17 @@ describe('DOM', () => {
       assert.deepEqual(['planets'], l.getAnnotations());
 
       // Iteration
-      for (let planet of l.values()!) {
+      for (let planet of l.elements()!) {
          assert.isNotNull(planet.stringValue());
       }
 
       // Indexing
-      assert.equal("Mercury", l.get(0)!.stringValue());
-      assert.equal("Venus", l.get(1)!.stringValue());
-      assert.equal("Earth",l.get(2)!.stringValue());
-      assert.equal("Mars", l.get(3)!.stringValue());
+      assert.equal("Mercury", l.get(0)?.stringValue());
+      assert.equal("Venus", l.get(1)?.stringValue());
+      assert.equal("Earth",l.get(2)?.stringValue());
+      assert.equal("Mars", l.get(3)?.stringValue());
 
-      let planets: string[] = [...l.values()!].map(s => s.stringValue()!);
+      let planets: string[] = l.elements().map(s => s.stringValue()!);
       assert.equal(4, planets.length);
    });
 
@@ -395,17 +397,17 @@ describe('DOM', () => {
       assert.deepEqual(['planets'], s.getAnnotations());
 
       // Iteration
-      for (let planet of s.values()!) {
+      for (let planet of s.elements()!) {
          assert.isNotNull(planet.stringValue());
       }
 
       // Indexing
-      assert.equal("Mercury", s.get(0)!.stringValue());
-      assert.equal("Venus", s.get(1)!.stringValue());
-      assert.equal("Earth",s.get(2)!.stringValue());
-      assert.equal("Mars", s.get(3)!.stringValue());
+      assert.equal("Mercury", s.get(0)?.stringValue());
+      assert.equal("Venus", s.get(1)?.stringValue());
+      assert.equal("Earth",s.get(2)?.stringValue());
+      assert.equal("Mars", s.get(3)?.stringValue());
 
-      let planets: string[] = [...s.values()!].map(s => s.stringValue()!);
+      let planets: string[] = s.elements().map(s => s.stringValue()!);
       assert.equal(4, planets.length);
    });
 
@@ -453,13 +455,13 @@ describe('DOM', () => {
       assert.equal("Jacob", s.get("name", "middle")!.stringValue());
 
       // Iteration
-      for (let [fieldName, value] of s.fields()!) {
+      for (let [fieldName, value] of s.fields()) {
          assert.isTrue(typeof fieldName === "string");
          assert.isTrue(fieldName.length > 0);
          assert.isFalse(value.isNull());
       }
 
-      assert.equal(2, [...s.fields()!].length)
+      assert.equal(2, s.fields().length);
    });
 
    it('load() Struct as any', () => {
@@ -482,12 +484,12 @@ describe('DOM', () => {
       assert.equal("Jacob", s["name"]["middle"]);
 
       // Iteration
-      for (let [fieldName, value] of s.fields()!) {
+      for (let [fieldName, value] of s) {
          assert.isTrue(typeof fieldName === "string");
          assert.isTrue(fieldName.length > 0);
          assert.isFalse(value.isNull());
       }
 
-      assert.equal(2, [...s.fields()!].length)
+      assert.equal(2, s.fields().length)
    });
 });
