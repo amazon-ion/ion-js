@@ -37,7 +37,7 @@ export class Struct extends DomValue(Object, IonTypes.STRUCT) implements Value {
         }
         let [pathHead, ...pathTail] = pathElements;
         if (typeof(pathHead) !== "string") {
-            return null;
+            throw new Error(`Cannot index into a struct with a ${typeof(pathHead)}.`);
         }
         let child: Value | null = this._getField(pathHead);
         if (pathTail.length === 0 || child === null) {

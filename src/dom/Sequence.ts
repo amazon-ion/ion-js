@@ -28,7 +28,7 @@ export function Sequence(ionType: IonType) {
             }
             let [pathHead, ...pathTail] = pathElements;
             if (typeof (pathHead) !== "number") {
-                return null;
+                throw new Error(`Cannot index into a ${this.getType().name} with a ${typeof(pathHead)}.`);
             }
 
             let children = this as Value[];

@@ -122,7 +122,7 @@ export function DomValue<Clazz extends Constructor>(BaseClass: Clazz, ionType: I
         }
 
         get(...pathElements: PathElement[]): Value | null {
-            return null;
+            this._unsupportedOperation('get');
         }
 
         as<T extends Value>(ionValueType: Constructor<T>): T {
