@@ -18,7 +18,7 @@ import {TextReader} from "../IonTextReader";
 import {BinaryReader} from "../IonBinaryReader";
 
 /**
- * Reads the provided ion data source into memory, constructing Value objects to represent
+ * Reads the provided Ion data source into memory, constructing Value objects to represent
  * each value found in the stream.
  *
  * This approach to reading is less efficient at runtime than using the streaming Reader API
@@ -44,8 +44,8 @@ export function loadAll(ionData: ReaderBuffer | Reader): Value[] {
 }
 
 /**
- * Reads the first value from the provided ion data source into memory, constructing
- * an Value object to represent it.
+ * Reads the first value from the provided Ion data source into memory, constructing
+ * a Value object to represent it.
  *
  * This approach to reading is less efficient at runtime than using the streaming Reader API
  * (next(), stepIn(), stepOut(), etc), but is often much simpler to use.
@@ -96,7 +96,7 @@ function _loadValue(reader: Reader): Value {
         case IonTypes.INT:
             return reader.intSize() == IntSize.Number
                 ? new Integer(reader.numberValue()!, annotations)
-                :  new Integer(reader.bigIntValue()!, annotations);
+                : new Integer(reader.bigIntValue()!, annotations);
         case IonTypes.FLOAT: return new Float(reader.numberValue()!, annotations);
         case IonTypes.DECIMAL: return new Decimal(reader.decimalValue()!, annotations);
         case IonTypes.TIMESTAMP: return new Timestamp(reader.timestampValue()!, annotations);

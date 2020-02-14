@@ -48,7 +48,7 @@ export class Null extends DomValue(Object, IonTypes.NULL) {
 
     /**
      * Constructor.
-     * @param ionType       The ion data type associated with this null value.
+     * @param ionType       The Ion data type associated with this null value.
      * @param annotations   An optional array of strings to associate with this null value.
      */
     constructor(ionType: IonType = IonTypes.NULL, annotations: string[] = []) {

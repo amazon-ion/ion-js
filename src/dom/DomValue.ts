@@ -11,8 +11,8 @@ export type Constructor<T = {}> = new (...args: any[]) => T;
  * A mixin[1] that allows each DOM class to effectively extend two different parent classes:
  *   1. The corresponding native JS data type (dom.String extends String, dom.Integer extends Number, etc.)
  *   2. A new class constructed by the DomValue method which provides functionality common to all
- *      DOM elements. This includes storing/accessing an ion data type and annotations, as well as
- *      convenience methods for converting from ion data types to JS data types.
+ *      DOM elements. This includes storing/accessing an Ion data type and annotations, as well as
+ *      convenience methods for converting from Ion data types to JS data types.
  *
  * [1] https://www.typescriptlang.org/docs/handbook/mixins.html
  *
