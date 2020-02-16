@@ -76,7 +76,7 @@
     "source-map-support": "^0.5.13",
     "ts-node": "^8.4.1",
     "tslint": "^5.20.1",
-    "typedoc": "github:zslayton/typedoc#7f58d79b0a445434e487d6b61bb14933fbe0c329",
+    "typedoc": "^0.16.10",
     "typescript": "^3.6.2"
   },
   "dependencies": {
