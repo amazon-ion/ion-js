@@ -67,16 +67,16 @@ export class Null extends DomValue(Object, IonTypes.NULL) {
         if (Null._operationIsSupported(this.getType(), operation)) {
             return null;
         }
-        throw new Error(`'${operation}' is not supported by Ion type ${this.getType().name}`);
+        throw new Error(`${operation} is not supported by Ion type ${this.getType().name}`);
     }
 
     // If this Null's Ion type supports the requested operation, throw an Error indicating this was a null dereference.
     // Otherwise, throw an Error indicating that the requested operation is not supported.
-    private _unsupportedOperationOrNullDerefence(operation: string): never {
+    private _unsupportedOperationOrNullDereference(operation: string): never {
         if (Null._operationIsSupported(this.getType(), operation)) {
-            throw new Error(`${operation} called on a null ${this.getType().name}.`);
+            throw new Error(`${operation}() called on a null ${this.getType().name}.`);
         }
-        throw new Error(`'${operation}' is not supported by Ion type ${this.getType().name}`);
+        throw new Error(`${operation} is not supported by Ion type ${this.getType().name}`);
     }
 
     booleanValue(): boolean | null {
@@ -108,15 +108,15 @@ export class Null extends DomValue(Object, IonTypes.NULL) {
     }
 
     fieldNames(): string[] {
-        this._unsupportedOperationOrNullDerefence('fieldNames');
+        this._unsupportedOperationOrNullDereference('fieldNames');
     }
 
     fields(): [string, Value][] {
-        this._unsupportedOperationOrNullDerefence('fields');
+        this._unsupportedOperationOrNullDereference('fields');
     }
 
     elements(): Value[] {
-        this._unsupportedOperationOrNullDerefence('elements');
+        this._unsupportedOperationOrNullDereference('elements');
     }
 
     get(...pathElements: PathElement[]): Value | null {
