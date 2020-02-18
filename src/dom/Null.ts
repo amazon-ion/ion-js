@@ -67,7 +67,7 @@ export class Null extends DomValue(Object, IonTypes.NULL) {
         if (Null._operationIsSupported(this.getType(), operation)) {
             return null;
         }
-        throw new Error(`${operation} is not supported by Ion type ${this.getType().name}`);
+        throw new Error(`${operation}() is not supported by Ion type ${this.getType().name}`);
     }
 
     // If this Null's Ion type supports the requested operation, throw an Error indicating this was a null dereference.
@@ -76,7 +76,7 @@ export class Null extends DomValue(Object, IonTypes.NULL) {
         if (Null._operationIsSupported(this.getType(), operation)) {
             throw new Error(`${operation}() called on a null ${this.getType().name}.`);
         }
-        throw new Error(`${operation} is not supported by Ion type ${this.getType().name}`);
+        throw new Error(`${operation}() is not supported by Ion type ${this.getType().name}`);
     }
 
     booleanValue(): boolean | null {
