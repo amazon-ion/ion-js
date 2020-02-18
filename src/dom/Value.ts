@@ -60,6 +60,9 @@ export interface Value {
     /**
      * For the Timestamp type, returns a JS Date representation of the Value; otherwise throws
      * an Error.
+     *
+     * Note that the conversion from an ion.Timestamp to a Date can involve a loss of precision.
+     * See timestampValue() for a lossless alternative.
      */
     dateValue(): Date | null;
 

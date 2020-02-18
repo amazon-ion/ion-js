@@ -35,10 +35,8 @@ import {BinaryReader} from "../IonBinaryReader";
 export function loadAll(ionData: ReaderBuffer | Reader): Value[] {
     let reader = _createReader(ionData);
     let ionValues: Value[] = [];
-    let ionType: IonType | null = reader.next();
-    while (ionType !== null) {
+    while (reader.next()) {
         ionValues.push(_loadValue(reader));
-        ionType = reader.next();
     }
     return ionValues;
 }
