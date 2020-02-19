@@ -1,12 +1,12 @@
 import {IonTypes} from "../Ion";
-import {DomValue} from "./DomValue";
+import {Value} from "./Value";
 
 /**
  * Represents a string[1] value in an Ion stream.
  *
  * [1] http://amzn.github.io/ion-docs/docs/spec.html#string
  */
-export class String extends DomValue(global.String, IonTypes.STRING) {
+export class String extends Value(global.String, IonTypes.STRING) {
     /**
      * Constructor.
      * @param text          The text value to represent as a string.

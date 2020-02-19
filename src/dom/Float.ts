@@ -1,12 +1,12 @@
 import {IonTypes} from "../Ion";
-import {DomValue} from "./DomValue";
+import {Value} from "./Value";
 
 /**
  * Represents a float[1] value in an Ion stream.
  *
  * [1] http://amzn.github.io/ion-docs/docs/spec.html#float
  */
-export class Float extends DomValue(Number, IonTypes.FLOAT) {
+export class Float extends Value(Number, IonTypes.FLOAT) {
 
     /**
      * Constructor.

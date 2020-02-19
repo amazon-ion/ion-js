@@ -1,13 +1,13 @@
 import JSBI from "jsbi";
 import {IonTypes} from "../Ion";
-import {DomValue} from "./DomValue";
+import {Value} from "./Value";
 
 /**
  * Represents an integer value in an Ion stream.
  *
  * [1] http://amzn.github.io/ion-docs/docs/spec.html#int
  */
-export class Integer extends DomValue(Number, IonTypes.INT) {
+export class Integer extends Value(Number, IonTypes.INT) {
     private _bigIntValue: JSBI | null;
     private _numberValue: number;
 

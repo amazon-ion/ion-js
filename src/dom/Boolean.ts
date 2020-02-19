@@ -1,5 +1,5 @@
 import {IonTypes} from "../Ion";
-import {DomValue} from "./DomValue";
+import {Value} from "./Value";
 
 /**
  * Represents a boolean[1] value in an Ion stream.
@@ -25,7 +25,7 @@ import {DomValue} from "./DomValue";
  * [1] http://amzn.github.io/ion-docs/docs/spec.html#bool
  * [2] https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean#Description
  */
-export class Boolean extends DomValue(global.Boolean, IonTypes.BOOL) {
+export class Boolean extends Value(global.Boolean, IonTypes.BOOL) {
 
     /**
      * Constructor.

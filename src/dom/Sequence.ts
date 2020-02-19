@@ -1,5 +1,4 @@
 import {Value, PathElement} from "./Value";
-import {DomValue} from "./DomValue";
 import {IonType} from "../Ion";
 
 /**
@@ -15,7 +14,7 @@ import {IonType} from "../Ion";
  * @private
  */
 export function Sequence(ionType: IonType) {
-    return class extends DomValue(Array, ionType) implements Value, Array<Value> {
+    return class extends Value(Array, ionType) implements Value, Array<Value> {
         protected constructor(children: Value[], annotations: string[] = []) {
             super();
             this.push(...children);

@@ -1,6 +1,5 @@
 import {Value, PathElement} from "./Value";
 import {IonTypes} from "../Ion";
-import {DomValue} from "./DomValue";
 
 /**
  * Represents a struct[1] value in an Ion stream.
@@ -12,7 +11,7 @@ import {DomValue} from "./DomValue";
  *
  * [1] http://amzn.github.io/ion-docs/docs/spec.html#struct
  */
-export class Struct extends DomValue(Object, IonTypes.STRUCT) implements Value {
+export class Struct extends Value(Object, IonTypes.STRUCT) {
     /**
      * Constructor.
      * @param fields        An iterator of field name/value pairs to represent as a struct.
