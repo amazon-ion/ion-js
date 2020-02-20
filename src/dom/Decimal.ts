@@ -1,4 +1,4 @@
-import {DomValue} from "./DomValue";
+import {Value} from "./Value";
 import {IonTypes} from "../Ion";
 import * as ion from "../Ion";
 
@@ -7,7 +7,7 @@ import * as ion from "../Ion";
  *
  * [1] http://amzn.github.io/ion-docs/docs/spec.html#decimal
  */
-export class Decimal extends DomValue(Number, IonTypes.DECIMAL) {
+export class Decimal extends Value(Number, IonTypes.DECIMAL) {
     private readonly _decimalValue: ion.Decimal;
     private readonly _numberValue: number;
 

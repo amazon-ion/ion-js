@@ -1,4 +1,4 @@
-import {DomValue} from "./DomValue";
+import {Value} from "./Value";
 import {IonTypes} from "../Ion";
 
 /**
@@ -6,7 +6,7 @@ import {IonTypes} from "../Ion";
  *
  * [1] http://amzn.github.io/ion-docs/docs/spec.html#blob
  */
-export class Blob extends DomValue(Uint8Array, IonTypes.BLOB) {
+export class Blob extends Value(Uint8Array, IonTypes.BLOB) {
 
     /**
      * Constructor.

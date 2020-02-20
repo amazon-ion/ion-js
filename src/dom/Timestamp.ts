@@ -1,4 +1,4 @@
-import {DomValue} from "./DomValue";
+import {Value} from "./Value";
 import * as ion from "../Ion";
 import {IonTypes} from "../Ion";
 
@@ -7,7 +7,7 @@ import {IonTypes} from "../Ion";
  *
  * [1] http://amzn.github.io/ion-docs/docs/spec.html#timestamp
  */
-export class Timestamp extends DomValue(Date, IonTypes.TIMESTAMP) {
+export class Timestamp extends Value(Date, IonTypes.TIMESTAMP) {
     protected _timestamp: ion.Timestamp;
     protected _date: Date;
 

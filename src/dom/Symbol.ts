@@ -1,5 +1,5 @@
 import {IonTypes} from "../Ion";
-import {DomValue} from "./DomValue";
+import {Value} from "./Value";
 
 // TODO:
 //   This extends 'String' because ion-js does not yet have a SymbolToken construct.
@@ -10,7 +10,7 @@ import {DomValue} from "./DomValue";
  *
  * [1] http://amzn.github.io/ion-docs/docs/spec.html#symbol
  */
-export class Symbol extends DomValue(String, IonTypes.SYMBOL) {
+export class Symbol extends Value(String, IonTypes.SYMBOL) {
     /**
      * Constructor.
      * @param symbolText    The text to represent as a symbol.
