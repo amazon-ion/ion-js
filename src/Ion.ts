@@ -99,3 +99,9 @@ export {SharedSymbolTable} from "./IonSharedSymbolTable";
 export {TimestampPrecision, Timestamp} from "./IonTimestamp";
 export {toBase64} from "./IonText";
 export {decodeUtf8} from "./IonUnicode";
+
+import * as dom from "./dom";
+export {dom};
+
+// Re-export dom convenience methods for easy access via 'ion'
+export {load, loadAll} from "./dom";
