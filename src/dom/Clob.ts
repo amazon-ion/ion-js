@@ -1,12 +1,12 @@
 import {IonTypes} from "../Ion";
-import {DomValue} from "./DomValue";
+import {Value} from "./Value";
 
 /**
  * Represents a clob[1] value in an Ion stream.
  *
  * [1] http://amzn.github.io/ion-docs/docs/spec.html#clob
  */
-export class Clob extends DomValue(Uint8Array, IonTypes.CLOB) {
+export class Clob extends Value(Uint8Array, IonTypes.CLOB) {
     /**
      * Constructor.
      * @param bytes         Raw, unsigned bytes to represent as a clob.
