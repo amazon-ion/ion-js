@@ -36,7 +36,7 @@ export class Timestamp extends Value(Date, IonTypes.TIMESTAMP) {
         return new ion.Timestamp(
             date.getTimezoneOffset(),
             date.getUTCFullYear(),
-            date.getUTCMonth(),
+            date.getUTCMonth() + 1, // Timestamp expects a range of 1-12
             date.getUTCDate(),
             date.getUTCHours(),
             date.getUTCMinutes(),

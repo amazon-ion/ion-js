@@ -1,5 +1,6 @@
-import {Decimal, Timestamp, IonType} from "../Ion";
+import {Decimal, dom, IonType, IonTypes, Timestamp} from "../Ion";
 import JSBI from "jsbi";
+import * as JsValueConversion from "./JsValueConversion";
 
 // This file leverages Typescript's declaration merging feature[1] to create a
 // combined type/value called `Value` that is simultaneously an interface, a mixin constructor,
@@ -7,7 +8,7 @@ import JSBI from "jsbi";
 // * Classes can implement Value
 // * Classes can extend a mixin constructed by Value()
 // * `instanceof Value` returns true for classes that extend a mixin constructed by Value()
-// * TODO: Concrete Value implementations can be constructed by calling Value.from(jsValue)
+// * Concrete Value implementations can be constructed by calling Value.from(jsValue)
 //
 // [1] https://www.typescriptlang.org/docs/handbook/declaration-merging.html
 
@@ -270,6 +271,33 @@ export function Value<Clazz extends Constructor>(BaseClass: Clazz, ionType: IonT
 }
 
 export namespace Value {
-    // TODO: Provide a function to convert from native JS values to ion.dom.Value instances.
-    //       function from(jsValue): Value {...}
+    /**
+     * Constructs a dom.Value from the provided Javascript value using the following type mappings:
+     *
+     * JS Type    | dom.Value subclass
+     * -----------------------------
+     * null       | dom.Null
+     * boolean    | dom.Boolean
+     * number     | dom.Integer or dom.Float
+     * BigInt     | dom.Integer
+     * string     | dom.String
+     * Decimal    | dom.Decimal
+     * Date       | dom.Timestamp
+     * Timestamp  | dom.Timestamp
+     * Uint8Array | dom.Blob
+     * Array      | dom.List
+     * Object     | dom.Struct
+     *
+     * Other input types (including 'undefined') are not supported and will throw an Error.
+     *
+     * If the input type is an Array or Object, this method will also convert each nested javascript
+     * values into a dom.Value.
+     *
+     * @param value         A javascript value to convert into an Ion dom.Value.
+     * @param annotations   An optional array of strings to associate with the newly created dom.Value.
+     *                      These annotations will NOT be associated with any nested dom.Values.
+     */
+    export function from(value: any, annotations: string[] = []): Value {
+        return JsValueConversion._ionValueFromJsValue(value, annotations);
+    }
 }

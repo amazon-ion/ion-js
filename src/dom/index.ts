@@ -1,4 +1,4 @@
-import {IntSize, IonType, IonTypes, makeReader, Reader, ReaderBuffer} from "../Ion";
+import {IntSize, IonTypes, makeReader, Reader, ReaderBuffer} from "../Ion";
 import * as ion from "../Ion";
 import {Value} from "./Value";
 import {Struct} from "./Struct";
