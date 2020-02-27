@@ -1,13 +1,18 @@
 import {Value} from "./Value";
 import * as ion from "../Ion";
 import {IonTypes} from "../Ion";
+import {FromJsConstructor, FromJsConstructorBuilder} from "./FromJsConstructor";
+
+const _fromJsConstructor: FromJsConstructor = new FromJsConstructorBuilder()
+    .withClasses(Date, ion.Timestamp)
+    .build();
 
 /**
  * Represents a timestamp[1] value in an Ion stream.
  *
  * [1] http://amzn.github.io/ion-docs/docs/spec.html#timestamp
  */
-export class Timestamp extends Value(Date, IonTypes.TIMESTAMP) {
+export class Timestamp extends Value(Date, IonTypes.TIMESTAMP, _fromJsConstructor) {
     protected _timestamp: ion.Timestamp;
     protected _date: Date;
 

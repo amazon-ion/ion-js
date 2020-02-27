@@ -1,6 +1,7 @@
-import {Decimal, dom, IonType, IonTypes, Timestamp} from "../Ion";
+import {Decimal, IonType, Timestamp} from "../Ion";
 import JSBI from "jsbi";
 import * as JsValueConversion from "./JsValueConversion";
+import {FromJsConstructor} from "./FromJsConstructor";
 
 // This file leverages Typescript's declaration merging feature[1] to create a
 // combined type/value called `Value` that is simultaneously an interface, a mixin constructor,
@@ -152,11 +153,13 @@ export type Constructor<T = {}> = new (...args: any[]) => T;
  *
  * [1] https://www.typescriptlang.org/docs/handbook/mixins.html
  *
- * @param BaseClass     A parent type for the newly constructed class to extend.
- * @param ionType       The Ion data type that will be associated with new instances of the constructed class.
+ * @param BaseClass             A parent type for the newly constructed class to extend.
+ * @param ionType               The Ion data type that will be associated with new instances of the constructed class.
+ * @param fromJsConstructor     Calls the class's primary constructor with a Javascript value after
+ *                              performing configured validation and adaptation logic.
  * @constructor
  */
-export function Value<Clazz extends Constructor>(BaseClass: Clazz, ionType: IonType) {
+export function Value<Clazz extends Constructor>(BaseClass: Clazz, ionType: IonType, fromJsConstructor: FromJsConstructor) {
     return class extends BaseClass implements Value {
         _ionType: IonType;
         _ionAnnotations: string[];
@@ -266,6 +269,16 @@ export function Value<Clazz extends Constructor>(BaseClass: Clazz, ionType: IonT
                 return this as unknown as T;
             }
             throw new Error(`${this.constructor.name} is not an instance of ${ionValueType.name}`);
+        }
+
+        // Verifies that the provided jsValue's type is supported by this class's constructor
+        // before using it to create a new instance of this class. In some cases, performs
+        // adaptation logic (e.g. unboxing boxed primitives) on jsValue before invoking the constructor.
+        // As a static mixin method, this method will be inherited by all subclasses of dom.Value.
+        // Value subtypes requiring more complex conversion logic (e.g. Struct, List) are free
+        // to override it.
+        static _fromJsValue(jsValue: any, annotations: string[]): Value {
+            return fromJsConstructor.construct(this, jsValue, annotations);
         }
     };
 }

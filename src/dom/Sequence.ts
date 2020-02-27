@@ -1,5 +1,6 @@
-import {Value, PathElement} from "./Value";
+import {PathElement, Value} from "./Value";
 import {IonType} from "../Ion";
+import {FromJsConstructor} from "./FromJsConstructor";
 
 /**
  * This mixin constructs a new class that:
@@ -14,7 +15,7 @@ import {IonType} from "../Ion";
  * @private
  */
 export function Sequence(ionType: IonType) {
-    return class extends Value(Array, ionType) implements Value, Array<Value> {
+    return class extends Value(Array, ionType, FromJsConstructor.NONE) implements Value, Array<Value> {
         protected constructor(children: Value[], annotations: string[] = []) {
             super();
             this.push(...children);
@@ -45,6 +46,14 @@ export function Sequence(ionType: IonType) {
 
         toString(): string {
             return '[' + this.join(', ') + ']';
+        }
+
+        static _fromJsValue(jsValue: any, annotations: string[]): Value {
+            if (!(jsValue instanceof Array)) {
+                throw new Error(`Cannot create a ${this.name} from: ${jsValue.toString()}`);
+            }
+            let children = jsValue.map(child => Value.from(child));
+            return new this(children, annotations);
         }
     }
 }

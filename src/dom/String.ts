@@ -1,12 +1,18 @@
 import {IonTypes} from "../Ion";
 import {Value} from "./Value";
+import {FromJsConstructor, FromJsConstructorBuilder, Primitives} from "./FromJsConstructor";
+
+const _fromJsConstructor: FromJsConstructor = new FromJsConstructorBuilder()
+    .withPrimitives(Primitives.String)
+    .withClassesToUnbox(global.String)
+    .build();
 
 /**
  * Represents a string[1] value in an Ion stream.
  *
  * [1] http://amzn.github.io/ion-docs/docs/spec.html#string
  */
-export class String extends Value(global.String, IonTypes.STRING) {
+export class String extends Value(global.String, IonTypes.STRING, _fromJsConstructor) {
     /**
      * Constructor.
      * @param text          The text value to represent as a string.
