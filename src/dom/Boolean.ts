@@ -1,5 +1,11 @@
 import {IonTypes} from "../Ion";
 import {Value} from "./Value";
+import {FromJsConstructor, FromJsConstructorBuilder, Primitives} from "./FromJsConstructor";
+
+const _fromJsConstructor: FromJsConstructor = new FromJsConstructorBuilder()
+    .withPrimitives(Primitives.Boolean)
+    .withClassesToUnbox(global.Boolean)
+    .build();
 
 /**
  * Represents a boolean[1] value in an Ion stream.
@@ -25,7 +31,7 @@ import {Value} from "./Value";
  * [1] http://amzn.github.io/ion-docs/docs/spec.html#bool
  * [2] https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean#Description
  */
-export class Boolean extends Value(global.Boolean, IonTypes.BOOL) {
+export class Boolean extends Value(global.Boolean, IonTypes.BOOL, _fromJsConstructor) {
 
     /**
      * Constructor.

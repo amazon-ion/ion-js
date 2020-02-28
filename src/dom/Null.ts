@@ -1,6 +1,7 @@
 import {Decimal, IonType, IonTypes} from "../Ion";
 import JSBI from "jsbi";
 import {PathElement, Value} from "./Value";
+import {FromJsConstructor} from "./FromJsConstructor";
 
 /**
  * Represents a null[1] value in an Ion stream.
@@ -26,7 +27,7 @@ import {PathElement, Value} from "./Value";
  *
  * [1] http://amzn.github.io/ion-docs/docs/spec.html#null
  */
-export class Null extends Value(Object, IonTypes.NULL) {
+export class Null extends Value(Object, IonTypes.NULL, FromJsConstructor.NONE) {
     private static _supportedIonTypesByOperation = new Map<string, Set<IonType>>([
         ['booleanValue', new Set([IonTypes.BOOL])],
         ['numberValue', new Set([IonTypes.INT, IonTypes.FLOAT, IonTypes.DECIMAL])],

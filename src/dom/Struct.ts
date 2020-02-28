@@ -1,5 +1,6 @@
-import {Value, PathElement} from "./Value";
+import {PathElement, Value} from "./Value";
 import {IonTypes} from "../Ion";
+import {FromJsConstructor} from "./FromJsConstructor";
 
 /**
  * Represents a struct[1] value in an Ion stream.
@@ -11,7 +12,7 @@ import {IonTypes} from "../Ion";
  *
  * [1] http://amzn.github.io/ion-docs/docs/spec.html#struct
  */
-export class Struct extends Value(Object, IonTypes.STRUCT) {
+export class Struct extends Value(Object, IonTypes.STRUCT, FromJsConstructor.NONE) {
     /**
      * Constructor.
      * @param fields        An iterator of field name/value pairs to represent as a struct.
@@ -35,8 +36,8 @@ export class Struct extends Value(Object, IonTypes.STRUCT) {
             throw new Error('Value#get requires at least one parameter.');
         }
         let [pathHead, ...pathTail] = pathElements;
-        if (typeof(pathHead) !== "string") {
-            throw new Error(`Cannot index into a struct with a ${typeof(pathHead)}.`);
+        if (typeof (pathHead) !== "string") {
+            throw new Error(`Cannot index into a struct with a ${typeof (pathHead)}.`);
         }
         let child: Value | null = this._getField(pathHead);
         if (pathTail.length === 0 || child === null) {
@@ -81,7 +82,7 @@ export class Struct extends Value(Object, IonTypes.STRUCT) {
          *   let value = struct['foo']; // JS
          *   let value = struct.foo;    // JS
          */
-        let obj = this as unknown as {[key: string]: Value};
+        let obj = this as unknown as { [key: string]: Value };
         let field: Value | undefined = obj[fieldName];
         if (field === undefined) {
             return null;
@@ -95,6 +96,15 @@ export class Struct extends Value(Object, IonTypes.STRUCT) {
             + [...this.fields()]
                 .map(([name, value]) => name + ': ' + value)
                 .join(', ')
-        + '}';
+            + '}';
+    }
+
+    static _fromJsValue(jsValue: any, annotations: string[]): Value {
+        if (!(jsValue instanceof Object)) {
+            throw new Error(`Cannot create a dom.Struct from: ${jsValue.toString()}`);
+        }
+        let fields: [string, Value][] = Object.entries(jsValue)
+            .map(([key, value]) => [key, Value.from(value)]);
+        return new this(fields, annotations);
     }
 }

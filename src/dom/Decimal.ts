@@ -1,13 +1,18 @@
 import {Value} from "./Value";
-import {IonTypes} from "../Ion";
 import * as ion from "../Ion";
+import {IonTypes} from "../Ion";
+import {FromJsConstructor, FromJsConstructorBuilder} from "./FromJsConstructor";
+
+const _fromJsConstructor: FromJsConstructor = new FromJsConstructorBuilder()
+    .withClasses(ion.Decimal)
+    .build();
 
 /**
  * Represents a decimal[1] value in an Ion stream.
  *
  * [1] http://amzn.github.io/ion-docs/docs/spec.html#decimal
  */
-export class Decimal extends Value(Number, IonTypes.DECIMAL) {
+export class Decimal extends Value(Number, IonTypes.DECIMAL, _fromJsConstructor) {
     private readonly _decimalValue: ion.Decimal;
     private readonly _numberValue: number;
 
