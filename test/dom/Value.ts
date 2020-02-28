@@ -11,41 +11,39 @@ function jsEqualsIon(jsValue, ionValue): boolean {
 }
 
 /**
- * Tests constructing an Ion value from a JS value. Verifies that the newly constructed
- * value has the expected Ion type, the expected JS type, and the correct value.
+ * Tests constructing an Ion dom.Value from a JS value. Verifies that the newly constructed
+ * dom.Value has the expected Ion type, the expected JS type, and a value equal to that of jsValue (or
+ * `expectValue` instead, if specified).
  *
- * Callers may optionally provide a wrapped version of the jsValue that will be used converted to
- * an Ion dom.Value. This is useful for validating that Value.from() behaves the same with boxed primitives
- * (Boolean, String, Number) as it does with actual primitives (boolean, string, number).
- *
- * @param jsValue               A JS value to pass to Value.from() after optionally wrapping it by
- *                              calling `wrapperConstructor` if provided.
+ * @param jsValue               A JS value to pass to Value.from().
  * @param expectedIonType       The new dom.Value's expected Ion type.
- * @param wrappedValue          A boxed version of jsValue.
- * @param equalityTest          A function that tests whether the new DOM value is equal to the provided jsValue
+ * @param equalityTest          A function that tests whether the new dom.Value is equal to the provided jsValue.
+ * @param expectValue           If specified, `equalityTest` will compare the new dom.Value to `expectValue` instead of
+ *                              comparing it to `jsValue`. This is helpful if jsValue is a boxed primitive
+ *                              but you want to test for equality with the primitive representation.
  */
 function domValueTest(jsValue,
                       expectedIonType,
                       equalityTest: (p1, p2) => boolean = jsEqualsIon,
-                      wrappedValue?) {
-    function validateDomValue(v: any, annotations) {
+                      expectValue?) {
+    function validateDomValue(domValue: Value, annotations) {
+        let equalityTestValue = _hasValue(expectValue) ? expectValue : jsValue;
         // Verify that the new dom.Value is considered equal to the original (unwrapped) JS value.
-        assert.isTrue(equalityTest(jsValue, v));
-        assert.equal(expectedIonType, v.getType());
+        assert.isTrue(equalityTest(equalityTestValue, domValue));
+        assert.equal(expectedIonType, domValue.getType());
         let expectedDomType: any = JsValueConversion._domConstructorFor(expectedIonType);
-        assert.isTrue(v instanceof expectedDomType);
-        assert.deepEqual(annotations, v.getAnnotations());
+        assert.isTrue(domValue instanceof expectedDomType);
+        assert.deepEqual(annotations, domValue.getAnnotations());
     }
 
     return () => {
         // Test Value.from() with and without specifying annotations
         let annotations = ['foo', 'bar', 'baz'];
-        let sourceValue = _hasValue(wrappedValue) ? wrappedValue : jsValue;
-        it('' + sourceValue, () => {
-            validateDomValue(Value.from(sourceValue), []);
+        it('' + jsValue, () => {
+            validateDomValue(Value.from(jsValue), []);
         });
-        it(annotations.join('::') + '::' + sourceValue, () => {
-            validateDomValue(Value.from(sourceValue, annotations), annotations);
+        it(annotations.join('::') + '::' + jsValue, () => {
+            validateDomValue(Value.from(jsValue, annotations), annotations);
         });
     };
 }
@@ -63,13 +61,13 @@ describe('Value', () => {
             domValueTest(true, IonTypes.BOOL)
         );
         describe('Boolean',
-            domValueTest(true, IonTypes.BOOL, jsEqualsIon, new Boolean(true))
+            domValueTest(new Boolean(true), IonTypes.BOOL, jsEqualsIon, true)
         );
         describe('number (integer)',
             domValueTest(7, IonTypes.INT)
         );
         describe('Number (integer)',
-            domValueTest(7, IonTypes.INT, jsEqualsIon, new Number(7))
+            domValueTest(new Number(7), IonTypes.INT, jsEqualsIon, 7)
         );
         describe('BigInt',
             domValueTest(
@@ -82,7 +80,7 @@ describe('Value', () => {
             domValueTest(7.5, IonTypes.FLOAT)
         );
         describe('Number (floating point)',
-            domValueTest(7.5, IonTypes.FLOAT, jsEqualsIon, new Number(7.5))
+            domValueTest(new Number(7.5), IonTypes.FLOAT, jsEqualsIon, 7.5)
         );
         describe('Decimal',
             domValueTest(
@@ -113,15 +111,15 @@ describe('Value', () => {
         );
         describe('String',
             domValueTest(
-                'Hello',
+                new String('Hello'),
                 IonTypes.STRING,
                 jsEqualsIon,
-                new String('Hello')
+                'Hello'
             )
         );
         describe('Blob',
             domValueTest(
-                new Uint8Array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]),
+                new Uint8Array([9, 8, 7, 6, 5, 4, 3, 2, 1, 0]),
                 IonTypes.BLOB,
                 (jsValue, domValue) =>
                     jsValue.every(
@@ -131,7 +129,7 @@ describe('Value', () => {
         );
         describe('List',
             domValueTest(
-                [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+                [9, 8, 7, 6, 5, 4, 3, 2, 1, 0],
                 IonTypes.LIST,
                 (jsValue, domValue) =>
                     jsValue.every(
@@ -150,7 +148,7 @@ describe('Value', () => {
         );
         describe('List inside Struct',
             domValueTest(
-                {foo: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]},
+                {foo: [9, 8, 7, 6, 5, 4, 3, 2, 1, 0]},
                 IonTypes.STRUCT,
                 (jsValue, domValue) => {
                     assert.isTrue(domValue instanceof dom.Struct);

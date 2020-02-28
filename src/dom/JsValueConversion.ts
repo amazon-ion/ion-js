@@ -92,7 +92,7 @@ function _inferType(value: any): IonType {
             throw new Error(`Value.from() does not support the JS primitive type ${valueType}.`);
     }
 
-    // TODO: Use the code below to create an easy-to-undesrtand _babelIsEnabled() test.
+    // TODO: Use the code below to create an easy-to-understand _babelJsbiIsEnabled() test.
     // If `value` is a native bigint but we're not using Babel for native bigint support, we need to
     // throw an Error.
     //
