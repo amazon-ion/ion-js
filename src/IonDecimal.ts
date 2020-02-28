@@ -230,6 +230,13 @@ export class Decimal {
     }
 
     /**
+     * Converts this Decimal value to a JSON number when being serialized via `JSON.stringify()`.
+     */
+    toJSON() {
+        return this.numberValue();
+    }
+
+    /**
      * Returns a BigInt representing the coefficient of this Decimal value.
      *
      * Note that the BigInt data type is unable to represent -0 natively. If you wish to check for a -0 coefficient,

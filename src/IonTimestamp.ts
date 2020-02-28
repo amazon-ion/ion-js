@@ -380,6 +380,14 @@ export class Timestamp {
         return strVal;
     }
 
+    /**
+     * Converts this Timestamp to a ISO8601-formatted string when being serialized with
+     * `JSON.stringify()`.
+    */
+    toJSON() {
+        return this.getDate().toISOString();
+    }
+
     private _checkRequiredField(fieldName: string, value: number, min: number, max: number) {
         if (!_hasValue(value)) {
             throw new Error(`${fieldName} cannot be ${value}`);

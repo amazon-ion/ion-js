@@ -1,4 +1,4 @@
-import {IonTypes} from "../Ion";
+import {IonTypes, toBase64} from "../Ion";
 import {Lob} from "./Lob";
 
 /**
@@ -15,5 +15,12 @@ export class Blob extends Lob(IonTypes.BLOB) {
      */
     constructor(data: Uint8Array, annotations: string[] = []) {
         super(data, annotations);
+    }
+
+    /**
+     * Converts this Blob to a base64-encoded string when being serialized with `JSON.stringify()`.
+     */
+    toJSON() {
+        return toBase64(this);
     }
 }
