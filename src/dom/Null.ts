@@ -129,4 +129,11 @@ export class Null extends Value(Object, IonTypes.NULL, FromJsConstructor.NONE) {
         }
         return 'null.' + this._ionType.name;
     }
+
+    /**
+     * Converts this dom.Null to a Javascript null when being serialized with `JSON.stringify()`.
+     */
+    toJSON() {
+        return null;
+    }
 }
