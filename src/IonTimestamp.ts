@@ -381,8 +381,8 @@ export class Timestamp {
     }
 
     /**
-     *  Converts this Timestamp to a ISO8601-formatted string when being serialized with
-     *  `JSON.stringify()`.
+     * Converts this Timestamp to a ISO8601-formatted string when being serialized with
+     * `JSON.stringify()`.
      */
     toJSON() {
         return this.getDate().toISOString();
