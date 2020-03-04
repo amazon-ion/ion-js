@@ -1,7 +1,7 @@
 import {assert} from "chai";
 import * as ion from "../../src/Ion";
 import {Decimal, IonTypes, Timestamp, toBase64} from "../../src/Ion";
-import {Value} from "../../src/dom";
+import {load, Value} from "../../src/dom";
 import {encodeUtf8} from "../../src/IonTests";
 
 // Verifies that subtypes of dom.Value down-convert to JSON following the documented process[1].
@@ -31,7 +31,7 @@ function jsonStringifyIonSourceTests(typeName: string, ...jsValueIonSourcePairs:
     describe(typeName, () => {
         for (let [jsValue, inputIon] of jsValueIonSourcePairs) {
             let json: string = JSON.stringify(jsValue);
-            let ionValue: Value = ion.load(inputIon)!;
+            let ionValue: Value = load(inputIon)!;
             it(inputIon, () => {
                 assert.equal(
                     json,
@@ -104,7 +104,7 @@ describe('JSON', () => {
         );
         it('Blob', () => {
             let helloWorldBase64 = toBase64(encodeUtf8("Hello, world!"));
-            let blob = ion.load('{{' + helloWorldBase64 + '}}')!;
+            let blob = load('{{' + helloWorldBase64 + '}}')!;
             assert.equal(IonTypes.BLOB, blob.getType());
             assert.equal(
                 JSON.stringify(helloWorldBase64),
@@ -126,7 +126,7 @@ describe('JSON', () => {
         it('Symbol', () => {
             assert.equal(
                 JSON.stringify('foo'),
-                JSON.stringify(ion.load('foo'))
+                JSON.stringify(load('foo'))
             );
         });
         it.skip('Clob', () => {

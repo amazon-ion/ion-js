@@ -1,5 +1,5 @@
 import JSBI from "jsbi";
-import {IonTypes} from "../Ion";
+import {IonTypes, Writer} from "../Ion";
 import {Constructor, Value} from "./Value";
 import {FromJsConstructor, FromJsConstructorBuilder, Primitives} from "./FromJsConstructor";
 
@@ -65,5 +65,14 @@ export class Integer extends Value(Number, IonTypes.INT, _fromJsConstructor) {
 
     valueOf() {
         return this.numberValue();
+    }
+
+    writeTo(writer: Writer): void {
+        writer.setAnnotations(this.getAnnotations());
+        if (this._bigIntValue === null) {
+            writer.writeInt(this.numberValue());
+        } else {
+            writer.writeInt(this._bigIntValue);
+        }
     }
 }

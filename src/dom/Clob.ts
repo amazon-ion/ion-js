@@ -1,4 +1,4 @@
-import {IonTypes} from "../Ion";
+import {IonTypes, Writer} from "../Ion";
 import {Lob} from "./Lob";
 
 /**
@@ -14,5 +14,10 @@ export class Clob extends Lob(IonTypes.CLOB) {
      */
     constructor(bytes: Uint8Array, annotations: string[] = []) {
         super(bytes, annotations);
+    }
+
+    writeTo(writer: Writer): void {
+        writer.setAnnotations(this.getAnnotations());
+        writer.writeClob(this);
     }
 }

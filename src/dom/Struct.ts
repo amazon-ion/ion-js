@@ -1,5 +1,5 @@
 import {PathElement, Value} from "./Value";
-import {IonTypes} from "../Ion";
+import {IonTypes, Writer} from "../Ion";
 import {FromJsConstructor} from "./FromJsConstructor";
 
 /**
@@ -97,6 +97,16 @@ export class Struct extends Value(Object, IonTypes.STRUCT, FromJsConstructor.NON
                 .map(([name, value]) => name + ': ' + value)
                 .join(', ')
             + '}';
+    }
+
+    writeTo(writer: Writer): void {
+        writer.setAnnotations(this.getAnnotations());
+        writer.stepIn(IonTypes.STRUCT);
+        for(let [fieldName, value] of this) {
+            writer.writeFieldName(fieldName);
+            value.writeTo(writer);
+        }
+        writer.stepOut();
     }
 
     static _fromJsValue(jsValue: any, annotations: string[]): Value {

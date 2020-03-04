@@ -2,6 +2,7 @@ import {Value} from "./Value";
 import * as ion from "../Ion";
 import {IonTypes} from "../Ion";
 import {FromJsConstructor, FromJsConstructorBuilder} from "./FromJsConstructor";
+import {Writer} from "../Ion";
 
 const _fromJsConstructor: FromJsConstructor = new FromJsConstructorBuilder()
     .withClasses(ion.Decimal)
@@ -42,5 +43,10 @@ export class Decimal extends Value(Number, IonTypes.DECIMAL, _fromJsConstructor)
 
     valueOf(): number {
         return this._numberValue;
+    }
+
+    writeTo(writer: Writer): void {
+        writer.setAnnotations(this.getAnnotations());
+        writer.writeDecimal(this.decimalValue());
     }
 }

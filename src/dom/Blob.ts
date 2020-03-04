@@ -1,4 +1,4 @@
-import {IonTypes, toBase64} from "../Ion";
+import {IonTypes, toBase64, Writer} from "../Ion";
 import {Lob} from "./Lob";
 
 /**
@@ -22,5 +22,10 @@ export class Blob extends Lob(IonTypes.BLOB) {
      */
     toJSON() {
         return toBase64(this);
+    }
+
+    writeTo(writer: Writer): void {
+        writer.setAnnotations(this.getAnnotations());
+        writer.writeBlob(this);
     }
 }
