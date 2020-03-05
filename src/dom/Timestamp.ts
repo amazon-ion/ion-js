@@ -2,6 +2,7 @@ import {Value} from "./Value";
 import * as ion from "../Ion";
 import {IonTypes} from "../Ion";
 import {FromJsConstructor, FromJsConstructorBuilder} from "./FromJsConstructor";
+import {Writer} from "../Ion";
 
 const _fromJsConstructor: FromJsConstructor = new FromJsConstructorBuilder()
     .withClasses(Date, ion.Timestamp)
@@ -55,5 +56,10 @@ export class Timestamp extends Value(Date, IonTypes.TIMESTAMP, _fromJsConstructo
 
     dateValue(): Date {
         return this._date;
+    }
+
+    writeTo(writer: Writer): void {
+        writer.setAnnotations(this.getAnnotations());
+        writer.writeTimestamp(this.timestampValue());
     }
 }

@@ -1,13 +1,139 @@
 import {assert} from "chai";
-import {Value} from "../../src/dom";
-import {Decimal, dom, IonTypes, Timestamp} from "../../src/Ion";
+import {Value, load, loadAll} from "../../src/dom";
+import {Decimal, dom, IonType, IonTypes, Timestamp} from "../../src/Ion";
+import * as ion from "../../src/Ion";
 import JSBI from "jsbi";
 import * as JsValueConversion from "../../src/dom/JsValueConversion";
 import {_hasValue} from "../../src/util";
+import {Constructor} from "../../src/dom/Value";
 
 // The same test logic performed by assert.equals() but without an assertion.
 function jsEqualsIon(jsValue, ionValue): boolean {
     return jsValue == ionValue;
+}
+
+// Generates a mocha-friendly string representation of the provided value that can be used in test names
+function valueName(value: any): string {
+    if (value === null) {
+        return 'null';
+    }
+    if (typeof value === "object") {
+        return `${value.constructor.name}(${value})`;
+    }
+    return `${typeof value}(${value})`;
+}
+
+// Tests whether each value is or is not an instance of dom.Value
+function instanceOfValueTest(expected: boolean, ...values: any[]) {
+    for (let value of values) {
+        it(`${valueName(value)} instanceof Value`, () => {
+            assert.equal(value instanceof Value, expected);
+        });
+    }
+}
+
+function instanceOfValueSubclassTest(constructor: Constructor, expected: boolean, ...values: any[]) {
+    for (let value of values) {
+        it(`${valueName(value)} instanceof ${constructor.name}`, () => {
+            assert.equal(value instanceof constructor, expected);
+        });
+    }
+}
+
+// Used as a default filter on the `exampleJsValuesWhere` and `exampleIonValuesWhere` functions below.
+function acceptAnyValue(_: any) : boolean {
+    return true;
+}
+
+// A common collection of JS values that can be reduced to a relevant subset using the provided filter function.
+function exampleJsValuesWhere(filter: (v: any) => boolean = acceptAnyValue): any[] {
+    return [
+        null,
+        true, false,
+        Number.MIN_SAFE_INTEGER, -7.5, -7, 0, 7, 7.5, Number.MAX_SAFE_INTEGER,
+        "", "foo",
+        new Date(0),
+        Timestamp.parse('1970-01-01T00:00:00Z'),
+        new Decimal('1.5'),
+        [], [1, 2, 3], [{foo: "bar"}],
+        {}, {foo: "bar", baz: 5}, {foo: [1, 2, 3]}
+    ].filter(filter);
+}
+
+// A common collection of Ion dom.Value instances that can be reduced to a relevant subset using
+// the provided filter function.
+function exampleIonValuesWhere(filter: (v: Value) => boolean = acceptAnyValue): Value[] {
+    return [
+        load('null')!, // null
+        load('null.string')!, // typed null
+        load('true')!, // boolean
+        load('1')!, // integer
+        load('15e-1')!, // float
+        load('15d-1')!, // decimal
+        load('1970-01-01T00:00:00.000Z')!, // timestamp
+        load('"Hello"')!, // string
+        load('Hello')!, // symbol
+        load('{{aGVsbG8gd29ybGQ=}}')!, // blob
+        load('{{"February"}}')!, // clob
+        load('[1, 2, 3]')!, // list
+        load('(1 2 3)')!, // s-expression
+        load('{foo: true, bar: "Hello", baz: 5, qux: null}')! // struct
+    ].filter(filter);
+}
+
+// Describes the static side of dom.Value subclasses
+interface DomValueConstructor extends Constructor {
+    _getIonType(): IonType;
+}
+
+// The constructors of all dom.Value subclasses
+const DOM_VALUE_SUBCLASSES: DomValueConstructor[] = [
+    dom.Null,
+    dom.Boolean,
+    dom.Integer,
+    dom.Float,
+    dom.Decimal,
+    dom.Timestamp,
+    dom.Clob,
+    dom.Blob,
+    dom.String,
+    dom.Symbol,
+    dom.List,
+    dom.SExpression,
+    dom.Struct
+];
+
+// Converts each argument in `valuesToRoundTrip` to a dom.Value, writes it to an Ion stream, and then load()s the Ion
+// stream back into a dom.Value. Finally, compares the original dom.Value with the dom.Value load()ed from the stream
+// to ensure that no data was lost.
+function domRoundTripTest(typeName: string,
+                          equalityTest: (p1, p2) => boolean,
+                          ...valuesToRoundTrip: any[]) {
+    describe(typeName, () => {
+        for (let value of valuesToRoundTrip) {
+            it(value + '', () => {
+                let writer = ion.makeBinaryWriter();
+                // Make a dom.Value out of the provided value if it isn't one already
+                let domValue;
+                if (value instanceof Value) {
+                    domValue = value as Value;
+                } else {
+                    domValue = Value.from(value);
+                }
+                // Serialize the dom.Value using the newly instantiated writer
+                domValue.writeTo(writer);
+                writer.close();
+                // Load the serialized version of the value
+                let roundTripped = load(writer.getBytes())!;
+                // Verify that nothing was lost in the round trip
+                assert.isNotNull(roundTripped);
+                assert.equal(domValue.isNull(), roundTripped.isNull());
+                assert.equal(domValue.getType(), roundTripped.getType());
+                assert.deepEqual(domValue.getAnnotations(), roundTripped.getAnnotations());
+                assert.isTrue(equalityTest(domValue, roundTripped));
+            });
+        }
+    });
 }
 
 /**
@@ -172,6 +298,188 @@ describe('Value', () => {
                                  .every(([key, value]) => domStruct.get(key)!.valueOf() === value)
                 }
             )
+        );
+    });
+    describe('instanceof', () => {
+        describe('All dom.Value subclasses are instances of dom.Value', () => {
+            instanceOfValueTest(
+                true,
+                ...exampleIonValuesWhere()
+            );
+        });
+        describe('No plain Javascript value is an instance of dom.Value', () => {
+            instanceOfValueTest(
+                false,
+                ...exampleJsValuesWhere()
+            );
+        });
+        for (let subclass of DOM_VALUE_SUBCLASSES) {
+            describe(`${subclass.name}`, () => {
+                // Javascript values are not instances of any dom.Value subclass
+                describe(`Plain Javascript value instanceof dom.${subclass.name}`, () => {
+                    instanceOfValueSubclassTest(
+                        subclass,
+                        false,
+                        ...exampleJsValuesWhere()
+                    );
+                });
+                // Non-null dom.Values whose Ion type matches that of the constructor must be instances of that
+                // dom.Value subclass.
+                describe(`Non-null ${subclass._getIonType().name} instanceof dom.${subclass.name}`, () => {
+                    instanceOfValueSubclassTest(
+                        subclass,
+                        true,
+                        ...exampleIonValuesWhere(
+                            (value) =>
+                                (value.isNull() && subclass === dom.Null)
+                                || (!value.isNull() && value.getType() === subclass._getIonType())
+                        )
+                    );
+                });
+                // Null dom.Values and those whose Ion type does NOT match that of the constructor must not be instances
+                // of that dom.Value subclass.
+                describe(`Null or non-${subclass._getIonType().name} instanceof dom.${subclass.name}`, () => {
+                    instanceOfValueSubclassTest(
+                        subclass,
+                        false,
+                        ...exampleIonValuesWhere(
+                            (value) =>
+                                (value.isNull() && subclass !== dom.Null)
+                                || (!value.isNull() && value.getType() !== subclass._getIonType())
+                        )
+                    );
+                });
+            });
+        }
+    });
+    describe('writeTo()', () => {
+        domRoundTripTest(
+            'Null',
+            (n1, n2) => true, // isNull() and getType() are already checked in `domRoundTripTest`
+            // Test `null` of every Ion type
+            ...Object.values(IonTypes)
+                     .map(ionType => load('null.' + ionType.name)!)
+        );
+        domRoundTripTest(
+          'Boolean',
+            (b1, b2) => b1.booleanValue() === b2.booleanValue(),
+            true,
+            false
+        );
+        domRoundTripTest(
+            'Integer',
+            (i1, i2) => i1.numberValue() === i2.numberValue(),
+            Number.MIN_SAFE_INTEGER,
+            -8675309,
+            -24601,
+            0,
+            24601,
+            8675309,
+            Number.MAX_SAFE_INTEGER
+        );
+        domRoundTripTest(
+            'Float',
+            (f1, f2) => Object.is(f1.numberValue(), f2.numberValue()), // Supports NaN equality
+            Number.NEGATIVE_INFINITY,
+            -867.5309,
+            -2.4601,
+            0.0,
+            2.4601,
+            867.5309,
+            Number.POSITIVE_INFINITY,
+            Number.NaN
+        );
+        domRoundTripTest(
+            'Decimal',
+            (d1, d2) => d1.decimalValue().equals(d2.decimalValue()),
+            new Decimal("0"),
+            new Decimal("1.5"),
+            new Decimal("-1.5"),
+            new Decimal(".00001"),
+            new Decimal("-.00001"),
+        );
+        domRoundTripTest(
+            'Timestamp',
+            (t1, t2) => t1.timestampValue().equals(t2.timestampValue()),
+            new Date('1970-01-01T00:00:00.000Z'),
+            Timestamp.parse('1970-01-01T00:00:00.000Z'),
+            Timestamp.parse('2020-03-01T00:00:00.000+01:00'), // UTC 11PM Leap day
+            Timestamp.parse('2020-02-28T23:00:00.000-01:00')  // UTC midnight Leap day
+        );
+        domRoundTripTest(
+            'String',
+            (s1, s2) => s1.stringValue() === s2.stringValue(),
+            "",
+            "foo",
+            "bar",
+            "baz",
+            load('foo::bar::baz::"Hello"')
+        );
+        domRoundTripTest(
+            'Symbol',
+            (s1, s2) => s1.stringValue() === s2.stringValue(),
+            load('foo'),
+            load("'bar'"),
+            load('foo::bar::baz'),
+        );
+        domRoundTripTest(
+            'Blob',
+            (b1, b2) => b1.every((value, index) => value === b2[index]),
+            load('{{aGVsbG8gd29ybGQ=}}'),
+            load('foo::bar::{{aGVsbG8gd29ybGQ=}}'),
+        );
+        domRoundTripTest(
+            'Clob',
+            (c1, c2) => c1.every((value, index) => value === c2[index]),
+            load('{{"February"}}'),
+            load('month::{{"February"}}'),
+        );
+        domRoundTripTest(
+            'List',
+            (l1, l2) => l1.reduce(
+                (equalSoFar, value, index) =>
+                    // The dom.Value classes don't have an easy test for deep equality,
+                    // so here we only check for general structure.
+                    equalSoFar
+                        && value.isNull() === l2[index].isNull()
+                        && value.getType() === l2[index].getType(),
+                true
+            ),
+            [],
+            [1, 2, 3],
+            ['foo', 'bar', 'baz'],
+            [new Date(0), true, "hello", null]
+        );
+        domRoundTripTest(
+            'S-Expression',
+            (s1, s2) => s1.reduce(
+                (equalSoFar, value, index) =>
+                    // The dom.Value classes don't have an easy test for deep equality,
+                    // so here we only check for general structure.
+                    equalSoFar
+                        && value.isNull() === s2[index].isNull()
+                        && value.getType() === s2[index].getType(),
+                true
+            ),
+            load('()'),
+            load('(1 2 3)'),
+            load('("foo" "bar" "baz")'),
+            load('(1970-01-01T00:00:00.000Z true "hello" null null.struct)')
+        );
+        domRoundTripTest(
+            'Struct',
+            (s1: Value, s2: Value) => s1.fields().reduce(
+                (equalSoFar, [key, value]) =>
+                    // The dom.Value classes don't have an easy test for deep equality,
+                    // so here we only check for general structure.
+                    equalSoFar
+                        && value.isNull() === s2[key].isNull()
+                        && value.getType() === s2[key].getType(),
+                true
+            ),
+            {},
+            {foo: 5, bar: "baz", qux: true},
+            {foo: ['dog', 'cat', 'mouse']}
         );
     });
 });

@@ -1,4 +1,4 @@
-import {IonTypes} from "../Ion";
+import {IonTypes, Writer} from "../Ion";
 import {Value} from "./Value";
 import {FromJsConstructor, FromJsConstructorBuilder, Primitives} from "./FromJsConstructor";
 
@@ -45,5 +45,10 @@ export class Boolean extends Value(global.Boolean, IonTypes.BOOL, _fromJsConstru
 
     booleanValue(): boolean {
         return this.valueOf() as boolean;
+    }
+
+    writeTo(writer: Writer): void {
+        writer.setAnnotations(this.getAnnotations());
+        writer.writeBoolean(this.booleanValue());
     }
 }

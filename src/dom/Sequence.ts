@@ -1,5 +1,5 @@
 import {PathElement, Value} from "./Value";
-import {IonType} from "../Ion";
+import {IonType, IonTypes, Writer} from "../Ion";
 import {FromJsConstructor} from "./FromJsConstructor";
 
 /**
@@ -54,6 +54,15 @@ export function Sequence(ionType: IonType) {
             }
             let children = jsValue.map(child => Value.from(child));
             return new this(children, annotations);
+        }
+
+        writeTo(writer: Writer) {
+            writer.setAnnotations(this.getAnnotations());
+            writer.stepIn(ionType);
+            for(let child of this) {
+                child.writeTo(writer);
+            }
+            writer.stepOut();
         }
     }
 }

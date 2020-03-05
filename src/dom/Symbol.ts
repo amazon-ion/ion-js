@@ -1,4 +1,4 @@
-import {IonTypes} from "../Ion";
+import {IonTypes, Writer} from "../Ion";
 import {Value} from "./Value";
 import {FromJsConstructor, FromJsConstructorBuilder, Primitives} from "./FromJsConstructor";
 
@@ -29,5 +29,10 @@ export class Symbol extends Value(String, IonTypes.SYMBOL, _fromJsConstructor) {
 
     stringValue(): string {
         return this.toString();
+    }
+
+    writeTo(writer: Writer): void {
+        writer.setAnnotations(this.getAnnotations());
+        writer.writeSymbol(this.stringValue());
     }
 }

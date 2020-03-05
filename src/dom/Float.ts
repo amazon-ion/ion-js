@@ -1,4 +1,4 @@
-import {IonTypes} from "../Ion";
+import {IonTypes, Writer} from "../Ion";
 import {Value} from "./Value";
 import {FromJsConstructor, FromJsConstructorBuilder, Primitives} from "./FromJsConstructor";
 
@@ -26,5 +26,10 @@ export class Float extends Value(Number, IonTypes.FLOAT, _fromJsConstructor) {
 
     public numberValue(): number {
         return +this.valueOf();
+    }
+
+    writeTo(writer: Writer): void {
+        writer.setAnnotations(this.getAnnotations());
+        writer.writeFloat64(this.numberValue());
     }
 }

@@ -1,7 +1,8 @@
-import {Decimal, IonType, Timestamp} from "../Ion";
+import {Decimal, IonType, Timestamp, Writer} from "../Ion";
 import JSBI from "jsbi";
 import * as JsValueConversion from "./JsValueConversion";
 import {FromJsConstructor} from "./FromJsConstructor";
+import {_hasValue} from "../util";
 
 // This file leverages Typescript's declaration merging feature[1] to create a
 // combined type/value called `Value` that is simultaneously an interface, a mixin constructor,
@@ -130,6 +131,13 @@ export interface Value {
      * function will cast it as type `T` and return it; otherwise throws an Error.
      */
     as<T extends Value>(ionValueType: Constructor<T>): T;
+
+    /**
+     * Writes the Ion value represented by this dom.Value (including annotations) to the provided Writer.
+     * If the value is a container, writeTo() will be called recursively on its nested values.
+     * @param writer    An Ion Writer to which the value should be written.
+     */
+    writeTo(writer: Writer): void;
 }
 
 /**
@@ -143,6 +151,12 @@ export type PathElement = string | number;
  * A type alias for the constructor signature required for mixins.
  */
 export type Constructor<T = {}> = new (...args: any[]) => T;
+
+/*
+ * This Symbol is used to mark classes created by the Value mixin as belonging to the dom.Value
+ * class hierarchy. This allows the `className instanceof dom.Value` test to work as expected.
+ */
+const _DOM_VALUE_SIGNET = Symbol("ion.dom.Value");
 
 /**
  * A mixin[1] that allows each DOM class to effectively extend two different parent classes:
@@ -160,7 +174,7 @@ export type Constructor<T = {}> = new (...args: any[]) => T;
  * @constructor
  */
 export function Value<Clazz extends Constructor>(BaseClass: Clazz, ionType: IonType, fromJsConstructor: FromJsConstructor) {
-    return class extends BaseClass implements Value {
+    let newClass = class extends BaseClass implements Value {
         _ionType: IonType;
         _ionAnnotations: string[];
 
@@ -271,6 +285,15 @@ export function Value<Clazz extends Constructor>(BaseClass: Clazz, ionType: IonT
             throw new Error(`${this.constructor.name} is not an instance of ${ionValueType.name}`);
         }
 
+        writeTo(writer: Writer): void {
+            this._unsupportedOperation('writeTo');
+        }
+
+        // Returns the IonType associated with a particular dom.Value subclass. Useful for testing.
+        static _getIonType(): IonType {
+            return ionType;
+        }
+
         // Verifies that the provided jsValue's type is supported by this class's constructor
         // before using it to create a new instance of this class. In some cases, performs
         // adaptation logic (e.g. unboxing boxed primitives) on jsValue before invoking the constructor.
@@ -281,6 +304,21 @@ export function Value<Clazz extends Constructor>(BaseClass: Clazz, ionType: IonT
             return fromJsConstructor.construct(this, jsValue, annotations);
         }
     };
+
+    // Classes created using this mixin will each have this static property.
+    // Because its name is a Symbol[1], it cannot be referenced outside of the class except
+    // by code in this file (which has access to the constant '_DOM_VALUE_SIGNET').
+    // See the Symbol.hasInstance property that is defined on the Value class at the bottom
+    // of this file for details.
+    //
+    // [1] https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Symbol
+    Object.defineProperty(newClass, _DOM_VALUE_SIGNET, {
+        writable: false,
+        enumerable: false,
+        value: _DOM_VALUE_SIGNET
+    });
+
+    return newClass;
 }
 
 export namespace Value {
@@ -310,7 +348,28 @@ export namespace Value {
      * @param annotations   An optional array of strings to associate with the newly created dom.Value.
      *                      These annotations will NOT be associated with any nested dom.Values.
      */
-    export function from(value: any, annotations: string[] = []): Value {
+    export function from(value: any, annotations?: string[]): Value {
+        if (value instanceof Value) {
+            if (_hasValue(annotations)) {
+                // TODO: This should probably be supported, but will require a clone(annotations?: string[])
+                //       API (or similar) to be added to Value subclasses.
+                throw new Error(
+                    "Value.from() does not support overriding the annotations on a dom.Value"
+                    + " passed as an argument."
+                );
+            }
+            return value as Value;
+        }
         return JsValueConversion._ionValueFromJsValue(value, annotations);
     }
 }
+
+// When testing whether a given object is an `instanceof Value`, this function
+// will test for the presence of the _DOM_VALUE_SIGNET Symbol on that object's constructor.
+Object.defineProperty(Value, Symbol.hasInstance, {
+    get: () => (instance) => {
+        return _hasValue(instance)
+            && _DOM_VALUE_SIGNET in instance.constructor
+            && instance.constructor[_DOM_VALUE_SIGNET] === _DOM_VALUE_SIGNET;
+    }
+});

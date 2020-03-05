@@ -1,4 +1,4 @@
-import {Decimal, IonType, IonTypes} from "../Ion";
+import {Decimal, IonType, IonTypes, Writer} from "../Ion";
 import JSBI from "jsbi";
 import {PathElement, Value} from "./Value";
 import {FromJsConstructor} from "./FromJsConstructor";
@@ -135,5 +135,10 @@ export class Null extends Value(Object, IonTypes.NULL, FromJsConstructor.NONE) {
      */
     toJSON() {
         return null;
+    }
+
+    writeTo(writer: Writer): void {
+        writer.setAnnotations(this.getAnnotations());
+        writer.writeNull(this.getType());
     }
 }
