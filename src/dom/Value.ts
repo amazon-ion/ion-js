@@ -133,7 +133,7 @@ export interface Value {
     as<T extends Value>(ionValueType: Constructor<T>): T;
 
     /**
-     * Writes the Ion value represented by this dom.Value (including annotations) to the provided Writer,
+     * Writes the Ion value represented by this dom.Value (including annotations) to the provided Writer.
      * If the value is a container, writeTo() will be called recursively on its nested values.
      * @param writer    An Ion Writer to which the value should be written.
      */
@@ -152,11 +152,11 @@ export type PathElement = string | number;
  */
 export type Constructor<T = {}> = new (...args: any[]) => T;
 
-/**
+/*
  * This Symbol is used to mark classes created by the Value mixin as belonging to the dom.Value
  * class hierarchy. This allows the `className instanceof dom.Value` test to work as expected.
  */
-const DOM_VALUE_SIGNET = Symbol("ion.dom.Value");
+const _DOM_VALUE_SIGNET = Symbol("ion.dom.Value");
 
 /**
  * A mixin[1] that allows each DOM class to effectively extend two different parent classes:
@@ -302,15 +302,15 @@ export function Value<Clazz extends Constructor>(BaseClass: Clazz, ionType: IonT
 
     // Classes created using this mixin will each have this static property.
     // Because its name is a Symbol[1], it cannot be referenced outside of the class except
-    // by code in this file (which has access to the constant 'DOM_VALUE_SIGNET').
+    // by code in this file (which has access to the constant '_DOM_VALUE_SIGNET').
     // See the Symbol.hasInstance property that is defined on the Value class at the bottom
     // of this file for details.
     //
     // [1] https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Symbol
-    Object.defineProperty(newClass, DOM_VALUE_SIGNET, {
+    Object.defineProperty(newClass, _DOM_VALUE_SIGNET, {
         writable: false,
         enumerable: false,
-        value: DOM_VALUE_SIGNET
+        value: _DOM_VALUE_SIGNET
     });
 
     return newClass;
@@ -360,11 +360,11 @@ export namespace Value {
 }
 
 // When testing whether a given object is an `instanceof Value`, this function
-// will test for the presence of the DOM_VALUE_SIGNET Symbol on that object's constructor.
+// will test for the presence of the _DOM_VALUE_SIGNET Symbol on that object's constructor.
 Object.defineProperty(Value, Symbol.hasInstance, {
     get: () => (instance) => {
         return _hasValue(instance)
-            && DOM_VALUE_SIGNET in instance.constructor
-            && instance.constructor[DOM_VALUE_SIGNET] === DOM_VALUE_SIGNET;
+            && _DOM_VALUE_SIGNET in instance.constructor
+            && instance.constructor[_DOM_VALUE_SIGNET] === _DOM_VALUE_SIGNET;
     }
 });

@@ -28,9 +28,9 @@ function instanceOfTest(expected: boolean, ...values: any[]) {
     }
 }
 
-// Converts each argument in `values` to a dom.Value, writes it to an Ion stream, and then load()s the Ion stream back
-// into a dom.Value. Finally, compares the original dom.Value with the dom.Value load()ed from the stream to ensure
-// that no data was lost.
+// Converts each argument in `valuesToRoundTrip` to a dom.Value, writes it to an Ion stream, and then load()s the Ion
+// stream back into a dom.Value. Finally, compares the original dom.Value with the dom.Value load()ed from the stream
+// to ensure that no data was lost.
 function domRoundTripTest(typeName: string,
                           equalityTest: (p1, p2) => boolean,
                           ...valuesToRoundTrip: any[]) {
@@ -45,7 +45,7 @@ function domRoundTripTest(typeName: string,
                 } else {
                     domValue = Value.from(value);
                 }
-                // Serialize the dom.Value using the provided writer
+                // Serialize the dom.Value using the newly instantiated writer
                 domValue.writeTo(writer);
                 writer.close();
                 // Load the serialized version of the value
@@ -237,6 +237,8 @@ describe('Value', () => {
             load('1970-01-01T00:00:00.000Z'), // timestamp
             load('"Hello"'), // string
             load('Hello'), // symbol
+            load('{{aGVsbG8gd29ybGQ=}}'), // blob
+            load('{{"February"}}'), // clob
             load('[1, 2, 3]'), // list
             load('(1 2 3)'), // s-expression
             load('{foo: true, bar: "Hello", baz: 5, qux: null}') // struct
@@ -352,14 +354,30 @@ describe('Value', () => {
             [new Date(0), true, "hello", null]
         );
         domRoundTripTest(
+            'S-Expression',
+            (s1, s2) => s1.reduce(
+                (equalSoFar, value, index) =>
+                    // The dom.Value classes don't have an easy test for deep equality,
+                    // so here we only check for general structure.
+                    equalSoFar
+                    && value.isNull() === s2[index].isNull()
+                    && value.getType() === s2[index].getType(),
+                true
+            ),
+            load('()'),
+            load('(1 2 3)'),
+            load('("foo" "bar" "baz")'),
+            load('(1970-01-01T00:00:00.000Z true "hello" null null.struct)')
+        );
+        domRoundTripTest(
             'Struct',
             (s1: Value, s2: Value) => s1.fields().reduce(
                 (equalSoFar, [key, value]) =>
                     // The dom.Value classes don't have an easy test for deep equality,
                     // so here we only check for general structure.
                     equalSoFar
-                    && value.isNull() === s2[key].isNull()
-                    && value.getType() === s2[key].getType(),
+                        && value.isNull() === s2[key].isNull()
+                        && value.getType() === s2[key].getType(),
                 true
             ),
             {},
