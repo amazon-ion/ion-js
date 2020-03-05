@@ -1,32 +1,107 @@
 import {assert} from "chai";
 import {Value, load, loadAll} from "../../src/dom";
-import {Decimal, dom, IonTypes, Timestamp} from "../../src/Ion";
+import {Decimal, dom, IonType, IonTypes, Timestamp} from "../../src/Ion";
 import * as ion from "../../src/Ion";
 import JSBI from "jsbi";
 import * as JsValueConversion from "../../src/dom/JsValueConversion";
 import {_hasValue} from "../../src/util";
+import {Constructor} from "../../src/dom/Value";
 
 // The same test logic performed by assert.equals() but without an assertion.
 function jsEqualsIon(jsValue, ionValue): boolean {
     return jsValue == ionValue;
 }
 
+// Generates a mocha-friendly string representation of the provided value that can be used in test names
+function valueName(value: any): string {
+    if (value === null) {
+        return 'null';
+    }
+    if (typeof value === "object") {
+        return `${value.constructor.name}(${value})`;
+    }
+    return `${typeof value}(${value})`;
+}
+
 // Tests whether each value is or is not an instance of dom.Value
-function instanceOfTest(expected: boolean, ...values: any[]) {
+function instanceOfValueTest(expected: boolean, ...values: any[]) {
     for (let value of values) {
-        let valueName: string;
-        if (value === null) {
-            valueName = 'null';
-        } else if (typeof value === "object") {
-            valueName = `${value.constructor.name}(${value})`;
-        } else {
-            valueName = `${typeof value}(${value})`;
-        }
-        it(`${valueName} instanceof Value`, () => {
+        it(`${valueName(value)} instanceof Value`, () => {
             assert.equal(value instanceof Value, expected);
         });
     }
 }
+
+function instanceOfValueSubclassTest(constructor: Constructor, expected: boolean, ...values: any[]) {
+    for (let value of values) {
+        it(`${valueName(value)} instanceof ${constructor.name}`, () => {
+            assert.equal(value instanceof constructor, expected);
+        });
+    }
+}
+
+function acceptAnyValue(_: any) : boolean {
+    return true;
+}
+
+// A common collection of JS values that can be reduced to a relevant subset using the provided filter function.
+function exampleJsValuesWhere(filter: (v: any) => boolean = acceptAnyValue): any[] {
+    return [
+        null,
+        true, false,
+        Number.MIN_SAFE_INTEGER, -7.5, -7, 0, 7, 7.5, Number.MAX_SAFE_INTEGER,
+        "", "foo",
+        new Date(0),
+        Timestamp.parse('1970-01-01T00:00:00Z'),
+        new Decimal('1.5'),
+        [], [1, 2, 3], [{foo: "bar"}],
+        {}, {foo: "bar", baz: 5}, {foo: [1, 2, 3]}
+    ].filter(filter);
+}
+
+// A common collection of Ion dom.Value instances that can be reduced to a relevant subset using
+// the provided filter function.
+function exampleIonValuesWhere(filter: (v: Value) => boolean = acceptAnyValue): Value[] {
+    return [
+        load('null')!, // null
+        load('null.string')!, // typed null
+        load('true')!, // boolean
+        load('1')!, // integer
+        load('15e-1')!, // float
+        load('15d-1')!, // decimal
+        load('1970-01-01T00:00:00.000Z')!, // timestamp
+        load('"Hello"')!, // string
+        load('Hello')!, // symbol
+        load('{{aGVsbG8gd29ybGQ=}}')!, // blob
+        load('{{"February"}}')!, // clob
+        load('[1, 2, 3]')!, // list
+        load('(1 2 3)')!, // s-expression
+        load('{foo: true, bar: "Hello", baz: 5, qux: null}')! // struct
+    ].filter(filter);
+}
+
+// Describes the static side of dom.Value subclasses
+interface DomValueConstructor extends Constructor {
+    _getIonType(): IonType;
+}
+
+// The constructors of all dom.Value subclasses
+const DOM_VALUE_SUBCLASSES: DomValueConstructor[] = [
+    dom.Null,
+    dom.Boolean,
+    dom.Integer,
+    dom.Float,
+    dom.Decimal,
+    dom.Timestamp,
+    dom.Clob,
+    dom.Blob,
+    dom.String,
+    dom.Symbol,
+    dom.List,
+    dom.SExpression,
+    dom.Struct
+];
+
 
 // Converts each argument in `valuesToRoundTrip` to a dom.Value, writes it to an Ion stream, and then load()s the Ion
 // stream back into a dom.Value. Finally, compares the original dom.Value with the dom.Value load()ed from the stream
@@ -226,34 +301,55 @@ describe('Value', () => {
         );
     });
     describe('instanceof', () => {
-        instanceOfTest(
-            true,
-            load('null'), // null
-            load('null.string'), // typed null
-            load('true'), // boolean
-            load('1'), // integer
-            load('15e-1'), // float
-            load('15d-1'), // decimal
-            load('1970-01-01T00:00:00.000Z'), // timestamp
-            load('"Hello"'), // string
-            load('Hello'), // symbol
-            load('{{aGVsbG8gd29ybGQ=}}'), // blob
-            load('{{"February"}}'), // clob
-            load('[1, 2, 3]'), // list
-            load('(1 2 3)'), // s-expression
-            load('{foo: true, bar: "Hello", baz: 5, qux: null}') // struct
-        );
-        instanceOfTest(
-            false,
-            null,
-            0,
-            1.5,
-            true,
-            new Date(0),
-            "Hello",
-            [1, 2, 3],
-            {foo: true, bar: "Hello", baz: 5, qux: null}
-        );
+        describe('All dom.Value subclasses are instances of dom.Value', () => {
+            instanceOfValueTest(
+                true,
+                ...exampleIonValuesWhere()
+            );
+        });
+        describe('No plain Javascript value is an instance of dom.Value', () => {
+            instanceOfValueTest(
+                false,
+                ...exampleJsValuesWhere()
+            );
+        });
+        for (let subclass of DOM_VALUE_SUBCLASSES) {
+            describe(`${subclass.name}`, () => {
+                // Javascript values are not instances of any dom.Value subclass
+                describe(`Plain Javascript value instanceof dom.${subclass.name}`, () => {
+                    instanceOfValueSubclassTest(
+                        subclass,
+                        false,
+                        ...exampleJsValuesWhere()
+                    );
+                });
+                // Non-null dom.Values whose Ion type matches the constructor must be instances of that dom.Value subclass
+                describe(`Non-null ${subclass._getIonType().name} instanceof dom.${subclass.name}`, () => {
+                    instanceOfValueSubclassTest(
+                        subclass,
+                        true,
+                        ...exampleIonValuesWhere(
+                            (value) =>
+                                (value.isNull() && subclass === dom.Null)
+                                || (!value.isNull() && value.getType() === subclass._getIonType())
+                        )
+                    );
+                });
+                // Null dom.Values and those whose Ion type does NOT match that of the constructor must not be instances
+                // of that dom.Value subclass.
+                describe(`Null or non-${subclass._getIonType().name} instanceof dom.${subclass.name}`, () => {
+                    instanceOfValueSubclassTest(
+                        subclass,
+                        false,
+                        ...exampleIonValuesWhere(
+                            (value) =>
+                                (value.isNull() && subclass !== dom.Null)
+                                || (!value.isNull() && value.getType() !== subclass._getIonType())
+                        )
+                    );
+                });
+            });
+        }
     });
     describe('writeTo()', () => {
         domRoundTripTest(

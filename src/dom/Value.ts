@@ -289,6 +289,11 @@ export function Value<Clazz extends Constructor>(BaseClass: Clazz, ionType: IonT
             this._unsupportedOperation('writeTo');
         }
 
+        // Returns the IonType associated with a particular dom.Value subclass. Useful for testing.
+        static _getIonType(): IonType {
+            return ionType;
+        }
+
         // Verifies that the provided jsValue's type is supported by this class's constructor
         // before using it to create a new instance of this class. In some cases, performs
         // adaptation logic (e.g. unboxing boxed primitives) on jsValue before invoking the constructor.
