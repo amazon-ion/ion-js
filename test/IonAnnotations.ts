@@ -104,7 +104,8 @@ describe('Annotations', () => {
 
     it('Sid0 binary annotation throws', () => {
         let test = () => {
-            let input = new Uint8Array([0xe0, 0x01, 0x00, 0xea, 0xe4, 0x81, 0x80, 0x21, 0x01]);//$0::1
+            // the following bytes represent $0::1
+            let input = new Uint8Array([0xe0, 0x01, 0x00, 0xea, 0xe4, 0x81, 0x80, 0x21, 0x01]);
             let reader = ion.makeReader(input);
             reader.next();
             reader.annotations();
