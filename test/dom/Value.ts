@@ -457,8 +457,8 @@ describe('Value', () => {
                     // The dom.Value classes don't have an easy test for deep equality,
                     // so here we only check for general structure.
                     equalSoFar
-                    && value.isNull() === s2[index].isNull()
-                    && value.getType() === s2[index].getType(),
+                        && value.isNull() === s2[index].isNull()
+                        && value.getType() === s2[index].getType(),
                 true
             ),
             load('()'),
