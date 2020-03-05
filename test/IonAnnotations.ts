@@ -92,4 +92,23 @@ describe('Annotations', () => {
         writer.stepOut();
         assert.equal(String.fromCharCode.apply(null, writer.getBytes()), 'a::b::{x:1}');
     });
+
+    it('Sid0 text annotation throws', () => {
+        let test = () => {
+            let input = '$0::taco';
+            let reader = ion.makeReader(input);
+            reader.next()
+        };
+        assert.throws(test);
+    });
+
+    it('Sid0 binary annotation throws', () => {
+        let test = () => {
+            let input = new Uint8Array([0xe0, 0x01, 0x00, 0xea, 0xe4, 0x81, 0x80, 0x21, 0x01]);//$0::1
+            let reader = ion.makeReader(input);
+            reader.next();
+            reader.annotations();
+        };
+        assert.throws(test);
+    });
 });
