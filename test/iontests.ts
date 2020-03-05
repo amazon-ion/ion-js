@@ -173,6 +173,10 @@ function checkReaderValueMethods(r1: Reader, r2: Reader, type: IonType | null) {
             assert(v1 !== undefined, "unexpected 'undefined' response");
             assert(v2 !== undefined, "unexpected 'undefined' response");
             assert.deepEqual(v1, v2, methodName + '():  ' + v1 + ' != ' + v2);
+        } else if (type != null && methodName === 'value' && type.isContainer && r1.isNull()) {
+            // special case for Reader.value() when the readers are pointed at a null container
+            assert.isNull(r1[methodName](), 'Expected ' + methodName + '() to return null');
+            assert.isNull(r2[methodName](), 'Expected ' + methodName + '() to return null');
         } else {
             assert.throws(() => {
                 r1[methodName]()
@@ -382,21 +386,15 @@ let eventSkipList = toSkipList([
     'ion-tests/iontestdata/good/intBinary.ion',
     'ion-tests/iontestdata/good/intsWithUnderscores.ion',
     'ion-tests/iontestdata/good/lists.ion',
-    'ion-tests/iontestdata/good/non-equivs/nulls.ion',
     'ion-tests/iontestdata/good/nopPadInsideEmptyStructZeroSymbolId.10n',
     'ion-tests/iontestdata/good/nopPadInsideStructWithNopPadThenValueZeroSymbolId.10n',
     'ion-tests/iontestdata/good/nopPadInsideStructWithValueThenNopPad.10n',
     'ion-tests/iontestdata/good/notVersionMarkers.ion',
-    'ion-tests/iontestdata/good/nullList.10n',
-    'ion-tests/iontestdata/good/nullSexp.10n',
-    'ion-tests/iontestdata/good/nullStruct.10n',
-    'ion-tests/iontestdata/good/nulls.ion',
     'ion-tests/iontestdata/good/sexpAnnotationQuotedOperator.ion',
     'ion-tests/iontestdata/good/subfieldVarInt.ion',
     'ion-tests/iontestdata/good/symbolExplicitZero.10n',
     'ion-tests/iontestdata/good/symbolImplicitZero.10n',
     'ion-tests/iontestdata/good/symbolZero.ion',
-    'ion-tests/iontestdata/good/testfile22.ion',
     'ion-tests/iontestdata/good/utf16.ion',
     'ion-tests/iontestdata/good/utf32.ion',
     'ion-tests/iontestdata/good/item1.10n',
