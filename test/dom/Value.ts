@@ -40,6 +40,7 @@ function instanceOfValueSubclassTest(constructor: Constructor, expected: boolean
     }
 }
 
+// Used as a default filter on the `exampleJsValuesWhere` and `exampleIonValuesWhere` functions below.
 function acceptAnyValue(_: any) : boolean {
     return true;
 }
@@ -101,7 +102,6 @@ const DOM_VALUE_SUBCLASSES: DomValueConstructor[] = [
     dom.SExpression,
     dom.Struct
 ];
-
 
 // Converts each argument in `valuesToRoundTrip` to a dom.Value, writes it to an Ion stream, and then load()s the Ion
 // stream back into a dom.Value. Finally, compares the original dom.Value with the dom.Value load()ed from the stream
@@ -323,7 +323,8 @@ describe('Value', () => {
                         ...exampleJsValuesWhere()
                     );
                 });
-                // Non-null dom.Values whose Ion type matches the constructor must be instances of that dom.Value subclass
+                // Non-null dom.Values whose Ion type matches that of the constructor must be instances of that
+                // dom.Value subclass.
                 describe(`Non-null ${subclass._getIonType().name} instanceof dom.${subclass.name}`, () => {
                     instanceOfValueSubclassTest(
                         subclass,
