@@ -170,6 +170,7 @@ export interface Reader {
      *  for all scalar types.
      *
      * @throw Error when the reader is not positioned on a scalar value.
+     * @deprecated Since version 3.2.  Use the type-specific methods instead (numberValue(), stringValue(), etc.).
      */
     value(): ReaderScalarValue;
 }

@@ -50,39 +50,43 @@ export class IonEventStream {
             writer.setAnnotations(tempEvent.annotations);
             switch (tempEvent.eventType) {
                 case IonEventType.SCALAR:
-                    switch (tempEvent.ionType) {
-                        case IonTypes.BOOL :
-                            writer.writeBoolean(tempEvent.ionValue);
-                            break;
-                        case IonTypes.STRING:
-                            writer.writeString(tempEvent.ionValue);
-                            break;
-                        case IonTypes.SYMBOL :
-                            writer.writeSymbol(tempEvent.ionValue);
-                            break;
-                        case IonTypes.INT :
-                            writer.writeInt(tempEvent.ionValue);
-                            break;
-                        case IonTypes.DECIMAL :
-                            writer.writeDecimal(tempEvent.ionValue);
-                            break;
-                        case IonTypes.FLOAT :
-                            writer.writeFloat64(tempEvent.ionValue);
-                            break;
-                        case IonTypes.NULL :
-                            writer.writeNull(tempEvent.ionType);
-                            break;
-                        case IonTypes.TIMESTAMP :
-                            writer.writeTimestamp(tempEvent.ionValue);
-                            break;
-                        case IonTypes.CLOB :
-                            writer.writeClob(tempEvent.ionValue);
-                            break;
-                        case IonTypes.BLOB :
-                            writer.writeBlob(tempEvent.ionValue);
-                            break;
-                        default :
-                            throw new Error("unexpected type: " + tempEvent.ionType!.name);
+                    if (tempEvent.ionValue == null) {
+                        writer.writeNull(tempEvent.ionType!);
+                    } else {
+                        switch (tempEvent.ionType) {
+                            case IonTypes.BOOL:
+                                writer.writeBoolean(tempEvent.ionValue);
+                                break;
+                            case IonTypes.STRING:
+                                writer.writeString(tempEvent.ionValue);
+                                break;
+                            case IonTypes.SYMBOL:
+                                writer.writeSymbol(tempEvent.ionValue);
+                                break;
+                            case IonTypes.INT:
+                                writer.writeInt(tempEvent.ionValue);
+                                break;
+                            case IonTypes.DECIMAL:
+                                writer.writeDecimal(tempEvent.ionValue);
+                                break;
+                            case IonTypes.FLOAT:
+                                writer.writeFloat64(tempEvent.ionValue);
+                                break;
+                            case IonTypes.NULL:
+                                writer.writeNull(tempEvent.ionType);
+                                break;
+                            case IonTypes.TIMESTAMP:
+                                writer.writeTimestamp(tempEvent.ionValue);
+                                break;
+                            case IonTypes.CLOB:
+                                writer.writeClob(tempEvent.ionValue);
+                                break;
+                            case IonTypes.BLOB:
+                                writer.writeBlob(tempEvent.ionValue);
+                                break;
+                            default:
+                                throw new Error("unexpected type: " + tempEvent.ionType!.name);
+                        }
                     }
                     break;
                 case IonEventType.CONTAINER_START:
@@ -117,11 +121,11 @@ export class IonEventStream {
             if (expectedEvent.eventType === IonEventType.SYMBOL_TABLE) expectedIndex++;
             if (actualEvent.eventType === IonEventType.SYMBOL_TABLE || expectedEvent.eventType === IonEventType.SYMBOL_TABLE) continue;
             switch (actualEvent.eventType) {
-                case IonEventType.SCALAR : {
+                case IonEventType.SCALAR: {
                     if (!actualEvent.equals(expectedEvent)) return false;
                     break;
                 }
-                case IonEventType.CONTAINER_START : {
+                case IonEventType.CONTAINER_START: {
                     if (actualEvent.equals(expectedEvent)) {
                         actualIndex = actualIndex + actualEvent.ionValue.length;
                         expectedIndex = expectedIndex + expectedEvent.ionValue.length;
@@ -130,12 +134,12 @@ export class IonEventStream {
                     }
                     break;
                 }
-                case IonEventType.CONTAINER_END :
-                case IonEventType.STREAM_END : {
+                case IonEventType.CONTAINER_END:
+                case IonEventType.STREAM_END: {
                     //no op
                     break;
                 }
-                default : {
+                default: {
                     throw new Error("Unexpected event type: " + actualEvent.eventType);
                 }
             }
@@ -158,9 +162,9 @@ export class IonEventStream {
                 this.eventStream.push(this.eventFactory.makeEvent(IonEventType.SCALAR, tid!, this.reader.fieldName(), this.reader.depth(), this.reader.annotations(), true, this.reader.value()));
             } else {
                 switch (tid) {
-                    case IonTypes.LIST :
-                    case IonTypes.SEXP :
-                    case IonTypes.STRUCT : {
+                    case IonTypes.LIST:
+                    case IonTypes.SEXP:
+                    case IonTypes.STRUCT: {
                         let containerEvent = this.eventFactory.makeEvent(IonEventType.CONTAINER_START, tid, this.reader.fieldName(), this.reader.depth(), this.reader.annotations(), false, null);
                         this.eventStream.push(containerEvent);
                         currentContainer.push(containerEvent);
@@ -168,7 +172,7 @@ export class IonEventStream {
                         this.reader.stepIn();
                         break;
                     }
-                    case null : {
+                    case null: {
                         if (this.reader.depth() === 0) {
                             this.eventStream.push(this.eventFactory.makeEvent(IonEventType.STREAM_END, IonTypes.NULL, null, this.reader.depth(), [], false, undefined));
                             return;
@@ -178,7 +182,7 @@ export class IonEventStream {
                         }
                         break;
                     }
-                    default : {
+                    default: {
                         this.eventStream.push(this.eventFactory.makeEvent(IonEventType.SCALAR, tid, this.reader.fieldName(), this.reader.depth(), this.reader.annotations(), false, this.reader.value()));
                         break;
                     }
@@ -222,27 +226,27 @@ export class IonEventStream {
             let fieldName = this.reader.fieldName();
             if (fieldName && currentEvent[fieldName] !== undefined) throw new Error('Repeated event field: ' + fieldName);
             switch (fieldName) {
-                case 'event_type' : {
+                case 'event_type': {
                     currentEvent[fieldName] = this.reader.stringValue();
                     break;
                 }
 
-                case 'ion_type' : {
+                case 'ion_type': {
                     currentEvent[fieldName] = this.parseIonType();
                     break;
                 }
 
-                case 'field_name' : {
+                case 'field_name': {
                     currentEvent[fieldName] = this.reader.stringValue();
                     break;
                 }
 
-                case 'annotations' : {
+                case 'annotations': {
                     currentEvent[fieldName] = this.parseAnnotations();
                     break;
                 }
 
-                case 'value_text' : {
+                case 'value_text': {
                     let tempString: string = this.reader.stringValue()!;
                     if (tempString.substr(0, 5) === '$ion_') tempString = "$ion_user_value::" + tempString;
                     let tempReader: Reader = makeReader(tempString);
@@ -253,40 +257,40 @@ export class IonEventStream {
                     break;
                 }
 
-                case 'value_binary' : {
+                case 'value_binary': {
                     currentEvent[fieldName] = this.parseBinaryValue();
                     break;
                 }
 
-                case 'imports' : {
+                case 'imports': {
                     currentEvent[fieldName] = this.parseImports();
                     break;
                 }
 
-                case 'depth' : {
+                case 'depth': {
                     currentEvent[fieldName] = this.reader.numberValue();
                     break;
                 }
 
-                default :
+                default:
                     throw new Error('Unexpected event field: ' + fieldName);
             }
         }
         let eventType: IonEventType;
         switch (currentEvent['event_type']) {
-            case 'CONTAINER_START' :
+            case 'CONTAINER_START':
                 eventType = IonEventType.CONTAINER_START;
                 break;
-            case 'STREAM_END' :
+            case 'STREAM_END':
                 eventType = IonEventType.STREAM_END;
                 break;
-            case 'CONTAINER_END' :
+            case 'CONTAINER_END':
                 eventType = IonEventType.CONTAINER_END;
                 break;
-            case 'SCALAR' :
+            case 'SCALAR':
                 eventType = IonEventType.SCALAR;
                 break;
-            case 'SYMBOL_TABLE' :
+            case 'SYMBOL_TABLE':
                 throw new Error('Symbol tables unsupported');
         }
         let fieldname = (currentEvent['field_name'] !== undefined ? currentEvent['field_name'] : null);
@@ -322,46 +326,46 @@ export class IonEventStream {
     private parseIonType(): IonType {
         let input: string = this.reader.stringValue()!.toLowerCase();
         switch (input) {
-            case 'null' : {
+            case 'null': {
                 return IonTypes.NULL;
             }
-            case 'bool' : {
+            case 'bool': {
                 return IonTypes.BOOL;
             }
-            case 'int' : {
+            case 'int': {
                 return IonTypes.INT;
             }
-            case 'float' : {
+            case 'float': {
                 return IonTypes.FLOAT;
             }
-            case 'decimal' : {
+            case 'decimal': {
                 return IonTypes.DECIMAL;
             }
-            case 'timestamp' : {
+            case 'timestamp': {
                 return IonTypes.TIMESTAMP;
             }
-            case 'symbol' : {
+            case 'symbol': {
                 return IonTypes.SYMBOL;
             }
-            case 'string' : {
+            case 'string': {
                 return IonTypes.STRING;
             }
-            case 'clob' : {
+            case 'clob': {
                 return IonTypes.CLOB;
             }
-            case 'blob' : {
+            case 'blob': {
                 return IonTypes.BLOB;
             }
-            case 'list' : {
+            case 'list': {
                 return IonTypes.LIST;
             }
-            case 'sexp' : {
+            case 'sexp': {
                 return IonTypes.SEXP;
             }
-            case 'struct' : {
+            case 'struct': {
                 return IonTypes.STRUCT;
             }
-            default : {
+            default: {
                 throw new Error('i: ' + input);
             }
 
