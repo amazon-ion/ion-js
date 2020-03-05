@@ -167,15 +167,16 @@ function checkReaderValueMethods(r1: Reader, r2: Reader, type: IonType | null) {
     const ANY_ERROR_MESSAGE = new RegExp('^');
     allValueMethods.forEach(methodName => {
         let typeName = type == null ? 'null' : type.name;
-        if (type != null
-                && (nonThrowingMethods[typeName][methodName]
-                    // Reader.value() returns null for null.list/null.sexp/null.struct:
-                    || (type.isContainer && r1.isNull()) && methodName === 'value')) {
+        if (type != null && nonThrowingMethods[typeName][methodName]) {
             let v1 = r1[methodName]();
             let v2 = r2[methodName]();
             assert(v1 !== undefined, "unexpected 'undefined' response");
             assert(v2 !== undefined, "unexpected 'undefined' response");
             assert.deepEqual(v1, v2, methodName + '():  ' + v1 + ' != ' + v2);
+        } else if (type != null && methodName === 'value' && type.isContainer && r1.isNull()) {
+            // special case for Reader.value() when the readers are pointed at a null container
+            assert.isNull(r1[methodName](), 'Expected ' + methodName + '() to return null');
+            assert.isNull(r2[methodName](), 'Expected ' + methodName + '() to return null');
         } else {
             assert.throws(() => {
                 r1[methodName]()
