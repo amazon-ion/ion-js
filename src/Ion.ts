@@ -87,6 +87,40 @@ export function makeBinaryWriter(): Writer {
     return new BinaryWriter(localSymbolTable, new Writeable());
 }
 
+// Used by the dump*() functions to write each of a sequence of values to the provided Writer.
+function _writeAllTo(writer: Writer, values: any[]): Uint8Array {
+    for (let value of values) {
+        dom.Value.from(value).writeTo(writer);
+    }
+    writer.close();
+    return writer.getBytes();
+}
+
+/**
+ * Returns a binary Ion representation of the provided values.
+ * @param values Values to encode in Ion.
+ */
+export function dumpBinary(...values: any[]): Uint8Array {
+    return _writeAllTo(makeBinaryWriter(), values);
+}
+
+/**
+ * Returns a compact text Ion representation of the provided values.
+ * @param values Values to encode in Ion.
+ */
+export function dumpText(...values: any[]): string {
+    return decodeUtf8(_writeAllTo(makeTextWriter(), values));
+}
+
+/**
+ * Returns a text Ion representation of the provided values that is generously spaced for
+ * easier human readability.
+ * @param values Values to encode in Ion.
+ */
+export function dumpPrettyText(...values: any[]): string {
+    return decodeUtf8(_writeAllTo(makePrettyWriter(), values));
+}
+
 export {Reader, ReaderScalarValue} from "./IonReader";
 export {Writer} from "./IonWriter";
 export {Catalog} from "./IonCatalog";

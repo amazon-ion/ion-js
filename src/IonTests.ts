@@ -13,6 +13,8 @@
  * permissions and limitations under the License.
  */
 
+import {Decimal} from "./IonDecimal";
+
 export * from './Ion';
 export {Writeable} from './IonWriteable';
 export {encodeUtf8} from './IonUnicode';

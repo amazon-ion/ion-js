@@ -2,7 +2,7 @@ import {assert} from "chai";
 import JSBI from "jsbi";
 import * as ion from "../../src/Ion";
 import {IonTypes} from "../../src/Ion";
-import {Value} from "../../src/dom";
+import {Value, load, loadAll} from "../../src/dom";
 import {encodeUtf8} from "../../src/IonUnicode";
 
 /**
@@ -17,7 +17,7 @@ import {encodeUtf8} from "../../src/IonUnicode";
 
 describe('DOM', () => {
    it('load() kitchen sink as Value[]', () => {
-      let values: Value[] = ion.loadAll(
+      let values: Value[] = loadAll(
             ' 7' +
             ' greeting::"Hello"' +
             ' [\'moose\', null.string]' +
@@ -55,7 +55,7 @@ describe('DOM', () => {
 
    it('load() kitchen sink as any[]', () => {
       // This test casts each Ion value as an `any`, allowing each to be interacted with as a plain JS value.
-      let values: any[] = ion.loadAll(
+      let values: any[] = loadAll(
           ' 7' +
           ' greeting::"Hello"' +
           ' [\'moose\', null.string]' +
@@ -92,7 +92,7 @@ describe('DOM', () => {
    });
 
    it('load() Null as Value', () => {
-      let n = ion.load('null.blob')!;
+      let n = load('null.blob')!;
 
       assert.isTrue(n.isNull());
       assert.isNull(n.uInt8ArrayValue());
@@ -113,7 +113,7 @@ describe('DOM', () => {
    // load() `Null` as `any` would be identical to the above.
 
    it('load() Boolean as Value', () => {
-      let b: Value = ion.load('false')!;
+      let b: Value = load('false')!;
 
       assert.equal(false, b.booleanValue()!);
       assert.equal(false, b.valueOf());
@@ -123,7 +123,7 @@ describe('DOM', () => {
    });
 
    it('load() Boolean as any', () => {
-      let b: any = ion.load('false')!;
+      let b: any = load('false')!;
 
       assert.equal(false, b.booleanValue()!);
       assert.equal(false, b.valueOf());
@@ -144,7 +144,7 @@ describe('DOM', () => {
    });
 
    it('load() Integer as Value', () => {
-      let i: Value = ion.load('foo::bar::7')!;
+      let i: Value = load('foo::bar::7')!;
 
       assert.equal(IonTypes.INT, i.getType());
       assert.deepEqual(['foo', 'bar'], i.getAnnotations());
@@ -166,7 +166,7 @@ describe('DOM', () => {
    });
 
    it('load() Integer as any', () => {
-      let i: any = ion.load('foo::bar::7')!;
+      let i: any = load('foo::bar::7')!;
 
       assert.equal(IonTypes.INT, i.getType());
       assert.deepEqual(['foo', 'bar'], i.getAnnotations());
@@ -187,7 +187,7 @@ describe('DOM', () => {
    });
 
    it('load() Float as Value', () => {
-      let f: Value = ion.load('baz::qux::15e-1')!;
+      let f: Value = load('baz::qux::15e-1')!;
 
       assert.equal(IonTypes.FLOAT, f.getType());
       assert.deepEqual(['baz', 'qux'], f.getAnnotations());
@@ -202,7 +202,7 @@ describe('DOM', () => {
    });
 
    it('load() Float as any', () => {
-      let f: any = ion.load('baz::qux::15e-1')!;
+      let f: any = load('baz::qux::15e-1')!;
 
       assert.equal(IonTypes.FLOAT, f.getType());
       assert.deepEqual(['baz', 'qux'], f.getAnnotations());
@@ -216,7 +216,7 @@ describe('DOM', () => {
    });
 
    it('load() Decimal as Value', () => {
-      let d: Value = ion.load('101.5')!;
+      let d: Value = load('101.5')!;
 
       assert.equal(IonTypes.DECIMAL, d.getType());
 
@@ -227,7 +227,7 @@ describe('DOM', () => {
    });
 
    it('load() Decimal as any', () => {
-      let d: any = ion.load('101.5')!;
+      let d: any = load('101.5')!;
 
       assert.equal(IonTypes.DECIMAL, d.getType());
 
@@ -238,7 +238,7 @@ describe('DOM', () => {
    });
 
    it('load() Timestamp as Value', () => {
-      let t: Value = ion.load('DOB::2020-01-16T20:15:54.066Z')!;
+      let t: Value = load('DOB::2020-01-16T20:15:54.066Z')!;
 
       assert.equal(IonTypes.TIMESTAMP, t.getType());
       assert.deepEqual(['DOB'], t.getAnnotations());
@@ -250,7 +250,7 @@ describe('DOM', () => {
    });
 
    it('load() Timestamp as any', () => {
-      let t: any = ion.load('DOB::2020-01-16T20:15:54.066Z')!;
+      let t: any = load('DOB::2020-01-16T20:15:54.066Z')!;
 
       assert.equal(IonTypes.TIMESTAMP, t.getType());
       assert.deepEqual(['DOB'], t.getAnnotations());
@@ -262,7 +262,7 @@ describe('DOM', () => {
    });
 
    it('load() Symbol as Value', () => {
-      let s: Value = ion.load('foo::bar::"Saturn"')!;
+      let s: Value = load('foo::bar::"Saturn"')!;
 
       assert.equal(IonTypes.STRING, s.getType());
       assert.deepEqual(['foo', 'bar'], s.getAnnotations());
@@ -275,7 +275,7 @@ describe('DOM', () => {
    });
 
    it('load() Symbol as any', () => {
-      let s: any = ion.load('foo::bar::"Saturn"')!;
+      let s: any = load('foo::bar::"Saturn"')!;
 
       assert.equal(IonTypes.STRING, s.getType());
       assert.deepEqual(['foo', 'bar'], s.getAnnotations());
@@ -286,7 +286,7 @@ describe('DOM', () => {
    });
 
    it('load() String as Value', () => {
-      let s: Value = ion.load('foo::bar::"Saturn"')!;
+      let s: Value = load('foo::bar::"Saturn"')!;
 
       assert.equal(IonTypes.STRING, s.getType());
       assert.deepEqual(['foo', 'bar'], s.getAnnotations());
@@ -299,7 +299,7 @@ describe('DOM', () => {
    });
 
    it('load() String as any', () => {
-      let s: any = ion.load('foo::bar::"Saturn"')!;
+      let s: any = load('foo::bar::"Saturn"')!;
 
       assert.equal(IonTypes.STRING, s.getType());
       assert.deepEqual(['foo', 'bar'], s.getAnnotations());
@@ -310,7 +310,7 @@ describe('DOM', () => {
    });
 
    it('load() Clob as Value', () => {
-      let c: Value = ion.load('month::{{"February"}}')!;
+      let c: Value = load('month::{{"February"}}')!;
 
       assert.equal(IonTypes.CLOB, c.getType());
       assert.deepEqual(['month'], c.getAnnotations());
@@ -319,7 +319,7 @@ describe('DOM', () => {
    });
 
    it('load() Clob as any', () => {
-      let c: any = ion.load('month::{{"February"}}')!;
+      let c: any = load('month::{{"February"}}')!;
 
       assert.equal(IonTypes.CLOB, c.getType());
       assert.deepEqual(['month'], c.getAnnotations());
@@ -328,7 +328,7 @@ describe('DOM', () => {
    });
 
    it('load() Blob as Value', () => {
-      let b: Value = ion.load('quote::{{VG8gaW5maW5pdHkuLi4gYW5kIGJleW9uZCE=}}')!;
+      let b: Value = load('quote::{{VG8gaW5maW5pdHkuLi4gYW5kIGJleW9uZCE=}}')!;
 
       assert.equal(IonTypes.BLOB, b.getType());
       assert.deepEqual(['quote'], b.getAnnotations());
@@ -337,7 +337,7 @@ describe('DOM', () => {
    });
 
    it('load() Blob as any', () => {
-      let b: any = ion.load('quote::{{VG8gaW5maW5pdHkuLi4gYW5kIGJleW9uZCE=}}')!;
+      let b: any = load('quote::{{VG8gaW5maW5pdHkuLi4gYW5kIGJleW9uZCE=}}')!;
 
       assert.equal(IonTypes.BLOB, b.getType());
       assert.deepEqual(['quote'], b.getAnnotations());
@@ -346,7 +346,7 @@ describe('DOM', () => {
    });
 
    it('load() List as Value', () => {
-      let l: Value = ion.load('planets::["Mercury", "Venus", "Earth", "Mars"]')!;
+      let l: Value = load('planets::["Mercury", "Venus", "Earth", "Mars"]')!;
 
       assert.equal(IonTypes.LIST, l.getType());
       assert.deepEqual(['planets'], l.getAnnotations());
@@ -367,7 +367,7 @@ describe('DOM', () => {
    });
 
    it('load() List as any', () => {
-      let l: any = ion.load('planets::["Mercury", "Venus", "Earth", "Mars"]')!;
+      let l: any = load('planets::["Mercury", "Venus", "Earth", "Mars"]')!;
 
       assert.equal(IonTypes.LIST, l.getType());
       assert.deepEqual(['planets'], l.getAnnotations());
@@ -391,7 +391,7 @@ describe('DOM', () => {
    });
 
    it('load() SExpression as Value', () => {
-      let s: Value = ion.load('planets::("Mercury" "Venus" "Earth" "Mars")')!;
+      let s: Value = load('planets::("Mercury" "Venus" "Earth" "Mars")')!;
 
       assert.equal(IonTypes.SEXP, s.getType());
       assert.deepEqual(['planets'], s.getAnnotations());
@@ -412,7 +412,7 @@ describe('DOM', () => {
    });
 
    it('load() SExpression as any', () => {
-      let s: any = ion.load('planets::("Mercury" "Venus" "Earth" "Mars")')!;
+      let s: any = load('planets::("Mercury" "Venus" "Earth" "Mars")')!;
 
       assert.equal(IonTypes.SEXP, s.getType());
       assert.deepEqual(['planets'], s.getAnnotations());
@@ -436,7 +436,7 @@ describe('DOM', () => {
    });
 
    it('load() Struct as Value', () => {
-      let s: Value = ion.load(
+      let s: Value = load(
           'foo::bar::{' +
             'name: {' +
                'first: "John", ' +
@@ -465,7 +465,7 @@ describe('DOM', () => {
    });
 
    it('load() Struct as any', () => {
-      let s: any = ion.load(
+      let s: any = load(
           'foo::bar::{' +
           'name: {' +
           'first: "John", ' +
