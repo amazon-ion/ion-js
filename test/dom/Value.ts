@@ -6,7 +6,8 @@ import JSBI from "jsbi";
 import * as JsValueConversion from "../../src/dom/JsValueConversion";
 import {_hasValue} from "../../src/util";
 import {Constructor} from "../../src/dom/Value";
-import {exampleIonValuesWhere, exampleJsValuesWhere, valueName} from "../../src/IonTests";
+import {exampleIonValuesWhere, exampleJsValuesWhere} from "../exampleValues";
+import {valueName} from "../mochaSupport";
 
 // The same test logic performed by assert.equals() but without an assertion.
 function jsEqualsIon(jsValue, ionValue): boolean {

@@ -15,7 +15,8 @@
 
 import {assert} from 'chai';
 import * as ion from '../src/IonTests';
-import {dom, exampleIonValuesWhere, exampleJsValuesWhere, IonTypes} from "../src/IonTests";
+import {dom, IonTypes} from '../src/IonTests';
+import {exampleIonValuesWhere, exampleJsValuesWhere} from "./exampleValues";
 
 function roundTripTests(...values: any[]) {
     let expectedValues: dom.Value[] = values.map((jsValue) => dom.Value.from(jsValue));
@@ -30,10 +31,8 @@ function roundTripTest(dumpFn: (...values: any[]) => any,
                        inputValues: any[],
                        expectedValues: dom.Value[]) {
     let actualValues: dom.Value[] = dom.loadAll(dumpFn(inputValues));
-    let testComparisons: [dom.Value, dom.Value][] = actualValues.map(
-        (actualValue, index) => [actualValue, expectedValues[index]]
-    );
-    for (let [actualValue, expectedValue] of testComparisons) {
+    expectedValues.forEach((expectedValue, index) => {
+       let actualValue = actualValues[index];
         //TODO: This tests for a very weak common definition of equality.
         //      We should make this a stronger test when .equals() is added to the Value interface[1].
         //      In the meantime, the core writing/equality logic is more strictly tested by
@@ -43,7 +42,7 @@ function roundTripTest(dumpFn: (...values: any[]) => any,
         assert.deepEqual(actualValue.getAnnotations(), expectedValue.getAnnotations());
         assert.equal(actualValue.isNull(), expectedValue.isNull());
         assert.equal(actualValue.getType(), expectedValue.getType());
-    }
+    });
 }
 
 describe('dump*()', () => {
@@ -73,12 +72,6 @@ describe('dump*()', () => {
         writer.writeInt(3);
         writer.stepOut();
         writer.close();
-        let expectedBytes: Uint8Array = writer.getBytes();
-        let byteComparisons: [number, number][] = Array.from(ionBinary).map(
-            (byte, index) => [byte, expectedBytes[index]]
-        );
-        for (let [actualByte, expectedByte] of byteComparisons) {
-            assert.equal(actualByte, expectedByte);
-        }
+        assert.deepEqual(ionBinary, writer.getBytes());
     });
 });

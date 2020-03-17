@@ -88,7 +88,7 @@ export function makeBinaryWriter(): Writer {
 }
 
 // Used by the dump*() functions to write each of a sequence of values to the provided Writer.
-function writeAllTo(writer: Writer, values: any[]): Uint8Array {
+function _writeAllTo(writer: Writer, values: any[]): Uint8Array {
     for (let value of values) {
         dom.Value.from(value).writeTo(writer);
     }
@@ -101,7 +101,7 @@ function writeAllTo(writer: Writer, values: any[]): Uint8Array {
  * @param values Values to encode in Ion.
  */
 export function dumpBinary(...values: any[]): Uint8Array {
-    return writeAllTo(makeBinaryWriter(), values);
+    return _writeAllTo(makeBinaryWriter(), values);
 }
 
 /**
@@ -109,7 +109,7 @@ export function dumpBinary(...values: any[]): Uint8Array {
  * @param values Values to encode in Ion.
  */
 export function dumpText(...values: any[]): string {
-    return decodeUtf8(writeAllTo(makeTextWriter(), values));
+    return decodeUtf8(_writeAllTo(makeTextWriter(), values));
 }
 
 /**
@@ -118,7 +118,7 @@ export function dumpText(...values: any[]): string {
  * @param values Values to encode in Ion.
  */
 export function dumpPrettyText(...values: any[]): string {
-    return decodeUtf8(writeAllTo(makePrettyWriter(), values));
+    return decodeUtf8(_writeAllTo(makePrettyWriter(), values));
 }
 
 export {Reader, ReaderScalarValue} from "./IonReader";

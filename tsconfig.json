@@ -19,7 +19,7 @@
     // TODO enable this to have stricter checking
     "strict": false,
     "strictNullChecks": true,
-    "rootDir": "src",
+    "rootDir": ".",
     "outDir": "dist/es6/es6",
     "experimentalDecorators": true
   }
