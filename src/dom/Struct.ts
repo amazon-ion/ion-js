@@ -10,9 +10,28 @@ import {FromJsConstructor} from "./FromJsConstructor";
  *    let s: any = ion.load('{foo: 1, bar: 2, baz: qux::3}');
  *    assert.equal(6, s.foo + s['bar'] + s.baz);
  *
+ * If a field in the struct has the same name as a method on the Struct class, attempting to access that property
+ * will always resolve to the method.
+ *
+ *     let s: any = ion.load('{fieldNames: ["foo", "bar", "baz"]}'); // Conflicts with Struct#fieldNames()
+ *     assert.deepEqual(s.fieldNames, ["foo", "bar", "baz"]); // Fails; `s.fieldNames` is a method
+ *     assert.deepEqual(s.fieldNames(), ["fieldNames"]); // Passes
+ *
+ * Unlike direct property accesses, Struct's get() method will only resolve to fields.
+ *
+ *     let s: any = ion.load('{fieldNames: ["foo", "bar", "baz"]}'); // Conflicts with Struct#fieldNames()
+ *     assert.equal(s.get('fieldNames', 0).stringValue(), "foo"); // Passes
+ *
  * [1] http://amzn.github.io/ion-docs/docs/spec.html#struct
  */
 export class Struct extends Value(Object, IonTypes.STRUCT, FromJsConstructor.NONE) {
+    /*
+     * Stores the string/Value pairs that represent the fields of the struct. These values are stored
+     * separately to allow field names that would otherwise collide with public properties from the Struct class
+     * itself to be stored. (e.g. 'stringValue', 'fields', or 'elements')
+     */
+    private _fields = {};
+
     /**
      * Constructor.
      * @param fields        An iterator of field name/value pairs to represent as a struct.
@@ -20,15 +39,28 @@ export class Struct extends Value(Object, IonTypes.STRUCT, FromJsConstructor.NON
      */
     constructor(fields: Iterable<[string, Value]>, annotations: string[] = []) {
         super();
-        for (let [fieldName, value] of fields) {
-            Object.defineProperty(this, fieldName, {
-                configurable: true,
-                enumerable: true,
-                value: value,
-                writable: true
-            });
+        for (let [fieldName, fieldValue] of fields) {
+            this._fields[fieldName] = fieldValue;
         }
         this._setAnnotations(annotations);
+
+        // Construct a Proxy that will prevent user-defined fields from shadowing public properties.
+        return new Proxy(this, {
+            // All values set by the user are stored in `this._fields` to avoid
+            // potentially overwriting Struct methods.
+            set: function(target, name, value): any  {
+                target._fields[name] = value;
+                return true;
+            },
+            get: function(target, name): any  {
+                // Property accesses will look for matching Struct API properties before
+                // looking for a matching field of the same name.
+                if (name in target) {
+                    return target[name];
+                }
+                return target._fields[name];
+            }
+        });
     }
 
     get(...pathElements: PathElement[]): Value | null {
@@ -39,56 +71,30 @@ export class Struct extends Value(Object, IonTypes.STRUCT, FromJsConstructor.NON
         if (typeof (pathHead) !== "string") {
             throw new Error(`Cannot index into a struct with a ${typeof (pathHead)}.`);
         }
-        let child: Value | null = this._getField(pathHead);
-        if (pathTail.length === 0 || child === null) {
+        let child: Value | undefined = this._fields[pathHead];
+        if (child === undefined) {
+            return null;
+        }
+        if (pathTail.length === 0) {
             return child;
         }
         return child.get(...pathTail);
     }
 
     fieldNames(): string[] {
-        return Object.keys(this);
+        return Object.keys(this._fields);
     }
 
     fields(): [string, Value][] {
-        return Object.entries(this);
+        return Object.entries(this._fields);
     }
 
     elements(): Value[] {
-        return Object.values(this);
+        return Object.values(this._fields);
     }
 
     [Symbol.iterator](): IterableIterator<[string, Value]> {
         return this.fields()[Symbol.iterator]();
-    }
-
-    _getField(fieldName: string): Value | null {
-        /* Typescript requires some convincing to retrieve
-         * properties that may have been stored on an Object
-         * via common Javascript idioms like:
-         *
-         *   obj['foo'] = ...;
-         *   obj.foo = ...;
-         *   Object.defineProperty(obj, 'foo', ...);
-         *
-         * Here we cast `this` from a Struct to the
-         * `unknown` type to disable static type analysis.
-         * Then we cast it to a vanilla JS object with string
-         * keys and Value values. This casting has no runtime
-         * overhead. It's a bit ugly, but allows us to access data
-         * in Structs via any of:
-         *
-         *   let value = struct.get('foo'); // Typescript + JS
-         *   let value = struct['foo']; // JS
-         *   let value = struct.foo;    // JS
-         */
-        let obj = this as unknown as { [key: string]: Value };
-        let field: Value | undefined = obj[fieldName];
-        if (field === undefined) {
-            return null;
-        }
-
-        return field;
     }
 
     toString(): string {
@@ -107,6 +113,10 @@ export class Struct extends Value(Object, IonTypes.STRUCT, FromJsConstructor.NON
             value.writeTo(writer);
         }
         writer.stepOut();
+    }
+
+    toJSON() {
+        return this._fields;
     }
 
     static _fromJsValue(jsValue: any, annotations: string[]): Value {
