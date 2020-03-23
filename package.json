@@ -69,6 +69,7 @@
     "grunt-ts": "^6.0.0-beta.21",
     "grunt-tslint": "^5.0.2",
     "grunt-typedoc": "^0.2.4",
+    "jsbi": "3.1.1",
     "mocha": "^6.2.0",
     "mocha-typescript": "^1.1.17",
     "nyc": "^14.1.1",
@@ -79,7 +80,7 @@
     "typedoc": "^0.16.10",
     "typescript": "^3.6.2"
   },
-  "dependencies": {
+  "peerDependencies": {
     "jsbi": "^3.1.1"
   }
 }
