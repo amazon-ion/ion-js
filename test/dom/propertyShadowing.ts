@@ -21,5 +21,10 @@ describe('dom.Struct property shadowing', () => {
         assert.equal(s.get('fieldNames', 0)!.stringValue(), 'dog');
         assert.equal(s.get('fieldNames', 1)!.stringValue(), 'cat');
         assert.equal(s.get('fieldNames', 2)!.stringValue(), 'mouse');
+
+        // get() does not return values for properties on `Object`
+        assert.isNull(s.get('toString'));
+        assert.isNull(s.get('toLocaleString'));
+        assert.isNull(s.get('valueOf'));
     })
 });

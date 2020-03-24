@@ -30,7 +30,7 @@ export class Struct extends Value(Object, IonTypes.STRUCT, FromJsConstructor.NON
      * separately to allow field names that would otherwise collide with public properties from the Struct class
      * itself to be stored. (e.g. 'stringValue', 'fields', or 'elements')
      */
-    private _fields = {};
+    private _fields = Object.create(null);
 
     /**
      * Constructor.
@@ -48,9 +48,9 @@ export class Struct extends Value(Object, IonTypes.STRUCT, FromJsConstructor.NON
         return new Proxy(this, {
             // All values set by the user are stored in `this._fields` to avoid
             // potentially overwriting Struct methods.
-            set: function(target, name, value): any  {
+            set: function(target, name, value): boolean {
                 target._fields[name] = value;
-                return true;
+                return true; // Indicates that the assignment succeeded
             },
             get: function(target, name): any  {
                 // Property accesses will look for matching Struct API properties before
