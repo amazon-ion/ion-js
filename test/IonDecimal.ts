@@ -14,8 +14,8 @@
  */
 
 import {assert} from "chai";
-import * as ion from "../src/IonTests";
-import {Decimal, decodeUtf8} from "../src/IonTests";
+import * as ion from "../src/Ion";
+import {Decimal, decodeUtf8} from "../src/Ion";
 import * as util from "../src/util";
 import JSBI from "jsbi";
 import {JsbiSupport} from "../src/JsbiSupport";

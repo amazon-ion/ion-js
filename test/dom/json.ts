@@ -2,7 +2,7 @@ import {assert} from "chai";
 import * as ion from "../../src/Ion";
 import {Decimal, IonTypes, Timestamp, toBase64} from "../../src/Ion";
 import {load, Value} from "../../src/dom";
-import {encodeUtf8} from "../../src/IonTests";
+import {encodeUtf8} from "../../src/IonUnicode";
 
 // Verifies that subtypes of dom.Value down-convert to JSON following the documented process[1].
 // [1] http://amzn.github.io/ion-docs/guides/cookbook.html#down-converting-to-json

@@ -14,9 +14,15 @@
  */
 
 import {assert} from 'chai';
-import * as ion from '../src/IonTests';
+import * as ion from '../src/Ion';
 import JSBI from 'jsbi';
-import {Decimal, Writer} from "../src/IonTests";
+import {Decimal, Writer} from "../src/Ion";
+import {BinaryWriter, NullNode} from "../src/IonBinaryWriter";
+import {Writeable} from "../src/IonWriteable";
+import {getSystemSymbolTableImport} from "../src/IonSystemSymbolTable";
+import {LocalSymbolTable} from "../src/IonLocalSymbolTable";
+import {encodeUtf8} from "../src/IonUnicode";
+import {LowLevelBinaryWriter} from "../src/IonLowLevelBinaryWriter";
 
 const ivm = [0xe0, 0x01, 0x00, 0xea];
 
@@ -34,9 +40,9 @@ interface BadTest {
 
 let writerTest = function (name: string, instructions: (writer: Writer) => void, expected: number[]) {
     it(name, () => {
-        let symbolTable = new ion.LocalSymbolTable(ion.getSystemSymbolTableImport());
-        let writeable = new ion.Writeable();
-        let writer = new ion.BinaryWriter(symbolTable, writeable);
+        let symbolTable = new LocalSymbolTable(getSystemSymbolTableImport());
+        let writeable = new Writeable();
+        let writer = new BinaryWriter(symbolTable, writeable);
         instructions(writer);
         writer.close();
         let actual = writeable.getBytes();
@@ -46,9 +52,9 @@ let writerTest = function (name: string, instructions: (writer: Writer) => void,
 
 let badWriterTest = function (name: string, instructions: (writer: Writer) => void) {
     let test = () => {
-        let symbolTable = new ion.LocalSymbolTable(ion.getSystemSymbolTableImport());
-        let writeable = new ion.Writeable();
-        let writer = new ion.BinaryWriter(symbolTable, writeable);
+        let symbolTable = new LocalSymbolTable(getSystemSymbolTableImport());
+        let writeable = new Writeable();
+        let writer = new BinaryWriter(symbolTable, writeable);
         instructions(writer);
         writer.close();
     };
@@ -701,9 +707,9 @@ let structWriterTests: Test[] = [
             writer.writeFieldName('b');
             writer.writeBoolean(false);
             writer.writeFieldName('b');
-            writer.writeBlob(ion.encodeUtf8('foo'));
+            writer.writeBlob(encodeUtf8('foo'));
             writer.writeFieldName('c');
-            writer.writeClob(ion.encodeUtf8('bar'));
+            writer.writeClob(encodeUtf8('bar'));
             writer.writeFieldName('d');
             writer.writeDecimal(Decimal.parse("123.456"));
             writer.writeFieldName('f');
@@ -1200,9 +1206,9 @@ describe('Binary Writer', () => {
         runBadWriterTests(badWriterTests);
     });
     it('Calculates node lenghts correctly', () => {
-        let writeable = new ion.Writeable();
-        let writer = new ion.LowLevelBinaryWriter(writeable);
-        let node = new ion.NullNode(writer, null, ion.IonTypes.LIST, new Uint8Array([10 | 0x80]));
+        let writeable = new Writeable();
+        let writer = new LowLevelBinaryWriter(writeable);
+        let node = new NullNode(writer, null, ion.IonTypes.LIST, new Uint8Array([10 | 0x80]));
         assert.equal(node.getAnnotatedContainerLength(), 3);
         assert.equal(node.getAnnotationsLength(), 3);
         assert.equal(node.getLength(), 4);

@@ -14,7 +14,8 @@
  */
 
 import {assert} from 'chai';
-import {LowLevelBinaryWriter, Writeable} from "../src/IonTests";
+import {LowLevelBinaryWriter} from "../src/IonLowLevelBinaryWriter";
+import {Writeable} from "../src/IonWriteable";
 
 let sizeOfUnsignedIntTests = [
     {value: 0, sizeInBytes: 1},

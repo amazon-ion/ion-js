@@ -14,7 +14,7 @@
  */
 
 import {assert} from 'chai';
-import * as ion from '../src/IonTests';
+import * as ion from '../src/Ion';
 
 function readerToBytes(reader) {
     let writer = ion.makeTextWriter();

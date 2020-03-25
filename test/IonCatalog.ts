@@ -14,7 +14,7 @@
  */
 
 import {assert} from 'chai';
-import {Catalog, SharedSymbolTable} from '../src/IonTests';
+import {Catalog, SharedSymbolTable} from '../src/Ion';
 
 describe('Catalog', () => {
     it('Finds specific version', () => {

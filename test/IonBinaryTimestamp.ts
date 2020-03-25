@@ -14,7 +14,7 @@
  */
 
 import {assert} from 'chai';
-import * as ion from '../src/IonTests';
+import * as ion from '../src/Ion';
 
 describe('Binary Timestamp', () => {
     it('Round trip', () => {

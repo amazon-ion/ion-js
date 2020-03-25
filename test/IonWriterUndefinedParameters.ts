@@ -14,8 +14,8 @@
  */
 
 import {assert} from "chai";
-import * as ion from "../src/IonTests";
-import {Decimal, IonType, IonTypes, Reader, Timestamp, Writer} from "../src/IonTests";
+import * as ion from "../src/Ion";
+import {Decimal, IonType, Reader, Timestamp, Writer} from "../src/Ion";
 import JSBI from "jsbi";
 
 // This dummy impl exists as a substitute for reflection directly against

@@ -14,8 +14,8 @@
  */
 
 import {assert} from 'chai';
-import * as ion from '../src/IonTests';
-import {IonTypes} from '../src/IonTests';
+import * as ion from '../src/Ion';
+import {IonTypes} from '../src/Ion';
 import IntSize from "../src/IntSize";
 import JSBI from "jsbi";
 
