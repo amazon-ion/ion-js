@@ -1,6 +1,6 @@
 import {assert} from "chai";
 import * as ion from "../../src/Ion";
-import {Decimal, decodeUtf8, IonTypes, Timestamp, toBase64} from "../../src/Ion";
+import {Decimal, IonTypes, Timestamp, toBase64} from "../../src/Ion";
 import {load, Value} from "../../src/dom";
 import {encodeUtf8} from "../../src/IonTests";
 

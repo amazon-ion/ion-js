@@ -23,7 +23,7 @@ export class Clob extends Lob(IonTypes.CLOB) {
 
     toJSON() {
         // Because the text encoding of the bytes stored in this Clob is unknown,
-        // we write each byte out as a unicode escape (e.g. 127 -> 0x7f -> \u007f)
+        // we write each byte out as a Unicode escape (e.g. 127 -> 0x7f -> \u007f)
         // unless it happens to fall within the ASCII range.
         // See the Ion cookbook's guide to down-converting to JSON for details:
         // http://amzn.github.io/ion-docs/guides/cookbook.html#down-converting-to-json
