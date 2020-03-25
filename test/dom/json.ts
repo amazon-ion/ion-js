@@ -1,6 +1,6 @@
 import {assert} from "chai";
 import * as ion from "../../src/Ion";
-import {Decimal, IonTypes, Timestamp, toBase64} from "../../src/Ion";
+import {Decimal, decodeUtf8, IonTypes, Timestamp, toBase64} from "../../src/Ion";
 import {load, Value} from "../../src/dom";
 import {encodeUtf8} from "../../src/IonTests";
 
@@ -111,7 +111,24 @@ describe('JSON', () => {
                 JSON.stringify(blob)
             );
         });
+        it('Clob', () => {
+            // Create a clob that contains some multi-byte, non-ASCII characters.
+            let text = "I ❤️ eating 🍕!";
+            let utf8 = encodeUtf8(text);
+            let clob = new ion.dom.Clob(utf8);
 
+            // JSON.stringify should escape any non-ASCII bytes, so we'll need
+            // the Unicode-escaped representations of the emoji used above.
+            let unicodeEscaped = {
+              heart: "\\u00e2\\u009d\\u00a4\\u00ef\\u00b8\\u008f",
+              pizza: "\\u00f0\\u009f\\u008d\\u0095"
+            };
+
+            let expectedJsonText = JSON.stringify(`I ${unicodeEscaped.heart} eating ${unicodeEscaped.pizza}!`);
+            let actualJsonText = JSON.stringify(clob);
+
+            assert.equal(actualJsonText, expectedJsonText);
+        });
         jsonStringifyIonSourceTests(
             'SExpression',
             [[], '()'],
@@ -122,15 +139,11 @@ describe('JSON', () => {
             [['-', '+', '@', '=', '/', '&', '*', '^'], '(- + @ = / & * ^)'],
             [['-+@=/&*^'], '(-+@=/&*^)'],
         );
-
         it('Symbol', () => {
             assert.equal(
                 JSON.stringify('foo'),
                 JSON.stringify(load('foo'))
             );
-        });
-        it.skip('Clob', () => {
-            //TODO: JSON.stringify() support for Clobs
         });
     });
 });
