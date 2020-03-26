@@ -14,8 +14,9 @@
  */
 
 import {assert} from 'chai';
-import * as ion from '../src/IonTests';
 import SignAndMagnitudeInt from "../src/SignAndMagnitudeInt";
+import {BinarySpan} from "../src/IonSpan";
+import {ParserBinaryRaw} from "../src/IonParserBinaryRaw";
 
 /**
  * Tests for reading the UInt primitive follow.
@@ -44,9 +45,9 @@ let maxValueByteArray = function (numberOfBytes: number) {
 
 let unsignedIntBytesMatchValue = (bytes: number[],
                                   expected: number,
-                                  readFrom: (input: ion.BinarySpan, numberOfBytes: number) => any =
-                                      ion.ParserBinaryRaw._readUnsignedIntAsBigIntFrom) => {
-    let binarySpan = new ion.BinarySpan(new Uint8Array(bytes));
+                                  readFrom: (input: BinarySpan, numberOfBytes: number) => any =
+                                      ParserBinaryRaw._readUnsignedIntAsBigIntFrom) => {
+    let binarySpan = new BinarySpan(new Uint8Array(bytes));
     let actual = readFrom(binarySpan, bytes.length);
     assert.equal(actual, expected)
 };
@@ -95,7 +96,7 @@ describe('Reading unsigned ints', () => {
         unsignedIntReadingTests.forEach(({bytes, expected}) => {
             it(
                 'Reading ' + expected + ' from bytes: ' + bytes.toString(),
-                () => unsignedIntBytesMatchValue(bytes, expected, ion.ParserBinaryRaw._readUnsignedIntAsNumberFrom)
+                () => unsignedIntBytesMatchValue(bytes, expected, ParserBinaryRaw._readUnsignedIntAsNumberFrom)
             );
         });
     });
@@ -106,7 +107,7 @@ describe('Reading unsigned ints', () => {
             let bytes = maxValueByteArray(numberOfBytes);
             it(
                 'Reading ' + expected + ' from bytes: ' + bytes.toString(),
-                () => assert.throws(() => unsignedIntBytesMatchValue(bytes, expected, ion.ParserBinaryRaw._readUnsignedIntAsNumberFrom))
+                () => assert.throws(() => unsignedIntBytesMatchValue(bytes, expected, ParserBinaryRaw._readUnsignedIntAsNumberFrom))
             );
         }
     });
@@ -131,8 +132,8 @@ describe('Reading unsigned ints', () => {
  */
 
 let signedIntBytesMatch = function (bytes: number[], expected: SignAndMagnitudeInt) {
-    let binarySpan = new ion.BinarySpan(new Uint8Array(bytes));
-    let actual = ion.ParserBinaryRaw._readSignedIntFrom(binarySpan, bytes.length);
+    let binarySpan = new BinarySpan(new Uint8Array(bytes));
+    let actual = ParserBinaryRaw._readSignedIntFrom(binarySpan, bytes.length);
     assert.isTrue(actual.equals(expected));
 };
 
@@ -175,8 +176,8 @@ describe('Reading signed ints', () => {
  */
 
 let varUnsignedIntBytesMatchValue = function (bytes: number[], expected: number) {
-    let binarySpan = new ion.BinarySpan(new Uint8Array(bytes));
-    let actual = ion.ParserBinaryRaw._readVarUnsignedIntFrom(binarySpan);
+    let binarySpan = new BinarySpan(new Uint8Array(bytes));
+    let actual = ParserBinaryRaw._readVarUnsignedIntFrom(binarySpan);
     assert.equal(actual, expected);
 };
 
@@ -228,8 +229,8 @@ describe('Reading variable unsigned ints', () => {
  */
 
 let varSignedIntBytesMatchValue = function (bytes: number[], expected: number) {
-    let binarySpan = new ion.BinarySpan(new Uint8Array(bytes));
-    let actual = ion.ParserBinaryRaw._readVarSignedIntFrom(binarySpan);
+    let binarySpan = new BinarySpan(new Uint8Array(bytes));
+    let actual = ParserBinaryRaw._readVarSignedIntFrom(binarySpan);
     assert.equal(actual, expected)
 };
 
@@ -311,8 +312,8 @@ let serializeFloat64 = function (value: number) {
 };
 
 let floatBytesMatchValue = function (bytes: Uint8Array, expected: number, comparison = (x: number, y: number) => assert.equal(x, y)) {
-    let binarySpan = new ion.BinarySpan(bytes);
-    let actual = ion.ParserBinaryRaw._readFloatFrom(binarySpan, binarySpan.getRemaining());
+    let binarySpan = new BinarySpan(bytes);
+    let actual = ParserBinaryRaw._readFloatFrom(binarySpan, binarySpan.getRemaining());
     comparison(actual!, expected);
 };
 

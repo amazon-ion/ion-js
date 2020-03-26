@@ -14,20 +14,21 @@
  */
 
 import {assert} from 'chai';
-import * as ion from '../src/IonTests';
+import {SharedSymbolTable} from "../src/IonSharedSymbolTable";
+import {Import} from "../src/IonImport";
 
 describe('Import', () => {
     it('Orphan import has offset of 1', () => {
-        let symbolTable = new ion.SharedSymbolTable('foo', 1, ['a']);
-        let import_ = new ion.Import(null, symbolTable);
+        let symbolTable = new SharedSymbolTable('foo', 1, ['a']);
+        let import_ = new Import(null, symbolTable);
         assert.equal(import_.getSymbolId('a'), 1);
     });
 
     it('Child symbol ids start after parent', () => {
-        let parentSymbolTable = new ion.SharedSymbolTable('foo', 1, ['a', 'b']);
-        let parentImport = new ion.Import(null, parentSymbolTable);
-        let childSymbolTable = new ion.SharedSymbolTable('bar', 1, ['c']);
-        let childImport = new ion.Import(parentImport, childSymbolTable);
+        let parentSymbolTable = new SharedSymbolTable('foo', 1, ['a', 'b']);
+        let parentImport = new Import(null, parentSymbolTable);
+        let childSymbolTable = new SharedSymbolTable('bar', 1, ['c']);
+        let childImport = new Import(parentImport, childSymbolTable);
 
         assert.equal(childImport.getSymbolId('a'), 1);
         assert.equal(childImport.getSymbolId('b'), 2);
@@ -35,9 +36,9 @@ describe('Import', () => {
     });
 
     it('Child import consults parent import first', () => {
-        let symbolTable = new ion.SharedSymbolTable('foo', 1, ['a', 'b', 'c']);
-        let parent = new ion.Import(null, symbolTable);
-        let child = new ion.Import(parent, symbolTable);
+        let symbolTable = new SharedSymbolTable('foo', 1, ['a', 'b', 'c']);
+        let parent = new Import(null, symbolTable);
+        let child = new Import(parent, symbolTable);
 
         // Sanity check the parent
         assert.equal(parent.getSymbolId('a'), 1);
@@ -56,9 +57,9 @@ describe('Import', () => {
     });
 
     it('Short length omits symbols', () => {
-        let symbolTable = new ion.SharedSymbolTable('foo', 1, ['a', 'b', 'c']);
-        let parent = new ion.Import(null, symbolTable, 1);
-        let child = new ion.Import(parent, symbolTable);
+        let symbolTable = new SharedSymbolTable('foo', 1, ['a', 'b', 'c']);
+        let parent = new Import(null, symbolTable, 1);
+        let child = new Import(parent, symbolTable);
 
         assert.equal(child.getSymbolText(1), 'a');
         assert.equal(child.getSymbolText(2), 'a');
@@ -67,9 +68,9 @@ describe('Import', () => {
     });
 
     it('Long length pads symbols', () => {
-        let symbolTable = new ion.SharedSymbolTable('foo', 1, ['a', 'b', 'c']);
-        let parent = new ion.Import(null, symbolTable, 4);
-        let child = new ion.Import(parent, symbolTable);
+        let symbolTable = new SharedSymbolTable('foo', 1, ['a', 'b', 'c']);
+        let parent = new Import(null, symbolTable, 4);
+        let child = new Import(parent, symbolTable);
 
         assert.equal(child.getSymbolText(1), 'a');
         assert.equal(child.getSymbolText(2), 'b');

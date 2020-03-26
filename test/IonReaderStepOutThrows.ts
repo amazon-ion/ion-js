@@ -14,7 +14,7 @@
  */
 
 import {assert} from "chai";
-import * as ion from "../src/IonTests";
+import * as ion from "../src/Ion";
 import {IonTypes, Writer} from "../src/Ion";
 
 describe('IonReaderStepOutThrows', () => {

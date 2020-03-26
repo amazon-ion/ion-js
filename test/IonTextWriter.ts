@@ -16,12 +16,12 @@
 import {assert} from 'chai';
 import * as ion from '../src/Ion';
 import * as IonUnicode from '../src/IonUnicode';
-import * as IonTests from '../src/IonTests';
 import {TextWriter} from '../src/IonTextWriter';
+import {Writeable} from "../src/IonWriteable";
 
 let writerTest = function (name: string, instructions, expected) {
     it(name, () => {
-        let writeable = new IonTests.Writeable();
+        let writeable = new Writeable();
         let writer = new TextWriter(writeable);
         instructions(writer);
         while (writer.depth() > 0) {

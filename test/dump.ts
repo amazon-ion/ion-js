@@ -14,8 +14,8 @@
  */
 
 import {assert} from 'chai';
-import * as ion from '../src/IonTests';
-import {dom, IonTypes} from '../src/IonTests';
+import * as ion from '../src/Ion';
+import {dom, IonTypes} from '../src/Ion';
 import {exampleIonValuesWhere, exampleJsValuesWhere} from "./exampleValues";
 
 function roundTripTests(...values: any[]) {
