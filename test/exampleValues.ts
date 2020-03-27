@@ -76,8 +76,8 @@ const _exampleIsoStrings: string[] = [
 // the provided filter function.
 export function exampleDatesWhere(filter: (v: Date) => boolean = acceptAnyValue): Date[] {
     return _exampleIsoStrings
-    .map((isoString) => new Date(isoString))
-    .filter(filter);
+        .map((isoString) => new Date(isoString))
+        .filter(filter);
 }
 
 // A common collection of Timestamp values that can be reduced to a relevant subset using
