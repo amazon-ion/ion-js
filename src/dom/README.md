@@ -15,19 +15,19 @@ simpler for developers to work with.
 
 To get started, try reading some Ion data into memory by calling `ion.load()` and passing it
 either a `string` or `Uint8Array` containing some serialized Ion data. This function will return
-a Javascript object representation of the first value it encounters, including any nested values.
+a JavaScript object representation of the first value it encounters, including any nested values.
 
-Each Ion DOM data type [extends a native Javascript type](#iondom-data-types), which means 
+Each Ion DOM data type [extends a native JavaScript type](#iondom-data-types), which means 
 that in most cases you can treat values returned by `ion.load()` the same way you would
-treat the standard Javascript equivalent. 
+treat the standard JavaScript equivalent. 
 
 #### Integer example
 ```javascript
 let int = ion.load('7');
-assert.equal(7, int);
-assert.equal(8, int + 1);
-assert.equal(49, int ** 2);
-assert.equal(1, int / 7);
+assert.equal(int, 7);
+assert.equal(int + 1, 8);
+assert.equal(int ** 2, 49);
+assert.equal(int / 7, 1);
 ```
 
 #### String example
@@ -43,14 +43,14 @@ if (string.match(/hello/i)) {
 ```javascript
 let list = ion.load('[1, 2, 3]');
 let sum = list.reduce((subTotal, value) => subTotal + value, 0);
-assert.equal(6, sum);
+assert.equal(sum, 6);
 ```
 
 #### Struct example
 ```javascript
-let struct = ion.load('person::{name: {first: "John", middle: "Jacob", last: "Jingleheimer-Schmidt"}, age: 41}');
-assert.equal("Jacob", struct.name.middle);
-assert.equal(41, struct.age);
+let struct = ion.load('{name: {first: "John", middle: "Jacob", last: "Jingleheimer-Schmidt"}, age: 41}');
+assert.equal(struct.name.middle, "Jacob");
+assert.equal(struct.age, 41);
 for (let [fieldName, value] of struct) {
   console.log(fieldName + ': ' + value);
 }
@@ -66,8 +66,8 @@ import * as ion from 'ion-js';
 
 let values = ion.loadAll('6 "Hello" true');
 
-assert.equal(6, values[0]);
-assert.equal("Hello", values[1]);
+assert.equal(values[0], 6);
+assert.equal(values[1], "Hello");
 assert.isTrue(values[2].booleanValue());
 ```
 
@@ -75,20 +75,20 @@ assert.isTrue(values[2].booleanValue());
 
 Values returned by `load()` implement the `ion.dom.Value` interface, which provides explicit methods for
 indexing into Ion values as well as for converting them to native JS representations. While this API is more verbose
-than the Javascript API demonstrated previously, it offers more type safety and is intended to be the interface used
-in Typescript code. 
+than the JavaScript API demonstrated previously, it offers more type safety and is intended to be the interface used
+in TypeScript code. 
 
 #### Integer example
 ```typescript
 // `i` is a `dom.Integer`, which implements the `Value` interface.
 let i: Value = ion.load('7');
 
-// The Typescript compiler won't allow a direct comparison of a dom.Integer and a JS number, so
+// The TypeScript compiler won't allow a direct comparison of a dom.Integer and a JS number, so
 // we'll need to down-convert our Ion value before comparing them. We can do this either by calling 
 // the Value interface's numberValue() method:
-assert.equal(7, i.numberValue()); 
-// or by using Javascript's unary `+` operator, which is more concise but less explicit:
-assert.equal(7, +i);
+assert.equal(i.numberValue(), 7); 
+// or by using JavaScript's unary `+` operator, which is more concise but less explicit:
+assert.equal(+i, 7);
 
 // dom.Integer is not a text value, so there is no string value associated with it.
 assert.throws(() => i.stringValue());
@@ -99,12 +99,12 @@ assert.throws(() => i.stringValue());
 // `s` is a `dom.String`, which implements the `Value` interface.
 let s: Value = ion.load('"foo"');
 
-// The Typescript compiler won't allow a direct comparison of a dom.String and a JS string, so
+// The TypeScript compiler won't allow a direct comparison of a dom.String and a JS string, so
 // we'll need to down-convert our Ion value before comparing them. We can do this either by calling 
 // the Value interface's stringValue() method:
-assert.equal("foo", s.stringValue()); 
+assert.equal(s.stringValue(), "foo"); 
 // or concatenate our dom.String with the empty string, which is more concise but less explicit:
-assert.equal("foo", +s);
+assert.equal(''+s, "foo");
 
 // dom.String is not a numeric value, so there is no number value associated with it.
 assert.throws(() => s.numberValue());
@@ -116,7 +116,7 @@ assert.throws(() => s.numberValue());
 let l: Value = ion.load('[0, 2, 4, 6, 8, 10]');
 
 // We can use the `get()` method to index into the Value
-assert.equal(4, l.get(2));
+assert.equal(l.get(2), 4);
 
 // iteration example using the `elements()` method
 for (let value of l.elements()) {
@@ -128,7 +128,7 @@ for (let value of l.elements()) {
 ```typescript
 // Ion struct
 let person: Value = ion.load(
-  'person::{' +
+  '{' +
       'name: {' +
           'first: "John", ' +
           'middle: "Jacob", ' +
@@ -139,10 +139,10 @@ let person: Value = ion.load(
 )!;
 
 // The get() method can also be used for indexing into structs
-assert.equal(41, person.get('age'));
+assert.equal(person.get('age'), 41);
 
 // If the data is nested, you can pass multiple keys into get() to specify a complete path:
-assert.equal('Jacob', person.get('name', 'middle'));
+assert.equal(person.get('name', 'middle'), 'Jacob');
 
 // Iteration example using the `fields()` method
 for (let [fieldName, value] of person.fields()) {
@@ -150,20 +150,19 @@ for (let [fieldName, value] of person.fields()) {
 }
 ```
 
-
 ### `ion.dom.Value.from()`
 
 You can upgrade a JS value to an Ion value using the `from()` method: 
 
 ```typescript
 let i = ion.dom.Value.from(7);
-assert.equal(IonTypes.INT, i.getType());
-assert.equal(7, i.numberValue());
+assert.equal(i.getType(), IonTypes.INT);
+assert.equal(i.numberValue(), 7);
 
-let s = ion.dom.Value.from("foo", ["bar", "baz"]); // from() accepts an optional list of annotations
-assert.equal(IonTypes.STRING, s.getType());
-assert.equal("foo", s.stringValue());
-assert.deepEqual(['bar', 'baz'], s.getAnnotations());
+let s = ion.dom.Value.from('"foo"', ["bar", "baz"]); // from() accepts an optional list of annotations
+assert.equal(s.getType(), IonTypes.STRING);
+assert.equal(s.stringValue(), "foo");
+assert.deepEqual(s.getAnnotations(), ['bar', 'baz']);
 ```
 
 ## `ion.dumpBinary()`, `ion.dumpText()`, and `ion.dumpPrettyText()`
@@ -185,21 +184,21 @@ let data = ion.dumpBinary(7);
 // Use ion.load() to parse `data`
 let i = ion.load(data);
 // Verify that the value found in the stream is the one we started with
-assert.equal(7, i);
+assert.equal(i, 7);
 ```
 
 ### ion.dumpText() vs ion.dumpPrettyText() example
-```
+```javascript
 let ionText = ion.dumpText([1, 2, 3]);
 let ionPrettyText = ion.dumpPrettyText([1, 2, 3]);
 
-assert.equal(ionText, '[1,2,3]');
-assert.equal(ionPrettyText, '[\n  1,\n  2,\n  3\n]');
+assert.equal('[1,2,3]', ionText);
+assert.equal('[\n  1,\n  2,\n  3\n]', ionPrettyText);
 ```
 
 ## `ion.dom` Data Types
 
-The Ion DOM data types each extend a native Javascript type: 
+The Ion DOM data types each extend a native JavaScript type: 
 
 Ion DOM Type | Extended JS Type
 ---|:---: 
@@ -220,7 +219,7 @@ Ion DOM Type | Extended JS Type
 ### Testing Equality
 
 Note that the JS types being extended are "[wrapper objects](https://developer.mozilla.org/en-US/docs/Glossary/Primitive#Primitive_wrapper_objects_in_JavaScript)"
-that box the primitive types themselves. This matters when testing for equality; Javascript's strict definition of equality 
+that box the primitive types themselves. This matters when testing for equality; JavaScript's strict definition of equality 
 (used by the `===` operator) takes `Object` identity into account and so will return `false` when comparing two different
 wrapper objects representing the same value.
 

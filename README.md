@@ -20,13 +20,18 @@ You can use this library either as a Node.js module or inside an HTML page.
     ```
     npm install --save ion-js
     ```
-1. Use the library to read/write ion data. Here is an example that reads Ion data from a Javascript string:
+1. Use the library to read/write Ion data. Here is an example that reads Ion data from a JavaScript string:
     ```javascript
     let ion = require("ion-js");
-   
+    
+    // Reading
     let ionData = '{ greeting: "Hello", name: "Ion" }';
     let value = ion.load(ionData);
     console.log(value.greeting + ", " + value.name + "!");
+   
+    // Writing
+    let ionText = ion.dumpText(value);
+    console.log("Serialized Ion: " + ionText);
     ```
    
    For more examples, see the [Ion DOM `README`](/src/dom/README.md).
