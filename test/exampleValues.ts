@@ -42,3 +42,27 @@ export function exampleIonValuesWhere(filter: (v: Value) => boolean = acceptAnyV
         load('{foo: true, bar: "Hello", baz: 5, qux: null}')! // struct
     ].filter(filter);
 }
+
+// A common collection of Date values that can be reduced to a relevant subset using
+// the provided filter function.
+export function exampleDatesWhere(filter: (v: Date) => boolean = acceptAnyValue): Date[] {
+    return [
+        "1970-01-01T00:00:00Z",
+        "2020-02-29T00:00:00Z",
+        "2020-02-29T00:00:00+01:00",
+        "2020-02-29T00:00:00-01:00",
+        "2020-03-19T03:17:59Z",
+        "2020-03-19T03:17:59+03:21",
+        "2020-03-19T23:59:59-05:00",
+        "2020-03-19T23:01:01-08:00",
+        "2020-03-27T00:00:00Z",
+        "2020-03-27T12:00:00-05:00",
+        "2020-03-27T12:00:00-08:00",
+        "2020-03-27T12:00:00+01:00",
+        "2020-03-27T19:00:00-05:00",
+        "2020-03-27T16:00:00-08:00",
+        "2020-03-28T01:00:00+01:00",
+    ]
+    .map((isoString) => new Date(isoString))
+    .filter(filter);
+}

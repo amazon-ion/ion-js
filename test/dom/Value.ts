@@ -6,7 +6,7 @@ import JSBI from "jsbi";
 import * as JsValueConversion from "../../src/dom/JsValueConversion";
 import {_hasValue} from "../../src/util";
 import {Constructor} from "../../src/dom/Value";
-import {exampleIonValuesWhere, exampleJsValuesWhere} from "../exampleValues";
+import {exampleDatesWhere, exampleIonValuesWhere, exampleJsValuesWhere} from "../exampleValues";
 import {valueName} from "../mochaSupport";
 
 // The same test logic performed by assert.equals() but without an assertion.
@@ -165,12 +165,18 @@ describe('Value', () => {
                 (jsValue, domValue) => domValue.decimalValue().equals(jsValue)
             )
         );
-        describe('Date',
-            domValueTest(
-                new Date("1970-01-01T00:00:00Z"),
-                IonTypes.TIMESTAMP,
-                (jsValue, domValue) => domValue.timestampValue().getDate().getTime() === jsValue.getTime()
-            )
+        describe('Date', () => {
+                for (let date of [...exampleDatesWhere(), new Date()]) {
+                    domValueTest(
+                        date,
+                        IonTypes.TIMESTAMP,
+                        (jsValue, domValue) => {
+                            return domValue.dateValue().getTime() == jsValue.getTime()
+                                && domValue.timestampValue().getDate().getTime() === jsValue.getTime();
+                        }
+                    )();
+                }
+            }
         );
         describe('Timestamp',
             domValueTest(
