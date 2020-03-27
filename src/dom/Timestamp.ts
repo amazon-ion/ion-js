@@ -39,8 +39,15 @@ export class Timestamp extends Value(Date, IonTypes.TIMESTAMP, _fromJsConstructo
     }
 
     private static _timestampFromDate(date: Date): ion.Timestamp {
+        // `Date` objects do not store a timezone offset. If the offset is requested
+        // via `.getTimezoneOffset()`, the configured offset of the host computer
+        // is returned instead of the timezone that was specified when the Date was
+        // constructed. Since the timezone of the host may or may not be meaningful
+        // to the user, we store the time in UTC instead. Users wishing to store a
+        // specific timezone offset on their dom.Timestamp can pass in an ion.Timestamp
+        // instead of a Date.
         return new ion.Timestamp(
-            date.getTimezoneOffset(),
+            0,
             date.getUTCFullYear(),
             date.getUTCMonth() + 1, // Timestamp expects a range of 1-12
             date.getUTCDate(),

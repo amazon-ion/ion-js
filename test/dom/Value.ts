@@ -169,7 +169,7 @@ describe('Value', () => {
             domValueTest(
                 new Date("1970-01-01T00:00:00Z"),
                 IonTypes.TIMESTAMP,
-                (jsValue, domValue) => domValue.dateValue().getTime() === jsValue.getTime()
+                (jsValue, domValue) => domValue.timestampValue().getDate().getTime() === jsValue.getTime()
             )
         );
         describe('Timestamp',
