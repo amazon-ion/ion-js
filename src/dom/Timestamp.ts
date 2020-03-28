@@ -1,6 +1,6 @@
 import {Value} from "./Value";
 import * as ion from "../Ion";
-import {IonTypes} from "../Ion";
+import {Decimal, IonTypes} from "../Ion";
 import {FromJsConstructor, FromJsConstructorBuilder} from "./FromJsConstructor";
 import {Writer} from "../Ion";
 
@@ -39,14 +39,24 @@ export class Timestamp extends Value(Date, IonTypes.TIMESTAMP, _fromJsConstructo
     }
 
     private static _timestampFromDate(date: Date): ion.Timestamp {
+        let milliseconds = (date.getUTCSeconds() * 1000) + date.getUTCMilliseconds();
+        let fractionalSeconds = new Decimal(milliseconds, -3);
+
+        // `Date` objects do not store a timezone offset. If the offset is requested
+        // via `.getTimezoneOffset()`, the configured offset of the host computer
+        // is returned instead of the timezone that was specified when the Date was
+        // constructed. Since the timezone of the host may or may not be meaningful
+        // to the user, we store the time in UTC instead. Users wishing to store a
+        // specific timezone offset on their dom.Timestamp can pass in an ion.Timestamp
+        // instead of a Date.
         return new ion.Timestamp(
-            date.getTimezoneOffset(),
+            0,
             date.getUTCFullYear(),
             date.getUTCMonth() + 1, // Timestamp expects a range of 1-12
             date.getUTCDate(),
             date.getUTCHours(),
             date.getUTCMinutes(),
-            date.getUTCSeconds() + (date.getUTCMilliseconds()/1000)
+            fractionalSeconds
         );
     }
 

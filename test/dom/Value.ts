@@ -6,7 +6,7 @@ import JSBI from "jsbi";
 import * as JsValueConversion from "../../src/dom/JsValueConversion";
 import {_hasValue} from "../../src/util";
 import {Constructor} from "../../src/dom/Value";
-import {exampleIonValuesWhere, exampleJsValuesWhere} from "../exampleValues";
+import {exampleDatesWhere, exampleIonValuesWhere, exampleJsValuesWhere, exampleTimestampsWhere} from "../exampleValues";
 import {valueName} from "../mochaSupport";
 
 // The same test logic performed by assert.equals() but without an assertion.
@@ -165,19 +165,28 @@ describe('Value', () => {
                 (jsValue, domValue) => domValue.decimalValue().equals(jsValue)
             )
         );
-        describe('Date',
-            domValueTest(
-                new Date("1970-01-01T00:00:00Z"),
-                IonTypes.TIMESTAMP,
-                (jsValue, domValue) => domValue.dateValue().getTime() === jsValue.getTime()
-            )
+        describe('Date', () => {
+                for (let date of [...exampleDatesWhere(), new Date()]) {
+                    domValueTest(
+                        date,
+                        IonTypes.TIMESTAMP,
+                        (jsValue, domValue) => {
+                            return domValue.dateValue().getTime() == jsValue.getTime()
+                                && domValue.timestampValue().getDate().getTime() === jsValue.getTime();
+                        }
+                    )();
+                }
+            }
         );
-        describe('Timestamp',
-            domValueTest(
-                Timestamp.parse("1970-01-01T00:00:00Z"),
-                IonTypes.TIMESTAMP,
-                (jsValue, domValue) => domValue.timestampValue().equals(jsValue)
-            )
+        describe('Timestamp', () => {
+                for (let timestamp of exampleTimestampsWhere()) {
+                    domValueTest(
+                        timestamp,
+                        IonTypes.TIMESTAMP,
+                        (jsValue, domValue) => domValue.timestampValue().equals(jsValue)
+                    )();
+                }
+            }
         );
         describe('string',
             domValueTest(
@@ -351,10 +360,8 @@ describe('Value', () => {
         domRoundTripTest(
             'Timestamp',
             (t1, t2) => t1.timestampValue().equals(t2.timestampValue()),
-            new Date('1970-01-01T00:00:00.000Z'),
-            Timestamp.parse('1970-01-01T00:00:00.000Z'),
-            Timestamp.parse('2020-03-01T00:00:00.000+01:00'), // UTC 11PM Leap day
-            Timestamp.parse('2020-02-28T23:00:00.000-01:00')  // UTC midnight Leap day
+            ...exampleDatesWhere(),
+            ...exampleTimestampsWhere()
         );
         domRoundTripTest(
             'String',
