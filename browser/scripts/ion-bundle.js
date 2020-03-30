@@ -1,5 +1,19 @@
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.ion = f()}})(function(){var define,module,exports;return (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
 "use strict";
+/*!
+ * Copyright 2012 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * A copy of the License is located at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * or in the "license" file accompanying this file. This file is distributed
+ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
 
@@ -13,9 +27,7 @@ Object.defineProperty(exports, "__esModule", {
 
 var IonTypes_1 = require("./IonTypes");
 
-var AbstractWriter =
-/*#__PURE__*/
-function () {
+var AbstractWriter = /*#__PURE__*/function () {
   function AbstractWriter() {
     (0, _classCallCheck2["default"])(this, AbstractWriter);
     this._annotations = [];
@@ -59,8 +71,6 @@ function () {
   }, {
     key: "_writeValues",
     value: function _writeValues(reader) {
-      var _depth = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
-
       var type = reader.type();
 
       if (type === null) {
@@ -68,7 +78,7 @@ function () {
       }
 
       while (type !== null) {
-        this._writeValue(reader, _depth);
+        this._writeValue(reader);
 
         type = reader.next();
       }
@@ -76,86 +86,89 @@ function () {
   }, {
     key: "_writeValue",
     value: function _writeValue(reader) {
-      var _depth = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
-
       var type = reader.type();
 
       if (type === null) {
         return;
       }
 
-      if (_depth > 0) {
-        if (reader.fieldName() != null) {
-          this.writeFieldName(reader.fieldName());
+      if (this._isInStruct()) {
+        var fieldName = reader.fieldName();
+
+        if (fieldName === null) {
+          throw new Error("Cannot call writeValue() when the Writer is in a Struct but the Reader is not.");
         }
+
+        this.writeFieldName(fieldName);
       }
 
       this.setAnnotations(reader.annotations());
 
       if (reader.isNull()) {
         this.writeNull(type);
-      } else {
-        switch (type) {
-          case IonTypes_1.IonTypes.BOOL:
-            this.writeBoolean(reader.booleanValue());
-            break;
+        return;
+      }
 
-          case IonTypes_1.IonTypes.INT:
-            this.writeInt(reader.bigIntValue());
-            break;
+      switch (type) {
+        case IonTypes_1.IonTypes.BOOL:
+          this.writeBoolean(reader.booleanValue());
+          break;
 
-          case IonTypes_1.IonTypes.FLOAT:
-            this.writeFloat64(reader.numberValue());
-            break;
+        case IonTypes_1.IonTypes.INT:
+          this.writeInt(reader.bigIntValue());
+          break;
 
-          case IonTypes_1.IonTypes.DECIMAL:
-            this.writeDecimal(reader.decimalValue());
-            break;
+        case IonTypes_1.IonTypes.FLOAT:
+          this.writeFloat64(reader.numberValue());
+          break;
 
-          case IonTypes_1.IonTypes.TIMESTAMP:
-            this.writeTimestamp(reader.timestampValue());
-            break;
+        case IonTypes_1.IonTypes.DECIMAL:
+          this.writeDecimal(reader.decimalValue());
+          break;
 
-          case IonTypes_1.IonTypes.SYMBOL:
-            this.writeSymbol(reader.stringValue());
-            break;
+        case IonTypes_1.IonTypes.TIMESTAMP:
+          this.writeTimestamp(reader.timestampValue());
+          break;
 
-          case IonTypes_1.IonTypes.STRING:
-            this.writeString(reader.stringValue());
-            break;
+        case IonTypes_1.IonTypes.SYMBOL:
+          this.writeSymbol(reader.stringValue());
+          break;
 
-          case IonTypes_1.IonTypes.CLOB:
-            this.writeClob(reader.byteValue());
-            break;
+        case IonTypes_1.IonTypes.STRING:
+          this.writeString(reader.stringValue());
+          break;
 
-          case IonTypes_1.IonTypes.BLOB:
-            this.writeBlob(reader.byteValue());
-            break;
+        case IonTypes_1.IonTypes.CLOB:
+          this.writeClob(reader.byteValue());
+          break;
 
-          case IonTypes_1.IonTypes.LIST:
-            this.stepIn(IonTypes_1.IonTypes.LIST);
-            break;
+        case IonTypes_1.IonTypes.BLOB:
+          this.writeBlob(reader.byteValue());
+          break;
 
-          case IonTypes_1.IonTypes.SEXP:
-            this.stepIn(IonTypes_1.IonTypes.SEXP);
-            break;
+        case IonTypes_1.IonTypes.LIST:
+          this.stepIn(IonTypes_1.IonTypes.LIST);
+          break;
 
-          case IonTypes_1.IonTypes.STRUCT:
-            this.stepIn(IonTypes_1.IonTypes.STRUCT);
-            break;
+        case IonTypes_1.IonTypes.SEXP:
+          this.stepIn(IonTypes_1.IonTypes.SEXP);
+          break;
 
-          default:
-            throw new Error('Unrecognized type ' + (type !== null ? type.name : type));
-        }
+        case IonTypes_1.IonTypes.STRUCT:
+          this.stepIn(IonTypes_1.IonTypes.STRUCT);
+          break;
 
-        if (type.isContainer) {
-          reader.stepIn();
+        default:
+          throw new Error('Unrecognized type ' + (type !== null ? type.name : type));
+      }
 
-          this._writeValues(reader, _depth + 1);
+      if (type.isContainer) {
+        reader.stepIn();
 
-          this.stepOut();
-          reader.stepOut();
-        }
+        this._writeValues(reader);
+
+        this.stepOut();
+        reader.stepOut();
       }
     }
   }, {
@@ -184,8 +197,22 @@ function () {
 
 exports.AbstractWriter = AbstractWriter;
 
-},{"./IonTypes":26,"@babel/runtime/helpers/classCallCheck":35,"@babel/runtime/helpers/createClass":36,"@babel/runtime/helpers/interopRequireDefault":42}],2:[function(require,module,exports){
+},{"./IonTypes":26,"@babel/runtime/helpers/classCallCheck":56,"@babel/runtime/helpers/createClass":57,"@babel/runtime/helpers/interopRequireDefault":63}],2:[function(require,module,exports){
 "use strict";
+/*!
+ * Copyright 2012 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * A copy of the License is located at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * or in the "license" file accompanying this file. This file is distributed
+ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -201,11 +228,41 @@ exports["default"] = IntSize;
 
 },{}],3:[function(require,module,exports){
 "use strict";
+/*!
+ * Copyright 2012 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * A copy of the License is located at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * or in the "license" file accompanying this file. This file is distributed
+ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
+
+function _createForOfIteratorHelper(o) { if (typeof Symbol === "undefined" || o[Symbol.iterator] == null) { if (Array.isArray(o) || (o = _unsupportedIterableToArray(o))) { var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var it, normalCompletion = true, didErr = false, err; return { s: function s() { it = o[Symbol.iterator](); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(n); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
 
 var __importDefault = void 0 && (void 0).__importDefault || function (mod) {
   return mod && mod.__esModule ? mod : {
     "default": mod
   };
+};
+
+var __importStar = void 0 && (void 0).__importStar || function (mod) {
+  if (mod && mod.__esModule) return mod;
+  var result = {};
+  if (mod != null) for (var k in mod) {
+    if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
+  }
+  result["default"] = mod;
+  return result;
 };
 
 Object.defineProperty(exports, "__esModule", {
@@ -249,18 +306,16 @@ function isBinary(buffer) {
 }
 
 function makeReader(buf) {
-  var catalog = null;
-
   if (typeof buf === "string") {
-    return new IonTextReader_1.TextReader(new IonSpan_1.StringSpan(buf), catalog);
+    return new IonTextReader_1.TextReader(new IonSpan_1.StringSpan(buf));
   }
 
   var bufArray = new Uint8Array(buf);
 
   if (isBinary(bufArray)) {
-    return new IonBinaryReader_1.BinaryReader(new IonSpan_1.BinarySpan(bufArray), catalog);
+    return new IonBinaryReader_1.BinaryReader(new IonSpan_1.BinarySpan(bufArray));
   } else {
-    return new IonTextReader_1.TextReader(new IonSpan_1.StringSpan(IonUnicode_1.decodeUtf8(bufArray)), catalog);
+    return new IonTextReader_1.TextReader(new IonSpan_1.StringSpan(IonUnicode_1.decodeUtf8(bufArray)));
   }
 }
 
@@ -284,6 +339,55 @@ function makeBinaryWriter() {
 }
 
 exports.makeBinaryWriter = makeBinaryWriter;
+
+function _writeAllTo(writer, values) {
+  var _iterator = _createForOfIteratorHelper(values),
+      _step;
+
+  try {
+    for (_iterator.s(); !(_step = _iterator.n()).done;) {
+      var value = _step.value;
+      dom.Value.from(value).writeTo(writer);
+    }
+  } catch (err) {
+    _iterator.e(err);
+  } finally {
+    _iterator.f();
+  }
+
+  writer.close();
+  return writer.getBytes();
+}
+
+function dumpBinary() {
+  for (var _len = arguments.length, values = new Array(_len), _key = 0; _key < _len; _key++) {
+    values[_key] = arguments[_key];
+  }
+
+  return _writeAllTo(makeBinaryWriter(), values);
+}
+
+exports.dumpBinary = dumpBinary;
+
+function dumpText() {
+  for (var _len2 = arguments.length, values = new Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+    values[_key2] = arguments[_key2];
+  }
+
+  return IonUnicode_1.decodeUtf8(_writeAllTo(makeTextWriter(), values));
+}
+
+exports.dumpText = dumpText;
+
+function dumpPrettyText() {
+  for (var _len3 = arguments.length, values = new Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
+    values[_key3] = arguments[_key3];
+  }
+
+  return IonUnicode_1.decodeUtf8(_writeAllTo(makePrettyWriter(), values));
+}
+
+exports.dumpPrettyText = dumpPrettyText;
 
 var IonCatalog_1 = require("./IonCatalog");
 
@@ -322,8 +426,31 @@ var IonUnicode_2 = require("./IonUnicode");
 
 exports.decodeUtf8 = IonUnicode_2.decodeUtf8;
 
-},{"./IntSize":2,"./IonBinaryReader":5,"./IonBinaryWriter":6,"./IonCatalog":7,"./IonConstants":8,"./IonDecimal":9,"./IonLocalSymbolTable":11,"./IonPrettyTextWriter":15,"./IonSharedSymbolTable":16,"./IonSpan":17,"./IonText":21,"./IonTextReader":22,"./IonTextWriter":23,"./IonTimestamp":24,"./IonType":25,"./IonTypes":26,"./IonUnicode":27,"./IonWriteable":28}],4:[function(require,module,exports){
+var dom = __importStar(require("./dom"));
+
+exports.dom = dom;
+
+var dom_1 = require("./dom");
+
+exports.load = dom_1.load;
+exports.loadAll = dom_1.loadAll;
+
+},{"./IntSize":2,"./IonBinaryReader":5,"./IonBinaryWriter":6,"./IonCatalog":7,"./IonConstants":8,"./IonDecimal":9,"./IonLocalSymbolTable":11,"./IonPrettyTextWriter":15,"./IonSharedSymbolTable":16,"./IonSpan":17,"./IonText":21,"./IonTextReader":22,"./IonTextWriter":23,"./IonTimestamp":24,"./IonType":25,"./IonTypes":26,"./IonUnicode":27,"./IonWriteable":28,"./dom":50}],4:[function(require,module,exports){
 "use strict";
+/*!
+ * Copyright 2012 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * A copy of the License is located at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * or in the "license" file accompanying this file. This file is distributed
+ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -353,6 +480,20 @@ exports.TB_ANNOTATION = 14;
 
 },{}],5:[function(require,module,exports){
 "use strict";
+/*!
+ * Copyright 2012 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * A copy of the License is located at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * or in the "license" file accompanying this file. This file is distributed
+ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
 
@@ -376,8 +517,6 @@ var IonLocalSymbolTable_1 = require("./IonLocalSymbolTable");
 
 var IonSymbols_1 = require("./IonSymbols");
 
-var IonType_1 = require("./IonType");
-
 var IonTypes_1 = require("./IonTypes");
 
 var IonConstants_1 = require("./IonConstants");
@@ -388,8 +527,6 @@ var IntSize_1 = __importDefault(require("./IntSize"));
 
 var JsbiSupport_1 = require("./JsbiSupport");
 
-var RAW_STRING = new IonType_1.IonType(-1, "raw_input", true, false, false, false);
-var ERROR = -3;
 var BOC = -2;
 var EOF = -1;
 var TB_NULL = 0;
@@ -406,11 +543,6 @@ var TB_BLOB = 10;
 var TB_LIST = 11;
 var TB_SEXP = 12;
 var TB_STRUCT = 13;
-var TB_ANNOTATION = 14;
-var TB_UNUSED__ = 15;
-var TB_SEXP_CLOSE = 21;
-var TB_LIST_CLOSE = 22;
-var TB_STRUCT_CLOSE = 23;
 
 function get_ion_type(t) {
   switch (t) {
@@ -461,9 +593,7 @@ function get_ion_type(t) {
   }
 }
 
-var BinaryReader =
-/*#__PURE__*/
-function () {
+var BinaryReader = /*#__PURE__*/function () {
   function BinaryReader(source, catalog) {
     (0, _classCallCheck2["default"])(this, BinaryReader);
     this._annotations = null;
@@ -537,7 +667,7 @@ function () {
     value: function annotations() {
       this._loadAnnotations();
 
-      return this._annotations;
+      return this._annotations !== null ? this._annotations : [];
     }
   }, {
     key: "getAnnotation",
@@ -607,7 +737,12 @@ function () {
             return null;
           }
 
-          return this.getSymbolString(p._getSid());
+          var sid = p._getSid();
+
+          if (sid !== null) {
+            return this.getSymbolString(sid);
+          }
+
       }
 
       throw new Error('Current value is not a string or symbol.');
@@ -678,13 +813,22 @@ function () {
     key: "getSymbolString",
     value: function getSymbolString(symbolId) {
       var s = null;
+      if (symbolId === null) return null;
 
       if (symbolId > 0) {
+        if (symbolId > this._symtab.maxId) {
+          throw new Error('Symbol $' + symbolId.toString() + ' greater than maxID.');
+        }
+
         s = this._symtab.getSymbolText(symbolId);
 
-        if (typeof s == 'undefined') {
-          s = "$" + symbolId.toString();
+        if (s === undefined) {
+          throw new Error('symbol is unresolvable');
         }
+      } else if (symbolId === 0) {
+        throw new Error('Symbol ID zero is unsupported');
+      } else if (symbolId < 0) {
+        throw new Error('Negative symbol ID: ' + symbolId + ' is illegal.');
       }
 
       return s;
@@ -695,8 +839,22 @@ function () {
 
 exports.BinaryReader = BinaryReader;
 
-},{"./IntSize":2,"./IonCatalog":7,"./IonConstants":8,"./IonLocalSymbolTable":11,"./IonParserBinaryRaw":13,"./IonSymbols":19,"./IonType":25,"./IonTypes":26,"./JsbiSupport":30,"@babel/runtime/helpers/classCallCheck":35,"@babel/runtime/helpers/createClass":36,"@babel/runtime/helpers/interopRequireDefault":42}],6:[function(require,module,exports){
+},{"./IntSize":2,"./IonCatalog":7,"./IonConstants":8,"./IonLocalSymbolTable":11,"./IonParserBinaryRaw":13,"./IonSymbols":19,"./IonTypes":26,"./JsbiSupport":30,"@babel/runtime/helpers/classCallCheck":56,"@babel/runtime/helpers/createClass":57,"@babel/runtime/helpers/interopRequireDefault":63}],6:[function(require,module,exports){
 "use strict";
+/*!
+ * Copyright 2012 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * A copy of the License is located at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * or in the "license" file accompanying this file. This file is distributed
+ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
 
@@ -712,6 +870,16 @@ var _getPrototypeOf2 = _interopRequireDefault(require("@babel/runtime/helpers/ge
 
 var _inherits2 = _interopRequireDefault(require("@babel/runtime/helpers/inherits"));
 
+function _createForOfIteratorHelper(o) { if (typeof Symbol === "undefined" || o[Symbol.iterator] == null) { if (Array.isArray(o) || (o = _unsupportedIterableToArray(o))) { var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var it, normalCompletion = true, didErr = false, err; return { s: function s() { it = o[Symbol.iterator](); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(n); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
+function _createSuper(Derived) { return function () { var Super = (0, _getPrototypeOf2["default"])(Derived), result; if (_isNativeReflectConstruct()) { var NewTarget = (0, _getPrototypeOf2["default"])(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return (0, _possibleConstructorReturn2["default"])(this, result); }; }
+
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
 var __importDefault = void 0 && (void 0).__importDefault || function (mod) {
   return mod && mod.__esModule ? mod : {
     "default": mod
@@ -723,8 +891,6 @@ Object.defineProperty(exports, "__esModule", {
 });
 
 var AbstractWriter_1 = require("./AbstractWriter");
-
-var IonDecimal_1 = require("./IonDecimal");
 
 var IonUnicode_1 = require("./IonUnicode");
 
@@ -750,6 +916,7 @@ var MAX_VALUE_LENGTH = 14;
 var MAX_VALUE_LENGTH_FLAG = 14;
 var NULL_VALUE_FLAG = 15;
 var TYPE_DESCRIPTOR_LENGTH = 1;
+var EMPTY_UINT8ARRAY = new Uint8Array();
 var States;
 
 (function (States) {
@@ -779,16 +946,16 @@ var TypeCodes;
   TypeCodes[TypeCodes["ANNOTATION"] = 14] = "ANNOTATION";
 })(TypeCodes || (TypeCodes = {}));
 
-var BinaryWriter =
-/*#__PURE__*/
-function (_AbstractWriter_1$Abs) {
+var BinaryWriter = /*#__PURE__*/function (_AbstractWriter_1$Abs) {
   (0, _inherits2["default"])(BinaryWriter, _AbstractWriter_1$Abs);
+
+  var _super = _createSuper(BinaryWriter);
 
   function BinaryWriter(symbolTable, writeable) {
     var _this;
 
     (0, _classCallCheck2["default"])(this, BinaryWriter);
-    _this = (0, _possibleConstructorReturn2["default"])(this, (0, _getPrototypeOf2["default"])(BinaryWriter).call(this));
+    _this = _super.call(this);
     _this.datagram = [];
     _this.containers = [];
     _this.state = States.VALUE;
@@ -805,9 +972,11 @@ function (_AbstractWriter_1$Abs) {
   }, {
     key: "writeBlob",
     value: function writeBlob(value) {
+      util_1._assertDefined(value);
+
       this.checkWriteValue();
 
-      if (value === null || value === undefined) {
+      if (value === null) {
         this.writeNull(IonTypes_1.IonTypes.BLOB);
         return;
       }
@@ -817,9 +986,11 @@ function (_AbstractWriter_1$Abs) {
   }, {
     key: "writeBoolean",
     value: function writeBoolean(value) {
+      util_1._assertDefined(value);
+
       this.checkWriteValue();
 
-      if (value === null || value === undefined) {
+      if (value === null) {
         this.writeNull(IonTypes_1.IonTypes.BOOL);
         return;
       }
@@ -829,9 +1000,11 @@ function (_AbstractWriter_1$Abs) {
   }, {
     key: "writeClob",
     value: function writeClob(value) {
+      util_1._assertDefined(value);
+
       this.checkWriteValue();
 
-      if (value === null || value === undefined) {
+      if (value === null) {
         this.writeNull(IonTypes_1.IonTypes.CLOB);
         return;
       }
@@ -841,14 +1014,15 @@ function (_AbstractWriter_1$Abs) {
   }, {
     key: "writeDecimal",
     value: function writeDecimal(value) {
+      util_1._assertDefined(value);
+
       this.checkWriteValue();
 
-      if (value === null || value === undefined) {
+      if (value === null) {
         this.writeNull(IonTypes_1.IonTypes.DECIMAL);
         return;
       }
 
-      if (typeof value == 'string') value = IonDecimal_1.Decimal.parse(value);
       var exponent = value.getExponent();
       var coefficient = value.getCoefficient();
       var isPositiveZero = jsbi_1["default"].equal(coefficient, JsbiSupport_1.JsbiSupport.ZERO) && !value.isNegative();
@@ -860,7 +1034,7 @@ function (_AbstractWriter_1$Abs) {
 
       var isNegative = value.isNegative();
       var writeCoefficient = isNegative || jsbi_1["default"].notEqual(coefficient, JsbiSupport_1.JsbiSupport.ZERO);
-      var coefficientBytes = writeCoefficient ? JsbiSerde_1.JsbiSerde.toSignedIntBytes(coefficient, isNegative) : null;
+      var coefficientBytes = writeCoefficient ? JsbiSerde_1.JsbiSerde.toSignedIntBytes(coefficient, isNegative) : EMPTY_UINT8ARRAY;
       var bufLen = IonLowLevelBinaryWriter_1.LowLevelBinaryWriter.getVariableLengthSignedIntSize(exponent) + (writeCoefficient ? coefficientBytes.length : 0);
       var writer = new IonLowLevelBinaryWriter_1.LowLevelBinaryWriter(new IonWriteable_1.Writeable(bufLen));
       writer.writeVariableLengthSignedInt(exponent);
@@ -874,9 +1048,11 @@ function (_AbstractWriter_1$Abs) {
   }, {
     key: "writeFloat32",
     value: function writeFloat32(value) {
+      util_1._assertDefined(value);
+
       this.checkWriteValue();
 
-      if (value === null || value === undefined) {
+      if (value === null) {
         this.writeNull(IonTypes_1.IonTypes.FLOAT);
         return;
       }
@@ -897,9 +1073,11 @@ function (_AbstractWriter_1$Abs) {
   }, {
     key: "writeFloat64",
     value: function writeFloat64(value) {
+      util_1._assertDefined(value);
+
       this.checkWriteValue();
 
-      if (value === null || value === undefined) {
+      if (value === null) {
         this.writeNull(IonTypes_1.IonTypes.FLOAT);
         return;
       }
@@ -920,9 +1098,11 @@ function (_AbstractWriter_1$Abs) {
   }, {
     key: "writeInt",
     value: function writeInt(value) {
+      util_1._assertDefined(value);
+
       this.checkWriteValue();
 
-      if (value === null || value === undefined) {
+      if (value === null) {
         this.writeNull(IonTypes_1.IonTypes.INT);
         return;
       }
@@ -931,17 +1111,22 @@ function (_AbstractWriter_1$Abs) {
     }
   }, {
     key: "writeNull",
-    value: function writeNull() {
-      var type = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : IonTypes_1.IonTypes.NULL;
+    value: function writeNull(type) {
+      if (type === undefined || type === null) {
+        type = IonTypes_1.IonTypes.NULL;
+      }
+
       this.checkWriteValue();
       this.addNode(new NullNode(this.writer, this.getCurrentContainer(), type, this.encodeAnnotations(this._annotations)));
     }
   }, {
     key: "writeString",
     value: function writeString(value) {
+      util_1._assertDefined(value);
+
       this.checkWriteValue();
 
-      if (value === null || value === undefined) {
+      if (value === null) {
         this.writeNull(IonTypes_1.IonTypes.STRING);
         return;
       }
@@ -951,9 +1136,11 @@ function (_AbstractWriter_1$Abs) {
   }, {
     key: "writeSymbol",
     value: function writeSymbol(value) {
+      util_1._assertDefined(value);
+
       this.checkWriteValue();
 
-      if (value === null || value === undefined) {
+      if (value === null) {
         this.writeNull(IonTypes_1.IonTypes.SYMBOL);
       } else {
         var symbolId = this.symbolTable.addSymbol(value);
@@ -965,9 +1152,11 @@ function (_AbstractWriter_1$Abs) {
   }, {
     key: "writeTimestamp",
     value: function writeTimestamp(value) {
+      util_1._assertDefined(value);
+
       this.checkWriteValue();
 
-      if (value === null || value === undefined) {
+      if (value === null) {
         this.writeNull(IonTypes_1.IonTypes.TIMESTAMP);
         return;
       }
@@ -1046,8 +1235,15 @@ function (_AbstractWriter_1$Abs) {
       }
     }
   }, {
+    key: "_isInStruct",
+    value: function _isInStruct() {
+      return this.getCurrentContainer() instanceof StructNode;
+    }
+  }, {
     key: "writeFieldName",
     value: function writeFieldName(fieldName) {
+      util_1._assertDefined(fieldName);
+
       if (this.state !== States.STRUCT_FIELD) {
         throw new Error("Cannot write a field name outside of a struct");
       }
@@ -1073,28 +1269,19 @@ function (_AbstractWriter_1$Abs) {
       var datagram = this.datagram;
       this.datagram = [];
       this.writeSymbolTable();
-      var _iteratorNormalCompletion = true;
-      var _didIteratorError = false;
-      var _iteratorError = undefined;
+
+      var _iterator = _createForOfIteratorHelper(datagram),
+          _step;
 
       try {
-        for (var _iterator = datagram[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+        for (_iterator.s(); !(_step = _iterator.n()).done;) {
           var node = _step.value;
           node.write();
         }
       } catch (err) {
-        _didIteratorError = true;
-        _iteratorError = err;
+        _iterator.e(err);
       } finally {
-        try {
-          if (!_iteratorNormalCompletion && _iterator["return"] != null) {
-            _iterator["return"]();
-          }
-        } finally {
-          if (_didIteratorError) {
-            throw _iteratorError;
-          }
-        }
+        _iterator.f();
       }
 
       this.state = States.CLOSED;
@@ -1116,29 +1303,20 @@ function (_AbstractWriter_1$Abs) {
 
       var writeable = new IonWriteable_1.Writeable();
       var writer = new IonLowLevelBinaryWriter_1.LowLevelBinaryWriter(writeable);
-      var _iteratorNormalCompletion2 = true;
-      var _didIteratorError2 = false;
-      var _iteratorError2 = undefined;
+
+      var _iterator2 = _createForOfIteratorHelper(annotations),
+          _step2;
 
       try {
-        for (var _iterator2 = annotations[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+        for (_iterator2.s(); !(_step2 = _iterator2.n()).done;) {
           var annotation = _step2.value;
           var symbolId = this.symbolTable.addSymbol(annotation);
           writer.writeVariableLengthUnsignedInt(symbolId);
         }
       } catch (err) {
-        _didIteratorError2 = true;
-        _iteratorError2 = err;
+        _iterator2.e(err);
       } finally {
-        try {
-          if (!_iteratorNormalCompletion2 && _iterator2["return"] != null) {
-            _iterator2["return"]();
-          }
-        } finally {
-          if (_didIteratorError2) {
-            throw _iteratorError2;
-          }
-        }
+        _iterator2.f();
       }
 
       this._clearAnnotations();
@@ -1208,12 +1386,12 @@ function (_AbstractWriter_1$Abs) {
       if (hasLocalSymbols) {
         this.writeFieldName('symbols');
         this.stepIn(IonTypes_1.IonTypes.LIST);
-        var _iteratorNormalCompletion3 = true;
-        var _didIteratorError3 = false;
-        var _iteratorError3 = undefined;
+
+        var _iterator3 = _createForOfIteratorHelper(this.symbolTable.symbols),
+            _step3;
 
         try {
-          for (var _iterator3 = this.symbolTable.symbols[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+          for (_iterator3.s(); !(_step3 = _iterator3.n()).done;) {
             var symbol_ = _step3.value;
 
             if (symbol_ !== undefined) {
@@ -1221,18 +1399,9 @@ function (_AbstractWriter_1$Abs) {
             }
           }
         } catch (err) {
-          _didIteratorError3 = true;
-          _iteratorError3 = err;
+          _iterator3.e(err);
         } finally {
-          try {
-            if (!_iteratorNormalCompletion3 && _iterator3["return"] != null) {
-              _iterator3["return"]();
-            }
-          } finally {
-            if (_didIteratorError3) {
-              throw _iteratorError3;
-            }
-          }
+          _iterator3.f();
         }
 
         this.stepOut();
@@ -1264,9 +1433,7 @@ function (_AbstractWriter_1$Abs) {
 
 exports.BinaryWriter = BinaryWriter;
 
-var AbstractNode =
-/*#__PURE__*/
-function () {
+var AbstractNode = /*#__PURE__*/function () {
   function AbstractNode(_writer, parent, _type, annotations) {
     (0, _classCallCheck2["default"])(this, AbstractNode);
     this._writer = _writer;
@@ -1369,14 +1536,14 @@ function () {
 
 exports.AbstractNode = AbstractNode;
 
-var ContainerNode =
-/*#__PURE__*/
-function (_AbstractNode) {
+var ContainerNode = /*#__PURE__*/function (_AbstractNode) {
   (0, _inherits2["default"])(ContainerNode, _AbstractNode);
+
+  var _super2 = _createSuper(ContainerNode);
 
   function ContainerNode(writer, parent, type, annotations) {
     (0, _classCallCheck2["default"])(this, ContainerNode);
-    return (0, _possibleConstructorReturn2["default"])(this, (0, _getPrototypeOf2["default"])(ContainerNode).call(this, writer, parent, type, annotations));
+    return _super2.call(this, writer, parent, type, annotations);
   }
 
   (0, _createClass2["default"])(ContainerNode, [{
@@ -1388,16 +1555,16 @@ function (_AbstractNode) {
   return ContainerNode;
 }(AbstractNode);
 
-var SequenceNode =
-/*#__PURE__*/
-function (_ContainerNode) {
+var SequenceNode = /*#__PURE__*/function (_ContainerNode) {
   (0, _inherits2["default"])(SequenceNode, _ContainerNode);
+
+  var _super3 = _createSuper(SequenceNode);
 
   function SequenceNode(writer, parent, type, annotations) {
     var _this2;
 
     (0, _classCallCheck2["default"])(this, SequenceNode);
-    _this2 = (0, _possibleConstructorReturn2["default"])(this, (0, _getPrototypeOf2["default"])(SequenceNode).call(this, writer, parent, type, annotations));
+    _this2 = _super3.call(this, writer, parent, type, annotations);
     _this2.children = [];
     return _this2;
   }
@@ -1412,56 +1579,38 @@ function (_ContainerNode) {
     value: function write() {
       this.writeAnnotations();
       this.writeTypeDescriptorAndLength(this.typeCode, false, this.getValueLength());
-      var _iteratorNormalCompletion4 = true;
-      var _didIteratorError4 = false;
-      var _iteratorError4 = undefined;
+
+      var _iterator4 = _createForOfIteratorHelper(this.children),
+          _step4;
 
       try {
-        for (var _iterator4 = this.children[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+        for (_iterator4.s(); !(_step4 = _iterator4.n()).done;) {
           var child = _step4.value;
           child.write();
         }
       } catch (err) {
-        _didIteratorError4 = true;
-        _iteratorError4 = err;
+        _iterator4.e(err);
       } finally {
-        try {
-          if (!_iteratorNormalCompletion4 && _iterator4["return"] != null) {
-            _iterator4["return"]();
-          }
-        } finally {
-          if (_didIteratorError4) {
-            throw _iteratorError4;
-          }
-        }
+        _iterator4.f();
       }
     }
   }, {
     key: "getValueLength",
     value: function getValueLength() {
       var valueLength = 0;
-      var _iteratorNormalCompletion5 = true;
-      var _didIteratorError5 = false;
-      var _iteratorError5 = undefined;
+
+      var _iterator5 = _createForOfIteratorHelper(this.children),
+          _step5;
 
       try {
-        for (var _iterator5 = this.children[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
+        for (_iterator5.s(); !(_step5 = _iterator5.n()).done;) {
           var child = _step5.value;
           valueLength += child.getLength();
         }
       } catch (err) {
-        _didIteratorError5 = true;
-        _iteratorError5 = err;
+        _iterator5.e(err);
       } finally {
-        try {
-          if (!_iteratorNormalCompletion5 && _iterator5["return"] != null) {
-            _iterator5["return"]();
-          }
-        } finally {
-          if (_didIteratorError5) {
-            throw _iteratorError5;
-          }
-        }
+        _iterator5.f();
       }
 
       return valueLength;
@@ -1479,16 +1628,16 @@ function (_ContainerNode) {
   return SequenceNode;
 }(ContainerNode);
 
-var StructNode =
-/*#__PURE__*/
-function (_ContainerNode2) {
+var StructNode = /*#__PURE__*/function (_ContainerNode2) {
   (0, _inherits2["default"])(StructNode, _ContainerNode2);
+
+  var _super4 = _createSuper(StructNode);
 
   function StructNode(writer, parent, annotations) {
     var _this3;
 
     (0, _classCallCheck2["default"])(this, StructNode);
-    _this3 = (0, _possibleConstructorReturn2["default"])(this, (0, _getPrototypeOf2["default"])(StructNode).call(this, writer, parent, IonTypes_1.IonTypes.STRUCT, annotations));
+    _this3 = _super4.call(this, writer, parent, IonTypes_1.IonTypes.STRUCT, annotations);
     _this3.fields = [];
     return _this3;
   }
@@ -1506,29 +1655,20 @@ function (_ContainerNode2) {
     key: "getValueLength",
     value: function getValueLength() {
       var valueLength = 0;
-      var _iteratorNormalCompletion6 = true;
-      var _didIteratorError6 = false;
-      var _iteratorError6 = undefined;
+
+      var _iterator6 = _createForOfIteratorHelper(this.fields),
+          _step6;
 
       try {
-        for (var _iterator6 = this.fields[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
+        for (_iterator6.s(); !(_step6 = _iterator6.n()).done;) {
           var field = _step6.value;
           valueLength += field.name.length;
           valueLength += field.value.getLength();
         }
       } catch (err) {
-        _didIteratorError6 = true;
-        _iteratorError6 = err;
+        _iterator6.e(err);
       } finally {
-        try {
-          if (!_iteratorNormalCompletion6 && _iterator6["return"] != null) {
-            _iterator6["return"]();
-          }
-        } finally {
-          if (_didIteratorError6) {
-            throw _iteratorError6;
-          }
-        }
+        _iterator6.f();
       }
 
       return valueLength;
@@ -1547,43 +1687,34 @@ function (_ContainerNode2) {
     value: function write() {
       this.writeAnnotations();
       this.writeTypeDescriptorAndLength(this.typeCode, false, this.getValueLength());
-      var _iteratorNormalCompletion7 = true;
-      var _didIteratorError7 = false;
-      var _iteratorError7 = undefined;
+
+      var _iterator7 = _createForOfIteratorHelper(this.fields),
+          _step7;
 
       try {
-        for (var _iterator7 = this.fields[Symbol.iterator](), _step7; !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
+        for (_iterator7.s(); !(_step7 = _iterator7.n()).done;) {
           var field = _step7.value;
           this.writer.writeBytes(new Uint8Array(field.name));
           field.value.write();
         }
       } catch (err) {
-        _didIteratorError7 = true;
-        _iteratorError7 = err;
+        _iterator7.e(err);
       } finally {
-        try {
-          if (!_iteratorNormalCompletion7 && _iterator7["return"] != null) {
-            _iterator7["return"]();
-          }
-        } finally {
-          if (_didIteratorError7) {
-            throw _iteratorError7;
-          }
-        }
+        _iterator7.f();
       }
     }
   }]);
   return StructNode;
 }(ContainerNode);
 
-var LeafNode =
-/*#__PURE__*/
-function (_AbstractNode2) {
+var LeafNode = /*#__PURE__*/function (_AbstractNode2) {
   (0, _inherits2["default"])(LeafNode, _AbstractNode2);
+
+  var _super5 = _createSuper(LeafNode);
 
   function LeafNode() {
     (0, _classCallCheck2["default"])(this, LeafNode);
-    return (0, _possibleConstructorReturn2["default"])(this, (0, _getPrototypeOf2["default"])(LeafNode).apply(this, arguments));
+    return _super5.apply(this, arguments);
   }
 
   (0, _createClass2["default"])(LeafNode, [{
@@ -1602,16 +1733,16 @@ function (_AbstractNode2) {
 
 exports.LeafNode = LeafNode;
 
-var BooleanNode =
-/*#__PURE__*/
-function (_LeafNode) {
+var BooleanNode = /*#__PURE__*/function (_LeafNode) {
   (0, _inherits2["default"])(BooleanNode, _LeafNode);
+
+  var _super6 = _createSuper(BooleanNode);
 
   function BooleanNode(writer, parent, annotations, value) {
     var _this4;
 
     (0, _classCallCheck2["default"])(this, BooleanNode);
-    _this4 = (0, _possibleConstructorReturn2["default"])(this, (0, _getPrototypeOf2["default"])(BooleanNode).call(this, writer, parent, IonTypes_1.IonTypes.BOOL, annotations));
+    _this4 = _super6.call(this, writer, parent, IonTypes_1.IonTypes.BOOL, annotations);
     _this4.value = value;
     return _this4;
   }
@@ -1631,16 +1762,16 @@ function (_LeafNode) {
   return BooleanNode;
 }(LeafNode);
 
-var IntNode =
-/*#__PURE__*/
-function (_LeafNode2) {
+var IntNode = /*#__PURE__*/function (_LeafNode2) {
   (0, _inherits2["default"])(IntNode, _LeafNode2);
+
+  var _super7 = _createSuper(IntNode);
 
   function IntNode(writer, parent, annotations, value) {
     var _this5;
 
     (0, _classCallCheck2["default"])(this, IntNode);
-    _this5 = (0, _possibleConstructorReturn2["default"])(this, (0, _getPrototypeOf2["default"])(IntNode).call(this, writer, parent, IonTypes_1.IonTypes.INT, annotations));
+    _this5 = _super7.call(this, writer, parent, IonTypes_1.IonTypes.INT, annotations);
     _this5.value = value;
 
     if (!(typeof _this5.value === 'number' || _this5.value instanceof jsbi_1["default"])) {
@@ -1662,6 +1793,8 @@ function (_LeafNode2) {
       if (value instanceof jsbi_1["default"]) {
         if (JsbiSupport_1.JsbiSupport.isNegative(value)) {
           magnitude = jsbi_1["default"].unaryMinus(value);
+        } else {
+          magnitude = value;
         }
       } else {
         magnitude = Math.abs(value);
@@ -1696,16 +1829,16 @@ function (_LeafNode2) {
   return IntNode;
 }(LeafNode);
 
-var BytesNode =
-/*#__PURE__*/
-function (_LeafNode3) {
+var BytesNode = /*#__PURE__*/function (_LeafNode3) {
   (0, _inherits2["default"])(BytesNode, _LeafNode3);
+
+  var _super8 = _createSuper(BytesNode);
 
   function BytesNode(writer, parent, type, annotations, value) {
     var _this6;
 
     (0, _classCallCheck2["default"])(this, BytesNode);
-    _this6 = (0, _possibleConstructorReturn2["default"])(this, (0, _getPrototypeOf2["default"])(BytesNode).call(this, writer, parent, type, annotations));
+    _this6 = _super8.call(this, writer, parent, type, annotations);
     _this6.value = value;
     return _this6;
   }
@@ -1726,14 +1859,14 @@ function (_LeafNode3) {
   return BytesNode;
 }(LeafNode);
 
-var NullNode =
-/*#__PURE__*/
-function (_LeafNode4) {
+var NullNode = /*#__PURE__*/function (_LeafNode4) {
   (0, _inherits2["default"])(NullNode, _LeafNode4);
+
+  var _super9 = _createSuper(NullNode);
 
   function NullNode(writer, parent, type, annotations) {
     (0, _classCallCheck2["default"])(this, NullNode);
-    return (0, _possibleConstructorReturn2["default"])(this, (0, _getPrototypeOf2["default"])(NullNode).call(this, writer, parent, type, annotations));
+    return _super9.call(this, writer, parent, type, annotations);
   }
 
   (0, _createClass2["default"])(NullNode, [{
@@ -1753,8 +1886,22 @@ function (_LeafNode4) {
 
 exports.NullNode = NullNode;
 
-},{"./AbstractWriter":1,"./IonDecimal":9,"./IonLowLevelBinaryWriter":12,"./IonTimestamp":24,"./IonTypes":26,"./IonUnicode":27,"./IonWriteable":28,"./JsbiSerde":29,"./JsbiSupport":30,"./util":32,"@babel/runtime/helpers/classCallCheck":35,"@babel/runtime/helpers/createClass":36,"@babel/runtime/helpers/get":39,"@babel/runtime/helpers/getPrototypeOf":40,"@babel/runtime/helpers/inherits":41,"@babel/runtime/helpers/interopRequireDefault":42,"@babel/runtime/helpers/possibleConstructorReturn":45,"jsbi":50}],7:[function(require,module,exports){
+},{"./AbstractWriter":1,"./IonLowLevelBinaryWriter":12,"./IonTimestamp":24,"./IonTypes":26,"./IonUnicode":27,"./IonWriteable":28,"./JsbiSerde":29,"./JsbiSupport":30,"./util":51,"@babel/runtime/helpers/classCallCheck":56,"@babel/runtime/helpers/createClass":57,"@babel/runtime/helpers/get":60,"@babel/runtime/helpers/getPrototypeOf":61,"@babel/runtime/helpers/inherits":62,"@babel/runtime/helpers/interopRequireDefault":63,"@babel/runtime/helpers/possibleConstructorReturn":68,"jsbi":75}],7:[function(require,module,exports){
 "use strict";
+/*!
+ * Copyright 2012 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * A copy of the License is located at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * or in the "license" file accompanying this file. This file is distributed
+ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
 
@@ -1772,9 +1919,7 @@ function byVersion(x, y) {
   return x.version - y.version;
 }
 
-var Catalog =
-/*#__PURE__*/
-function () {
+var Catalog = /*#__PURE__*/function () {
   function Catalog() {
     (0, _classCallCheck2["default"])(this, Catalog);
     this.symbolTables = {};
@@ -1812,8 +1957,22 @@ function () {
 
 exports.Catalog = Catalog;
 
-},{"./IonSystemSymbolTable":20,"@babel/runtime/helpers/classCallCheck":35,"@babel/runtime/helpers/createClass":36,"@babel/runtime/helpers/interopRequireDefault":42}],8:[function(require,module,exports){
+},{"./IonSystemSymbolTable":20,"@babel/runtime/helpers/classCallCheck":56,"@babel/runtime/helpers/createClass":57,"@babel/runtime/helpers/interopRequireDefault":63}],8:[function(require,module,exports){
 "use strict";
+/*!
+ * Copyright 2012 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * A copy of the License is located at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * or in the "license" file accompanying this file. This file is distributed
+ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -1827,6 +1986,20 @@ exports.IVM = {
 
 },{}],9:[function(require,module,exports){
 "use strict";
+/*!
+ * Copyright 2012 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * A copy of the License is located at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * or in the "license" file accompanying this file. This file is distributed
+ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
 
@@ -1852,10 +2025,9 @@ var util_1 = require("./util");
 
 var JsbiSupport_1 = require("./JsbiSupport");
 
-var Decimal =
-/*#__PURE__*/
-function () {
-  function Decimal(coefficient, exponent, isNegative) {
+var Decimal = /*#__PURE__*/function () {
+  function Decimal(coefficient, exponent) {
+    var isNegative = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
     (0, _classCallCheck2["default"])(this, Decimal);
 
     if (typeof coefficient === "string") {
@@ -1937,6 +2109,11 @@ function () {
       }
 
       return (this.isNegative() ? '-' : '') + s;
+    }
+  }, {
+    key: "toJSON",
+    value: function toJSON() {
+      return this.numberValue();
     }
   }, {
     key: "getCoefficient",
@@ -2062,7 +2239,7 @@ function () {
       var d = str.match('[d|D]');
       var exponentDelimiterIndex = str.length;
 
-      if (d) {
+      if (d !== undefined && d !== null) {
         exponent = Number(str.substring(d.index + 1, str.length));
         exponentDelimiterIndex = d.index;
       }
@@ -2090,8 +2267,22 @@ exports.Decimal = Decimal;
 Decimal.ZERO = new Decimal(0, 0);
 Decimal.ONE = new Decimal(1, 0);
 
-},{"./JsbiSupport":30,"./util":32,"@babel/runtime/helpers/classCallCheck":35,"@babel/runtime/helpers/createClass":36,"@babel/runtime/helpers/interopRequireDefault":42,"@babel/runtime/helpers/slicedToArray":47,"jsbi":50}],10:[function(require,module,exports){
+},{"./JsbiSupport":30,"./util":51,"@babel/runtime/helpers/classCallCheck":56,"@babel/runtime/helpers/createClass":57,"@babel/runtime/helpers/interopRequireDefault":63,"@babel/runtime/helpers/slicedToArray":70,"jsbi":75}],10:[function(require,module,exports){
 "use strict";
+/*!
+ * Copyright 2012 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * A copy of the License is located at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * or in the "license" file accompanying this file. This file is distributed
+ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
 
@@ -2103,9 +2294,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var Import =
-/*#__PURE__*/
-function () {
+var Import = /*#__PURE__*/function () {
   function Import(parent, symbolTable, length) {
     (0, _classCallCheck2["default"])(this, Import);
     this._parent = parent;
@@ -2182,8 +2371,22 @@ function () {
 
 exports.Import = Import;
 
-},{"@babel/runtime/helpers/classCallCheck":35,"@babel/runtime/helpers/createClass":36,"@babel/runtime/helpers/interopRequireDefault":42}],11:[function(require,module,exports){
+},{"@babel/runtime/helpers/classCallCheck":56,"@babel/runtime/helpers/createClass":57,"@babel/runtime/helpers/interopRequireDefault":63}],11:[function(require,module,exports){
 "use strict";
+/*!
+ * Copyright 2012 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * A copy of the License is located at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * or in the "license" file accompanying this file. This file is distributed
+ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
 
@@ -2191,46 +2394,45 @@ var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime/helpers/cl
 
 var _createClass2 = _interopRequireDefault(require("@babel/runtime/helpers/createClass"));
 
+function _createForOfIteratorHelper(o) { if (typeof Symbol === "undefined" || o[Symbol.iterator] == null) { if (Array.isArray(o) || (o = _unsupportedIterableToArray(o))) { var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var it, normalCompletion = true, didErr = false, err; return { s: function s() { it = o[Symbol.iterator](); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(n); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
 var IonSystemSymbolTable_1 = require("./IonSystemSymbolTable");
 
-var LocalSymbolTable =
-/*#__PURE__*/
-function () {
-  function LocalSymbolTable() {
-    var _import = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : IonSystemSymbolTable_1.getSystemSymbolTableImport();
-
+var LocalSymbolTable = /*#__PURE__*/function () {
+  function LocalSymbolTable(theImport) {
     var symbols = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
     (0, _classCallCheck2["default"])(this, LocalSymbolTable);
-    this._import = _import;
     this.index = {};
     this._symbols = [];
-    this.offset = _import.offset + _import.length;
-    var _iteratorNormalCompletion = true;
-    var _didIteratorError = false;
-    var _iteratorError = undefined;
+
+    if (theImport === null) {
+      this._import = IonSystemSymbolTable_1.getSystemSymbolTableImport();
+    } else {
+      this._import = theImport;
+    }
+
+    this.offset = this._import.offset + this._import.length;
+
+    var _iterator = _createForOfIteratorHelper(symbols),
+        _step;
 
     try {
-      for (var _iterator = symbols[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+      for (_iterator.s(); !(_step = _iterator.n()).done;) {
         var symbol_ = _step.value;
         this.addSymbol(symbol_);
       }
     } catch (err) {
-      _didIteratorError = true;
-      _iteratorError = err;
+      _iterator.e(err);
     } finally {
-      try {
-        if (!_iteratorNormalCompletion && _iterator["return"] != null) {
-          _iterator["return"]();
-        }
-      } finally {
-        if (_didIteratorError) {
-          throw _iteratorError;
-        }
-      }
+      _iterator.f();
     }
   }
 
@@ -2242,11 +2444,18 @@ function () {
   }, {
     key: "addSymbol",
     value: function addSymbol(symbol_) {
-      var existingSymbolId = this.getSymbolId(symbol_);
-      if (existingSymbolId !== undefined) return existingSymbolId;
+      if (symbol_ !== null) {
+        var existingSymbolId = this.getSymbolId(symbol_);
+        if (existingSymbolId !== undefined) return existingSymbolId;
+      }
+
       var symbolId = this.offset + this.symbols.length;
       this.symbols.push(symbol_);
-      this.index[symbol_] = symbolId;
+
+      if (symbol_ !== null) {
+        this.index[symbol_] = symbolId;
+      }
+
       return symbolId;
     }
   }, {
@@ -2290,8 +2499,22 @@ function defaultLocalSymbolTable() {
 
 exports.defaultLocalSymbolTable = defaultLocalSymbolTable;
 
-},{"./IonSystemSymbolTable":20,"@babel/runtime/helpers/classCallCheck":35,"@babel/runtime/helpers/createClass":36,"@babel/runtime/helpers/interopRequireDefault":42}],12:[function(require,module,exports){
+},{"./IonSystemSymbolTable":20,"@babel/runtime/helpers/classCallCheck":56,"@babel/runtime/helpers/createClass":57,"@babel/runtime/helpers/interopRequireDefault":63}],12:[function(require,module,exports){
 "use strict";
+/*!
+ * Copyright 2012 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * A copy of the License is located at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * or in the "license" file accompanying this file. This file is distributed
+ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
 
@@ -2313,9 +2536,7 @@ var jsbi_1 = __importDefault(require("jsbi"));
 
 var JsbiSerde_1 = require("./JsbiSerde");
 
-var LowLevelBinaryWriter =
-/*#__PURE__*/
-function () {
+var LowLevelBinaryWriter = /*#__PURE__*/function () {
   function LowLevelBinaryWriter(writeable) {
     (0, _classCallCheck2["default"])(this, LowLevelBinaryWriter);
     this.writeable = writeable;
@@ -2471,8 +2692,22 @@ function () {
 
 exports.LowLevelBinaryWriter = LowLevelBinaryWriter;
 
-},{"./JsbiSerde":29,"@babel/runtime/helpers/classCallCheck":35,"@babel/runtime/helpers/createClass":36,"@babel/runtime/helpers/interopRequireDefault":42,"jsbi":50}],13:[function(require,module,exports){
+},{"./JsbiSerde":29,"@babel/runtime/helpers/classCallCheck":56,"@babel/runtime/helpers/createClass":57,"@babel/runtime/helpers/interopRequireDefault":63,"jsbi":75}],13:[function(require,module,exports){
 "use strict";
+/*!
+ * Copyright 2012 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * A copy of the License is located at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * or in the "license" file accompanying this file. This file is distributed
+ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
 
@@ -2522,14 +2757,8 @@ var SignAndMagnitudeInt_1 = __importDefault(require("./SignAndMagnitudeInt"));
 
 var JsbiSerde_1 = require("./JsbiSerde");
 
-var DEBUG_FLAG = true;
 var EOF = -1;
-var ERROR = -2;
-var TB_UNUSED__ = 15;
 var TB_DATAGRAM = 20;
-var TB_SEXP_CLOSE = 21;
-var TB_LIST_CLOSE = 22;
-var TB_STRUCT_CLOSE = 23;
 
 function get_ion_type(rt) {
   switch (rt) {
@@ -2576,7 +2805,7 @@ function get_ion_type(rt) {
       return IonTypes_1.IonTypes.STRUCT;
 
     default:
-      return undefined;
+      throw new Error('Unrecognized type code ' + rt);
   }
 }
 
@@ -2615,16 +2844,14 @@ var ivm_image_1 = IonConstants_1.IVM.binary[1];
 var ivm_image_2 = IonConstants_1.IVM.binary[2];
 var ivm_image_3 = IonConstants_1.IVM.binary[3];
 
-var ParserBinaryRaw =
-/*#__PURE__*/
-function () {
+var ParserBinaryRaw = /*#__PURE__*/function () {
   function ParserBinaryRaw(source) {
     (0, _classCallCheck2["default"])(this, ParserBinaryRaw);
     this._raw_type = EOF;
     this._len = -1;
     this._curr = undefined;
     this._null = false;
-    this._fid = -1;
+    this._fid = null;
     this._as = -1;
     this._ae = -1;
     this._a = [];
@@ -2638,9 +2865,9 @@ function () {
     value: function next() {
       if (this._curr === undefined && this._len > 0) {
         this._in.skip(this._len);
-      } else {
-        this.clear_value();
       }
+
+      this.clear_value();
 
       if (this._in_struct) {
         this._fid = this.readVarUnsignedInt();
@@ -2686,7 +2913,7 @@ function () {
           t = this;
 
       if (t._ts.length < 2) {
-        throw new Error("you can't stepOut unless you stepped in");
+        throw new Error('Cannot stepOut any further, already at top level');
       }
 
       ts = t._ts.pop();
@@ -2755,68 +2982,10 @@ function () {
       this.load_value();
 
       if (this._raw_type == IonBinary.TB_SYMBOL) {
-        return this._curr === undefined ? null : this._curr;
+        return this._curr === undefined || this._curr === null ? null : this._curr;
       }
 
       return null;
-    }
-  }, {
-    key: "_stringRepresentation",
-    value: function _stringRepresentation() {
-      var t = this;
-
-      switch (t._raw_type) {
-        case IonBinary.TB_NULL:
-        case IonBinary.TB_BOOL:
-        case IonBinary.TB_INT:
-        case IonBinary.TB_NEG_INT:
-        case IonBinary.TB_FLOAT:
-        case IonBinary.TB_DECIMAL:
-        case IonBinary.TB_TIMESTAMP:
-        case IonBinary.TB_SYMBOL:
-        case IonBinary.TB_STRING:
-          break;
-
-        default:
-          throw new Error("Cannot convert to string.");
-      }
-
-      if (t.isNull()) {
-        switch (t._raw_type) {
-          case IonBinary.TB_BOOL:
-          case IonBinary.TB_INT:
-          case IonBinary.TB_NEG_INT:
-          case IonBinary.TB_FLOAT:
-          case IonBinary.TB_DECIMAL:
-          case IonBinary.TB_TIMESTAMP:
-          case IonBinary.TB_SYMBOL:
-          case IonBinary.TB_STRING:
-            "null." + t.ionType().name;
-            break;
-        }
-      } else {
-        t.load_value();
-
-        switch (t._raw_type) {
-          case IonBinary.TB_BOOL:
-          case IonBinary.TB_INT:
-          case IonBinary.TB_NEG_INT:
-          case IonBinary.TB_DECIMAL:
-          case IonBinary.TB_TIMESTAMP:
-            return t._curr.toString();
-
-          case IonBinary.TB_FLOAT:
-            var s = t.numberValue().toString();
-            if (s.indexOf("e") === -1) return s + "e0";
-
-          case IonBinary.TB_STRING:
-            if (t._null) {
-              return null;
-            }
-
-            return t._curr;
-        }
-      }
     }
   }, {
     key: "byteValue",
@@ -2908,7 +3077,7 @@ function () {
 
           this.load_value();
           var bigInt = this._curr;
-          return JsbiSupport_1.JsbiSupport.clampToSafeIntegerRange(bigInt);
+          return jsbi_1["default"].toNumber(bigInt);
 
         case IonBinary.TB_FLOAT:
           if (this.isNull()) {
@@ -2998,11 +3167,11 @@ function () {
 
       var offset;
       var year;
-      var month;
-      var day;
-      var hour;
-      var minute;
-      var secondInt;
+      var month = null;
+      var day = null;
+      var hour = null;
+      var minute = null;
+      var secondInt = null;
       var fractionalSeconds = IonDecimal_1.Decimal.ZERO;
       var precision = IonTimestamp_1.TimestampPrecision.YEAR;
 
@@ -3083,7 +3252,7 @@ function () {
       this._a = empty_array;
       this._as = -1;
       this._null = false;
-      this._fid = -1;
+      this._fid = null;
       this._len = -1;
     }
   }, {
@@ -3207,6 +3376,10 @@ function () {
         a = a << VINT_SHIFT | b & VINT_MASK;
 
         if ((b & VINT_FLAG) !== 0) {
+          if (a === 0) {
+            throw new Error('Symbol ID zero is unsupported.');
+          }
+
           arr.push(a);
           a = 0;
         }
@@ -3227,7 +3400,7 @@ function () {
     key: "load_value",
     value: function load_value() {
       if (this._curr != undefined) return;
-      if (this.isNull()) return null;
+      if (this.isNull()) return;
 
       switch (this._raw_type) {
         case IonBinary.TB_BOOL:
@@ -3320,7 +3493,7 @@ function () {
       }
 
       if (numberOfBits > 31) {
-        throw new Error("VarUInt values larger than 31 bits must be read using LongInt.");
+        throw new Error("VarUInt values larger than 31 bits must be read using SignAndMagnitudeInt.");
       }
 
       return magnitude;
@@ -3346,7 +3519,7 @@ function () {
       }
 
       if (bits > 32) {
-        throw new Error("VarInt values larger than 32 bits must be read using LongInt");
+        throw new Error("VarInt values larger than 32 bits must be read using SignAndMagnitudeInt");
       }
 
       return isNegative ? -v : v;
@@ -3420,8 +3593,22 @@ function () {
 
 exports.ParserBinaryRaw = ParserBinaryRaw;
 
-},{"./IonBinary":4,"./IonConstants":8,"./IonDecimal":9,"./IonTimestamp":24,"./IonTypes":26,"./IonUnicode":27,"./JsbiSerde":29,"./JsbiSupport":30,"./SignAndMagnitudeInt":31,"@babel/runtime/helpers/classCallCheck":35,"@babel/runtime/helpers/createClass":36,"@babel/runtime/helpers/interopRequireDefault":42,"@babel/runtime/helpers/slicedToArray":47,"jsbi":50}],14:[function(require,module,exports){
+},{"./IonBinary":4,"./IonConstants":8,"./IonDecimal":9,"./IonTimestamp":24,"./IonTypes":26,"./IonUnicode":27,"./JsbiSerde":29,"./JsbiSupport":30,"./SignAndMagnitudeInt":31,"@babel/runtime/helpers/classCallCheck":56,"@babel/runtime/helpers/createClass":57,"@babel/runtime/helpers/interopRequireDefault":63,"@babel/runtime/helpers/slicedToArray":70,"jsbi":75}],14:[function(require,module,exports){
 "use strict";
+/*!
+ * Copyright 2012 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * A copy of the License is located at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * or in the "license" file accompanying this file. This file is distributed
+ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
 
@@ -3439,6 +3626,12 @@ var __importStar = void 0 && (void 0).__importStar || function (mod) {
   return result;
 };
 
+var __importDefault = void 0 && (void 0).__importDefault || function (mod) {
+  return mod && mod.__esModule ? mod : {
+    "default": mod
+  };
+};
+
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
@@ -3446,6 +3639,8 @@ Object.defineProperty(exports, "__esModule", {
 var IonText = __importStar(require("./IonText"));
 
 var IonText_1 = require("./IonText");
+
+var jsbi_1 = __importDefault(require("jsbi"));
 
 var IonTypes_1 = require("./IonTypes");
 
@@ -3522,7 +3717,6 @@ var ESC_nl3 = 13;
 var ESC_x = CH_x;
 var ESC_u = 117;
 var ESC_U = 85;
-var empty_array = [];
 var INF = [CH_i, CH_n, CH_f];
 var _UTF16_MASK = 0x03ff;
 
@@ -3711,9 +3905,7 @@ function is_valid_string_char(ch, allow_new_line) {
   return true;
 }
 
-var ParserTextRaw =
-/*#__PURE__*/
-function () {
+var ParserTextRaw = /*#__PURE__*/function () {
   function ParserTextRaw(source) {
     (0, _classCallCheck2["default"])(this, ParserTextRaw);
     this._value_null = false;
@@ -3855,7 +4047,7 @@ function () {
       switch (this._curr) {
         case T_INT:
         case T_HEXINT:
-          return JsbiSupport_1.JsbiSupport.clampToSafeIntegerRange(JsbiSupport_1.JsbiSupport.bigIntFromString(s));
+          return jsbi_1["default"].toNumber(JsbiSupport_1.JsbiSupport.bigIntFromString(s));
 
         case T_FLOAT:
           return Number(s);
@@ -3873,13 +4065,13 @@ function () {
       if (this.isNull()) return null;
       var s = this.get_value_as_string(T_BOOL);
 
-      if (s == "true") {
+      if (s === "true") {
         return true;
-      } else if (s == "false") {
+      } else if (s === "false") {
         return false;
-      } else {
-        return undefined;
       }
+
+      throw new Error("Unrecognized Boolean value '" + s + "'");
     }
   }, {
     key: "get_value_as_string",
@@ -3952,7 +4144,16 @@ function () {
             } else if (t === T_STRING3 && ch === CH_SQ && !isEscaped && this.verifyTriple(index)) {
               index = this._skip_triple_quote_gap(index, this._end, true);
             } else if (ch >= 0) {
-              s += String.fromCharCode(ch);
+              if (isEscaped) {
+                s += String.fromCodePoint(ch);
+              } else {
+                if (t === T_STRING3 && ch === ESC_nl3 && this._in.valueAt(index + 1) === ESC_nl2) {
+                  ch = ESC_nl2;
+                  index++;
+                }
+
+                s += String.fromCharCode(ch);
+              }
             }
           }
 
@@ -4035,7 +4236,7 @@ function () {
       if (this._curr === ERROR) {
         this._value.push(ERROR);
 
-        t = undefined;
+        return undefined;
       } else {
         t = this._curr;
       }
@@ -4326,8 +4527,6 @@ function () {
   }, {
     key: "_read_value_helper_letter",
     value: function _read_value_helper_letter(ch1, accept_operator_symbols, calling_op) {
-      var tempNullStart = this._start;
-
       this._read_symbol();
 
       var type = this._value_pop();
@@ -4365,6 +4564,8 @@ function () {
 
         if (_ch2 == CH_CL && this._peek() == CH_CL) {
           this._read();
+
+          if (symbol === '$0') throw new Error('Symbol ID zero is not supported.');
 
           this._ann.push(symbol);
 
@@ -4783,6 +4984,14 @@ function () {
       if (ch == CH_CL && this._peek() == CH_CL) {
         this._read();
 
+        if (s[0] === '$') {
+          var tempStr = s.substr(1, s.length);
+
+          if (+tempStr === +tempStr) {
+            s = "'" + s + "'";
+          }
+        }
+
         this._ann.push(s);
 
         is_ann = true;
@@ -4852,13 +5061,6 @@ function () {
       if (!is_valid_base64_length(base64_chars, trailers)) throw new Error("Invalid base64 value");
 
       this._value_push(T_BLOB);
-    }
-  }, {
-    key: "_read_comma",
-    value: function _read_comma() {
-      var ch = this._read_after_whitespace(true);
-
-      if (ch != CH_CM) this._error("expected ','");
     }
   }, {
     key: "_read_close_double_brace",
@@ -4940,9 +5142,6 @@ function () {
     key: "_skip_triple_quote_gap",
     value: function _skip_triple_quote_gap(entryIndex, end, acceptComments) {
       var tempIndex = entryIndex + 3;
-
-      var ch = this._in.valueAt(tempIndex);
-
       tempIndex = this.indexWhiteSpace(tempIndex, acceptComments);
 
       if (tempIndex + 2 <= end && this.verifyTriple(tempIndex)) {
@@ -4957,9 +5156,7 @@ function () {
       var ch;
 
       if (ii + 1 >= end) {
-        this._error("invalid escape sequence");
-
-        return;
+        throw new Error("invalid escape sequence");
       }
 
       ch = this._in.valueAt(ii + 1);
@@ -5009,7 +5206,7 @@ function () {
           return -1;
 
         case ESC_nl3:
-          if (ii + 3 < end && this._in.valueAt(ii + 3) == CH_NL) {
+          if (ii + 2 < end && this._in.valueAt(ii + 2) == CH_NL) {
             this._esc_len = 2;
           }
 
@@ -5017,9 +5214,7 @@ function () {
 
         case ESC_x:
           if (ii + 3 >= end) {
-            this._error("invalid escape sequence");
-
-            return;
+            throw new Error("invalid escape sequence");
           }
 
           ch = this._get_N_hexdigits(ii + 2, ii + 4);
@@ -5084,7 +5279,7 @@ function () {
           return -1;
 
         case ESC_nl3:
-          if (ii + 3 < end && this._in.valueAt(ii + 3) == CH_NL) {
+          if (ii + 2 < end && this._in.valueAt(ii + 2) == CH_NL) {
             this._esc_len = 2;
           }
 
@@ -5092,9 +5287,7 @@ function () {
 
         case ESC_x:
           if (ii + 3 >= end) {
-            this._error("invalid escape sequence");
-
-            return;
+            throw new Error("invalid escape sequence");
           }
 
           ch = this._get_N_hexdigits(ii + 2, ii + 4);
@@ -5103,9 +5296,7 @@ function () {
 
         case ESC_u:
           if (ii + 5 >= end) {
-            this._error("invalid escape sequence");
-
-            return;
+            throw new Error("invalid escape sequence");
           }
 
           ch = this._get_N_hexdigits(ii + 2, ii + 6);
@@ -5114,9 +5305,7 @@ function () {
 
         case ESC_U:
           if (ii + 9 >= end) {
-            this._error("invalid escape sequence");
-
-            return;
+            throw new Error("invalid escape sequence");
           }
 
           ch = this._get_N_hexdigits(ii + 2, ii + 10);
@@ -5124,8 +5313,7 @@ function () {
           break;
 
         default:
-          this._error("unexpected character after escape slash");
-
+          throw new Error("unexpected character after escape slash");
       }
 
       return ch;
@@ -5293,15 +5481,6 @@ function () {
       return ch;
     }
   }, {
-    key: "_peek_after_whitespace",
-    value: function _peek_after_whitespace(recognize_comments) {
-      var ch = this._read_after_whitespace(recognize_comments);
-
-      this._unread(ch);
-
-      return ch;
-    }
-  }, {
     key: "_peek_4_digits",
     value: function _peek_4_digits(ch1) {
       var ii,
@@ -5401,38 +5580,6 @@ function () {
       return ch;
     }
   }, {
-    key: "_read_hours_and_minutes",
-    value: function _read_hours_and_minutes(ch) {
-      if (!IonText.is_digit(ch)) return ERROR;
-      ch = this._readPastNDigits(1);
-
-      if (ch == CH_CL) {
-        ch = this._readPastNDigits(2);
-      } else {
-        ch = ERROR;
-      }
-
-      return ch;
-    }
-  }, {
-    key: "_check_for_keywords",
-    value: function _check_for_keywords() {
-      var len,
-          s,
-          v = this._value_pop();
-
-      if (v == T_IDENTIFIER) {
-        len = this._end - this._start;
-
-        if (len >= 3 && len <= 5) {
-          s = this.get_value_as_string(v);
-          v = get_keyword_type(s);
-        }
-      }
-
-      this._value_push(v);
-    }
-  }, {
     key: "_error",
     value: function _error(msg) {
       this._ops.unshift(this._done_with_error);
@@ -5445,8 +5592,22 @@ function () {
 
 exports.ParserTextRaw = ParserTextRaw;
 
-},{"./IonText":21,"./IonTypes":26,"./JsbiSupport":30,"@babel/runtime/helpers/classCallCheck":35,"@babel/runtime/helpers/createClass":36,"@babel/runtime/helpers/interopRequireDefault":42}],15:[function(require,module,exports){
+},{"./IonText":21,"./IonTypes":26,"./JsbiSupport":30,"@babel/runtime/helpers/classCallCheck":56,"@babel/runtime/helpers/createClass":57,"@babel/runtime/helpers/interopRequireDefault":63,"jsbi":75}],15:[function(require,module,exports){
 "use strict";
+/*!
+ * Copyright 2012 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * A copy of the License is located at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * or in the "license" file accompanying this file. This file is distributed
+ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
 
@@ -5460,6 +5621,10 @@ var _getPrototypeOf2 = _interopRequireDefault(require("@babel/runtime/helpers/ge
 
 var _inherits2 = _interopRequireDefault(require("@babel/runtime/helpers/inherits"));
 
+function _createSuper(Derived) { return function () { var Super = (0, _getPrototypeOf2["default"])(Derived), result; if (_isNativeReflectConstruct()) { var NewTarget = (0, _getPrototypeOf2["default"])(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return (0, _possibleConstructorReturn2["default"])(this, result); }; }
+
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
@@ -5470,17 +5635,17 @@ var IonText_1 = require("./IonText");
 
 var IonTypes_1 = require("./IonTypes");
 
-var PrettyTextWriter =
-/*#__PURE__*/
-function (_IonTextWriter_1$Text) {
+var PrettyTextWriter = /*#__PURE__*/function (_IonTextWriter_1$Text) {
   (0, _inherits2["default"])(PrettyTextWriter, _IonTextWriter_1$Text);
+
+  var _super = _createSuper(PrettyTextWriter);
 
   function PrettyTextWriter(writeable) {
     var _this;
 
     var indentSize = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 2;
     (0, _classCallCheck2["default"])(this, PrettyTextWriter);
-    _this = (0, _possibleConstructorReturn2["default"])(this, (0, _getPrototypeOf2["default"])(PrettyTextWriter).call(this, writeable));
+    _this = _super.call(this, writeable);
     _this.indentSize = indentSize;
     _this.indentCount = 0;
     return _this;
@@ -5510,14 +5675,16 @@ function (_IonTextWriter_1$Text) {
   }, {
     key: "writeNull",
     value: function writeNull(type) {
-      if (type === null || type === undefined || type.binaryTypeId < 0 || type.binaryTypeId > 13) {
-        throw new Error("Cannot write null for type ".concat(type));
+      if (type === undefined || type === null) {
+        type = IonTypes_1.IonTypes.NULL;
       }
 
       this.handleSeparator();
       this.writePrettyValue();
       this.writeAnnotations();
-      this.writeUtf8("null." + type.name);
+
+      this._writeNull(type);
+
       if (this.currentContainer.containerType === IonTypes_1.IonTypes.STRUCT) this.currentContainer.state = IonTextWriter_1.State.STRUCT_FIELD;
     }
   }, {
@@ -5559,7 +5726,7 @@ function (_IonTextWriter_1$Text) {
     value: function _serializeValue(type, value, serialize) {
       if (this.currentContainer.state === IonTextWriter_1.State.STRUCT_FIELD) throw new Error("Expecting a struct field");
 
-      if (value === null || value === undefined) {
+      if (value === null) {
         this.writeNull(type);
         return;
       }
@@ -5647,8 +5814,22 @@ function (_IonTextWriter_1$Text) {
 
 exports.PrettyTextWriter = PrettyTextWriter;
 
-},{"./IonText":21,"./IonTextWriter":23,"./IonTypes":26,"@babel/runtime/helpers/classCallCheck":35,"@babel/runtime/helpers/createClass":36,"@babel/runtime/helpers/getPrototypeOf":40,"@babel/runtime/helpers/inherits":41,"@babel/runtime/helpers/interopRequireDefault":42,"@babel/runtime/helpers/possibleConstructorReturn":45}],16:[function(require,module,exports){
+},{"./IonText":21,"./IonTextWriter":23,"./IonTypes":26,"@babel/runtime/helpers/classCallCheck":56,"@babel/runtime/helpers/createClass":57,"@babel/runtime/helpers/getPrototypeOf":61,"@babel/runtime/helpers/inherits":62,"@babel/runtime/helpers/interopRequireDefault":63,"@babel/runtime/helpers/possibleConstructorReturn":68}],16:[function(require,module,exports){
 "use strict";
+/*!
+ * Copyright 2012 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * A copy of the License is located at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * or in the "license" file accompanying this file. This file is distributed
+ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
 
@@ -5660,9 +5841,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var SharedSymbolTable =
-/*#__PURE__*/
-function () {
+var SharedSymbolTable = /*#__PURE__*/function () {
   function SharedSymbolTable(_name, _version, _symbols) {
     (0, _classCallCheck2["default"])(this, SharedSymbolTable);
     this._name = _name;
@@ -5692,13 +5871,7 @@ function () {
   }, {
     key: "getSymbolId",
     value: function getSymbolId(text) {
-      var symbolId = this._idsByText[text];
-
-      if (symbolId === undefined) {
-        return null;
-      }
-
-      return symbolId;
+      return this._idsByText[text];
     }
   }, {
     key: "numberOfSymbols",
@@ -5721,8 +5894,22 @@ function () {
 
 exports.SharedSymbolTable = SharedSymbolTable;
 
-},{"@babel/runtime/helpers/classCallCheck":35,"@babel/runtime/helpers/createClass":36,"@babel/runtime/helpers/interopRequireDefault":42}],17:[function(require,module,exports){
+},{"@babel/runtime/helpers/classCallCheck":56,"@babel/runtime/helpers/createClass":57,"@babel/runtime/helpers/interopRequireDefault":63}],17:[function(require,module,exports){
 "use strict";
+/*!
+ * Copyright 2012 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * A copy of the License is located at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * or in the "license" file accompanying this file. This file is distributed
+ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
 
@@ -5735,6 +5922,10 @@ var _inherits2 = _interopRequireDefault(require("@babel/runtime/helpers/inherits
 var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime/helpers/classCallCheck"));
 
 var _createClass2 = _interopRequireDefault(require("@babel/runtime/helpers/createClass"));
+
+function _createSuper(Derived) { return function () { var Super = (0, _getPrototypeOf2["default"])(Derived), result; if (_isNativeReflectConstruct()) { var NewTarget = (0, _getPrototypeOf2["default"])(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return (0, _possibleConstructorReturn2["default"])(this, result); }; }
+
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -5752,9 +5943,7 @@ var LINE_FEED = 10;
 var CARRAIGE_RETURN = 13;
 var DEBUG_FLAG = true;
 
-var Span =
-/*#__PURE__*/
-function () {
+var Span = /*#__PURE__*/function () {
   function Span(_type) {
     (0, _classCallCheck2["default"])(this, Span);
     this._type = _type;
@@ -5776,16 +5965,16 @@ function () {
 
 exports.Span = Span;
 
-var StringSpan =
-/*#__PURE__*/
-function (_Span) {
+var StringSpan = /*#__PURE__*/function (_Span) {
   (0, _inherits2["default"])(StringSpan, _Span);
+
+  var _super = _createSuper(StringSpan);
 
   function StringSpan(src) {
     var _this;
 
     (0, _classCallCheck2["default"])(this, StringSpan);
-    _this = (0, _possibleConstructorReturn2["default"])(this, (0, _getPrototypeOf2["default"])(StringSpan).call(this, SPAN_TYPE_STRING));
+    _this = _super.call(this, SPAN_TYPE_STRING);
     _this._line = 1;
     _this._src = src;
     _this._limit = src.length;
@@ -5927,16 +6116,16 @@ function (_Span) {
 
 exports.StringSpan = StringSpan;
 
-var BinarySpan =
-/*#__PURE__*/
-function (_Span2) {
+var BinarySpan = /*#__PURE__*/function (_Span2) {
   (0, _inherits2["default"])(BinarySpan, _Span2);
+
+  var _super2 = _createSuper(BinarySpan);
 
   function BinarySpan(src) {
     var _this2;
 
     (0, _classCallCheck2["default"])(this, BinarySpan);
-    _this2 = (0, _possibleConstructorReturn2["default"])(this, (0, _getPrototypeOf2["default"])(BinarySpan).call(this, SPAN_TYPE_BINARY));
+    _this2 = _super2.call(this, SPAN_TYPE_BINARY);
     _this2._src = src;
     _this2._limit = src.length;
     _this2._start = 0;
@@ -6014,7 +6203,7 @@ function (_Span2) {
   }, {
     key: "valueAt",
     value: function valueAt(ii) {
-      if (ii < this._start || ii >= this._limit) return undefined;
+      if (ii < this._start || ii >= this._limit) return IonConstants_1.EOF;
       return this._src[ii];
     }
   }, {
@@ -6028,8 +6217,22 @@ function (_Span2) {
 
 exports.BinarySpan = BinarySpan;
 
-},{"./IonConstants":8,"@babel/runtime/helpers/classCallCheck":35,"@babel/runtime/helpers/createClass":36,"@babel/runtime/helpers/getPrototypeOf":40,"@babel/runtime/helpers/inherits":41,"@babel/runtime/helpers/interopRequireDefault":42,"@babel/runtime/helpers/possibleConstructorReturn":45}],18:[function(require,module,exports){
+},{"./IonConstants":8,"@babel/runtime/helpers/classCallCheck":56,"@babel/runtime/helpers/createClass":57,"@babel/runtime/helpers/getPrototypeOf":61,"@babel/runtime/helpers/inherits":62,"@babel/runtime/helpers/interopRequireDefault":63,"@babel/runtime/helpers/possibleConstructorReturn":68}],18:[function(require,module,exports){
 "use strict";
+/*!
+ * Copyright 2012 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * A copy of the License is located at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * or in the "license" file accompanying this file. This file is distributed
+ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
 
@@ -6043,16 +6246,20 @@ var _getPrototypeOf2 = _interopRequireDefault(require("@babel/runtime/helpers/ge
 
 var _inherits2 = _interopRequireDefault(require("@babel/runtime/helpers/inherits"));
 
+function _createSuper(Derived) { return function () { var Super = (0, _getPrototypeOf2["default"])(Derived), result; if (_isNativeReflectConstruct()) { var NewTarget = (0, _getPrototypeOf2["default"])(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return (0, _possibleConstructorReturn2["default"])(this, result); }; }
+
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
 var IonSharedSymbolTable_1 = require("./IonSharedSymbolTable");
 
-var SubstituteSymbolTable =
-/*#__PURE__*/
-function (_IonSharedSymbolTable) {
+var SubstituteSymbolTable = /*#__PURE__*/function (_IonSharedSymbolTable) {
   (0, _inherits2["default"])(SubstituteSymbolTable, _IonSharedSymbolTable);
+
+  var _super = _createSuper(SubstituteSymbolTable);
 
   function SubstituteSymbolTable(length) {
     var _this;
@@ -6063,7 +6270,7 @@ function (_IonSharedSymbolTable) {
       throw new Error("Cannot instantiate a SubstituteSymbolTable with a negative length. (" + length + ")");
     }
 
-    _this = (0, _possibleConstructorReturn2["default"])(this, (0, _getPrototypeOf2["default"])(SubstituteSymbolTable).call(this, "_substitute", undefined, []));
+    _this = _super.call(this, "_substitute", -1, []);
     _this._numberOfSymbols = length;
     return _this;
   }
@@ -6088,8 +6295,22 @@ function (_IonSharedSymbolTable) {
 
 exports.SubstituteSymbolTable = SubstituteSymbolTable;
 
-},{"./IonSharedSymbolTable":16,"@babel/runtime/helpers/classCallCheck":35,"@babel/runtime/helpers/createClass":36,"@babel/runtime/helpers/getPrototypeOf":40,"@babel/runtime/helpers/inherits":41,"@babel/runtime/helpers/interopRequireDefault":42,"@babel/runtime/helpers/possibleConstructorReturn":45}],19:[function(require,module,exports){
+},{"./IonSharedSymbolTable":16,"@babel/runtime/helpers/classCallCheck":56,"@babel/runtime/helpers/createClass":57,"@babel/runtime/helpers/getPrototypeOf":61,"@babel/runtime/helpers/inherits":62,"@babel/runtime/helpers/interopRequireDefault":63,"@babel/runtime/helpers/possibleConstructorReturn":68}],19:[function(require,module,exports){
 "use strict";
+/*!
+ * Copyright 2012 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * A copy of the License is located at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * or in the "license" file accompanying this file. This file is distributed
+ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -6113,9 +6334,9 @@ function load_imports(reader, catalog) {
 
   while (reader.next()) {
     reader.stepIn();
-    var name = void 0;
+    var name = null;
     var version = 1;
-    var maxId = void 0;
+    var maxId = null;
 
     while (reader.next()) {
       switch (reader.fieldName()) {
@@ -6132,7 +6353,7 @@ function load_imports(reader, catalog) {
       }
     }
 
-    if (version < 1) {
+    if (version === null || version < 1) {
       version = 1;
     }
 
@@ -6174,9 +6395,8 @@ function load_symbols(reader) {
 }
 
 function makeSymbolTable(catalog, reader) {
-  var import_;
-  var symbols;
-  var maxId;
+  var import_ = null;
+  var symbols = [];
   var foundSymbols = false;
   var foundImports = false;
   reader.stepIn();
@@ -6205,6 +6425,20 @@ exports.makeSymbolTable = makeSymbolTable;
 
 },{"./IonImport":10,"./IonLocalSymbolTable":11,"./IonSubstituteSymbolTable":18,"./IonSystemSymbolTable":20}],20:[function(require,module,exports){
 "use strict";
+/*!
+ * Copyright 2012 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * A copy of the License is located at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * or in the "license" file accompanying this file. This file is distributed
+ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -6230,6 +6464,20 @@ exports.getSystemSymbolTableImport = getSystemSymbolTableImport;
 
 },{"./IonImport":10,"./IonSharedSymbolTable":16}],21:[function(require,module,exports){
 "use strict";
+/*!
+ * Copyright 2012 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * A copy of the License is located at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * or in the "license" file accompanying this file. This file is distributed
+ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
 
@@ -6337,8 +6585,6 @@ exports.needsEscape = needsEscape;
 function escapeString(s, pos) {
   var fixes = [],
       c,
-      old_len,
-      new_len,
       ii,
       s2;
 
@@ -6741,14 +6987,34 @@ function escape(input, escapes) {
 
 exports.escape = escape;
 
-},{"@babel/runtime/helpers/extends":38,"@babel/runtime/helpers/interopRequireDefault":42}],22:[function(require,module,exports){
+},{"@babel/runtime/helpers/extends":59,"@babel/runtime/helpers/interopRequireDefault":63}],22:[function(require,module,exports){
 "use strict";
+/*!
+ * Copyright 2012 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * A copy of the License is located at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * or in the "license" file accompanying this file. This file is distributed
+ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
 
 var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime/helpers/classCallCheck"));
 
 var _createClass2 = _interopRequireDefault(require("@babel/runtime/helpers/createClass"));
+
+function _createForOfIteratorHelper(o) { if (typeof Symbol === "undefined" || o[Symbol.iterator] == null) { if (Array.isArray(o) || (o = _unsupportedIterableToArray(o))) { var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var it, normalCompletion = true, didErr = false, err; return { s: function s() { it = o[Symbol.iterator](); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(n); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
 
 var __importDefault = void 0 && (void 0).__importDefault || function (mod) {
   return mod && mod.__esModule ? mod : {
@@ -6770,8 +7036,6 @@ var IonParserTextRaw_1 = require("./IonParserTextRaw");
 
 var IonSymbols_1 = require("./IonSymbols");
 
-var IonType_1 = require("./IonType");
-
 var IonTypes_1 = require("./IonTypes");
 
 var IonTimestamp_1 = require("./IonTimestamp");
@@ -6782,7 +7046,6 @@ var JsbiSupport_1 = require("./JsbiSupport");
 
 var IntSize_1 = __importDefault(require("./IntSize"));
 
-var RAW_STRING = new IonType_1.IonType(-1, "raw_input", true, false, false, false);
 var BEGINNING_OF_CONTAINER = -2;
 var EOF = -1;
 var T_IDENTIFIER = 9;
@@ -6791,9 +7054,7 @@ var T_CLOB2 = 14;
 var T_CLOB3 = 15;
 var T_STRUCT = 19;
 
-var TextReader =
-/*#__PURE__*/
-function () {
+var TextReader = /*#__PURE__*/function () {
   function TextReader(source, catalog) {
     (0, _classCallCheck2["default"])(this, TextReader);
 
@@ -6881,8 +7142,11 @@ function () {
     value: function next() {
       this._raw = undefined;
       if (this._raw_type === EOF) return null;
-      var should_skip = this._raw_type !== BEGINNING_OF_CONTAINER && !this.isNull() && this._type && this._type.isContainer;
-      if (should_skip) this.skip_past_container();
+
+      if (this._raw_type !== BEGINNING_OF_CONTAINER && !this.isNull() && this._type && this._type.isContainer) {
+        this.skip_past_container();
+      }
+
       var p = this._parser;
 
       for (;;) {
@@ -6943,6 +7207,11 @@ function () {
       }
 
       this._raw_type = undefined;
+
+      if (this._depth <= 0) {
+        throw new Error('Cannot stepOut any further, already at top level');
+      }
+
       this._depth--;
     }
   }, {
@@ -6960,16 +7229,18 @@ function () {
     value: function fieldName() {
       var str = this._parser.fieldName();
 
-      var raw_type = this._parser.fieldNameType();
+      if (str !== null) {
+        var raw_type = this._parser.fieldNameType();
 
-      if (raw_type === T_IDENTIFIER && str.length > 1 && str.charAt(0) === '$'.charAt(0)) {
-        var tempStr = str.substr(1, str.length);
+        if (raw_type === T_IDENTIFIER && str.length > 1 && str[0] === '$') {
+          var tempStr = str.substr(1, str.length);
 
-        if (+tempStr === +tempStr) {
-          var symbol = this._symtab.getSymbolText(Number(tempStr));
+          if (+tempStr === +tempStr) {
+            var symbol = this._symtab.getSymbolText(Number(tempStr));
 
-          if (symbol === undefined) throw new Error("Unresolveable symbol ID, symboltokens unsupported.");
-          return symbol;
+            if (symbol === undefined) throw new Error("Unresolvable symbol ID, symboltokens unsupported.");
+            return symbol;
+          }
         }
       }
 
@@ -6978,7 +7249,36 @@ function () {
   }, {
     key: "annotations",
     value: function annotations() {
-      return this._parser.annotations();
+      var ann = [];
+
+      var _iterator = _createForOfIteratorHelper(this._parser.annotations()),
+          _step;
+
+      try {
+        for (_iterator.s(); !(_step = _iterator.n()).done;) {
+          var str = _step.value;
+          ann.push(str);
+        }
+      } catch (err) {
+        _iterator.e(err);
+      } finally {
+        _iterator.f();
+      }
+
+      for (var i = 0; i < ann.length; i++) {
+        if (ann[i].length > 1 && ann[i][0] === '$') {
+          var tempStr = ann[i].substr(1, ann[i].length);
+
+          if (+tempStr === +tempStr) {
+            var symbol = this._symtab.getSymbolText(Number(tempStr));
+
+            if (symbol === undefined || symbol === null) throw new Error("Unresolvable symbol ID, symboltokens unsupported.");
+            ann[i] = symbol;
+          }
+        }
+      }
+
+      return ann;
     }
   }, {
     key: "isNull",
@@ -6991,32 +7291,7 @@ function () {
     value: function _stringRepresentation() {
       this.load_raw();
       if (this.isNull()) return this._type === IonTypes_1.IonTypes.NULL ? "null" : "null." + this._type.name;
-
-      if (this._type.isScalar) {
-        switch (this._type) {
-          case IonTypes_1.IonTypes.BLOB:
-            return this._raw;
-
-          case IonTypes_1.IonTypes.SYMBOL:
-            if (this._raw_type === T_IDENTIFIER && this._raw.length > 1 && this._raw.charAt(0) === '$'.charAt(0)) {
-              var tempStr = this._raw.substr(1, this._raw.length);
-
-              if (+tempStr === +tempStr) {
-                var symbol = this._symtab.getSymbolText(Number(tempStr));
-
-                if (symbol === undefined) throw new Error("Unresolvable symbol ID, symboltokens unsupported.");
-                return symbol;
-              }
-            }
-
-            return this._raw;
-
-          default:
-            return this._raw;
-        }
-      } else {
-        throw new Error("Cannot create string representation of non-scalar values.");
-      }
+      return this._raw;
     }
   }, {
     key: "booleanValue",
@@ -7206,22 +7481,46 @@ function () {
 
 exports.TextReader = TextReader;
 
-},{"./IntSize":2,"./IonCatalog":7,"./IonDecimal":9,"./IonLocalSymbolTable":11,"./IonParserTextRaw":14,"./IonSymbols":19,"./IonText":21,"./IonTimestamp":24,"./IonType":25,"./IonTypes":26,"./JsbiSupport":30,"@babel/runtime/helpers/classCallCheck":35,"@babel/runtime/helpers/createClass":36,"@babel/runtime/helpers/interopRequireDefault":42}],23:[function(require,module,exports){
+},{"./IntSize":2,"./IonCatalog":7,"./IonDecimal":9,"./IonLocalSymbolTable":11,"./IonParserTextRaw":14,"./IonSymbols":19,"./IonText":21,"./IonTimestamp":24,"./IonTypes":26,"./JsbiSupport":30,"@babel/runtime/helpers/classCallCheck":56,"@babel/runtime/helpers/createClass":57,"@babel/runtime/helpers/interopRequireDefault":63}],23:[function(require,module,exports){
 "use strict";
+/*!
+ * Copyright 2012 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * A copy of the License is located at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * or in the "license" file accompanying this file. This file is distributed
+ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
 
 var _createClass2 = _interopRequireDefault(require("@babel/runtime/helpers/createClass"));
 
+var _assertThisInitialized2 = _interopRequireDefault(require("@babel/runtime/helpers/assertThisInitialized"));
+
 var _possibleConstructorReturn2 = _interopRequireDefault(require("@babel/runtime/helpers/possibleConstructorReturn"));
 
 var _getPrototypeOf2 = _interopRequireDefault(require("@babel/runtime/helpers/getPrototypeOf"));
 
-var _assertThisInitialized2 = _interopRequireDefault(require("@babel/runtime/helpers/assertThisInitialized"));
-
 var _inherits2 = _interopRequireDefault(require("@babel/runtime/helpers/inherits"));
 
 var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime/helpers/classCallCheck"));
+
+function _createForOfIteratorHelper(o) { if (typeof Symbol === "undefined" || o[Symbol.iterator] == null) { if (Array.isArray(o) || (o = _unsupportedIterableToArray(o))) { var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var it, normalCompletion = true, didErr = false, err; return { s: function s() { it = o[Symbol.iterator](); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(n); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
+function _createSuper(Derived) { return function () { var Super = (0, _getPrototypeOf2["default"])(Derived), result; if (_isNativeReflectConstruct()) { var NewTarget = (0, _getPrototypeOf2["default"])(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return (0, _possibleConstructorReturn2["default"])(this, result); }; }
+
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -7255,23 +7554,23 @@ var Context = function Context(myType) {
 
 exports.Context = Context;
 
-var TextWriter =
-/*#__PURE__*/
-function (_AbstractWriter_1$Abs) {
+var TextWriter = /*#__PURE__*/function (_AbstractWriter_1$Abs) {
   (0, _inherits2["default"])(TextWriter, _AbstractWriter_1$Abs);
+
+  var _super = _createSuper(TextWriter);
 
   function TextWriter(writeable) {
     var _this;
 
     (0, _classCallCheck2["default"])(this, TextWriter);
-    _this = (0, _possibleConstructorReturn2["default"])(this, (0, _getPrototypeOf2["default"])(TextWriter).call(this));
+    _this = _super.call(this);
     _this.writeable = writeable;
 
     _this._floatSerializer = function (value) {
       TextWriter._serializeFloat((0, _assertThisInitialized2["default"])(_this), value);
     };
 
-    _this.containerContext = [new Context(undefined)];
+    _this.containerContext = [new Context(null)];
     return _this;
   }
 
@@ -7285,6 +7584,8 @@ function (_AbstractWriter_1$Abs) {
     value: function writeBlob(value) {
       var _this2 = this;
 
+      util_1._assertDefined(value);
+
       this._serializeValue(IonTypes_1.IonTypes.BLOB, value, function (value) {
         _this2.writeable.writeBytes(IonUnicode_1.encodeUtf8('{{' + IonText_1.toBase64(value) + '}}'));
       });
@@ -7294,6 +7595,8 @@ function (_AbstractWriter_1$Abs) {
     value: function writeBoolean(value) {
       var _this3 = this;
 
+      util_1._assertDefined(value);
+
       this._serializeValue(IonTypes_1.IonTypes.BOOL, value, function (value) {
         _this3.writeUtf8(value ? "true" : "false");
       });
@@ -7302,6 +7605,8 @@ function (_AbstractWriter_1$Abs) {
     key: "writeClob",
     value: function writeClob(value) {
       var _this4 = this;
+
+      util_1._assertDefined(value);
 
       this._serializeValue(IonTypes_1.IonTypes.CLOB, value, function (value) {
         var hexStr;
@@ -7344,33 +7649,38 @@ function (_AbstractWriter_1$Abs) {
     value: function writeDecimal(value) {
       var _this5 = this;
 
+      util_1._assertDefined(value);
+
       this._serializeValue(IonTypes_1.IonTypes.DECIMAL, value, function (value) {
-        if (value === null) {
-          _this5.writeUtf8("null.decimal");
-        } else {
-          var s = '';
-          var coefficient = value.getCoefficient();
+        var s = '';
+        var coefficient = value.getCoefficient();
 
-          if (JsbiSupport_1.JsbiSupport.isZero(coefficient) && value.isNegative()) {
-            s += '-';
-          }
-
-          s += coefficient.toString() + 'd';
-          var exponent = value.getExponent();
-
-          if (exponent === 0 && util_1._sign(exponent) === -1) {
-            s += '-';
-          }
-
-          s += exponent;
-
-          _this5.writeUtf8(s);
+        if (JsbiSupport_1.JsbiSupport.isZero(coefficient) && value.isNegative()) {
+          s += '-';
         }
+
+        s += coefficient.toString() + 'd';
+        var exponent = value.getExponent();
+
+        if (exponent === 0 && util_1._sign(exponent) === -1) {
+          s += '-';
+        }
+
+        s += exponent;
+
+        _this5.writeUtf8(s);
       });
+    }
+  }, {
+    key: "_isInStruct",
+    value: function _isInStruct() {
+      return this.currentContainer.containerType === IonTypes_1.IonTypes.STRUCT;
     }
   }, {
     key: "writeFieldName",
     value: function writeFieldName(fieldName) {
+      util_1._assertDefined(fieldName);
+
       if (this.currentContainer.containerType !== IonTypes_1.IonTypes.STRUCT) {
         throw new Error("Cannot write field name outside of a struct");
       }
@@ -7390,11 +7700,15 @@ function (_AbstractWriter_1$Abs) {
   }, {
     key: "writeFloat32",
     value: function writeFloat32(value) {
+      util_1._assertDefined(value);
+
       this._writeFloat(value);
     }
   }, {
     key: "writeFloat64",
     value: function writeFloat64(value) {
+      util_1._assertDefined(value);
+
       this._writeFloat(value);
     }
   }, {
@@ -7402,26 +7716,41 @@ function (_AbstractWriter_1$Abs) {
     value: function writeInt(value) {
       var _this6 = this;
 
+      util_1._assertDefined(value);
+
       this._serializeValue(IonTypes_1.IonTypes.INT, value, function (value) {
         _this6.writeUtf8(value.toString(10));
       });
     }
   }, {
+    key: "_writeNull",
+    value: function _writeNull(type) {
+      if (type === IonTypes_1.IonTypes.NULL) {
+        this.writeUtf8("null");
+      } else {
+        this.writeUtf8("null." + type.name);
+      }
+    }
+  }, {
     key: "writeNull",
     value: function writeNull(type) {
-      if (type === null || type === undefined || type.binaryTypeId < 0 || type.binaryTypeId > 13) {
-        throw new Error("Cannot write null for type ".concat(type));
+      if (type === undefined || type === null) {
+        type = IonTypes_1.IonTypes.NULL;
       }
 
       this.handleSeparator();
       this.writeAnnotations();
-      this.writeUtf8("null." + type.name);
+
+      this._writeNull(type);
+
       if (this.currentContainer.containerType === IonTypes_1.IonTypes.STRUCT) this.currentContainer.state = State.STRUCT_FIELD;
     }
   }, {
     key: "writeString",
     value: function writeString(value) {
       var _this7 = this;
+
+      util_1._assertDefined(value);
 
       this._serializeValue(IonTypes_1.IonTypes.STRING, value, function (value) {
         _this7.writeable.writeBytes(IonUnicode_1.encodeUtf8('"' + IonText_1.escape(value, IonText_1.StringEscapes) + '"'));
@@ -7432,6 +7761,8 @@ function (_AbstractWriter_1$Abs) {
     value: function writeSymbol(value) {
       var _this8 = this;
 
+      util_1._assertDefined(value);
+
       this._serializeValue(IonTypes_1.IonTypes.SYMBOL, value, function (value) {
         _this8.writeSymbolToken(value);
       });
@@ -7441,6 +7772,8 @@ function (_AbstractWriter_1$Abs) {
     value: function writeTimestamp(value) {
       var _this9 = this;
 
+      util_1._assertDefined(value);
+
       this._serializeValue(IonTypes_1.IonTypes.TIMESTAMP, value, function (value) {
         _this9.writeUtf8(value.toString());
       });
@@ -7449,7 +7782,7 @@ function (_AbstractWriter_1$Abs) {
     key: "stepIn",
     value: function stepIn(type) {
       if (this.currentContainer.state === State.STRUCT_FIELD) {
-        throw new Error("Started writing a ".concat(this.currentContainer.containerType.name, " inside a struct without writing the field name first. Call writeFieldName(string) with the desired name before calling stepIn(").concat(this.currentContainer.containerType.name, ")."));
+        throw new Error("Started writing a ".concat(this.currentContainer.containerType.name, " inside a struct\"\n                + \" without writing the field name first. Call writeFieldName(string) with the desired name\"\n                + \" before calling stepIn(").concat(this.currentContainer.containerType.name, ")."));
       }
 
       switch (type) {
@@ -7518,7 +7851,7 @@ function (_AbstractWriter_1$Abs) {
     value: function _serializeValue(type, value, serialize) {
       if (this.currentContainer.state === State.STRUCT_FIELD) throw new Error("Expecting a struct field");
 
-      if (value === null || value === undefined) {
+      if (value === null) {
         this.writeNull(type);
         return;
       }
@@ -7576,29 +7909,19 @@ function (_AbstractWriter_1$Abs) {
   }, {
     key: "writeAnnotations",
     value: function writeAnnotations() {
-      var _iteratorNormalCompletion = true;
-      var _didIteratorError = false;
-      var _iteratorError = undefined;
+      var _iterator = _createForOfIteratorHelper(this._annotations),
+          _step;
 
       try {
-        for (var _iterator = this._annotations[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+        for (_iterator.s(); !(_step = _iterator.n()).done;) {
           var annotation = _step.value;
           this.writeSymbolToken(annotation);
           this.writeUtf8('::');
         }
       } catch (err) {
-        _didIteratorError = true;
-        _iteratorError = err;
+        _iterator.e(err);
       } finally {
-        try {
-          if (!_iteratorNormalCompletion && _iterator["return"] != null) {
-            _iterator["return"]();
-          }
-        } finally {
-          if (_didIteratorError) {
-            throw _iteratorError;
-          }
-        }
+        _iterator.f();
       }
 
       this._clearAnnotations();
@@ -7672,8 +7995,22 @@ function (_AbstractWriter_1$Abs) {
 
 exports.TextWriter = TextWriter;
 
-},{"./AbstractWriter":1,"./IonText":21,"./IonTypes":26,"./IonUnicode":27,"./JsbiSupport":30,"./util":32,"@babel/runtime/helpers/assertThisInitialized":34,"@babel/runtime/helpers/classCallCheck":35,"@babel/runtime/helpers/createClass":36,"@babel/runtime/helpers/getPrototypeOf":40,"@babel/runtime/helpers/inherits":41,"@babel/runtime/helpers/interopRequireDefault":42,"@babel/runtime/helpers/possibleConstructorReturn":45}],24:[function(require,module,exports){
+},{"./AbstractWriter":1,"./IonText":21,"./IonTypes":26,"./IonUnicode":27,"./JsbiSupport":30,"./util":51,"@babel/runtime/helpers/assertThisInitialized":55,"@babel/runtime/helpers/classCallCheck":56,"@babel/runtime/helpers/createClass":57,"@babel/runtime/helpers/getPrototypeOf":61,"@babel/runtime/helpers/inherits":62,"@babel/runtime/helpers/interopRequireDefault":63,"@babel/runtime/helpers/possibleConstructorReturn":68}],24:[function(require,module,exports){
 "use strict";
+/*!
+ * Copyright 2012 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * A copy of the License is located at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * or in the "license" file accompanying this file. This file is distributed
+ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
 
@@ -7707,10 +8044,13 @@ var TimestampPrecision;
   TimestampPrecision[TimestampPrecision["SECONDS"] = 5] = "SECONDS";
 })(TimestampPrecision = exports.TimestampPrecision || (exports.TimestampPrecision = {}));
 
-var Timestamp =
-/*#__PURE__*/
-function () {
-  function Timestamp(localOffset, year, month, day, hour, minutes, seconds) {
+var Timestamp = /*#__PURE__*/function () {
+  function Timestamp(localOffset, year) {
+    var month = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
+    var day = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
+    var hour = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : null;
+    var minutes = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : null;
+    var seconds = arguments.length > 6 && arguments[6] !== undefined ? arguments[6] : null;
     (0, _classCallCheck2["default"])(this, Timestamp);
     this._localOffset = localOffset;
     this._year = year;
@@ -7732,7 +8072,9 @@ function () {
 
       this._secondsDecimal = new IonDecimal_1.Decimal(seconds, 0);
     } else {
-      this._secondsDecimal = seconds;
+      if (seconds !== null) {
+        this._secondsDecimal = seconds;
+      }
     }
 
     if (this._secondsDecimal === null || this._secondsDecimal === undefined) {
@@ -7780,7 +8122,7 @@ function () {
   }, {
     key: "getDate",
     value: function getDate() {
-      var ms = null;
+      var ms = 0;
 
       if (this._precision === TimestampPrecision.SECONDS) {
         ms = Math.round((this._secondsDecimal.numberValue() - this.getSecondsInt()) * 1000);
@@ -7885,6 +8227,11 @@ function () {
       }
 
       return strVal;
+    }
+  }, {
+    key: "toJSON",
+    value: function toJSON() {
+      return this.getDate().toISOString();
     }
   }, {
     key: "_checkRequiredField",
@@ -8065,16 +8412,15 @@ var _States;
   _States[_States["OFFSET_UNKNOWN"] = 11] = "OFFSET_UNKNOWN";
 })(_States || (_States = {}));
 
-var _TimeParserState = function _TimeParserState(f, len, t) {
+var _TimeParserState = function _TimeParserState(f, len) {
+  var t = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
   (0, _classCallCheck2["default"])(this, _TimeParserState);
   this.f = f;
   this.len = len;
   this.t = t;
 };
 
-var _TimestampParser =
-/*#__PURE__*/
-function () {
+var _TimestampParser = /*#__PURE__*/function () {
   function _TimestampParser() {
     (0, _classCallCheck2["default"])(this, _TimestampParser);
   }
@@ -8095,13 +8441,13 @@ function () {
       }
 
       var offsetSign;
-      var offset;
+      var offset = null;
       var year = 0;
-      var month;
-      var day;
-      var hour;
-      var minute;
-      var secondsInt;
+      var month = null;
+      var day = null;
+      var hour = null;
+      var minute = null;
+      var secondsInt = null;
       var fractionStr = '';
       var pos = 0;
       var state = _TimestampParser._timeParserStates[_States.YEAR];
@@ -8109,7 +8455,7 @@ function () {
       var v;
 
       while (pos < limit) {
-        if (state.len === undefined) {
+        if (state.len === null) {
           var digits = _TimestampParser._readUnknownDigits(str, pos);
 
           if (digits.length === 0) throw new Error("No digits found at pos: " + pos);
@@ -8117,9 +8463,11 @@ function () {
           pos += digits.length;
         } else if (state.len > 0) {
           v = _TimestampParser._readDigits(str, pos, state.len);
-          if (v < 0) throw new Error("Non digit value found at pos " + pos);
+          if (v < 0) throw new Error("Non-digit value found at pos " + pos);
           pos = pos + state.len;
         }
+
+        v = v;
 
         switch (state.f) {
           case _States.YEAR:
@@ -8182,7 +8530,7 @@ function () {
           break;
         }
 
-        if (state.t !== undefined) {
+        if (state.t !== null) {
           var c = String.fromCharCode(str.charCodeAt(pos));
           state = _TimestampParser._timeParserStates[state.t[c]];
           if (state === undefined) throw new Error("State was not set pos:" + pos);
@@ -8196,8 +8544,8 @@ function () {
         pos++;
       }
 
-      if (offset === undefined) {
-        if (minute !== undefined) {
+      if (offset === null) {
+        if (minute !== null) {
           throw new Error('invalid timestamp, missing local offset: "' + str + '"');
         }
 
@@ -8206,7 +8554,7 @@ function () {
         offset = offsetSign * offset;
       }
 
-      var seconds;
+      var seconds = undefined;
 
       if (secondsInt !== undefined && secondsInt !== null || fractionStr) {
         seconds = IonDecimal_1.Decimal.parse(secondsInt + '.' + (fractionStr ? fractionStr : ''));
@@ -8268,7 +8616,7 @@ _TimestampParser._timeParserStates = (_TimestampParser$_tim = {}, (0, _definePro
   "+": _States.OFFSET_POSITIVE,
   "-": _States.OFFSET_NEGATIVE,
   "Z": _States.OFFSET_ZULU
-})), (0, _defineProperty2["default"])(_TimestampParser$_tim, _States.FRACTIONAL_SECONDS, new _TimeParserState(_States.FRACTIONAL_SECONDS, undefined, {
+})), (0, _defineProperty2["default"])(_TimestampParser$_tim, _States.FRACTIONAL_SECONDS, new _TimeParserState(_States.FRACTIONAL_SECONDS, null, {
   "+": _States.OFFSET_POSITIVE,
   "-": _States.OFFSET_NEGATIVE,
   "Z": _States.OFFSET_ZULU
@@ -8276,10 +8624,24 @@ _TimestampParser._timeParserStates = (_TimestampParser$_tim = {}, (0, _definePro
   ":": _States.OFFSET_MINUTES
 })), (0, _defineProperty2["default"])(_TimestampParser$_tim, _States.OFFSET_NEGATIVE, new _TimeParserState(_States.OFFSET_NEGATIVE, 2, {
   ":": _States.OFFSET_MINUTES
-})), (0, _defineProperty2["default"])(_TimestampParser$_tim, _States.OFFSET_MINUTES, new _TimeParserState(_States.OFFSET_MINUTES, 2, undefined)), (0, _defineProperty2["default"])(_TimestampParser$_tim, _States.OFFSET_ZULU, new _TimeParserState(_States.OFFSET_ZULU, 0, undefined)), (0, _defineProperty2["default"])(_TimestampParser$_tim, _States.OFFSET_UNKNOWN, new _TimeParserState(_States.OFFSET_UNKNOWN, 0, undefined)), _TimestampParser$_tim);
+})), (0, _defineProperty2["default"])(_TimestampParser$_tim, _States.OFFSET_MINUTES, new _TimeParserState(_States.OFFSET_MINUTES, 2)), (0, _defineProperty2["default"])(_TimestampParser$_tim, _States.OFFSET_ZULU, new _TimeParserState(_States.OFFSET_ZULU, 0)), (0, _defineProperty2["default"])(_TimestampParser$_tim, _States.OFFSET_UNKNOWN, new _TimeParserState(_States.OFFSET_UNKNOWN, 0)), _TimestampParser$_tim);
 
-},{"./IonDecimal":9,"./IonText":21,"./util":32,"@babel/runtime/helpers/classCallCheck":35,"@babel/runtime/helpers/createClass":36,"@babel/runtime/helpers/defineProperty":37,"@babel/runtime/helpers/interopRequireDefault":42,"@babel/runtime/helpers/slicedToArray":47}],25:[function(require,module,exports){
+},{"./IonDecimal":9,"./IonText":21,"./util":51,"@babel/runtime/helpers/classCallCheck":56,"@babel/runtime/helpers/createClass":57,"@babel/runtime/helpers/defineProperty":58,"@babel/runtime/helpers/interopRequireDefault":63,"@babel/runtime/helpers/slicedToArray":70}],25:[function(require,module,exports){
 "use strict";
+/*!
+ * Copyright 2012 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * A copy of the License is located at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * or in the "license" file accompanying this file. This file is distributed
+ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
 
@@ -8301,8 +8663,22 @@ var IonType = function IonType(binaryTypeId, name, isScalar, isLob, isNumeric, i
 
 exports.IonType = IonType;
 
-},{"@babel/runtime/helpers/classCallCheck":35,"@babel/runtime/helpers/interopRequireDefault":42}],26:[function(require,module,exports){
+},{"@babel/runtime/helpers/classCallCheck":56,"@babel/runtime/helpers/interopRequireDefault":63}],26:[function(require,module,exports){
 "use strict";
+/*!
+ * Copyright 2012 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * A copy of the License is located at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * or in the "license" file accompanying this file. This file is distributed
+ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -8328,6 +8704,20 @@ exports.IonTypes = {
 
 },{"./IonType":25}],27:[function(require,module,exports){
 "use strict";
+/*!
+ * Copyright 2012 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * A copy of the License is located at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * or in the "license" file accompanying this file. This file is distributed
+ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -8404,6 +8794,20 @@ exports.decodeUtf8 = decodeUtf8;
 
 },{}],28:[function(require,module,exports){
 "use strict";
+/*!
+ * Copyright 2012 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * A copy of the License is located at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * or in the "license" file accompanying this file. This file is distributed
+ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
 
@@ -8415,9 +8819,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var Writeable =
-/*#__PURE__*/
-function () {
+var Writeable = /*#__PURE__*/function () {
   function Writeable(bufferSize) {
     (0, _classCallCheck2["default"])(this, Writeable);
     this.bufferSize = bufferSize ? bufferSize : 4096;
@@ -8495,8 +8897,22 @@ function () {
 
 exports.Writeable = Writeable;
 
-},{"@babel/runtime/helpers/classCallCheck":35,"@babel/runtime/helpers/createClass":36,"@babel/runtime/helpers/interopRequireDefault":42}],29:[function(require,module,exports){
+},{"@babel/runtime/helpers/classCallCheck":56,"@babel/runtime/helpers/createClass":57,"@babel/runtime/helpers/interopRequireDefault":63}],29:[function(require,module,exports){
 "use strict";
+/*!
+ * Copyright 2012 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * A copy of the License is located at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * or in the "license" file accompanying this file. This file is distributed
+ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
 
@@ -8518,9 +8934,7 @@ var jsbi_1 = __importDefault(require("jsbi"));
 
 var JsbiSupport_1 = require("./JsbiSupport");
 
-var JsbiSerde =
-/*#__PURE__*/
-function () {
+var JsbiSerde = /*#__PURE__*/function () {
   function JsbiSerde() {
     (0, _classCallCheck2["default"])(this, JsbiSerde);
   }
@@ -8623,8 +9037,22 @@ JsbiSerde.BITS_PER_BYTE = jsbi_1["default"].BigInt(8);
 JsbiSerde.BYTE_MAX_VALUE = jsbi_1["default"].BigInt(0xFF);
 JsbiSerde.SIZE_THRESHOLDS = JsbiSerde.calculateSizeThresholds();
 
-},{"./JsbiSupport":30,"@babel/runtime/helpers/classCallCheck":35,"@babel/runtime/helpers/createClass":36,"@babel/runtime/helpers/interopRequireDefault":42,"jsbi":50}],30:[function(require,module,exports){
+},{"./JsbiSupport":30,"@babel/runtime/helpers/classCallCheck":56,"@babel/runtime/helpers/createClass":57,"@babel/runtime/helpers/interopRequireDefault":63,"jsbi":75}],30:[function(require,module,exports){
 "use strict";
+/*!
+ * Copyright 2012 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * A copy of the License is located at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * or in the "license" file accompanying this file. This file is distributed
+ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
 
@@ -8644,9 +9072,7 @@ Object.defineProperty(exports, "__esModule", {
 
 var jsbi_1 = __importDefault(require("jsbi"));
 
-var JsbiSupport =
-/*#__PURE__*/
-function () {
+var JsbiSupport = /*#__PURE__*/function () {
   function JsbiSupport() {
     (0, _classCallCheck2["default"])(this, JsbiSupport);
   }
@@ -8709,8 +9135,22 @@ JsbiSupport.TWO = jsbi_1["default"].BigInt(2);
 JsbiSupport.NUMBER_MAX_SAFE_INTEGER = jsbi_1["default"].BigInt(Number.MAX_SAFE_INTEGER);
 JsbiSupport.NUMBER_MIN_SAFE_INTEGER = jsbi_1["default"].BigInt(Number.MIN_SAFE_INTEGER);
 
-},{"@babel/runtime/helpers/classCallCheck":35,"@babel/runtime/helpers/createClass":36,"@babel/runtime/helpers/interopRequireDefault":42,"jsbi":50}],31:[function(require,module,exports){
+},{"@babel/runtime/helpers/classCallCheck":56,"@babel/runtime/helpers/createClass":57,"@babel/runtime/helpers/interopRequireDefault":63,"jsbi":75}],31:[function(require,module,exports){
 "use strict";
+/*!
+ * Copyright 2012 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * A copy of the License is located at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * or in the "license" file accompanying this file. This file is distributed
+ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
 
@@ -8732,9 +9172,7 @@ var jsbi_1 = __importDefault(require("jsbi"));
 
 var JsbiSupport_1 = require("./JsbiSupport");
 
-var SignAndMagnitudeInt =
-/*#__PURE__*/
-function () {
+var SignAndMagnitudeInt = /*#__PURE__*/function () {
   function SignAndMagnitudeInt(_magnitude) {
     var _isNegative = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : JsbiSupport_1.JsbiSupport.isNegative(_magnitude);
 
@@ -8772,8 +9210,2091 @@ function () {
 
 exports["default"] = SignAndMagnitudeInt;
 
-},{"./JsbiSupport":30,"@babel/runtime/helpers/classCallCheck":35,"@babel/runtime/helpers/createClass":36,"@babel/runtime/helpers/interopRequireDefault":42,"jsbi":50}],32:[function(require,module,exports){
+},{"./JsbiSupport":30,"@babel/runtime/helpers/classCallCheck":56,"@babel/runtime/helpers/createClass":57,"@babel/runtime/helpers/interopRequireDefault":63,"jsbi":75}],32:[function(require,module,exports){
 "use strict";
+
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
+
+var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime/helpers/classCallCheck"));
+
+var _createClass2 = _interopRequireDefault(require("@babel/runtime/helpers/createClass"));
+
+var _possibleConstructorReturn2 = _interopRequireDefault(require("@babel/runtime/helpers/possibleConstructorReturn"));
+
+var _getPrototypeOf2 = _interopRequireDefault(require("@babel/runtime/helpers/getPrototypeOf"));
+
+var _inherits2 = _interopRequireDefault(require("@babel/runtime/helpers/inherits"));
+
+function _createSuper(Derived) { return function () { var Super = (0, _getPrototypeOf2["default"])(Derived), result; if (_isNativeReflectConstruct()) { var NewTarget = (0, _getPrototypeOf2["default"])(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return (0, _possibleConstructorReturn2["default"])(this, result); }; }
+
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var Ion_1 = require("../Ion");
+
+var Lob_1 = require("./Lob");
+
+var Blob = /*#__PURE__*/function (_Lob_1$Lob) {
+  (0, _inherits2["default"])(Blob, _Lob_1$Lob);
+
+  var _super = _createSuper(Blob);
+
+  function Blob(data) {
+    var annotations = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
+    (0, _classCallCheck2["default"])(this, Blob);
+    return _super.call(this, data, annotations);
+  }
+
+  (0, _createClass2["default"])(Blob, [{
+    key: "toJSON",
+    value: function toJSON() {
+      return Ion_1.toBase64(this);
+    }
+  }, {
+    key: "writeTo",
+    value: function writeTo(writer) {
+      writer.setAnnotations(this.getAnnotations());
+      writer.writeBlob(this);
+    }
+  }]);
+  return Blob;
+}(Lob_1.Lob(Ion_1.IonTypes.BLOB));
+
+exports.Blob = Blob;
+
+},{"../Ion":3,"./Lob":41,"@babel/runtime/helpers/classCallCheck":56,"@babel/runtime/helpers/createClass":57,"@babel/runtime/helpers/getPrototypeOf":61,"@babel/runtime/helpers/inherits":62,"@babel/runtime/helpers/interopRequireDefault":63,"@babel/runtime/helpers/possibleConstructorReturn":68}],33:[function(require,module,exports){
+(function (global){
+"use strict";
+
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
+
+var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime/helpers/classCallCheck"));
+
+var _createClass2 = _interopRequireDefault(require("@babel/runtime/helpers/createClass"));
+
+var _possibleConstructorReturn2 = _interopRequireDefault(require("@babel/runtime/helpers/possibleConstructorReturn"));
+
+var _getPrototypeOf2 = _interopRequireDefault(require("@babel/runtime/helpers/getPrototypeOf"));
+
+var _inherits2 = _interopRequireDefault(require("@babel/runtime/helpers/inherits"));
+
+function _createSuper(Derived) { return function () { var Super = (0, _getPrototypeOf2["default"])(Derived), result; if (_isNativeReflectConstruct()) { var NewTarget = (0, _getPrototypeOf2["default"])(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return (0, _possibleConstructorReturn2["default"])(this, result); }; }
+
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var Ion_1 = require("../Ion");
+
+var Value_1 = require("./Value");
+
+var FromJsConstructor_1 = require("./FromJsConstructor");
+
+var _fromJsConstructor = new FromJsConstructor_1.FromJsConstructorBuilder().withPrimitives(FromJsConstructor_1.Primitives.Boolean).withClassesToUnbox(global.Boolean).build();
+
+var Boolean = /*#__PURE__*/function (_Value_1$Value) {
+  (0, _inherits2["default"])(Boolean, _Value_1$Value);
+
+  var _super = _createSuper(Boolean);
+
+  function Boolean(value) {
+    var _this;
+
+    var annotations = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
+    (0, _classCallCheck2["default"])(this, Boolean);
+    _this = _super.call(this, value);
+
+    _this._setAnnotations(annotations);
+
+    return _this;
+  }
+
+  (0, _createClass2["default"])(Boolean, [{
+    key: "booleanValue",
+    value: function booleanValue() {
+      return this.valueOf();
+    }
+  }, {
+    key: "writeTo",
+    value: function writeTo(writer) {
+      writer.setAnnotations(this.getAnnotations());
+      writer.writeBoolean(this.booleanValue());
+    }
+  }]);
+  return Boolean;
+}(Value_1.Value(global.Boolean, Ion_1.IonTypes.BOOL, _fromJsConstructor));
+
+exports.Boolean = Boolean;
+
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{"../Ion":3,"./FromJsConstructor":37,"./Value":49,"@babel/runtime/helpers/classCallCheck":56,"@babel/runtime/helpers/createClass":57,"@babel/runtime/helpers/getPrototypeOf":61,"@babel/runtime/helpers/inherits":62,"@babel/runtime/helpers/interopRequireDefault":63,"@babel/runtime/helpers/possibleConstructorReturn":68}],34:[function(require,module,exports){
+"use strict";
+
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
+
+var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime/helpers/classCallCheck"));
+
+var _createClass2 = _interopRequireDefault(require("@babel/runtime/helpers/createClass"));
+
+var _possibleConstructorReturn2 = _interopRequireDefault(require("@babel/runtime/helpers/possibleConstructorReturn"));
+
+var _getPrototypeOf2 = _interopRequireDefault(require("@babel/runtime/helpers/getPrototypeOf"));
+
+var _inherits2 = _interopRequireDefault(require("@babel/runtime/helpers/inherits"));
+
+function _createForOfIteratorHelper(o) { if (typeof Symbol === "undefined" || o[Symbol.iterator] == null) { if (Array.isArray(o) || (o = _unsupportedIterableToArray(o))) { var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var it, normalCompletion = true, didErr = false, err; return { s: function s() { it = o[Symbol.iterator](); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(n); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
+function _createSuper(Derived) { return function () { var Super = (0, _getPrototypeOf2["default"])(Derived), result; if (_isNativeReflectConstruct()) { var NewTarget = (0, _getPrototypeOf2["default"])(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return (0, _possibleConstructorReturn2["default"])(this, result); }; }
+
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var Ion_1 = require("../Ion");
+
+var Lob_1 = require("./Lob");
+
+var Clob = /*#__PURE__*/function (_Lob_1$Lob) {
+  (0, _inherits2["default"])(Clob, _Lob_1$Lob);
+
+  var _super = _createSuper(Clob);
+
+  function Clob(bytes) {
+    var annotations = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
+    (0, _classCallCheck2["default"])(this, Clob);
+    return _super.call(this, bytes, annotations);
+  }
+
+  (0, _createClass2["default"])(Clob, [{
+    key: "writeTo",
+    value: function writeTo(writer) {
+      writer.setAnnotations(this.getAnnotations());
+      writer.writeClob(this);
+    }
+  }, {
+    key: "toJSON",
+    value: function toJSON() {
+      var encodedText = '';
+
+      var _iterator = _createForOfIteratorHelper(this),
+          _step;
+
+      try {
+        for (_iterator.s(); !(_step = _iterator.n()).done;) {
+          var _byte = _step.value;
+
+          if (_byte >= 32 && _byte <= 126) {
+            encodedText += String.fromCharCode(_byte);
+            continue;
+          }
+
+          var hex = _byte.toString(16);
+
+          if (hex.length == 1) {
+            encodedText += "\\u000" + hex;
+          } else {
+            encodedText += "\\u00" + hex;
+          }
+        }
+      } catch (err) {
+        _iterator.e(err);
+      } finally {
+        _iterator.f();
+      }
+
+      return encodedText;
+    }
+  }]);
+  return Clob;
+}(Lob_1.Lob(Ion_1.IonTypes.CLOB));
+
+exports.Clob = Clob;
+
+},{"../Ion":3,"./Lob":41,"@babel/runtime/helpers/classCallCheck":56,"@babel/runtime/helpers/createClass":57,"@babel/runtime/helpers/getPrototypeOf":61,"@babel/runtime/helpers/inherits":62,"@babel/runtime/helpers/interopRequireDefault":63,"@babel/runtime/helpers/possibleConstructorReturn":68}],35:[function(require,module,exports){
+"use strict";
+
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
+
+var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime/helpers/classCallCheck"));
+
+var _createClass2 = _interopRequireDefault(require("@babel/runtime/helpers/createClass"));
+
+var _possibleConstructorReturn2 = _interopRequireDefault(require("@babel/runtime/helpers/possibleConstructorReturn"));
+
+var _getPrototypeOf2 = _interopRequireDefault(require("@babel/runtime/helpers/getPrototypeOf"));
+
+var _inherits2 = _interopRequireDefault(require("@babel/runtime/helpers/inherits"));
+
+function _createSuper(Derived) { return function () { var Super = (0, _getPrototypeOf2["default"])(Derived), result; if (_isNativeReflectConstruct()) { var NewTarget = (0, _getPrototypeOf2["default"])(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return (0, _possibleConstructorReturn2["default"])(this, result); }; }
+
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
+var __importStar = void 0 && (void 0).__importStar || function (mod) {
+  if (mod && mod.__esModule) return mod;
+  var result = {};
+  if (mod != null) for (var k in mod) {
+    if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
+  }
+  result["default"] = mod;
+  return result;
+};
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var Value_1 = require("./Value");
+
+var ion = __importStar(require("../Ion"));
+
+var Ion_1 = require("../Ion");
+
+var FromJsConstructor_1 = require("./FromJsConstructor");
+
+var _fromJsConstructor = new FromJsConstructor_1.FromJsConstructorBuilder().withClasses(ion.Decimal).build();
+
+var Decimal = /*#__PURE__*/function (_Value_1$Value) {
+  (0, _inherits2["default"])(Decimal, _Value_1$Value);
+
+  var _super = _createSuper(Decimal);
+
+  function Decimal(value) {
+    var _this;
+
+    var annotations = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
+    (0, _classCallCheck2["default"])(this, Decimal);
+    _this = _super.call.apply(_super, [this].concat([value.getCoefficient(), value.getExponent(), value.isNegative()]));
+    _this._decimalValue = value;
+    _this._numberValue = value.numberValue();
+
+    _this._setAnnotations(annotations);
+
+    return _this;
+  }
+
+  (0, _createClass2["default"])(Decimal, [{
+    key: "numberValue",
+    value: function numberValue() {
+      return this._numberValue;
+    }
+  }, {
+    key: "decimalValue",
+    value: function decimalValue() {
+      return this._decimalValue;
+    }
+  }, {
+    key: "toString",
+    value: function toString() {
+      return this._decimalValue.toString();
+    }
+  }, {
+    key: "valueOf",
+    value: function valueOf() {
+      return this._numberValue;
+    }
+  }, {
+    key: "writeTo",
+    value: function writeTo(writer) {
+      writer.setAnnotations(this.getAnnotations());
+      writer.writeDecimal(this.decimalValue());
+    }
+  }]);
+  return Decimal;
+}(Value_1.Value(Number, Ion_1.IonTypes.DECIMAL, _fromJsConstructor));
+
+exports.Decimal = Decimal;
+
+},{"../Ion":3,"./FromJsConstructor":37,"./Value":49,"@babel/runtime/helpers/classCallCheck":56,"@babel/runtime/helpers/createClass":57,"@babel/runtime/helpers/getPrototypeOf":61,"@babel/runtime/helpers/inherits":62,"@babel/runtime/helpers/interopRequireDefault":63,"@babel/runtime/helpers/possibleConstructorReturn":68}],36:[function(require,module,exports){
+"use strict";
+
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
+
+var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime/helpers/classCallCheck"));
+
+var _createClass2 = _interopRequireDefault(require("@babel/runtime/helpers/createClass"));
+
+var _possibleConstructorReturn2 = _interopRequireDefault(require("@babel/runtime/helpers/possibleConstructorReturn"));
+
+var _getPrototypeOf2 = _interopRequireDefault(require("@babel/runtime/helpers/getPrototypeOf"));
+
+var _inherits2 = _interopRequireDefault(require("@babel/runtime/helpers/inherits"));
+
+function _createSuper(Derived) { return function () { var Super = (0, _getPrototypeOf2["default"])(Derived), result; if (_isNativeReflectConstruct()) { var NewTarget = (0, _getPrototypeOf2["default"])(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return (0, _possibleConstructorReturn2["default"])(this, result); }; }
+
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var Ion_1 = require("../Ion");
+
+var Value_1 = require("./Value");
+
+var FromJsConstructor_1 = require("./FromJsConstructor");
+
+var _fromJsConstructor = new FromJsConstructor_1.FromJsConstructorBuilder().withPrimitives(FromJsConstructor_1.Primitives.Number).withClassesToUnbox(Number).build();
+
+var Float = /*#__PURE__*/function (_Value_1$Value) {
+  (0, _inherits2["default"])(Float, _Value_1$Value);
+
+  var _super = _createSuper(Float);
+
+  function Float(value) {
+    var _this;
+
+    var annotations = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
+    (0, _classCallCheck2["default"])(this, Float);
+    _this = _super.call(this, value);
+
+    _this._setAnnotations(annotations);
+
+    return _this;
+  }
+
+  (0, _createClass2["default"])(Float, [{
+    key: "numberValue",
+    value: function numberValue() {
+      return +this.valueOf();
+    }
+  }, {
+    key: "writeTo",
+    value: function writeTo(writer) {
+      writer.setAnnotations(this.getAnnotations());
+      writer.writeFloat64(this.numberValue());
+    }
+  }]);
+  return Float;
+}(Value_1.Value(Number, Ion_1.IonTypes.FLOAT, _fromJsConstructor));
+
+exports.Float = Float;
+
+},{"../Ion":3,"./FromJsConstructor":37,"./Value":49,"@babel/runtime/helpers/classCallCheck":56,"@babel/runtime/helpers/createClass":57,"@babel/runtime/helpers/getPrototypeOf":61,"@babel/runtime/helpers/inherits":62,"@babel/runtime/helpers/interopRequireDefault":63,"@babel/runtime/helpers/possibleConstructorReturn":68}],37:[function(require,module,exports){
+"use strict";
+
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
+
+var _typeof2 = _interopRequireDefault(require("@babel/runtime/helpers/typeof"));
+
+var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime/helpers/classCallCheck"));
+
+var _createClass2 = _interopRequireDefault(require("@babel/runtime/helpers/createClass"));
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var Ion_1 = require("../Ion");
+
+var util_1 = require("../util");
+
+function _newSet(values) {
+  if (util_1._hasValue(values)) {
+    return new Set(values);
+  }
+
+  return new Set();
+}
+
+var FromJsConstructorBuilder = /*#__PURE__*/function () {
+  function FromJsConstructorBuilder() {
+    (0, _classCallCheck2["default"])(this, FromJsConstructorBuilder);
+    this._primitives = _newSet();
+    this._classesToUnbox = _newSet();
+    this._classes = _newSet();
+  }
+
+  (0, _createClass2["default"])(FromJsConstructorBuilder, [{
+    key: "withPrimitives",
+    value: function withPrimitives() {
+      for (var _len = arguments.length, primitives = new Array(_len), _key = 0; _key < _len; _key++) {
+        primitives[_key] = arguments[_key];
+      }
+
+      this._primitives = _newSet(primitives);
+      return this;
+    }
+  }, {
+    key: "withClasses",
+    value: function withClasses() {
+      for (var _len2 = arguments.length, classes = new Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+        classes[_key2] = arguments[_key2];
+      }
+
+      this._classes = _newSet(classes);
+      return this;
+    }
+  }, {
+    key: "withClassesToUnbox",
+    value: function withClassesToUnbox() {
+      for (var _len3 = arguments.length, classes = new Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
+        classes[_key3] = arguments[_key3];
+      }
+
+      this._classesToUnbox = _newSet(classes);
+      return this;
+    }
+  }, {
+    key: "build",
+    value: function build() {
+      return new FromJsConstructor(this._primitives, this._classesToUnbox, this._classes);
+    }
+  }]);
+  return FromJsConstructorBuilder;
+}();
+
+exports.FromJsConstructorBuilder = FromJsConstructorBuilder;
+
+var FromJsConstructor = /*#__PURE__*/function () {
+  function FromJsConstructor(_primitives, _classesToUnbox, _classes) {
+    (0, _classCallCheck2["default"])(this, FromJsConstructor);
+    this._primitives = _primitives;
+    this._classesToUnbox = _classesToUnbox;
+    this._classes = _classes;
+  }
+
+  (0, _createClass2["default"])(FromJsConstructor, [{
+    key: "construct",
+    value: function construct(constructor, jsValue) {
+      var annotations = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : [];
+
+      if (jsValue === null) {
+        return new Ion_1.dom.Null(Ion_1.IonTypes.NULL, annotations);
+      }
+
+      var jsValueType = (0, _typeof2["default"])(jsValue);
+
+      if (jsValueType === "object") {
+        if (this._classesToUnbox.has(jsValue.constructor)) {
+          return new constructor(jsValue.valueOf(), annotations);
+        }
+
+        if (this._classes.has(jsValue.constructor)) {
+          return new constructor(jsValue, annotations);
+        }
+
+        throw new Error("Unable to construct a(n) ".concat(constructor.name, " from a ").concat(jsValue.constructor.name, "."));
+      }
+
+      if (this._primitives.has(jsValueType)) {
+        return new constructor(jsValue, annotations);
+      }
+
+      throw new Error("Unable to construct a(n) ".concat(constructor.name, " from a ").concat(jsValueType, "."));
+    }
+  }]);
+  return FromJsConstructor;
+}();
+
+exports.FromJsConstructor = FromJsConstructor;
+FromJsConstructor.NONE = new FromJsConstructorBuilder().build();
+exports.Primitives = {
+  Boolean: "boolean",
+  Number: "number",
+  String: "string"
+};
+
+},{"../Ion":3,"../util":51,"@babel/runtime/helpers/classCallCheck":56,"@babel/runtime/helpers/createClass":57,"@babel/runtime/helpers/interopRequireDefault":63,"@babel/runtime/helpers/typeof":73}],38:[function(require,module,exports){
+"use strict";
+
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
+
+var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime/helpers/classCallCheck"));
+
+var _createClass2 = _interopRequireDefault(require("@babel/runtime/helpers/createClass"));
+
+var _possibleConstructorReturn2 = _interopRequireDefault(require("@babel/runtime/helpers/possibleConstructorReturn"));
+
+var _getPrototypeOf2 = _interopRequireDefault(require("@babel/runtime/helpers/getPrototypeOf"));
+
+var _inherits2 = _interopRequireDefault(require("@babel/runtime/helpers/inherits"));
+
+function _createSuper(Derived) { return function () { var Super = (0, _getPrototypeOf2["default"])(Derived), result; if (_isNativeReflectConstruct()) { var NewTarget = (0, _getPrototypeOf2["default"])(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return (0, _possibleConstructorReturn2["default"])(this, result); }; }
+
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
+var __importDefault = void 0 && (void 0).__importDefault || function (mod) {
+  return mod && mod.__esModule ? mod : {
+    "default": mod
+  };
+};
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var jsbi_1 = __importDefault(require("jsbi"));
+
+var Ion_1 = require("../Ion");
+
+var Value_1 = require("./Value");
+
+var FromJsConstructor_1 = require("./FromJsConstructor");
+
+var _jsbiConstructor = jsbi_1["default"];
+
+var _fromJsConstructor = new FromJsConstructor_1.FromJsConstructorBuilder().withPrimitives(FromJsConstructor_1.Primitives.Number).withClassesToUnbox(Number).withClasses(_jsbiConstructor).build();
+
+var Integer = /*#__PURE__*/function (_Value_1$Value) {
+  (0, _inherits2["default"])(Integer, _Value_1$Value);
+
+  var _super = _createSuper(Integer);
+
+  function Integer(value) {
+    var _this;
+
+    var annotations = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
+    (0, _classCallCheck2["default"])(this, Integer);
+
+    if (typeof value === "number") {
+      _this = _super.call(this, value);
+      _this._numberValue = value;
+      _this._bigIntValue = null;
+    } else {
+      var numberValue = jsbi_1["default"].toNumber(value);
+      _this = _super.call(this, numberValue);
+      _this._bigIntValue = value;
+      _this._numberValue = numberValue;
+    }
+
+    _this._setAnnotations(annotations);
+
+    return (0, _possibleConstructorReturn2["default"])(_this);
+  }
+
+  (0, _createClass2["default"])(Integer, [{
+    key: "bigIntValue",
+    value: function bigIntValue() {
+      if (this._bigIntValue === null) {
+        this._bigIntValue = jsbi_1["default"].BigInt(this.numberValue());
+      }
+
+      return this._bigIntValue;
+    }
+  }, {
+    key: "numberValue",
+    value: function numberValue() {
+      return this._numberValue;
+    }
+  }, {
+    key: "toString",
+    value: function toString() {
+      if (this._bigIntValue === null) {
+        return this._numberValue.toString();
+      }
+
+      return this._bigIntValue.toString();
+    }
+  }, {
+    key: "valueOf",
+    value: function valueOf() {
+      return this.numberValue();
+    }
+  }, {
+    key: "writeTo",
+    value: function writeTo(writer) {
+      writer.setAnnotations(this.getAnnotations());
+
+      if (this._bigIntValue === null) {
+        writer.writeInt(this.numberValue());
+      } else {
+        writer.writeInt(this._bigIntValue);
+      }
+    }
+  }]);
+  return Integer;
+}(Value_1.Value(Number, Ion_1.IonTypes.INT, _fromJsConstructor));
+
+exports.Integer = Integer;
+
+},{"../Ion":3,"./FromJsConstructor":37,"./Value":49,"@babel/runtime/helpers/classCallCheck":56,"@babel/runtime/helpers/createClass":57,"@babel/runtime/helpers/getPrototypeOf":61,"@babel/runtime/helpers/inherits":62,"@babel/runtime/helpers/interopRequireDefault":63,"@babel/runtime/helpers/possibleConstructorReturn":68,"jsbi":75}],39:[function(require,module,exports){
+"use strict";
+
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
+
+var _typeof2 = _interopRequireDefault(require("@babel/runtime/helpers/typeof"));
+
+var __importDefault = void 0 && (void 0).__importDefault || function (mod) {
+  return mod && mod.__esModule ? mod : {
+    "default": mod
+  };
+};
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var IonTypes_1 = require("../IonTypes");
+
+var Ion_1 = require("../Ion");
+
+var jsbi_1 = __importDefault(require("jsbi"));
+
+var util_1 = require("../util");
+
+var _domTypesByIonType = null;
+
+function _getDomTypesByIonTypeMap() {
+  if (_domTypesByIonType === null) {
+    _domTypesByIonType = new Map([[IonTypes_1.IonTypes.NULL, Ion_1.dom.Null], [IonTypes_1.IonTypes.BOOL, Ion_1.dom.Boolean], [IonTypes_1.IonTypes.INT, Ion_1.dom.Integer], [IonTypes_1.IonTypes.FLOAT, Ion_1.dom.Float], [IonTypes_1.IonTypes.DECIMAL, Ion_1.dom.Decimal], [IonTypes_1.IonTypes.TIMESTAMP, Ion_1.dom.Timestamp], [IonTypes_1.IonTypes.STRING, Ion_1.dom.String], [IonTypes_1.IonTypes.BLOB, Ion_1.dom.Blob], [IonTypes_1.IonTypes.LIST, Ion_1.dom.List], [IonTypes_1.IonTypes.STRUCT, Ion_1.dom.Struct]]);
+  }
+
+  return _domTypesByIonType;
+}
+
+function _domConstructorFor(ionType) {
+  var domConstructor = _getDomTypesByIonTypeMap().get(ionType);
+
+  if (!util_1._hasValue(domConstructor)) {
+    throw new Error("No dom type constructor was found for Ion type ".concat(ionType.name));
+  }
+
+  return domConstructor;
+}
+
+exports._domConstructorFor = _domConstructorFor;
+
+function _inferType(value) {
+  if (value === undefined) {
+    throw new Error("Cannot create an Ion value from `undefined`.");
+  }
+
+  if (value === null) {
+    return IonTypes_1.IonTypes.NULL;
+  }
+
+  var valueType = (0, _typeof2["default"])(value);
+
+  switch (valueType) {
+    case "string":
+      return IonTypes_1.IonTypes.STRING;
+
+    case "number":
+      return Number.isInteger(value) ? IonTypes_1.IonTypes.INT : IonTypes_1.IonTypes.FLOAT;
+
+    case "boolean":
+      return IonTypes_1.IonTypes.BOOL;
+
+    case "object":
+      break;
+
+    case "bigint":
+      break;
+
+    default:
+      throw new Error("Value.from() does not support the JS primitive type ".concat(valueType, "."));
+  }
+
+  if (value instanceof jsbi_1["default"]) {
+    return IonTypes_1.IonTypes.INT;
+  } else if (typeof value === 'bigint') {
+    throw new Error('bigints are not supported without using Babel for JSBI compilation.');
+  }
+
+  if (value instanceof Number) {
+    return Number.isInteger(value.valueOf()) ? IonTypes_1.IonTypes.INT : IonTypes_1.IonTypes.FLOAT;
+  }
+
+  if (value instanceof Boolean) {
+    return IonTypes_1.IonTypes.BOOL;
+  }
+
+  if (value instanceof String) {
+    return IonTypes_1.IonTypes.STRING;
+  }
+
+  if (value instanceof Ion_1.Decimal) {
+    return IonTypes_1.IonTypes.DECIMAL;
+  }
+
+  if (value instanceof Date || value instanceof Ion_1.Timestamp) {
+    return IonTypes_1.IonTypes.TIMESTAMP;
+  }
+
+  if (value instanceof Uint8Array) {
+    return IonTypes_1.IonTypes.BLOB;
+  }
+
+  if (value instanceof Array) {
+    return IonTypes_1.IonTypes.LIST;
+  }
+
+  return IonTypes_1.IonTypes.STRUCT;
+}
+
+function _ionValueFromJsValue(value) {
+  var annotations = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
+
+  var ionType = _inferType(value);
+
+  var ionTypeConstructor = _domConstructorFor(ionType);
+
+  return ionTypeConstructor._fromJsValue(value, annotations);
+}
+
+exports._ionValueFromJsValue = _ionValueFromJsValue;
+
+},{"../Ion":3,"../IonTypes":26,"../util":51,"@babel/runtime/helpers/interopRequireDefault":63,"@babel/runtime/helpers/typeof":73,"jsbi":75}],40:[function(require,module,exports){
+"use strict";
+
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
+
+var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime/helpers/classCallCheck"));
+
+var _possibleConstructorReturn2 = _interopRequireDefault(require("@babel/runtime/helpers/possibleConstructorReturn"));
+
+var _getPrototypeOf2 = _interopRequireDefault(require("@babel/runtime/helpers/getPrototypeOf"));
+
+var _inherits2 = _interopRequireDefault(require("@babel/runtime/helpers/inherits"));
+
+function _createSuper(Derived) { return function () { var Super = (0, _getPrototypeOf2["default"])(Derived), result; if (_isNativeReflectConstruct()) { var NewTarget = (0, _getPrototypeOf2["default"])(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return (0, _possibleConstructorReturn2["default"])(this, result); }; }
+
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var Ion_1 = require("../Ion");
+
+var Sequence_1 = require("./Sequence");
+
+var List = /*#__PURE__*/function (_Sequence_1$Sequence) {
+  (0, _inherits2["default"])(List, _Sequence_1$Sequence);
+
+  var _super = _createSuper(List);
+
+  function List(children) {
+    var annotations = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
+    (0, _classCallCheck2["default"])(this, List);
+    return _super.call(this, children, annotations);
+  }
+
+  return List;
+}(Sequence_1.Sequence(Ion_1.IonTypes.LIST));
+
+exports.List = List;
+
+},{"../Ion":3,"./Sequence":44,"@babel/runtime/helpers/classCallCheck":56,"@babel/runtime/helpers/getPrototypeOf":61,"@babel/runtime/helpers/inherits":62,"@babel/runtime/helpers/interopRequireDefault":63,"@babel/runtime/helpers/possibleConstructorReturn":68}],41:[function(require,module,exports){
+"use strict";
+
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
+
+var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime/helpers/classCallCheck"));
+
+var _createClass2 = _interopRequireDefault(require("@babel/runtime/helpers/createClass"));
+
+var _possibleConstructorReturn2 = _interopRequireDefault(require("@babel/runtime/helpers/possibleConstructorReturn"));
+
+var _getPrototypeOf2 = _interopRequireDefault(require("@babel/runtime/helpers/getPrototypeOf"));
+
+var _inherits2 = _interopRequireDefault(require("@babel/runtime/helpers/inherits"));
+
+function _createSuper(Derived) { return function () { var Super = (0, _getPrototypeOf2["default"])(Derived), result; if (_isNativeReflectConstruct()) { var NewTarget = (0, _getPrototypeOf2["default"])(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return (0, _possibleConstructorReturn2["default"])(this, result); }; }
+
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var Value_1 = require("./Value");
+
+var FromJsConstructor_1 = require("./FromJsConstructor");
+
+var _fromJsConstructor = new FromJsConstructor_1.FromJsConstructorBuilder().withClasses(Uint8Array).build();
+
+function Lob(ionType) {
+  return /*#__PURE__*/function (_Value_1$Value) {
+    (0, _inherits2["default"])(_class, _Value_1$Value);
+
+    var _super = _createSuper(_class);
+
+    function _class(data) {
+      var _this;
+
+      var annotations = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
+      (0, _classCallCheck2["default"])(this, _class);
+      _this = _super.call(this, data);
+
+      _this._setAnnotations(annotations);
+
+      return _this;
+    }
+
+    (0, _createClass2["default"])(_class, [{
+      key: "uInt8ArrayValue",
+      value: function uInt8ArrayValue() {
+        return this;
+      }
+    }]);
+    return _class;
+  }(Value_1.Value(Uint8Array, ionType, _fromJsConstructor));
+}
+
+exports.Lob = Lob;
+
+},{"./FromJsConstructor":37,"./Value":49,"@babel/runtime/helpers/classCallCheck":56,"@babel/runtime/helpers/createClass":57,"@babel/runtime/helpers/getPrototypeOf":61,"@babel/runtime/helpers/inherits":62,"@babel/runtime/helpers/interopRequireDefault":63,"@babel/runtime/helpers/possibleConstructorReturn":68}],42:[function(require,module,exports){
+"use strict";
+
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
+
+var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime/helpers/classCallCheck"));
+
+var _createClass2 = _interopRequireDefault(require("@babel/runtime/helpers/createClass"));
+
+var _possibleConstructorReturn2 = _interopRequireDefault(require("@babel/runtime/helpers/possibleConstructorReturn"));
+
+var _getPrototypeOf2 = _interopRequireDefault(require("@babel/runtime/helpers/getPrototypeOf"));
+
+var _inherits2 = _interopRequireDefault(require("@babel/runtime/helpers/inherits"));
+
+function _createSuper(Derived) { return function () { var Super = (0, _getPrototypeOf2["default"])(Derived), result; if (_isNativeReflectConstruct()) { var NewTarget = (0, _getPrototypeOf2["default"])(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return (0, _possibleConstructorReturn2["default"])(this, result); }; }
+
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var Ion_1 = require("../Ion");
+
+var Value_1 = require("./Value");
+
+var FromJsConstructor_1 = require("./FromJsConstructor");
+
+var Null = /*#__PURE__*/function (_Value_1$Value) {
+  (0, _inherits2["default"])(Null, _Value_1$Value);
+
+  var _super = _createSuper(Null);
+
+  function Null() {
+    var _this;
+
+    var ionType = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : Ion_1.IonTypes.NULL;
+    var annotations = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
+    (0, _classCallCheck2["default"])(this, Null);
+    _this = _super.call(this);
+    _this._ionType = ionType;
+
+    _this._setAnnotations(annotations);
+
+    return _this;
+  }
+
+  (0, _createClass2["default"])(Null, [{
+    key: "isNull",
+    value: function isNull() {
+      return true;
+    }
+  }, {
+    key: "_convertToJsNull",
+    value: function _convertToJsNull(operation) {
+      if (Null._operationIsSupported(this.getType(), operation)) {
+        return null;
+      }
+
+      throw new Error("".concat(operation, "() is not supported by Ion type ").concat(this.getType().name));
+    }
+  }, {
+    key: "_unsupportedOperationOrNullDereference",
+    value: function _unsupportedOperationOrNullDereference(operation) {
+      if (Null._operationIsSupported(this.getType(), operation)) {
+        throw new Error("".concat(operation, "() called on a null ").concat(this.getType().name, "."));
+      }
+
+      throw new Error("".concat(operation, "() is not supported by Ion type ").concat(this.getType().name));
+    }
+  }, {
+    key: "booleanValue",
+    value: function booleanValue() {
+      return this._convertToJsNull('booleanValue');
+    }
+  }, {
+    key: "numberValue",
+    value: function numberValue() {
+      return this._convertToJsNull('numberValue');
+    }
+  }, {
+    key: "bigIntValue",
+    value: function bigIntValue() {
+      return this._convertToJsNull('bigIntValue');
+    }
+  }, {
+    key: "decimalValue",
+    value: function decimalValue() {
+      return this._convertToJsNull('decimalValue');
+    }
+  }, {
+    key: "stringValue",
+    value: function stringValue() {
+      return this._convertToJsNull('stringValue');
+    }
+  }, {
+    key: "dateValue",
+    value: function dateValue() {
+      return this._convertToJsNull('dateValue');
+    }
+  }, {
+    key: "uInt8ArrayValue",
+    value: function uInt8ArrayValue() {
+      return this._convertToJsNull('uInt8ArrayValue');
+    }
+  }, {
+    key: "fieldNames",
+    value: function fieldNames() {
+      this._unsupportedOperationOrNullDereference('fieldNames');
+    }
+  }, {
+    key: "fields",
+    value: function fields() {
+      this._unsupportedOperationOrNullDereference('fields');
+    }
+  }, {
+    key: "elements",
+    value: function elements() {
+      this._unsupportedOperationOrNullDereference('elements');
+    }
+  }, {
+    key: "get",
+    value: function get() {
+      return null;
+    }
+  }, {
+    key: "toString",
+    value: function toString() {
+      if (this.getType() == Ion_1.IonTypes.NULL) {
+        return 'null';
+      }
+
+      return 'null.' + this._ionType.name;
+    }
+  }, {
+    key: "toJSON",
+    value: function toJSON() {
+      return null;
+    }
+  }, {
+    key: "writeTo",
+    value: function writeTo(writer) {
+      writer.setAnnotations(this.getAnnotations());
+      writer.writeNull(this.getType());
+    }
+  }], [{
+    key: "_operationIsSupported",
+    value: function _operationIsSupported(ionType, operation) {
+      return Null._supportedIonTypesByOperation.get(operation).has(ionType);
+    }
+  }]);
+  return Null;
+}(Value_1.Value(Object, Ion_1.IonTypes.NULL, FromJsConstructor_1.FromJsConstructor.NONE));
+
+exports.Null = Null;
+Null._supportedIonTypesByOperation = new Map([['booleanValue', new Set([Ion_1.IonTypes.BOOL])], ['numberValue', new Set([Ion_1.IonTypes.INT, Ion_1.IonTypes.FLOAT, Ion_1.IonTypes.DECIMAL])], ['bigIntValue', new Set([Ion_1.IonTypes.INT])], ['decimalValue', new Set([Ion_1.IonTypes.DECIMAL])], ['stringValue', new Set([Ion_1.IonTypes.STRING, Ion_1.IonTypes.SYMBOL])], ['dateValue', new Set([Ion_1.IonTypes.TIMESTAMP])], ['timestampValue', new Set([Ion_1.IonTypes.TIMESTAMP])], ['uInt8ArrayValue', new Set([Ion_1.IonTypes.BLOB, Ion_1.IonTypes.CLOB])], ['fields', new Set([Ion_1.IonTypes.STRUCT])], ['fieldNames', new Set([Ion_1.IonTypes.STRUCT])], ['elements', new Set([Ion_1.IonTypes.LIST, Ion_1.IonTypes.SEXP, Ion_1.IonTypes.STRUCT])]]);
+
+},{"../Ion":3,"./FromJsConstructor":37,"./Value":49,"@babel/runtime/helpers/classCallCheck":56,"@babel/runtime/helpers/createClass":57,"@babel/runtime/helpers/getPrototypeOf":61,"@babel/runtime/helpers/inherits":62,"@babel/runtime/helpers/interopRequireDefault":63,"@babel/runtime/helpers/possibleConstructorReturn":68}],43:[function(require,module,exports){
+"use strict";
+
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
+
+var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime/helpers/classCallCheck"));
+
+var _createClass2 = _interopRequireDefault(require("@babel/runtime/helpers/createClass"));
+
+var _possibleConstructorReturn2 = _interopRequireDefault(require("@babel/runtime/helpers/possibleConstructorReturn"));
+
+var _getPrototypeOf2 = _interopRequireDefault(require("@babel/runtime/helpers/getPrototypeOf"));
+
+var _inherits2 = _interopRequireDefault(require("@babel/runtime/helpers/inherits"));
+
+function _createSuper(Derived) { return function () { var Super = (0, _getPrototypeOf2["default"])(Derived), result; if (_isNativeReflectConstruct()) { var NewTarget = (0, _getPrototypeOf2["default"])(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return (0, _possibleConstructorReturn2["default"])(this, result); }; }
+
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var Ion_1 = require("../Ion");
+
+var Sequence_1 = require("./Sequence");
+
+var SExpression = /*#__PURE__*/function (_Sequence_1$Sequence) {
+  (0, _inherits2["default"])(SExpression, _Sequence_1$Sequence);
+
+  var _super = _createSuper(SExpression);
+
+  function SExpression(children) {
+    var annotations = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
+    (0, _classCallCheck2["default"])(this, SExpression);
+    return _super.call(this, children, annotations);
+  }
+
+  (0, _createClass2["default"])(SExpression, [{
+    key: "toString",
+    value: function toString() {
+      return '(' + this.join(' ') + ')';
+    }
+  }]);
+  return SExpression;
+}(Sequence_1.Sequence(Ion_1.IonTypes.SEXP));
+
+exports.SExpression = SExpression;
+
+},{"../Ion":3,"./Sequence":44,"@babel/runtime/helpers/classCallCheck":56,"@babel/runtime/helpers/createClass":57,"@babel/runtime/helpers/getPrototypeOf":61,"@babel/runtime/helpers/inherits":62,"@babel/runtime/helpers/interopRequireDefault":63,"@babel/runtime/helpers/possibleConstructorReturn":68}],44:[function(require,module,exports){
+"use strict";
+
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
+
+var _typeof2 = _interopRequireDefault(require("@babel/runtime/helpers/typeof"));
+
+var _toConsumableArray2 = _interopRequireDefault(require("@babel/runtime/helpers/toConsumableArray"));
+
+var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime/helpers/classCallCheck"));
+
+var _createClass2 = _interopRequireDefault(require("@babel/runtime/helpers/createClass"));
+
+var _possibleConstructorReturn2 = _interopRequireDefault(require("@babel/runtime/helpers/possibleConstructorReturn"));
+
+var _getPrototypeOf2 = _interopRequireDefault(require("@babel/runtime/helpers/getPrototypeOf"));
+
+var _inherits2 = _interopRequireDefault(require("@babel/runtime/helpers/inherits"));
+
+function _createForOfIteratorHelper(o) { if (typeof Symbol === "undefined" || o[Symbol.iterator] == null) { if (Array.isArray(o) || (o = _unsupportedIterableToArray(o))) { var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var it, normalCompletion = true, didErr = false, err; return { s: function s() { it = o[Symbol.iterator](); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(n); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
+function _createSuper(Derived) { return function () { var Super = (0, _getPrototypeOf2["default"])(Derived), result; if (_isNativeReflectConstruct()) { var NewTarget = (0, _getPrototypeOf2["default"])(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return (0, _possibleConstructorReturn2["default"])(this, result); }; }
+
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var Value_1 = require("./Value");
+
+var FromJsConstructor_1 = require("./FromJsConstructor");
+
+function Sequence(ionType) {
+  return /*#__PURE__*/function (_Value_1$Value) {
+    (0, _inherits2["default"])(_class, _Value_1$Value);
+
+    var _super = _createSuper(_class);
+
+    function _class(children) {
+      var _this2;
+
+      var _this;
+
+      var annotations = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
+      (0, _classCallCheck2["default"])(this, _class);
+      _this = _super.call(this);
+
+      (_this2 = _this).push.apply(_this2, (0, _toConsumableArray2["default"])(children));
+
+      _this._setAnnotations(annotations);
+
+      return _this;
+    }
+
+    (0, _createClass2["default"])(_class, [{
+      key: "get",
+      value: function get() {
+        for (var _len = arguments.length, pathElements = new Array(_len), _key = 0; _key < _len; _key++) {
+          pathElements[_key] = arguments[_key];
+        }
+
+        if (pathElements.length === 0) {
+          throw new Error('Value#get requires at least one parameter.');
+        }
+
+        var pathHead = pathElements[0],
+            pathTail = pathElements.slice(1);
+
+        if (typeof pathHead !== "number") {
+          throw new Error("Cannot index into a ".concat(this.getType().name, " with a ").concat((0, _typeof2["default"])(pathHead), "."));
+        }
+
+        var children = this;
+        var maybeChild = children[pathHead];
+        var child = maybeChild === undefined ? null : maybeChild;
+
+        if (pathTail.length === 0 || child === null) {
+          return child;
+        }
+
+        return child.get.apply(child, (0, _toConsumableArray2["default"])(pathTail));
+      }
+    }, {
+      key: "elements",
+      value: function elements() {
+        return Object.values(this);
+      }
+    }, {
+      key: "toString",
+      value: function toString() {
+        return '[' + this.join(', ') + ']';
+      }
+    }, {
+      key: "writeTo",
+      value: function writeTo(writer) {
+        writer.setAnnotations(this.getAnnotations());
+        writer.stepIn(ionType);
+
+        var _iterator = _createForOfIteratorHelper(this),
+            _step;
+
+        try {
+          for (_iterator.s(); !(_step = _iterator.n()).done;) {
+            var child = _step.value;
+            child.writeTo(writer);
+          }
+        } catch (err) {
+          _iterator.e(err);
+        } finally {
+          _iterator.f();
+        }
+
+        writer.stepOut();
+      }
+    }], [{
+      key: "_fromJsValue",
+      value: function _fromJsValue(jsValue, annotations) {
+        if (!(jsValue instanceof Array)) {
+          throw new Error("Cannot create a ".concat(this.name, " from: ").concat(jsValue.toString()));
+        }
+
+        var children = jsValue.map(function (child) {
+          return Value_1.Value.from(child);
+        });
+        return new this(children, annotations);
+      }
+    }]);
+    return _class;
+  }(Value_1.Value(Array, ionType, FromJsConstructor_1.FromJsConstructor.NONE));
+}
+
+exports.Sequence = Sequence;
+
+},{"./FromJsConstructor":37,"./Value":49,"@babel/runtime/helpers/classCallCheck":56,"@babel/runtime/helpers/createClass":57,"@babel/runtime/helpers/getPrototypeOf":61,"@babel/runtime/helpers/inherits":62,"@babel/runtime/helpers/interopRequireDefault":63,"@babel/runtime/helpers/possibleConstructorReturn":68,"@babel/runtime/helpers/toConsumableArray":72,"@babel/runtime/helpers/typeof":73}],45:[function(require,module,exports){
+(function (global){
+"use strict";
+
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
+
+var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime/helpers/classCallCheck"));
+
+var _createClass2 = _interopRequireDefault(require("@babel/runtime/helpers/createClass"));
+
+var _possibleConstructorReturn2 = _interopRequireDefault(require("@babel/runtime/helpers/possibleConstructorReturn"));
+
+var _getPrototypeOf2 = _interopRequireDefault(require("@babel/runtime/helpers/getPrototypeOf"));
+
+var _inherits2 = _interopRequireDefault(require("@babel/runtime/helpers/inherits"));
+
+function _createSuper(Derived) { return function () { var Super = (0, _getPrototypeOf2["default"])(Derived), result; if (_isNativeReflectConstruct()) { var NewTarget = (0, _getPrototypeOf2["default"])(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return (0, _possibleConstructorReturn2["default"])(this, result); }; }
+
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var Ion_1 = require("../Ion");
+
+var Value_1 = require("./Value");
+
+var FromJsConstructor_1 = require("./FromJsConstructor");
+
+var _fromJsConstructor = new FromJsConstructor_1.FromJsConstructorBuilder().withPrimitives(FromJsConstructor_1.Primitives.String).withClassesToUnbox(global.String).build();
+
+var String = /*#__PURE__*/function (_Value_1$Value) {
+  (0, _inherits2["default"])(String, _Value_1$Value);
+
+  var _super = _createSuper(String);
+
+  function String(text) {
+    var _this;
+
+    var annotations = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
+    (0, _classCallCheck2["default"])(this, String);
+    _this = _super.call(this, text);
+
+    _this._setAnnotations(annotations);
+
+    return _this;
+  }
+
+  (0, _createClass2["default"])(String, [{
+    key: "stringValue",
+    value: function stringValue() {
+      return this.toString();
+    }
+  }, {
+    key: "writeTo",
+    value: function writeTo(writer) {
+      writer.setAnnotations(this.getAnnotations());
+      writer.writeString(this.stringValue());
+    }
+  }]);
+  return String;
+}(Value_1.Value(global.String, Ion_1.IonTypes.STRING, _fromJsConstructor));
+
+exports.String = String;
+
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{"../Ion":3,"./FromJsConstructor":37,"./Value":49,"@babel/runtime/helpers/classCallCheck":56,"@babel/runtime/helpers/createClass":57,"@babel/runtime/helpers/getPrototypeOf":61,"@babel/runtime/helpers/inherits":62,"@babel/runtime/helpers/interopRequireDefault":63,"@babel/runtime/helpers/possibleConstructorReturn":68}],46:[function(require,module,exports){
+"use strict";
+
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
+
+var _toConsumableArray2 = _interopRequireDefault(require("@babel/runtime/helpers/toConsumableArray"));
+
+var _typeof2 = _interopRequireDefault(require("@babel/runtime/helpers/typeof"));
+
+var _slicedToArray2 = _interopRequireDefault(require("@babel/runtime/helpers/slicedToArray"));
+
+var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime/helpers/classCallCheck"));
+
+var _createClass2 = _interopRequireDefault(require("@babel/runtime/helpers/createClass"));
+
+var _assertThisInitialized2 = _interopRequireDefault(require("@babel/runtime/helpers/assertThisInitialized"));
+
+var _possibleConstructorReturn2 = _interopRequireDefault(require("@babel/runtime/helpers/possibleConstructorReturn"));
+
+var _getPrototypeOf2 = _interopRequireDefault(require("@babel/runtime/helpers/getPrototypeOf"));
+
+var _inherits2 = _interopRequireDefault(require("@babel/runtime/helpers/inherits"));
+
+function _createForOfIteratorHelper(o) { if (typeof Symbol === "undefined" || o[Symbol.iterator] == null) { if (Array.isArray(o) || (o = _unsupportedIterableToArray(o))) { var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var it, normalCompletion = true, didErr = false, err; return { s: function s() { it = o[Symbol.iterator](); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(n); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
+function _createSuper(Derived) { return function () { var Super = (0, _getPrototypeOf2["default"])(Derived), result; if (_isNativeReflectConstruct()) { var NewTarget = (0, _getPrototypeOf2["default"])(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return (0, _possibleConstructorReturn2["default"])(this, result); }; }
+
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var Value_1 = require("./Value");
+
+var Ion_1 = require("../Ion");
+
+var FromJsConstructor_1 = require("./FromJsConstructor");
+
+var Struct = /*#__PURE__*/function (_Value_1$Value) {
+  (0, _inherits2["default"])(Struct, _Value_1$Value);
+
+  var _super = _createSuper(Struct);
+
+  function Struct(fields) {
+    var _this;
+
+    var annotations = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
+    (0, _classCallCheck2["default"])(this, Struct);
+    _this = _super.call(this);
+    _this._fields = Object.create(null);
+
+    var _iterator = _createForOfIteratorHelper(fields),
+        _step;
+
+    try {
+      for (_iterator.s(); !(_step = _iterator.n()).done;) {
+        var _step$value = (0, _slicedToArray2["default"])(_step.value, 2),
+            fieldName = _step$value[0],
+            fieldValue = _step$value[1];
+
+        _this._fields[fieldName] = fieldValue;
+      }
+    } catch (err) {
+      _iterator.e(err);
+    } finally {
+      _iterator.f();
+    }
+
+    _this._setAnnotations(annotations);
+
+    return (0, _possibleConstructorReturn2["default"])(_this, new Proxy((0, _assertThisInitialized2["default"])(_this), {
+      set: function set(target, name, value) {
+        target._fields[name] = value;
+        return true;
+      },
+      get: function get(target, name) {
+        if (name in target) {
+          return target[name];
+        }
+
+        return target._fields[name];
+      }
+    }));
+  }
+
+  (0, _createClass2["default"])(Struct, [{
+    key: "get",
+    value: function get() {
+      for (var _len = arguments.length, pathElements = new Array(_len), _key = 0; _key < _len; _key++) {
+        pathElements[_key] = arguments[_key];
+      }
+
+      if (pathElements.length === 0) {
+        throw new Error('Value#get requires at least one parameter.');
+      }
+
+      var pathHead = pathElements[0],
+          pathTail = pathElements.slice(1);
+
+      if (typeof pathHead !== "string") {
+        throw new Error("Cannot index into a struct with a ".concat((0, _typeof2["default"])(pathHead), "."));
+      }
+
+      var child = this._fields[pathHead];
+
+      if (child === undefined) {
+        return null;
+      }
+
+      if (pathTail.length === 0) {
+        return child;
+      }
+
+      return child.get.apply(child, (0, _toConsumableArray2["default"])(pathTail));
+    }
+  }, {
+    key: "fieldNames",
+    value: function fieldNames() {
+      return Object.keys(this._fields);
+    }
+  }, {
+    key: "fields",
+    value: function fields() {
+      return Object.entries(this._fields);
+    }
+  }, {
+    key: "elements",
+    value: function elements() {
+      return Object.values(this._fields);
+    }
+  }, {
+    key: Symbol.iterator,
+    value: function value() {
+      return this.fields()[Symbol.iterator]();
+    }
+  }, {
+    key: "toString",
+    value: function toString() {
+      return '{' + (0, _toConsumableArray2["default"])(this.fields()).map(function (_ref) {
+        var _ref2 = (0, _slicedToArray2["default"])(_ref, 2),
+            name = _ref2[0],
+            value = _ref2[1];
+
+        return name + ': ' + value;
+      }).join(', ') + '}';
+    }
+  }, {
+    key: "writeTo",
+    value: function writeTo(writer) {
+      writer.setAnnotations(this.getAnnotations());
+      writer.stepIn(Ion_1.IonTypes.STRUCT);
+
+      var _iterator2 = _createForOfIteratorHelper(this),
+          _step2;
+
+      try {
+        for (_iterator2.s(); !(_step2 = _iterator2.n()).done;) {
+          var _step2$value = (0, _slicedToArray2["default"])(_step2.value, 2),
+              fieldName = _step2$value[0],
+              value = _step2$value[1];
+
+          writer.writeFieldName(fieldName);
+          value.writeTo(writer);
+        }
+      } catch (err) {
+        _iterator2.e(err);
+      } finally {
+        _iterator2.f();
+      }
+
+      writer.stepOut();
+    }
+  }, {
+    key: "toJSON",
+    value: function toJSON() {
+      return this._fields;
+    }
+  }], [{
+    key: "_fromJsValue",
+    value: function _fromJsValue(jsValue, annotations) {
+      if (!(jsValue instanceof Object)) {
+        throw new Error("Cannot create a dom.Struct from: ".concat(jsValue.toString()));
+      }
+
+      var fields = Object.entries(jsValue).map(function (_ref3) {
+        var _ref4 = (0, _slicedToArray2["default"])(_ref3, 2),
+            key = _ref4[0],
+            value = _ref4[1];
+
+        return [key, Value_1.Value.from(value)];
+      });
+      return new this(fields, annotations);
+    }
+  }]);
+  return Struct;
+}(Value_1.Value(Object, Ion_1.IonTypes.STRUCT, FromJsConstructor_1.FromJsConstructor.NONE));
+
+exports.Struct = Struct;
+
+},{"../Ion":3,"./FromJsConstructor":37,"./Value":49,"@babel/runtime/helpers/assertThisInitialized":55,"@babel/runtime/helpers/classCallCheck":56,"@babel/runtime/helpers/createClass":57,"@babel/runtime/helpers/getPrototypeOf":61,"@babel/runtime/helpers/inherits":62,"@babel/runtime/helpers/interopRequireDefault":63,"@babel/runtime/helpers/possibleConstructorReturn":68,"@babel/runtime/helpers/slicedToArray":70,"@babel/runtime/helpers/toConsumableArray":72,"@babel/runtime/helpers/typeof":73}],47:[function(require,module,exports){
+(function (global){
+"use strict";
+
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
+
+var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime/helpers/classCallCheck"));
+
+var _createClass2 = _interopRequireDefault(require("@babel/runtime/helpers/createClass"));
+
+var _possibleConstructorReturn2 = _interopRequireDefault(require("@babel/runtime/helpers/possibleConstructorReturn"));
+
+var _getPrototypeOf2 = _interopRequireDefault(require("@babel/runtime/helpers/getPrototypeOf"));
+
+var _inherits2 = _interopRequireDefault(require("@babel/runtime/helpers/inherits"));
+
+function _createSuper(Derived) { return function () { var Super = (0, _getPrototypeOf2["default"])(Derived), result; if (_isNativeReflectConstruct()) { var NewTarget = (0, _getPrototypeOf2["default"])(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return (0, _possibleConstructorReturn2["default"])(this, result); }; }
+
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var Ion_1 = require("../Ion");
+
+var Value_1 = require("./Value");
+
+var FromJsConstructor_1 = require("./FromJsConstructor");
+
+var _fromJsConstructor = new FromJsConstructor_1.FromJsConstructorBuilder().withPrimitives(FromJsConstructor_1.Primitives.String).withClassesToUnbox(global.String).build();
+
+var _Symbol = /*#__PURE__*/function (_Value_1$Value) {
+  (0, _inherits2["default"])(_Symbol, _Value_1$Value);
+
+  var _super = _createSuper(_Symbol);
+
+  function _Symbol(symbolText) {
+    var _this;
+
+    var annotations = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
+    (0, _classCallCheck2["default"])(this, _Symbol);
+    _this = _super.call(this, symbolText);
+
+    _this._setAnnotations(annotations);
+
+    return _this;
+  }
+
+  (0, _createClass2["default"])(_Symbol, [{
+    key: "stringValue",
+    value: function stringValue() {
+      return this.toString();
+    }
+  }, {
+    key: "writeTo",
+    value: function writeTo(writer) {
+      writer.setAnnotations(this.getAnnotations());
+      writer.writeSymbol(this.stringValue());
+    }
+  }]);
+  return _Symbol;
+}(Value_1.Value(String, Ion_1.IonTypes.SYMBOL, _fromJsConstructor));
+
+exports.Symbol = _Symbol;
+
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{"../Ion":3,"./FromJsConstructor":37,"./Value":49,"@babel/runtime/helpers/classCallCheck":56,"@babel/runtime/helpers/createClass":57,"@babel/runtime/helpers/getPrototypeOf":61,"@babel/runtime/helpers/inherits":62,"@babel/runtime/helpers/interopRequireDefault":63,"@babel/runtime/helpers/possibleConstructorReturn":68}],48:[function(require,module,exports){
+"use strict";
+
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
+
+var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime/helpers/classCallCheck"));
+
+var _createClass2 = _interopRequireDefault(require("@babel/runtime/helpers/createClass"));
+
+var _possibleConstructorReturn2 = _interopRequireDefault(require("@babel/runtime/helpers/possibleConstructorReturn"));
+
+var _getPrototypeOf2 = _interopRequireDefault(require("@babel/runtime/helpers/getPrototypeOf"));
+
+var _inherits2 = _interopRequireDefault(require("@babel/runtime/helpers/inherits"));
+
+function _createSuper(Derived) { return function () { var Super = (0, _getPrototypeOf2["default"])(Derived), result; if (_isNativeReflectConstruct()) { var NewTarget = (0, _getPrototypeOf2["default"])(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return (0, _possibleConstructorReturn2["default"])(this, result); }; }
+
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
+var __importStar = void 0 && (void 0).__importStar || function (mod) {
+  if (mod && mod.__esModule) return mod;
+  var result = {};
+  if (mod != null) for (var k in mod) {
+    if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
+  }
+  result["default"] = mod;
+  return result;
+};
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var Value_1 = require("./Value");
+
+var ion = __importStar(require("../Ion"));
+
+var Ion_1 = require("../Ion");
+
+var FromJsConstructor_1 = require("./FromJsConstructor");
+
+var _fromJsConstructor = new FromJsConstructor_1.FromJsConstructorBuilder().withClasses(Date, ion.Timestamp).build();
+
+var Timestamp = /*#__PURE__*/function (_Value_1$Value) {
+  (0, _inherits2["default"])(Timestamp, _Value_1$Value);
+
+  var _super = _createSuper(Timestamp);
+
+  function Timestamp(dateOrTimestamp) {
+    var _this;
+
+    var annotations = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
+    (0, _classCallCheck2["default"])(this, Timestamp);
+    var date;
+    var timestamp;
+
+    if (dateOrTimestamp instanceof Date) {
+      date = dateOrTimestamp;
+      timestamp = Timestamp._timestampFromDate(date);
+    } else {
+      timestamp = dateOrTimestamp;
+      date = timestamp.getDate();
+    }
+
+    _this = _super.call(this, date);
+    _this._date = date;
+    _this._timestamp = timestamp;
+
+    _this._setAnnotations(annotations);
+
+    return _this;
+  }
+
+  (0, _createClass2["default"])(Timestamp, [{
+    key: "timestampValue",
+    value: function timestampValue() {
+      return this._timestamp;
+    }
+  }, {
+    key: "dateValue",
+    value: function dateValue() {
+      return this._date;
+    }
+  }, {
+    key: "writeTo",
+    value: function writeTo(writer) {
+      writer.setAnnotations(this.getAnnotations());
+      writer.writeTimestamp(this.timestampValue());
+    }
+  }], [{
+    key: "_timestampFromDate",
+    value: function _timestampFromDate(date) {
+      var milliseconds = date.getUTCSeconds() * 1000 + date.getUTCMilliseconds();
+      var fractionalSeconds = new Ion_1.Decimal(milliseconds, -3);
+      return new ion.Timestamp(0, date.getUTCFullYear(), date.getUTCMonth() + 1, date.getUTCDate(), date.getUTCHours(), date.getUTCMinutes(), fractionalSeconds);
+    }
+  }]);
+  return Timestamp;
+}(Value_1.Value(Date, Ion_1.IonTypes.TIMESTAMP, _fromJsConstructor));
+
+exports.Timestamp = Timestamp;
+
+},{"../Ion":3,"./FromJsConstructor":37,"./Value":49,"@babel/runtime/helpers/classCallCheck":56,"@babel/runtime/helpers/createClass":57,"@babel/runtime/helpers/getPrototypeOf":61,"@babel/runtime/helpers/inherits":62,"@babel/runtime/helpers/interopRequireDefault":63,"@babel/runtime/helpers/possibleConstructorReturn":68}],49:[function(require,module,exports){
+"use strict";
+
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
+
+var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime/helpers/classCallCheck"));
+
+var _createClass2 = _interopRequireDefault(require("@babel/runtime/helpers/createClass"));
+
+var _assertThisInitialized2 = _interopRequireDefault(require("@babel/runtime/helpers/assertThisInitialized"));
+
+var _possibleConstructorReturn2 = _interopRequireDefault(require("@babel/runtime/helpers/possibleConstructorReturn"));
+
+var _getPrototypeOf2 = _interopRequireDefault(require("@babel/runtime/helpers/getPrototypeOf"));
+
+var _inherits2 = _interopRequireDefault(require("@babel/runtime/helpers/inherits"));
+
+function _createSuper(Derived) { return function () { var Super = (0, _getPrototypeOf2["default"])(Derived), result; if (_isNativeReflectConstruct()) { var NewTarget = (0, _getPrototypeOf2["default"])(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return (0, _possibleConstructorReturn2["default"])(this, result); }; }
+
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
+var __importStar = void 0 && (void 0).__importStar || function (mod) {
+  if (mod && mod.__esModule) return mod;
+  var result = {};
+  if (mod != null) for (var k in mod) {
+    if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
+  }
+  result["default"] = mod;
+  return result;
+};
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var JsValueConversion = __importStar(require("./JsValueConversion"));
+
+var util_1 = require("../util");
+
+var _DOM_VALUE_SIGNET = Symbol("ion.dom.Value");
+
+function Value(BaseClass, ionType, fromJsConstructor) {
+  var newClass = /*#__PURE__*/function (_BaseClass) {
+    (0, _inherits2["default"])(newClass, _BaseClass);
+
+    var _super = _createSuper(newClass);
+
+    function newClass() {
+      var _this;
+
+      (0, _classCallCheck2["default"])(this, newClass);
+
+      for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
+        args[_key] = arguments[_key];
+      }
+
+      _this = _super.call.apply(_super, [this].concat(args));
+      _this._ionType = ionType;
+      _this._ionAnnotations = [];
+      Object.defineProperty((0, _assertThisInitialized2["default"])(_this), "_ionType", {
+        enumerable: false
+      });
+      Object.defineProperty((0, _assertThisInitialized2["default"])(_this), "_ionAnnotations", {
+        enumerable: false
+      });
+      return _this;
+    }
+
+    (0, _createClass2["default"])(newClass, [{
+      key: "_unsupportedOperation",
+      value: function _unsupportedOperation(functionName) {
+        throw new Error("Value#".concat(functionName, "() is not supported by Ion type ").concat(this.getType().name));
+      }
+    }, {
+      key: "getType",
+      value: function getType() {
+        return this._ionType;
+      }
+    }, {
+      key: "_setAnnotations",
+      value: function _setAnnotations(annotations) {
+        this._ionAnnotations = annotations;
+      }
+    }, {
+      key: "getAnnotations",
+      value: function getAnnotations() {
+        if (this._ionAnnotations === null) {
+          return [];
+        }
+
+        return this._ionAnnotations;
+      }
+    }, {
+      key: "isNull",
+      value: function isNull() {
+        return false;
+      }
+    }, {
+      key: "booleanValue",
+      value: function booleanValue() {
+        this._unsupportedOperation('booleanValue');
+      }
+    }, {
+      key: "numberValue",
+      value: function numberValue() {
+        this._unsupportedOperation('numberValue');
+      }
+    }, {
+      key: "bigIntValue",
+      value: function bigIntValue() {
+        this._unsupportedOperation('bigIntValue');
+      }
+    }, {
+      key: "decimalValue",
+      value: function decimalValue() {
+        this._unsupportedOperation('decimalValue');
+      }
+    }, {
+      key: "stringValue",
+      value: function stringValue() {
+        this._unsupportedOperation('stringValue');
+      }
+    }, {
+      key: "dateValue",
+      value: function dateValue() {
+        this._unsupportedOperation('dateValue');
+      }
+    }, {
+      key: "timestampValue",
+      value: function timestampValue() {
+        this._unsupportedOperation('timestampValue');
+      }
+    }, {
+      key: "uInt8ArrayValue",
+      value: function uInt8ArrayValue() {
+        this._unsupportedOperation('uInt8ArrayValue');
+      }
+    }, {
+      key: "fieldNames",
+      value: function fieldNames() {
+        this._unsupportedOperation('fieldNames');
+      }
+    }, {
+      key: "fields",
+      value: function fields() {
+        this._unsupportedOperation('fields');
+      }
+    }, {
+      key: "elements",
+      value: function elements() {
+        this._unsupportedOperation('elements');
+      }
+    }, {
+      key: "get",
+      value: function get() {
+        this._unsupportedOperation('get');
+      }
+    }, {
+      key: "as",
+      value: function as(ionValueType) {
+        if (this instanceof ionValueType) {
+          return this;
+        }
+
+        throw new Error("".concat(this.constructor.name, " is not an instance of ").concat(ionValueType.name));
+      }
+    }, {
+      key: "writeTo",
+      value: function writeTo(writer) {
+        this._unsupportedOperation('writeTo');
+      }
+    }], [{
+      key: "_getIonType",
+      value: function _getIonType() {
+        return ionType;
+      }
+    }, {
+      key: "_fromJsValue",
+      value: function _fromJsValue(jsValue, annotations) {
+        return fromJsConstructor.construct(this, jsValue, annotations);
+      }
+    }]);
+    return newClass;
+  }(BaseClass);
+
+  Object.defineProperty(newClass, _DOM_VALUE_SIGNET, {
+    writable: false,
+    enumerable: false,
+    value: _DOM_VALUE_SIGNET
+  });
+  return newClass;
+}
+
+exports.Value = Value;
+
+(function (Value) {
+  function from(value, annotations) {
+    if (value instanceof Value) {
+      if (util_1._hasValue(annotations)) {
+        throw new Error("Value.from() does not support overriding the annotations on a dom.Value" + " passed as an argument.");
+      }
+
+      return value;
+    }
+
+    return JsValueConversion._ionValueFromJsValue(value, annotations);
+  }
+
+  Value.from = from;
+})(Value = exports.Value || (exports.Value = {}));
+
+Object.defineProperty(Value, Symbol.hasInstance, {
+  get: function get() {
+    return function (instance) {
+      return util_1._hasValue(instance) && _DOM_VALUE_SIGNET in instance.constructor && instance.constructor[_DOM_VALUE_SIGNET] === _DOM_VALUE_SIGNET;
+    };
+  }
+});
+
+},{"../util":51,"./JsValueConversion":39,"@babel/runtime/helpers/assertThisInitialized":55,"@babel/runtime/helpers/classCallCheck":56,"@babel/runtime/helpers/createClass":57,"@babel/runtime/helpers/getPrototypeOf":61,"@babel/runtime/helpers/inherits":62,"@babel/runtime/helpers/interopRequireDefault":63,"@babel/runtime/helpers/possibleConstructorReturn":68}],50:[function(require,module,exports){
+"use strict";
+
+var __importStar = void 0 && (void 0).__importStar || function (mod) {
+  if (mod && mod.__esModule) return mod;
+  var result = {};
+  if (mod != null) for (var k in mod) {
+    if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
+  }
+  result["default"] = mod;
+  return result;
+};
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var ion = __importStar(require("../Ion"));
+
+var Ion_1 = require("../Ion");
+
+var Struct_1 = require("./Struct");
+
+var List_1 = require("./List");
+
+var SExpression_1 = require("./SExpression");
+
+var Null_1 = require("./Null");
+
+var Integer_1 = require("./Integer");
+
+var Float_1 = require("./Float");
+
+var Decimal_1 = require("./Decimal");
+
+var Timestamp_1 = require("./Timestamp");
+
+var Symbol_1 = require("./Symbol");
+
+var Clob_1 = require("./Clob");
+
+var Blob_1 = require("./Blob");
+
+var IonTextReader_1 = require("../IonTextReader");
+
+var IonBinaryReader_1 = require("../IonBinaryReader");
+
+function loadAll(ionData) {
+  var reader = _createReader(ionData);
+
+  var ionValues = [];
+
+  while (reader.next()) {
+    ionValues.push(_loadValue(reader));
+  }
+
+  return ionValues;
+}
+
+exports.loadAll = loadAll;
+
+function load(ionData) {
+  var reader = _createReader(ionData);
+
+  if (reader.type() === null) {
+    reader.next();
+  }
+
+  return reader.type() === null ? null : _loadValue(reader);
+}
+
+exports.load = load;
+
+function _createReader(ionData) {
+  if (ionData instanceof IonTextReader_1.TextReader || ionData instanceof IonBinaryReader_1.BinaryReader) {
+    return ionData;
+  }
+
+  return Ion_1.makeReader(ionData);
+}
+
+function _loadValue(reader) {
+  var ionType = reader.type();
+
+  if (ionType === null) {
+    throw new Error("loadValue() called when no further values were available to read.");
+  }
+
+  var annotations = reader.annotations();
+
+  if (reader.isNull()) {
+    return new Null_1.Null(reader.type(), annotations);
+  }
+
+  switch (ionType) {
+    case Ion_1.IonTypes.NULL:
+      return new Null_1.Null(Ion_1.IonTypes.NULL, annotations);
+
+    case Ion_1.IonTypes.BOOL:
+      return new ion.dom.Boolean(reader.booleanValue(), annotations);
+
+    case Ion_1.IonTypes.INT:
+      return reader.intSize() == Ion_1.IntSize.Number ? new Integer_1.Integer(reader.numberValue(), annotations) : new Integer_1.Integer(reader.bigIntValue(), annotations);
+
+    case Ion_1.IonTypes.FLOAT:
+      return new Float_1.Float(reader.numberValue(), annotations);
+
+    case Ion_1.IonTypes.DECIMAL:
+      return new Decimal_1.Decimal(reader.decimalValue(), annotations);
+
+    case Ion_1.IonTypes.TIMESTAMP:
+      return new Timestamp_1.Timestamp(reader.timestampValue(), annotations);
+
+    case Ion_1.IonTypes.SYMBOL:
+      return new Symbol_1.Symbol(reader.stringValue(), annotations);
+
+    case Ion_1.IonTypes.STRING:
+      return new ion.dom.String(reader.stringValue(), annotations);
+
+    case Ion_1.IonTypes.CLOB:
+      return new Clob_1.Clob(reader.byteValue(), annotations);
+
+    case Ion_1.IonTypes.BLOB:
+      return new Blob_1.Blob(reader.byteValue(), annotations);
+
+    case Ion_1.IonTypes.LIST:
+      return _loadList(reader);
+
+    case Ion_1.IonTypes.SEXP:
+      return _loadSExpression(reader);
+
+    case Ion_1.IonTypes.STRUCT:
+      return _loadStruct(reader);
+
+    default:
+      throw new Error("Unrecognized IonType '".concat(ionType, "' found."));
+  }
+}
+
+function _loadStruct(reader) {
+  var children = new Map();
+  var annotations = reader.annotations();
+  reader.stepIn();
+
+  while (reader.next()) {
+    children.set(reader.fieldName(), _loadValue(reader));
+  }
+
+  reader.stepOut();
+  return new Struct_1.Struct(children.entries(), annotations);
+}
+
+function _loadList(reader) {
+  var annotations = reader.annotations();
+  return new List_1.List(_loadSequence(reader), annotations);
+}
+
+function _loadSExpression(reader) {
+  var annotations = reader.annotations();
+  return new SExpression_1.SExpression(_loadSequence(reader), annotations);
+}
+
+function _loadSequence(reader) {
+  var children = [];
+  reader.stepIn();
+
+  while (reader.next()) {
+    children.push(_loadValue(reader));
+  }
+
+  reader.stepOut();
+  return children;
+}
+
+var Value_1 = require("./Value");
+
+exports.Value = Value_1.Value;
+
+var Null_2 = require("./Null");
+
+exports.Null = Null_2.Null;
+
+var Boolean_1 = require("./Boolean");
+
+exports.Boolean = Boolean_1.Boolean;
+
+var Integer_2 = require("./Integer");
+
+exports.Integer = Integer_2.Integer;
+
+var Float_2 = require("./Float");
+
+exports.Float = Float_2.Float;
+
+var Decimal_2 = require("./Decimal");
+
+exports.Decimal = Decimal_2.Decimal;
+
+var Timestamp_2 = require("./Timestamp");
+
+exports.Timestamp = Timestamp_2.Timestamp;
+
+var String_1 = require("./String");
+
+exports.String = String_1.String;
+
+var Symbol_2 = require("./Symbol");
+
+exports.Symbol = Symbol_2.Symbol;
+
+var Blob_2 = require("./Blob");
+
+exports.Blob = Blob_2.Blob;
+
+var Clob_2 = require("./Clob");
+
+exports.Clob = Clob_2.Clob;
+
+var Struct_2 = require("./Struct");
+
+exports.Struct = Struct_2.Struct;
+
+var List_2 = require("./List");
+
+exports.List = List_2.List;
+
+var SExpression_2 = require("./SExpression");
+
+exports.SExpression = SExpression_2.SExpression;
+
+},{"../Ion":3,"../IonBinaryReader":5,"../IonTextReader":22,"./Blob":32,"./Boolean":33,"./Clob":34,"./Decimal":35,"./Float":36,"./Integer":38,"./List":40,"./Null":42,"./SExpression":43,"./String":45,"./Struct":46,"./Symbol":47,"./Timestamp":48,"./Value":49}],51:[function(require,module,exports){
+"use strict";
+/*!
+ * Copyright 2012 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * A copy of the License is located at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * or in the "license" file accompanying this file. This file is distributed
+ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -8791,13 +11312,41 @@ function _hasValue(v) {
 
 exports._hasValue = _hasValue;
 
-},{}],33:[function(require,module,exports){
+function _assertDefined(value) {
+  if (value === undefined) {
+    throw new Error("Expected value to be defined");
+  }
+}
+
+exports._assertDefined = _assertDefined;
+
+},{}],52:[function(require,module,exports){
+function _arrayLikeToArray(arr, len) {
+  if (len == null || len > arr.length) len = arr.length;
+
+  for (var i = 0, arr2 = new Array(len); i < len; i++) {
+    arr2[i] = arr[i];
+  }
+
+  return arr2;
+}
+
+module.exports = _arrayLikeToArray;
+},{}],53:[function(require,module,exports){
 function _arrayWithHoles(arr) {
   if (Array.isArray(arr)) return arr;
 }
 
 module.exports = _arrayWithHoles;
-},{}],34:[function(require,module,exports){
+},{}],54:[function(require,module,exports){
+var arrayLikeToArray = require("./arrayLikeToArray");
+
+function _arrayWithoutHoles(arr) {
+  if (Array.isArray(arr)) return arrayLikeToArray(arr);
+}
+
+module.exports = _arrayWithoutHoles;
+},{"./arrayLikeToArray":52}],55:[function(require,module,exports){
 function _assertThisInitialized(self) {
   if (self === void 0) {
     throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
@@ -8807,7 +11356,7 @@ function _assertThisInitialized(self) {
 }
 
 module.exports = _assertThisInitialized;
-},{}],35:[function(require,module,exports){
+},{}],56:[function(require,module,exports){
 function _classCallCheck(instance, Constructor) {
   if (!(instance instanceof Constructor)) {
     throw new TypeError("Cannot call a class as a function");
@@ -8815,7 +11364,7 @@ function _classCallCheck(instance, Constructor) {
 }
 
 module.exports = _classCallCheck;
-},{}],36:[function(require,module,exports){
+},{}],57:[function(require,module,exports){
 function _defineProperties(target, props) {
   for (var i = 0; i < props.length; i++) {
     var descriptor = props[i];
@@ -8833,7 +11382,7 @@ function _createClass(Constructor, protoProps, staticProps) {
 }
 
 module.exports = _createClass;
-},{}],37:[function(require,module,exports){
+},{}],58:[function(require,module,exports){
 function _defineProperty(obj, key, value) {
   if (key in obj) {
     Object.defineProperty(obj, key, {
@@ -8850,7 +11399,7 @@ function _defineProperty(obj, key, value) {
 }
 
 module.exports = _defineProperty;
-},{}],38:[function(require,module,exports){
+},{}],59:[function(require,module,exports){
 function _extends() {
   module.exports = _extends = Object.assign || function (target) {
     for (var i = 1; i < arguments.length; i++) {
@@ -8870,7 +11419,7 @@ function _extends() {
 }
 
 module.exports = _extends;
-},{}],39:[function(require,module,exports){
+},{}],60:[function(require,module,exports){
 var superPropBase = require("./superPropBase");
 
 function _get(target, property, receiver) {
@@ -8894,7 +11443,7 @@ function _get(target, property, receiver) {
 }
 
 module.exports = _get;
-},{"./superPropBase":48}],40:[function(require,module,exports){
+},{"./superPropBase":71}],61:[function(require,module,exports){
 function _getPrototypeOf(o) {
   module.exports = _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) {
     return o.__proto__ || Object.getPrototypeOf(o);
@@ -8903,7 +11452,7 @@ function _getPrototypeOf(o) {
 }
 
 module.exports = _getPrototypeOf;
-},{}],41:[function(require,module,exports){
+},{}],62:[function(require,module,exports){
 var setPrototypeOf = require("./setPrototypeOf");
 
 function _inherits(subClass, superClass) {
@@ -8922,7 +11471,7 @@ function _inherits(subClass, superClass) {
 }
 
 module.exports = _inherits;
-},{"./setPrototypeOf":46}],42:[function(require,module,exports){
+},{"./setPrototypeOf":69}],63:[function(require,module,exports){
 function _interopRequireDefault(obj) {
   return obj && obj.__esModule ? obj : {
     "default": obj
@@ -8930,12 +11479,15 @@ function _interopRequireDefault(obj) {
 }
 
 module.exports = _interopRequireDefault;
-},{}],43:[function(require,module,exports){
-function _iterableToArrayLimit(arr, i) {
-  if (!(Symbol.iterator in Object(arr) || Object.prototype.toString.call(arr) === "[object Arguments]")) {
-    return;
-  }
+},{}],64:[function(require,module,exports){
+function _iterableToArray(iter) {
+  if (typeof Symbol !== "undefined" && Symbol.iterator in Object(iter)) return Array.from(iter);
+}
 
+module.exports = _iterableToArray;
+},{}],65:[function(require,module,exports){
+function _iterableToArrayLimit(arr, i) {
+  if (typeof Symbol === "undefined" || !(Symbol.iterator in Object(arr))) return;
   var _arr = [];
   var _n = true;
   var _d = false;
@@ -8962,13 +11514,19 @@ function _iterableToArrayLimit(arr, i) {
 }
 
 module.exports = _iterableToArrayLimit;
-},{}],44:[function(require,module,exports){
+},{}],66:[function(require,module,exports){
 function _nonIterableRest() {
-  throw new TypeError("Invalid attempt to destructure non-iterable instance");
+  throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
 }
 
 module.exports = _nonIterableRest;
-},{}],45:[function(require,module,exports){
+},{}],67:[function(require,module,exports){
+function _nonIterableSpread() {
+  throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
+}
+
+module.exports = _nonIterableSpread;
+},{}],68:[function(require,module,exports){
 var _typeof = require("../helpers/typeof");
 
 var assertThisInitialized = require("./assertThisInitialized");
@@ -8982,7 +11540,7 @@ function _possibleConstructorReturn(self, call) {
 }
 
 module.exports = _possibleConstructorReturn;
-},{"../helpers/typeof":49,"./assertThisInitialized":34}],46:[function(require,module,exports){
+},{"../helpers/typeof":73,"./assertThisInitialized":55}],69:[function(require,module,exports){
 function _setPrototypeOf(o, p) {
   module.exports = _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) {
     o.__proto__ = p;
@@ -8993,19 +11551,21 @@ function _setPrototypeOf(o, p) {
 }
 
 module.exports = _setPrototypeOf;
-},{}],47:[function(require,module,exports){
+},{}],70:[function(require,module,exports){
 var arrayWithHoles = require("./arrayWithHoles");
 
 var iterableToArrayLimit = require("./iterableToArrayLimit");
 
+var unsupportedIterableToArray = require("./unsupportedIterableToArray");
+
 var nonIterableRest = require("./nonIterableRest");
 
 function _slicedToArray(arr, i) {
-  return arrayWithHoles(arr) || iterableToArrayLimit(arr, i) || nonIterableRest();
+  return arrayWithHoles(arr) || iterableToArrayLimit(arr, i) || unsupportedIterableToArray(arr, i) || nonIterableRest();
 }
 
 module.exports = _slicedToArray;
-},{"./arrayWithHoles":33,"./iterableToArrayLimit":43,"./nonIterableRest":44}],48:[function(require,module,exports){
+},{"./arrayWithHoles":53,"./iterableToArrayLimit":65,"./nonIterableRest":66,"./unsupportedIterableToArray":74}],71:[function(require,module,exports){
 var getPrototypeOf = require("./getPrototypeOf");
 
 function _superPropBase(object, property) {
@@ -9018,17 +11578,31 @@ function _superPropBase(object, property) {
 }
 
 module.exports = _superPropBase;
-},{"./getPrototypeOf":40}],49:[function(require,module,exports){
-function _typeof2(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof2 = function _typeof2(obj) { return typeof obj; }; } else { _typeof2 = function _typeof2(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof2(obj); }
+},{"./getPrototypeOf":61}],72:[function(require,module,exports){
+var arrayWithoutHoles = require("./arrayWithoutHoles");
 
+var iterableToArray = require("./iterableToArray");
+
+var unsupportedIterableToArray = require("./unsupportedIterableToArray");
+
+var nonIterableSpread = require("./nonIterableSpread");
+
+function _toConsumableArray(arr) {
+  return arrayWithoutHoles(arr) || iterableToArray(arr) || unsupportedIterableToArray(arr) || nonIterableSpread();
+}
+
+module.exports = _toConsumableArray;
+},{"./arrayWithoutHoles":54,"./iterableToArray":64,"./nonIterableSpread":67,"./unsupportedIterableToArray":74}],73:[function(require,module,exports){
 function _typeof(obj) {
-  if (typeof Symbol === "function" && _typeof2(Symbol.iterator) === "symbol") {
+  "@babel/helpers - typeof";
+
+  if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") {
     module.exports = _typeof = function _typeof(obj) {
-      return _typeof2(obj);
+      return typeof obj;
     };
   } else {
     module.exports = _typeof = function _typeof(obj) {
-      return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : _typeof2(obj);
+      return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
     };
   }
 
@@ -9036,7 +11610,20 @@ function _typeof(obj) {
 }
 
 module.exports = _typeof;
-},{}],50:[function(require,module,exports){
+},{}],74:[function(require,module,exports){
+var arrayLikeToArray = require("./arrayLikeToArray");
+
+function _unsupportedIterableToArray(o, minLen) {
+  if (!o) return;
+  if (typeof o === "string") return arrayLikeToArray(o, minLen);
+  var n = Object.prototype.toString.call(o).slice(8, -1);
+  if (n === "Object" && o.constructor) n = o.constructor.name;
+  if (n === "Map" || n === "Set") return Array.from(n);
+  if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return arrayLikeToArray(o, minLen);
+}
+
+module.exports = _unsupportedIterableToArray;
+},{"./arrayLikeToArray":52}],75:[function(require,module,exports){
 (function(e,t){"object"==typeof exports&&"undefined"!=typeof module?module.exports=t():"function"==typeof define&&define.amd?define(t):(e=e||self,e.JSBI=t())})(this,function(){'use strict';function e(t){return e="function"==typeof Symbol&&"symbol"==typeof Symbol.iterator?function(e){return typeof e}:function(e){return e&&"function"==typeof Symbol&&e.constructor===Symbol&&e!==Symbol.prototype?"symbol":typeof e},e(t)}function t(e,t){if(!(e instanceof t))throw new TypeError("Cannot call a class as a function")}function i(e,t){for(var _,n=0;n<t.length;n++)_=t[n],_.enumerable=_.enumerable||!1,_.configurable=!0,"value"in _&&(_.writable=!0),Object.defineProperty(e,_.key,_)}function _(e,t,_){return t&&i(e.prototype,t),_&&i(e,_),e}function n(e,t){if("function"!=typeof t&&null!==t)throw new TypeError("Super expression must either be null or a function");e.prototype=Object.create(t&&t.prototype,{constructor:{value:e,writable:!0,configurable:!0}}),t&&l(e,t)}function g(e){return g=Object.setPrototypeOf?Object.getPrototypeOf:function(e){return e.__proto__||Object.getPrototypeOf(e)},g(e)}function l(e,t){return l=Object.setPrototypeOf||function(e,t){return e.__proto__=t,e},l(e,t)}function o(){if("undefined"==typeof Reflect||!Reflect.construct)return!1;if(Reflect.construct.sham)return!1;if("function"==typeof Proxy)return!0;try{return Date.prototype.toString.call(Reflect.construct(Date,[],function(){})),!0}catch(t){return!1}}function a(){return a=o()?Reflect.construct:function(e,t,i){var _=[null];_.push.apply(_,t);var n=Function.bind.apply(e,_),g=new n;return i&&l(g,i.prototype),g},a.apply(null,arguments)}function s(e){return-1!==Function.toString.call(e).indexOf("[native code]")}function u(e){var t="function"==typeof Map?new Map:void 0;return u=function(e){function i(){return a(e,arguments,g(this).constructor)}if(null===e||!s(e))return e;if("function"!=typeof e)throw new TypeError("Super expression must either be null or a function");if("undefined"!=typeof t){if(t.has(e))return t.get(e);t.set(e,i)}return i.prototype=Object.create(e.prototype,{constructor:{value:i,enumerable:!1,writable:!0,configurable:!0}}),l(i,e)},u(e)}function r(e){if(void 0===e)throw new ReferenceError("this hasn't been initialised - super() hasn't been called");return e}function d(e,t){return t&&("object"==typeof t||"function"==typeof t)?t:r(e)}var h=function(i){var o=Math.abs,a=Math.max,s=Math.imul,u=Math.clz32;function l(e,i){var _;if(t(this,l),e>l.__kMaxLength)throw new RangeError("Maximum BigInt size exceeded");return _=d(this,g(l).call(this,e)),_.sign=i,_}return n(l,i),_(l,[{key:"toDebugString",value:function(){var e=["BigInt["],t=!0,i=!1,_=void 0;try{for(var n,g,l=this[Symbol.iterator]();!(t=(n=l.next()).done);t=!0)g=n.value,e.push((g?(g>>>0).toString(16):g)+", ")}catch(e){i=!0,_=e}finally{try{t||null==l.return||l.return()}finally{if(i)throw _}}return e.push("]"),e.join("")}},{key:"toString",value:function(){var e=0<arguments.length&&void 0!==arguments[0]?arguments[0]:10;if(2>e||36<e)throw new RangeError("toString() radix argument must be between 2 and 36");return 0===this.length?"0":0==(e&e-1)?l.__toStringBasePowerOfTwo(this,e):l.__toStringGeneric(this,e,!1)}},{key:"__copy",value:function(){for(var e=new l(this.length,this.sign),t=0;t<this.length;t++)e[t]=this[t];return e}},{key:"__trim",value:function(){for(var e=this.length,t=this[e-1];0===t;)e--,t=this[e-1],this.pop();return 0===e&&(this.sign=!1),this}},{key:"__initializeDigits",value:function(){for(var e=0;e<this.length;e++)this[e]=0}},{key:"__clzmsd",value:function(){return u(this[this.length-1])}},{key:"__inplaceMultiplyAdd",value:function(e,t,_){_>this.length&&(_=this.length);for(var n=65535&e,g=e>>>16,l=0,o=65535&t,a=t>>>16,u=0;u<_;u++){var r=this.__digit(u),d=65535&r,h=r>>>16,b=s(d,n),m=s(d,g),c=s(h,n),v=s(h,g),y=o+(65535&b),f=a+l+(y>>>16)+(b>>>16)+(65535&m)+(65535&c);o=(m>>>16)+(c>>>16)+(65535&v)+(f>>>16),l=o>>>16,o&=65535,a=v>>>16;this.__setDigit(u,65535&y|f<<16)}if(0!==l||0!==o||0!==a)throw new Error("implementation bug")}},{key:"__inplaceAdd",value:function(e,t,_){for(var n,g=0,l=0;l<_;l++)n=this.__halfDigit(t+l)+e.__halfDigit(l)+g,g=n>>>16,this.__setHalfDigit(t+l,n);return g}},{key:"__inplaceSub",value:function(e,t,_){var n=0;if(1&t){t>>=1;for(var g=this.__digit(t),l=65535&g,o=0;o<_-1>>>1;o++){var a=e.__digit(o),s=(g>>>16)-(65535&a)-n;n=1&s>>>16,this.__setDigit(t+o,s<<16|65535&l),g=this.__digit(t+o+1),l=(65535&g)-(a>>>16)-n,n=1&l>>>16}var u=e.__digit(o),r=(g>>>16)-(65535&u)-n;n=1&r>>>16,this.__setDigit(t+o,r<<16|65535&l);if(t+o+1>=this.length)throw new RangeError("out of bounds");0==(1&_)&&(g=this.__digit(t+o+1),l=(65535&g)-(u>>>16)-n,n=1&l>>>16,this.__setDigit(t+e.length,4294901760&g|65535&l))}else{t>>=1;for(var d=0;d<e.length-1;d++){var h=this.__digit(t+d),b=e.__digit(d),m=(65535&h)-(65535&b)-n;n=1&m>>>16;var c=(h>>>16)-(b>>>16)-n;n=1&c>>>16,this.__setDigit(t+d,c<<16|65535&m)}var v=this.__digit(t+d),y=e.__digit(d),f=(65535&v)-(65535&y)-n;n=1&f>>>16;var k=0;0==(1&_)&&(k=(v>>>16)-(y>>>16)-n,n=1&k>>>16),this.__setDigit(t+d,k<<16|65535&f)}return n}},{key:"__inplaceRightShift",value:function(e){if(0!==e){for(var t,_=this.__digit(0)>>>e,n=this.length-1,g=0;g<n;g++)t=this.__digit(g+1),this.__setDigit(g,t<<32-e|_),_=t>>>e;this.__setDigit(n,_)}}},{key:"__digit",value:function(e){return this[e]}},{key:"__unsignedDigit",value:function(e){return this[e]>>>0}},{key:"__setDigit",value:function(e,t){this[e]=0|t}},{key:"__setDigitGrow",value:function(e,t){this[e]=0|t}},{key:"__halfDigitLength",value:function(){var e=this.length;return 65535>=this.__unsignedDigit(e-1)?2*e-1:2*e}},{key:"__halfDigit",value:function(e){return 65535&this[e>>>1]>>>((1&e)<<4)}},{key:"__setHalfDigit",value:function(e,t){var i=e>>>1,_=this.__digit(i),n=1&e?65535&_|t<<16:4294901760&_|65535&t;this.__setDigit(i,n)}}],[{key:"BigInt",value:function(t){var i=Math.floor,_=Number.isFinite;if("number"==typeof t){if(0===t)return l.__zero();if((0|t)===t)return 0>t?l.__oneDigit(-t,!0):l.__oneDigit(t,!1);if(!_(t)||i(t)!==t)throw new RangeError("The number "+t+" cannot be converted to BigInt because it is not an integer");return l.__fromDouble(t)}if("string"==typeof t){var n=l.__fromString(t);if(null===n)throw new SyntaxError("Cannot convert "+t+" to a BigInt");return n}if("boolean"==typeof t)return!0===t?l.__oneDigit(1,!1):l.__zero();if("object"===e(t)){if(t.constructor===l)return t;var g=l.__toPrimitive(t);return l.BigInt(g)}throw new TypeError("Cannot convert "+t+" to a BigInt")}},{key:"toNumber",value:function(e){var t=e.length;if(0===t)return 0;if(1===t){var i=e.__unsignedDigit(0);return e.sign?-i:i}var _=e.__digit(t-1),n=u(_),g=32*t-n;if(1024<g)return e.sign?-Infinity:1/0;var o=g-1,a=_,s=t-1,r=n+1,d=32===r?0:a<<r;d>>>=12;var h=r-12,b=12<=r?0:a<<20+r,m=20+r;0<h&&0<s&&(s--,a=e.__digit(s),d|=a>>>32-h,b=a<<h,m=h),0<m&&0<s&&(s--,a=e.__digit(s),b|=a>>>32-m,m-=32);var c=l.__decideRounding(e,m,s,a);if((1===c||0===c&&1==(1&b))&&(b=b+1>>>0,0===b&&(d++,0!=d>>>20&&(d=0,o++,1023<o))))return e.sign?-Infinity:1/0;var v=e.sign?-2147483648:0;return o=o+1023<<20,l.__kBitConversionInts[1]=v|o|d,l.__kBitConversionInts[0]=b,l.__kBitConversionDouble[0]}},{key:"unaryMinus",value:function(e){if(0===e.length)return e;var t=e.__copy();return t.sign=!e.sign,t}},{key:"bitwiseNot",value:function(e){return e.sign?l.__absoluteSubOne(e).__trim():l.__absoluteAddOne(e,!0)}},{key:"exponentiate",value:function(e,t){if(t.sign)throw new RangeError("Exponent must be positive");if(0===t.length)return l.__oneDigit(1,!1);if(0===e.length)return e;if(1===e.length&&1===e.__digit(0))return e.sign&&0==(1&t.__digit(0))?l.unaryMinus(e):e;if(1<t.length)throw new RangeError("BigInt too big");var i=t.__unsignedDigit(0);if(1===i)return e;if(i>=l.__kMaxLengthBits)throw new RangeError("BigInt too big");if(1===e.length&&2===e.__digit(0)){var _=1+(i>>>5),n=e.sign&&0!=(1&i),g=new l(_,n);g.__initializeDigits();var o=1<<(31&i);return g.__setDigit(_-1,o),g}var a=null,s=e;for(0!=(1&i)&&(a=e),i>>=1;0!==i;i>>=1)s=l.multiply(s,s),0!=(1&i)&&(null===a?a=s:a=l.multiply(a,s));return a}},{key:"multiply",value:function(e,t){if(0===e.length)return e;if(0===t.length)return t;var _=e.length+t.length;32<=e.__clzmsd()+t.__clzmsd()&&_--;var n=new l(_,e.sign!==t.sign);n.__initializeDigits();for(var g=0;g<e.length;g++)l.__multiplyAccumulate(t,e.__digit(g),n,g);return n.__trim()}},{key:"divide",value:function(e,t){if(0===t.length)throw new RangeError("Division by zero");if(0>l.__absoluteCompare(e,t))return l.__zero();var i,_=e.sign!==t.sign,n=t.__unsignedDigit(0);if(1===t.length&&65535>=n){if(1===n)return _===e.sign?e:l.unaryMinus(e);i=l.__absoluteDivSmall(e,n,null)}else i=l.__absoluteDivLarge(e,t,!0,!1);return i.sign=_,i.__trim()}},{key:"remainder",value:function e(t,i){if(0===i.length)throw new RangeError("Division by zero");if(0>l.__absoluteCompare(t,i))return t;var _=i.__unsignedDigit(0);if(1===i.length&&65535>=_){if(1===_)return l.__zero();var n=l.__absoluteModSmall(t,_);return 0===n?l.__zero():l.__oneDigit(n,t.sign)}var e=l.__absoluteDivLarge(t,i,!1,!0);return e.sign=t.sign,e.__trim()}},{key:"add",value:function(e,t){var i=e.sign;return i===t.sign?l.__absoluteAdd(e,t,i):0<=l.__absoluteCompare(e,t)?l.__absoluteSub(e,t,i):l.__absoluteSub(t,e,!i)}},{key:"subtract",value:function(e,t){var i=e.sign;return i===t.sign?0<=l.__absoluteCompare(e,t)?l.__absoluteSub(e,t,i):l.__absoluteSub(t,e,!i):l.__absoluteAdd(e,t,i)}},{key:"leftShift",value:function(e,t){return 0===t.length||0===e.length?e:t.sign?l.__rightShiftByAbsolute(e,t):l.__leftShiftByAbsolute(e,t)}},{key:"signedRightShift",value:function(e,t){return 0===t.length||0===e.length?e:t.sign?l.__leftShiftByAbsolute(e,t):l.__rightShiftByAbsolute(e,t)}},{key:"unsignedRightShift",value:function(){throw new TypeError("BigInts have no unsigned right shift; use >> instead")}},{key:"lessThan",value:function(e,t){return 0>l.__compareToBigInt(e,t)}},{key:"lessThanOrEqual",value:function(e,t){return 0>=l.__compareToBigInt(e,t)}},{key:"greaterThan",value:function(e,t){return 0<l.__compareToBigInt(e,t)}},{key:"greaterThanOrEqual",value:function(e,t){return 0<=l.__compareToBigInt(e,t)}},{key:"equal",value:function(e,t){if(e.sign!==t.sign)return!1;if(e.length!==t.length)return!1;for(var _=0;_<e.length;_++)if(e.__digit(_)!==t.__digit(_))return!1;return!0}},{key:"notEqual",value:function(e,t){return!l.equal(e,t)}},{key:"bitwiseAnd",value:function(e,t){if(!e.sign&&!t.sign)return l.__absoluteAnd(e,t).__trim();if(e.sign&&t.sign){var i=a(e.length,t.length)+1,_=l.__absoluteSubOne(e,i),n=l.__absoluteSubOne(t);return _=l.__absoluteOr(_,n,_),l.__absoluteAddOne(_,!0,_).__trim()}if(e.sign){var g=[t,e];e=g[0],t=g[1]}return l.__absoluteAndNot(e,l.__absoluteSubOne(t)).__trim()}},{key:"bitwiseXor",value:function(e,t){if(!e.sign&&!t.sign)return l.__absoluteXor(e,t).__trim();if(e.sign&&t.sign){var i=a(e.length,t.length),_=l.__absoluteSubOne(e,i),n=l.__absoluteSubOne(t);return l.__absoluteXor(_,n,_).__trim()}var g=a(e.length,t.length)+1;if(e.sign){var o=[t,e];e=o[0],t=o[1]}var s=l.__absoluteSubOne(t,g);return s=l.__absoluteXor(s,e,s),l.__absoluteAddOne(s,!0,s).__trim()}},{key:"bitwiseOr",value:function(e,t){var i=a(e.length,t.length);if(!e.sign&&!t.sign)return l.__absoluteOr(e,t).__trim();if(e.sign&&t.sign){var _=l.__absoluteSubOne(e,i),n=l.__absoluteSubOne(t);return _=l.__absoluteAnd(_,n,_),l.__absoluteAddOne(_,!0,_).__trim()}if(e.sign){var g=[t,e];e=g[0],t=g[1]}var o=l.__absoluteSubOne(t,i);return o=l.__absoluteAndNot(o,e,o),l.__absoluteAddOne(o,!0,o).__trim()}},{key:"asIntN",value:function(e,t){if(0===t.length)return t;if(0===e)return l.__zero();if(e>=l.__kMaxLengthBits)return t;var _=e+31>>>5;if(t.length<_)return t;var n=t.__unsignedDigit(_-1),g=1<<(31&e-1);if(t.length===_&&n<g)return t;if(!((n&g)===g))return l.__truncateToNBits(e,t);if(!t.sign)return l.__truncateAndSubFromPowerOfTwo(e,t,!0);if(0==(n&g-1)){for(var o=_-2;0<=o;o--)if(0!==t.__digit(o))return l.__truncateAndSubFromPowerOfTwo(e,t,!1);return t.length===_&&n===g?t:l.__truncateToNBits(e,t)}return l.__truncateAndSubFromPowerOfTwo(e,t,!1)}},{key:"asUintN",value:function(e,t){if(0===t.length)return t;if(0===e)return l.__zero();if(t.sign){if(e>l.__kMaxLengthBits)throw new RangeError("BigInt too big");return l.__truncateAndSubFromPowerOfTwo(e,t,!1)}if(e>=l.__kMaxLengthBits)return t;var i=e+31>>>5;if(t.length<i)return t;var _=31&e;if(t.length==i){if(0==_)return t;var n=t.__digit(i-1);if(0==n>>>_)return t}return l.__truncateToNBits(e,t)}},{key:"ADD",value:function(e,t){if(e=l.__toPrimitive(e),t=l.__toPrimitive(t),"string"==typeof e)return"string"!=typeof t&&(t=t.toString()),e+t;if("string"==typeof t)return e.toString()+t;if(e=l.__toNumeric(e),t=l.__toNumeric(t),l.__isBigInt(e)&&l.__isBigInt(t))return l.add(e,t);if("number"==typeof e&&"number"==typeof t)return e+t;throw new TypeError("Cannot mix BigInt and other types, use explicit conversions")}},{key:"LT",value:function(e,t){return l.__compare(e,t,0)}},{key:"LE",value:function(e,t){return l.__compare(e,t,1)}},{key:"GT",value:function(e,t){return l.__compare(e,t,2)}},{key:"GE",value:function(e,t){return l.__compare(e,t,3)}},{key:"EQ",value:function(t,i){for(;;){if(l.__isBigInt(t))return l.__isBigInt(i)?l.equal(t,i):l.EQ(i,t);if("number"==typeof t){if(l.__isBigInt(i))return l.__equalToNumber(i,t);if("object"!==e(i))return t==i;i=l.__toPrimitive(i)}else if("string"==typeof t){if(l.__isBigInt(i))return t=l.__fromString(t),null!==t&&l.equal(t,i);if("object"!==e(i))return t==i;i=l.__toPrimitive(i)}else if("boolean"==typeof t){if(l.__isBigInt(i))return l.__equalToNumber(i,+t);if("object"!==e(i))return t==i;i=l.__toPrimitive(i)}else if("symbol"===e(t)){if(l.__isBigInt(i))return!1;if("object"!==e(i))return t==i;i=l.__toPrimitive(i)}else if("object"===e(t)){if("object"===e(i)&&i.constructor!==l)return t==i;t=l.__toPrimitive(t)}else return t==i}}},{key:"NE",value:function(e,t){return!l.EQ(e,t)}},{key:"__zero",value:function(){return new l(0,!1)}},{key:"__oneDigit",value:function(e,t){var i=new l(1,t);return i.__setDigit(0,e),i}},{key:"__decideRounding",value:function(e,t,i,_){if(0<t)return-1;var n;if(0>t)n=-t-1;else{if(0===i)return-1;i--,_=e.__digit(i),n=31}var g=1<<n;if(0==(_&g))return-1;if(g-=1,0!=(_&g))return 1;for(;0<i;)if(i--,0!==e.__digit(i))return 1;return 0}},{key:"__fromDouble",value:function(e){l.__kBitConversionDouble[0]=e;var t,i=2047&l.__kBitConversionInts[1]>>>20,_=i-1023,n=(_>>>5)+1,g=new l(n,0>e),o=1048575&l.__kBitConversionInts[1]|1048576,a=l.__kBitConversionInts[0],s=20,u=31&_,r=0;if(u<s){var d=s-u;r=d+32,t=o>>>d,o=o<<32-d|a>>>d,a<<=32-d}else if(u===s)r=32,t=o,o=a;else{var h=u-s;r=32-h,t=o<<h|a>>>32-h,o=a<<h}g.__setDigit(n-1,t);for(var b=n-2;0<=b;b--)0<r?(r-=32,t=o,o=a):t=0,g.__setDigit(b,t);return g.__trim()}},{key:"__isWhitespace",value:function(e){return!!(13>=e&&9<=e)||(159>=e?32==e:131071>=e?160==e||5760==e:196607>=e?(e&=131071,10>=e||40==e||41==e||47==e||95==e||4096==e):65279==e)}},{key:"__fromString",value:function(e){var t=1<arguments.length&&void 0!==arguments[1]?arguments[1]:0,i=0,_=e.length,n=0;if(n===_)return l.__zero();for(var g=e.charCodeAt(n);l.__isWhitespace(g);){if(++n===_)return l.__zero();g=e.charCodeAt(n)}if(43===g){if(++n===_)return null;g=e.charCodeAt(n),i=1}else if(45===g){if(++n===_)return null;g=e.charCodeAt(n),i=-1}if(0===t){if(t=10,48===g){if(++n===_)return l.__zero();if(g=e.charCodeAt(n),88===g||120===g){if(t=16,++n===_)return null;g=e.charCodeAt(n)}else if(79===g||111===g){if(t=8,++n===_)return null;g=e.charCodeAt(n)}else if(66===g||98===g){if(t=2,++n===_)return null;g=e.charCodeAt(n)}}}else if(16===t&&48===g){if(++n===_)return l.__zero();if(g=e.charCodeAt(n),88===g||120===g){if(++n===_)return null;g=e.charCodeAt(n)}}for(;48===g;){if(++n===_)return l.__zero();g=e.charCodeAt(n)}var o=_-n,a=l.__kMaxBitsPerChar[t],s=l.__kBitsPerCharTableMultiplier-1;if(o>1073741824/a)return null;var u=a*o+s>>>l.__kBitsPerCharTableShift,r=new l(u+31>>>5,!1),h=10>t?t:10,b=10<t?t-10:0;if(0==(t&t-1)){a>>=l.__kBitsPerCharTableShift;var c=[],v=[],y=!1;do{for(var f,k=0,D=0;;){if(f=void 0,g-48>>>0<h)f=g-48;else if((32|g)-97>>>0<b)f=(32|g)-87;else{y=!0;break}if(D+=a,k=k<<a|f,++n===_){y=!0;break}if(g=e.charCodeAt(n),32<D+a)break}c.push(k),v.push(D)}while(!y);l.__fillFromParts(r,c,v)}else{r.__initializeDigits();var p=!1,B=0;do{for(var S,C=0,A=1;;){if(S=void 0,g-48>>>0<h)S=g-48;else if((32|g)-97>>>0<b)S=(32|g)-87;else{p=!0;break}var T=A*t;if(4294967295<T)break;if(A=T,C=C*t+S,B++,++n===_){p=!0;break}g=e.charCodeAt(n)}s=32*l.__kBitsPerCharTableMultiplier-1;var m=a*B+s>>>l.__kBitsPerCharTableShift+5;r.__inplaceMultiplyAdd(A,C,m)}while(!p)}for(;n!==_;){if(!l.__isWhitespace(g))return null;g=e.charCodeAt(n++)}return 0!==i&&10!==t?null:(r.sign=-1===i,r.__trim())}},{key:"__fillFromParts",value:function(e,t,_){for(var n=0,g=0,l=0,o=t.length-1;0<=o;o--){var a=t[o],s=_[o];g|=a<<l,l+=s,32===l?(e.__setDigit(n++,g),l=0,g=0):32<l&&(e.__setDigit(n++,g),l-=32,g=a>>>s-l)}if(0!==g){if(n>=e.length)throw new Error("implementation bug");e.__setDigit(n++,g)}for(;n<e.length;n++)e.__setDigit(n,0)}},{key:"__toStringBasePowerOfTwo",value:function(e,t){var _=e.length,n=t-1;n=(85&n>>>1)+(85&n),n=(51&n>>>2)+(51&n),n=(15&n>>>4)+(15&n);var g=n,o=t-1,a=e.__digit(_-1),s=u(a),r=0|(32*_-s+g-1)/g;if(e.sign&&r++,268435456<r)throw new Error("string too long");for(var d=Array(r),h=r-1,b=0,m=0,c=0;c<_-1;c++){var v=e.__digit(c),y=(b|v<<m)&o;d[h--]=l.__kConversionChars[y];var f=g-m;for(b=v>>>f,m=32-f;m>=g;)d[h--]=l.__kConversionChars[b&o],b>>>=g,m-=g}var k=(b|a<<m)&o;for(d[h--]=l.__kConversionChars[k],b=a>>>g-m;0!==b;)d[h--]=l.__kConversionChars[b&o],b>>>=g;if(e.sign&&(d[h--]="-"),-1!==h)throw new Error("implementation bug");return d.join("")}},{key:"__toStringGeneric",value:function(e,t,_){var n=e.length;if(0===n)return"";if(1===n){var g=e.__unsignedDigit(0).toString(t);return!1===_&&e.sign&&(g="-"+g),g}var o=32*n-u(e.__digit(n-1)),a=l.__kMaxBitsPerChar[t],s=a-1,r=o*l.__kBitsPerCharTableMultiplier;r+=s-1,r=0|r/s;var d,h,b=r+1>>1,m=l.exponentiate(l.__oneDigit(t,!1),l.__oneDigit(b,!1)),c=m.__unsignedDigit(0);if(1===m.length&&65535>=c){d=new l(e.length,!1),d.__initializeDigits();for(var v,y=0,f=2*e.length-1;0<=f;f--)v=y<<16|e.__halfDigit(f),d.__setHalfDigit(f,0|v/c),y=0|v%c;h=y.toString(t)}else{var k=l.__absoluteDivLarge(e,m,!0,!0);d=k.quotient;var D=k.remainder.__trim();h=l.__toStringGeneric(D,t,!0)}d.__trim();for(var p=l.__toStringGeneric(d,t,!0);h.length<b;)h="0"+h;return!1===_&&e.sign&&(p="-"+p),p+h}},{key:"__unequalSign",value:function(e){return e?-1:1}},{key:"__absoluteGreater",value:function(e){return e?-1:1}},{key:"__absoluteLess",value:function(e){return e?1:-1}},{key:"__compareToBigInt",value:function(e,t){var i=e.sign;if(i!==t.sign)return l.__unequalSign(i);var _=l.__absoluteCompare(e,t);return 0<_?l.__absoluteGreater(i):0>_?l.__absoluteLess(i):0}},{key:"__compareToNumber",value:function(e,t){if(!0|t){var i=e.sign,_=0>t;if(i!==_)return l.__unequalSign(i);if(0===e.length){if(_)throw new Error("implementation bug");return 0===t?0:-1}if(1<e.length)return l.__absoluteGreater(i);var n=o(t),g=e.__unsignedDigit(0);return g>n?l.__absoluteGreater(i):g<n?l.__absoluteLess(i):0}return l.__compareToDouble(e,t)}},{key:"__compareToDouble",value:function(e,t){if(t!==t)return t;if(t===1/0)return-1;if(t===-Infinity)return 1;var i=e.sign;if(i!==0>t)return l.__unequalSign(i);if(0===t)throw new Error("implementation bug: should be handled elsewhere");if(0===e.length)return-1;l.__kBitConversionDouble[0]=t;var _=2047&l.__kBitConversionInts[1]>>>20;if(2047==_)throw new Error("implementation bug: handled elsewhere");var n=_-1023;if(0>n)return l.__absoluteGreater(i);var g=e.length,o=e.__digit(g-1),a=u(o),s=32*g-a,r=n+1;if(s<r)return l.__absoluteLess(i);if(s>r)return l.__absoluteGreater(i);var d=1048576|1048575&l.__kBitConversionInts[1],h=l.__kBitConversionInts[0],b=20,m=31-a;if(m!==(s-1)%31)throw new Error("implementation bug");var c,v=0;if(m<b){var y=b-m;v=y+32,c=d>>>y,d=d<<32-y|h>>>y,h<<=32-y}else if(m===b)v=32,c=d,d=h;else{var f=m-b;v=32-f,c=d<<f|h>>>32-f,d=h<<f}if(o>>>=0,c>>>=0,o>c)return l.__absoluteGreater(i);if(o<c)return l.__absoluteLess(i);for(var k=g-2;0<=k;k--){0<v?(v-=32,c=d>>>0,d=h,h=0):c=0;var D=e.__unsignedDigit(k);if(D>c)return l.__absoluteGreater(i);if(D<c)return l.__absoluteLess(i)}if(0!==d||0!==h){if(0===v)throw new Error("implementation bug");return l.__absoluteLess(i)}return 0}},{key:"__equalToNumber",value:function(e,t){return t|0===t?0===t?0===e.length:1===e.length&&e.sign===0>t&&e.__unsignedDigit(0)===o(t):0===l.__compareToDouble(e,t)}},{key:"__comparisonResultToBool",value:function(e,t){switch(t){case 0:return 0>e;case 1:return 0>=e;case 2:return 0<e;case 3:return 0<=e;}throw new Error("unreachable")}},{key:"__compare",value:function(e,t,i){if(e=l.__toPrimitive(e),t=l.__toPrimitive(t),"string"==typeof e&&"string"==typeof t)switch(i){case 0:return e<t;case 1:return e<=t;case 2:return e>t;case 3:return e>=t;}if(l.__isBigInt(e)&&"string"==typeof t)return t=l.__fromString(t),null!==t&&l.__comparisonResultToBool(l.__compareToBigInt(e,t),i);if("string"==typeof e&&l.__isBigInt(t))return e=l.__fromString(e),null!==e&&l.__comparisonResultToBool(l.__compareToBigInt(e,t),i);if(e=l.__toNumeric(e),t=l.__toNumeric(t),l.__isBigInt(e)){if(l.__isBigInt(t))return l.__comparisonResultToBool(l.__compareToBigInt(e,t),i);if("number"!=typeof t)throw new Error("implementation bug");return l.__comparisonResultToBool(l.__compareToNumber(e,t),i)}if("number"!=typeof e)throw new Error("implementation bug");if(l.__isBigInt(t))return l.__comparisonResultToBool(l.__compareToNumber(t,e),2^i);if("number"!=typeof t)throw new Error("implementation bug");return 0===i?e<t:1===i?e<=t:2===i?e>t:3===i?e>=t:void 0}},{key:"__absoluteAdd",value:function(e,t,_){if(e.length<t.length)return l.__absoluteAdd(t,e,_);if(0===e.length)return e;if(0===t.length)return e.sign===_?e:l.unaryMinus(e);var n=e.length;(0===e.__clzmsd()||t.length===e.length&&0===t.__clzmsd())&&n++;for(var g=new l(n,_),o=0,a=0;a<t.length;a++){var s=t.__digit(a),u=e.__digit(a),r=(65535&u)+(65535&s)+o,d=(u>>>16)+(s>>>16)+(r>>>16);o=d>>>16,g.__setDigit(a,65535&r|d<<16)}for(;a<e.length;a++){var h=e.__digit(a),b=(65535&h)+o,m=(h>>>16)+(b>>>16);o=m>>>16,g.__setDigit(a,65535&b|m<<16)}return a<g.length&&g.__setDigit(a,o),g.__trim()}},{key:"__absoluteSub",value:function(e,t,_){if(0===e.length)return e;if(0===t.length)return e.sign===_?e:l.unaryMinus(e);for(var n=new l(e.length,_),g=0,o=0;o<t.length;o++){var a=e.__digit(o),s=t.__digit(o),u=(65535&a)-(65535&s)-g;g=1&u>>>16;var r=(a>>>16)-(s>>>16)-g;g=1&r>>>16,n.__setDigit(o,65535&u|r<<16)}for(;o<e.length;o++){var d=e.__digit(o),h=(65535&d)-g;g=1&h>>>16;var b=(d>>>16)-g;g=1&b>>>16,n.__setDigit(o,65535&h|b<<16)}return n.__trim()}},{key:"__absoluteAddOne",value:function(e,t){var _=2<arguments.length&&void 0!==arguments[2]?arguments[2]:null,n=e.length;null===_?_=new l(n,t):_.sign=t;for(var g=!0,o=0;o<n;o++){var a=e.__digit(o),s=-1===a;g&&(a=0|a+1),g=s,_.__setDigit(o,a)}return g&&_.__setDigitGrow(n,1),_}},{key:"__absoluteSubOne",value:function(e,t){var _=e.length;t=t||_;for(var n=new l(t,!1),g=!0,o=0;o<_;o++){var a=e.__digit(o),s=0===a;g&&(a=0|a-1),g=s,n.__setDigit(o,a)}for(var u=_;u<t;u++)n.__setDigit(u,0);return n}},{key:"__absoluteAnd",value:function(e,t){var _=2<arguments.length&&void 0!==arguments[2]?arguments[2]:null,n=e.length,g=t.length,o=g;if(n<g){o=n;var a=e,s=n;e=t,n=g,t=a,g=s}var u=o;null===_?_=new l(u,!1):u=_.length;for(var r=0;r<o;r++)_.__setDigit(r,e.__digit(r)&t.__digit(r));for(;r<u;r++)_.__setDigit(r,0);return _}},{key:"__absoluteAndNot",value:function(e,t){var _=2<arguments.length&&void 0!==arguments[2]?arguments[2]:null,n=e.length,g=t.length,o=g;n<g&&(o=n);var a=n;null===_?_=new l(a,!1):a=_.length;for(var s=0;s<o;s++)_.__setDigit(s,e.__digit(s)&~t.__digit(s));for(;s<n;s++)_.__setDigit(s,e.__digit(s));for(;s<a;s++)_.__setDigit(s,0);return _}},{key:"__absoluteOr",value:function(e,t){var _=2<arguments.length&&void 0!==arguments[2]?arguments[2]:null,n=e.length,g=t.length,o=g;if(n<g){o=n;var a=e,s=n;e=t,n=g,t=a,g=s}var u=n;null===_?_=new l(u,!1):u=_.length;for(var r=0;r<o;r++)_.__setDigit(r,e.__digit(r)|t.__digit(r));for(;r<n;r++)_.__setDigit(r,e.__digit(r));for(;r<u;r++)_.__setDigit(r,0);return _}},{key:"__absoluteXor",value:function(e,t){var _=2<arguments.length&&void 0!==arguments[2]?arguments[2]:null,n=e.length,g=t.length,o=g;if(n<g){o=n;var a=e,s=n;e=t,n=g,t=a,g=s}var u=n;null===_?_=new l(u,!1):u=_.length;for(var r=0;r<o;r++)_.__setDigit(r,e.__digit(r)^t.__digit(r));for(;r<n;r++)_.__setDigit(r,e.__digit(r));for(;r<u;r++)_.__setDigit(r,0);return _}},{key:"__absoluteCompare",value:function(e,t){var _=e.length-t.length;if(0!=_)return _;for(var n=e.length-1;0<=n&&e.__digit(n)===t.__digit(n);)n--;return 0>n?0:e.__unsignedDigit(n)>t.__unsignedDigit(n)?1:-1}},{key:"__multiplyAccumulate",value:function(e,t,_,n){if(0!==t){for(var g=65535&t,l=t>>>16,o=0,a=0,u=0,r=0;r<e.length;r++,n++){var d=_.__digit(n),h=65535&d,b=d>>>16,m=e.__digit(r),c=65535&m,v=m>>>16,y=s(c,g),f=s(c,l),k=s(v,g),D=s(v,l);h+=a+(65535&y),b+=u+o+(h>>>16)+(y>>>16)+(65535&f)+(65535&k),o=b>>>16,a=(f>>>16)+(k>>>16)+(65535&D)+o,o=a>>>16,a&=65535,u=D>>>16,d=65535&h|b<<16,_.__setDigit(n,d)}for(;0!==o||0!==a||0!==u;n++){var p=_.__digit(n),B=(65535&p)+a,S=(p>>>16)+(B>>>16)+u+o;a=0,u=0,o=S>>>16,p=65535&B|S<<16,_.__setDigit(n,p)}}}},{key:"__internalMultiplyAdd",value:function(e,t,_,g,l){for(var o=_,a=0,u=0;u<g;u++){var r=e.__digit(u),d=s(65535&r,t),h=(65535&d)+a+o;o=h>>>16;var b=s(r>>>16,t),m=(65535&b)+(d>>>16)+o;o=m>>>16,a=b>>>16,l.__setDigit(u,m<<16|65535&h)}if(l.length>g)for(l.__setDigit(g++,o+a);g<l.length;)l.__setDigit(g++,0);else if(0!==o+a)throw new Error("implementation bug")}},{key:"__absoluteDivSmall",value:function(e,t,_){null===_&&(_=new l(e.length,!1));for(var n=0,g=2*e.length-1;0<=g;g-=2){var o=(n<<16|e.__halfDigit(g))>>>0,a=0|o/t;n=0|o%t,o=(n<<16|e.__halfDigit(g-1))>>>0;var s=0|o/t;n=0|o%t,_.__setDigit(g>>>1,a<<16|s)}return _}},{key:"__absoluteModSmall",value:function(e,t){for(var _,n=0,g=2*e.length-1;0<=g;g--)_=(n<<16|e.__halfDigit(g))>>>0,n=0|_%t;return n}},{key:"__absoluteDivLarge",value:function(e,t,i,_){var g=t.__halfDigitLength(),n=t.length,o=e.__halfDigitLength()-g,a=null;i&&(a=new l(o+2>>>1,!1),a.__initializeDigits());var r=new l(g+2>>>1,!1);r.__initializeDigits();var d=l.__clz16(t.__halfDigit(g-1));0<d&&(t=l.__specialLeftShift(t,d,0));for(var h=l.__specialLeftShift(e,d,1),u=t.__halfDigit(g-1),b=0,m=o;0<=m;m--){var v=65535,y=h.__halfDigit(m+g);if(y!==u){var f=(y<<16|h.__halfDigit(m+g-1))>>>0;v=0|f/u;for(var k=0|f%u,D=t.__halfDigit(g-2),p=h.__halfDigit(m+g-2);s(v,D)>>>0>(k<<16|p)>>>0&&(v--,k+=u,!(65535<k)););}l.__internalMultiplyAdd(t,v,0,n,r);var B=h.__inplaceSub(r,m,g+1);0!==B&&(B=h.__inplaceAdd(t,m,g),h.__setHalfDigit(m+g,h.__halfDigit(m+g)+B),v--),i&&(1&m?b=v<<16:a.__setDigit(m>>>1,b|v))}return _?(h.__inplaceRightShift(d),i?{quotient:a,remainder:h}:h):i?a:void 0}},{key:"__clz16",value:function(e){return u(e)-16}},{key:"__specialLeftShift",value:function(e,t,_){var g=e.length,n=new l(g+_,!1);if(0===t){for(var o=0;o<g;o++)n.__setDigit(o,e.__digit(o));return 0<_&&n.__setDigit(g,0),n}for(var a,s=0,u=0;u<g;u++)a=e.__digit(u),n.__setDigit(u,a<<t|s),s=a>>>32-t;return 0<_&&n.__setDigit(g,s),n}},{key:"__leftShiftByAbsolute",value:function(e,t){var _=l.__toShiftAmount(t);if(0>_)throw new RangeError("BigInt too big");var n=_>>>5,g=31&_,o=e.length,a=0!==g&&0!=e.__digit(o-1)>>>32-g,s=o+n+(a?1:0),u=new l(s,e.sign);if(0===g){for(var r=0;r<n;r++)u.__setDigit(r,0);for(;r<s;r++)u.__setDigit(r,e.__digit(r-n))}else{for(var h=0,b=0;b<n;b++)u.__setDigit(b,0);for(var m,c=0;c<o;c++)m=e.__digit(c),u.__setDigit(c+n,m<<g|h),h=m>>>32-g;if(a)u.__setDigit(o+n,h);else if(0!==h)throw new Error("implementation bug")}return u.__trim()}},{key:"__rightShiftByAbsolute",value:function(e,t){var _=e.length,n=e.sign,g=l.__toShiftAmount(t);if(0>g)return l.__rightShiftByMaximum(n);var o=g>>>5,a=31&g,s=_-o;if(0>=s)return l.__rightShiftByMaximum(n);var u=!1;if(n){if(0!=(e.__digit(o)&(1<<a)-1))u=!0;else for(var r=0;r<o;r++)if(0!==e.__digit(r)){u=!0;break}}if(u&&0===a){var h=e.__digit(_-1);0==~h&&s++}var b=new l(s,n);if(0===a)for(var m=o;m<_;m++)b.__setDigit(m-o,e.__digit(m));else{for(var c,v=e.__digit(o)>>>a,y=_-o-1,f=0;f<y;f++)c=e.__digit(f+o+1),b.__setDigit(f,c<<32-a|v),v=c>>>a;b.__setDigit(y,v)}return u&&(b=l.__absoluteAddOne(b,!0,b)),b.__trim()}},{key:"__rightShiftByMaximum",value:function(e){return e?l.__oneDigit(1,!0):l.__zero()}},{key:"__toShiftAmount",value:function(e){if(1<e.length)return-1;var t=e.__unsignedDigit(0);return t>l.__kMaxLengthBits?-1:t}},{key:"__toPrimitive",value:function(t){var i=1<arguments.length&&void 0!==arguments[1]?arguments[1]:"default";if("object"!==e(t))return t;if(t.constructor===l)return t;var _=t[Symbol.toPrimitive];if(_){var n=_(i);if("object"!==e(n))return n;throw new TypeError("Cannot convert object to primitive value")}var g=t.valueOf;if(g){var o=g.call(t);if("object"!==e(o))return o}var a=t.toString;if(a){var s=a.call(t);if("object"!==e(s))return s}throw new TypeError("Cannot convert object to primitive value")}},{key:"__toNumeric",value:function(e){return l.__isBigInt(e)?e:+e}},{key:"__isBigInt",value:function(t){return"object"===e(t)&&t.constructor===l}},{key:"__truncateToNBits",value:function(e,t){for(var _=e+31>>>5,n=new l(_,t.sign),g=_-1,o=0;o<g;o++)n.__setDigit(o,t.__digit(o));var a=t.__digit(g);if(0!=(31&e)){var s=32-(31&e);a=a<<s>>>s}return n.__setDigit(g,a),n.__trim()}},{key:"__truncateAndSubFromPowerOfTwo",value:function(e,t,_){for(var n=Math.min,g=e+31>>>5,o=new l(g,_),a=0,s=g-1,u=0,r=n(s,t.length);a<r;a++){var d=t.__digit(a),h=0-(65535&d)-u;u=1&h>>>16;var b=0-(d>>>16)-u;u=1&b>>>16,o.__setDigit(a,65535&h|b<<16)}for(;a<s;a++)o.__setDigit(a,0|-u);var m,c=s<t.length?t.__digit(s):0,v=31&e;if(0===v){var y=0-(65535&c)-u;u=1&y>>>16;var f=0-(c>>>16)-u;m=65535&y|f<<16}else{var k=32-v;c=c<<k>>>k;var D=1<<32-k,p=(65535&D)-(65535&c)-u;u=1&p>>>16;var B=(D>>>16)-(c>>>16)-u;m=65535&p|B<<16,m&=D-1}return o.__setDigit(s,m),o.__trim()}},{key:"__digitPow",value:function(e,t){for(var i=1;0<t;)1&t&&(i*=e),t>>>=1,e*=e;return i}}]),l}(u(Array));return h.__kMaxLength=33554432,h.__kMaxLengthBits=h.__kMaxLength<<5,h.__kMaxBitsPerChar=[0,0,32,51,64,75,83,90,96,102,107,111,115,119,122,126,128,131,134,136,139,141,143,145,147,149,151,153,154,156,158,159,160,162,163,165,166],h.__kBitsPerCharTableShift=5,h.__kBitsPerCharTableMultiplier=1<<h.__kBitsPerCharTableShift,h.__kConversionChars=["0","1","2","3","4","5","6","7","8","9","a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z"],h.__kBitConversionBuffer=new ArrayBuffer(8),h.__kBitConversionDouble=new Float64Array(h.__kBitConversionBuffer),h.__kBitConversionInts=new Int32Array(h.__kBitConversionBuffer),h});
 
 },{}]},{},[3])(3)

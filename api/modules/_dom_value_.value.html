@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>&quot;IonType&quot; | Ion-JS Library</title>
+	<title>Value | Ion-JS Library</title>
 	<meta name="description" content="">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -54,27 +54,144 @@
 					<a href="../globals.html">Globals</a>
 				</li>
 				<li>
-					<a href="_iontype_.html">&quot;IonType&quot;</a>
+					<a href="_dom_value_.html">&quot;dom/Value&quot;</a>
+				</li>
+				<li>
+					<a href="_dom_value_.value.html">Value</a>
 				</li>
 			</ul>
-			<h1>External module &quot;IonType&quot;</h1>
+			<h1>Module Value</h1>
 		</div>
 	</div>
 </header>
 <div class="container container-main">
 	<div class="row">
 		<div class="col-8 col-content">
+			<section class="tsd-panel">
+				<h3 class="tsd-before-signature">Callable</h3>
+				<ul class="tsd-signatures tsd-kind-module tsd-parent-kind-external-module tsd-has-type-parameter">
+					<li class="tsd-signature tsd-kind-icon">Value&lt;Clazz&gt;<span class="tsd-signature-symbol">(</span>BaseClass<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Clazz</span>, ionType<span class="tsd-signature-symbol">: </span><a href="../classes/_iontype_.iontype.html" class="tsd-signature-type">IonType</a>, fromJsConstructor<span class="tsd-signature-symbol">: </span><a href="../classes/_dom_fromjsconstructor_.fromjsconstructor.html" class="tsd-signature-type">FromJsConstructor</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">newClass</span><span class="tsd-signature-symbol"> &amp; </span><span class="tsd-signature-type">Clazz</span></li>
+				</ul>
+				<ul class="tsd-descriptions">
+					<li class="tsd-description">
+						<aside class="tsd-sources">
+							<ul>
+								<li>Defined in <a href="https://github.com/amzn/ion-js/blob/e8be26f/src/dom/Value.ts#L176">src/dom/Value.ts:176</a></li>
+							</ul>
+						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>A mixin[1] that allows each DOM class to effectively extend two different parent classes:</p>
+								<ol>
+									<li>The corresponding native JS data type (dom.String extends String, dom.Integer extends Number, etc.)</li>
+									<li>A new class constructed by the DomValue method which provides functionality common to all
+										DOM elements. This includes storing/accessing an Ion data type and annotations, as well as
+									convenience methods for converting from Ion data types to JS data types.</li>
+								</ol>
+							</div>
+							<p>[1] <a href="https://www.typescriptlang.org/docs/handbook/mixins.html">https://www.typescriptlang.org/docs/handbook/mixins.html</a></p>
+						</div>
+						<h4 class="tsd-type-parameters-title">Type parameters</h4>
+						<ul class="tsd-type-parameters">
+							<li>
+								<h4>Clazz<span class="tsd-signature-symbol">: </span><a href="_dom_value_.html#constructor" class="tsd-signature-type">Constructor</a></h4>
+							</li>
+						</ul>
+						<h4 class="tsd-parameters-title">Parameters</h4>
+						<ul class="tsd-parameters">
+							<li>
+								<h5>BaseClass: <span class="tsd-signature-type">Clazz</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>A parent type for the newly constructed class to extend.</p>
+								</div>
+							</li>
+							<li>
+								<h5>ionType: <a href="../classes/_iontype_.iontype.html" class="tsd-signature-type">IonType</a></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The Ion data type that will be associated with new instances of the constructed class.</p>
+								</div>
+							</li>
+							<li>
+								<h5>fromJsConstructor: <a href="../classes/_dom_fromjsconstructor_.fromjsconstructor.html" class="tsd-signature-type">FromJsConstructor</a></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>Calls the class&#39;s primary constructor with a Javascript value after
+									performing configured validation and adaptation logic.</p>
+								</div>
+							</li>
+						</ul>
+						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">newClass</span><span class="tsd-signature-symbol"> &amp; </span><span class="tsd-signature-type">Clazz</span></h4>
+					</li>
+				</ul>
+			</section>
 			<section class="tsd-panel-group tsd-index-group">
 				<h2>Index</h2>
 				<section class="tsd-panel tsd-index-panel">
 					<div class="tsd-index-content">
 						<section class="tsd-index-section ">
-							<h3>Classes</h3>
+							<h3>Functions</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-class tsd-parent-kind-external-module"><a href="../classes/_iontype_.iontype.html" class="tsd-kind-icon">Ion<wbr>Type</a></li>
+								<li class="tsd-kind-function tsd-parent-kind-module"><a href="_dom_value_.value.html#from" class="tsd-kind-icon">from</a></li>
 							</ul>
 						</section>
 					</div>
+				</section>
+			</section>
+			<section class="tsd-panel-group tsd-member-group ">
+				<h2>Functions</h2>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module">
+					<a name="from" class="tsd-anchor"></a>
+					<h3>from</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module">
+						<li class="tsd-signature tsd-kind-icon">from<span class="tsd-signature-symbol">(</span>value<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span>, annotations<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../interfaces/_dom_value_.value-1.html" class="tsd-signature-type">Value</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/e8be26f/src/dom/Value.ts#L351">src/dom/Value.ts:351</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Constructs a dom.Value from the provided Javascript value using the following type mappings:</p>
+								</div>
+								<a href="#js-type-----domvalue-subclass" id="js-type-----domvalue-subclass" style="color: inherit; text-decoration: none;">
+									<h2>JS Type    | dom.Value subclass</h2>
+								</a>
+								<p>null       | dom.Null
+									boolean    | dom.Boolean
+									number     | dom.Integer or dom.Float
+									BigInt     | dom.Integer
+									string     | dom.String
+									Decimal    | dom.Decimal
+									Date       | dom.Timestamp
+									Timestamp  | dom.Timestamp
+									Uint8Array | dom.Blob
+									Array      | dom.List
+								Object     | dom.Struct</p>
+								<p>Other input types (including &#39;undefined&#39;) are not supported and will throw an Error.</p>
+								<p>If the input type is an Array or Object, this method will also convert each nested javascript
+								values into a dom.Value.</p>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>value: <span class="tsd-signature-type">any</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>A javascript value to convert into an Ion dom.Value.</p>
+									</div>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> annotations: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>An optional array of strings to associate with the newly created dom.Value.
+										These annotations will NOT be associated with any nested dom.Values.</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="../interfaces/_dom_value_.value-1.html" class="tsd-signature-type">Value</a></h4>
+						</li>
+					</ul>
 				</section>
 			</section>
 		</div>
@@ -85,14 +202,19 @@
 						<a href="../globals.html"><em>Globals</em></a>
 					</li>
 					<li class="current tsd-kind-external-module">
-						<a href="_iontype_.html">&quot;<wbr>Ion<wbr>Type&quot;</a>
+						<a href="_dom_value_.html">&quot;dom/<wbr>Value&quot;</a>
+						<ul>
+							<li class="current tsd-kind-module tsd-parent-kind-external-module tsd-has-type-parameter">
+								<a href="_dom_value_.value.html">Value</a>
+							</li>
+						</ul>
 					</li>
 				</ul>
 			</nav>
 			<nav class="tsd-navigation secondary menu-sticky">
 				<ul class="before-current">
-					<li class=" tsd-kind-class tsd-parent-kind-external-module">
-						<a href="../classes/_iontype_.iontype.html" class="tsd-kind-icon">Ion<wbr>Type</a>
+					<li class=" tsd-kind-function tsd-parent-kind-module">
+						<a href="_dom_value_.value.html#from" class="tsd-kind-icon">from</a>
 					</li>
 				</ul>
 			</nav>

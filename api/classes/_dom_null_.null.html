@@ -1,0 +1,1082 @@
+<!doctype html>
+<html class="default no-js">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>Null | Ion-JS Library</title>
+	<meta name="description" content="">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+<header>
+	<div class="tsd-page-toolbar">
+		<div class="container">
+			<div class="table-wrap">
+				<div class="table-cell" id="tsd-search" data-index="../assets/js/search.js" data-base="..">
+					<div class="field">
+						<label for="tsd-search-field" class="tsd-widget search no-caption">Search</label>
+						<input id="tsd-search-field" type="text" />
+					</div>
+					<ul class="results">
+						<li class="state loading">Preparing search index...</li>
+						<li class="state failure">The search index is not available</li>
+					</ul>
+					<a href="../index.html" class="title">Ion-JS Library</a>
+				</div>
+				<div class="table-cell" id="tsd-widgets">
+					<div id="tsd-filter">
+						<a href="#" class="tsd-widget options no-caption" data-toggle="options">Options</a>
+						<div class="tsd-filter-group">
+							<div class="tsd-select" id="tsd-filter-visibility">
+								<span class="tsd-select-label">All</span>
+								<ul class="tsd-select-list">
+									<li data-value="public">Public</li>
+									<li data-value="protected">Public/Protected</li>
+									<li data-value="private" class="selected">All</li>
+								</ul>
+							</div>
+							<input type="checkbox" id="tsd-filter-inherited" checked />
+							<label class="tsd-widget" for="tsd-filter-inherited">Inherited</label>
+							<input type="checkbox" id="tsd-filter-externals" checked />
+							<label class="tsd-widget" for="tsd-filter-externals">Externals</label>
+						</div>
+					</div>
+					<a href="#" class="tsd-widget menu no-caption" data-toggle="menu">Menu</a>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="tsd-page-title">
+		<div class="container">
+			<ul class="tsd-breadcrumb">
+				<li>
+					<a href="../globals.html">Globals</a>
+				</li>
+				<li>
+					<a href="../modules/_dom_null_.html">&quot;dom/Null&quot;</a>
+				</li>
+				<li>
+					<a href="_dom_null_.null.html">Null</a>
+				</li>
+			</ul>
+			<h1>Class Null</h1>
+		</div>
+	</div>
+</header>
+<div class="container container-main">
+	<div class="row">
+		<div class="col-8 col-content">
+			<section class="tsd-panel tsd-comment">
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>Represents a null[1] value in an Ion stream.</p>
+					</div>
+					<p>An Ion null differs from a Javascript null in that an instance of an Ion null may have data associated with it.</p>
+					<p>In particular, Ion nulls have an Ion data type:</p>
+					<pre><code> text encoding | <span class="hljs-type">Ion</span> <span class="hljs-class"><span class="hljs-keyword">data</span> <span class="hljs-keyword">type</span></span></code></pre><p> ======================================
+						null          | IonType.NULL
+						null.null     | IonType.NULL
+						null.string   | IonType.STRING
+						null.int      | IonType.INT
+						null.struct   | IonType.STRUCT
+					...</p>
+					<p>They can also be annotated:</p>
+					<pre><code> customerName::<span class="hljs-literal">null</span>.<span class="hljs-built_in">string</span>
+ dollars::<span class="hljs-literal">null</span>.decimal
+ meters::<span class="hljs-literal">null</span>.<span class="hljs-built_in">float</span></code></pre><p>[1] <a href="http://amzn.github.io/ion-docs/docs/spec.html#null">http://amzn.github.io/ion-docs/docs/spec.html#null</a></p>
+				</div>
+			</section>
+			<section class="tsd-panel tsd-hierarchy">
+				<h3>Hierarchy</h3>
+				<ul class="tsd-hierarchy">
+					<li>
+						<span class="tsd-signature-type">newClass</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">ObjectConstructor</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">this</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> &amp; </span><a href="_dom_struct_.struct.html#object" class="tsd-signature-type">Object</a>
+						<ul class="tsd-hierarchy">
+							<li>
+								<span class="target">Null</span>
+							</li>
+						</ul>
+					</li>
+				</ul>
+			</section>
+			<section class="tsd-panel">
+				<h3>Implements</h3>
+				<ul class="tsd-hierarchy">
+					<li><a href="../interfaces/_dom_value_.value-1.html" class="tsd-signature-type">Value</a></li>
+				</ul>
+			</section>
+			<section class="tsd-panel-group tsd-index-group">
+				<h2>Index</h2>
+				<section class="tsd-panel tsd-index-panel">
+					<div class="tsd-index-content">
+						<section class="tsd-index-section ">
+							<h3>Constructors</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-constructor tsd-parent-kind-class tsd-is-overwrite"><a href="_dom_null_.null.html#constructor" class="tsd-kind-icon">constructor</a></li>
+							</ul>
+						</section>
+						<section class="tsd-index-section ">
+							<h3>Properties</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><a href="_dom_null_.null.html#_ionannotations" class="tsd-kind-icon">_ion<wbr>Annotations</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><a href="_dom_null_.null.html#_iontype" class="tsd-kind-icon">_ion<wbr>Type</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><a href="_dom_null_.null.html#should" class="tsd-kind-icon">should</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-static"><a href="_dom_null_.null.html#object" class="tsd-kind-icon">Object</a></li>
+							</ul>
+						</section>
+						<section class="tsd-index-section ">
+							<h3>Methods</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="_dom_null_.null.html#_setannotations" class="tsd-kind-icon">_set<wbr>Annotations</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter tsd-is-inherited"><a href="_dom_null_.null.html#_unsupportedoperation" class="tsd-kind-icon">_unsupported<wbr>Operation</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter tsd-is-inherited"><a href="_dom_null_.null.html#as" class="tsd-kind-icon">as</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-overwrite"><a href="_dom_null_.null.html#bigintvalue" class="tsd-kind-icon">big<wbr>Int<wbr>Value</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-overwrite"><a href="_dom_null_.null.html#booleanvalue" class="tsd-kind-icon">boolean<wbr>Value</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-overwrite"><a href="_dom_null_.null.html#datevalue" class="tsd-kind-icon">date<wbr>Value</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-overwrite"><a href="_dom_null_.null.html#decimalvalue" class="tsd-kind-icon">decimal<wbr>Value</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-overwrite"><a href="_dom_null_.null.html#elements" class="tsd-kind-icon">elements</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-overwrite"><a href="_dom_null_.null.html#fieldnames" class="tsd-kind-icon">field<wbr>Names</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-overwrite"><a href="_dom_null_.null.html#fields" class="tsd-kind-icon">fields</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-overwrite"><a href="_dom_null_.null.html#get" class="tsd-kind-icon">get</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="_dom_null_.null.html#getannotations" class="tsd-kind-icon">get<wbr>Annotations</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="_dom_null_.null.html#gettype" class="tsd-kind-icon">get<wbr>Type</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="_dom_null_.null.html#hasownproperty" class="tsd-kind-icon">has<wbr>Own<wbr>Property</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-overwrite"><a href="_dom_null_.null.html#isnull" class="tsd-kind-icon">is<wbr>Null</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="_dom_null_.null.html#isprototypeof" class="tsd-kind-icon">is<wbr>Prototype<wbr>Of</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-overwrite"><a href="_dom_null_.null.html#numbervalue" class="tsd-kind-icon">number<wbr>Value</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="_dom_null_.null.html#propertyisenumerable" class="tsd-kind-icon">property<wbr>IsEnumerable</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-overwrite"><a href="_dom_null_.null.html#stringvalue" class="tsd-kind-icon">string<wbr>Value</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="_dom_null_.null.html#timestampvalue" class="tsd-kind-icon">timestamp<wbr>Value</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_dom_null_.null.html#tojson" class="tsd-kind-icon">toJSON</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="_dom_null_.null.html#tolocalestring" class="tsd-kind-icon">to<wbr>Locale<wbr>String</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-overwrite"><a href="_dom_null_.null.html#tostring" class="tsd-kind-icon">to<wbr>String</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-overwrite"><a href="_dom_null_.null.html#uint8arrayvalue" class="tsd-kind-icon">u<wbr>Int8<wbr>Array<wbr>Value</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="_dom_null_.null.html#valueof" class="tsd-kind-icon">value<wbr>Of</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-overwrite"><a href="_dom_null_.null.html#writeto" class="tsd-kind-icon">write<wbr>To</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-static"><a href="_dom_null_.null.html#_fromjsvalue" class="tsd-kind-icon">_from<wbr>JsValue</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-static"><a href="_dom_null_.null.html#_getiontype" class="tsd-kind-icon">_get<wbr>Ion<wbr>Type</a></li>
+							</ul>
+						</section>
+					</div>
+				</section>
+			</section>
+			<section class="tsd-panel-group tsd-member-group ">
+				<h2>Constructors</h2>
+				<section class="tsd-panel tsd-member tsd-kind-constructor tsd-parent-kind-class tsd-is-overwrite">
+					<a name="constructor" class="tsd-anchor"></a>
+					<h3>constructor</h3>
+					<ul class="tsd-signatures tsd-kind-constructor tsd-parent-kind-class tsd-is-overwrite">
+						<li class="tsd-signature tsd-kind-icon">new <wbr>Null<span class="tsd-signature-symbol">(</span>ionType<span class="tsd-signature-symbol">?: </span><a href="_iontype_.iontype.html" class="tsd-signature-type">IonType</a>, annotations<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_dom_null_.null.html" class="tsd-signature-type">Null</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Overrides newClass.__constructor</p>
+								<ul>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/e8be26f/src/dom/Null.ts#L47">src/dom/Null.ts:47</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Constructor.</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> ionType: <a href="_iontype_.iontype.html" class="tsd-signature-type">IonType</a><span class="tsd-signature-symbol"> = IonTypes.NULL</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<div class="lead">
+											<p>The Ion data type associated with this null value.</p>
+										</div>
+									</div>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> annotations: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol"> = []</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<div class="lead">
+											<p>An optional array of strings to associate with this null value.</p>
+										</div>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="_dom_null_.null.html" class="tsd-signature-type">Null</a></h4>
+						</li>
+					</ul>
+				</section>
+			</section>
+			<section class="tsd-panel-group tsd-member-group ">
+				<h2>Properties</h2>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
+					<a name="_ionannotations" class="tsd-anchor"></a>
+					<h3>_ion<wbr>Annotations</h3>
+					<div class="tsd-signature tsd-kind-icon">_ion<wbr>Annotations<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span></div>
+					<aside class="tsd-sources">
+						<p>Inherited from <a href="_dom_struct_.struct.html">Struct</a>.<a href="_dom_struct_.struct.html#_ionannotations">_ionAnnotations</a></p>
+						<ul>
+							<li>Defined in <a href="https://github.com/amzn/ion-js/blob/e8be26f/src/dom/Value.ts#L179">src/dom/Value.ts:179</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
+					<a name="_iontype" class="tsd-anchor"></a>
+					<h3>_ion<wbr>Type</h3>
+					<div class="tsd-signature tsd-kind-icon">_ion<wbr>Type<span class="tsd-signature-symbol">:</span> <a href="_iontype_.iontype.html" class="tsd-signature-type">IonType</a></div>
+					<aside class="tsd-sources">
+						<p>Inherited from <a href="_dom_struct_.struct.html">Struct</a>.<a href="_dom_struct_.struct.html#_iontype">_ionType</a></p>
+						<ul>
+							<li>Defined in <a href="https://github.com/amzn/ion-js/blob/e8be26f/src/dom/Value.ts#L178">src/dom/Value.ts:178</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
+					<a name="should" class="tsd-anchor"></a>
+					<h3>should</h3>
+					<div class="tsd-signature tsd-kind-icon">should<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Assertion</span></div>
+					<aside class="tsd-sources">
+						<p>Inherited from <a href="_dom_struct_.struct.html">Struct</a>.<a href="_dom_struct_.struct.html#should">should</a></p>
+						<ul>
+							<li>Defined in node_modules/@types/chai/index.d.ts:1943</li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-static">
+					<a name="object" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagStatic">Static</span> Object</h3>
+					<div class="tsd-signature tsd-kind-icon">Object<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">ObjectConstructor</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in node_modules/typedoc/node_modules/typescript/lib/lib.es5.d.ts:267</li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Provides functionality common to all JavaScript objects.</p>
+						</div>
+					</div>
+				</section>
+			</section>
+			<section class="tsd-panel-group tsd-member-group ">
+				<h2>Methods</h2>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+					<a name="_setannotations" class="tsd-anchor"></a>
+					<h3>_set<wbr>Annotations</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+						<li class="tsd-signature tsd-kind-icon">_set<wbr>Annotations<span class="tsd-signature-symbol">(</span>annotations<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="_dom_struct_.struct.html">Struct</a>.<a href="_dom_struct_.struct.html#_setannotations">_setAnnotations</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/e8be26f/src/dom/Value.ts#L218">src/dom/Value.ts:218</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>annotations: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter tsd-is-inherited">
+					<a name="_unsupportedoperation" class="tsd-anchor"></a>
+					<h3>_unsupported<wbr>Operation</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter tsd-is-inherited">
+						<li class="tsd-signature tsd-kind-icon">_unsupported<wbr>Operation&lt;T&gt;<span class="tsd-signature-symbol">(</span>functionName<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">never</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="_dom_struct_.struct.html">Struct</a>.<a href="_dom_struct_.struct.html#_unsupportedoperation">_unsupportedOperation</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/e8be26f/src/dom/Value.ts#L209">src/dom/Value.ts:209</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-type-parameters-title">Type parameters</h4>
+							<ul class="tsd-type-parameters">
+								<li>
+									<h4>T<span class="tsd-signature-symbol">: </span><a href="../interfaces/_dom_value_.value-1.html" class="tsd-signature-type">Value</a></h4>
+								</li>
+							</ul>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>functionName: <span class="tsd-signature-type">string</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">never</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter tsd-is-inherited">
+					<a name="as" class="tsd-anchor"></a>
+					<h3>as</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter tsd-is-inherited">
+						<li class="tsd-signature tsd-kind-icon">as&lt;T&gt;<span class="tsd-signature-symbol">(</span>ionValueType<span class="tsd-signature-symbol">: </span><a href="../modules/_dom_value_.html#constructor" class="tsd-signature-type">Constructor</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">T</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Implementation of <a href="../interfaces/_dom_value_.value-1.html">Value</a>.<a href="../interfaces/_dom_value_.value-1.html#as">as</a></p>
+								<p>Inherited from <a href="_dom_struct_.struct.html">Struct</a>.<a href="_dom_struct_.struct.html#as">as</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/e8be26f/src/dom/Value.ts#L281">src/dom/Value.ts:281</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-type-parameters-title">Type parameters</h4>
+							<ul class="tsd-type-parameters">
+								<li>
+									<h4>T<span class="tsd-signature-symbol">: </span><a href="../interfaces/_dom_value_.value-1.html" class="tsd-signature-type">Value</a></h4>
+								</li>
+							</ul>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>ionValueType: <a href="../modules/_dom_value_.html#constructor" class="tsd-signature-type">Constructor</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">T</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
+					<a name="bigintvalue" class="tsd-anchor"></a>
+					<h3>big<wbr>Int<wbr>Value</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
+						<li class="tsd-signature tsd-kind-icon">big<wbr>Int<wbr>Value<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">JSBI</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Implementation of <a href="../interfaces/_dom_value_.value-1.html">Value</a>.<a href="../interfaces/_dom_value_.value-1.html#bigintvalue">bigIntValue</a></p>
+								<p>Overrides <a href="_dom_struct_.struct.html">Struct</a>.<a href="_dom_struct_.struct.html#bigintvalue">bigIntValue</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/e8be26f/src/dom/Null.ts#L90">src/dom/Null.ts:90</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">JSBI</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
+					<a name="booleanvalue" class="tsd-anchor"></a>
+					<h3>boolean<wbr>Value</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
+						<li class="tsd-signature tsd-kind-icon">boolean<wbr>Value<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Implementation of <a href="../interfaces/_dom_value_.value-1.html">Value</a>.<a href="../interfaces/_dom_value_.value-1.html#booleanvalue">booleanValue</a></p>
+								<p>Overrides <a href="_dom_struct_.struct.html">Struct</a>.<a href="_dom_struct_.struct.html#booleanvalue">booleanValue</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/e8be26f/src/dom/Null.ts#L82">src/dom/Null.ts:82</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
+					<a name="datevalue" class="tsd-anchor"></a>
+					<h3>date<wbr>Value</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
+						<li class="tsd-signature tsd-kind-icon">date<wbr>Value<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_dom_timestamp_.timestamp.html#date" class="tsd-signature-type">Date</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Implementation of <a href="../interfaces/_dom_value_.value-1.html">Value</a>.<a href="../interfaces/_dom_value_.value-1.html#datevalue">dateValue</a></p>
+								<p>Overrides <a href="_dom_struct_.struct.html">Struct</a>.<a href="_dom_struct_.struct.html#datevalue">dateValue</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/e8be26f/src/dom/Null.ts#L102">src/dom/Null.ts:102</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-returns-title">Returns <a href="_dom_timestamp_.timestamp.html#date" class="tsd-signature-type">Date</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
+					<a name="decimalvalue" class="tsd-anchor"></a>
+					<h3>decimal<wbr>Value</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
+						<li class="tsd-signature tsd-kind-icon">decimal<wbr>Value<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_iondecimal_.decimal.html" class="tsd-signature-type">Decimal</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Implementation of <a href="../interfaces/_dom_value_.value-1.html">Value</a>.<a href="../interfaces/_dom_value_.value-1.html#decimalvalue">decimalValue</a></p>
+								<p>Overrides <a href="_dom_struct_.struct.html">Struct</a>.<a href="_dom_struct_.struct.html#decimalvalue">decimalValue</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/e8be26f/src/dom/Null.ts#L94">src/dom/Null.ts:94</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-returns-title">Returns <a href="_iondecimal_.decimal.html" class="tsd-signature-type">Decimal</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
+					<a name="elements" class="tsd-anchor"></a>
+					<h3>elements</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
+						<li class="tsd-signature tsd-kind-icon">elements<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../interfaces/_dom_value_.value-1.html" class="tsd-signature-type">Value</a><span class="tsd-signature-symbol">[]</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Implementation of <a href="../interfaces/_dom_value_.value-1.html">Value</a>.<a href="../interfaces/_dom_value_.value-1.html#elements">elements</a></p>
+								<p>Overrides <a href="_dom_boolean_.boolean.html">Boolean</a>.<a href="_dom_boolean_.boolean.html#elements">elements</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/e8be26f/src/dom/Null.ts#L118">src/dom/Null.ts:118</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-returns-title">Returns <a href="../interfaces/_dom_value_.value-1.html" class="tsd-signature-type">Value</a><span class="tsd-signature-symbol">[]</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
+					<a name="fieldnames" class="tsd-anchor"></a>
+					<h3>field<wbr>Names</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
+						<li class="tsd-signature tsd-kind-icon">field<wbr>Names<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Implementation of <a href="../interfaces/_dom_value_.value-1.html">Value</a>.<a href="../interfaces/_dom_value_.value-1.html#fieldnames">fieldNames</a></p>
+								<p>Overrides <a href="_dom_list_.list.html">List</a>.<a href="_dom_list_.list.html#fieldnames">fieldNames</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/e8be26f/src/dom/Null.ts#L110">src/dom/Null.ts:110</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
+					<a name="fields" class="tsd-anchor"></a>
+					<h3>fields</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
+						<li class="tsd-signature tsd-kind-icon">fields<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><a href="../interfaces/_dom_value_.value-1.html" class="tsd-signature-type">Value</a><span class="tsd-signature-symbol">]</span><span class="tsd-signature-symbol">[]</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Implementation of <a href="../interfaces/_dom_value_.value-1.html">Value</a>.<a href="../interfaces/_dom_value_.value-1.html#fields">fields</a></p>
+								<p>Overrides <a href="_dom_list_.list.html">List</a>.<a href="_dom_list_.list.html#fields">fields</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/e8be26f/src/dom/Null.ts#L114">src/dom/Null.ts:114</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><a href="../interfaces/_dom_value_.value-1.html" class="tsd-signature-type">Value</a><span class="tsd-signature-symbol">]</span><span class="tsd-signature-symbol">[]</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
+					<a name="get" class="tsd-anchor"></a>
+					<h3>get</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
+						<li class="tsd-signature tsd-kind-icon">get<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">...</span>pathElements<span class="tsd-signature-symbol">: </span><a href="../modules/_dom_value_.html#pathelement" class="tsd-signature-type">PathElement</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../interfaces/_dom_value_.value-1.html" class="tsd-signature-type">Value</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Implementation of <a href="../interfaces/_dom_value_.value-1.html">Value</a>.<a href="../interfaces/_dom_value_.value-1.html#get">get</a></p>
+								<p>Overrides <a href="_dom_boolean_.boolean.html">Boolean</a>.<a href="_dom_boolean_.boolean.html#get">get</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/e8be26f/src/dom/Null.ts#L122">src/dom/Null.ts:122</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5><span class="tsd-flag ts-flagRest">Rest</span> <span class="tsd-signature-symbol">...</span>pathElements: <a href="../modules/_dom_value_.html#pathelement" class="tsd-signature-type">PathElement</a><span class="tsd-signature-symbol">[]</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="../interfaces/_dom_value_.value-1.html" class="tsd-signature-type">Value</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+					<a name="getannotations" class="tsd-anchor"></a>
+					<h3>get<wbr>Annotations</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+						<li class="tsd-signature tsd-kind-icon">get<wbr>Annotations<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Implementation of <a href="../interfaces/_dom_value_.value-1.html">Value</a>.<a href="../interfaces/_dom_value_.value-1.html#getannotations">getAnnotations</a></p>
+								<p>Inherited from <a href="_dom_struct_.struct.html">Struct</a>.<a href="_dom_struct_.struct.html#getannotations">getAnnotations</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/e8be26f/src/dom/Value.ts#L222">src/dom/Value.ts:222</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+					<a name="gettype" class="tsd-anchor"></a>
+					<h3>get<wbr>Type</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+						<li class="tsd-signature tsd-kind-icon">get<wbr>Type<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_iontype_.iontype.html" class="tsd-signature-type">IonType</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Implementation of <a href="../interfaces/_dom_value_.value-1.html">Value</a>.<a href="../interfaces/_dom_value_.value-1.html#gettype">getType</a></p>
+								<p>Inherited from <a href="_dom_struct_.struct.html">Struct</a>.<a href="_dom_struct_.struct.html#gettype">getType</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/e8be26f/src/dom/Value.ts#L213">src/dom/Value.ts:213</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-returns-title">Returns <a href="_iontype_.iontype.html" class="tsd-signature-type">IonType</a></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+					<a name="hasownproperty" class="tsd-anchor"></a>
+					<h3>has<wbr>Own<wbr>Property</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+						<li class="tsd-signature tsd-kind-icon">has<wbr>Own<wbr>Property<span class="tsd-signature-symbol">(</span>v<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">PropertyKey</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="_dom_struct_.struct.html">Struct</a>.<a href="_dom_struct_.struct.html#hasownproperty">hasOwnProperty</a></p>
+								<ul>
+									<li>Defined in node_modules/typedoc/node_modules/typescript/lib/lib.es5.d.ts:137</li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Determines whether an object has a property with the specified name.</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>v: <span class="tsd-signature-type">PropertyKey</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>A property name.</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
+					<a name="isnull" class="tsd-anchor"></a>
+					<h3>is<wbr>Null</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
+						<li class="tsd-signature tsd-kind-icon">is<wbr>Null<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Implementation of <a href="../interfaces/_dom_value_.value-1.html">Value</a>.<a href="../interfaces/_dom_value_.value-1.html#isnull">isNull</a></p>
+								<p>Overrides <a href="_dom_struct_.struct.html">Struct</a>.<a href="_dom_struct_.struct.html#isnull">isNull</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/e8be26f/src/dom/Null.ts#L60">src/dom/Null.ts:60</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+					<a name="isprototypeof" class="tsd-anchor"></a>
+					<h3>is<wbr>Prototype<wbr>Of</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+						<li class="tsd-signature tsd-kind-icon">is<wbr>Prototype<wbr>Of<span class="tsd-signature-symbol">(</span>v<span class="tsd-signature-symbol">: </span><a href="_dom_struct_.struct.html#object" class="tsd-signature-type">Object</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="_dom_struct_.struct.html">Struct</a>.<a href="_dom_struct_.struct.html#isprototypeof">isPrototypeOf</a></p>
+								<ul>
+									<li>Defined in node_modules/typedoc/node_modules/typescript/lib/lib.es5.d.ts:143</li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Determines whether an object exists in another object&#39;s prototype chain.</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>v: <a href="_dom_struct_.struct.html#object" class="tsd-signature-type">Object</a></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>Another object whose prototype chain is to be checked.</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
+					<a name="numbervalue" class="tsd-anchor"></a>
+					<h3>number<wbr>Value</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
+						<li class="tsd-signature tsd-kind-icon">number<wbr>Value<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Implementation of <a href="../interfaces/_dom_value_.value-1.html">Value</a>.<a href="../interfaces/_dom_value_.value-1.html#numbervalue">numberValue</a></p>
+								<p>Overrides <a href="_dom_struct_.struct.html">Struct</a>.<a href="_dom_struct_.struct.html#numbervalue">numberValue</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/e8be26f/src/dom/Null.ts#L86">src/dom/Null.ts:86</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+					<a name="propertyisenumerable" class="tsd-anchor"></a>
+					<h3>property<wbr>IsEnumerable</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+						<li class="tsd-signature tsd-kind-icon">property<wbr>IsEnumerable<span class="tsd-signature-symbol">(</span>v<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">PropertyKey</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="_dom_struct_.struct.html">Struct</a>.<a href="_dom_struct_.struct.html#propertyisenumerable">propertyIsEnumerable</a></p>
+								<ul>
+									<li>Defined in node_modules/typedoc/node_modules/typescript/lib/lib.es5.d.ts:149</li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Determines whether a specified property is enumerable.</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>v: <span class="tsd-signature-type">PropertyKey</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>A property name.</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
+					<a name="stringvalue" class="tsd-anchor"></a>
+					<h3>string<wbr>Value</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
+						<li class="tsd-signature tsd-kind-icon">string<wbr>Value<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Implementation of <a href="../interfaces/_dom_value_.value-1.html">Value</a>.<a href="../interfaces/_dom_value_.value-1.html#stringvalue">stringValue</a></p>
+								<p>Overrides <a href="_dom_struct_.struct.html">Struct</a>.<a href="_dom_struct_.struct.html#stringvalue">stringValue</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/e8be26f/src/dom/Null.ts#L98">src/dom/Null.ts:98</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+					<a name="timestampvalue" class="tsd-anchor"></a>
+					<h3>timestamp<wbr>Value</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+						<li class="tsd-signature tsd-kind-icon">timestamp<wbr>Value<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_iontimestamp_.timestamp.html" class="tsd-signature-type">Timestamp</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Implementation of <a href="../interfaces/_dom_value_.value-1.html">Value</a>.<a href="../interfaces/_dom_value_.value-1.html#timestampvalue">timestampValue</a></p>
+								<p>Inherited from <a href="_dom_struct_.struct.html">Struct</a>.<a href="_dom_struct_.struct.html#timestampvalue">timestampValue</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/e8be26f/src/dom/Value.ts#L257">src/dom/Value.ts:257</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-returns-title">Returns <a href="_iontimestamp_.timestamp.html" class="tsd-signature-type">Timestamp</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="tojson" class="tsd-anchor"></a>
+					<h3>toJSON</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">toJSON<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">null</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/e8be26f/src/dom/Null.ts#L136">src/dom/Null.ts:136</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Converts this dom.Null to a Javascript null when being serialized with <code>JSON.stringify()</code>.</p>
+								</div>
+							</div>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">null</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+					<a name="tolocalestring" class="tsd-anchor"></a>
+					<h3>to<wbr>Locale<wbr>String</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+						<li class="tsd-signature tsd-kind-icon">to<wbr>Locale<wbr>String<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="_dom_struct_.struct.html">Struct</a>.<a href="_dom_struct_.struct.html#tolocalestring">toLocaleString</a></p>
+								<ul>
+									<li>Defined in node_modules/typedoc/node_modules/typescript/lib/lib.es5.d.ts:128</li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Returns a date converted to a string using the current locale.</p>
+								</div>
+							</div>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
+					<a name="tostring" class="tsd-anchor"></a>
+					<h3>to<wbr>String</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
+						<li class="tsd-signature tsd-kind-icon">to<wbr>String<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Overrides Object.toString</p>
+								<ul>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/e8be26f/src/dom/Null.ts#L126">src/dom/Null.ts:126</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
+					<a name="uint8arrayvalue" class="tsd-anchor"></a>
+					<h3>u<wbr>Int8<wbr>Array<wbr>Value</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
+						<li class="tsd-signature tsd-kind-icon">u<wbr>Int8<wbr>Array<wbr>Value<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Uint8Array</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Implementation of <a href="../interfaces/_dom_value_.value-1.html">Value</a>.<a href="../interfaces/_dom_value_.value-1.html#uint8arrayvalue">uInt8ArrayValue</a></p>
+								<p>Overrides <a href="_dom_struct_.struct.html">Struct</a>.<a href="_dom_struct_.struct.html#uint8arrayvalue">uInt8ArrayValue</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/e8be26f/src/dom/Null.ts#L106">src/dom/Null.ts:106</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Uint8Array</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+					<a name="valueof" class="tsd-anchor"></a>
+					<h3>value<wbr>Of</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+						<li class="tsd-signature tsd-kind-icon">value<wbr>Of<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_dom_struct_.struct.html#object" class="tsd-signature-type">Object</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="_dom_struct_.struct.html">Struct</a>.<a href="_dom_struct_.struct.html#valueof">valueOf</a></p>
+								<ul>
+									<li>Defined in node_modules/typedoc/node_modules/typescript/lib/lib.es5.d.ts:131</li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Returns the primitive value of the specified object.</p>
+								</div>
+							</div>
+							<h4 class="tsd-returns-title">Returns <a href="_dom_struct_.struct.html#object" class="tsd-signature-type">Object</a></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
+					<a name="writeto" class="tsd-anchor"></a>
+					<h3>write<wbr>To</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
+						<li class="tsd-signature tsd-kind-icon">write<wbr>To<span class="tsd-signature-symbol">(</span>writer<span class="tsd-signature-symbol">: </span><a href="../interfaces/_ionwriter_.writer.html" class="tsd-signature-type">Writer</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Implementation of <a href="../interfaces/_dom_value_.value-1.html">Value</a>.<a href="../interfaces/_dom_value_.value-1.html#writeto">writeTo</a></p>
+								<p>Overrides newClass.writeTo</p>
+								<ul>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/e8be26f/src/dom/Null.ts#L140">src/dom/Null.ts:140</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>writer: <a href="../interfaces/_ionwriter_.writer.html" class="tsd-signature-type">Writer</a></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-static">
+					<a name="_fromjsvalue" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagStatic">Static</span> _from<wbr>JsValue</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-static">
+						<li class="tsd-signature tsd-kind-icon">_from<wbr>JsValue<span class="tsd-signature-symbol">(</span>jsValue<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span>, annotations<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../interfaces/_dom_value_.value-1.html" class="tsd-signature-type">Value</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="_dom_null_.null.html">Null</a>.<a href="_dom_null_.null.html#_fromjsvalue">_fromJsValue</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/e8be26f/src/dom/Value.ts#L303">src/dom/Value.ts:303</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>jsValue: <span class="tsd-signature-type">any</span></h5>
+								</li>
+								<li>
+									<h5>annotations: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="../interfaces/_dom_value_.value-1.html" class="tsd-signature-type">Value</a></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-static">
+					<a name="_getiontype" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagStatic">Static</span> _get<wbr>Ion<wbr>Type</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-static">
+						<li class="tsd-signature tsd-kind-icon">_get<wbr>Ion<wbr>Type<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_iontype_.iontype.html" class="tsd-signature-type">IonType</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="_dom_struct_.struct.html">Struct</a>.<a href="_dom_struct_.struct.html#_getiontype">_getIonType</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/e8be26f/src/dom/Value.ts#L293">src/dom/Value.ts:293</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-returns-title">Returns <a href="_iontype_.iontype.html" class="tsd-signature-type">IonType</a></h4>
+						</li>
+					</ul>
+				</section>
+			</section>
+		</div>
+		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
+			<nav class="tsd-navigation primary">
+				<ul>
+					<li class="globals  ">
+						<a href="../globals.html"><em>Globals</em></a>
+					</li>
+					<li class="current tsd-kind-external-module">
+						<a href="../modules/_dom_null_.html">&quot;dom/<wbr>Null&quot;</a>
+					</li>
+				</ul>
+			</nav>
+			<nav class="tsd-navigation secondary menu-sticky">
+				<ul class="before-current">
+				</ul>
+				<ul class="current">
+					<li class="current tsd-kind-class tsd-parent-kind-external-module">
+						<a href="_dom_null_.null.html" class="tsd-kind-icon">Null</a>
+						<ul>
+							<li class=" tsd-kind-constructor tsd-parent-kind-class tsd-is-overwrite">
+								<a href="_dom_null_.null.html#constructor" class="tsd-kind-icon">constructor</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
+								<a href="_dom_null_.null.html#_ionannotations" class="tsd-kind-icon">_ion<wbr>Annotations</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
+								<a href="_dom_null_.null.html#_iontype" class="tsd-kind-icon">_ion<wbr>Type</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
+								<a href="_dom_null_.null.html#should" class="tsd-kind-icon">should</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-static">
+								<a href="_dom_null_.null.html#object" class="tsd-kind-icon">Object</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+								<a href="_dom_null_.null.html#_setannotations" class="tsd-kind-icon">_set<wbr>Annotations</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter tsd-is-inherited">
+								<a href="_dom_null_.null.html#_unsupportedoperation" class="tsd-kind-icon">_unsupported<wbr>Operation</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter tsd-is-inherited">
+								<a href="_dom_null_.null.html#as" class="tsd-kind-icon">as</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
+								<a href="_dom_null_.null.html#bigintvalue" class="tsd-kind-icon">big<wbr>Int<wbr>Value</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
+								<a href="_dom_null_.null.html#booleanvalue" class="tsd-kind-icon">boolean<wbr>Value</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
+								<a href="_dom_null_.null.html#datevalue" class="tsd-kind-icon">date<wbr>Value</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
+								<a href="_dom_null_.null.html#decimalvalue" class="tsd-kind-icon">decimal<wbr>Value</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
+								<a href="_dom_null_.null.html#elements" class="tsd-kind-icon">elements</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
+								<a href="_dom_null_.null.html#fieldnames" class="tsd-kind-icon">field<wbr>Names</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
+								<a href="_dom_null_.null.html#fields" class="tsd-kind-icon">fields</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
+								<a href="_dom_null_.null.html#get" class="tsd-kind-icon">get</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+								<a href="_dom_null_.null.html#getannotations" class="tsd-kind-icon">get<wbr>Annotations</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+								<a href="_dom_null_.null.html#gettype" class="tsd-kind-icon">get<wbr>Type</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+								<a href="_dom_null_.null.html#hasownproperty" class="tsd-kind-icon">has<wbr>Own<wbr>Property</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
+								<a href="_dom_null_.null.html#isnull" class="tsd-kind-icon">is<wbr>Null</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+								<a href="_dom_null_.null.html#isprototypeof" class="tsd-kind-icon">is<wbr>Prototype<wbr>Of</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
+								<a href="_dom_null_.null.html#numbervalue" class="tsd-kind-icon">number<wbr>Value</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+								<a href="_dom_null_.null.html#propertyisenumerable" class="tsd-kind-icon">property<wbr>IsEnumerable</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
+								<a href="_dom_null_.null.html#stringvalue" class="tsd-kind-icon">string<wbr>Value</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+								<a href="_dom_null_.null.html#timestampvalue" class="tsd-kind-icon">timestamp<wbr>Value</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_dom_null_.null.html#tojson" class="tsd-kind-icon">toJSON</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+								<a href="_dom_null_.null.html#tolocalestring" class="tsd-kind-icon">to<wbr>Locale<wbr>String</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
+								<a href="_dom_null_.null.html#tostring" class="tsd-kind-icon">to<wbr>String</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
+								<a href="_dom_null_.null.html#uint8arrayvalue" class="tsd-kind-icon">u<wbr>Int8<wbr>Array<wbr>Value</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+								<a href="_dom_null_.null.html#valueof" class="tsd-kind-icon">value<wbr>Of</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
+								<a href="_dom_null_.null.html#writeto" class="tsd-kind-icon">write<wbr>To</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-static">
+								<a href="_dom_null_.null.html#_fromjsvalue" class="tsd-kind-icon">_from<wbr>JsValue</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-static">
+								<a href="_dom_null_.null.html#_getiontype" class="tsd-kind-icon">_get<wbr>Ion<wbr>Type</a>
+							</li>
+						</ul>
+					</li>
+				</ul>
+				<ul class="after-current">
+				</ul>
+			</nav>
+		</div>
+	</div>
+</div>
+<footer>
+	<div class="container">
+		<h2>Legend</h2>
+		<div class="tsd-legend-group">
+			<ul class="tsd-legend">
+				<li class="tsd-kind-module"><span class="tsd-kind-icon">Module</span></li>
+				<li class="tsd-kind-object-literal"><span class="tsd-kind-icon">Object literal</span></li>
+				<li class="tsd-kind-variable"><span class="tsd-kind-icon">Variable</span></li>
+				<li class="tsd-kind-function"><span class="tsd-kind-icon">Function</span></li>
+				<li class="tsd-kind-function tsd-has-type-parameter"><span class="tsd-kind-icon">Function with type parameter</span></li>
+				<li class="tsd-kind-index-signature"><span class="tsd-kind-icon">Index signature</span></li>
+				<li class="tsd-kind-type-alias"><span class="tsd-kind-icon">Type alias</span></li>
+				<li class="tsd-kind-type-alias tsd-has-type-parameter"><span class="tsd-kind-icon">Type alias with type parameter</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-enum"><span class="tsd-kind-icon">Enumeration</span></li>
+				<li class="tsd-kind-enum-member"><span class="tsd-kind-icon">Enumeration member</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-enum"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-enum"><span class="tsd-kind-icon">Method</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-interface"><span class="tsd-kind-icon">Interface</span></li>
+				<li class="tsd-kind-interface tsd-has-type-parameter"><span class="tsd-kind-icon">Interface with type parameter</span></li>
+				<li class="tsd-kind-constructor tsd-parent-kind-interface"><span class="tsd-kind-icon">Constructor</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-interface"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-interface"><span class="tsd-kind-icon">Method</span></li>
+				<li class="tsd-kind-index-signature tsd-parent-kind-interface"><span class="tsd-kind-icon">Index signature</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-class"><span class="tsd-kind-icon">Class</span></li>
+				<li class="tsd-kind-class tsd-has-type-parameter"><span class="tsd-kind-icon">Class with type parameter</span></li>
+				<li class="tsd-kind-constructor tsd-parent-kind-class"><span class="tsd-kind-icon">Constructor</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-class"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class"><span class="tsd-kind-icon">Method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class"><span class="tsd-kind-icon">Accessor</span></li>
+				<li class="tsd-kind-index-signature tsd-parent-kind-class"><span class="tsd-kind-icon">Index signature</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-constructor tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited constructor</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited accessor</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected accessor</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private accessor</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-static"><span class="tsd-kind-icon">Static property</span></li>
+				<li class="tsd-kind-call-signature tsd-parent-kind-class tsd-is-static"><span class="tsd-kind-icon">Static method</span></li>
+			</ul>
+		</div>
+	</div>
+</footer>
+<div class="overlay"></div>
+<script src="../assets/js/main.js"></script>
+<script>if (location.protocol == 'file:') document.write('<script src="../assets/js/search.js"><' + '/script>');</script>
+</body>
+</html>

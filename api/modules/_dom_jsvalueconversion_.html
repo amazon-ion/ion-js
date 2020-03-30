@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>&quot;IonType&quot; | Ion-JS Library</title>
+	<title>&quot;dom/JsValueConversion&quot; | Ion-JS Library</title>
 	<meta name="description" content="">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -54,10 +54,10 @@
 					<a href="../globals.html">Globals</a>
 				</li>
 				<li>
-					<a href="_iontype_.html">&quot;IonType&quot;</a>
+					<a href="_dom_jsvalueconversion_.html">&quot;dom/JsValueConversion&quot;</a>
 				</li>
 			</ul>
-			<h1>External module &quot;IonType&quot;</h1>
+			<h1>External module &quot;dom/JsValueConversion&quot;</h1>
 		</div>
 	</div>
 </header>
@@ -69,12 +69,71 @@
 				<section class="tsd-panel tsd-index-panel">
 					<div class="tsd-index-content">
 						<section class="tsd-index-section ">
-							<h3>Classes</h3>
+							<h3>Interfaces</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-class tsd-parent-kind-external-module"><a href="../classes/_iontype_.iontype.html" class="tsd-kind-icon">Ion<wbr>Type</a></li>
+								<li class="tsd-kind-interface tsd-parent-kind-external-module"><a href="../interfaces/_dom_jsvalueconversion_.fromjsvalue.html" class="tsd-kind-icon">From<wbr>JsValue</a></li>
+							</ul>
+						</section>
+						<section class="tsd-index-section ">
+							<h3>Functions</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-function tsd-parent-kind-external-module"><a href="_dom_jsvalueconversion_.html#_domconstructorfor" class="tsd-kind-icon">_dom<wbr>Constructor<wbr>For</a></li>
+								<li class="tsd-kind-function tsd-parent-kind-external-module"><a href="_dom_jsvalueconversion_.html#_ionvaluefromjsvalue" class="tsd-kind-icon">_ion<wbr>Value<wbr>From<wbr>JsValue</a></li>
 							</ul>
 						</section>
 					</div>
+				</section>
+			</section>
+			<section class="tsd-panel-group tsd-member-group ">
+				<h2>Functions</h2>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-external-module">
+					<a name="_domconstructorfor" class="tsd-anchor"></a>
+					<h3>_dom<wbr>Constructor<wbr>For</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-external-module">
+						<li class="tsd-signature tsd-kind-icon">_dom<wbr>Constructor<wbr>For<span class="tsd-signature-symbol">(</span>ionType<span class="tsd-signature-symbol">: </span><a href="../classes/_iontype_.iontype.html" class="tsd-signature-type">IonType</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../interfaces/_dom_jsvalueconversion_.fromjsvalue.html" class="tsd-signature-type">FromJsValue</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/e8be26f/src/dom/JsValueConversion.ts#L52">src/dom/JsValueConversion.ts:52</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>ionType: <a href="../classes/_iontype_.iontype.html" class="tsd-signature-type">IonType</a></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="../interfaces/_dom_jsvalueconversion_.fromjsvalue.html" class="tsd-signature-type">FromJsValue</a></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-external-module">
+					<a name="_ionvaluefromjsvalue" class="tsd-anchor"></a>
+					<h3>_ion<wbr>Value<wbr>From<wbr>JsValue</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-external-module">
+						<li class="tsd-signature tsd-kind-icon">_ion<wbr>Value<wbr>From<wbr>JsValue<span class="tsd-signature-symbol">(</span>value<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span>, annotations<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../interfaces/_dom_value_.value-1.html" class="tsd-signature-type">Value</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/e8be26f/src/dom/JsValueConversion.ts#L142">src/dom/JsValueConversion.ts:142</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>value: <span class="tsd-signature-type">any</span></h5>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> annotations: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol"> = []</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="../interfaces/_dom_value_.value-1.html" class="tsd-signature-type">Value</a></h4>
+						</li>
+					</ul>
 				</section>
 			</section>
 		</div>
@@ -85,14 +144,20 @@
 						<a href="../globals.html"><em>Globals</em></a>
 					</li>
 					<li class="current tsd-kind-external-module">
-						<a href="_iontype_.html">&quot;<wbr>Ion<wbr>Type&quot;</a>
+						<a href="_dom_jsvalueconversion_.html">&quot;dom/<wbr>JsValue<wbr>Conversion&quot;</a>
 					</li>
 				</ul>
 			</nav>
 			<nav class="tsd-navigation secondary menu-sticky">
 				<ul class="before-current">
-					<li class=" tsd-kind-class tsd-parent-kind-external-module">
-						<a href="../classes/_iontype_.iontype.html" class="tsd-kind-icon">Ion<wbr>Type</a>
+					<li class=" tsd-kind-interface tsd-parent-kind-external-module">
+						<a href="../interfaces/_dom_jsvalueconversion_.fromjsvalue.html" class="tsd-kind-icon">From<wbr>JsValue</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-external-module">
+						<a href="_dom_jsvalueconversion_.html#_domconstructorfor" class="tsd-kind-icon">_dom<wbr>Constructor<wbr>For</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-external-module">
+						<a href="_dom_jsvalueconversion_.html#_ionvaluefromjsvalue" class="tsd-kind-icon">_ion<wbr>Value<wbr>From<wbr>JsValue</a>
 					</li>
 				</ul>
 			</nav>

@@ -54,7 +54,7 @@
 					<a href="globals.html">Globals</a>
 				</li>
 			</ul>
-			<h1> Ion-JS Library</h1>
+			<h1>Ion-JS Library</h1>
 		</div>
 	</div>
 </header>
@@ -69,10 +69,10 @@
 				<p><a href="https://www.npmjs.com/package/ion-js"><img src="https://img.shields.io/npm/v/ion-js.svg" alt="NPM Version"></a>
 					<a href="https://github.com/amzn/ion-js/blob/master/LICENSE"><img src="https://img.shields.io/hexpm/l/plug.svg" alt="License"></a>
 					<a href="https://travis-ci.org/amzn/ion-js"><img src="https://api.travis-ci.org/amzn/ion-js.svg?branch=master" alt="Travis CI Status"></a>
-					<a href="https://amzn.github.io/ion-js/api/index.html"><img src="https://img.shields.io/badge/docs-api-green.svg" alt="Documentation"></a>
-				<a href="https://github.com/amzn/ion-js/releases"><img src="https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg" alt="Semantic Releases"></a></p>
-				<p>This package is designed with work with Node JS major versions <strong>8</strong>, <strong>10</strong>, and <strong>12</strong>.  Browser compatibility
-				should be anything that supports <strong>ES5+</strong>.</p>
+				<a href="https://amzn.github.io/ion-js/api/index.html"><img src="https://img.shields.io/badge/docs-api-green.svg" alt="Documentation"></a></p>
+				<p>This package is designed to work with Node JS major versions <strong>8</strong>, <strong>10</strong>, and <strong>12</strong>.  While this library
+					should be usable within browsers that support <strong>ES5+</strong>, please note that it is not currently being tested
+				in any browser environments.</p>
 				<a href="#getting-started" id="getting-started" style="color: inherit; text-decoration: none;">
 					<h2>Getting Started</h2>
 				</a>
@@ -82,22 +82,26 @@
 				</a>
 				<ol>
 					<li><p>Add <code>ion-js</code> to your dependencies using <code>npm</code></p>
-					<pre><code> npm install --<span class="hljs-built_in">save</span>-<span class="hljs-built_in">dev</span> ion-js</code></pre></li>
-					<li><p>Use the library to read/write ion data. Here is an example that reads Ion data from a Javascript string</p>
-						<pre><code class="language-javascript"> <span class="hljs-keyword">var</span> ionJs = <span class="hljs-built_in">require</span>(<span class="hljs-string">"ion-js"</span>)
+					<pre><code> npm <span class="hljs-keyword">install</span> <span class="hljs-comment">--save ion-js</span></code></pre></li>
+					<li><p>Use the library to read/write Ion data. Here is an example that reads Ion data from a JavaScript string:</p>
+						<pre><code class="language-javascript"> <span class="hljs-keyword">let</span> ion = <span class="hljs-built_in">require</span>(<span class="hljs-string">"ion-js"</span>);
 
- <span class="hljs-keyword">var</span> ionData = <span class="hljs-string">"{ hello: \"Ion\" }"</span>;
- <span class="hljs-keyword">var</span> ionReader = ionJs.makeReader(ionData);
- ionReader.next();
- ionReader.stepIn();
- ionReader.next();
- <span class="hljs-keyword">var</span> hello = ionReader.fieldName();
- <span class="hljs-keyword">var</span> ion = ionReader.stringValue();
- ionReader.stepOut();
- <span class="hljs-built_in">console</span>.log(ion.concat(<span class="hljs-string">", "</span>).concat(hello));</code></pre>
+ <span class="hljs-comment">// Reading</span>
+ <span class="hljs-keyword">let</span> ionData = <span class="hljs-string">'{ greeting: "Hello", name: "Ion" }'</span>;
+ <span class="hljs-keyword">let</span> value = ion.load(ionData);
+ <span class="hljs-built_in">console</span>.log(value.greeting + <span class="hljs-string">", "</span> + value.name + <span class="hljs-string">"!"</span>);
+
+ <span class="hljs-comment">// Writing</span>
+ <span class="hljs-keyword">let</span> ionText = ion.dumpText(value);
+ <span class="hljs-built_in">console</span>.log(<span class="hljs-string">"Serialized Ion: "</span> + ionText);</code></pre>
+						<p>For more examples, see the <a href="/src/dom/README.md">Ion DOM <code>README</code></a>.</p>
 					</li>
 				</ol>
 				<p><a href="https://npm.runkit.com/ion-js">Try it yourself</a>.</p>
+				<p><strong>Note:</strong> if your package&#39;s public interface exposes part of this library, this library should be specified
+					as a peer dependency in your package&#39;s package.json file.  Otherwise, packages that depend on your package
+					<em>and</em> this library may experience unexpected behavior, as two installations of this library (even if the same
+				version) are not designed or tested to behave correctly.</p>
 				<a href="#web-browser" id="web-browser" style="color: inherit; text-decoration: none;">
 					<h3>Web Browser</h3>
 				</a>
@@ -299,28 +303,85 @@ $ git <span class="hljs-keyword">submodule </span>update</code></pre>
 						<a href="globals.html"><em>Globals</em></a>
 					</li>
 					<li class=" tsd-kind-external-module">
-						<a href="modules/_intsize_.html">"<wbr>Int<wbr>Size"</a>
+						<a href="modules/_intsize_.html">&quot;<wbr>Int<wbr>Size&quot;</a>
 					</li>
 					<li class=" tsd-kind-external-module">
-						<a href="modules/_ion_.html">"<wbr>Ion"</a>
+						<a href="modules/_ion_.html">&quot;<wbr>Ion&quot;</a>
 					</li>
 					<li class=" tsd-kind-external-module">
-						<a href="modules/_iondecimal_.html">"<wbr>Ion<wbr>Decimal"</a>
+						<a href="modules/_iondecimal_.html">&quot;<wbr>Ion<wbr>Decimal&quot;</a>
 					</li>
 					<li class=" tsd-kind-external-module">
-						<a href="modules/_ionreader_.html">"<wbr>Ion<wbr>Reader"</a>
+						<a href="modules/_ionreader_.html">&quot;<wbr>Ion<wbr>Reader&quot;</a>
 					</li>
 					<li class=" tsd-kind-external-module">
-						<a href="modules/_iontimestamp_.html">"<wbr>Ion<wbr>Timestamp"</a>
+						<a href="modules/_iontimestamp_.html">&quot;<wbr>Ion<wbr>Timestamp&quot;</a>
 					</li>
 					<li class=" tsd-kind-external-module">
-						<a href="modules/_iontype_.html">"<wbr>Ion<wbr>Type"</a>
+						<a href="modules/_iontype_.html">&quot;<wbr>Ion<wbr>Type&quot;</a>
 					</li>
 					<li class=" tsd-kind-external-module">
-						<a href="modules/_iontypes_.html">"<wbr>Ion<wbr>Types"</a>
+						<a href="modules/_iontypes_.html">&quot;<wbr>Ion<wbr>Types&quot;</a>
 					</li>
 					<li class=" tsd-kind-external-module">
-						<a href="modules/_ionwriter_.html">"<wbr>Ion<wbr>Writer"</a>
+						<a href="modules/_ionwriter_.html">&quot;<wbr>Ion<wbr>Writer&quot;</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_dom_blob_.html">&quot;dom/<wbr>Blob&quot;</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_dom_boolean_.html">&quot;dom/<wbr>Boolean&quot;</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_dom_clob_.html">&quot;dom/<wbr>Clob&quot;</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_dom_decimal_.html">&quot;dom/<wbr>Decimal&quot;</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_dom_float_.html">&quot;dom/<wbr>Float&quot;</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_dom_fromjsconstructor_.html">&quot;dom/<wbr>From<wbr>JsConstructor&quot;</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_dom_integer_.html">&quot;dom/<wbr>Integer&quot;</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_dom_jsvalueconversion_.html">&quot;dom/<wbr>JsValue<wbr>Conversion&quot;</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_dom_list_.html">&quot;dom/<wbr>List&quot;</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_dom_lob_.html">&quot;dom/<wbr>Lob&quot;</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_dom_null_.html">&quot;dom/<wbr>Null&quot;</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_dom_sexpression_.html">&quot;dom/SExpression&quot;</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_dom_sequence_.html">&quot;dom/<wbr>Sequence&quot;</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_dom_string_.html">&quot;dom/<wbr>String&quot;</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_dom_struct_.html">&quot;dom/<wbr>Struct&quot;</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_dom_symbol_.html">&quot;dom/<wbr>Symbol&quot;</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_dom_timestamp_.html">&quot;dom/<wbr>Timestamp&quot;</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_dom_value_.html">&quot;dom/<wbr>Value&quot;</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_dom_index_.html">&quot;dom/index&quot;</a>
 					</li>
 				</ul>
 			</nav>
@@ -331,7 +392,7 @@ $ git <span class="hljs-keyword">submodule </span>update</code></pre>
 		</div>
 	</div>
 </div>
-<footer class="with-border-bottom">
+<footer>
 	<div class="container">
 		<h2>Legend</h2>
 		<div class="tsd-legend-group">
@@ -391,9 +452,6 @@ $ git <span class="hljs-keyword">submodule </span>update</code></pre>
 		</div>
 	</div>
 </footer>
-<div class="container tsd-generator">
-	<p>Generated using <a href="https://typedoc.org/" target="_blank">TypeDoc</a></p>
-</div>
 <div class="overlay"></div>
 <script src="assets/js/main.js"></script>
 <script>if (location.protocol == 'file:') document.write('<script src="assets/js/search.js"><' + '/script>');</script>
