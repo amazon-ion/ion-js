@@ -269,7 +269,8 @@ describe('Value', () => {
         describe('No plain Javascript value is an instance of dom.Value', () => {
             instanceOfValueTest(
                 false,
-                ...exampleJsValuesWhere()
+                ...exampleJsValuesWhere(),
+                Object.create(null)
             );
         });
         for (let subclass of DOM_VALUE_SUBCLASSES) {
@@ -438,5 +439,31 @@ describe('Value', () => {
             {foo: 5, bar: "baz", qux: true},
             {foo: ['dog', 'cat', 'mouse']}
         );
+    });
+    describe('Large containers', () => {
+        const LARGE_CONTAINER_NUM_ENTRIES = 1_000_000;
+        let largeJsArray: Value[] = new Array(LARGE_CONTAINER_NUM_ENTRIES);
+        let largeJsObject = {};
+        for (let i = 0; i < LARGE_CONTAINER_NUM_ENTRIES; i++) {
+            let ionValue = Value.from(i);
+            largeJsArray[i] = ionValue;
+            largeJsObject[i] = ionValue;
+        }
+        it('List', () => {
+            let ionList = Value.from(largeJsArray) as any;
+            assert.equal(ionList.getType(), IonTypes.LIST);
+            assert.equal(ionList.length, LARGE_CONTAINER_NUM_ENTRIES);
+        });
+        it('S-Expression', () => {
+            let ionSExpression = new dom.SExpression(largeJsArray) as any;
+            assert.equal(ionSExpression.getType(), IonTypes.SEXP);
+            assert.equal(ionSExpression.length, LARGE_CONTAINER_NUM_ENTRIES);
+        });
+        it('Struct', function () {
+            this.timeout(5_000)
+            let ionStruct = Value.from(largeJsObject) as any;
+            assert.equal(ionStruct.getType(), IonTypes.STRUCT);
+            assert.equal(ionStruct.fields().length, LARGE_CONTAINER_NUM_ENTRIES);
+        });
     });
 });

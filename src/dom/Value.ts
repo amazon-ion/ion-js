@@ -369,6 +369,7 @@ export namespace Value {
 Object.defineProperty(Value, Symbol.hasInstance, {
     get: () => (instance) => {
         return _hasValue(instance)
+            && _hasValue(instance.constructor)
             && _DOM_VALUE_SIGNET in instance.constructor
             && instance.constructor[_DOM_VALUE_SIGNET] === _DOM_VALUE_SIGNET;
     }

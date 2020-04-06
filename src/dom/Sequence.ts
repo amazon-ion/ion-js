@@ -18,7 +18,9 @@ export function Sequence(ionType: IonType) {
     return class extends Value(Array, ionType, FromJsConstructor.NONE) implements Value, Array<Value> {
         protected constructor(children: Value[], annotations: string[] = []) {
             super();
-            this.push(...children);
+            for (let child of children) {
+                this.push(child);
+            }
             this._setAnnotations(annotations);
         }
 
