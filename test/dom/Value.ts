@@ -459,10 +459,11 @@ describe('Value', () => {
             assert.equal(ionSExpression.getType(), IonTypes.SEXP);
             assert.equal(ionSExpression.length, LARGE_CONTAINER_NUM_ENTRIES);
         });
-        it('Struct', () => {
+        it('Struct', function () {
+            this.timeout(5_000)
             let ionStruct = Value.from(largeJsObject) as any;
             assert.equal(ionStruct.getType(), IonTypes.STRUCT);
             assert.equal(ionStruct.fields().length, LARGE_CONTAINER_NUM_ENTRIES);
-        }).timeout(5_000);
+        });
     });
 });
