@@ -48,6 +48,7 @@ export class PrettyTextWriter extends TextWriter {
         this.writePrettyIndent(0);
         this.writeSymbolToken(fieldName);
         this.writeable.writeByte(CharCodes.COLON);
+        this.writeable.writeByte(CharCodes.SPACE);
 
         this.currentContainer.state = State.VALUE;
     }
