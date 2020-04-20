@@ -543,16 +543,16 @@ describe("Text Writer", () => {
                 writer.stepOut();
             },
             `a1::{
-  int:a3::123,
-  string:a4::"string",
-  symbol:a5::symbol,
-  symbol:null.symbol,
-  timestamp:a8::2017-04-03T00:00:00.000Z,
-  decimal:a9::12d-1,
-  struct:a10::{
-    symbol:a11::symbol
+  int: a3::123,
+  string: a4::"string",
+  symbol: a5::symbol,
+  symbol: null.symbol,
+  timestamp: a8::2017-04-03T00:00:00.000Z,
+  decimal: a9::12d-1,
+  struct: a10::{
+    symbol: a11::symbol
   },
-  list:a12::[
+  list: a12::[
     a14::123,
     a15::"string",
     a16::symbol,
@@ -563,7 +563,7 @@ describe("Text Writer", () => {
     a22::[
     ]
   ],
-  sexp:a23::(
+  sexp: a23::(
     a24::null.symbol 
     a25::null.string 
     a26::null
