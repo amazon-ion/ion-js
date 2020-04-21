@@ -54,8 +54,6 @@ export class Context {
     }
 }
 
-let _jsbiZero = JSBI.BigInt(0);
-
 export class TextWriter extends AbstractWriter {
 
     protected containerContext: Context[];
@@ -163,7 +161,7 @@ export class TextWriter extends AbstractWriter {
             let s = '';
 
             let coefficient = value.getCoefficient();
-            if (JSBI.lessThan(coefficient, _jsbiZero)) {
+            if (JSBI.lessThan(coefficient, JsbiSupport.ZERO)) {
                 coefficient = JSBI.unaryMinus(coefficient);
             }
             if (value.isNegative()) {
