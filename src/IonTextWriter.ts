@@ -159,17 +159,46 @@ export class TextWriter extends AbstractWriter {
         _assertDefined(value);
         this._serializeValue(IonTypes.DECIMAL, value, (value: Decimal) => {
             let s = '';
+
             let coefficient = value.getCoefficient();
-            if (JsbiSupport.isZero(coefficient) && value.isNegative()) {
+            if (JSBI.lessThan(coefficient, JsbiSupport.ZERO)) {
+                coefficient = JSBI.unaryMinus(coefficient);
+            }
+            if (value.isNegative()) {
                 s += '-';
             }
-            s += coefficient.toString() + 'd';
 
             let exponent = value.getExponent();
-            if (exponent === 0 && _sign(exponent) === -1) {
-                s += '-';
+            let scale = -exponent;
+
+            if (exponent == 0) {
+                s += coefficient + '.';
+
+            } else if (exponent < 0) {
+                // Avoid printing small negative exponents using a heuristic
+                // adapted from http://speleotrove.com/decimal/daconvs.html
+
+                let significantDigits = coefficient.toString().length;
+                let adjustedExponent = significantDigits - 1 - scale;
+                if (adjustedExponent >= 0) {
+                    let wholeDigits = significantDigits - scale;
+                    s += coefficient.toString().substring(0, wholeDigits);
+                    s += '.';
+                    s += coefficient.toString().substring(wholeDigits, significantDigits);
+                } else if (adjustedExponent >= -6) {
+                    s += '0.';
+                    s += '00000'.substring(0, scale - significantDigits);
+                    s += coefficient;
+                } else {
+                    s += coefficient;
+                    s += 'd-';
+                    s += scale.toString();
+                }
+
+            } else {  // exponent > 0
+                s += coefficient + 'd' + exponent;
             }
-            s += exponent;
+
             this.writeUtf8(s);
         });
     }
