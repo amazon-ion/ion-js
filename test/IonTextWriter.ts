@@ -139,10 +139,10 @@ describe("Text Writer", () => {
                 expected
             );
         };
-        decimalTest('Writes positive decimal', '123.456', '123456d-3');
-        decimalTest('Writes negative decimal', '-123.456', '-123456d-3');
-        decimalTest('Writes integer decimal', '123456.', '123456d0');
-        decimalTest('Mantissa-only decimal has leading zero', '123456d-6', '123456d-6');
+        decimalTest('Writes positive decimal', '123.456', '123.456');
+        decimalTest('Writes negative decimal', '-123.456', '-123.456');
+        decimalTest('Writes integer decimal', '123456.', '123456.');
+        decimalTest('Mantissa-only decimal has leading zero', '123456d-6', '0.123456');
         writerTest('Writes null decimal using null',
             writer => writer.writeDecimal(null),
             'null.decimal');
@@ -154,7 +154,7 @@ describe("Text Writer", () => {
                 writer.setAnnotations(['foo', 'bar']);
                 writer.writeDecimal(ion.Decimal.parse('123.456'))
             },
-            'foo::bar::123456d-3');
+            'foo::bar::123.456');
     });
 
     describe("Writing floats", () => {
@@ -548,7 +548,7 @@ describe("Text Writer", () => {
   symbol: a5::symbol,
   symbol: null.symbol,
   timestamp: a8::2017-04-03T00:00:00.000Z,
-  decimal: a9::12d-1,
+  decimal: a9::1.2,
   struct: a10::{
     symbol: a11::symbol
   },
@@ -557,7 +557,7 @@ describe("Text Writer", () => {
     a15::"string",
     a16::symbol,
     a19::2017-04-03T00:00:00.000Z,
-    a20::12d-1,
+    a20::1.2,
     a21::{
     },
     a22::[
