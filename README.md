@@ -163,7 +163,7 @@ Notes:
 
 ## Contributing
 
-See [CONTRIBUTE.md](CONTRIBUTE.md)
+See [CONTRIBUTING.md](CONTRIBUTING.md)
 
 ## License
 
