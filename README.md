@@ -163,7 +163,7 @@ Notes:
 
 ## Contributing
 
-See [CONTRIBUTING.md](https://github.com/amzn/ion-js/blob/master/CONTRIBUTING.md)
+See [CONTRIBUTING.md](CONTRIBUTING.md)
 
 ## License
 
