@@ -151,7 +151,7 @@ export class TextReader implements Reader {
                 this._raw_type = undefined;
             } else if (this._raw_type === T_STRUCT) {
                 if (p.annotations().length !== 1) break;
-                if (p.annotations()[0] != ion_symbol_table) break;
+                if (p.annotations()[0].getText() != ion_symbol_table) break;
                 this._type = get_ion_type(this._raw_type);
                 this._symtab = makeSymbolTable(this._cat, this);
                 this._raw = undefined;
@@ -217,20 +217,19 @@ export class TextReader implements Reader {
     }
 
     annotations(): string[] {
-        let ann : string[] = [];
-        for (let str of this._parser.annotations()) {
-            ann.push(str);
-        }
-        for (let i = 0; i < ann.length; i++) {
-            if(ann[i].length > 1 && ann[i][0] === '$') {
-                let tempStr = ann[i].substr(1, ann[i].length);
-                if (+tempStr === +tempStr) {//look up sid, +str === +str is a one line is integer hack
-                    let symbol = this._symtab.getSymbolText(Number(tempStr));
-                    if(symbol === undefined || symbol === null) throw new Error("Unresolvable symbol ID, symboltokens unsupported.");
-                    ann[i] = symbol;
+        let ann: string[] = [];
+        this._parser.annotations().forEach((st) => {
+            let text = st.getText();
+            if (text !== null) {
+                ann.push(text);
+            } else {
+                let symbol = this._symtab.getSymbolText(st.getSid());
+                if (symbol === undefined || symbol === null) {
+                    throw new Error("Unresolvable symbol ID, symboltokens unsupported.");
                 }
+                ann.push(symbol);
             }
-        }
+        });
         return ann;
     }
 

@@ -36,3 +36,17 @@ export function _assertDefined(value: any): void {
         throw new Error("Expected value to be defined");
     }
 }
+
+/**
+ * If s consists solely of chars ['0'..'9'] and can be parsed as an int,
+ * returns the int value;  otherwise returns NaN.
+ */
+export function _toInt(s: string): number {
+    for (let i = 0; i < s.length; i++) {
+        if (s[i] < '0' || s[i] > '9') {
+            return NaN;
+        }
+    }
+    return parseInt(s);
+}
+
