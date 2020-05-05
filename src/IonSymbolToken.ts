@@ -14,8 +14,9 @@
  */
 
 /**
- * An Ion symbol token (field name, annotation, and symbol values)
- * providing both the symbol text and the assigned symbol ID.
+ * An Ion symbol token (used to represent field names, annotations,
+ * and symbol values) providing both the symbol text and the assigned
+ * symbol ID.
  */
 export class SymbolToken {
     private static _UNKNOWN_SYMBOL_ID = -1;

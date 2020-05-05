@@ -217,20 +217,18 @@ export class TextReader implements Reader {
     }
 
     annotations(): string[] {
-        let ann: string[] = [];
-        this._parser.annotations().forEach((st) => {
+        return this._parser.annotations().map((st) => {
             let text = st.getText();
             if (text !== null) {
-                ann.push(text);
+                return text;
             } else {
                 let symbol = this._symtab.getSymbolText(st.getSid());
                 if (symbol === undefined || symbol === null) {
                     throw new Error("Unresolvable symbol ID, symboltokens unsupported.");
                 }
-                ann.push(symbol);
+                return symbol;
             }
         });
-        return ann;
     }
 
     isNull(): boolean {

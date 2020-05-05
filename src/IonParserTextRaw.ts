@@ -28,7 +28,6 @@ import {SymbolToken} from "./IonSymbolToken";
 import {IonType} from "./IonType";
 import {IonTypes} from "./IonTypes";
 import {JsbiSupport} from "./JsbiSupport";
-import {_toInt} from "./util";
 
 const EOF = -1;  // EOF is end of container, distinct from undefined which is value has been consumed
 const ERROR           = -2;
@@ -751,10 +750,7 @@ export class ParserTextRaw {
             let ch = this._read_after_whitespace(true);
             if (ch == CH_CL && this._peek() == CH_CL) {
                 this._read(); // consume the colon character
-                let sid = NaN;
-                if (symbol[0] === '$') {
-                    sid = _toInt(symbol.substr(1, symbol.length));
-                }
+                let sid = this._parseSymbolId(symbol);
                 if (sid === 0) {
                     throw new Error('Symbol ID zero is not supported.');
                 } else if (isNaN(sid)) {
@@ -1516,6 +1512,23 @@ export class ParserTextRaw {
             ii++;
         }
         return ch;
+    }
+
+    /**
+     * Attempts to parse a SID from a string such as "$5".  Specifically:
+     * if s starts with '$', and the remaining chars are in the range ['0'..'9']
+     * and can be parsed as an int, returns the int value;  otherwise returns NaN.
+     */
+    private _parseSymbolId(s: string): number {
+        if (s[0] !== '$') {
+            return NaN;
+        }
+        for (let i = 1; i < s.length; i++) {
+            if (s[i] < '0' || s[i] > '9') {
+                return NaN;
+            }
+        }
+        return parseInt(s.substr(1, s.length));
     }
 
     private _error(msg: string): void {
