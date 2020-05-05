@@ -36,4 +36,3 @@ export function _assertDefined(value: any): void {
         throw new Error("Expected value to be defined");
     }
 }
-
