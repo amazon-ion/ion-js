@@ -24,6 +24,7 @@ import {is_keyword, is_whitespace} from "./IonText";
 
 import JSBI from "jsbi";
 import {StringSpan} from "./IonSpan";
+import {SymbolToken} from "./IonSymbolToken";
 import {IonType} from "./IonType";
 import {IonTypes} from "./IonTypes";
 import {JsbiSupport} from "./JsbiSupport";
@@ -219,7 +220,7 @@ export class ParserTextRaw {
     private _esc_len: number;
     private _curr: number;
     private _curr_null: boolean = false;
-    private _ann: any[];
+    private _ann: SymbolToken[];
     private _msg: string;
     private _error_msg: string;
     private _fieldname: string | null;
@@ -278,7 +279,7 @@ export class ParserTextRaw {
         return this._fieldnameType;
     }
 
-    annotations(): string[] {
+    annotations(): SymbolToken[] {
         return this._ann;
     }
 
@@ -749,8 +750,14 @@ export class ParserTextRaw {
             let ch = this._read_after_whitespace(true);
             if (ch == CH_CL && this._peek() == CH_CL) {
                 this._read(); // consume the colon character
-                if(symbol === '$0') throw new Error('Symbol ID zero is not supported.');
-                this._ann.push(symbol);
+                let sid = this._parseSymbolId(symbol);
+                if (sid === 0) {
+                    throw new Error('Symbol ID zero is not supported.');
+                } else if (isNaN(sid)) {
+                    this._ann.push(new SymbolToken(symbol));
+                } else {
+                    this._ann.push(new SymbolToken(null, sid));
+                }
                 this._ops.unshift(calling_op);
             } else {
                 let kwt = T_IDENTIFIER;
@@ -1084,13 +1091,7 @@ export class ParserTextRaw {
         ch = this._read_after_whitespace(true);
         if (ch == CH_CL && this._peek() == CH_CL) {
             this._read(); // consume the colon character
-            if(s[0] === '$') {
-                let tempStr = s.substr(1, s.length)
-                if (+tempStr === +tempStr) {
-                    s = "'" + s + "'";
-                }
-            }
-            this._ann.push(s);
+            this._ann.push(new SymbolToken(s));
             is_ann = true;
         } else {
             this._unread(ch);
@@ -1511,6 +1512,23 @@ export class ParserTextRaw {
             ii++;
         }
         return ch;
+    }
+
+    /**
+     * Attempts to parse a SID from a string such as "$5".  Specifically:
+     * if s starts with '$', and the remaining chars are in the range ['0'..'9']
+     * and can be parsed as an int, returns the int value;  otherwise returns NaN.
+     */
+    private _parseSymbolId(s: string): number {
+        if (s[0] !== '$') {
+            return NaN;
+        }
+        for (let i = 1; i < s.length; i++) {
+            if (s[i] < '0' || s[i] > '9') {
+                return NaN;
+            }
+        }
+        return parseInt(s.substr(1, s.length));
     }
 
     private _error(msg: string): void {

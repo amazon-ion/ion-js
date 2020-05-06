@@ -19,6 +19,7 @@ import {ParserTextRaw} from '../src/IonParserTextRaw';
 import {IonTypes} from "../src/IonTypes";
 import {IonType} from "../src/IonType";
 import JSBI from "jsbi";
+import {SymbolToken} from "../src/IonSymbolToken";
 
 // a few notes/surprises:
 // - fieldNameType() always appears to return 9 (T_IDENTIFIER) when positioned on a field,
@@ -266,20 +267,22 @@ describe('IonParserTextRaw', () => {
 
     it('Reads annotations', () => {
         let p = new ParserTextRaw(new StringSpan('z::[1, y::2, x::{a: w::3, b: v::(s::t::u::4)}, r::5]'));
-        p.next(); assert.deepEqual(p.annotations(), ['z']);
+        p.next(); assert.deepEqual(p.annotations(), [new SymbolToken('z')]);
         p.next(); assert.deepEqual(p.annotations(), []);
-        p.next(); assert.deepEqual(p.annotations(), ['y']);
-        p.next(); assert.deepEqual(p.annotations(), ['x']);
-        p.next(); assert.deepEqual(p.annotations(), ['w']);
-        p.next(); assert.deepEqual(p.annotations(), ['v']);
-        p.next(); assert.deepEqual(p.annotations(), ['s', 't', 'u']);
+        p.next(); assert.deepEqual(p.annotations(), [new SymbolToken('y')]);
+        p.next(); assert.deepEqual(p.annotations(), [new SymbolToken('x')]);
+        p.next(); assert.deepEqual(p.annotations(), [new SymbolToken('w')]);
+        p.next(); assert.deepEqual(p.annotations(), [new SymbolToken('v')]);
+        p.next(); assert.deepEqual(p.annotations(), [new SymbolToken('s'),
+                                                     new SymbolToken('t'),
+                                                     new SymbolToken('u')]);
 
         assert.equal(p.next(), -1);  // "EOF" (end of nested sexp)
         assert.deepEqual(p.annotations(), []);
         assert.equal(p.next(), -1);  // "EOF" (end of nested struct)
         assert.deepEqual(p.annotations(), []);
 
-        p.next(); assert.deepEqual(p.annotations(), ['r']);
+        p.next(); assert.deepEqual(p.annotations(), [new SymbolToken('r')]);
         assert.equal(p.next(), -1);  // "EOF" (end of list)
         assert.deepEqual(p.annotations(), []);
     })
