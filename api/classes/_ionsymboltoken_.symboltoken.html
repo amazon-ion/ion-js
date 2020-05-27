@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>FromJsConstructorBuilder | Ion-JS Library</title>
+	<title>SymbolToken | Ion-JS Library</title>
 	<meta name="description" content="">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -54,13 +54,13 @@
 					<a href="../globals.html">Globals</a>
 				</li>
 				<li>
-					<a href="../modules/_dom_fromjsconstructor_.html">&quot;dom/FromJsConstructor&quot;</a>
+					<a href="../modules/_ionsymboltoken_.html">&quot;IonSymbolToken&quot;</a>
 				</li>
 				<li>
-					<a href="_dom_fromjsconstructor_.fromjsconstructorbuilder.html">FromJsConstructorBuilder</a>
+					<a href="_ionsymboltoken_.symboltoken.html">SymbolToken</a>
 				</li>
 			</ul>
-			<h1>Class FromJsConstructorBuilder</h1>
+			<h1>Class SymbolToken</h1>
 		</div>
 	</div>
 </header>
@@ -70,17 +70,17 @@
 			<section class="tsd-panel tsd-comment">
 				<div class="tsd-comment tsd-typography">
 					<div class="lead">
-						<p>Builder to configure and instantiate FromJsConstructor objects. See the documentation for
-						the FromJsConstructor class for a description of each field.</p>
+						<p>An Ion symbol token (used to represent field names, annotations,
+							and symbol values) providing both the symbol text and the assigned
+						symbol ID.</p>
 					</div>
-					<p>Package-visible for use in dom.Value subclass definitions.</p>
 				</div>
 			</section>
 			<section class="tsd-panel tsd-hierarchy">
 				<h3>Hierarchy</h3>
 				<ul class="tsd-hierarchy">
 					<li>
-						<span class="target">FromJsConstructorBuilder</span>
+						<span class="target">SymbolToken</span>
 					</li>
 				</ul>
 			</section>
@@ -91,16 +91,14 @@
 						<section class="tsd-index-section ">
 							<h3>Constructors</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-constructor tsd-parent-kind-class"><a href="_dom_fromjsconstructor_.fromjsconstructorbuilder.html#constructor" class="tsd-kind-icon">constructor</a></li>
+								<li class="tsd-kind-constructor tsd-parent-kind-class"><a href="_ionsymboltoken_.symboltoken.html#constructor" class="tsd-kind-icon">constructor</a></li>
 							</ul>
 						</section>
 						<section class="tsd-index-section ">
 							<h3>Methods</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_dom_fromjsconstructor_.fromjsconstructorbuilder.html#build" class="tsd-kind-icon">build</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_dom_fromjsconstructor_.fromjsconstructorbuilder.html#withclasses" class="tsd-kind-icon">with<wbr>Classes</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_dom_fromjsconstructor_.fromjsconstructorbuilder.html#withclassestounbox" class="tsd-kind-icon">with<wbr>Classes<wbr>ToUnbox</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_dom_fromjsconstructor_.fromjsconstructorbuilder.html#withprimitives" class="tsd-kind-icon">with<wbr>Primitives</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_ionsymboltoken_.symboltoken.html#getsid" class="tsd-kind-icon">get<wbr>Sid</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_ionsymboltoken_.symboltoken.html#gettext" class="tsd-kind-icon">get<wbr>Text</a></li>
 							</ul>
 						</section>
 					</div>
@@ -112,16 +110,25 @@
 					<a name="constructor" class="tsd-anchor"></a>
 					<h3>constructor</h3>
 					<ul class="tsd-signatures tsd-kind-constructor tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">new <wbr>From<wbr>JsConstructor<wbr>Builder<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_dom_fromjsconstructor_.fromjsconstructorbuilder.html" class="tsd-signature-type">FromJsConstructorBuilder</a></li>
+						<li class="tsd-signature tsd-kind-icon">new <wbr>Symbol<wbr>Token<span class="tsd-signature-symbol">(</span>text<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span>, sid<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_ionsymboltoken_.symboltoken.html" class="tsd-signature-type">SymbolToken</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/3a88880/src/dom/FromJsConstructor.ts#L23">src/dom/FromJsConstructor.ts:23</a></li>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/3a88880/src/IonSymbolToken.ts#L22">src/IonSymbolToken.ts:22</a></li>
 								</ul>
 							</aside>
-							<h4 class="tsd-returns-title">Returns <a href="_dom_fromjsconstructor_.fromjsconstructorbuilder.html" class="tsd-signature-type">FromJsConstructorBuilder</a></h4>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>text: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span></h5>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> sid: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> = SymbolToken._UNKNOWN_SYMBOL_ID</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="_ionsymboltoken_.symboltoken.html" class="tsd-signature-type">SymbolToken</a></h4>
 						</li>
 					</ul>
 				</section>
@@ -129,88 +136,46 @@
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Methods</h2>
 				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
-					<a name="build" class="tsd-anchor"></a>
-					<h3>build</h3>
+					<a name="getsid" class="tsd-anchor"></a>
+					<h3>get<wbr>Sid</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">build<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_dom_fromjsconstructor_.fromjsconstructor.html" class="tsd-signature-type">FromJsConstructor</a></li>
+						<li class="tsd-signature tsd-kind-icon">get<wbr>Sid<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/3a88880/src/dom/FromJsConstructor.ts#L46">src/dom/FromJsConstructor.ts:46</a></li>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/3a88880/src/IonSymbolToken.ts#L38">src/IonSymbolToken.ts:38</a></li>
 								</ul>
 							</aside>
-							<h4 class="tsd-returns-title">Returns <a href="_dom_fromjsconstructor_.fromjsconstructor.html" class="tsd-signature-type">FromJsConstructor</a></h4>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Returns the symbol ID (sid) of this symbol, or -1 if the sid is unknown.</p>
+								</div>
+							</div>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
 						</li>
 					</ul>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
-					<a name="withclasses" class="tsd-anchor"></a>
-					<h3>with<wbr>Classes</h3>
+					<a name="gettext" class="tsd-anchor"></a>
+					<h3>get<wbr>Text</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">with<wbr>Classes<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">...</span>classes<span class="tsd-signature-symbol">: </span><a href="../modules/_dom_value_.html#constructor" class="tsd-signature-type">Constructor</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_dom_fromjsconstructor_.fromjsconstructorbuilder.html" class="tsd-signature-type">FromJsConstructorBuilder</a></li>
+						<li class="tsd-signature tsd-kind-icon">get<wbr>Text<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/3a88880/src/dom/FromJsConstructor.ts#L36">src/dom/FromJsConstructor.ts:36</a></li>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/3a88880/src/IonSymbolToken.ts#L31">src/IonSymbolToken.ts:31</a></li>
 								</ul>
 							</aside>
-							<h4 class="tsd-parameters-title">Parameters</h4>
-							<ul class="tsd-parameters">
-								<li>
-									<h5><span class="tsd-flag ts-flagRest">Rest</span> <span class="tsd-signature-symbol">...</span>classes: <a href="../modules/_dom_value_.html#constructor" class="tsd-signature-type">Constructor</a><span class="tsd-signature-symbol">[]</span></h5>
-								</li>
-							</ul>
-							<h4 class="tsd-returns-title">Returns <a href="_dom_fromjsconstructor_.fromjsconstructorbuilder.html" class="tsd-signature-type">FromJsConstructorBuilder</a></h4>
-						</li>
-					</ul>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
-					<a name="withclassestounbox" class="tsd-anchor"></a>
-					<h3>with<wbr>Classes<wbr>ToUnbox</h3>
-					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">with<wbr>Classes<wbr>ToUnbox<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">...</span>classes<span class="tsd-signature-symbol">: </span><a href="../modules/_dom_value_.html#constructor" class="tsd-signature-type">Constructor</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_dom_fromjsconstructor_.fromjsconstructorbuilder.html" class="tsd-signature-type">FromJsConstructorBuilder</a></li>
-					</ul>
-					<ul class="tsd-descriptions">
-						<li class="tsd-description">
-							<aside class="tsd-sources">
-								<ul>
-									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/3a88880/src/dom/FromJsConstructor.ts#L41">src/dom/FromJsConstructor.ts:41</a></li>
-								</ul>
-							</aside>
-							<h4 class="tsd-parameters-title">Parameters</h4>
-							<ul class="tsd-parameters">
-								<li>
-									<h5><span class="tsd-flag ts-flagRest">Rest</span> <span class="tsd-signature-symbol">...</span>classes: <a href="../modules/_dom_value_.html#constructor" class="tsd-signature-type">Constructor</a><span class="tsd-signature-symbol">[]</span></h5>
-								</li>
-							</ul>
-							<h4 class="tsd-returns-title">Returns <a href="_dom_fromjsconstructor_.fromjsconstructorbuilder.html" class="tsd-signature-type">FromJsConstructorBuilder</a></h4>
-						</li>
-					</ul>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
-					<a name="withprimitives" class="tsd-anchor"></a>
-					<h3>with<wbr>Primitives</h3>
-					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">with<wbr>Primitives<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">...</span>primitives<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_dom_fromjsconstructor_.fromjsconstructorbuilder.html" class="tsd-signature-type">FromJsConstructorBuilder</a></li>
-					</ul>
-					<ul class="tsd-descriptions">
-						<li class="tsd-description">
-							<aside class="tsd-sources">
-								<ul>
-									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/3a88880/src/dom/FromJsConstructor.ts#L31">src/dom/FromJsConstructor.ts:31</a></li>
-								</ul>
-							</aside>
-							<h4 class="tsd-parameters-title">Parameters</h4>
-							<ul class="tsd-parameters">
-								<li>
-									<h5><span class="tsd-flag ts-flagRest">Rest</span> <span class="tsd-signature-symbol">...</span>primitives: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span></h5>
-								</li>
-							</ul>
-							<h4 class="tsd-returns-title">Returns <a href="_dom_fromjsconstructor_.fromjsconstructorbuilder.html" class="tsd-signature-type">FromJsConstructorBuilder</a></h4>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Returns the text of this symbol, or null if the text is unknown.</p>
+								</div>
+							</div>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span></h4>
 						</li>
 					</ul>
 				</section>
@@ -223,42 +188,30 @@
 						<a href="../globals.html"><em>Globals</em></a>
 					</li>
 					<li class="current tsd-kind-external-module">
-						<a href="../modules/_dom_fromjsconstructor_.html">&quot;dom/<wbr>From<wbr>JsConstructor&quot;</a>
+						<a href="../modules/_ionsymboltoken_.html">&quot;<wbr>Ion<wbr>Symbol<wbr>Token&quot;</a>
 					</li>
 				</ul>
 			</nav>
 			<nav class="tsd-navigation secondary menu-sticky">
 				<ul class="before-current">
-					<li class=" tsd-kind-class tsd-parent-kind-external-module">
-						<a href="_dom_fromjsconstructor_.fromjsconstructor.html" class="tsd-kind-icon">From<wbr>JsConstructor</a>
-					</li>
 				</ul>
 				<ul class="current">
-					<li class="current tsd-kind-class tsd-parent-kind-external-module tsd-is-private">
-						<a href="_dom_fromjsconstructor_.fromjsconstructorbuilder.html" class="tsd-kind-icon">From<wbr>JsConstructor<wbr>Builder</a>
+					<li class="current tsd-kind-class tsd-parent-kind-external-module">
+						<a href="_ionsymboltoken_.symboltoken.html" class="tsd-kind-icon">Symbol<wbr>Token</a>
 						<ul>
 							<li class=" tsd-kind-constructor tsd-parent-kind-class">
-								<a href="_dom_fromjsconstructor_.fromjsconstructorbuilder.html#constructor" class="tsd-kind-icon">constructor</a>
+								<a href="_ionsymboltoken_.symboltoken.html#constructor" class="tsd-kind-icon">constructor</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
-								<a href="_dom_fromjsconstructor_.fromjsconstructorbuilder.html#build" class="tsd-kind-icon">build</a>
+								<a href="_ionsymboltoken_.symboltoken.html#getsid" class="tsd-kind-icon">get<wbr>Sid</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
-								<a href="_dom_fromjsconstructor_.fromjsconstructorbuilder.html#withclasses" class="tsd-kind-icon">with<wbr>Classes</a>
-							</li>
-							<li class=" tsd-kind-method tsd-parent-kind-class">
-								<a href="_dom_fromjsconstructor_.fromjsconstructorbuilder.html#withclassestounbox" class="tsd-kind-icon">with<wbr>Classes<wbr>ToUnbox</a>
-							</li>
-							<li class=" tsd-kind-method tsd-parent-kind-class">
-								<a href="_dom_fromjsconstructor_.fromjsconstructorbuilder.html#withprimitives" class="tsd-kind-icon">with<wbr>Primitives</a>
+								<a href="_ionsymboltoken_.symboltoken.html#gettext" class="tsd-kind-icon">get<wbr>Text</a>
 							</li>
 						</ul>
 					</li>
 				</ul>
 				<ul class="after-current">
-					<li class=" tsd-kind-object-literal tsd-parent-kind-external-module">
-						<a href="../modules/_dom_fromjsconstructor_.html#primitives" class="tsd-kind-icon">Primitives</a>
-					</li>
 				</ul>
 			</nav>
 		</div>
