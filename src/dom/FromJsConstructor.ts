@@ -67,10 +67,6 @@ export class FromJsConstructorBuilder {
  * See also: Value._fromJsValue()
  */
 export class FromJsConstructor {
-    // Useful for dom.Value subclasses that do not use a FromJsConstructor (e.g. Struct, List)
-    // Because it has no supported types, any attempt to use this instance will throw an Error.
-    public static NONE: FromJsConstructor = new FromJsConstructorBuilder().build();
-
     /**
      * Constructor.
      *
@@ -121,6 +117,14 @@ export class FromJsConstructor {
 
         throw new Error(`Unable to construct a(n) ${constructor.name} from a ${jsValueType}.`);
     }
+}
+
+// This namespace will be merged with the class definition above. This allows static values to invoke functions in the
+// FromJsConstructor class after the class has been fully initialized.
+export namespace FromJsConstructor {
+    // Useful for dom.Value subclasses that do not use a FromJsConstructor (e.g. Struct, List).
+    // Because it has no supported types, any attempt to use this instance will throw an Error.
+    export const NONE: FromJsConstructor = new FromJsConstructorBuilder().build();
 }
 
 /**
