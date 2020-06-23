@@ -1,16 +1,18 @@
-/*
-* Copyright 2017 Amazon.com, Inc. or its affiliates. All Rights Reserved.
-*
-* Licensed under the Apache License, Version 2.0 (the "License").
-* You may not use this file except in compliance with the License.
-* A copy of the License is located at:
-*
-*     http://aws.amazon.com/apache2.0/
-*
-* or in the "license" file accompanying this file. This file is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific
-* language governing permissions and limitations under the License.
-*/
+/*!
+ * Copyright 2012 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * A copy of the License is located at
+ *  
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *  
+ * or in the "license" file accompanying this file. This file is distributed
+ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
+
 import {AbstractWriter} from "./AbstractWriter";
 import {Decimal} from "./IonDecimal";
 import {encodeUtf8} from "./IonUnicode";
@@ -29,7 +31,7 @@ import {IonType} from "./IonType";
 import {IonTypes} from "./IonTypes";
 import {Timestamp} from "./IonTimestamp";
 import {Writeable} from "./IonWriteable";
-import {_sign} from "./util";
+import {_assertDefined, _sign} from "./util";
 import {JsbiSupport} from "./JsbiSupport";
 import JSBI from "jsbi";
 
@@ -43,9 +45,9 @@ export enum State {
 export class Context {
     state: State;
     clean: boolean;
-    containerType: IonType;
+    containerType: IonType | null;
 
-    constructor(myType: IonType) {
+    constructor(myType: IonType | null) {
         this.state = myType === IonTypes.STRUCT ? State.STRUCT_FIELD : State.VALUE;
         this.clean = true;
         this.containerType = myType;
@@ -58,7 +60,7 @@ export class TextWriter extends AbstractWriter {
 
     constructor(protected readonly writeable: Writeable) {
         super();
-        this.containerContext = [new Context(undefined)];
+        this.containerContext = [new Context(null)];
     }
 
     get isTopLevel(): boolean {
@@ -108,18 +110,21 @@ export class TextWriter extends AbstractWriter {
     }
 
     writeBlob(value: Uint8Array): void {
+        _assertDefined(value);
         this._serializeValue(IonTypes.BLOB, value, (value: Uint8Array) => {
             this.writeable.writeBytes(encodeUtf8('{{' + toBase64(value) + '}}'));
         });
     }
 
     writeBoolean(value: boolean): void {
+        _assertDefined(value);
         this._serializeValue(IonTypes.BOOL, value, (value: boolean) => {
             this.writeUtf8(value ? "true" : "false");
         });
     }
 
     writeClob(value: Uint8Array): void {
+        _assertDefined(value);
         this._serializeValue(IonTypes.CLOB, value, (value: Uint8Array) => {
             let hexStr: string;
             this.writeUtf8('{{"');
@@ -151,25 +156,55 @@ export class TextWriter extends AbstractWriter {
     }
 
     writeDecimal(value: Decimal): void {
+        _assertDefined(value);
         this._serializeValue(IonTypes.DECIMAL, value, (value: Decimal) => {
-            if (value === null) {
-                this.writeUtf8("null.decimal");
-            } else {
-                let s = '';
-                let coefficient = value.getCoefficient();
-                if (JsbiSupport.isZero(coefficient) && value.isNegative()) {
-                    s += '-';
-                }
-                s += coefficient.toString() + 'd';
+            let s = '';
 
-                let exponent = value.getExponent();
-                if (exponent === 0 && _sign(exponent) === -1) {
-                    s += '-';
-                }
-                s += exponent;
-                this.writeUtf8(s);
+            let coefficient = value.getCoefficient();
+            if (JSBI.lessThan(coefficient, JsbiSupport.ZERO)) {
+                coefficient = JSBI.unaryMinus(coefficient);
             }
+            if (value.isNegative()) {
+                s += '-';
+            }
+
+            let exponent = value.getExponent();
+            let scale = -exponent;
+
+            if (exponent == 0) {
+                s += coefficient + '.';
+
+            } else if (exponent < 0) {
+                // Avoid printing small negative exponents using a heuristic
+                // adapted from http://speleotrove.com/decimal/daconvs.html
+
+                let significantDigits = coefficient.toString().length;
+                let adjustedExponent = significantDigits - 1 - scale;
+                if (adjustedExponent >= 0) {
+                    let wholeDigits = significantDigits - scale;
+                    s += coefficient.toString().substring(0, wholeDigits);
+                    s += '.';
+                    s += coefficient.toString().substring(wholeDigits, significantDigits);
+                } else if (adjustedExponent >= -6) {
+                    s += '0.';
+                    s += '00000'.substring(0, scale - significantDigits);
+                    s += coefficient;
+                } else {
+                    s += coefficient;
+                    s += 'd-';
+                    s += scale.toString();
+                }
+
+            } else {  // exponent > 0
+                s += coefficient + 'd' + exponent;
+            }
+
+            this.writeUtf8(s);
         });
+    }
+
+    protected _isInStruct(): boolean {
+        return this.currentContainer.containerType === IonTypes.STRUCT;
     }
 
     /*
@@ -179,6 +214,7 @@ export class TextWriter extends AbstractWriter {
     I can't think of a reason why it HAS to be done that way right now, but if that feels cleaner to you, then consider it.
      */
     writeFieldName(fieldName: string): void {
+        _assertDefined(fieldName);
         if (this.currentContainer.containerType !== IonTypes.STRUCT) {
             throw new Error("Cannot write field name outside of a struct");
         }
@@ -197,42 +233,56 @@ export class TextWriter extends AbstractWriter {
     }
 
     writeFloat32(value: number): void {
+        _assertDefined(value);
         this._writeFloat(value);
     }
 
     writeFloat64(value: number): void {
+        _assertDefined(value);
         this._writeFloat(value);
     }
 
     writeInt(value: number | JSBI): void {
+        _assertDefined(value);
         this._serializeValue(IonTypes.INT, value, (value: number | JSBI) => {
             this.writeUtf8(value.toString(10));
         });
     }
 
+    protected _writeNull(type: IonType): void {
+        if (type === IonTypes.NULL) {
+            this.writeUtf8("null");
+        } else {
+            this.writeUtf8("null." + type.name);
+        }
+    }
+
     writeNull(type: IonType): void {
-        if (type === null || type === undefined || type.binaryTypeId < 0 || type.binaryTypeId > 13) {
-            throw new Error(`Cannot write null for type ${type}`);
+        if (type === undefined || type === null) {
+            type = IonTypes.NULL;
         }
         this.handleSeparator();
         this.writeAnnotations();
-        this.writeUtf8("null." + type.name);
+        this._writeNull(type);
         if (this.currentContainer.containerType === IonTypes.STRUCT) this.currentContainer.state = State.STRUCT_FIELD;
     }
 
     writeString(value: string): void {
+        _assertDefined(value);
         this._serializeValue(IonTypes.STRING, value, (value: string) => {
             this.writeable.writeBytes(encodeUtf8('"' + escape(value, StringEscapes) + '"'));
         });
     }
 
     writeSymbol(value: string): void {
+        _assertDefined(value);
         this._serializeValue(IonTypes.SYMBOL, value, (value: string) => {
             this.writeSymbolToken(value);
         });
     }
 
     writeTimestamp(value: Timestamp): void {
+        _assertDefined(value);
         this._serializeValue(IonTypes.TIMESTAMP, value, (value: Timestamp) => {
             this.writeUtf8(value.toString());
         });
@@ -240,7 +290,9 @@ export class TextWriter extends AbstractWriter {
 
     stepIn(type: IonType): void {
         if (this.currentContainer.state === State.STRUCT_FIELD) {
-            throw new Error(`Started writing a ${this.currentContainer.containerType.name} inside a struct without writing the field name first. Call writeFieldName(string) with the desired name before calling stepIn(${this.currentContainer.containerType.name}).`);
+            throw new Error(`Started writing a ${this.currentContainer.containerType!.name} inside a struct"
+                + " without writing the field name first. Call writeFieldName(string) with the desired name"
+                + " before calling stepIn(${this.currentContainer.containerType!.name}).`);
         }
         switch (type) {
             case IonTypes.LIST:
@@ -295,7 +347,7 @@ export class TextWriter extends AbstractWriter {
 
     protected _serializeValue<T>(type: IonType, value: T, serialize: Serializer<T>) {
         if (this.currentContainer.state === State.STRUCT_FIELD) throw new Error("Expecting a struct field");
-        if (value === null || value === undefined) {
+        if (value === null) {
             this.writeNull(type);
             return;
         }

@@ -12,13 +12,14 @@
     "module": "commonjs",
     "moduleResolution": "node",
     "esModuleInterop": true,
-    "lib": ["es6"],
+    "lib": ["es6", "es2017.object"],
     "declaration": true,
     "inlineSources": true,
     "sourceMap": true,
     // TODO enable this to have stricter checking
     "strict": false,
-    "rootDir": "src",
+    "strictNullChecks": true,
+    "rootDirs": ["src", "test"],
     "outDir": "dist/es6/es6",
     "experimentalDecorators": true
   }

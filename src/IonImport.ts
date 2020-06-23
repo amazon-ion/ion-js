@@ -1,16 +1,18 @@
-/*
- * Copyright 2012-2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
- *
+/*!
+ * Copyright 2012 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
- * A copy of the License is located at:
- *
- *     http://aws.amazon.com/apache2.0/
- *
- * or in the "license" file accompanying this file. This file is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific
- * language governing permissions and limitations under the License.
+ * A copy of the License is located at
+ *  
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *  
+ * or in the "license" file accompanying this file. This file is distributed
+ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
  */
+
 import {SharedSymbolTable} from "./IonSharedSymbolTable";
 
 /**
@@ -27,17 +29,17 @@ import {SharedSymbolTable} from "./IonSharedSymbolTable";
 export class Import {
     private readonly _offset: number;
     private readonly _length: number;
-    private readonly _parent: Import;
+    private readonly _parent: Import | null;
     private readonly _symbolTable: SharedSymbolTable;
 
-    constructor(parent: Import, symbolTable: SharedSymbolTable, length?: number) {
+    constructor(parent: Import | null, symbolTable: SharedSymbolTable, length?: number | null) {
         this._parent = parent;
         this._symbolTable = symbolTable;
         this._offset = this.parent ? this.parent.offset + this.parent.length : 1;
         this._length = length || this.symbolTable.numberOfSymbols;
     }
 
-    get parent(): Import {
+    get parent(): Import | null {
         return this._parent;
     }
 
@@ -53,7 +55,7 @@ export class Import {
         return this._symbolTable;
     }
 
-    getSymbolText(symbolId: number): string {
+    getSymbolText(symbolId: number): string | undefined {
         if (this.parent === undefined) throw new Error("Illegal parent state.");
         if (this.parent !== null) {
             let parentSymbol = this.parent.getSymbolText(symbolId);
@@ -69,7 +71,7 @@ export class Import {
         return undefined;
     }
 
-    getSymbolId(symbolText: string): number {
+    getSymbolId(symbolText: string): number | undefined {
         let symbolId;
         if (this.parent !== null) {
             symbolId = this.parent.getSymbolId(symbolText);

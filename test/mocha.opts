@@ -3,3 +3,4 @@
 --require source-map-support/register
 
 test/*.ts
+test/dom/*.ts

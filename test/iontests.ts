@@ -1,23 +1,27 @@
-/*
+/*!
  * Copyright 2012 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
- * A copy of the License is located at:
+ * A copy of the License is located at
  *
- *     http://aws.amazon.com/apache2.0/
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * or in the "license" file accompanying this file. This file is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific
- * language governing permissions and limitations under the License.
+ * or in the "license" file accompanying this file. This file is distributed
+ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
  */
+
 import {assert} from 'chai';
 import * as ion from '../src/Ion';
 import * as fs from 'fs';
 import * as path from 'path';
 import {IonEventStream} from '../src/IonEventStream';
+import {IonEventType} from '../src/IonEvent';
+import {IonType, Reader, Writer} from '../src/Ion';
 
-function findFiles(folder, files = []) {
+function findFiles(folder: string, files: string[] = []) {
     fs.readdirSync(folder).forEach(file => {
         let filePath = path.join(folder, file);
         let stats = fs.lstatSync(filePath);
@@ -30,7 +34,7 @@ function findFiles(folder, files = []) {
     return files;
 }
 
-function exhaust(reader) {
+function exhaust(reader: Reader) {
     for (let type; type = reader.next();) {
         if (type.isContainer && !reader.isNull()) {
             reader.stepIn();
@@ -42,93 +46,78 @@ function exhaust(reader) {
     }
 }
 
-function loadValues(path, newWriter) {
-    let reader = ion.makeReader(getInput(path));
-    let values = [];
-    let containerIdx = 0;
+function makeEventStream(src: string | Buffer | Uint8Array, writer: Writer): IonEventStream {
+    writer.writeValues(ion.makeReader(src));
+    writer.close();
+    return new IonEventStream(ion.makeReader(writer.getBytes()));
+}
 
-    for (let topLevelType; topLevelType = reader.next();) {
-        if (!topLevelType.isContainer) {
-            throw Error('Expected top-level value to be a container, was ' + topLevelType);
+function equivsTest(path: string, expectedEquivalence = true, equivsTimelines = false) {
+    let bytes = getInput(path)
+    let originalEvents = new IonEventStream(ion.makeReader(bytes)).getEvents();
+    let textEvents = makeEventStream(bytes, ion.makeTextWriter()).getEvents();
+    let binEvents = makeEventStream(bytes, ion.makeBinaryWriter()).getEvents();
+
+    //i is the index of each toplevel container start event
+    for (let i = 0; i < originalEvents.length - 2; i += originalEvents[i].ionValue.length + 1) {
+        let event = originalEvents[i];
+        let textEvent = textEvents[i];
+        let binEvent = binEvents[i];
+        //Comparisons can be either IonEventStream[](Embedded Documents List of strings interpreted as top level streams).
+        //Or an IonEvent[](contents of an sexp of equivalent Ion values).
+        let comparisons : any = [];
+        if (event.annotations[0] === 'embedded_documents') {
+            //we found a list of strings that we need to interpret as top level ion text streams.
+            for (let j = 0; j < event.ionValue.length - 1; j++) {
+                comparisons.push(
+                    [
+                        new IonEventStream(ion.makeReader(event.ionValue[j].ionValue)),
+                        new IonEventStream(ion.makeReader(textEvent.ionValue[j].ionValue)),
+                        new IonEventStream(ion.makeReader(binEvent.ionValue[j].ionValue))
+                    ]
+                );
+            }
+        } else {//we're in an sexp
+            for (let j = 0; j < event.ionValue.length - 1; j++) {
+                comparisons.push([event.ionValue[j], textEvent.ionValue[j], binEvent.ionValue[j]]);
+                if (event.ionValue[j].eventType === IonEventType.CONTAINER_START) {
+                    j += event.ionValue[j].ionValue.length
+                }
+            }
         }
-
-        reader.stepIn();
-        values.push([]);
-
-        for (let type; type = reader.next();) {
-            let writer = newWriter();
-            writer.writeValue(reader);
-            writer.close();
-            values[containerIdx].push(writer.getBytes());
-        }
-
-        containerIdx += 1;
-        reader.stepOut();
-    }
-    return values;
-}
-
-function bytesToString(c, idx, bytes) {
-    let sb = '[' + c + '][' + idx + ']';
-    if (bytes.length >= 4 && bytes[0] === 224 && bytes[1] === 1 && bytes[2] === 0 && bytes[3] === 234) {
-        // Ion binary, convert to hex string
-        bytes.forEach(b => {
-            sb += ' ' + ('0' + (b & 0xFF).toString(16)).slice(-2);
-        });
-        return sb;
-    }
-    // otherwise, text:
-    return sb + ' ' + String.fromCharCode.apply(null, bytes);
-}
-
-function equivsTestCompare(c, i, j, bytesI, bytesJ, expectedEquivalence) {
-    let eventStreamI = new IonEventStream(ion.makeReader(bytesI));
-    let eventStreamJ = new IonEventStream(ion.makeReader(bytesJ));
-    let result = eventStreamI.equals(eventStreamJ);
-    assert(expectedEquivalence ? result : !result,
-        'Expected ' + bytesToString(c, i, bytesI)
-        + ' to' + (expectedEquivalence ? '' : ' not')
-        + ' be equivalent to ' + bytesToString(c, j, bytesJ));
-}
-
-function equivsTest(path, expectedEquivalence = true, compare = equivsTestCompare) {
-    let binaryValues = loadValues(path, () => ion.makeBinaryWriter());
-    let textValues = loadValues(path, () => ion.makeTextWriter());
-
-    for (let c = 0; c < binaryValues.length; c++) {
-        for (let i = 0; i < binaryValues[c].length; i++) {
-            for (let j = i + 1; j < binaryValues[c].length; j++) {
-                compare(c, i, j, binaryValues[c][i], binaryValues[c][j], expectedEquivalence);
-                compare(c, i, j, binaryValues[c][i], textValues[c][j], expectedEquivalence);
-                compare(c, i, j, textValues[c][i], textValues[c][j], expectedEquivalence);
+        //width is the number of "copies"  of each value (original, text, binary)
+        let width = comparisons[0].length;
+        //if we're equal everybody equals everybody
+        //if !eq only the copies in our row are equal
+        //every value in row j must compare with every other row
+        for (let j = 0; j < comparisons.length; j++) {
+            for (let k = j + 1; k < comparisons.length; k++) {
+                //l tracks our index within row j
+                for (let l = 0; l < width; l++) {
+                    //m tracks our index within row k
+                    for (let m = 0; m < width; m++) {
+                        if (equivsTimelines) {
+                            assert.equal(comparisons[j][l].ionValue.compareTo(comparisons[k][m].ionValue), 0);
+                        } else {
+                            assert.equal(comparisons[j][l].equals(comparisons[k][m]), expectedEquivalence);
+                        }
+                    }
+                }
             }
         }
     }
 }
 
-function nonEquivsTest(path) {
+function nonEquivsTest(path: string) {
     equivsTest(path, false);
 }
 
-function equivTimelinesTest(path) {
-    function timelinesCompare(c, i, j, bytesI, bytesJ) {
-        function readTimestamp(bytes) {
-            let reader = ion.makeReader(bytes);
-            reader.next();
-            return reader.timestampValue();
-        }
-
-        let tsI = readTimestamp(bytesI);
-        let tsJ = readTimestamp(bytesJ);
-        // assert that the timestamps represent the same instant (but not necessarily data-model equivalent):
-        assert(tsI.compareTo(tsJ) === 0, 'Expected ' + tsI + ' to be instant-equivalent to ' + tsJ);
-    }
-
-    equivsTest(path, true, timelinesCompare);
+function equivTimelinesTest(path: string) {
+    equivsTest(path, true, true);
 }
 
-function readerCompareTest(source) {
-    function toBytes(source, writer) {
+function readerCompareTest(source: string | Buffer) {
+    function toBytes(source: string | Buffer, writer: Writer) {
         let reader = ion.makeReader(source);
         writer.writeValues(reader);
         writer.close();
@@ -141,7 +130,7 @@ function readerCompareTest(source) {
     readerCompare(ion.makeReader(ionBinary), ion.makeReader(ionText));
 }
 
-function readerCompare(r1, r2) {
+function readerCompare(r1: Reader, r2: Reader) {
     checkReaderValueMethods(r1, r2, null);
 
     while (true) {
@@ -172,7 +161,7 @@ function readerCompare(r1, r2) {
     }
 }
 
-function checkReaderValueMethods(r1, r2, type) {
+function checkReaderValueMethods(r1: Reader, r2: Reader, type: IonType | null) {
     // This RegEx will immediately match any string that's passed to it.
     // It's used to allow assert.throws() to accept any Error that's thrown.
     const ANY_ERROR_MESSAGE = new RegExp('^');
@@ -184,6 +173,10 @@ function checkReaderValueMethods(r1, r2, type) {
             assert(v1 !== undefined, "unexpected 'undefined' response");
             assert(v2 !== undefined, "unexpected 'undefined' response");
             assert.deepEqual(v1, v2, methodName + '():  ' + v1 + ' != ' + v2);
+        } else if (type != null && methodName === 'value' && type.isContainer && r1.isNull()) {
+            // special case for Reader.value() when the readers are pointed at a null container
+            assert.isNull(r1[methodName](), 'Expected ' + methodName + '() to return null');
+            assert.isNull(r2[methodName](), 'Expected ' + methodName + '() to return null');
         } else {
             assert.throws(() => {
                 r1[methodName]()
@@ -215,35 +208,40 @@ function checkReaderValueMethods(r1, r2, type) {
     assert.equal(r1.type(), r2.type(), "types don't match");
 }
 
-function getInput(path) {
+function getInput(path: string): string | Buffer {
     let options = path.endsWith(".10n") ? null : "utf8";
     return fs.readFileSync(path, options);
 }
 
-function roundTripEventStreams(reader) {
-    let streams = [];
-    streams.push(new IonEventStream(reader));
-
-    let eventWriter = ion.makeTextWriter();
-    streams[0].writeEventStream(eventWriter);
-    eventWriter.close();
-    streams.push(new IonEventStream(ion.makeReader(eventWriter.getBytes())));
+function roundTripEventStreams(input: string | Buffer) {
+    let streams: IonEventStream[] = [];
+    streams.push(new IonEventStream(ion.makeReader(input)));
 
     let textWriter = ion.makeTextWriter();
-    streams[0].writeIon(textWriter);
-    streams.push(new IonEventStream(ion.makeReader(textWriter.getBytes())));
+    streams.push(makeEventStream(input, textWriter));
+    let text = textWriter.getBytes();
 
     let binaryWriter = ion.makeBinaryWriter();
-    streams[0].writeIon(binaryWriter);
-    streams.push(new IonEventStream(ion.makeReader(binaryWriter.getBytes())));
+    streams.push(makeEventStream(input, binaryWriter));
+    let binary = binaryWriter.getBytes();
 
-    let eventTextWriter = ion.makeTextWriter();
-    streams[0].writeIon(eventTextWriter);
-    streams.push(new IonEventStream(ion.makeReader(eventTextWriter.getBytes())));
+    // text -> text -> eventstream
+    streams.push(makeEventStream(text, ion.makeTextWriter()));
 
-    let eventBinaryWriter = ion.makeBinaryWriter();
-    streams[0].writeIon(eventBinaryWriter);
-    streams.push(new IonEventStream(ion.makeReader(eventBinaryWriter.getBytes())));
+    // text -> binary -> eventstream
+    streams.push(makeEventStream(text, ion.makeBinaryWriter()));
+
+    // binary -> text -> eventstream
+    streams.push(makeEventStream(binary, ion.makeTextWriter()));
+
+    // binary -> binary -> eventstream
+    streams.push(makeEventStream(binary, ion.makeBinaryWriter()));
+
+    // eventstream -> eventstream
+    textWriter = ion.makeTextWriter();
+    streams[0].writeEventStream(textWriter);
+    textWriter.close();
+    streams.push(new IonEventStream(ion.makeReader(textWriter.getBytes())));
 
     for (let i = 0; i < streams.length - 1; i++) {
         for (let j = i + 1; j < streams.length; j++) {
@@ -294,8 +292,6 @@ function toSkipList(paths: Array<string>): Map<string, number> {
     return skipList;
 }
 
-////// beginning of generated skiplists
-
 let goodSkipList = toSkipList([
     'ion-tests/iontestdata/good/decimalsWithUnderscores.ion',
     'ion-tests/iontestdata/good/equivs/binaryInts.ion',
@@ -306,8 +302,13 @@ let goodSkipList = toSkipList([
     'ion-tests/iontestdata/good/intBinary.ion',
     'ion-tests/iontestdata/good/intsWithUnderscores.ion',
     'ion-tests/iontestdata/good/symbolZero.ion',
+    'ion-tests/iontestdata/good/symbolExplicitZero.10n',
+    'ion-tests/iontestdata/good/symbolImplicitZero.10n',
     'ion-tests/iontestdata/good/utf16.ion',
     'ion-tests/iontestdata/good/utf32.ion',
+    'ion-tests/iontestdata/good/item1.10n',
+    'ion-tests/iontestdata/good/typecodes/T7-large.10n', // https://github.com/amzn/ion-js/issues/541
+    'ion-tests/iontestdata/good/typecodes/T7-small.10n', // https://github.com/amzn/ion-js/issues/541
 ]);
 
 let badSkipList = toSkipList([
@@ -327,6 +328,44 @@ let badSkipList = toSkipList([
     'ion-tests/iontestdata/bad/timestamp/timestampSept31.10n',
     'ion-tests/iontestdata/bad/timestamp/outOfRange/leapDayNonLeapYear_1.10n',
     'ion-tests/iontestdata/bad/timestamp/outOfRange/leapDayNonLeapYear_2.10n',
+    'ion-tests/iontestdata/bad/annotationSymbolIDUnmapped.10n', // https://github.com/amzn/ion-js/issues/542
+    'ion-tests/iontestdata/bad/annotationSymbolIDUnmapped.ion', // https://github.com/amzn/ion-js/issues/542
+    'ion-tests/iontestdata/bad/fieldNameSymbolIDUnmapped.10n', // https://github.com/amzn/ion-js/issues/542
+    'ion-tests/iontestdata/bad/fieldNameSymbolIDUnmapped.ion', // https://github.com/amzn/ion-js/issues/542
+    'ion-tests/iontestdata/bad/timestamp/timestampFraction10d-1.10n', // https://github.com/amzn/ion-js/issues/543
+    'ion-tests/iontestdata/bad/timestamp/timestampFraction11d-1.10n', // https://github.com/amzn/ion-js/issues/543
+    'ion-tests/iontestdata/bad/timestamp/timestampFraction1d0.10n', // https://github.com/amzn/ion-js/issues/543
+    'ion-tests/iontestdata/bad/typecodes/type_15_length_0.10n', // https://github.com/amzn/ion-js/issues/544
+    'ion-tests/iontestdata/bad/typecodes/type_15_length_1.10n', // https://github.com/amzn/ion-js/issues/544
+    'ion-tests/iontestdata/bad/typecodes/type_15_length_10.10n', // https://github.com/amzn/ion-js/issues/544
+    'ion-tests/iontestdata/bad/typecodes/type_15_length_11.10n', // https://github.com/amzn/ion-js/issues/544
+    'ion-tests/iontestdata/bad/typecodes/type_15_length_12.10n', // https://github.com/amzn/ion-js/issues/544
+    'ion-tests/iontestdata/bad/typecodes/type_15_length_13.10n', // https://github.com/amzn/ion-js/issues/544
+    'ion-tests/iontestdata/bad/typecodes/type_15_length_14.10n', // https://github.com/amzn/ion-js/issues/544
+    'ion-tests/iontestdata/bad/typecodes/type_15_length_15.10n', // https://github.com/amzn/ion-js/issues/544
+    'ion-tests/iontestdata/bad/typecodes/type_15_length_2.10n', // https://github.com/amzn/ion-js/issues/544
+    'ion-tests/iontestdata/bad/typecodes/type_15_length_3.10n', // https://github.com/amzn/ion-js/issues/544
+    'ion-tests/iontestdata/bad/typecodes/type_15_length_4.10n', // https://github.com/amzn/ion-js/issues/544
+    'ion-tests/iontestdata/bad/typecodes/type_15_length_5.10n', // https://github.com/amzn/ion-js/issues/544
+    'ion-tests/iontestdata/bad/typecodes/type_15_length_6.10n', // https://github.com/amzn/ion-js/issues/544
+    'ion-tests/iontestdata/bad/typecodes/type_15_length_7.10n', // https://github.com/amzn/ion-js/issues/544
+    'ion-tests/iontestdata/bad/typecodes/type_15_length_8.10n', // https://github.com/amzn/ion-js/issues/544
+    'ion-tests/iontestdata/bad/typecodes/type_15_length_9.10n', // https://github.com/amzn/ion-js/issues/544
+    'ion-tests/iontestdata/bad/typecodes/type_1_length_10.10n', // https://github.com/amzn/ion-js/issues/545
+    'ion-tests/iontestdata/bad/typecodes/type_1_length_11.10n', // https://github.com/amzn/ion-js/issues/545
+    'ion-tests/iontestdata/bad/typecodes/type_1_length_12.10n', // https://github.com/amzn/ion-js/issues/545
+    'ion-tests/iontestdata/bad/typecodes/type_1_length_13.10n', // https://github.com/amzn/ion-js/issues/545
+    'ion-tests/iontestdata/bad/typecodes/type_1_length_14.10n', // https://github.com/amzn/ion-js/issues/545
+    'ion-tests/iontestdata/bad/typecodes/type_1_length_2.10n', // https://github.com/amzn/ion-js/issues/545
+    'ion-tests/iontestdata/bad/typecodes/type_1_length_3.10n', // https://github.com/amzn/ion-js/issues/545
+    'ion-tests/iontestdata/bad/typecodes/type_1_length_4.10n', // https://github.com/amzn/ion-js/issues/545
+    'ion-tests/iontestdata/bad/typecodes/type_1_length_5.10n', // https://github.com/amzn/ion-js/issues/545
+    'ion-tests/iontestdata/bad/typecodes/type_1_length_6.10n', // https://github.com/amzn/ion-js/issues/545
+    'ion-tests/iontestdata/bad/typecodes/type_1_length_7.10n', // https://github.com/amzn/ion-js/issues/545
+    'ion-tests/iontestdata/bad/typecodes/type_1_length_8.10n', // https://github.com/amzn/ion-js/issues/545
+    'ion-tests/iontestdata/bad/typecodes/type_1_length_9.10n', // https://github.com/amzn/ion-js/issues/545
+    'ion-tests/iontestdata/bad/typecodes/type_3_length_0.10n', // https://github.com/amzn/ion-js/issues/546
+    'ion-tests/iontestdata/bad/typecodes/type_6_length_0.10n', // https://github.com/amzn/ion-js/issues/547
 ]);
 
 let eventSkipList = toSkipList([
@@ -347,23 +386,24 @@ let eventSkipList = toSkipList([
     'ion-tests/iontestdata/good/intBinary.ion',
     'ion-tests/iontestdata/good/intsWithUnderscores.ion',
     'ion-tests/iontestdata/good/lists.ion',
-    'ion-tests/iontestdata/good/non-equivs/nulls.ion',
     'ion-tests/iontestdata/good/nopPadInsideEmptyStructZeroSymbolId.10n',
     'ion-tests/iontestdata/good/nopPadInsideStructWithNopPadThenValueZeroSymbolId.10n',
     'ion-tests/iontestdata/good/nopPadInsideStructWithValueThenNopPad.10n',
     'ion-tests/iontestdata/good/notVersionMarkers.ion',
-    'ion-tests/iontestdata/good/nullList.10n',
-    'ion-tests/iontestdata/good/nullSexp.10n',
-    'ion-tests/iontestdata/good/nullStruct.10n',
-    'ion-tests/iontestdata/good/nulls.ion',
     'ion-tests/iontestdata/good/sexpAnnotationQuotedOperator.ion',
     'ion-tests/iontestdata/good/subfieldVarInt.ion',
     'ion-tests/iontestdata/good/symbolExplicitZero.10n',
     'ion-tests/iontestdata/good/symbolImplicitZero.10n',
     'ion-tests/iontestdata/good/symbolZero.ion',
-    'ion-tests/iontestdata/good/testfile22.ion',
     'ion-tests/iontestdata/good/utf16.ion',
     'ion-tests/iontestdata/good/utf32.ion',
+    'ion-tests/iontestdata/good/item1.10n',
+    'ion-tests/iontestdata/good/typecodes/T6-large.10n', // https://github.com/amzn/ion-js/issues/554
+    'ion-tests/iontestdata/good/typecodes/T11.10n', // https://github.com/amzn/ion-js/issues/548
+    'ion-tests/iontestdata/good/typecodes/T12.10n', // https://github.com/amzn/ion-js/issues/548
+    'ion-tests/iontestdata/good/typecodes/T13.10n', // https://github.com/amzn/ion-js/issues/548
+    'ion-tests/iontestdata/good/typecodes/T7-large.10n', // https://github.com/amzn/ion-js/issues/549
+    'ion-tests/iontestdata/good/typecodes/T7-small.10n', // https://github.com/amzn/ion-js/issues/549
 ]);
 
 let readerCompareSkipList = toSkipList([]);
@@ -384,37 +424,18 @@ let equivsSkipList = toSkipList([
     'ion-tests/iontestdata/good/equivs/systemSymbols.ion',
     'ion-tests/iontestdata/good/equivs/systemSymbolsAsAnnotations.ion',
     'ion-tests/iontestdata/good/equivs/textNewlines.ion',
-    'ion-tests/iontestdata/good/equivs/utf8/stringU0001D11E.ion',
-    'ion-tests/iontestdata/good/equivs/utf8/stringUtf8.ion',
+
+    'ion-tests/iontestdata/good/equivs/clobNewlines.ion', // https://github.com/amzn/ion-js/issues/550
+    'ion-tests/iontestdata/good/equivs/localSymbolTableWithAnnotations.ion', // https://github.com/amzn/ion-js/issues/551
+    'ion-tests/iontestdata/good/equivs/longStringsWithComments.ion', // https://github.com/amzn/ion-js/issues/552
 ]);
 
 let nonEquivsSkipList = toSkipList([
     'ion-tests/iontestdata/good/non-equivs/clobs.ion',
     'ion-tests/iontestdata/good/non-equivs/floats.ion',
     'ion-tests/iontestdata/good/non-equivs/floatsVsDecimals.ion',
+    'ion-tests/iontestdata/good/non-equivs/symbolTablesUnknownText.ion',//Cannot pass until we implement symbol token support.
 ]);
-
-////// end of generated skiplists
-
-/*
-  notes from the previous skipList mechanism:
-    'good/intBinary.ion', //binaryInts unsupported.
-    'good/integer_values.ion', //binary ints unsupported.
-    'good/intsWithUnderscores.ion', //binary ints unsupported.
-    'good/equivs/intsWithUnderscores.ion', //binary ints unsupported.
-    'good/equivs/binaryInts.ion', //binary ints unsupported.
-    'good/floatsWithUnderscores.ion', //numbers with underscores unsupported.
-    'good/equivs/floatsWithUnderscores.ion', //numbers with underscores unsupported.
-    'good/equivs/decimalsWithUnderscores.ion', //numbers with underscores unsupported.
-    'good/decimalsWithUnderscores.ion', //numbers with underscores unsupported.
-    'good/symbolZero.ion', //no symboltoken support as of yet.
-    'good/testfile12.ion',
-    'good/non-equivs/nonNulls.ion',
-    'good/equivs/utf8/stringU0001D11E.ion',
-    'good/equivs/structComments.ion',
-    'good/equivs/sexps.ion',
-    'good/equivs/lists.ion',
- */
 
 let goodTestsPath = path.join('ion-tests', 'iontestdata', 'good');
 let badTestsPath = path.join('ion-tests', 'iontestdata', 'bad');
@@ -428,14 +449,19 @@ let equivTestFiles = findFiles(equivTestsPath);
 let nonEquivTestFiles = findFiles(nonEquivTestsPath);
 let equivTimelineTestFiles = findFiles(equivTimelineTestsPath);
 
-function skipOrTest(paths: Array<string>, skipLists: Array<Map<string, number>>, test: (string) => void): void {
+function skipOrTest(paths: Array<string>, skipLists: Array<Map<string, number>>, test: (s: string) => void): void {
     for (let path of paths) {
         let skipped = false;
-        for (let skipList of skipLists) {
-            if (skipList[path]) {
-                it.skip(path, () => {});
-                skipped = true;
-                break;
+
+        if (path.endsWith('.md')) {
+            skipped = true;
+        } else {
+            for (let skipList of skipLists) {
+                if (skipList[path]) {
+                    it.skip(path, () => {});
+                    skipped = true;
+                    break;
+                }
             }
         }
         if (!skipped) {
@@ -490,7 +516,7 @@ describe('ion-tests', () => {
             // Re-use the 'good' file set
             goodTestFiles,
             [eventSkipList],
-            (path) => roundTripEventStreams(ion.makeReader(getInput(path)))
+            (path) => roundTripEventStreams(getInput(path))
         );
     });
 
@@ -503,4 +529,3 @@ describe('ion-tests', () => {
         );
     });
 });
-

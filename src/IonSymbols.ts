@@ -1,16 +1,18 @@
-/*
- * Copyright 2012-2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
- *
+/*!
+ * Copyright 2012 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
- * A copy of the License is located at:
- *
- *     http://aws.amazon.com/apache2.0/
- *
- * or in the "license" file accompanying this file. This file is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific
- * language governing permissions and limitations under the License.
+ * A copy of the License is located at
+ *  
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *  
+ * or in the "license" file accompanying this file. This file is distributed
+ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
  */
+
 import {Catalog} from "./IonCatalog";
 import {getSystemSymbolTableImport} from "./IonSystemSymbolTable";
 import {Import} from "./IonImport";
@@ -31,9 +33,9 @@ function load_imports(reader: Reader, catalog: Catalog): Import {
     while (reader.next()) {
         reader.stepIn(); // into the struct of 1 import
 
-        let name: string;
-        let version: number = 1;
-        let maxId: number;
+        let name: string | null = null;
+        let version: number | null = 1;
+        let maxId: number | null = null;
 
         while (reader.next()) {
             switch (reader.fieldName()) {
@@ -48,12 +50,12 @@ function load_imports(reader: Reader, catalog: Catalog): Import {
             }
         }
 
-        if (version < 1) {
+        if (version === null || version < 1) {
             version = 1;
         }
 
         if (name && name !== "$ion") {
-            let symbolTable: SharedSymbolTable = catalog.getVersion(name, version);
+            let symbolTable: SharedSymbolTable | null = catalog.getVersion(name, version!);
             if (!symbolTable) {
                 if (maxId === undefined) {
                     throw new Error(`No exact match found when trying to import symbol table ${name} version ${version}`);
@@ -63,10 +65,10 @@ function load_imports(reader: Reader, catalog: Catalog): Import {
             }
 
             if (!symbolTable) {
-                symbolTable = new SubstituteSymbolTable(maxId);
+                symbolTable = new SubstituteSymbolTable(maxId!);
             }
 
-            import_ = new Import(import_, symbolTable, maxId);
+            import_ = new Import(import_, symbolTable!, maxId);
         }
 
         reader.stepOut(); // out of one import struct
@@ -76,8 +78,8 @@ function load_imports(reader: Reader, catalog: Catalog): Import {
     return import_;
 }
 
-function load_symbols(reader: Reader): string[] {
-    let symbols: string[] = [];
+function load_symbols(reader: Reader): (string | null)[] {
+    let symbols: (string | null)[] = [];
 
     reader.stepIn();
     while (reader.next()) {
@@ -95,9 +97,8 @@ function load_symbols(reader: Reader): string[] {
  * @param reader The Ion {Reader} over the local symbol table in its serialized form.
  */
 export function makeSymbolTable(catalog: Catalog, reader: Reader): LocalSymbolTable {
-    let import_: Import;
-    let symbols: string[];
-    let maxId: number;
+    let import_: Import | null = null;
+    let symbols: (string | null)[] = [];
     let foundSymbols: boolean = false;
     let foundImports: boolean = false;
 

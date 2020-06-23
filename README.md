@@ -5,10 +5,10 @@ An implementation of [Amazon Ion](https://amzn.github.io/ion-docs/) for JavaScri
 [![License](https://img.shields.io/hexpm/l/plug.svg)](https://github.com/amzn/ion-js/blob/master/LICENSE)
 [![Travis CI Status](https://api.travis-ci.org/amzn/ion-js.svg?branch=master)](https://travis-ci.org/amzn/ion-js)
 [![Documentation](https://img.shields.io/badge/docs-api-green.svg)](https://amzn.github.io/ion-js/api/index.html)
-[![Semantic Releases](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg)](https://github.com/amzn/ion-js/releases)
 
-This package is designed with work with Node JS major versions **8**, **10**, and **12**.  Browser compatibility
-should be anything that supports **ES5+**.
+This package is designed to work with Node JS major versions **8**, **10**, and **12**.  While this library
+should be usable within browsers that support **ES5+**, please note that it is not currently being tested
+in any browser environments.
 
 ## Getting Started
 
@@ -16,26 +16,32 @@ You can use this library either as a Node.js module or inside an HTML page.
 
 ### NPM
 
-1. Add `ion-js` to your dependencies using `npm`
+1. Add `ion-js` and `jsbi` to your dependencies using `npm`
     ```
-    npm install --save ion-js
+    npm install --save ion-js jsbi
     ```
-1. Use the library to read/write ion data. Here is an example that reads Ion data from a Javascript string
+1. Use the library to read/write Ion data. Here is an example that reads Ion data from a JavaScript string:
     ```javascript
-    var ionJs = require("ion-js")
-
-    var ionData = "{ hello: \"Ion\" }";
-    var ionReader = ionJs.makeReader(ionData);
-    ionReader.next();
-    ionReader.stepIn();
-    ionReader.next();
-    var hello = ionReader.fieldName();
-    var ion = ionReader.stringValue();
-    ionReader.stepOut();
-    console.log(ion.concat(", ").concat(hello));
+    let ion = require("ion-js");
+    
+    // Reading
+    let ionData = '{ greeting: "Hello", name: "Ion" }';
+    let value = ion.load(ionData);
+    console.log(value.greeting + ", " + value.name + "!");
+   
+    // Writing
+    let ionText = ion.dumpText(value);
+    console.log("Serialized Ion: " + ionText);
     ```
+   
+   For more examples, see the [Ion DOM `README`](/src/dom/README.md).
 
 [Try it yourself](https://npm.runkit.com/ion-js).
+
+**Note:** if your package's public interface exposes part of this library, this library should be specified
+as a peer dependency in your package's package.json file.  Otherwise, packages that depend on your package
+*and* this library may experience unexpected behavior, as two installations of this library (even if the same
+version) are not designed or tested to behave correctly.
 
 ### Web Browser
 
@@ -157,7 +163,7 @@ Notes:
 
 ## Contributing
 
-See [CONTRIBUTE.md](CONTRIBUTE.md)
+See [CONTRIBUTING.md](CONTRIBUTING.md)
 
 ## License
 

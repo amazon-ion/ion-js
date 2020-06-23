@@ -1,16 +1,18 @@
-/*
- * Copyright 2012-2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
- *
+/*!
+ * Copyright 2012 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
- * A copy of the License is located at:
- *
- *     http://aws.amazon.com/apache2.0/
- *
- * or in the "license" file accompanying this file. This file is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific
- * language governing permissions and limitations under the License.
+ * A copy of the License is located at
+ *  
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *  
+ * or in the "license" file accompanying this file. This file is distributed
+ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
  */
+
 import {Decimal} from "./IonDecimal";
 import {IonType} from "./IonType";
 import {Reader} from "./IonReader";
@@ -99,15 +101,27 @@ export interface Writer {
     writeClob(value: Uint8Array | null): void;
 
     /**
-     * Writes a reader's current value.  If there's no current value, this method
-     * does nothing.
+     * Writes a reader's current value.
+     *
+     * If there's no current value, this method does nothing.
+     * If the current value is a container, this method will stepIn() recursively,
+     * writing each nested value that it encounters.
+     *
+     * It is illegal to call this method if this Writer is positioned within a Struct
+     * while the Reader is not.
      */
     writeValue(reader: Reader): void;
 
     /**
      * Writes a reader's current value and all following values until the end
-     * of the current container.  If there's no current value then this method
-     * calls {@link next()} to get started.
+     * of the current container.
+     *
+     * If there's no current value then this method calls {@link next()} to get started.
+     * This method will stepIn() to containers recursively, writing each nested value that it
+     * encounters.
+     *
+     * It is illegal to call this method if this Writer is positioned within a Struct
+     * while the Reader is not.
      */
     writeValues(reader: Reader): void;
 

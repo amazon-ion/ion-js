@@ -1,39 +1,40 @@
-/*
- * Copyright 2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
- *
+/*!
+ * Copyright 2012 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
- * A copy of the License is located at:
- *
- *       http://aws.amazon.com/apache2.0/
- *
- * or in the "license" file accompanying this file. This file is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific
- * language governing permissions and limitations under the License.
+ * A copy of the License is located at
+ *  
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *  
+ * or in the "license" file accompanying this file. This file is distributed
+ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
  */
 
 import {assert} from "chai";
-import * as ion from "../src/IonTests";
-import {Decimal, decodeUtf8} from "../src/IonTests";
+import * as ion from "../src/Ion";
+import {Decimal, decodeUtf8} from "../src/Ion";
 import * as util from "../src/util";
 import JSBI from "jsbi";
 import {JsbiSupport} from "../src/JsbiSupport";
 
 /**
  * @param decimalString The text representation of the decimal to test.
- * @param expectedCoefficient The expected `number` or `string` (LongInt) for the coefficient.
- * @param expectedExponent The expected `number` or `string` (LongInt) for the exponent part.
+ * @param expectedCoefficient The expected `string` for the coefficient.
+ * @param expectedExponent The expected `number` for the exponent part.
  * @param expectedNumberValue The expected number or an array of size two indicating the inclusive range of
  *   possible values (due to platform dependent rounding of `Math.pow()`).
  * @param expectedToString The expected text image of `Decimal.toString()`
  */
-function test(decimalString,
-              expectedCoefficient,
-              expectedExponent,
-              expectedNumberValue,
-              expectedToString) {
+function test(decimalString: string,
+              expectedCoefficient: string,
+              expectedExponent: number,
+              expectedNumberValue: number | number[],
+              expectedToString: string) {
 
-    let decimal = ion.Decimal.parse(decimalString);
+    let decimal = ion.Decimal.parse(decimalString)!;
 
     assert.deepEqual(decimal.getCoefficient(), JSBI.BigInt(expectedCoefficient), '_getCoefficient()');
     assert.equal(decimal.isNegative(), Object.is(Number(expectedCoefficient), -0) || JsbiSupport.isNegative(JSBI.BigInt(expectedCoefficient)), 'coefficient sign');
@@ -50,24 +51,25 @@ function test(decimalString,
         const decNumberValue = decimal.numberValue();
         assert.isAtLeast(decNumberValue, expectedNumberValue[0], `numberValue() not in range ${expectedNumberValue}`);
         assert.isAtMost(decNumberValue, expectedNumberValue[1], `numberValue() not in range ${expectedNumberValue}`);
+        assert.equal(util._sign(decimal.numberValue()), util._sign(expectedNumberValue[0]), 'numberValue sign');
     } else {
         assert.equal(decimal.numberValue(), expectedNumberValue, 'numberValue()');
+        assert.equal(util._sign(decimal.numberValue()), util._sign(expectedNumberValue), 'numberValue sign');
     }
-    assert.equal(util._sign(decimal.numberValue()), util._sign(expectedNumberValue), 'numberValue sign');
 
     assert.equal(decimal.toString(), expectedToString, 'toString()');
 }
 
-function testEquals(decimalString1, decimalString2, expected) {
-    let dec1 = ion.Decimal.parse(decimalString1);
-    let dec2 = ion.Decimal.parse(decimalString2);
+function testEquals(decimalString1: string, decimalString2: string, expected: boolean) {
+    let dec1 = ion.Decimal.parse(decimalString1)!;
+    let dec2 = ion.Decimal.parse(decimalString2)!;
     assert.equal(dec1.equals(dec2), expected);
     assert.equal(dec2.equals(dec1), expected);
 }
 
-function testCompareTo(decimalString1, decimalString2, expected) {
-    let dec1 = ion.Decimal.parse(decimalString1);
-    let dec2 = ion.Decimal.parse(decimalString2);
+function testCompareTo(decimalString1: string, decimalString2: string, expected: number) {
+    let dec1 = ion.Decimal.parse(decimalString1)!;
+    let dec2 = ion.Decimal.parse(decimalString2)!;
     assert.equal(dec1.compareTo(dec2), expected);
     assert.equal(dec2.compareTo(dec1), -expected);
 }
@@ -226,25 +228,30 @@ let isNegativeZero = (value: number | JSBI, isNegative?: boolean): boolean => {
         || (value instanceof JSBI && isNegative === true && JsbiSupport.isZero(value));
 };
 
-let toStringWithSign = (value: number | JSBI, isNegative): string => {
+let toStringWithSign = (value: number | JSBI, isNegative: boolean): string => {
     if (isNegativeZero(value, isNegative)) {
         return '-0';
     }
     return value.toString();
 };
 
-let decimalConstructorTest = (coefficient, exponent, isNegative?) => {
+let decimalConstructorTest = (coefficient: number | JSBI, exponent: number, isNegative: boolean = false) => {
     let coefficientText = toStringWithSign(coefficient, isNegative);
     let exponentText = toStringWithSign(exponent, isNegative);
 
-    let decimalValue = new Decimal(coefficient, exponent, isNegative);
+    let decimalValue: Decimal;
+    if (coefficient instanceof JSBI) {
+        decimalValue = new Decimal(coefficient, exponent, isNegative);
+    } else {
+        decimalValue = new Decimal(coefficient, exponent);
+    }
     let writer = ion.makeTextWriter();
     writer.writeDecimal(decimalValue);
     writer.close();
     let textDecimal = decodeUtf8(writer.getBytes());
     let reader = ion.makeReader(textDecimal);
     assert.equal(ion.IonTypes.DECIMAL, reader.next());
-    let decimalFromText = reader.decimalValue();
+    let decimalFromText = reader.decimalValue()!;
 
     let testName = `new Decimal(${coefficientText}, ${exponentText}`;
     if (isNegative !== undefined) {
@@ -317,26 +324,26 @@ describe('Decimal', () => {
             });
     });
 
-    it('intValue(5.0)', () => assert.equal(ion.Decimal.parse('5.0').intValue(), 5));
-    it('intValue(5.0000001)', () => assert.equal(ion.Decimal.parse('5.0000001').intValue(), 5));
-    it('intValue(5.9999999)', () => assert.equal(ion.Decimal.parse('5.9999999').intValue(), 5));
-    it('intValue(0)', () => assert.equal(ion.Decimal.parse('0').intValue(), 0));
-    it('intValue(0.0000001)', () => assert.equal(ion.Decimal.parse('0.0000001').intValue(), 0));
-    it('intValue(0.9999999)', () => assert.equal(ion.Decimal.parse('0.9999999').intValue(), 0));
+    it('intValue(5.0)', () => assert.equal(ion.Decimal.parse('5.0')!.intValue(), 5));
+    it('intValue(5.0000001)', () => assert.equal(ion.Decimal.parse('5.0000001')!.intValue(), 5));
+    it('intValue(5.9999999)', () => assert.equal(ion.Decimal.parse('5.9999999')!.intValue(), 5));
+    it('intValue(0)', () => assert.equal(ion.Decimal.parse('0')!.intValue(), 0));
+    it('intValue(0.0000001)', () => assert.equal(ion.Decimal.parse('0.0000001')!.intValue(), 0));
+    it('intValue(0.9999999)', () => assert.equal(ion.Decimal.parse('0.9999999')!.intValue(), 0));
     it('intValue(-0)', () => {
-        let int = ion.Decimal.parse('-0').intValue();
+        let int = ion.Decimal.parse('-0')!.intValue();
         assert.equal(int, 0);
         assert.equal(util._sign(int), -1);
     });
     it('intValue(-0.0000001)', () => {
-        let int = ion.Decimal.parse('-0.0000001').intValue();
+        let int = ion.Decimal.parse('-0.0000001')!.intValue();
         assert.equal(int, 0);
         assert.equal(util._sign(int), -1);
     });
     it('intValue(-0.9999999)', () => {
-        let int = ion.Decimal.parse('-0.9999999').intValue();
+        let int = ion.Decimal.parse('-0.9999999')!.intValue();
         assert.equal(int, 0);
         assert.equal(util._sign(int), -1);
     });
-    it('intValue(-1.0000001)', () => () => assert.equal(ion.Decimal.parse('-1.0000001').intValue(), -1));
+    it('intValue(-1.0000001)', () => () => assert.equal(ion.Decimal.parse('-1.0000001')!.intValue(), -1));
 });

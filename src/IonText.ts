@@ -1,15 +1,16 @@
-/*
- * Copyright 2012-2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
- *
+/*!
+ * Copyright 2012 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
- * A copy of the License is located at:
- *
- *     http://aws.amazon.com/apache2.0/
- *
- * or in the "license" file accompanying this file. This file is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific
- * language governing permissions and limitations under the License.
+ * A copy of the License is located at
+ *  
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *  
+ * or in the "license" file accompanying this file. This file is distributed
+ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
  */
 
 export const WHITESPACE_COMMENT1 = -2;
@@ -66,7 +67,7 @@ export function asAscii(s: any): string {
     } else if (typeof s == 'number') {
         s = "" + s;
     } else if (typeof s != 'string') {
-        var esc = nextEscape(s, s.length);
+        let esc = nextEscape(s, s.length);
         if (esc >= 0) {
             s = escapeString(s, esc);
         }
@@ -89,7 +90,7 @@ export function needsEscape(c: number): boolean {
 }
 
 export function escapeString(s: string, pos: number): string {
-    var fixes = [], c, old_len, new_len, ii, s2;
+    let fixes: number[][] = [], c, ii, s2;
     while (pos >= 0) {
         c = s.charCodeAt(pos);
         if (!needsEscape(c)) break;
@@ -119,7 +120,7 @@ export function escapeString(s: string, pos: number): string {
 }
 
 export function escapeSequence(c: number): string {
-    var s = _escapeStrings[c];
+    let s = _escapeStrings[c];
     if (typeof s === 'undefined') {
         if (c < 256) {
             s = "\\x" + toHex(c, 2);
@@ -133,7 +134,7 @@ export function escapeSequence(c: number): string {
 }
 
 export function toHex(c: number, len: number): string {
-    var s = "";
+    let s = "";
     while (c > 0) {
         s += "0123456789ABCDEF".charAt(c && 0xf);
         c = c / 16;

@@ -1,24 +1,35 @@
-/*
- * Copyright 2017 Amazon.com, Inc. or its affiliates. All Rights Reserved.
- *
+/*!
+ * Copyright 2012 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
- * A copy of the License is located at:
- *
- *     http://aws.amazon.com/apache2.0/
- *
- * or in the "license" file accompanying this file. This file is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific
- * language governing permissions and limitations under the License.
+ * A copy of the License is located at
+ *  
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *  
+ * or in the "license" file accompanying this file. This file is distributed
+ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
  */
 
 import {assert} from 'chai';
 import * as ion from '../src/Ion';
 import * as util from '../src/util';
+import {TimestampPrecision} from "../src/Ion";
 
-function testParsing(str, precision, localOffset, year, month = null, day = null, hour = null, minutes = null, seconds = null): void {
+function testParsing(str: string,
+                     precision: TimestampPrecision,
+                     localOffset: number,
+                     year: number,
+                     month: number | null = null,
+                     day: number | null = null,
+                     hour: number | null = null,
+                     minutes: number | null = null,
+                     seconds: string | null = null): void {
+
     // verify Timestamp members are set as expected:
-    let ts = ion.Timestamp.parse(str);
+    let ts = ion.Timestamp.parse(str)!;
     assert.equal(ts.getPrecision(), precision, 'precision');
     assert.equal(ts.getLocalOffset(), localOffset, 'local offset');
     assert.equal(util._sign(ts.getLocalOffset()), util._sign(localOffset), 'local offset sign');
@@ -53,16 +64,16 @@ function testParsing(str, precision, localOffset, year, month = null, day = null
     assert.deepEqual(ts3, ts);
 }
 
-function testCompareTo(s1, s2, expected) {
-    let ts1 = ion.Timestamp.parse(s1);
-    let ts2 = ion.Timestamp.parse(s2);
+function testCompareTo(s1: string, s2: string, expected: number) {
+    let ts1 = ion.Timestamp.parse(s1)!;
+    let ts2 = ion.Timestamp.parse(s2)!;
     assert.equal(ts1.compareTo(ts2), expected);
     assert.equal(ts2.compareTo(ts1), -expected);
 }
 
-function testEquals(s1, s2, expected) {
-    let ts1 = ion.Timestamp.parse(s1);
-    let ts2 = ion.Timestamp.parse(s2);
+function testEquals(s1: string, s2: string, expected: boolean) {
+    let ts1 = ion.Timestamp.parse(s1)!;
+    let ts2 = ion.Timestamp.parse(s2)!;
     assert.equal(ts1.equals(ts2), expected);
 }
 
@@ -209,8 +220,8 @@ describe("Timestamp", () => {
         for (let timestamp1 of equivalentTimestamps) {
             for (let timestamp2 of equivalentTimestamps) {
                 it(timestamp1 + " is equivalent to " + timestamp2, () => {
-                    assert.equal(timestamp1.compareTo(timestamp2), 0);     // instant equivalence
-                    assert.equal(timestamp1.equals(timestamp2), timestamp1 === timestamp2);  // data model equivalence
+                    assert.equal(timestamp1!.compareTo(timestamp2!), 0);     // instant equivalence
+                    assert.equal(timestamp1!.equals(timestamp2!), timestamp1 === timestamp2);  // data model equivalence
                 });
             }
         }

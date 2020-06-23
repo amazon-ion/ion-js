@@ -1,26 +1,27 @@
-/*
- * Copyright 2017 Amazon.com, Inc. or its affiliates. All Rights Reserved.
- *
+/*!
+ * Copyright 2012 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
- * A copy of the License is located at:
- *
- *     http://aws.amazon.com/apache2.0/
- *
- * or in the "license" file accompanying this file. This file is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific
- * language governing permissions and limitations under the License.
+ * A copy of the License is located at
+ *  
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *  
+ * or in the "license" file accompanying this file. This file is distributed
+ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
  */
 
 import {assert} from 'chai';
 import * as ion from '../src/Ion';
 import * as IonUnicode from '../src/IonUnicode';
-import * as IonTests from '../src/IonTests';
 import {TextWriter} from '../src/IonTextWriter';
+import {Writeable} from "../src/IonWriteable";
 
 let writerTest = function (name: string, instructions, expected) {
     it(name, () => {
-        let writeable = new IonTests.Writeable();
+        let writeable = new Writeable();
         let writer = new TextWriter(writeable);
         instructions(writer);
         while (writer.depth() > 0) {
@@ -71,9 +72,6 @@ describe("Text Writer", () => {
         writerTest('Writes null blob using null',
             writer => writer.writeBlob(null),
             'null.blob');
-        writerTest('Writes null blob using undefined',
-            writer => writer.writeBlob(),
-            'null.blob');
         writerTest('Writes null blob using type',
             writer => writer.writeNull(ion.IonTypes.BLOB),
             'null.blob');
@@ -101,9 +99,6 @@ describe("Text Writer", () => {
         writerTest('Writes null boolean using null',
             writer => writer.writeBoolean(null),
             'null.bool');
-        writerTest('Writes null boolean using undefined',
-            writer => writer.writeBoolean(),
-            'null.bool');
         writerTest('Writes null boolean using type',
             writer => writer.writeNull(ion.IonTypes.BOOL),
             'null.bool');
@@ -121,9 +116,6 @@ describe("Text Writer", () => {
             '{{"A"}}');
         writerTest('Writes null clob using null',
             writer => writer.writeClob(null),
-            'null.clob');
-        writerTest('Writes null clob using undefined',
-            writer => writer.writeClob(),
             'null.clob');
         writerTest('Writes null clob using type',
             writer => writer.writeNull(ion.IonTypes.CLOB),
@@ -147,15 +139,12 @@ describe("Text Writer", () => {
                 expected
             );
         };
-        decimalTest('Writes positive decimal', '123.456', '123456d-3');
-        decimalTest('Writes negative decimal', '-123.456', '-123456d-3');
-        decimalTest('Writes integer decimal', '123456.', '123456d0');
-        decimalTest('Mantissa-only decimal has leading zero', '123456d-6', '123456d-6');
+        decimalTest('Writes positive decimal', '123.456', '123.456');
+        decimalTest('Writes negative decimal', '-123.456', '-123.456');
+        decimalTest('Writes integer decimal', '123456.', '123456.');
+        decimalTest('Mantissa-only decimal has leading zero', '123456d-6', '0.123456');
         writerTest('Writes null decimal using null',
             writer => writer.writeDecimal(null),
-            'null.decimal');
-        writerTest('Writes null decimal using undefined',
-            writer => writer.writeDecimal(),
             'null.decimal');
         writerTest('Writes null decimal using type',
             writer => writer.writeNull(ion.IonTypes.DECIMAL),
@@ -165,7 +154,7 @@ describe("Text Writer", () => {
                 writer.setAnnotations(['foo', 'bar']);
                 writer.writeDecimal(ion.Decimal.parse('123.456'))
             },
-            'foo::bar::123456d-3');
+            'foo::bar::123.456');
     });
 
     describe("Writing floats", () => {
@@ -174,9 +163,6 @@ describe("Text Writer", () => {
             '8.125e0');
         writerTest('Writes null 32-bit float using null',
             writer => writer.writeFloat32(null),
-            'null.float');
-        writerTest('Writes null 32-bit float using undefined',
-            writer => writer.writeFloat32(),
             'null.float');
         writerTest('Writes 32-bit float with annotations',
             writer => {
@@ -208,9 +194,6 @@ describe("Text Writer", () => {
             '8.125e0');
         writerTest('Writes null 64-bit float using null',
             writer => writer.writeFloat64(null),
-            'null.float');
-        writerTest('Writes null 64-bit float using undefined',
-            writer => writer.writeFloat64(),
             'null.float');
         writerTest('Writes 64-bit float with annotations',
             writer => {
@@ -250,9 +233,6 @@ describe("Text Writer", () => {
             '-123456');
         writerTest('Writes null int using null',
             writer => writer.writeInt(null),
-            'null.int');
-        writerTest('Writes null int using undefined',
-            writer => writer.writeInt(),
             'null.int');
         writerTest('Writes null using type',
             writer => writer.writeNull(ion.IonTypes.INT),
@@ -300,13 +280,13 @@ describe("Text Writer", () => {
     describe("Writing nulls", () => {
         writerTest('Writes null',
             writer => writer.writeNull(ion.IonTypes.NULL),
-            'null.null');
+            'null');
         writerTest('Writes null with annotations',
             writer => {
                 writer.setAnnotations(['foo', 'bar']);
                 writer.writeNull(ion.IonTypes.NULL)
             },
-            'foo::bar::null.null');
+            'foo::bar::null');
     });
 
     describe("Writing s-expressions", () => {
@@ -411,6 +391,42 @@ describe("Text Writer", () => {
         writerTest('Writes symbol containing control character',
             writer => writer.writeSymbol(String.fromCharCode(1)),
             "'\\x01'");
+    });
+
+    describe("Writing annotations", () => {
+        badWriterTest('Should throw when setting annotations to null',
+            (writer) => { writer.setAnnotations(null); writer.writeInt(5) });
+
+        badWriterTest('Should throw when passing single string as an annotation.',
+            (writer) => { writer.setAnnotations('taco'), writer.writeInt(5) });
+        badWriterTest('Should throw when adding int as annotation.',
+            (writer) => { writer.addAnnotation(5), writer.writeInt(5) });
+        badWriterTest('Should throw when adding array of chars.',
+            (writer) => { writer.addAnnotation(['t', 'a', 'c', 'o']), writer.writeInt(5) });
+        badWriterTest('Should throw when adding a non string annotation.',
+            (writer) => { writer.addAnnotation(null), writer.writeInt(5) });
+        badWriterTest('Should throw when adding a non string annotation.',
+            (writer) => { writer.addAnnotation(undefined), writer.writeInt(5) });
+        badWriterTest('Should throw when passing annotations array without a string.',
+            (writer) => { writer.setAnnotations([5]), writer.writeInt(5) });
+        badWriterTest('Should throw when passing annotations array containing a non string value.',
+            (writer) => { writer.setAnnotations(['a', 5,'t']), writer.writeInt(5) });
+        badWriterTest('Should throw when passing annotations array containing undefined.',
+            (writer) => { writer.setAnnotations([undefined]), writer.writeInt(5) });
+        badWriterTest('Should throw when passing annotations array containing null',
+            (writer) => { writer.setAnnotations([null]), writer.writeInt(5) });
+        badWriterTest('Should throw when passing undefined as annotations.',
+            (writer) => { writer.setAnnotations(undefined), writer.writeInt(5) });
+        badWriterTest('Should throw when writing top-level field name',
+            (writer) => { writer.writeFieldName('foo') });
+        badWriterTest('Should throw when exiting a container at top level',
+            (writer) => { writer.stepOut() });
+        badWriterTest('Should throw when double-exiting a container',
+            (writer) => {
+                writer.stepIn(ion.IonTypes.LIST);
+                writer.stepOut();
+                writer.stepOut();
+            });
     });
 
     describe("Writing timestamps", () => {
@@ -527,30 +543,30 @@ describe("Text Writer", () => {
                 writer.stepOut();
             },
             `a1::{
-  int:a3::123,
-  string:a4::"string",
-  symbol:a5::symbol,
-  symbol:null.symbol,
-  timestamp:a8::2017-04-03T00:00:00.000Z,
-  decimal:a9::12d-1,
-  struct:a10::{
-    symbol:a11::symbol
+  int: a3::123,
+  string: a4::"string",
+  symbol: a5::symbol,
+  symbol: null.symbol,
+  timestamp: a8::2017-04-03T00:00:00.000Z,
+  decimal: a9::1.2,
+  struct: a10::{
+    symbol: a11::symbol
   },
-  list:a12::[
+  list: a12::[
     a14::123,
     a15::"string",
     a16::symbol,
     a19::2017-04-03T00:00:00.000Z,
-    a20::12d-1,
+    a20::1.2,
     a21::{
     },
     a22::[
     ]
   ],
-  sexp:a23::(
+  sexp: a23::(
     a24::null.symbol 
     a25::null.string 
-    a26::null.null
+    a26::null
   )
 }`);
     });

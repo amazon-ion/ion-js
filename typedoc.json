@@ -9,7 +9,6 @@
     "src/AbstractWriter.ts",
     "src/IonConstants.ts",
     "src/IonImport.ts",
-    "src/IonLongInt.ts",
     "src/IonSubstituteSymbolTable.ts",
     "src/IonSpan.ts",
     "src/IonSymbol.ts",
