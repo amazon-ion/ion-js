@@ -62,6 +62,7 @@ export class Struct extends Value(Object, IonTypes.STRUCT, FromJsConstructor.NON
             },
             deleteProperty: function (target, name): boolean {
                 // Property is deleted only if it's in _field Collection
+                // reference Document: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/delete#Return_value
                 if (name in target._fields) {
                     delete target._fields[name];
                 }

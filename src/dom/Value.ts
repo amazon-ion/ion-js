@@ -140,8 +140,8 @@ export interface Value {
     writeTo(writer: Writer): void;
 
     /**
-     * For the Struct type, deletes the key/field if it's in the _fields collection
-     * otherwise throws an Error.
+     * For the Struct type, deletes the field with provided name if present. Returns a boolean
+     * indicating whether the Struct was modified. For all other types, throws an Error.
      */
     deleteField(name: string): boolean;
 }
@@ -296,7 +296,7 @@ export function Value<Clazz extends Constructor>(BaseClass: Clazz, ionType: IonT
         }
 
         deleteField(name: string): boolean {
-            this._unsupportedOperation('delete');
+            this._unsupportedOperation('deleteField');
         }
 
         // Returns the IonType associated with a particular dom.Value subclass. Useful for testing.

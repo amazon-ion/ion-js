@@ -1,6 +1,5 @@
 import {assert} from "chai";
 import {dom, IonTypes} from "../../src/Ion";
-import {Err} from "typedoc/dist/lib/utils/result";
 
 describe('dom.Struct property shadowing', () => {
     it('Built-in properties cannot be shadowed', () => {
@@ -13,8 +12,6 @@ describe('dom.Struct property shadowing', () => {
             greetings: "hi",
             age: 7
         }, ['foo', 'bar']);
-
-        let l = dom.Value.from([1, 2, 3]);
 
         // Method names are still directly accessible
         assert.equal(s.getType(), IonTypes.STRUCT);
@@ -39,7 +36,7 @@ describe('dom.Struct property shadowing', () => {
         // delete for properties that match built-in
         assert.equal(s.get('toString')!.numberValue(), 10);
         assert.isTrue(delete s['toString']);
-        assert.equal(s.toString(),'{getType: baz, getAnnotations: 56, fieldNames: [dog, cat, mouse]}');
+        assert.equal(typeof s.toString, "function");
         assert.deepEqual(s.fieldNames(), ['getType', 'getAnnotations', 'fieldNames']);
 
         // delete for field that doesn't exist
@@ -49,6 +46,7 @@ describe('dom.Struct property shadowing', () => {
         assert.isUndefined(s['greetings']);
 
         // deleteField will throw an error if it's called on a dom.Value that isn't a struct
+        let l = dom.Value.from([1, 2, 3]);
         assert.throws(() => l.deleteField("1"), Error);
 
         // get() does not return values for properties on `Object`
