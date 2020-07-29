@@ -138,6 +138,12 @@ export interface Value {
      * @param writer    An Ion Writer to which the value should be written.
      */
     writeTo(writer: Writer): void;
+
+    /**
+     * For the Struct type, deletes the field with provided name if present. Returns a boolean
+     * indicating whether the Struct was modified. For all other types, throws an Error.
+     */
+    deleteField(name: string): boolean;
 }
 
 /**
@@ -287,6 +293,10 @@ export function Value<Clazz extends Constructor>(BaseClass: Clazz, ionType: IonT
 
         writeTo(writer: Writer): void {
             this._unsupportedOperation('writeTo');
+        }
+
+        deleteField(name: string): boolean {
+            this._unsupportedOperation('deleteField');
         }
 
         // Returns the IonType associated with a particular dom.Value subclass. Useful for testing.

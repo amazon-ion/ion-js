@@ -59,6 +59,14 @@ export class Struct extends Value(Object, IonTypes.STRUCT, FromJsConstructor.NON
                     return target[name];
                 }
                 return target._fields[name];
+            },
+            deleteProperty: function (target, name): boolean {
+                // Property is deleted only if it's in _field Collection
+                if (name in target._fields) {
+                    delete target._fields[name];
+                }
+                // Reference: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/delete#Return_value
+                return true;
             }
         });
     }
@@ -113,6 +121,14 @@ export class Struct extends Value(Object, IonTypes.STRUCT, FromJsConstructor.NON
             value.writeTo(writer);
         }
         writer.stepOut();
+    }
+
+    deleteField(name: string): boolean {
+        if (name in this._fields) {
+            delete this._fields[name];
+            return true;
+        }
+        return false;
     }
 
     toJSON() {
