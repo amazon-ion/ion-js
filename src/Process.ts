@@ -1,79 +1,18 @@
+import fs from 'fs';
 import {OutputFormat} from './OutputFormat';
 import {IonEventStream} from "./IonEventStream";
 import {Writer} from "./IonWriter";
-import {options} from 'yargs';
-import {makeReader} from "./Ion";
-import * as fs from 'fs';
+import {ErrorType, IonCliCommonArgs, IonCliError} from "./Cli";
+import {makeReader, Reader} from "./Ion";
 
-const argv = options({
-    'output': {
-        alias: 'o',
-        description: 'Output file',
-    },
-    'output-format': {
-        alias: 'f',
-        choices: ['pretty', 'text', 'binary', 'events'] as const,
-        default: 'pretty',
-        description: "Output format, from the set (text | pretty | binary |\n"
-            + "events | none). 'events' is only available with the\n"
-            + "'process' command, and outputs a serialized EventStream\n"
-            + "representing the input Ion stream(s)."
-    },
-    'error-report': {
-        alias: 'e',
-        description: 'Error report file',
-    }
-}).argv;
+export const command = 'process <input file..>'
 
-class ProcessArgs {
-    inputFiles: Array<string>;
-    outputFile: any;
-    outputFormatName: string;
-    errorReportFile: any;
+export const describe = "Read the input file(s) (optionally, specifying ReadInstructions or a filter) and re-write in" +
+    "the format specified by --output.";
 
-    constructor() {
-        // create output stream (DEFAULT: stdout)
-        this.outputFile = argv["output"] ? fs.createWriteStream(<string> argv["output"], {flags : 'w'}) : process.stdout;
-        // create error output stream (DEFAULT: stderr)
-        this.errorReportFile = argv["error-report"] ? fs.createWriteStream(<string> argv["error-report"], {flags : 'w'}) : process.stderr;
-        this.outputFormatName = <string> argv["output-format"];
-        this.inputFiles = argv._;
-    }
-
-    getOutputFile(): any {
-        return this.outputFile;
-    }
-
-    getErrorReportFile(): any {
-        return this.errorReportFile;
-    }
-
-    getInputFiles(): Array<string> {
-        return this.inputFiles;
-    }
-
-    getOutputFormatName(): OutputFormat{
-        return <OutputFormat> this.outputFormatName;
-    }
-}
-
-/** Error structure for error report */
-class ProcessError {
-    errorType: string;
-    location: string;
-    message: string;
-    errorReportFile: any;
-
-    constructor(errorType: string, location: string, message: string, errorReportFile: any) {
-        this.errorType = errorType;
-        this.location = location;
-        this.message = message;
-        this.errorReportFile = errorReportFile;
-    }
-
-    writeErrorReport() {
-        this.errorReportFile.write(this.errorType + ": " + this.location + " " + this.message + "\n");
-    }
+export const handler = function (argv) {
+    let args = new IonCliCommonArgs(argv);
+    new Process(args);
 }
 
 /**
@@ -82,12 +21,11 @@ class ProcessError {
  *
  *  Create error report through --error-report and output file specified by --output
  */
-class Process {
+export class Process {
 
-    constructor() {
-        let parsedArgs = new ProcessArgs();
+    constructor(parsedArgs: IonCliCommonArgs) {
         let output_writer = OutputFormat.createIonWriter(parsedArgs.getOutputFormatName());
-        if(parsedArgs.getOutputFormatName() == "events") {
+        if(parsedArgs.getOutputFormatName() == OutputFormat.EVENTS) {
             this.processEvents(output_writer, parsedArgs);
         } else {
             this.processFiles(output_writer, parsedArgs);
@@ -99,35 +37,68 @@ class Process {
         return fs.readFileSync(path, options);
     }
 
-    processEvents(ionOutputWriter: Writer, args: ProcessArgs): void {
+    clearIonOutputWriter(ionOutputWriter: Writer){
+        while(ionOutputWriter.depth() > 0){
+            ionOutputWriter.stepOut();
+        }
+        ionOutputWriter.close();
+    }
+
+    createReaderForProcess(path: string, args: IonCliCommonArgs): Reader {
+        let ionReader;
+        try{
+            ionReader = makeReader(this.getInput(path));
+        } catch(Error) {
+            new IonCliError(ErrorType.READ, path, Error.message, args.getErrorReportFile()).writeErrorReport();
+        }
+        return ionReader;
+    }
+
+    processEvents(ionOutputWriter: Writer, args: IonCliCommonArgs): void {
         for (let path of args.getInputFiles()) {
-            try{
-                let ionReader = makeReader(this.getInput(path));
-                let eventStream = new IonEventStream(ionReader);
-                // processes ion stream into event stream
-                eventStream.writeEventStream(ionOutputWriter);
-                ionOutputWriter.close();
-                args.getOutputFile().write(ionOutputWriter.getBytes());
-            } catch(Error) {
-                new ProcessError("Process Events", path, Error.message, args.getErrorReportFile()).writeErrorReport();
-            }
+            this.processEvent(ionOutputWriter, args, path);
+        }
+        args.getOutputFile().write(ionOutputWriter.getBytes());
+    }
+
+    processEvent(ionOutputWriter: Writer, args: IonCliCommonArgs, path: string): void {
+        let ionReader = this.createReaderForProcess(path, args);
+        this.writeToEventStream(ionOutputWriter, ionReader, path, args);
+    }
+
+    writeToEventStream(ionOutputWriter: Writer, ionReader: Reader, path: string, args: IonCliCommonArgs): void {
+        try{
+            let eventStream = new IonEventStream(ionReader);
+            // processes ion stream into event stream
+            eventStream.writeEventStream(ionOutputWriter);
+            ionOutputWriter.close();
+        } catch(Error) {
+            this.clearIonOutputWriter(ionOutputWriter);
+            new IonCliError(ErrorType.WRITE, path, Error.message, args.getErrorReportFile()).writeErrorReport();
         }
     }
 
-    processFiles(ionOutputWriter: Writer, args: ProcessArgs): void {
+    processFiles(ionOutputWriter: Writer, args: IonCliCommonArgs): void {
         for (let path of args.getInputFiles()) {
-            try{
-                let ionReader = makeReader(this.getInput(path));
-                ionOutputWriter.writeValues(ionReader);
-                ionOutputWriter.close();
-                args.getOutputFile().write(ionOutputWriter.getBytes());
-            } catch(Error) {
-                new ProcessError("Process Files", path, Error.message, args.getErrorReportFile()).writeErrorReport();
+                this.processFile(ionOutputWriter, args, path);
             }
+        if(args.getOutputFormatName() != OutputFormat.NONE) {
+            args.getOutputFile().write(ionOutputWriter.getBytes());
+        }
+    }
+
+    processFile(ionOutputWriter: Writer, args: IonCliCommonArgs, path: string): void {
+        let ionReader = this.createReaderForProcess(path, args);
+        this.writeToProcessFile(ionOutputWriter, ionReader, path, args);
+    }
+
+    writeToProcessFile(ionOutputWriter: Writer, ionReader: Reader, path: string, args: IonCliCommonArgs): void {
+        try{
+            ionOutputWriter.writeValues(ionReader);
+            ionOutputWriter.close();
+        } catch(Error) {
+            this.clearIonOutputWriter(ionOutputWriter);
+            new IonCliError(ErrorType.WRITE, path, Error.message, args.getErrorReportFile()).writeErrorReport();
         }
     }
 }
-
-let p = new Process();
-
-

@@ -9,7 +9,8 @@ export enum OutputFormat {
     PRETTY = "pretty",
     TEXT = "text",
     BINARY = "binary",
-    EVENTS = "events"
+    EVENTS = "events",
+    NONE = "none"
 }
 
 export namespace OutputFormat {
@@ -22,6 +23,8 @@ export namespace OutputFormat {
             case OutputFormat.BINARY:
                 return makeBinaryWriter();
             case OutputFormat.EVENTS:
+                return makePrettyWriter();
+            case OutputFormat.NONE:
                 return makePrettyWriter();
             default:
                 throw new Error("Output Format " + name + " unexpected.");
