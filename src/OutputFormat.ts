@@ -14,7 +14,7 @@ export enum OutputFormat {
 }
 
 export namespace OutputFormat {
-    export function createIonWriter(name: OutputFormat) : Writer {
+    export function createIonWriter(name: OutputFormat) : Writer | null {
         switch (name) {
             case OutputFormat.PRETTY:
                 return makePrettyWriter();
@@ -25,7 +25,7 @@ export namespace OutputFormat {
             case OutputFormat.EVENTS:
                 return makePrettyWriter();
             case OutputFormat.NONE:
-                return makePrettyWriter();
+                return null;
             default:
                 throw new Error("Output Format " + name + " unexpected.");
         }

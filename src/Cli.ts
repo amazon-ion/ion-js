@@ -1,27 +1,28 @@
 import yargs from "yargs";
-import fs from "fs";
+import fs, {WriteStream} from "fs";
 import {OutputFormat} from "./OutputFormat";
+import {IonTypes, makeTextWriter} from "./Ion";
 
 /** common CLI arguments structure */
 export class IonCliCommonArgs {
     inputFiles: Array<string>;
-    outputFile: any;
+    outputFile: WriteStream | NodeJS.WriteStream;
     outputFormatName: OutputFormat;
-    errorReportFile: any;
+    errorReportFile: WriteStream | NodeJS.WriteStream;
 
     constructor(argv: yargs.Arguments) {
-        this.outputFile = argv["output"] ? fs.createWriteStream(<string>argv["output"], {flags: 'w'}) : process.stdout;
+        this.outputFile = argv["output"] ? fs.createWriteStream(argv["output"] as string, {flags: 'w'}) : process.stdout;
         // create error output stream (DEFAULT: stderr)
-        this.errorReportFile = argv["error-report"] ? fs.createWriteStream(<string>argv["error-report"], {flags: 'w'}) : process.stderr;
-        this.outputFormatName = <OutputFormat>argv["output-format"];
-        this.inputFiles = <Array<string>>argv["inputfile"];
+        this.errorReportFile = argv["error-report"] ? fs.createWriteStream(argv["error-report"] as string, {flags: 'w'}) : process.stderr;
+        this.outputFormatName = argv["output-format"] as OutputFormat;
+        this.inputFiles = argv["input-file"] as Array<string>;
     }
 
-    getOutputFile(): any {
+    getOutputFile(): WriteStream | NodeJS.WriteStream {
         return this.outputFile;
     }
 
-    getErrorReportFile(): any {
+    getErrorReportFile(): WriteStream | NodeJS.WriteStream {
         return this.errorReportFile;
     }
 
@@ -44,22 +45,43 @@ export enum ErrorType {
 /** Error structure for error report */
 export class IonCliError {
     errorType: ErrorType;
+    eventIndex: number;
     location: string;
     message: string;
     errorReportFile: any;
 
-    constructor(errorType: ErrorType, location: string, message: string, errorReportFile: any) {
+    constructor(errorType: ErrorType, location: string, message: string, errorReportFile: any, eventIndex: number = 0) {
         this.errorType = errorType;
         this.location = location;
         this.message = message;
         this.errorReportFile = errorReportFile;
+        this.eventIndex = eventIndex;
     }
 
     writeErrorReport() {
-        this.errorReportFile.write(this.errorType + ": " + this.location + " " + this.message + "\n");
+        let writer = makeTextWriter();
+        writer.stepIn(IonTypes.STRUCT);
+        writer.writeFieldName('error_type');
+        writer.writeSymbol(this.errorType);
+        writer.writeFieldName('message');
+        writer.writeString(this.message);
+        writer.writeFieldName('location');
+        writer.writeString(this.location);
+        writer.writeFieldName('event_index');
+        writer.writeInt(this.eventIndex);
+        writer.stepOut();
+        this.errorReportFile.write(writer.getBytes());
+        this.errorReportFile.write("\n");
     }
 }
 
+/**
+ * This will cause `yargs` to look in other .ts files in the same directory for command modules.
+ *
+ * For more information, see:
+ * Command modules: https://github.com/yargs/yargs/blob/master/docs/advanced.md#providing-a-command-module
+ * commandDir: https://github.com/yargs/yargs/blob/master/docs/advanced.md#commanddirdirectory-opts
+ */
 const argv = yargs
     .commandDir(__dirname,{
         extensions: ['ts'],
