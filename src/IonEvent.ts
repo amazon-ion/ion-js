@@ -108,7 +108,10 @@ abstract class AbstractIonEvent implements IonEvent {
         }
         writer.stepIn(IonTypes.LIST);
         for (let i = 0; i < this.annotations.length; i++) {
+            writer.stepIn(IonTypes.STRUCT);
+            writer.writeFieldName("text");
             writer.writeString(this.annotations[i]);
+            writer.stepOut();
         }
         writer.stepOut();
     }

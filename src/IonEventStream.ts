@@ -18,7 +18,7 @@ import {IonEvent, IonEventFactory, IonEventType} from "./IonEvent";
 import {Writer} from "./IonWriter";
 import {IonType} from "./IonType";
 import {IonTypes} from "./IonTypes";
-import {makeReader, ReaderOctetBuffer} from "./Ion";
+import {defaultLocalSymbolTable, makeReader, ReaderOctetBuffer} from "./Ion";
 import {BinaryReader} from "./IonBinaryReader";
 import {BinarySpan} from "./IonSpan";
 import {ErrorType, IonCliCommonArgs, IonCliError} from "./Cli";
@@ -411,7 +411,25 @@ export class IonEventStream {
         } else {
             this.reader.stepIn();
             for (let tid; tid = this.reader.next();) {
-                annotations.push(this.reader.stringValue()!);
+                if(tid == IonTypes.STRUCT) {
+                    this.reader.stepIn();
+                    let type = this.reader.next();
+                    if(this.reader.fieldName() == "text" && type == IonTypes.STRING) {
+                        let text = this.reader.stringValue();
+                        if (text !== null) {
+                            annotations.push(text!);
+                        }
+                    }
+                    else if(this.reader.fieldName() == "importLocation" && type == IonTypes.INT) {
+                        let symtab = defaultLocalSymbolTable();
+                        let symbol = symtab.getSymbolText(this.reader.numberValue()!)
+                        if (symbol === undefined || symbol === null) {
+                            throw new Error("Unresolvable symbol ID, symboltokens unsupported.");
+                        }
+                        annotations.push(symbol);
+                    }
+                    this.reader.stepOut();
+                }
             }
             this.reader.stepOut();
             return annotations;
