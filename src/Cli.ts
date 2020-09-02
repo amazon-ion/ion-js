@@ -3,6 +3,7 @@ import fs, {WriteStream} from "fs";
 import {OutputFormat} from "./OutputFormat";
 import {IonTypes, makeTextWriter} from "./Ion";
 import {Writable} from "stream";
+import {ComparisonContext, ComparisonType} from "./Compare";
 
 /** common CLI arguments structure */
 export class IonCliCommonArgs {
@@ -33,6 +34,20 @@ export class IonCliCommonArgs {
 
     getOutputFormatName(): OutputFormat {
         return this.outputFormatName;
+    }
+}
+
+/** CLI arguments for compare structure */
+export class IonCompareArgs extends IonCliCommonArgs{
+    comparisonType : ComparisonType;
+
+    constructor(props) {
+        super(props);
+        this.comparisonType = props["comparison-type"] as ComparisonType;
+    }
+
+    getComparisonType(): ComparisonType {
+        return this.comparisonType;
     }
 }
 
@@ -73,6 +88,56 @@ export class IonCliError {
         writer.stepOut();
         this.errorReportFile.write(writer.getBytes());
         this.errorReportFile.write("\n");
+    }
+}
+
+/** Comparison result types for the comparison report */
+export enum ComparisonResultType {
+    EQUAL = "EQUAL",
+    NOT_EQUAL = "NOT_EQUAL",
+    ERROR = "ERROR"
+}
+
+/** comparison result with event index and message **/
+export class ComparisonResult {
+    message: string;
+    result: ComparisonResultType;
+    actualIndex: number;
+    expectedIndex: number;
+
+    constructor(result: ComparisonResultType, message: string = "", actualIndex: number = 0, expectedIndex: number = 0) {
+        this.result = result;
+        this.message = message;
+        this.actualIndex = actualIndex;
+        this.expectedIndex = expectedIndex;
+    }
+}
+
+export class IonComparisonReport {
+    lhs: ComparisonContext;
+    rhs: ComparisonContext;
+    comparisonReportFile: Writable;
+    comparisonType: ComparisonType;
+
+    constructor(lhs: ComparisonContext, rhs: ComparisonContext, comparisonReportFile: Writable, comprisonType: ComparisonType) {
+        this.lhs = lhs;
+        this.rhs = rhs;
+        this.comparisonReportFile = comparisonReportFile;
+        this.comparisonType = comprisonType;
+    }
+
+    writeComparisonReport(result: ComparisonResultType, message: string, event_index_lhs: number, event_index_rhs: number) {
+        let writer = makeTextWriter();
+        writer.stepIn(IonTypes.STRUCT);
+        writer.writeFieldName('result');
+        writer.writeSymbol(result);
+        this.lhs.writeComparisonContext(writer, "lhs", event_index_lhs);
+        this.rhs.writeComparisonContext(writer, "rhs", event_index_rhs);
+        writer.writeFieldName('message');
+        writer.writeString(message);
+        writer.stepOut();
+        this.comparisonReportFile.write(writer.getBytes());
+        this.comparisonReportFile.write("\n");
     }
 }
 
