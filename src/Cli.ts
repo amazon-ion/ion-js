@@ -1,5 +1,5 @@
-import yargs from "yargs";
-import fs, {WriteStream} from "fs";
+import * as yargs from "yargs";
+import fs from "fs";
 import {OutputFormat} from "./OutputFormat";
 import {IonTypes, makeTextWriter} from "./Ion";
 import {Writable} from "stream";

@@ -88,6 +88,7 @@ export class Process {
         for (let path of args.getInputFiles()) {
             this.processFile(ionOutputWriter, args, path);
         }
+        args.getOutputFile().write(ionOutputWriter.getBytes());
     }
 
     processFile(ionOutputWriter: Writer, args: IonCliCommonArgs, path: string): void {
@@ -104,7 +105,6 @@ export class Process {
         try {
             let eventStream = new IonEventStream(ionReader, path, args);
             eventStream.writeIon(ionOutputWriter);
-            args.getOutputFile().write(ionOutputWriter.getBytes());
         } catch (Error) {
             new IonCliError(ErrorType.WRITE, path, Error.message, args.getErrorReportFile()).writeErrorReport();
         }
@@ -114,7 +114,6 @@ export class Process {
         try {
             ionOutputWriter.writeValues(ionReader);
             ionOutputWriter.close();
-            args.getOutputFile().write(ionOutputWriter.getBytes());
         } catch (Error) {
             new IonCliError(ErrorType.WRITE, path, Error.message, args.getErrorReportFile()).writeErrorReport();
         }
