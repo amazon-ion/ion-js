@@ -2,13 +2,14 @@ import yargs from "yargs";
 import fs, {WriteStream} from "fs";
 import {OutputFormat} from "./OutputFormat";
 import {IonTypes, makeTextWriter} from "./Ion";
+import {Writable} from "stream";
 
 /** common CLI arguments structure */
 export class IonCliCommonArgs {
     inputFiles: Array<string>;
-    outputFile: WriteStream | NodeJS.WriteStream;
+    outputFile: Writable;
     outputFormatName: OutputFormat;
-    errorReportFile: WriteStream | NodeJS.WriteStream;
+    errorReportFile: Writable;
 
     constructor(argv: yargs.Arguments) {
         this.outputFile = argv["output"] ? fs.createWriteStream(argv["output"] as string, {flags: 'w'}) : process.stdout;
@@ -18,11 +19,11 @@ export class IonCliCommonArgs {
         this.inputFiles = argv["input-file"] as Array<string>;
     }
 
-    getOutputFile(): WriteStream | NodeJS.WriteStream {
+    getOutputFile(): Writable {
         return this.outputFile;
     }
 
-    getErrorReportFile(): WriteStream | NodeJS.WriteStream {
+    getErrorReportFile(): Writable {
         return this.errorReportFile;
     }
 
