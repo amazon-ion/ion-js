@@ -119,11 +119,11 @@ export class IonComparisonReport {
     comparisonReportFile: Writable;
     comparisonType: ComparisonType;
 
-    constructor(lhs: ComparisonContext, rhs: ComparisonContext, comparisonReportFile: Writable, comprisonType: ComparisonType) {
+    constructor(lhs: ComparisonContext, rhs: ComparisonContext, comparisonReportFile: Writable, comparisonType: ComparisonType) {
         this.lhs = lhs;
         this.rhs = rhs;
         this.comparisonReportFile = comparisonReportFile;
-        this.comparisonType = comprisonType;
+        this.comparisonType = comparisonType;
     }
 
     writeComparisonReport(result: ComparisonResultType, message: string, event_index_lhs: number, event_index_rhs: number) {
