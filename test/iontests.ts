@@ -15,11 +15,11 @@
 
 import {assert} from 'chai';
 import * as ion from '../src/Ion';
+import {IonType, Reader, Writer} from '../src/Ion';
 import * as fs from 'fs';
 import * as path from 'path';
 import {IonEventStream} from '../src/IonEventStream';
-import {IonEventType} from '../src/IonEvent';
-import {IonType, Reader, Writer} from '../src/Ion';
+import {ComparisonType} from "../src/Compare";
 
 function findFiles(folder: string, files: string[] = []) {
     fs.readdirSync(folder).forEach(file => {
@@ -54,58 +54,19 @@ function makeEventStream(src: string | Buffer | Uint8Array, writer: Writer): Ion
 
 function equivsTest(path: string, expectedEquivalence = true, equivsTimelines = false) {
     let bytes = getInput(path)
-    let originalEvents = new IonEventStream(ion.makeReader(bytes)).getEvents();
-    let textEvents = makeEventStream(bytes, ion.makeTextWriter()).getEvents();
-    let binEvents = makeEventStream(bytes, ion.makeBinaryWriter()).getEvents();
+    let originalEvents = new IonEventStream(ion.makeReader(bytes));
+    let textEvents = makeEventStream(bytes, ion.makeTextWriter());
+    let binEvents = makeEventStream(bytes, ion.makeBinaryWriter());
+    let comparisonType = ComparisonType.EQUIVS;
 
-    //i is the index of each toplevel container start event
-    for (let i = 0; i < originalEvents.length - 2; i += originalEvents[i].ionValue.length + 1) {
-        let event = originalEvents[i];
-        let textEvent = textEvents[i];
-        let binEvent = binEvents[i];
-        //Comparisons can be either IonEventStream[](Embedded Documents List of strings interpreted as top level streams).
-        //Or an IonEvent[](contents of an sexp of equivalent Ion values).
-        let comparisons : any = [];
-        if (event.annotations[0] === 'embedded_documents') {
-            //we found a list of strings that we need to interpret as top level ion text streams.
-            for (let j = 0; j < event.ionValue.length - 1; j++) {
-                comparisons.push(
-                    [
-                        new IonEventStream(ion.makeReader(event.ionValue[j].ionValue)),
-                        new IonEventStream(ion.makeReader(textEvent.ionValue[j].ionValue)),
-                        new IonEventStream(ion.makeReader(binEvent.ionValue[j].ionValue))
-                    ]
-                );
-            }
-        } else {//we're in an sexp
-            for (let j = 0; j < event.ionValue.length - 1; j++) {
-                comparisons.push([event.ionValue[j], textEvent.ionValue[j], binEvent.ionValue[j]]);
-                if (event.ionValue[j].eventType === IonEventType.CONTAINER_START) {
-                    j += event.ionValue[j].ionValue.length
-                }
-            }
-        }
-        //width is the number of "copies"  of each value (original, text, binary)
-        let width = comparisons[0].length;
-        //if we're equal everybody equals everybody
-        //if !eq only the copies in our row are equal
-        //every value in row j must compare with every other row
-        for (let j = 0; j < comparisons.length; j++) {
-            for (let k = j + 1; k < comparisons.length; k++) {
-                //l tracks our index within row j
-                for (let l = 0; l < width; l++) {
-                    //m tracks our index within row k
-                    for (let m = 0; m < width; m++) {
-                        if (equivsTimelines) {
-                            assert.equal(comparisons[j][l].ionValue.compareTo(comparisons[k][m].ionValue), 0);
-                        } else {
-                            assert.equal(comparisons[j][l].equals(comparisons[k][m]), expectedEquivalence);
-                        }
-                    }
-                }
-            }
-        }
-    }
+    if(equivsTimelines)
+        comparisonType = ComparisonType.EQUIV_TIMELINE;
+    else if(!expectedEquivalence)
+        comparisonType = ComparisonType.NON_EQUIVS;
+
+    assert.equal(originalEvents.equivs(textEvents, comparisonType), expectedEquivalence);
+    assert.equal(binEvents.equivs(originalEvents, comparisonType), expectedEquivalence);
+    assert.equal(textEvents.equivs(binEvents, comparisonType), expectedEquivalence);
 }
 
 function nonEquivsTest(path: string) {

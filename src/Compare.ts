@@ -132,7 +132,7 @@ export class Compare {
         }
         else if(comparisonType == ComparisonType.EQUIVS || comparisonType == ComparisonType.EQUIV_TIMELINE
             || comparisonType == ComparisonType.NON_EQUIVS) {
-            lhs.getEventStream().compareEquivs(rhs.getEventStream(), comparisonReport);
+            lhs.getEventStream().compareEquivs(rhs.getEventStream(), comparisonType, comparisonReport);
         }
     }
 }

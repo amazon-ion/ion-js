@@ -489,8 +489,8 @@ class IonStructEvent extends AbsIonContainerEvent {//no embed support as of yet.
                     matchFound = child.compare(expectedChild);
                     if (matchFound.result == ComparisonResultType.EQUAL) paired[j] = true;
                     if (matchFound.result == ComparisonResultType.EQUAL && child.eventType === IonEventType.CONTAINER_START) {
-                        for (let k = j + 1; k < expectedChild.ionValue.length; k++) {
-                            paired[k] = true;
+                        for (let k = 0; k < expectedChild.ionValue.length; k++) {
+                            paired[k + j + 1] = true;
                         }
                         i += child.ionValue.length;
                     }
@@ -546,8 +546,8 @@ class IonSexpEvent extends AbsIonContainerEvent {
         if (container.length !== expectedContainer.length) return new ComparisonResult(ComparisonResultType.NOT_EQUAL, "S-expression length don't match");
         for (let i: number = 0; i < container.length; i++) {
             let child = container[i];
-            let eventResult = child.compare(expectedContainer[i]).result;
-            if (eventResult == ComparisonResultType.NOT_EQUAL) {
+            let eventResult = child.compare(expectedContainer[i]);
+            if (eventResult.result == ComparisonResultType.NOT_EQUAL) {
                 return eventResult;
             } else if (child.eventType === IonEventType.CONTAINER_START) {
                 i += child.ionValue.length;
