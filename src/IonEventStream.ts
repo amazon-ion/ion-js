@@ -35,13 +35,13 @@ export class IonEventStream {
     private eventStream: IonEvent[];
     private reader: Reader;
     private eventFactory: IonEventFactory;
-    private isEmbedded : boolean;
+    isEventStream: boolean; // check if reader has an eventstream as input
 
     constructor(reader: Reader, path: string = "", args?: IonCliCommonArgs) {
         this.eventStream = [];
         this.reader = reader;
         this.eventFactory = new IonEventFactory();
-        this.isEmbedded = false;
+        this.isEventStream = false;
         this.generateStream(path, args!);
     }
 
@@ -54,10 +54,15 @@ export class IonEventStream {
 
     writeIon(writer: Writer) {
         let tempEvent: IonEvent;
+        let isEmbedded = false;
         for (let indice: number = 0; indice < this.eventStream.length; indice++) {
             tempEvent = this.eventStream[indice];
             if (tempEvent.fieldName !== null) {
                 writer.writeFieldName(tempEvent.fieldName);
+            }
+            if((tempEvent.ionType == IonTypes.SEXP || tempEvent.ionType == IonTypes.LIST)
+                && tempEvent.annotations[0] == "embedded_documents") {
+                isEmbedded = true;
             }
             writer.setAnnotations(tempEvent.annotations);
             switch (tempEvent.eventType) {
@@ -66,7 +71,7 @@ export class IonEventStream {
                         writer.writeNull(tempEvent.ionType!);
                         return;
                     }
-                    if (this.isEmbedded) {
+                    if (isEmbedded) {
                         writer.writeString(tempEvent.ionValue.toString());
                         break;
                     }
@@ -109,6 +114,9 @@ export class IonEventStream {
                     writer.stepIn(tempEvent.ionType!);
                     break;
                 case IonEventType.CONTAINER_END:
+                    if(isEmbedded) {
+                        isEmbedded = false;
+                    }
                     writer.stepOut();
                     break;
                 case IonEventType.STREAM_END:
@@ -138,8 +146,9 @@ export class IonEventStream {
     compare(expected: IonEventStream, comparisonReport?: IonComparisonReport): ComparisonResult {
         let actualIndex: number = 0;
         let expectedIndex: number = 0;
-        if(this.eventStream.length != expected.eventStream.length)
+        if(this.eventStream.length != expected.eventStream.length) {
             return new ComparisonResult(ComparisonResultType.ERROR, "Both event streams of different length");
+        }
         while (actualIndex < this.eventStream.length && expectedIndex < expected.eventStream.length) {
             let actualEvent = this.eventStream[actualIndex];
             let expectedEvent = expected.eventStream[expectedIndex];
@@ -191,10 +200,25 @@ export class IonEventStream {
         return new ComparisonResult(ComparisonResultType.EQUAL);
     }
 
+    /**
+     * Returns boolean based on comparison result produced by compareEquivs method
+     * */
     equivs(expected: IonEventStream, comparisonType: ComparisonType): boolean {
         return this.compareEquivs(expected, comparisonType).result == ComparisonResultType.EQUAL;
     }
 
+    isEmbedded(event: IonEvent): boolean {
+        if(event.annotations[0] === 'embedded_documents') {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     *  equivs, non-equivs & equiv-timeline comparison of eventstreams
+     *
+     *  @param comparisonReport: optional argument to write a comparison report for the equivalence result
+     */
     compareEquivs(expected: IonEventStream , comparisonType: ComparisonType, comparisonReport?: IonComparisonReport): ComparisonResult {
         let actualIndex: number = 0;
         let expectedIndex: number = 0;
@@ -206,17 +230,19 @@ export class IonEventStream {
             if(actualEvent.eventType == IonEventType.STREAM_END && expectedEvent.eventType == IonEventType.STREAM_END) {
                 break;
             } else if(actualEvent.eventType == IonEventType.STREAM_END || expectedEvent.eventType == IonEventType.STREAM_END) {
-                    throw new Error("Different number of comparison sets.");
+                throw new Error("Different number of comparison sets.");
             } else if (!(actualEvent.ionType == IonTypes.LIST || actualEvent.ionType == IonTypes.SEXP)
                 || !(expectedEvent.ionType == IonTypes.LIST || expectedEvent.ionType == IonTypes.SEXP)) {
                 throw new Error("Comparison sets must be lists or s-expressions.");
-            } else if((actualEvent.annotations[0] === 'embedded_documents') as any ^ (expectedEvent.annotations[0] === 'embedded_documents') as any) {
+            } else if(this.isEmbedded(actualEvent) as any ^ this.isEmbedded(expectedEvent) as any) {
                 throw new Error("Both streams should be embedded streams.");
             }
 
+            // both containers has type any as it maybe IonEventStream[] or IonEvent[]
+            // depending on the type compare method will be called
             let actualContainer: any = [];
             let expectedContainer: any = [];
-            if (actualEvent.annotations[0] === 'embedded_documents' && expectedEvent.annotations[0] === 'embedded_documents') {
+            if (this.isEmbedded(actualEvent) && this.isEmbedded(expectedEvent)) {
                 //we found a list of strings that we need to interpret as top level ion text streams.
                 actualContainer = this.parseEventStream(actualEvent);
                 expectedContainer = this.parseEventStream(expectedEvent);
@@ -235,15 +261,6 @@ export class IonEventStream {
                         continue;
                     let actualContainerEvent: IonEvent = actualContainer[i];
                     let expectedContainerEvent: IonEvent = expectedContainer[j];
-                    if(actualContainerEvent.eventType == IonEventType.STREAM_END || actualContainerEvent.eventType == IonEventType.CONTAINER_END) {
-                        // no op
-                        break;
-                    }
-                    if (expectedContainerEvent.eventType == IonEventType.STREAM_END || expectedContainerEvent.eventType == IonEventType.CONTAINER_END) {
-                        // no op
-                        continue;
-                    }
-
                     let eventResult;
 
                     if (comparisonType == ComparisonType.EQUIV_TIMELINE && actualContainerEvent.ionType == IonTypes.TIMESTAMP) {
@@ -252,18 +269,20 @@ export class IonEventStream {
                         eventResult = ionTimestampActual.compareTo(ionTimestampExpected) == 0 ? new ComparisonResult(ComparisonResultType.EQUAL)
                             : new ComparisonResult(ComparisonResultType.NOT_EQUAL, ionTimestampActual + " vs. " + ionTimestampExpected);
                     } else {
-                            eventResult = actualContainerEvent.compare(expectedContainerEvent);
+                        eventResult = actualContainerEvent.compare(expectedContainerEvent);
                     }
 
                     if ((comparisonType == ComparisonType.EQUIVS || comparisonType == ComparisonType.EQUIV_TIMELINE)
                         && eventResult.result == ComparisonResultType.NOT_EQUAL) {
-                        if(comparisonReport)
+                        if(comparisonReport) {
                             comparisonReport.writeComparisonReport(ComparisonResultType.NOT_EQUAL, eventResult.message, i + 1, j + 1);
+                        }
                         return new ComparisonResult(ComparisonResultType.NOT_EQUAL);
                     } else if (comparisonType == ComparisonType.NON_EQUIVS && eventResult.result == ComparisonResultType.EQUAL) {
-                        if(comparisonReport)
+                        if(comparisonReport) {
                             comparisonReport.writeComparisonReport(ComparisonResultType.EQUAL,
                                 "Both values are equal in non-equivs comparison.", i + 1, j + 1);
+                        }
                         return new ComparisonResult(ComparisonResultType.EQUAL);
                     }
                 }
@@ -279,13 +298,13 @@ export class IonEventStream {
         for (let j = 0; j < event.ionValue.length - 1; j++) {
             container.push(event.ionValue[j]);
             if (event.ionValue[j].eventType === IonEventType.CONTAINER_START) {
-                j += event.ionValue[j].ionValue.length
+                j += event.ionValue[j].ionValue.length;
             }
         }
         return container;
     }
 
-    private parseEventStream(event: IonEvent): IonEvent[] {
+    private parseEventStream(event: IonEvent): any {
         let container: any = [];
         for (let j = 0; j < event.ionValue.length - 1; j++) {
             if(event.ionValue[j].eventType == IonEventType.STREAM_END)
@@ -300,10 +319,8 @@ export class IonEventStream {
             let tid: IonType | null = this.reader.next();
             if (tid === IonTypes.SYMBOL && this.reader.stringValue() === "$ion_event_stream") {
                 this.marshalStream();
+                this.isEventStream = true;
                 return;
-            }
-            if (tid === IonTypes.SEXP && this.reader.annotations()[0] === "embedded_documents") {
-                this.isEmbedded = true;
             }
             let currentContainer: IonEvent[] = [];
             let currentContainerIndex: number[] = [];
@@ -333,21 +350,7 @@ export class IonEventStream {
                             break;
                         }
                         default: {
-                            if(this.isEmbedded) {
-                                let tempReader = makeReader(this.reader.value() as string);
-                                let type: IonType | null = tempReader.next();
-                                while (true) {
-                                    if (type == null) {
-                                        this.eventStream.push(this.eventFactory.makeEvent(IonEventType.STREAM_END, IonTypes.NULL, null, tempReader.depth(), [], false, undefined));
-                                        break;
-                                    } else {
-                                        this.eventStream.push(this.eventFactory.makeEvent(IonEventType.SCALAR, type!, tempReader.fieldName(), tempReader.depth(), tempReader.annotations(), false, tempReader.value()));
-                                    }
-                                    type = tempReader.next();
-                                }
-                            } else {
-                                this.eventStream.push(this.eventFactory.makeEvent(IonEventType.SCALAR, tid, this.reader.fieldName(), this.reader.depth(), this.reader.annotations(), false, this.reader.value()));
-                            }
+                            this.eventStream.push(this.eventFactory.makeEvent(IonEventType.SCALAR, tid, this.reader.fieldName(), this.reader.depth(), this.reader.annotations(), false, this.reader.value()));
                             break;
                         }
                     }
@@ -386,9 +389,6 @@ export class IonEventStream {
                 throw new Error('Unexpected eventType: ' + tempEvent.eventType);
             }
             this.reader.stepOut();
-        }
-        if(this.eventStream[0].eventType == IonEventType.CONTAINER_START && this.eventStream[0].ionType == IonTypes.SEXP || IonTypes.LIST && this.eventStream[0].annotations[0] == "embedded_documents") {
-            this.isEmbedded = true;
         }
     }
 

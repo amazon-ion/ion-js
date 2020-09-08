@@ -4,6 +4,7 @@ import {IonEventStream} from "./IonEventStream";
 import {Writer} from "./IonWriter";
 import {ErrorType, IonCliCommonArgs, IonCliError} from "./Cli";
 import {IonTypes, makeReader, Reader} from "./Ion";
+import {IonEvent} from "./IonEvent";
 
 /**
  * The `command`, `describe`, and `handler` exports below are part of the yargs command module API
@@ -63,6 +64,7 @@ export class Process {
         for (let path of args.getInputFiles()) {
             this.processEvent(ionOutputWriter, args, path);
         }
+        args.getOutputFile().write(ionOutputWriter.getBytes());
     }
 
     processEvent(ionOutputWriter: Writer, args: IonCliCommonArgs, path: string): void {
@@ -75,10 +77,33 @@ export class Process {
         try {
             eventStream = new IonEventStream(ionReader, path, args);
 
-            // processes input stream into event stream
-            eventStream.writeEventStream(ionOutputWriter);
+            ionOutputWriter.writeSymbol(this.EVENT_STREAM);
+            let writeEvents: IonEvent[] = [];
+            for(let i =0; i < eventStream.getEvents().length; i++) {
+                let event = eventStream.getEvents()[i];
+
+                //process event stream into event stream
+                if(eventStream.isEventStream) {
+                    writeEvents = eventStream.getEvents();
+                    break;
+                }
+
+                // processes input stream(text or binary) into event stream
+                writeEvents.push(event);
+
+                if(event.annotations[0] == 'embedded_documents') {
+                    for (let j = 0; j < event.ionValue.length - 1; j++) {
+                        writeEvents.push(...new IonEventStream(makeReader(event.ionValue[j].ionValue)).getEvents());
+                    }
+                    i = i + (event.ionValue.length - 1);
+                }
+            }
+
+            for(let event of writeEvents) {
+                event.write(ionOutputWriter);
+            }
+
             ionOutputWriter.close();
-            args.getOutputFile().write(ionOutputWriter.getBytes());
         } catch (Error) {
             new IonCliError(ErrorType.WRITE, path, Error.message, args.getErrorReportFile()).writeErrorReport();
         }

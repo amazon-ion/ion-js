@@ -2,15 +2,17 @@ import * as yargs from "yargs";
 import fs from "fs";
 import {OutputFormat} from "./OutputFormat";
 import {IonTypes, makeTextWriter} from "./Ion";
-import {Writable} from "stream";
 import {ComparisonContext, ComparisonType} from "./Compare";
 
-/** common CLI arguments structure */
+/** common CLI arguments structure
+ *
+ * @params outputFile,errorReportFile : 'any' datatype to use stdout as well as file write stream to write ion data
+ * */
 export class IonCliCommonArgs {
     inputFiles: Array<string>;
-    outputFile: Writable;
+    outputFile: any;
     outputFormatName: OutputFormat;
-    errorReportFile: Writable;
+    errorReportFile: any;
 
     constructor(argv: yargs.Arguments) {
         this.outputFile = argv["output"] ? fs.createWriteStream(argv["output"] as string, {flags: 'w'}) : process.stdout;
@@ -20,11 +22,11 @@ export class IonCliCommonArgs {
         this.inputFiles = argv["input-file"] as Array<string>;
     }
 
-    getOutputFile(): Writable {
+    getOutputFile(): any {
         return this.outputFile;
     }
 
-    getErrorReportFile(): Writable {
+    getErrorReportFile(): any {
         return this.errorReportFile;
     }
 
@@ -116,10 +118,10 @@ export class ComparisonResult {
 export class IonComparisonReport {
     lhs: ComparisonContext;
     rhs: ComparisonContext;
-    comparisonReportFile: Writable;
+    comparisonReportFile: any;
     comparisonType: ComparisonType;
 
-    constructor(lhs: ComparisonContext, rhs: ComparisonContext, comparisonReportFile: Writable, comparisonType: ComparisonType) {
+    constructor(lhs: ComparisonContext, rhs: ComparisonContext, comparisonReportFile: any, comparisonType: ComparisonType) {
         this.lhs = lhs;
         this.rhs = rhs;
         this.comparisonReportFile = comparisonReportFile;
