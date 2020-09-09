@@ -79,24 +79,13 @@ export class Process {
 
             ionOutputWriter.writeSymbol(this.EVENT_STREAM);
             let writeEvents: IonEvent[] = [];
-            for(let i =0; i < eventStream.getEvents().length; i++) {
-                let event = eventStream.getEvents()[i];
 
+            if(eventStream.isEventStream) {
                 //process event stream into event stream
-                if(eventStream.isEventStream) {
-                    writeEvents = eventStream.getEvents();
-                    break;
-                }
-
+                writeEvents = eventStream.getEvents();
+            } else {
                 // processes input stream(text or binary) into event stream
-                writeEvents.push(event);
-
-                if(event.annotations[0] == 'embedded_documents') {
-                    for (let j = 0; j < event.ionValue.length - 1; j++) {
-                        writeEvents.push(...new IonEventStream(makeReader(event.ionValue[j].ionValue)).getEvents());
-                    }
-                    i = i + (event.ionValue.length - 1);
-                }
+                writeEvents = this.collectInputStreamEvents(writeEvents, eventStream);
             }
 
             for(let event of writeEvents) {
@@ -107,6 +96,21 @@ export class Process {
         } catch (Error) {
             new IonCliError(ErrorType.WRITE, path, Error.message, args.getErrorReportFile()).writeErrorReport();
         }
+    }
+
+    collectInputStreamEvents(writeEvents: IonEvent[], eventStream: IonEventStream): IonEvent[] {
+        for(let i = 0; i < eventStream.getEvents().length; i++) {
+            let event = eventStream.getEvents()[i];
+            writeEvents.push(event);
+
+            if (eventStream.isEmbedded(event)) {
+                for (let j = 0; j < event.ionValue.length - 1; j++) {
+                    writeEvents.push(...new IonEventStream(makeReader(event.ionValue[j].ionValue)).getEvents());
+                }
+                i = i + (event.ionValue.length - 1);
+            }
+        }
+        return writeEvents;
     }
 
     processFiles(ionOutputWriter: Writer, args: IonCliCommonArgs): void {

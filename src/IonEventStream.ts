@@ -35,7 +35,7 @@ export class IonEventStream {
     private eventStream: IonEvent[];
     private reader: Reader;
     private eventFactory: IonEventFactory;
-    isEventStream: boolean; // check if reader has an eventstream as input
+    isEventStream: boolean; // whether the reader has an event stream as input
 
     constructor(reader: Reader, path: string = "", args?: IonCliCommonArgs) {
         this.eventStream = [];
@@ -61,7 +61,7 @@ export class IonEventStream {
                 writer.writeFieldName(tempEvent.fieldName);
             }
             if((tempEvent.ionType == IonTypes.SEXP || tempEvent.ionType == IonTypes.LIST)
-                && tempEvent.annotations[0] == "embedded_documents") {
+                && this.isEmbedded(tempEvent)) {
                 isEmbedded = true;
             }
             writer.setAnnotations(tempEvent.annotations);
@@ -201,7 +201,8 @@ export class IonEventStream {
     }
 
     /**
-     * Returns boolean based on comparison result produced by compareEquivs method
+     * Returns true if this `IonEventStream` is equal to the provided `IonEventStream`
+     * as determined by the `ComparisonType`; returns false otherwise.
      * */
     equivs(expected: IonEventStream, comparisonType: ComparisonType): boolean {
         return this.compareEquivs(expected, comparisonType).result == ComparisonResultType.EQUAL;

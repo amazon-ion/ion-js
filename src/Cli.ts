@@ -6,12 +6,14 @@ import {ComparisonContext, ComparisonType} from "./Compare";
 
 /** common CLI arguments structure
  *
- * @params outputFile,errorReportFile : 'any' datatype to use stdout as well as file write stream to write ion data
+ * @params
  * */
 export class IonCliCommonArgs {
     inputFiles: Array<string>;
-    outputFile: any;
     outputFormatName: OutputFormat;
+
+    // outputFile,errorReportFile: 'any' datatype to use stdout as well as file write stream to write ion data
+    outputFile: any;
     errorReportFile: any;
 
     constructor(argv: yargs.Arguments) {
