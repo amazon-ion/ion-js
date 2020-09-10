@@ -109,7 +109,7 @@ function equivsTest(path: string, expectedEquivalence = true, equivsTimelines = 
 }
 
 function nonEquivsTest(path: string) {
-    equivsTest(path, true);
+    equivsTest(path, false);
 }
 
 function equivTimelinesTest(path: string) {
