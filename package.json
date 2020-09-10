@@ -6,7 +6,7 @@
   "types": "dist/commonjs/es6/Ion.d.ts",
   "scripts": {
     "commit": "git-cz",
-    "prepare": "grunt",
+    "prepare": "grunt release",
     "test": "nyc mocha",
     "release": "grunt release"
   },
