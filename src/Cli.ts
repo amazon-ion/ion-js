@@ -13,6 +13,7 @@ export class IonCliCommonArgs {
     outputFormatName: OutputFormat;
 
     // outputFile,errorReportFile: 'any' datatype to use stdout as well as file write stream to write ion data
+    // for more information : https://github.com/amzn/ion-js/issues/627
     outputFile: any;
     errorReportFile: any;
 
