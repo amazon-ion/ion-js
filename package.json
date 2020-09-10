@@ -8,7 +8,8 @@
     "commit": "git-cz",
     "prepare": "grunt",
     "test": "nyc mocha",
-    "release": "grunt release"
+    "release": "grunt release",
+    "prettier-check": "prettier --check \"src/**.{js,ts}\""
   },
   "repository": {
     "type": "git",
@@ -73,6 +74,7 @@
     "mocha": "^6.2.3",
     "mocha-typescript": "^1.1.17",
     "nyc": "^14.1.1",
+    "prettier": "^1.16.4",
     "semantic-release": "^15.13.24",
     "source-map-support": "^0.5.19",
     "ts-node": "^8.10.1",
