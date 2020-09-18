@@ -1,19 +1,19 @@
 /*!
  * Copyright 2012 Amazon.com, Inc. or its affiliates. All Rights Reserved.
- *  
+ *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
  * A copy of the License is located at
- *  
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- *  
+ *
  * or in the "license" file accompanying this file. This file is distributed
  * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
  * express or implied. See the License for the specific language governing
  * permissions and limitations under the License.
  */
 
-import {SharedSymbolTable} from "./IonSharedSymbolTable";
+import { SharedSymbolTable } from "./IonSharedSymbolTable";
 
 /**
  * A shared symbol table import.
@@ -27,66 +27,68 @@ import {SharedSymbolTable} from "./IonSharedSymbolTable";
  * @see http://amzn.github.io/ion-docs/symbols.html#imports
  */
 export class Import {
-    private readonly _offset: number;
-    private readonly _length: number;
-    private readonly _parent: Import | null;
-    private readonly _symbolTable: SharedSymbolTable;
+  private readonly _offset: number;
+  private readonly _length: number;
+  private readonly _parent: Import | null;
+  private readonly _symbolTable: SharedSymbolTable;
 
-    constructor(parent: Import | null, symbolTable: SharedSymbolTable, length?: number | null) {
-        this._parent = parent;
-        this._symbolTable = symbolTable;
-        this._offset = this.parent ? this.parent.offset + this.parent.length : 1;
-        this._length = length || this.symbolTable.numberOfSymbols;
+  constructor(
+    parent: Import | null,
+    symbolTable: SharedSymbolTable,
+    length?: number | null
+  ) {
+    this._parent = parent;
+    this._symbolTable = symbolTable;
+    this._offset = this.parent ? this.parent.offset + this.parent.length : 1;
+    this._length = length || this.symbolTable.numberOfSymbols;
+  }
+
+  get parent(): Import | null {
+    return this._parent;
+  }
+
+  get offset(): number {
+    return this._offset;
+  }
+
+  get length(): number {
+    return this._length;
+  }
+
+  get symbolTable(): SharedSymbolTable {
+    return this._symbolTable;
+  }
+
+  getSymbolText(symbolId: number): string | undefined {
+    if (this.parent === undefined) throw new Error("Illegal parent state.");
+    if (this.parent !== null) {
+      let parentSymbol = this.parent.getSymbolText(symbolId);
+      if (parentSymbol) {
+        return parentSymbol;
+      }
     }
 
-    get parent(): Import | null {
-        return this._parent;
+    let index: number = symbolId - this.offset;
+    if (index >= 0 && index < this.length) {
+      return this.symbolTable.getSymbolText(index);
+    }
+    return undefined;
+  }
+
+  getSymbolId(symbolText: string): number | undefined {
+    let symbolId;
+    if (this.parent !== null) {
+      symbolId = this.parent.getSymbolId(symbolText);
+      if (symbolId) {
+        return symbolId;
+      }
     }
 
-    get offset(): number {
-        return this._offset;
+    symbolId = this.symbolTable.getSymbolId(symbolText);
+    if (symbolId !== null && symbolId !== undefined && symbolId < this.length) {
+      return symbolId + this.offset;
     }
 
-    get length(): number {
-        return this._length;
-    }
-
-    get symbolTable(): SharedSymbolTable {
-        return this._symbolTable;
-    }
-
-    getSymbolText(symbolId: number): string | undefined {
-        if (this.parent === undefined) throw new Error("Illegal parent state.");
-        if (this.parent !== null) {
-            let parentSymbol = this.parent.getSymbolText(symbolId);
-            if (parentSymbol) {
-                return parentSymbol;
-            }
-        }
-
-        let index: number = symbolId - this.offset;
-        if (index >= 0 && index < this.length) {
-            return this.symbolTable.getSymbolText(index);
-        }
-        return undefined;
-    }
-
-    getSymbolId(symbolText: string): number | undefined {
-        let symbolId;
-        if (this.parent !== null) {
-            symbolId = this.parent.getSymbolId(symbolText);
-            if (symbolId) {
-                return symbolId;
-            }
-        }
-
-        symbolId = this.symbolTable.getSymbolId(symbolText);
-        if (symbolId !== null
-            && symbolId !== undefined
-            && symbolId < this.length) {
-            return symbolId + this.offset;
-        }
-
-        return undefined;
-    }
+    return undefined;
+  }
 }

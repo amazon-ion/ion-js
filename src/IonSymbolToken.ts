@@ -19,24 +19,24 @@
  * symbol ID.
  */
 export class SymbolToken {
-    private static _UNKNOWN_SYMBOL_ID = -1;
+  private static _UNKNOWN_SYMBOL_ID = -1;
 
-    constructor(private text: string | null,
-                private sid: number = SymbolToken._UNKNOWN_SYMBOL_ID) {
-    }
+  constructor(
+    private text: string | null,
+    private sid: number = SymbolToken._UNKNOWN_SYMBOL_ID
+  ) {}
 
-    /**
-     * Returns the text of this symbol, or null if the text is unknown.
-     */
-    public getText(): string | null {
-        return this.text;
-    }
+  /**
+   * Returns the text of this symbol, or null if the text is unknown.
+   */
+  public getText(): string | null {
+    return this.text;
+  }
 
-    /**
-     * Returns the symbol ID (sid) of this symbol, or -1 if the sid is unknown.
-     */
-    public getSid(): number {
-        return this.sid;
-    }
+  /**
+   * Returns the symbol ID (sid) of this symbol, or -1 if the sid is unknown.
+   */
+  public getSid(): number {
+    return this.sid;
+  }
 }
-

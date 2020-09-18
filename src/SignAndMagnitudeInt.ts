@@ -1,12 +1,12 @@
 /*!
  * Copyright 2012 Amazon.com, Inc. or its affiliates. All Rights Reserved.
- *  
+ *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
  * A copy of the License is located at
- *  
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- *  
+ *
  * or in the "license" file accompanying this file. This file is distributed
  * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
  * express or implied. See the License for the specific language governing
@@ -14,7 +14,7 @@
  */
 
 import JSBI from "jsbi";
-import {JsbiSupport} from "./JsbiSupport";
+import { JsbiSupport } from "./JsbiSupport";
 
 /**
  * Represents a signed, arbitrarily sized integer.
@@ -26,28 +26,30 @@ import {JsbiSupport} from "./JsbiSupport";
  *
  */
 export default class SignAndMagnitudeInt {
-    constructor(
-        public readonly _magnitude: JSBI,
-        public readonly _isNegative = JsbiSupport.isNegative(_magnitude)
-    ) {
-    }
+  constructor(
+    public readonly _magnitude: JSBI,
+    public readonly _isNegative = JsbiSupport.isNegative(_magnitude)
+  ) {}
 
-    get magnitude(): JSBI {
-        return this._magnitude;
-    }
+  get magnitude(): JSBI {
+    return this._magnitude;
+  }
 
-    get isNegative(): boolean {
-        return this._isNegative;
-    }
+  get isNegative(): boolean {
+    return this._isNegative;
+  }
 
-    public static fromNumber(value: number): SignAndMagnitudeInt {
-        let isNegative = value < 0 || Object.is(value, -0);
-        let absoluteValue = Math.abs(value);
-        let magnitude = JSBI.BigInt(absoluteValue);
-        return new SignAndMagnitudeInt(magnitude, isNegative);
-    }
+  public static fromNumber(value: number): SignAndMagnitudeInt {
+    let isNegative = value < 0 || Object.is(value, -0);
+    let absoluteValue = Math.abs(value);
+    let magnitude = JSBI.BigInt(absoluteValue);
+    return new SignAndMagnitudeInt(magnitude, isNegative);
+  }
 
-    public equals(other: SignAndMagnitudeInt): boolean {
-        return JSBI.equal(this._magnitude, other._magnitude) && this._isNegative === other._isNegative;
-    }
+  public equals(other: SignAndMagnitudeInt): boolean {
+    return (
+      JSBI.equal(this._magnitude, other._magnitude) &&
+      this._isNegative === other._isNegative
+    );
+  }
 }
