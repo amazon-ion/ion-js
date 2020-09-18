@@ -1,11 +1,15 @@
-import {IonTypes, Writer} from "../Ion";
-import {Value} from "./Value";
-import {FromJsConstructor, FromJsConstructorBuilder, Primitives} from "./FromJsConstructor";
+import { IonTypes, Writer } from "../Ion";
+import { Value } from "./Value";
+import {
+  FromJsConstructor,
+  FromJsConstructorBuilder,
+  Primitives,
+} from "./FromJsConstructor";
 
 const _fromJsConstructor: FromJsConstructor = new FromJsConstructorBuilder()
-    .withPrimitives(Primitives.Boolean)
-    .withClassesToUnbox(global.Boolean)
-    .build();
+  .withPrimitives(Primitives.Boolean)
+  .withClassesToUnbox(global.Boolean)
+  .build();
 
 /**
  * Represents a boolean[1] value in an Ion stream.
@@ -31,24 +35,27 @@ const _fromJsConstructor: FromJsConstructor = new FromJsConstructorBuilder()
  * [1] http://amzn.github.io/ion-docs/docs/spec.html#bool
  * [2] https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean#Description
  */
-export class Boolean extends Value(global.Boolean, IonTypes.BOOL, _fromJsConstructor) {
+export class Boolean extends Value(
+  global.Boolean,
+  IonTypes.BOOL,
+  _fromJsConstructor
+) {
+  /**
+   * Constructor.
+   * @param value         The boolean value of the new instance.
+   * @param annotations   An optional array of strings to associate with `value`.
+   */
+  constructor(value: boolean, annotations: string[] = []) {
+    super(value);
+    this._setAnnotations(annotations);
+  }
 
-    /**
-     * Constructor.
-     * @param value         The boolean value of the new instance.
-     * @param annotations   An optional array of strings to associate with `value`.
-     */
-    constructor(value: boolean, annotations: string[] = []) {
-        super(value);
-        this._setAnnotations(annotations);
-    }
+  booleanValue(): boolean {
+    return this.valueOf() as boolean;
+  }
 
-    booleanValue(): boolean {
-        return this.valueOf() as boolean;
-    }
-
-    writeTo(writer: Writer): void {
-        writer.setAnnotations(this.getAnnotations());
-        writer.writeBoolean(this.booleanValue());
-    }
+  writeTo(writer: Writer): void {
+    writer.setAnnotations(this.getAnnotations());
+    writer.writeBoolean(this.booleanValue());
+  }
 }

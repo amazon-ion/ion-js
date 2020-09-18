@@ -1,19 +1,19 @@
 /*!
  * Copyright 2012 Amazon.com, Inc. or its affiliates. All Rights Reserved.
- *  
+ *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
  * A copy of the License is located at
- *  
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- *  
+ *
  * or in the "license" file accompanying this file. This file is distributed
  * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
  * express or implied. See the License for the specific language governing
  * permissions and limitations under the License.
  */
 
-import {SharedSymbolTable} from "./IonSharedSymbolTable";
+import { SharedSymbolTable } from "./IonSharedSymbolTable";
 
 /**
  * A special case of shared symbol table whose entries are all undefined. Used in certain cases
@@ -21,26 +21,28 @@ import {SharedSymbolTable} from "./IonSharedSymbolTable";
  * @see http://amzn.github.io/ion-docs/symbols.html#imports
  */
 export class SubstituteSymbolTable extends SharedSymbolTable {
-    constructor(length: number) {
-        if (length < 0) {
-            throw new Error(
-                "Cannot instantiate a SubstituteSymbolTable with a negative length. (" + length + ")"
-            );
-        }
-        super("_substitute", -1, []);
-        this._numberOfSymbols = length;
+  constructor(length: number) {
+    if (length < 0) {
+      throw new Error(
+        "Cannot instantiate a SubstituteSymbolTable with a negative length. (" +
+          length +
+          ")"
+      );
     }
+    super("_substitute", -1, []);
+    this._numberOfSymbols = length;
+  }
 
-    getSymbolText(symbolId: number): string | undefined {
-        if (symbolId < 0) {
-            throw new Error(
-                `Index ${symbolId} is out of bounds for the SharedSymbolTable name=${this.name}, version=${this.version}`
-            );
-        }
-        return undefined;
+  getSymbolText(symbolId: number): string | undefined {
+    if (symbolId < 0) {
+      throw new Error(
+        `Index ${symbolId} is out of bounds for the SharedSymbolTable name=${this.name}, version=${this.version}`
+      );
     }
+    return undefined;
+  }
 
-    getSymbolId(text: string): number | undefined {
-        return undefined;
-    }
+  getSymbolId(text: string): number | undefined {
+    return undefined;
+  }
 }

@@ -1,6 +1,6 @@
-import {PathElement, Value} from "./Value";
-import {IonTypes, Writer} from "../Ion";
-import {FromJsConstructor} from "./FromJsConstructor";
+import { PathElement, Value } from "./Value";
+import { IonTypes, Writer } from "../Ion";
+import { FromJsConstructor } from "./FromJsConstructor";
 
 /**
  * Represents a struct[1] value in an Ion stream.
@@ -24,123 +24,130 @@ import {FromJsConstructor} from "./FromJsConstructor";
  *
  * [1] http://amzn.github.io/ion-docs/docs/spec.html#struct
  */
-export class Struct extends Value(Object, IonTypes.STRUCT, FromJsConstructor.NONE) {
-    /*
-     * Stores the string/Value pairs that represent the fields of the struct. These values are stored
-     * separately to allow field names that would otherwise collide with public properties from the Struct class
-     * itself to be stored. (e.g. 'stringValue', 'fields', or 'elements')
-     */
-    private _fields = Object.create(null);
+export class Struct extends Value(
+  Object,
+  IonTypes.STRUCT,
+  FromJsConstructor.NONE
+) {
+  /*
+   * Stores the string/Value pairs that represent the fields of the struct. These values are stored
+   * separately to allow field names that would otherwise collide with public properties from the Struct class
+   * itself to be stored. (e.g. 'stringValue', 'fields', or 'elements')
+   */
+  private _fields = Object.create(null);
 
-    /**
-     * Constructor.
-     * @param fields        An iterator of field name/value pairs to represent as a struct.
-     * @param annotations   An optional array of strings to associate with this null value.
-     */
-    constructor(fields: Iterable<[string, Value]>, annotations: string[] = []) {
-        super();
-        for (let [fieldName, fieldValue] of fields) {
-            this._fields[fieldName] = fieldValue;
+  /**
+   * Constructor.
+   * @param fields        An iterator of field name/value pairs to represent as a struct.
+   * @param annotations   An optional array of strings to associate with this null value.
+   */
+  constructor(fields: Iterable<[string, Value]>, annotations: string[] = []) {
+    super();
+    for (let [fieldName, fieldValue] of fields) {
+      this._fields[fieldName] = fieldValue;
+    }
+    this._setAnnotations(annotations);
+
+    // Construct a Proxy that will prevent user-defined fields from shadowing public properties.
+    return new Proxy(this, {
+      // All values set by the user are stored in `this._fields` to avoid
+      // potentially overwriting Struct methods.
+      set: function (target, name, value): boolean {
+        target._fields[name] = value;
+        return true; // Indicates that the assignment succeeded
+      },
+      get: function (target, name): any {
+        // Property accesses will look for matching Struct API properties before
+        // looking for a matching field of the same name.
+        if (name in target) {
+          return target[name];
         }
-        this._setAnnotations(annotations);
-
-        // Construct a Proxy that will prevent user-defined fields from shadowing public properties.
-        return new Proxy(this, {
-            // All values set by the user are stored in `this._fields` to avoid
-            // potentially overwriting Struct methods.
-            set: function(target, name, value): boolean {
-                target._fields[name] = value;
-                return true; // Indicates that the assignment succeeded
-            },
-            get: function(target, name): any  {
-                // Property accesses will look for matching Struct API properties before
-                // looking for a matching field of the same name.
-                if (name in target) {
-                    return target[name];
-                }
-                return target._fields[name];
-            },
-            deleteProperty: function (target, name): boolean {
-                // Property is deleted only if it's in _field Collection
-                if (name in target._fields) {
-                    delete target._fields[name];
-                }
-                // Reference: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/delete#Return_value
-                return true;
-            }
-        });
-    }
-
-    get(...pathElements: PathElement[]): Value | null {
-        if (pathElements.length === 0) {
-            throw new Error('Value#get requires at least one parameter.');
+        return target._fields[name];
+      },
+      deleteProperty: function (target, name): boolean {
+        // Property is deleted only if it's in _field Collection
+        if (name in target._fields) {
+          delete target._fields[name];
         }
-        let [pathHead, ...pathTail] = pathElements;
-        if (typeof (pathHead) !== "string") {
-            throw new Error(`Cannot index into a struct with a ${typeof (pathHead)}.`);
-        }
-        let child: Value | undefined = this._fields[pathHead];
-        if (child === undefined) {
-            return null;
-        }
-        if (pathTail.length === 0) {
-            return child;
-        }
-        return child.get(...pathTail);
-    }
+        // Reference: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/delete#Return_value
+        return true;
+      },
+    });
+  }
 
-    fieldNames(): string[] {
-        return Object.keys(this._fields);
+  get(...pathElements: PathElement[]): Value | null {
+    if (pathElements.length === 0) {
+      throw new Error("Value#get requires at least one parameter.");
     }
+    let [pathHead, ...pathTail] = pathElements;
+    if (typeof pathHead !== "string") {
+      throw new Error(`Cannot index into a struct with a ${typeof pathHead}.`);
+    }
+    let child: Value | undefined = this._fields[pathHead];
+    if (child === undefined) {
+      return null;
+    }
+    if (pathTail.length === 0) {
+      return child;
+    }
+    return child.get(...pathTail);
+  }
 
-    fields(): [string, Value][] {
-        return Object.entries(this._fields);
-    }
+  fieldNames(): string[] {
+    return Object.keys(this._fields);
+  }
 
-    elements(): Value[] {
-        return Object.values(this._fields);
-    }
+  fields(): [string, Value][] {
+    return Object.entries(this._fields);
+  }
 
-    [Symbol.iterator](): IterableIterator<[string, Value]> {
-        return this.fields()[Symbol.iterator]();
-    }
+  elements(): Value[] {
+    return Object.values(this._fields);
+  }
 
-    toString(): string {
-        return '{'
-            + [...this.fields()]
-                .map(([name, value]) => name + ': ' + value)
-                .join(', ')
-            + '}';
-    }
+  [Symbol.iterator](): IterableIterator<[string, Value]> {
+    return this.fields()[Symbol.iterator]();
+  }
 
-    writeTo(writer: Writer): void {
-        writer.setAnnotations(this.getAnnotations());
-        writer.stepIn(IonTypes.STRUCT);
-        for(let [fieldName, value] of this) {
-            writer.writeFieldName(fieldName);
-            value.writeTo(writer);
-        }
-        writer.stepOut();
-    }
+  toString(): string {
+    return (
+      "{" +
+      [...this.fields()]
+        .map(([name, value]) => name + ": " + value)
+        .join(", ") +
+      "}"
+    );
+  }
 
-    deleteField(name: string): boolean {
-        if (name in this._fields) {
-            delete this._fields[name];
-            return true;
-        }
-        return false;
+  writeTo(writer: Writer): void {
+    writer.setAnnotations(this.getAnnotations());
+    writer.stepIn(IonTypes.STRUCT);
+    for (let [fieldName, value] of this) {
+      writer.writeFieldName(fieldName);
+      value.writeTo(writer);
     }
+    writer.stepOut();
+  }
 
-    toJSON() {
-        return this._fields;
+  deleteField(name: string): boolean {
+    if (name in this._fields) {
+      delete this._fields[name];
+      return true;
     }
+    return false;
+  }
 
-    static _fromJsValue(jsValue: any, annotations: string[]): Value {
-        if (!(jsValue instanceof Object)) {
-            throw new Error(`Cannot create a dom.Struct from: ${jsValue.toString()}`);
-        }
-        let fields: [string, Value][] = Object.entries(jsValue)
-            .map(([key, value]) => [key, Value.from(value)]);
-        return new this(fields, annotations);
+  toJSON() {
+    return this._fields;
+  }
+
+  static _fromJsValue(jsValue: any, annotations: string[]): Value {
+    if (!(jsValue instanceof Object)) {
+      throw new Error(`Cannot create a dom.Struct from: ${jsValue.toString()}`);
     }
+    let fields: [string, Value][] = Object.entries(
+      jsValue
+    ).map(([key, value]) => [key, Value.from(value)]);
+    return new this(fields, annotations);
+  }
 }
