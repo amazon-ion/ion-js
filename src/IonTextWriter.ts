@@ -95,7 +95,7 @@ export class TextWriter extends AbstractWriter {
       text = value.toExponential();
       // If present, removes '+' character from the serialized exponent.
       // The '+' is legal Ion, but is superfluous.
-      let plusSignIndex = text.lastIndexOf("+");
+      const plusSignIndex = text.lastIndexOf("+");
       if (plusSignIndex > -1) {
         text = text.slice(0, plusSignIndex) + text.slice(plusSignIndex + 1);
       }
@@ -128,14 +128,14 @@ export class TextWriter extends AbstractWriter {
       let hexStr: string;
       this.writeUtf8('{{"');
       for (let i: number = 0; i < value.length; i++) {
-        let c: number = value[i];
+        const c: number = value[i];
         if (c > 127 && c < 256) {
           hexStr = "\\x" + c.toString(16);
           for (let j = 0; j < hexStr.length; j++) {
             this.writeable.writeByte(hexStr.charCodeAt(j));
           }
         } else {
-          let escape: number[] = ClobEscapes[c];
+          const escape: number[] = ClobEscapes[c];
           if (escape === undefined) {
             if (c < 32) {
               hexStr = "\\x" + c.toString(16);
@@ -167,8 +167,8 @@ export class TextWriter extends AbstractWriter {
         s += "-";
       }
 
-      let exponent = value.getExponent();
-      let scale = -exponent;
+      const exponent = value.getExponent();
+      const scale = -exponent;
 
       if (exponent == 0) {
         s += coefficient + ".";
@@ -176,10 +176,10 @@ export class TextWriter extends AbstractWriter {
         // Avoid printing small negative exponents using a heuristic
         // adapted from http://speleotrove.com/decimal/daconvs.html
 
-        let significantDigits = coefficient.toString().length;
-        let adjustedExponent = significantDigits - 1 - scale;
+        const significantDigits = coefficient.toString().length;
+        const adjustedExponent = significantDigits - 1 - scale;
         if (adjustedExponent >= 0) {
-          let wholeDigits = significantDigits - scale;
+          const wholeDigits = significantDigits - scale;
           s += coefficient.toString().substring(0, wholeDigits);
           s += ".";
           s += coefficient.toString().substring(wholeDigits, significantDigits);
@@ -324,7 +324,7 @@ export class TextWriter extends AbstractWriter {
   }
 
   stepOut(): void {
-    let currentContainer = this.containerContext.pop();
+    const currentContainer = this.containerContext.pop();
     if (!currentContainer || !currentContainer.containerType) {
       throw new Error("Can't step out when not in a container");
     } else if (
@@ -422,7 +422,7 @@ export class TextWriter extends AbstractWriter {
   }
 
   protected writeAnnotations(): void {
-    for (let annotation of this._annotations) {
+    for (const annotation of this._annotations) {
       this.writeSymbolToken(annotation);
       this.writeUtf8("::");
     }
@@ -472,7 +472,7 @@ export class TextWriter extends AbstractWriter {
 
   private isSid(s: string): boolean {
     if (s.length > 1 && s.charAt(0) === "$".charAt(0)) {
-      let t = s.substr(1, s.length);
+      const t = s.substr(1, s.length);
       return +t === +t; // +str === +str is a one line "is integer?" hack
     }
     return false;

@@ -165,7 +165,7 @@ export class StringSpan extends Span {
   }
 
   chunk(length: number): string {
-    let tempStr: string = this._src.substr(this._pos, length);
+    const tempStr: string = this._src.substr(this._pos, length);
     this._pos += length;
     return tempStr;
   }

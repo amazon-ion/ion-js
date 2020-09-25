@@ -66,7 +66,7 @@ export class PrettyTextWriter extends TextWriter {
   }
 
   stepOut(): void {
-    let currentContainer = this.containerContext.pop();
+    const currentContainer = this.containerContext.pop();
     if (!currentContainer || !currentContainer.containerType) {
       throw new Error("Can't step out when not in a container");
     } else if (

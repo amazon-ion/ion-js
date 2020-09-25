@@ -147,20 +147,20 @@ abstract class AbstractIonEvent implements IonEvent {
   }
 
   writeTextValue(writer: Writer): void {
-    let tempTextWriter = new TextWriter(new Writeable());
+    const tempTextWriter = new TextWriter(new Writeable());
     this.writeIonValue(tempTextWriter);
     tempTextWriter.close();
     writer.writeString(decodeUtf8(tempTextWriter.getBytes()));
   }
 
   writeBinaryValue(writer: Writer): void {
-    let tempBinaryWriter = new BinaryWriter(
+    const tempBinaryWriter = new BinaryWriter(
       defaultLocalSymbolTable(),
       new Writeable()
     );
     this.writeIonValue(tempBinaryWriter);
     tempBinaryWriter.close();
-    let binaryBuffer = tempBinaryWriter.getBytes();
+    const binaryBuffer = tempBinaryWriter.getBytes();
     writer.stepIn(IonTypes.LIST);
     for (let i = 0; i < binaryBuffer.length; i++) {
       writer.writeInt(binaryBuffer[i]);
@@ -628,13 +628,13 @@ class IonStructEvent extends AbsIonContainerEvent {
     expectedEvents: AbstractIonEvent[]
   ): boolean {
     let matchFound: boolean = true;
-    let paired: boolean[] = new Array<boolean>(expectedEvents.length);
+    const paired: boolean[] = new Array<boolean>(expectedEvents.length);
     for (let i: number = 0; matchFound && i < actualEvents.length; i++) {
       matchFound = false;
       for (let j: number = 0; !matchFound && j < expectedEvents.length; j++) {
         if (!paired[j]) {
-          let child = actualEvents[i];
-          let expectedChild = expectedEvents[j];
+          const child = actualEvents[i];
+          const expectedChild = expectedEvents[j];
           matchFound = child.equals(expectedChild);
           if (matchFound) paired[j] = true;
           if (matchFound && child.eventType === IonEventType.CONTAINER_START) {
@@ -663,11 +663,11 @@ class IonListEvent extends AbsIonContainerEvent {
 
   valueEquals(expected: IonListEvent): boolean {
     if (!(expected instanceof IonListEvent)) return false;
-    let container = this.ionValue;
-    let expectedContainer = expected.ionValue;
+    const container = this.ionValue;
+    const expectedContainer = expected.ionValue;
     if (container.length !== expectedContainer.length) return false;
     for (let i: number = 0; i < container.length; i++) {
-      let child = container[i];
+      const child = container[i];
       if (!child.equals(expectedContainer[i])) {
         return false;
       } else if (child.eventType === IonEventType.CONTAINER_START) {
@@ -691,11 +691,11 @@ class IonSexpEvent extends AbsIonContainerEvent {
 
   valueEquals(expected: IonSexpEvent): boolean {
     if (!(expected instanceof IonSexpEvent)) return false;
-    let container = this.ionValue;
-    let expectedContainer = expected.ionValue;
+    const container = this.ionValue;
+    const expectedContainer = expected.ionValue;
     if (container.length !== expectedContainer.length) return false;
     for (let i: number = 0; i < container.length; i++) {
-      let child = container[i];
+      const child = container[i];
       if (!child.equals(expectedContainer[i])) {
         return false;
       } else if (child.eventType === IonEventType.CONTAINER_START) {

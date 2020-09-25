@@ -159,7 +159,7 @@ export class Timestamp {
     if (this._precision > TimestampPrecision.MONTH) {
       // check the days per month - first the general case, basically index into the next month
       // (which doesnt need +1 because we index from 1 to 12 unlike Date) and look at the day before which is indexed with 0.
-      let tempDate = new Date(this._year, this._month, 0);
+      const tempDate = new Date(this._year, this._month, 0);
       tempDate.setUTCFullYear(this._year);
       if (this._day > tempDate.getDate()) {
         throw new Error(`Month ${this._month} has less than ${this._day} days`);
@@ -176,7 +176,7 @@ export class Timestamp {
     }
 
     // verify that year (compensated by offset) is within the valid range:
-    let utcYear = this.getDate().getUTCFullYear();
+    const utcYear = this.getDate().getUTCFullYear();
     this._checkFieldRange(
       "Year",
       utcYear,
@@ -209,7 +209,7 @@ export class Timestamp {
       return msSinceEpoch;
     }
 
-    let date = new Date(msSinceEpoch);
+    const date = new Date(msSinceEpoch);
     date.setUTCFullYear(year); // yes, we really do mean some year < 100
     return date.getTime();
   }
@@ -219,12 +219,12 @@ export class Timestamp {
    * @hidden
    */
   static _splitSecondsDecimal(secondsDecimal: Decimal): [string, string] {
-    let coefStr = secondsDecimal.getCoefficient().toString();
-    let exp = secondsDecimal.getExponent();
+    const coefStr = secondsDecimal.getCoefficient().toString();
+    const exp = secondsDecimal.getExponent();
     let secondsStr = "";
     let fractionStr = "";
     if (exp < 0) {
-      let idx = Math.max(coefStr.length + exp, 0);
+      const idx = Math.max(coefStr.length + exp, 0);
       secondsStr = coefStr.substr(0, idx);
       fractionStr = coefStr.substr(idx);
       if (-secondsDecimal.getExponent() - coefStr.length > 0) {
@@ -257,12 +257,12 @@ export class Timestamp {
     fractionalSeconds?: Decimal,
     precision?: TimestampPrecision
   ): Timestamp {
-    let msSinceEpoch = date.getTime() + localOffset * 60 * 1000;
+    const msSinceEpoch = date.getTime() + localOffset * 60 * 1000;
     date = new Date(msSinceEpoch);
 
     let secondsDecimal: Decimal;
     if (fractionalSeconds != null) {
-      let [_, fractionStr] = Timestamp._splitSecondsDecimal(fractionalSeconds);
+      const [_, fractionStr] = Timestamp._splitSecondsDecimal(fractionalSeconds);
       secondsDecimal = Decimal.parse(date.getUTCSeconds() + "." + fractionStr)!;
     } else {
       secondsDecimal = Decimal.parse(
@@ -361,7 +361,7 @@ export class Timestamp {
       msSinceEpoch
     );
 
-    let offsetShiftMs = this._localOffset * 60 * 1000;
+    const offsetShiftMs = this._localOffset * 60 * 1000;
     return new Date(msSinceEpoch - offsetShiftMs);
   }
 
@@ -384,7 +384,7 @@ export class Timestamp {
    * @hidden
    */
   _getFractionalSeconds(): Decimal {
-    let [_, fractionStr] = Timestamp._splitSecondsDecimal(this._secondsDecimal);
+    const [_, fractionStr] = Timestamp._splitSecondsDecimal(this._secondsDecimal);
     if (fractionStr === "") {
       return Decimal.ZERO;
     }
@@ -424,8 +424,8 @@ export class Timestamp {
    *   | 2001-01-01T00:00Z        | 2000-12-31T23:59-00:01   |     0     | false  |
    */
   compareTo(that: Timestamp): number {
-    let thisMs = this.getDate().getTime();
-    let thatMs = that.getDate().getTime();
+    const thisMs = this.getDate().getTime();
+    const thatMs = that.getDate().getTime();
     if (thisMs === thatMs) {
       return this.getSecondsDecimal().compareTo(that.getSecondsDecimal());
     }
@@ -441,7 +441,7 @@ export class Timestamp {
       default:
         throw new Error("unrecognized timestamp precision " + this._precision);
       case TimestampPrecision.SECONDS:
-        let [secondsStr, fractionStr] = Timestamp._splitSecondsDecimal(
+        const [secondsStr, fractionStr] = Timestamp._splitSecondsDecimal(
           this._secondsDecimal
         );
         strVal = this._lpadZeros(secondsStr, 2);
@@ -468,7 +468,7 @@ export class Timestamp {
     }
 
     // hours : minute (for offset)
-    let o: number = this._localOffset;
+    const o: number = this._localOffset;
     if (this._precision > TimestampPrecision.DAY) {
       if (o === 0 && _sign(o) === 1) {
         strVal = strVal + "Z";
@@ -567,7 +567,7 @@ export class Timestamp {
   }
 
   private _lpadZeros(v: number | string, size: number): string {
-    let s = v.toString();
+    const s = v.toString();
     if (s.length <= size) {
       return "0".repeat(size - s.length) + s;
     }
@@ -681,13 +681,13 @@ class _TimestampParser {
     let pos: number = 0;
     let state: _TimeParserState =
       _TimestampParser._timeParserStates[_States.YEAR];
-    let limit: number = str.length;
+    const limit: number = str.length;
 
     let v: number;
 
     while (pos < limit) {
       if (state.len === null) {
-        let digits: string = _TimestampParser._readUnknownDigits(str, pos);
+        const digits: string = _TimestampParser._readUnknownDigits(str, pos);
         if (digits.length === 0)
           throw new Error("No digits found at pos: " + pos);
         v = parseInt(digits, 10);
@@ -749,7 +749,7 @@ class _TimestampParser {
         break;
       }
       if (state.t !== null) {
-        let c: string = String.fromCharCode(str.charCodeAt(pos));
+        const c: string = String.fromCharCode(str.charCodeAt(pos));
         state = _TimestampParser._timeParserStates[state.t[c]];
         if (state === undefined)
           throw new Error("State was not set pos:" + pos);
@@ -795,7 +795,7 @@ class _TimestampParser {
   private static _readDigits(str: string, pos: number, len: number): number {
     let v: number = 0;
     for (let i: number = pos; i < pos + len; i++) {
-      let c: number = str.charCodeAt(i) - 48;
+      const c: number = str.charCodeAt(i) - 48;
       if (c < 0 && c > 9) {
         return -1;
       }

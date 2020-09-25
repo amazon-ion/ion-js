@@ -184,7 +184,7 @@ export function Value<Clazz extends Constructor>(
   ionType: IonType,
   fromJsConstructor: FromJsConstructor
 ) {
-  let newClass = class extends BaseClass implements Value {
+  const newClass = class extends BaseClass implements Value {
     _ionType: IonType;
     _ionAnnotations: string[];
 

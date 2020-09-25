@@ -100,7 +100,7 @@ const TS_SHIFT = 5;
 const TS_MASK = 0x1f;
 
 function encode_type_stack(type_, len) {
-  let ts = (len << TS_SHIFT) | (type_ & TS_MASK);
+  const ts = (len << TS_SHIFT) | (type_ & TS_MASK);
   return ts;
 }
 
@@ -192,7 +192,7 @@ export class ParserBinaryRaw {
   static _readVarSignedIntFrom(input: BinarySpan): number {
     let v = input.next(),
       byte;
-    let isNegative = v & 0x40;
+    const isNegative = v & 0x40;
     let stopBit = v & 0x80;
     v &= 0x3f; // clears the sign/stop bit
     let bits = 6;
@@ -220,11 +220,11 @@ export class ParserBinaryRaw {
     if (numberOfBytes == 0) {
       return new SignAndMagnitudeInt(JsbiSupport.ZERO);
     }
-    let bytes: Uint8Array = input.view(numberOfBytes);
-    let isNegative = (bytes[0] & 0x80) == 0x80;
-    let numbers = Array.prototype.slice.call(bytes);
+    const bytes: Uint8Array = input.view(numberOfBytes);
+    const isNegative = (bytes[0] & 0x80) == 0x80;
+    const numbers = Array.prototype.slice.call(bytes);
     numbers[0] = bytes[0] & 0x7f;
-    let magnitude: JSBI = JsbiSerde.fromUnsignedBytes(numbers);
+    const magnitude: JSBI = JsbiSerde.fromUnsignedBytes(numbers);
     return new SignAndMagnitudeInt(magnitude, isNegative);
   }
 
@@ -253,7 +253,7 @@ export class ParserBinaryRaw {
   ): number {
     let value = 0;
     let bytesRead = 0;
-    let bytesAvailable = input.getRemaining();
+    const bytesAvailable = input.getRemaining();
     let byte;
     if (numberOfBytes < 1) {
       return 0;
@@ -299,18 +299,18 @@ export class ParserBinaryRaw {
     // Decimal representations have two components: exponent (a VarInt) and coefficient (an Int).
     // The decimal’s value is: coefficient * 10 ^ exponent
 
-    let initialPosition = input.position();
+    const initialPosition = input.position();
 
-    let exponent: number = ParserBinaryRaw._readVarSignedIntFrom(input);
-    let numberOfExponentBytes = input.position() - initialPosition;
-    let numberOfCoefficientBytes = numberOfBytes - numberOfExponentBytes;
+    const exponent: number = ParserBinaryRaw._readVarSignedIntFrom(input);
+    const numberOfExponentBytes = input.position() - initialPosition;
+    const numberOfCoefficientBytes = numberOfBytes - numberOfExponentBytes;
 
-    let signedInt = ParserBinaryRaw._readSignedIntFrom(
+    const signedInt = ParserBinaryRaw._readSignedIntFrom(
       input,
       numberOfCoefficientBytes
     );
-    let isNegative = signedInt.isNegative;
-    let coefficient = isNegative
+    const isNegative = signedInt.isNegative;
+    const coefficient = isNegative
       ? JSBI.unaryMinus(signedInt.magnitude)
       : signedInt.magnitude;
     return Decimal._fromBigIntCoefficient(isNegative, coefficient, exponent);
@@ -329,8 +329,8 @@ export class ParserBinaryRaw {
 
   stepIn() {
     let len,
-      ts,
-      t = this;
+      ts;
+    const t = this;
     // _ts : [ T_DATAGRAM ], // (old _in limit << 4) & container type
     switch (t._raw_type) {
       case IonBinary.TB_STRUCT:
@@ -352,8 +352,8 @@ export class ParserBinaryRaw {
     let parent_type,
       ts,
       l,
-      r,
-      t = this;
+      r;
+    const  t = this;
     if (t._ts.length < 2) {
       throw new Error("Cannot stepOut any further, already at top level");
     }
@@ -390,8 +390,7 @@ export class ParserBinaryRaw {
   }
 
   getAnnotations(): any {
-    let a,
-      t = this;
+    const t = this;
     if (t._a === undefined || t._a.length === 0) {
       t.load_annotation_values();
     }
@@ -399,8 +398,7 @@ export class ParserBinaryRaw {
   }
 
   getAnnotation(index: number): any {
-    let a,
-      t = this;
+    const t = this;
     if (t._a === undefined || t._a.length === 0) {
       t.load_annotation_values();
     }
@@ -492,7 +490,7 @@ export class ParserBinaryRaw {
           return null;
         }
         this.load_value();
-        let bigInt: JSBI = this._curr!;
+        const bigInt: JSBI = this._curr!;
         return JSBI.toNumber(bigInt);
       case IonBinary.TB_FLOAT:
         if (this.isNull()) {
@@ -573,7 +571,7 @@ export class ParserBinaryRaw {
     let fractionalSeconds = Decimal.ZERO;
     let precision = TimestampPrecision.YEAR;
 
-    let end = this._in.position() + this._len;
+    const end = this._in.position() + this._len;
     offset = this.readVarSignedInt();
     if (this._in.position() < end) {
       year = this.readVarUnsignedInt();
@@ -602,23 +600,23 @@ export class ParserBinaryRaw {
       precision = TimestampPrecision.SECONDS;
     }
     if (this._in.position() < end) {
-      let exponent: number = this.readVarSignedInt();
+      const exponent: number = this.readVarSignedInt();
       let coefficient: JSBI = JsbiSupport.ZERO;
       let isNegative = false;
       if (this._in.position() < end) {
-        let deserializedSignedInt = ParserBinaryRaw._readSignedIntFrom(
+        const deserializedSignedInt = ParserBinaryRaw._readSignedIntFrom(
           this._in,
           end - this._in.position()
         );
         isNegative = deserializedSignedInt._isNegative;
         coefficient = deserializedSignedInt._magnitude;
       }
-      let dec = Decimal._fromBigIntCoefficient(
+      const dec = Decimal._fromBigIntCoefficient(
         isNegative,
         coefficient,
         exponent
       );
-      let [_, fractionStr] = Timestamp._splitSecondsDecimal(dec);
+      const [_, fractionStr] = Timestamp._splitSecondsDecimal(dec);
       fractionalSeconds = Decimal.parse(secondInt! + "." + fractionStr)!;
     }
 
@@ -632,7 +630,7 @@ export class ParserBinaryRaw {
       0
     );
     msSinceEpoch = Timestamp._adjustMsSinceEpochIfNeeded(year, msSinceEpoch);
-    let date = new Date(msSinceEpoch);
+    const date = new Date(msSinceEpoch);
     return Timestamp._valueOf(date, offset, fractionalSeconds, precision);
   }
 
@@ -651,7 +649,7 @@ export class ParserBinaryRaw {
   }
 
   private load_length(tb: number) {
-    let t: ParserBinaryRaw = this;
+    const t: ParserBinaryRaw = this;
     t._len = low_nibble(tb);
     switch (t._len) {
       case 1:
@@ -680,7 +678,7 @@ export class ParserBinaryRaw {
   }
 
   private load_next(): number | undefined {
-    let t: ParserBinaryRaw = this;
+    const t: ParserBinaryRaw = this;
 
     let rt, tb;
     t._as = -1;
@@ -714,7 +712,7 @@ export class ParserBinaryRaw {
   }
 
   private load_annotations() {
-    let t: ParserBinaryRaw = this;
+    const t: ParserBinaryRaw = this;
 
     let tb, type_, annotation_len;
     if (t._len < 1 && t.depth() === 0) {
@@ -732,8 +730,8 @@ export class ParserBinaryRaw {
   }
 
   private load_ivm(): number {
-    let t: ParserBinaryRaw = this;
-    let span = t._in;
+    const t: ParserBinaryRaw = this;
+    const span = t._in;
     if (span.next() !== ivm_image_1)
       throw new Error("invalid binary Ion at " + span.position());
     if (span.next() !== ivm_image_2)
@@ -746,7 +744,7 @@ export class ParserBinaryRaw {
   }
 
   private load_annotation_values(): void {
-    let t: ParserBinaryRaw = this;
+    const t: ParserBinaryRaw = this;
 
     let a, b, pos, limit, arr;
     if ((pos = t._as) < 0) return; // nothing to do,

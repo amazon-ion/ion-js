@@ -84,7 +84,7 @@ function load_imports(reader: Reader, catalog: Catalog): Import {
 }
 
 function load_symbols(reader: Reader): (string | null)[] {
-  let symbols: (string | null)[] = [];
+  const symbols: (string | null)[] = [];
 
   reader.stepIn();
   while (reader.next()) {
