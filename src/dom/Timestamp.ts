@@ -39,8 +39,8 @@ export class Timestamp extends Value(Date, IonTypes.TIMESTAMP, _fromJsConstructo
     }
 
     private static _timestampFromDate(date: Date): ion.Timestamp {
-        let milliseconds = (date.getUTCSeconds() * 1000) + date.getUTCMilliseconds();
-        let fractionalSeconds = new Decimal(milliseconds, -3);
+        const milliseconds = (date.getUTCSeconds() * 1000) + date.getUTCMilliseconds();
+        const fractionalSeconds = new Decimal(milliseconds, -3);
 
         // `Date` objects do not store a timezone offset. If the offset is requested
         // via `.getTimezoneOffset()`, the configured offset of the host computer

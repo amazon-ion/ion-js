@@ -33,8 +33,8 @@ import {BinaryReader} from "../IonBinaryReader";
  * @returns         An array of Value objects representing the values found in the stream.
  */
 export function loadAll(ionData: ReaderBuffer | Reader): Value[] {
-    let reader = _createReader(ionData);
-    let ionValues: Value[] = [];
+    const reader = _createReader(ionData);
+    const ionValues: Value[] = [];
     while (reader.next()) {
         ionValues.push(_loadValue(reader));
     }
@@ -61,7 +61,7 @@ export function loadAll(ionData: ReaderBuffer | Reader): Value[] {
  *                  or null if the stream is empty.
  */
 export function load(ionData: ReaderBuffer | Reader): Value | null {
-    let reader = _createReader(ionData);
+    const reader = _createReader(ionData);
     if (reader.type() === null) {
         reader.next();
     }
@@ -80,11 +80,11 @@ function _createReader(ionData: ReaderBuffer | Reader): Reader {
 
 // Loads the Reader's current value, returning it as a DOM Value
 function _loadValue(reader: Reader): Value {
-    let ionType = reader.type();
+    const ionType = reader.type();
     if (ionType === null) {
         throw new Error("loadValue() called when no further values were available to read.");
     }
-    let annotations: string[] = reader.annotations();
+    const annotations: string[] = reader.annotations();
     if (reader.isNull()) {
         return new Null(reader.type()!, annotations);
     }
@@ -111,8 +111,8 @@ function _loadValue(reader: Reader): Value {
 }
 
 function _loadStruct(reader: Reader): Struct {
-    let children: Map<string, Value> = new Map();
-    let annotations: string[] = reader.annotations();
+    const children: Map<string, Value> = new Map();
+    const annotations: string[] = reader.annotations();
     reader.stepIn();
     while (reader.next()) {
         children.set(reader.fieldName()!, _loadValue(reader));
@@ -122,17 +122,17 @@ function _loadStruct(reader: Reader): Struct {
 }
 
 function _loadList(reader: Reader): List {
-    let annotations = reader.annotations();
+    const annotations = reader.annotations();
     return new List(_loadSequence(reader), annotations);
 }
 
 function _loadSExpression(reader: Reader): SExpression {
-    let annotations = reader.annotations();
+    const annotations = reader.annotations();
     return new SExpression(_loadSequence(reader), annotations);
 }
 
 function _loadSequence(reader: Reader): Value[] {
-    let children: Value[] = [];
+    const children: Value[] = [];
     reader.stepIn();
     while (reader.next()) {
         children.push(_loadValue(reader));

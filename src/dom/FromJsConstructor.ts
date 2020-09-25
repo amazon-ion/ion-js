@@ -96,7 +96,7 @@ export class FromJsConstructor {
             return new dom.Null(IonTypes.NULL, annotations);
         }
 
-        let jsValueType = typeof(jsValue);
+        const jsValueType = typeof(jsValue);
         if (jsValueType === "object") {
             // jsValue is an unsupported boxed primitive, but we can use it if we convert it to a primitive first
             if (this._classesToUnbox.has(jsValue.constructor)) {

@@ -39,7 +39,7 @@ export class Struct extends Value(Object, IonTypes.STRUCT, FromJsConstructor.NON
      */
     constructor(fields: Iterable<[string, Value]>, annotations: string[] = []) {
         super();
-        for (let [fieldName, fieldValue] of fields) {
+        for (const [fieldName, fieldValue] of fields) {
             this._fields[fieldName] = fieldValue;
         }
         this._setAnnotations(annotations);
@@ -75,11 +75,11 @@ export class Struct extends Value(Object, IonTypes.STRUCT, FromJsConstructor.NON
         if (pathElements.length === 0) {
             throw new Error('Value#get requires at least one parameter.');
         }
-        let [pathHead, ...pathTail] = pathElements;
+        const [pathHead, ...pathTail] = pathElements;
         if (typeof (pathHead) !== "string") {
             throw new Error(`Cannot index into a struct with a ${typeof (pathHead)}.`);
         }
-        let child: Value | undefined = this._fields[pathHead];
+        const child: Value | undefined = this._fields[pathHead];
         if (child === undefined) {
             return null;
         }
@@ -116,7 +116,7 @@ export class Struct extends Value(Object, IonTypes.STRUCT, FromJsConstructor.NON
     writeTo(writer: Writer): void {
         writer.setAnnotations(this.getAnnotations());
         writer.stepIn(IonTypes.STRUCT);
-        for(let [fieldName, value] of this) {
+        for(const [fieldName, value] of this) {
             writer.writeFieldName(fieldName);
             value.writeTo(writer);
         }
@@ -139,7 +139,7 @@ export class Struct extends Value(Object, IonTypes.STRUCT, FromJsConstructor.NON
         if (!(jsValue instanceof Object)) {
             throw new Error(`Cannot create a dom.Struct from: ${jsValue.toString()}`);
         }
-        let fields: [string, Value][] = Object.entries(jsValue)
+        const fields: [string, Value][] = Object.entries(jsValue)
             .map(([key, value]) => [key, Value.from(value)]);
         return new this(fields, annotations);
     }

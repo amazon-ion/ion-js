@@ -40,7 +40,7 @@ export class Catalog {
     /** Adds a new shared symbol table to this catalog. */
     add(symbolTable: SharedSymbolTable): void {
         if (symbolTable.name === undefined || symbolTable.name === null) throw new Error("SymbolTable name must be defined.");
-        let versions = this.symbolTables[symbolTable.name];
+        const versions = this.symbolTables[symbolTable.name];
         if (versions === undefined) this.symbolTables[symbolTable.name] = [];
         this.symbolTables[symbolTable.name][symbolTable.version] = symbolTable;
     }
@@ -51,7 +51,7 @@ export class Catalog {
      * @return The symbol table or `null` if it does not exist in the {Catalog}.
      */
     getVersion(name: string, version: number): SharedSymbolTable | null {
-        let tables: SharedSymbolTable[] = this.symbolTables[name];
+        const tables: SharedSymbolTable[] = this.symbolTables[name];
         if (!tables) return null;
         let table = tables[version];
         if (!table) table = tables[tables.length];
@@ -64,7 +64,8 @@ export class Catalog {
      * @return The symbol table or `null` if it does not exist in the {Catalog}.
      */
     getTable(name: string): SharedSymbolTable | null {
-        let versions = this.symbolTables[name], table;
+        const versions = this.symbolTables[name];
+        let table;
         if (versions === undefined) return null;
         return versions[versions.length - 1];
     }

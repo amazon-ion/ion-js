@@ -38,7 +38,7 @@ export class JsbiSerde {
     public static toSignedIntBytes(value: JSBI, isNegative: boolean): Uint8Array {
         let bytes: Uint8Array = this.toUnsignedIntBytes(value);
         if (bytes[0] >= 128) {
-            let extendedBytes: Uint8Array = new Uint8Array(bytes.length + 1);
+            const extendedBytes: Uint8Array = new Uint8Array(bytes.length + 1);
             extendedBytes.set(bytes, 1);
             bytes = extendedBytes;
         }
@@ -57,7 +57,7 @@ export class JsbiSerde {
     public static fromUnsignedBytes(bytes: Uint8Array): JSBI {
         let magnitude: JSBI = JsbiSupport.ZERO;
         for (let m = 0; m < bytes.length; m++) {
-            let byte = JSBI.BigInt(bytes[m]);
+            const byte = JSBI.BigInt(bytes[m]);
             magnitude = JSBI.leftShift(magnitude, this.BITS_PER_BYTE);
             magnitude = JSBI.bitwiseOr(magnitude, byte);
         }
@@ -75,10 +75,10 @@ export class JsbiSerde {
             value = JSBI.unaryMinus(value);
         }
 
-        let sizeInBytes = this.getUnsignedIntSizeInBytes(value);
-        let bytes = new Uint8Array(sizeInBytes);
+        const sizeInBytes = this.getUnsignedIntSizeInBytes(value);
+        const bytes = new Uint8Array(sizeInBytes);
         for (let m = sizeInBytes - 1; m >= 0; m--) {
-            let lastByte = JSBI.toNumber(JSBI.bitwiseAnd(value, this.BYTE_MAX_VALUE));
+            const lastByte = JSBI.toNumber(JSBI.bitwiseAnd(value, this.BYTE_MAX_VALUE));
             value = JSBI.signedRightShift(value, this.BITS_PER_BYTE);
             bytes[m] = lastByte;
         }
@@ -90,7 +90,7 @@ export class JsbiSerde {
     static getUnsignedIntSizeInBytes(value: JSBI): number {
         // TODO: Profile on real data sets to see if binary search is preferable to a low-to-high linear search.
         for (let m = 0; m < this.SIZE_THRESHOLDS.length; m++) {
-            let threshold = this.SIZE_THRESHOLDS[m];
+            const threshold = this.SIZE_THRESHOLDS[m];
             if (JSBI.lessThanOrEqual(value, threshold)) {
                 return m + 1;
             }
@@ -110,7 +110,7 @@ export class JsbiSerde {
     // Called once during initialization. Creates an array of thresholds that can be referred to to determine how many
     // bytes will be needed to store the UInt encoding of a given JSBI value.
     private static calculateSizeThresholds(): Array<JSBI> {
-        let thresholds: Array<JSBI> = [];
+        const thresholds: Array<JSBI> = [];
         for (let m = 1; m <= this.SERIALIZED_JSBI_SIZES_TO_PRECOMPUTE; m++) {
             thresholds.push(this.calculateSizeThreshold(m));
         }
@@ -118,8 +118,8 @@ export class JsbiSerde {
     }
 
     private static calculateSizeThreshold(numberOfBytes: number): JSBI {
-        let exponent: JSBI = JSBI.multiply(JSBI.BigInt(numberOfBytes), this.BITS_PER_BYTE);
-        let threshold = JSBI.exponentiate(JsbiSupport.TWO, exponent);
+        const exponent: JSBI = JSBI.multiply(JSBI.BigInt(numberOfBytes), this.BITS_PER_BYTE);
+        const threshold = JSBI.exponentiate(JsbiSupport.TWO, exponent);
         return JSBI.subtract(threshold, JsbiSupport.ONE);
     }
 }

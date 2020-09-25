@@ -50,7 +50,7 @@ function _getDomTypesByIonTypeMap(): Map<IonType, FromJsValue> {
 // Returns a dom type constructor for the provided IonType.
 // This function is exported to assist in unit testing but is not visible at the library level.
 export function _domConstructorFor(ionType: IonType): FromJsValue {
-    let domConstructor = _getDomTypesByIonTypeMap().get(ionType)!;
+    const domConstructor = _getDomTypesByIonTypeMap().get(ionType)!;
     if (!_hasValue(domConstructor)) {
         throw new Error(`No dom type constructor was found for Ion type ${ionType.name}`);
     }
@@ -68,7 +68,7 @@ function _inferType(value: any): IonType {
         return IonTypes.NULL;
     }
 
-    let valueType: string = typeof(value);
+    const valueType: string = typeof(value);
     switch (valueType) {
         case "string":
             return IonTypes.STRING;
@@ -140,7 +140,7 @@ function _inferType(value: any): IonType {
 // Inspects the provided JS value and constructs a new instance of the appropriate Ion
 // type using that value.
 export function _ionValueFromJsValue(value: any, annotations: string[] = []): Value {
-    let ionType = _inferType(value);
-    let ionTypeConstructor: FromJsValue = _domConstructorFor(ionType);
+    const ionType = _inferType(value);
+    const ionTypeConstructor: FromJsValue = _domConstructorFor(ionType);
     return ionTypeConstructor._fromJsValue(value, annotations);
 }

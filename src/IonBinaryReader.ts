@@ -91,7 +91,7 @@ export class BinaryReader implements Reader {
         if (this._raw_type === EOF) return null;
         for (this._raw_type = this._parser.next(); this.depth() === 0; this._raw_type = this._parser.next()) {
             if (this._raw_type === TB_SYMBOL) {
-                let raw: number | null = this._parser._getSid();
+                const raw: number | null = this._parser._getSid();
                 if (raw !== IVM.sid) break;
                 this._symtab = defaultLocalSymbolTable();
             } else if (this._raw_type === TB_STRUCT) {
@@ -174,8 +174,8 @@ export class BinaryReader implements Reader {
     }
 
     stringValue(): string | null {
-        let t: BinaryReader = this;
-        let p = t._parser;
+        const t: BinaryReader = this;
+        const p = t._parser;
         switch (get_ion_type(t._raw_type)) {
             case IonTypes.NULL:
                 return null;
@@ -188,7 +188,7 @@ export class BinaryReader implements Reader {
                 if (this.isNull()) {
                     return null;
                 }
-                let sid = p._getSid();
+                const sid = p._getSid();
                 if (sid !== null) {
                     return this.getSymbolString(sid);
                 }
@@ -201,7 +201,7 @@ export class BinaryReader implements Reader {
     }
 
     value(): any {
-        let type = this.type();
+        const type = this.type();
         if (type && type.isContainer) {
             if (this.isNull()) {
                 return null;

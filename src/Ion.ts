@@ -89,7 +89,7 @@ export function makeBinaryWriter(): Writer {
 
 // Used by the dump*() functions to write each of a sequence of values to the provided Writer.
 function _writeAllTo(writer: Writer, values: any[]): Uint8Array {
-    for (let value of values) {
+    for (const value of values) {
         dom.Value.from(value).writeTo(writer);
     }
     writer.close();

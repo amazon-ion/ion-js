@@ -66,7 +66,7 @@ export class TextReader implements Reader {
     }
 
     load_raw() {
-        let t: TextReader = this;
+        const t: TextReader = this;
         if (t._raw !== undefined) return;
         if (t._raw_type === T_CLOB2 || t._raw_type === T_CLOB3) {
             t._raw = t._parser.get_value_as_uint8array(t._raw_type);
@@ -77,7 +77,7 @@ export class TextReader implements Reader {
 
     skip_past_container() {
         let type;
-        let d = this.depth();  // we want to have read the EOC that matches the container we just saw
+        const d = this.depth();  // we want to have read the EOC that matches the container we just saw
         this.stepIn();
         while (this.depth() > d) {
             type = this.next();
@@ -103,14 +103,14 @@ export class TextReader implements Reader {
         }
 
         while (i < input.length && input.charAt(i) != '_') {
-            let ch = input.charAt(i);
+            const ch = input.charAt(i);
             if (ch < '0' || ch > '9') return false;
             i++;
         }
         i++;
 
         while (i < input.length) {
-            let ch = input.charAt(i);
+            const ch = input.charAt(i);
             if (ch < '0' || ch > '9') return false;
             i++;
         }
@@ -133,7 +133,7 @@ export class TextReader implements Reader {
             this.skip_past_container();
         }
 
-        let p: ParserTextRaw = this._parser;
+        const p: ParserTextRaw = this._parser;
         for (; ;) {
             this._raw_type = p.next();
             if (this._raw_type === T_IDENTIFIER) {
@@ -201,13 +201,13 @@ export class TextReader implements Reader {
     }
 
     fieldName(): string | null {
-        let str = this._parser.fieldName();
+        const str = this._parser.fieldName();
         if (str !== null) {
-            let raw_type = this._parser.fieldNameType();
+            const raw_type = this._parser.fieldNameType();
             if (raw_type === T_IDENTIFIER && (str.length > 1 && str[0] === '$')) {
-                let tempStr = str.substr(1, str.length);
+                const tempStr = str.substr(1, str.length);
                 if (+tempStr === +tempStr) {//look up sid, +str === +str is a one line is integer hack
-                    let symbol = this._symtab.getSymbolText(Number(tempStr));
+                    const symbol = this._symtab.getSymbolText(Number(tempStr));
                     if (symbol === undefined) throw new Error("Unresolvable symbol ID, symboltokens unsupported.");
                     return symbol;
                 }
@@ -218,11 +218,11 @@ export class TextReader implements Reader {
 
     annotations(): string[] {
         return this._parser.annotations().map((st) => {
-            let text = st.getText();
+            const text = st.getText();
             if (text !== null) {
                 return text;
             } else {
-                let symbol = this._symtab.getSymbolText(st.getSid());
+                const symbol = this._symtab.getSymbolText(st.getSid());
                 if (symbol === undefined || symbol === null) {
                     throw new Error("Unresolvable symbol ID, symboltokens unsupported.");
                 }
@@ -324,10 +324,10 @@ export class TextReader implements Reader {
                     return null;
                 }
                 if (this._raw_type === T_IDENTIFIER && (this._raw.length > 1 && this._raw.charAt(0) === '$'.charAt(0))) {
-                    let tempStr = this._raw.substr(1, this._raw.length);
+                    const tempStr = this._raw.substr(1, this._raw.length);
                     if (+tempStr === +tempStr) {//look up sid, +str === +str is a one line is integer hack
-                        let symbolId = Number(tempStr);
-                        let symbol = this._symtab.getSymbolText(symbolId);
+                        const symbolId = Number(tempStr);
+                        const symbol = this._symtab.getSymbolText(symbolId);
                         if (symbol === undefined) throw new Error("Unresolvable symbol ID, symboltokens unsupported.");
                         return symbol;
                     }

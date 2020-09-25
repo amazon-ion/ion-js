@@ -35,8 +35,8 @@ export class LowLevelBinaryWriter {
         }
         const numberOfSignBits = 1;
         const magnitude = Math.abs(value);
-        let numberOfMagnitudeBits = Math.ceil(Math.log2(magnitude + 1));
-        let numberOfBits = numberOfMagnitudeBits + numberOfSignBits;
+        const numberOfMagnitudeBits = Math.ceil(Math.log2(magnitude + 1));
+        const numberOfBits = numberOfMagnitudeBits + numberOfSignBits;
         return Math.ceil(numberOfBits / 8);
     }
 
@@ -47,20 +47,20 @@ export class LowLevelBinaryWriter {
         if (value === 0) {
             return 1;
         }
-        let numberOfBits = Math.floor(Math['log2'](value)) + 1;
-        let numberOfBytes = Math.ceil(numberOfBits / 8);
+        const numberOfBits = Math.floor(Math['log2'](value)) + 1;
+        const numberOfBytes = Math.ceil(numberOfBits / 8);
         return numberOfBytes;
     }
 
     static getVariableLengthSignedIntSize(value: number): number {
-        let absoluteValue: number = Math.abs(value);
+        const absoluteValue: number = Math.abs(value);
         if (absoluteValue === 0) {
             return 1;
         }
-        let valueBits: number = Math.floor(Math['log2'](absoluteValue)) + 1;
-        let trailingStopBits: number = Math.floor(valueBits / 7);
-        let leadingStopBit = 1;
-        let signBit = 1;
+        const valueBits: number = Math.floor(Math['log2'](absoluteValue)) + 1;
+        const trailingStopBits: number = Math.floor(valueBits / 7);
+        const leadingStopBit = 1;
+        const signBit = 1;
         return Math.ceil((valueBits + trailingStopBits + leadingStopBit + signBit) / 8);
     }
 
@@ -68,15 +68,15 @@ export class LowLevelBinaryWriter {
         if (value === 0) {
             return 1;
         }
-        let valueBits: number = Math.floor(Math['log2'](value)) + 1;
-        let stopBits: number = Math.ceil(valueBits / 7);
+        const valueBits: number = Math.floor(Math['log2'](value)) + 1;
+        const stopBits: number = Math.ceil(valueBits / 7);
         return Math.ceil((valueBits + stopBits) / 8);
     }
 
     writeSignedInt(originalValue: number): void {//TODO this should flip to different modes based on the length calculation because bit shifting will drop to 32 bits.
-        let length = LowLevelBinaryWriter.getSignedIntSize(originalValue);
+        const length = LowLevelBinaryWriter.getSignedIntSize(originalValue);
         let value: number = Math.abs(originalValue);
-        let tempBuf = new Uint8Array(length);
+        const tempBuf = new Uint8Array(length);
         // Trailing bytes
         let i: number = tempBuf.length;
         while (value >= 128) {
@@ -94,13 +94,13 @@ export class LowLevelBinaryWriter {
 
     writeUnsignedInt(originalValue: number | JSBI): void {
         if (originalValue instanceof JSBI) {
-            let encodedBytes = JsbiSerde.toUnsignedIntBytes(originalValue);
+            const encodedBytes = JsbiSerde.toUnsignedIntBytes(originalValue);
             this.writeable.writeBytes(encodedBytes);
             return;
         }
 
-        let length = LowLevelBinaryWriter.getUnsignedIntSize(originalValue);
-        let tempBuf = new Uint8Array(length);
+        const length = LowLevelBinaryWriter.getUnsignedIntSize(originalValue);
+        const tempBuf = new Uint8Array(length);
         let value: number = originalValue;
         let i: number = tempBuf.length;
 
@@ -115,7 +115,7 @@ export class LowLevelBinaryWriter {
     }
 
     writeVariableLengthSignedInt(originalValue: number): void {
-        let tempBuf = new Uint8Array(LowLevelBinaryWriter.getVariableLengthSignedIntSize(originalValue));
+        const tempBuf = new Uint8Array(LowLevelBinaryWriter.getVariableLengthSignedIntSize(originalValue));
         let value: number = Math.abs(originalValue);
         let i = tempBuf.length - 1;
 
@@ -139,7 +139,7 @@ export class LowLevelBinaryWriter {
     }
 
     writeVariableLengthUnsignedInt(originalValue: number): void {
-        let tempBuf = new Uint8Array(LowLevelBinaryWriter.getVariableLengthUnsignedIntSize(originalValue));
+        const tempBuf = new Uint8Array(LowLevelBinaryWriter.getVariableLengthUnsignedIntSize(originalValue));
         let value: number = originalValue;
         let i = tempBuf.length;
 

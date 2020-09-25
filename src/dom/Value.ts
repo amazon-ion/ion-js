@@ -180,7 +180,7 @@ const _DOM_VALUE_SIGNET = Symbol("ion.dom.Value");
  * @constructor
  */
 export function Value<Clazz extends Constructor>(BaseClass: Clazz, ionType: IonType, fromJsConstructor: FromJsConstructor) {
-    let newClass = class extends BaseClass implements Value {
+    const newClass = class extends BaseClass implements Value {
         _ionType: IonType;
         _ionAnnotations: string[];
 

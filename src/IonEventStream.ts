@@ -115,8 +115,8 @@ export class IonEventStream {
         let actualIndex: number = 0;
         let expectedIndex: number = 0;
         while (actualIndex < this.eventStream.length && expectedIndex < expected.eventStream.length) {
-            let actualEvent = this.eventStream[actualIndex];
-            let expectedEvent = expected.eventStream[expectedIndex];
+            const actualEvent = this.eventStream[actualIndex];
+            const expectedEvent = expected.eventStream[expectedIndex];
             if (actualEvent.eventType === IonEventType.SYMBOL_TABLE) actualIndex++;
             if (expectedEvent.eventType === IonEventType.SYMBOL_TABLE) expectedIndex++;
             if (actualEvent.eventType === IonEventType.SYMBOL_TABLE || expectedEvent.eventType === IonEventType.SYMBOL_TABLE) continue;
@@ -155,8 +155,8 @@ export class IonEventStream {
             this.marshalStream();
             return;
         }
-        let currentContainer: IonEvent[] = [];
-        let currentContainerIndex: number[] = [];
+        const currentContainer: IonEvent[] = [];
+        const currentContainerIndex: number[] = [];
         while (true) {
             if (this.reader.isNull()) {
                 this.eventStream.push(this.eventFactory.makeEvent(IonEventType.SCALAR, tid!, this.reader.fieldName(), this.reader.depth(), this.reader.annotations(), true, this.reader.value()));
@@ -165,7 +165,7 @@ export class IonEventStream {
                     case IonTypes.LIST:
                     case IonTypes.SEXP:
                     case IonTypes.STRUCT: {
-                        let containerEvent = this.eventFactory.makeEvent(IonEventType.CONTAINER_START, tid, this.reader.fieldName(), this.reader.depth(), this.reader.annotations(), false, null);
+                        const containerEvent = this.eventFactory.makeEvent(IonEventType.CONTAINER_START, tid, this.reader.fieldName(), this.reader.depth(), this.reader.annotations(), false, null);
                         this.eventStream.push(containerEvent);
                         currentContainer.push(containerEvent);
                         currentContainerIndex.push(this.eventStream.length);
@@ -200,11 +200,11 @@ export class IonEventStream {
 //(event_type: EventType, ion_type: IonType, field_name: SymbolToken, annotations: list<SymbolToken>, value_text: string, value_binary: list<byte>, imports: list<ImportDescriptor>, depth: int)
     private marshalStream(): void {
         this.eventStream = [];
-        let currentContainer: IonEvent[] = [];
-        let currentContainerIndex: number[] = [];
+        const currentContainer: IonEvent[] = [];
+        const currentContainerIndex: number[] = [];
         for (let tid: IonType | null = this.reader.next(); tid === IonTypes.STRUCT; tid = this.reader.next()) {
             this.reader.stepIn();
-            let tempEvent: IonEvent = this.marshalEvent();
+            const tempEvent: IonEvent = this.marshalEvent();
             if (tempEvent.eventType === IonEventType.CONTAINER_START) {
                 currentContainer.push(tempEvent);
                 this.eventStream.push(tempEvent);
@@ -221,9 +221,9 @@ export class IonEventStream {
     }
 
     private marshalEvent(): IonEvent {
-        let currentEvent = {};
+        const currentEvent = {};
         for (let tid: IonType | null; tid = this.reader.next();) {
-            let fieldName = this.reader.fieldName();
+            const fieldName = this.reader.fieldName();
             if (fieldName && currentEvent[fieldName] !== undefined) throw new Error('Repeated event field: ' + fieldName);
             switch (fieldName) {
                 case 'event_type': {
@@ -249,9 +249,9 @@ export class IonEventStream {
                 case 'value_text': {
                     let tempString: string = this.reader.stringValue()!;
                     if (tempString.substr(0, 5) === '$ion_') tempString = "$ion_user_value::" + tempString;
-                    let tempReader: Reader = makeReader(tempString);
+                    const tempReader: Reader = makeReader(tempString);
                     tempReader.next();
-                    let tempValue = tempReader.value();
+                    const tempValue = tempReader.value();
                     currentEvent['isNull'] = tempReader.isNull();
                     currentEvent[fieldName] = tempValue;
                     break;
@@ -293,10 +293,10 @@ export class IonEventStream {
             case 'SYMBOL_TABLE':
                 throw new Error('Symbol tables unsupported');
         }
-        let fieldname = (currentEvent['field_name'] !== undefined ? currentEvent['field_name'] : null);
+        const fieldname = (currentEvent['field_name'] !== undefined ? currentEvent['field_name'] : null);
         if (!currentEvent['annotations']) currentEvent['annotations'] = [];
 
-        let textEvent = this.eventFactory.makeEvent(
+        const textEvent = this.eventFactory.makeEvent(
             eventType!,
             currentEvent['ion_type'],
             fieldname,
@@ -307,7 +307,7 @@ export class IonEventStream {
         );
 
         if (eventType! === IonEventType.SCALAR) {
-            let binaryEvent = this.eventFactory.makeEvent(
+            const binaryEvent = this.eventFactory.makeEvent(
                 eventType,
                 currentEvent['ion_type'],
                 fieldname,
@@ -324,7 +324,7 @@ export class IonEventStream {
     }
 
     private parseIonType(): IonType {
-        let input: string = this.reader.stringValue()!.toLowerCase();
+        const input: string = this.reader.stringValue()!.toLowerCase();
         switch (input) {
             case 'null': {
                 return IonTypes.NULL;
@@ -373,7 +373,7 @@ export class IonEventStream {
     }
 
     private parseAnnotations(): string[] {
-        let annotations: string[] = [];
+        const annotations: string[] = [];
         if (this.reader.isNull()) {
             return annotations;
         } else {
@@ -390,7 +390,7 @@ export class IonEventStream {
         //convert list of ints to array of bytes and pass the currentBuffer to a binary reader, generate value from factory.
         //start with a null check
         if (this.reader.isNull()) return null;
-        let numBuffer: number[] = [];
+        const numBuffer: number[] = [];
         this.reader.stepIn();
         let tid: IonType | null = this.reader.next();
         while (tid) {
@@ -398,7 +398,7 @@ export class IonEventStream {
             tid = this.reader.next();
         }
         this.reader.stepOut();
-        let tempReader: Reader = makeReader(numBuffer);
+        const tempReader: Reader = makeReader(numBuffer);
         tempReader.next();
         return tempReader.value();
     }

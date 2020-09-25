@@ -119,7 +119,7 @@ export class Decimal {
         if (!Number.isInteger(coefficient)) {
             throw new Error("The provided coefficient was not an integer. (" + coefficient + ")");
         }
-        let isNegative = coefficient < 0 || Object.is(coefficient, -0);
+        const isNegative = coefficient < 0 || Object.is(coefficient, -0);
         return this._fromBigIntCoefficient(isNegative, JSBI.BigInt(coefficient), exponent);
     }
 
@@ -128,7 +128,7 @@ export class Decimal {
      * @hidden
      */
     static _fromBigIntCoefficient(isNegative: boolean, coefficient: JSBI, exponent: number): Decimal {
-        let value = Object.create(this.prototype);
+        const value = Object.create(this.prototype);
         value._initialize(isNegative, coefficient, exponent);
         return value;
     }
@@ -141,16 +141,16 @@ export class Decimal {
     static parse(str: string): Decimal | null {
         let exponent = 0;
         if (str === 'null' || str === 'null.decimal') return null;
-        let d = str.match('[d|D]');
+        const d = str.match('[d|D]');
         let exponentDelimiterIndex = str.length;
         if (d !== undefined && d !== null) {
             exponent = Number(str.substring(d.index! + 1, str.length));
             exponentDelimiterIndex = d.index!;
         }
-        let f = str.match('\\.');
+        const f = str.match('\\.');
         let coefficientText: string;
         if (f) {
-            let exponentShift = d ? (d.index! - 1) - f.index! : (str.length - 1) - f.index!;
+            const exponentShift = d ? (d.index! - 1) - f.index! : (str.length - 1) - f.index!;
             exponent -= exponentShift;
             // Remove the '.' from the input string.
             coefficientText = str.substring(0, f.index) + str.substring(f.index! + 1, exponentDelimiterIndex);
@@ -158,8 +158,8 @@ export class Decimal {
             coefficientText = str.substring(0, exponentDelimiterIndex);
         }
 
-        let coefficient: JSBI = JSBI.BigInt(coefficientText);
-        let isNegative: boolean = JsbiSupport.isNegative(coefficient) || (coefficientText.startsWith("-0"));
+        const coefficient: JSBI = JSBI.BigInt(coefficientText);
+        const isNegative: boolean = JsbiSupport.isNegative(coefficient) || (coefficientText.startsWith("-0"));
         return Decimal._fromBigIntCoefficient(isNegative, coefficient, exponent);
     }
 
@@ -202,8 +202,8 @@ export class Decimal {
             cStr = cStr.substr(1, cStr.length);
         }
 
-        let precision = cStr.length;
-        let adjustedExponent = this._exponent + (precision - 1);
+        const precision = cStr.length;
+        const adjustedExponent = this._exponent + (precision - 1);
 
         let s = '';
         if (this._exponent <= 0 && adjustedExponent >= -6) {
@@ -282,15 +282,16 @@ export class Decimal {
             return 0;
         }
 
-        let neg = this.isNegative();
+        const neg = this.isNegative();
         if (neg !== that.isNegative()) {
             return neg ? -1 : 1;
         }
 
         // decimals have the same sign; compare magnitudes
+        // tslint:disable:prefer-const
         let [thisCoefficientStr, thisPrecision, thisMagnitude] = this._compareToParams();
         let [thatCoefficientStr, thatPrecision, thatMagnitude] = that._compareToParams();
-
+        // tslint:enable:prefer-const
         if (thisMagnitude > thatMagnitude) {
             return neg ? -1 : 1;
         } else if (thisMagnitude < thatMagnitude) {
@@ -305,8 +306,8 @@ export class Decimal {
             thatCoefficientStr += '0'.repeat(thisPrecision - thatPrecision);
         }
 
-        let thisJsbi = JSBI.BigInt(thisCoefficientStr);
-        let thatJsbi = JSBI.BigInt(thatCoefficientStr);
+        const thisJsbi = JSBI.BigInt(thisCoefficientStr);
+        const thatJsbi = JSBI.BigInt(thatCoefficientStr);
         if (JSBI.greaterThan(thisJsbi, thatJsbi)) {
             return neg ? -1 : 1;
         } else if (JSBI.lessThan(thisJsbi, thatJsbi)) {
@@ -355,10 +356,10 @@ export class Decimal {
      * @hidden
      */
     private _compareToParams(): [string, number, number] {
-        let coefficientStr = this.isNegative()
+        const coefficientStr = this.isNegative()
             ? this._coefficient.toString().substring(1)
             : this._coefficient.toString();
-        let precision = coefficientStr.length;
+        const precision = coefficientStr.length;
         let magnitude = precision + this._exponent;
         if (magnitude <= 0) {
             // without this, the value 0.1 would have magnitude of 0 (not the end of the world,

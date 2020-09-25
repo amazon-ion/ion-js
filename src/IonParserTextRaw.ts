@@ -242,7 +242,7 @@ export class ParserTextRaw {
         this._fieldname = null;
         this._fieldnameType = null;
 
-        let helpers: ReadValueHelpers = {
+        const helpers: ReadValueHelpers = {
             //  -1 : this._read_value_helper_EOF,    //      == EOF
             40: this._read_value_helper_paren,  // '('  == CH_OP
             91: this._read_value_helper_square, // '['  == CH_OS
@@ -252,7 +252,7 @@ export class ParserTextRaw {
             39: this._read_value_helper_single, // '\'' == CH_SQ
             34: this._read_value_helper_double, // '\"' == CH_DQ
         };
-        let set_helper = function (str: string, fn: ReadValueHelper) {
+        const set_helper = function (str: string, fn: ReadValueHelper) {
             let i = str.length, ch;
             while (i > 0) {
                 i--;
@@ -296,7 +296,7 @@ export class ParserTextRaw {
         if (this.isNull()) {
             return null;
         }
-        let intText = this.get_value_as_string(this._curr);
+        const intText = this.get_value_as_string(this._curr);
         switch (this._curr) {
             case T_INT:
             case T_HEXINT:
@@ -308,7 +308,7 @@ export class ParserTextRaw {
 
     numberValue(): number | null {
         if (this.isNull()) return null;
-        let s = this.get_value_as_string(this._curr);
+        const s = this.get_value_as_string(this._curr);
         switch (this._curr) {
             case T_INT:
             case T_HEXINT:
@@ -326,7 +326,7 @@ export class ParserTextRaw {
 
     booleanValue(): boolean | null {
         if (this.isNull()) return null;
-        let s: string = this.get_value_as_string(T_BOOL);
+        const s: string = this.get_value_as_string(T_BOOL);
         if (s === "true") {
             return true;
         } else if (s === "false") {
@@ -382,9 +382,9 @@ export class ParserTextRaw {
                         }
                         if (this.isLowSurrogate(tempChar)) {
                             // convert from UTF-16 surrogate pair to a codepoint
-                            let hiSurrogate = ch;
-                            let loSurrogate = tempChar;
-                            let codepoint = 0x10000 + ((hiSurrogate & _UTF16_MASK) << 10) + (loSurrogate & _UTF16_MASK);
+                            const hiSurrogate = ch;
+                            const loSurrogate = tempChar;
+                            const codepoint = 0x10000 + ((hiSurrogate & _UTF16_MASK) << 10) + (loSurrogate & _UTF16_MASK);
                             s += String.fromCodePoint(codepoint);
                         } else {
                             throw new Error("expected a low surrogate, but found: " + ch);
@@ -413,11 +413,11 @@ export class ParserTextRaw {
     }
 
     get_value_as_uint8array(t: number): Uint8Array {
-        let bytes: number[] = [];
+        const bytes: number[] = [];
         switch (t) {
             case T_CLOB2:
                 for (let index = this._start; index < this._end; index++) {
-                    let ch = this._in.valueAt(index);
+                    const ch = this._in.valueAt(index);
                     if (ch === CH_BS) {
                         bytes.push(this.readClobEscapes(index, this._end));
                         index += this._esc_len;
@@ -430,9 +430,9 @@ export class ParserTextRaw {
                 break;
             case T_CLOB3:
                 for (let index = this._start; index < this._end; index++) {
-                    let ch = this._in.valueAt(index);
+                    const ch = this._in.valueAt(index);
                     if (ch === CH_BS) {
-                        let escaped = this.readClobEscapes(index, this._end);
+                        const escaped = this.readClobEscapes(index, this._end);
                         if (escaped >= 0) {
                             bytes.push(escaped);
                         }
@@ -478,7 +478,7 @@ export class ParserTextRaw {
     }
 
     private _read_datagram_values() {
-        let ch = this._peek();
+        const ch = this._peek();
         if (ch == EOF) {
             this._value_push(EOF);
         } else {
@@ -489,7 +489,7 @@ export class ParserTextRaw {
     }
 
     private _read_sexp_values() {
-        let ch = this._read_after_whitespace(true);
+        const ch = this._read_after_whitespace(true);
         if (ch == CH_CP) {
             this._value_push(EOF);
         } else if (ch === EOF) {
@@ -502,7 +502,7 @@ export class ParserTextRaw {
     }
 
     private _read_list_values() {
-        let ch = this._read_after_whitespace(true);
+        const ch = this._read_after_whitespace(true);
         if (ch == CH_CS) {
             // degenerate case of an empty list
             this._value_push(EOF);
@@ -587,7 +587,7 @@ export class ParserTextRaw {
 
     private _load_field_name() {
         this._fieldnameType = this._value_pop();
-        let s = this.get_value_as_string(this._fieldnameType!);
+        const s = this.get_value_as_string(this._fieldnameType!);
 
         switch (this._fieldnameType) {
             case T_IDENTIFIER:
@@ -611,11 +611,11 @@ export class ParserTextRaw {
     }
 
     private _read_value_helper(accept_operator_symbols: boolean, calling_op: ReadValueHelper) {
-        let ch: number = this._read_after_whitespace(true);
+        const ch: number = this._read_after_whitespace(true);
         if (ch == EOF) {  // since we can't index into our object with a value of -1
             this._read_value_helper_EOF(ch, accept_operator_symbols, calling_op);
         } else {
-            let fn: ReadValueHelper = this._read_value_helper_helpers[ch];
+            const fn: ReadValueHelper = this._read_value_helper_helpers[ch];
             if (fn != undefined) {
                 fn.call(this, ch, accept_operator_symbols, calling_op);
             } else {
@@ -640,7 +640,8 @@ export class ParserTextRaw {
     }
 
     private _read_value_helper_curly(ch1: number, accept_operator_symbols: boolean, calling_op: ReadValueHelper) {
-        let ch3, ch2 = this._read();
+        let ch3;
+        const ch2 = this._read();
         if (ch2 == CH_LEFT_CURLY) {
             ch3 = this._read_after_whitespace(false);
             if (ch3 == CH_SQ) {
@@ -659,7 +660,7 @@ export class ParserTextRaw {
     }
 
     private _read_value_helper_plus(ch1: number, accept_operator_symbols: boolean, calling_op: ReadValueHelper) {
-        let ch2 = this._peek("inf");
+        const ch2 = this._peek("inf");
         this._unread(ch1); // in any case we'll leave this character for the next function to use
         if (IonText.isNumericTerminator(ch2)) {
             this._ops.unshift(this._read_plus_inf);
@@ -694,7 +695,7 @@ export class ParserTextRaw {
     };
 
     private _read_value_helper_digit(ch1: number, accept_operator_symbols: boolean, calling_op: ReadValueHelper) {
-        let ch2 = this._peek_4_digits(ch1);
+        const ch2 = this._peek_4_digits(ch1);
         this._unread(ch1);
         if (ch2 == CH_T || ch2 == CH_MS) {
             this._ops.unshift(this._readTimestamp);
@@ -724,7 +725,7 @@ export class ParserTextRaw {
 
     private _read_value_helper_letter(ch1: number, accept_operator_symbols: boolean, calling_op: ReadValueHelper) {
         this._read_symbol();
-        let type = this._value_pop();
+        const type = this._value_pop();
         if (type != T_IDENTIFIER) throw new Error("Expecting symbol here.");
 
         let symbol = this.get_value_as_string(type);
@@ -735,7 +736,7 @@ export class ParserTextRaw {
                 this._value_null = true;
                 if (this._peek() === CH_DT) {
                     this._read(); // consume the dot
-                    let ch = this._read();
+                    const ch = this._read();
                     if (IonText.is_letter(ch) !== true) throw new Error("Expected type name after 'null.'");
                     this._read_symbol();
                     if (this._value_pop() !== T_IDENTIFIER) throw new Error("Expected type name after 'null.'");
@@ -747,10 +748,10 @@ export class ParserTextRaw {
             }
             this._value_push(kwt);
         } else {
-            let ch = this._read_after_whitespace(true);
+            const ch = this._read_after_whitespace(true);
             if (ch == CH_CL && this._peek() == CH_CL) {
                 this._read(); // consume the colon character
-                let sid = this._parseSymbolId(symbol);
+                const sid = this._parseSymbolId(symbol);
                 if (sid === 0) {
                     throw new Error('Symbol ID zero is not supported.');
                 } else if (isNaN(sid)) {
@@ -760,7 +761,7 @@ export class ParserTextRaw {
                 }
                 this._ops.unshift(calling_op);
             } else {
-                let kwt = T_IDENTIFIER;
+                const kwt = T_IDENTIFIER;
                 this._unread(ch);
                 this._value_push(kwt); // put the value back on the stack
             }
@@ -914,7 +915,7 @@ export class ParserTextRaw {
             throw new Error("Timestamp day must be followed by a numeric stop character .");
         }
 
-        let peekChar = this._in.peek();
+        const peekChar = this._in.peek();
         if (IonText.isNumericTerminator(peekChar)) {//checks to see if timestamp value has terminated.
             this._end = this._in.position();
             this._value_push(T_TIMESTAMP);
@@ -1085,7 +1086,8 @@ export class ParserTextRaw {
     }
 
     private _test_string_as_annotation(op): boolean {  // we could use op to validate the string type (1 or 3) vs the op - meh
-        let s, ch, is_ann, t = this._value_pop();
+        let s, ch, is_ann;
+        const t = this._value_pop();
         if (t != T_STRING1 && t != T_STRING3) this._error("expecting quoted symbol here");
         s = this.get_value_as_string(t);
         ch = this._read_after_whitespace(true);
@@ -1142,7 +1144,7 @@ export class ParserTextRaw {
     }
 
     private _read_close_double_brace(): void {
-        let ch = this._read_after_whitespace(false);
+        const ch = this._read_after_whitespace(false);
         if (ch != CH_CC || this._read() != CH_CC) {
             this._error("expected '}}'");
         }
@@ -1338,7 +1340,7 @@ export class ParserTextRaw {
     }
 
     private _value_pop() {
-        let t = this._value_type;
+        const t = this._value_type;
         this._value_type = ERROR;
         return t;
     }
@@ -1352,7 +1354,7 @@ export class ParserTextRaw {
     }
 
     private _read(): number {
-        let ch = this._in.next();
+        const ch = this._in.next();
         return ch;
     }
 
@@ -1445,7 +1447,8 @@ export class ParserTextRaw {
     }
 
     private _peek_4_digits(ch1: number): number {
-        let ii: number, ch: number, is_digits = true, chars: number[] = [];
+        let ii: number, ch: number, is_digits = true;
+        const chars: number[] = [];
         if (!IonText.is_digit(ch1)) return ERROR;
         for (ii = 0; ii < 3; ii++) {
             ch = this._read();

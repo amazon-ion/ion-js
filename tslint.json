@@ -4,7 +4,6 @@
     // TODO: remove rules that needs to be included by tslint
     "member-ordering": false,
     "prefer-for-of": false,
-    "prefer-const": false,
     "quotemark": false,
     "max-line-length": false,
     "no-bitwise": false,
