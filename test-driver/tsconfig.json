@@ -1,0 +1,27 @@
+// Test-driver Typscript Compiler Configuration
+// Targets CommonJS Module system and ES6 feature set.
+{
+  "include": [
+    "src/**"
+  ],
+  "exclude": [
+    "**/*.d.ts"
+  ],
+  "compilerOptions": {
+    "target": "es6",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "lib": ["es6", "es2017.object"],
+    "declaration": false,
+    "inlineSources": true,
+    "sourceMap": true,
+    "strict": false,
+    "strictNullChecks": true,
+    "rootDirs": [
+      "src"
+    ],
+    "outDir": "dist",
+    "experimentalDecorators": true
+  }
+}
