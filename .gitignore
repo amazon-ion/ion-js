@@ -1,7 +1,8 @@
 .tscache/
 dist/
+test-driver/dist
 node_modules/
-src/.baseDir.ts
+**/.baseDir.ts
 lcov.info
 package-lock.json
 browser/scripts
@@ -41,7 +42,6 @@ tramp
 
 # cask packages
 .cask/
-dist/
 
 # Flycheck
 flycheck_*.el
