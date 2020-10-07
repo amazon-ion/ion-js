@@ -26,7 +26,7 @@ export class LocalSymbolTable {
   private readonly offset: number;
   private index: SymbolIndex = {};
 
-  constructor(theImport: Import | null, symbols: (string | null)[] = []) {
+  constructor(theImport: Import | null, symbols: Array<string | null> = []) {
     if (theImport === null) {
       this._import = getSystemSymbolTableImport();
     } else {
@@ -39,9 +39,9 @@ export class LocalSymbolTable {
     }
   }
 
-  private _symbols: (string | null)[] = [];
+  private _symbols: Array<string | null> = [];
 
-  get symbols(): (string | null)[] {
+  get symbols(): Array<string | null> {
     return this._symbols;
   }
 

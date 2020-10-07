@@ -120,7 +120,7 @@ export class Null extends Value(Object, IonTypes.NULL, FromJsConstructor.NONE) {
     this._unsupportedOperationOrNullDereference("fieldNames");
   }
 
-  fields(): [string, Value][] {
+  fields(): Array<[string, Value]> {
     this._unsupportedOperationOrNullDereference("fields");
   }
 
