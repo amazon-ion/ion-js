@@ -1,6 +1,8 @@
 --require ts-node/register
 --ui mocha-typescript
 --require source-map-support/register
+#Increasing test timeout for node v14, refer To: https://github.com/amzn/ion-js/issues/581
+--timeout 3000
 
 test/*.ts
 test/dom/*.ts

@@ -9,6 +9,8 @@
     "prepare": "grunt release",
     "test": "nyc mocha",
     "release": "grunt release",
+    "test-driver": "cd test-driver && npm install",
+    "build-test-driver": "cd test-driver && npm run build",
     "prettier-check": "prettier --check 'src/**/*.ts'"
   },
   "repository": {
@@ -80,7 +82,8 @@
     "ts-node": "^8.10.1",
     "tslint": "^5.20.1",
     "typedoc": "^0.16.10",
-    "typescript": "^3.9.3"
+    "typescript": "^3.9.3",
+    "yargs": "^15.4.1"
   },
   "peerDependencies": {
     "jsbi": "^3.1.1"

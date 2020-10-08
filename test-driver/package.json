@@ -1,0 +1,23 @@
+{
+  "name": "test-driver",
+  "version": "1.0.0",
+  "description": "A JavaScript implementation of ion-test-driver",
+  "main": "dist/Cli.js",
+  "scripts": {
+    "build": "grunt build:test-driver"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/amzn/ion-js.git"
+  },
+  "author": "The Ion Team <ion-team@amazon.com> (https://amzn.github.io/ion-docs/index.html)",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/amzn/ion-js/issues"
+  },
+  "homepage": "https://github.com/amzn/ion-js#readme",
+  "dependencies": {
+    "yargs": "^15.4.1",
+    "ion-js": "../"
+  }
+}
