@@ -468,7 +468,7 @@ export class TextWriter extends AbstractWriter {
    */
   private readonly _floatSerializer: Serializer<number> = (value: number) => {
     TextWriter._serializeFloat(this, value);
-  };
+  }
 
   private isSid(s: string): boolean {
     if (s.length > 1 && s.charAt(0) === "$".charAt(0)) {

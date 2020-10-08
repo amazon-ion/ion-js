@@ -17,7 +17,6 @@
     "interface-name": false,
     "no-empty-interface": false,
     "variable-name": false,
-    "semicolon": false,
     "no-consecutive-blank-lines": false,
     "trailing-comma": false,
     "no-angle-bracket-type-assertion": false,
