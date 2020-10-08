@@ -58,7 +58,7 @@ export type ReaderBuffer = ReaderOctetBuffer | string;
  */
 export function makeReader(buf: ReaderBuffer): Reader {
   if (typeof buf === "string") {
-    return new TextReader(new StringSpan(<string>buf));
+    return new TextReader(new StringSpan(buf as string));
   }
   const bufArray = new Uint8Array(buf as ReaderOctetBuffer);
   if (isBinary(bufArray)) {
