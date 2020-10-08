@@ -46,17 +46,17 @@
 //    byteValue
 
 import JSBI from "jsbi";
-import { JsbiSupport } from "./JsbiSupport";
 import * as IonBinary from "./IonBinary";
-import { decodeUtf8 } from "./IonUnicode";
-import { Decimal } from "./IonDecimal";
-import { IonType } from "./IonType";
-import { IonTypes } from "./IonTypes";
 import { IVM } from "./IonConstants";
+import { Decimal } from "./IonDecimal";
 import { BinarySpan } from "./IonSpan";
 import { Timestamp, TimestampPrecision } from "./IonTimestamp";
-import SignAndMagnitudeInt from "./SignAndMagnitudeInt";
+import { IonType } from "./IonType";
+import { IonTypes } from "./IonTypes";
+import { decodeUtf8 } from "./IonUnicode";
 import { JsbiSerde } from "./JsbiSerde";
+import { JsbiSupport } from "./JsbiSupport";
+import SignAndMagnitudeInt from "./SignAndMagnitudeInt";
 
 const EOF = -1; // EOF is end of container; distinct from undefined which is value has been consumed
 const TB_DATAGRAM = 20; // fake type of the top level

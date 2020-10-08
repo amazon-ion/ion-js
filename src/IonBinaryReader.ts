@@ -19,22 +19,22 @@
 // Handles system symbols, and conversion from the parsed
 // input byte array  to the desired Javascript value (scalar or
 // object, such as IonValue).
+import JSBI from "jsbi";
+import IntSize from "./IntSize";
 import { Catalog } from "./IonCatalog";
+import { IVM } from "./IonConstants";
 import { Decimal } from "./IonDecimal";
 import {
   defaultLocalSymbolTable,
   LocalSymbolTable,
 } from "./IonLocalSymbolTable";
-import { ion_symbol_table_sid, makeSymbolTable } from "./IonSymbols";
-import { IonType } from "./IonType";
-import { IonTypes } from "./IonTypes";
-import { IVM } from "./IonConstants";
 import { ParserBinaryRaw } from "./IonParserBinaryRaw";
 import { Reader } from "./IonReader";
 import { BinarySpan } from "./IonSpan";
+import { ion_symbol_table_sid, makeSymbolTable } from "./IonSymbols";
 import { Timestamp } from "./IonTimestamp";
-import JSBI from "jsbi";
-import IntSize from "./IntSize";
+import { IonType } from "./IonType";
+import { IonTypes } from "./IonTypes";
 import { JsbiSupport } from "./JsbiSupport";
 
 const BOC = -2; //beginning of container?

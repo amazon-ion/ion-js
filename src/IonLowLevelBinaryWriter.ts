@@ -13,8 +13,8 @@
  * permissions and limitations under the License.
  */
 
-import { Writeable } from "./IonWriteable";
 import JSBI from "jsbi";
+import { Writeable } from "./IonWriteable";
 import { JsbiSerde } from "./JsbiSerde";
 
 /**

@@ -13,11 +13,11 @@
  * permissions and limitations under the License.
  */
 
-import { Decimal } from "./IonDecimal";
-import { IonType } from "./IonType";
-import { Timestamp } from "./IonTimestamp";
 import JSBI from "jsbi";
 import IntSize from "./IntSize";
+import { Decimal } from "./IonDecimal";
+import { Timestamp } from "./IonTimestamp";
+import { IonType } from "./IonType";
 
 /** Represents the possible return values of [[Reader.value]]. */
 export type ReaderScalarValue =

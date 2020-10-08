@@ -1,6 +1,6 @@
-import { PathElement, Value } from "./Value";
 import { IonType, IonTypes, Writer } from "../Ion";
 import { FromJsConstructor } from "./FromJsConstructor";
+import { PathElement, Value } from "./Value";
 
 /**
  * This mixin constructs a new class that:

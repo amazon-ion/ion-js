@@ -1,11 +1,11 @@
 import JSBI from "jsbi";
 import { IonTypes, Writer } from "../Ion";
-import { Constructor, Value } from "./Value";
 import {
   FromJsConstructor,
   FromJsConstructorBuilder,
   Primitives,
 } from "./FromJsConstructor";
+import { Constructor, Value } from "./Value";
 
 // JSBI is an irregular class type in that it provides no constructor, only static
 // constructor methods. This means that while it is a class type and `instanceof JSBI`

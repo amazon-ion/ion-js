@@ -13,11 +13,11 @@
  * permissions and limitations under the License.
  */
 
+import JSBI from "jsbi";
 import { Decimal } from "./IonDecimal";
-import { IonType } from "./IonType";
 import { Reader } from "./IonReader";
 import { Timestamp } from "./IonTimestamp";
-import JSBI from "jsbi";
+import { IonType } from "./IonType";
 
 /**
  * Serializes data in Ion text or binary format to an implementation defined buffer.

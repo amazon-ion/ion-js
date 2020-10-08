@@ -19,6 +19,8 @@
 // Handles system symbols, and conversion from the parsed
 // input string to the desired Javascript value (scalar or
 // object, such as IonValue).
+import JSBI from "jsbi";
+import IntSize from "./IntSize";
 import { Catalog } from "./IonCatalog";
 import { Decimal } from "./IonDecimal";
 import {
@@ -26,16 +28,14 @@ import {
   LocalSymbolTable,
 } from "./IonLocalSymbolTable";
 import { get_ion_type, ParserTextRaw } from "./IonParserTextRaw";
-import { ion_symbol_table, makeSymbolTable } from "./IonSymbols";
-import { IonType } from "./IonType";
-import { IonTypes } from "./IonTypes";
 import { Reader } from "./IonReader";
 import { StringSpan } from "./IonSpan";
-import { Timestamp } from "./IonTimestamp";
+import { ion_symbol_table, makeSymbolTable } from "./IonSymbols";
 import { fromBase64 } from "./IonText";
-import JSBI from "jsbi";
+import { Timestamp } from "./IonTimestamp";
+import { IonType } from "./IonType";
+import { IonTypes } from "./IonTypes";
 import { JsbiSupport } from "./JsbiSupport";
-import IntSize from "./IntSize";
 
 const BEGINNING_OF_CONTAINER = -2; // cloned from IonParserTextRaw
 const EOF = -1;

@@ -1,8 +1,8 @@
-import { Decimal, IonType, Timestamp, Writer } from "../Ion";
 import JSBI from "jsbi";
-import * as JsValueConversion from "./JsValueConversion";
-import { FromJsConstructor } from "./FromJsConstructor";
+import { Decimal, IonType, Timestamp, Writer } from "../Ion";
 import { _hasValue } from "../util";
+import { FromJsConstructor } from "./FromJsConstructor";
+import * as JsValueConversion from "./JsValueConversion";
 
 // This file leverages Typescript's declaration merging feature[1] to create a
 // combined type/value called `Value` that is simultaneously an interface, a mixin constructor,

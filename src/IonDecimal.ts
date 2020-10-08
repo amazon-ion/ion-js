@@ -14,8 +14,8 @@
  */
 
 import JSBI from "jsbi";
-import { _hasValue, _sign } from "./util";
 import { JsbiSupport } from "./JsbiSupport";
+import { _hasValue, _sign } from "./util";
 
 /**
  * This class provides the additional semantics necessary for decimal values.

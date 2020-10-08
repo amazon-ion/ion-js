@@ -1,21 +1,21 @@
 import * as ion from "../Ion";
 import { IntSize, IonTypes, makeReader, Reader, ReaderBuffer } from "../Ion";
-import { Value } from "./Value";
-import { Struct } from "./Struct";
-import { List } from "./List";
-import { SExpression } from "./SExpression";
-import { Null } from "./Null";
-import { Boolean } from "./Boolean";
-import { Integer } from "./Integer";
-import { Float } from "./Float";
-import { Decimal } from "./Decimal";
-import { Timestamp } from "./Timestamp";
-import { Symbol } from "./Symbol";
-import { String } from "./String";
-import { Clob } from "./Clob";
-import { Blob } from "./Blob";
-import { TextReader } from "../IonTextReader";
 import { BinaryReader } from "../IonBinaryReader";
+import { TextReader } from "../IonTextReader";
+import { Blob } from "./Blob";
+import { Boolean } from "./Boolean";
+import { Clob } from "./Clob";
+import { Decimal } from "./Decimal";
+import { Float } from "./Float";
+import { Integer } from "./Integer";
+import { List } from "./List";
+import { Null } from "./Null";
+import { SExpression } from "./SExpression";
+import { String } from "./String";
+import { Struct } from "./Struct";
+import { Symbol } from "./Symbol";
+import { Timestamp } from "./Timestamp";
+import { Value } from "./Value";
 
 /**
  * Reads the provided Ion data source into memory, constructing Value objects to represent

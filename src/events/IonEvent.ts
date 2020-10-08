@@ -13,19 +13,19 @@
  * permissions and limitations under the License.
  */
 
-import { IonTypes } from "../IonTypes";
+import JSBI from "jsbi";
+import { ComparisonResult } from "../ComparisonResult";
+import { ComparisonResultType } from "../ComparisonResult";
+import { BinaryWriter } from "../IonBinaryWriter";
 import { Decimal } from "../IonDecimal";
+import { defaultLocalSymbolTable } from "../IonLocalSymbolTable";
+import { TextWriter } from "../IonTextWriter";
 import { Timestamp } from "../IonTimestamp";
 import { IonType } from "../IonType";
-import { Writer } from "../IonWriter";
-import { TextWriter } from "../IonTextWriter";
-import { Writeable } from "../IonWriteable";
-import { BinaryWriter } from "../IonBinaryWriter";
-import { defaultLocalSymbolTable } from "../IonLocalSymbolTable";
+import { IonTypes } from "../IonTypes";
 import { decodeUtf8 } from "../IonUnicode";
-import JSBI from "jsbi";
-import { ComparisonResultType } from "../ComparisonResult";
-import { ComparisonResult } from "../ComparisonResult";
+import { Writeable } from "../IonWriteable";
+import { Writer } from "../IonWriter";
 
 export enum IonEventType {
   SCALAR = 0,

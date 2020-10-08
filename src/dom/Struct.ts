@@ -1,6 +1,6 @@
-import { PathElement, Value } from "./Value";
 import { IonTypes, Writer } from "../Ion";
 import { FromJsConstructor } from "./FromJsConstructor";
+import { PathElement, Value } from "./Value";
 
 /**
  * Represents a struct[1] value in an Ion stream.

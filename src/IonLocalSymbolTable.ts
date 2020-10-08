@@ -13,9 +13,9 @@
  * permissions and limitations under the License.
  */
 
-import { getSystemSymbolTableImport } from "./IonSystemSymbolTable";
 import { Import } from "./IonImport";
 import { SymbolIndex } from "./IonSymbolIndex";
+import { getSystemSymbolTableImport } from "./IonSystemSymbolTable";
 
 /**
  * A local symbol table defines all the symbols which aren't included in the system

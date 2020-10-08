@@ -1,7 +1,7 @@
-import { Decimal, IonType, IonTypes, Writer } from "../Ion";
 import JSBI from "jsbi";
-import { PathElement, Value } from "./Value";
+import { Decimal, IonType, IonTypes, Writer } from "../Ion";
 import { FromJsConstructor } from "./FromJsConstructor";
+import { PathElement, Value } from "./Value";
 
 /**
  * Represents a null[1] value in an Ion stream.

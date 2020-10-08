@@ -1,6 +1,6 @@
-import { Value } from "./Value";
 import { IonTypes } from "../Ion";
 import { Sequence } from "./Sequence";
+import { Value } from "./Value";
 
 /**
  * Represents an s-expression[1] value in an Ion stream.

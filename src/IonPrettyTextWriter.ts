@@ -13,11 +13,11 @@
  * permissions and limitations under the License.
  */
 
-import { State, TextWriter } from "./IonTextWriter";
-import { Writeable } from "./IonWriteable";
 import { CharCodes } from "./IonText";
+import { State, TextWriter } from "./IonTextWriter";
 import { IonType } from "./IonType";
 import { IonTypes } from "./IonTypes";
+import { Writeable } from "./IonWriteable";
 
 type Serializer<T> = (value: T) => void;
 

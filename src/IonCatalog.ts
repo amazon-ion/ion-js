@@ -13,8 +13,8 @@
  * permissions and limitations under the License.
  */
 
-import { getSystemSymbolTable } from "./IonSystemSymbolTable";
 import { SharedSymbolTable } from "./IonSharedSymbolTable";
+import { getSystemSymbolTable } from "./IonSystemSymbolTable";
 
 interface SymbolTableIndex {
   [name: string]: SharedSymbolTable[];

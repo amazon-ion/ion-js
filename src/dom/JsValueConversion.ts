@@ -1,9 +1,9 @@
+import JSBI from "jsbi";
+import { Decimal, dom, Timestamp } from "../Ion";
 import { IonType } from "../IonType";
 import { IonTypes } from "../IonTypes";
-import { Decimal, dom, Timestamp } from "../Ion";
-import { Value } from "./Value";
-import JSBI from "jsbi";
 import { _hasValue } from "../util";
+import { Value } from "./Value";
 
 // Typescript interfaces can be used to describe classes' static methods; this can
 // be a bit surprising as the methods in the interface are not marked 'static' and

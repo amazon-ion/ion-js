@@ -13,20 +13,20 @@
  * permissions and limitations under the License.
  */
 
+import JSBI from "jsbi";
 import { AbstractWriter } from "./AbstractWriter";
 import { Decimal } from "./IonDecimal";
-import { encodeUtf8 } from "./IonUnicode";
 import { Import } from "./IonImport";
-import { IonType } from "./IonType";
-import { IonTypes } from "./IonTypes";
 import { LocalSymbolTable } from "./IonLocalSymbolTable";
 import { LowLevelBinaryWriter } from "./IonLowLevelBinaryWriter";
 import { Timestamp, TimestampPrecision } from "./IonTimestamp";
+import { IonType } from "./IonType";
+import { IonTypes } from "./IonTypes";
+import { encodeUtf8 } from "./IonUnicode";
 import { Writeable } from "./IonWriteable";
-import { _assertDefined, _sign } from "./util";
-import JSBI from "jsbi";
-import { JsbiSupport } from "./JsbiSupport";
 import { JsbiSerde } from "./JsbiSerde";
+import { JsbiSupport } from "./JsbiSupport";
+import { _assertDefined, _sign } from "./util";
 
 const MAJOR_VERSION: number = 1;
 const MINOR_VERSION: number = 0;

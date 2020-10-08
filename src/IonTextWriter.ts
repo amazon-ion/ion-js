@@ -13,9 +13,9 @@
  * permissions and limitations under the License.
  */
 
+import JSBI from "jsbi";
 import { AbstractWriter } from "./AbstractWriter";
 import { Decimal } from "./IonDecimal";
-import { encodeUtf8 } from "./IonUnicode";
 import {
   CharCodes,
   ClobEscapes,
@@ -27,13 +27,13 @@ import {
   SymbolEscapes,
   toBase64,
 } from "./IonText";
+import { Timestamp } from "./IonTimestamp";
 import { IonType } from "./IonType";
 import { IonTypes } from "./IonTypes";
-import { Timestamp } from "./IonTimestamp";
+import { encodeUtf8 } from "./IonUnicode";
 import { Writeable } from "./IonWriteable";
-import { _assertDefined, _sign } from "./util";
 import { JsbiSupport } from "./JsbiSupport";
-import JSBI from "jsbi";
+import { _assertDefined, _sign } from "./util";
 
 type Serializer<T> = (value: T) => void;
 

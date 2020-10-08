@@ -13,20 +13,20 @@
  * permissions and limitations under the License.
  */
 
+import IntSize from "./IntSize";
 import { BinaryReader } from "./IonBinaryReader";
+import { BinaryWriter } from "./IonBinaryWriter";
 import { Catalog } from "./IonCatalog";
 import { IVM } from "./IonConstants";
+import { defaultLocalSymbolTable } from "./IonLocalSymbolTable";
+import { PrettyTextWriter } from "./IonPrettyTextWriter";
 import { Reader } from "./IonReader";
 import { BinarySpan, StringSpan } from "./IonSpan";
 import { TextReader } from "./IonTextReader";
-import { Writer } from "./IonWriter";
 import { TextWriter } from "./IonTextWriter";
-import { PrettyTextWriter } from "./IonPrettyTextWriter";
-import { Writeable } from "./IonWriteable";
-import { BinaryWriter } from "./IonBinaryWriter";
-import { defaultLocalSymbolTable } from "./IonLocalSymbolTable";
 import { decodeUtf8 } from "./IonUnicode";
-import IntSize from "./IntSize";
+import { Writeable } from "./IonWriteable";
+import { Writer } from "./IonWriter";
 
 /**
  * Indicates whether the provided buffer contains binary Ion data.

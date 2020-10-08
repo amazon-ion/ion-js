@@ -1,6 +1,6 @@
-import { Constructor, Value } from "./Value";
 import { dom, IonTypes } from "../Ion";
 import { _hasValue } from "../util";
+import { Constructor, Value } from "./Value";
 
 // Converts the provided Iterable into a Set. If no iterable is provided, returns an empty set.
 function _newSet<T>(values?: Iterable<T>): Set<T> {

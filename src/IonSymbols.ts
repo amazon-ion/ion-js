@@ -14,12 +14,12 @@
  */
 
 import { Catalog } from "./IonCatalog";
-import { getSystemSymbolTableImport } from "./IonSystemSymbolTable";
 import { Import } from "./IonImport";
 import { LocalSymbolTable } from "./IonLocalSymbolTable";
 import { Reader } from "./IonReader";
 import { SharedSymbolTable } from "./IonSharedSymbolTable";
 import { SubstituteSymbolTable } from "./IonSubstituteSymbolTable";
+import { getSystemSymbolTableImport } from "./IonSystemSymbolTable";
 
 export const ion_symbol_table = "$ion_symbol_table";
 export const ion_symbol_table_sid = 3;
