@@ -57,12 +57,12 @@ function load_imports(reader: Reader, catalog: Catalog): Import {
     if (name && name !== "$ion") {
       let symbolTable: SharedSymbolTable | null = catalog.getVersion(
         name,
-        version!
+        version!,
       );
       if (!symbolTable) {
         if (maxId === undefined) {
           throw new Error(
-            `No exact match found when trying to import symbol table ${name} version ${version}`
+            `No exact match found when trying to import symbol table ${name} version ${version}`,
           );
         } else {
           symbolTable = catalog.getTable(name);
@@ -103,7 +103,7 @@ function load_symbols(reader: Reader): Array<string | null> {
  */
 export function makeSymbolTable(
   catalog: Catalog,
-  reader: Reader
+  reader: Reader,
 ): LocalSymbolTable {
   let import_: Import | null = null;
   let symbols: Array<string | null> = [];

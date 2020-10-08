@@ -239,7 +239,7 @@ function get_hex_value(ch: number): number {
 
 function is_valid_base64_length(
   char_length: number,
-  trailer_length: number
+  trailer_length: number,
 ): boolean {
   if (trailer_length > 2) return false;
   if (((char_length + trailer_length) & 0x3) != 0) return false;
@@ -257,7 +257,7 @@ function is_valid_string_char(ch: number, allow_new_line: boolean): boolean {
 type ReadValueHelper = (
   ch: number,
   accept_operator_symbols: boolean,
-  calling_op: ReadValueHelper
+  calling_op: ReadValueHelper,
 ) => void;
 
 type ReadValueHelpers = { [index: number]: ReadValueHelper };
@@ -318,7 +318,7 @@ export class ParserTextRaw {
     set_helper("0123456789", this._read_value_helper_digit);
     set_helper(
       "_$abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ",
-      this._read_value_helper_letter
+      this._read_value_helper_letter,
     );
     set_helper("!#%&*+-./;<=>?@^`|~", this._read_value_helper_operator);
     // patch (back) in the two special to the operator functions
@@ -360,7 +360,7 @@ export class ParserTextRaw {
         return JsbiSupport.bigIntFromString(intText);
       default:
         throw new Error(
-          "intValue() was called when the current value was not an integer."
+          "intValue() was called when the current value was not an integer.",
         );
     }
   }
@@ -462,7 +462,7 @@ export class ParserTextRaw {
             index = this._skip_triple_quote_gap(
               index,
               this._end,
-              /*acceptComments*/ true
+              /*acceptComments*/ true,
             );
           } else if (ch >= 0) {
             if (isEscaped) {
@@ -517,7 +517,7 @@ export class ParserTextRaw {
               index = this._skip_triple_quote_gap(
                 index,
                 this._end,
-                /*acceptComments*/ false
+                /*acceptComments*/ false,
               );
             } else {
               bytes.push(ch);
@@ -672,7 +672,7 @@ export class ParserTextRaw {
       case T_IDENTIFIER:
         if (is_keyword(s))
           throw new Error(
-            "can't use '" + s + "' as a fieldname without quotes"
+            "can't use '" + s + "' as a fieldname without quotes",
           );
       case T_STRING1:
       case T_STRING2:
@@ -694,7 +694,7 @@ export class ParserTextRaw {
 
   private _read_value_helper(
     accept_operator_symbols: boolean,
-    calling_op: ReadValueHelper
+    calling_op: ReadValueHelper,
   ) {
     const ch: number = this._read_after_whitespace(true);
     if (ch == EOF) {
@@ -714,7 +714,7 @@ export class ParserTextRaw {
   private _read_value_helper_EOF(
     ch1: number,
     accept_operator_symbols: boolean,
-    calling_op: ReadValueHelper
+    calling_op: ReadValueHelper,
   ) {
     this._ops.unshift(this._done);
   }
@@ -722,7 +722,7 @@ export class ParserTextRaw {
   private _read_value_helper_paren(
     ch1: number,
     accept_operator_symbols: boolean,
-    calling_op: ReadValueHelper
+    calling_op: ReadValueHelper,
   ) {
     this._value_push(T_SEXP);
     this._ops.unshift(this._read_sexp_values);
@@ -731,7 +731,7 @@ export class ParserTextRaw {
   private _read_value_helper_square(
     ch1: number,
     accept_operator_symbols: boolean,
-    calling_op: ReadValueHelper
+    calling_op: ReadValueHelper,
   ) {
     this._value_push(T_LIST);
     this._ops.unshift(this._read_list_values);
@@ -740,7 +740,7 @@ export class ParserTextRaw {
   private _read_value_helper_curly(
     ch1: number,
     accept_operator_symbols: boolean,
-    calling_op: ReadValueHelper
+    calling_op: ReadValueHelper,
   ) {
     let ch3;
     const ch2 = this._read();
@@ -764,7 +764,7 @@ export class ParserTextRaw {
   private _read_value_helper_plus(
     ch1: number,
     accept_operator_symbols: boolean,
-    calling_op: ReadValueHelper
+    calling_op: ReadValueHelper,
   ) {
     const ch2 = this._peek("inf");
     this._unread(ch1); // in any case we'll leave this character for the next function to use
@@ -780,7 +780,7 @@ export class ParserTextRaw {
   private _read_value_helper_minus = function (
     ch1: number,
     accept_operator_symbols: boolean,
-    calling_op: ReadValueHelper
+    calling_op: ReadValueHelper,
   ) {
     let op = undefined,
       ch2 = this._peek();
@@ -807,7 +807,7 @@ export class ParserTextRaw {
   private _read_value_helper_digit(
     ch1: number,
     accept_operator_symbols: boolean,
-    calling_op: ReadValueHelper
+    calling_op: ReadValueHelper,
   ) {
     const ch2 = this._peek_4_digits(ch1);
     this._unread(ch1);
@@ -821,7 +821,7 @@ export class ParserTextRaw {
   private _read_value_helper_single(
     ch1: number,
     accept_operator_symbols: boolean,
-    calling_op: ReadValueHelper
+    calling_op: ReadValueHelper,
   ) {
     let op;
     if (this._peek("''") != ERROR) {
@@ -840,7 +840,7 @@ export class ParserTextRaw {
   private _read_value_helper_double(
     ch1: number,
     accept_operator_symbols: boolean,
-    calling_op: ReadValueHelper
+    calling_op: ReadValueHelper,
   ) {
     this._ops.unshift(this._read_string2);
   }
@@ -848,7 +848,7 @@ export class ParserTextRaw {
   private _read_value_helper_letter(
     ch1: number,
     accept_operator_symbols: boolean,
-    calling_op: ReadValueHelper
+    calling_op: ReadValueHelper,
   ) {
     this._read_symbol();
     const type = this._value_pop();
@@ -899,7 +899,7 @@ export class ParserTextRaw {
   private _read_value_helper_operator(
     ch1: number,
     accept_operator_symbols: boolean,
-    calling_op: ReadValueHelper
+    calling_op: ReadValueHelper,
   ) {
     if (accept_operator_symbols) {
       this._unread(ch1);
@@ -1045,7 +1045,7 @@ export class ParserTextRaw {
       return;
     } else if (ch !== CH_T) {
       throw new Error(
-        "Timestamp day must be followed by a numeric stop character ."
+        "Timestamp day must be followed by a numeric stop character .",
       );
     }
 
@@ -1057,7 +1057,7 @@ export class ParserTextRaw {
       return;
     } else if (!IonText.is_digit(peekChar)) {
       throw new Error(
-        "Timestamp DATE must be followed by numeric terminator or additional TIME digits."
+        "Timestamp DATE must be followed by numeric terminator or additional TIME digits.",
       );
     }
 
@@ -1075,7 +1075,7 @@ export class ParserTextRaw {
         //read fractional seconds
         if (!IonText.is_digit(this._read()))
           throw new Error(
-            "W3C timestamp spec requires atleast one digit after decimal point."
+            "W3C timestamp spec requires atleast one digit after decimal point.",
           );
         while (IonText.is_digit((ch = this._read()))) {}
       }
@@ -1186,7 +1186,7 @@ export class ParserTextRaw {
 
   private _read_string_helper = function (
     terminator: number,
-    allow_new_line: boolean
+    allow_new_line: boolean,
   ): void {
     let ch;
     this._start = this._in.position();
@@ -1376,7 +1376,7 @@ export class ParserTextRaw {
   private _skip_triple_quote_gap(
     entryIndex: number,
     end: number,
-    acceptComments: boolean
+    acceptComments: boolean,
   ): number {
     let tempIndex: number = entryIndex + 3;
     tempIndex = this.indexWhiteSpace(tempIndex, acceptComments);

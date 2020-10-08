@@ -136,7 +136,7 @@ export class IonEventStream {
         WRITE,
         error.message,
         this.events.length,
-        this.events
+        this.events,
       );
     }
   }
@@ -158,7 +158,7 @@ export class IonEventStream {
     if (this.events.length != expected.events.length) {
       return new ComparisonResult(
         ComparisonResultType.NOT_EQUAL,
-        "The event streams have different lengths"
+        "The event streams have different lengths",
       );
     }
     while (
@@ -250,8 +250,8 @@ export class IonEventStream {
               this.reader.depth(),
               this.reader.annotations(),
               true,
-              this.reader.value()
-            )
+              this.reader.value(),
+            ),
           );
         } else {
           switch (tid) {
@@ -265,7 +265,7 @@ export class IonEventStream {
                 this.reader.depth(),
                 this.reader.annotations(),
                 false,
-                null
+                null,
               );
               this.events.push(containerEvent);
               currentContainer.push(containerEvent);
@@ -283,15 +283,15 @@ export class IonEventStream {
                     this.reader.depth(),
                     [],
                     false,
-                    undefined
-                  )
+                    undefined,
+                  ),
                 );
                 return;
               } else {
                 this.reader.stepOut();
                 this.endContainer(
                   currentContainer.pop()!,
-                  currentContainerIndex.pop()!
+                  currentContainerIndex.pop()!,
                 );
               }
               break;
@@ -305,8 +305,8 @@ export class IonEventStream {
                   this.reader.depth(),
                   this.reader.annotations(),
                   false,
-                  this.reader.value()
-                )
+                  this.reader.value(),
+                ),
               );
               break;
             }
@@ -320,7 +320,7 @@ export class IonEventStream {
         READ,
         error.message,
         this.events.length,
-        this.events
+        this.events,
       );
     }
   }
@@ -334,12 +334,12 @@ export class IonEventStream {
         thisContainer.depth,
         [],
         false,
-        null
-      )
+        null,
+      ),
     );
     thisContainer.ionValue = this.events.slice(
       thisContainerIndex,
-      this.events.length
+      this.events.length,
     );
   }
 
@@ -362,7 +362,7 @@ export class IonEventStream {
       } else if (tempEvent.eventType === IonEventType.CONTAINER_END) {
         this.endContainer(
           currentContainer.pop()!,
-          currentContainerIndex.pop()!
+          currentContainerIndex.pop()!,
         );
       } else if (
         tempEvent.eventType === IonEventType.SCALAR ||
@@ -466,7 +466,7 @@ export class IonEventStream {
       currentEvent["depth"],
       currentEvent["annotations"],
       currentEvent["isNull"],
-      currentEvent["value_text"]
+      currentEvent["value_text"],
     );
 
     if (eventType! === IonEventType.SCALAR) {
@@ -477,11 +477,11 @@ export class IonEventStream {
         currentEvent["depth"],
         currentEvent["annotations"],
         currentEvent["isNull"],
-        currentEvent["value_binary"]
+        currentEvent["value_binary"],
       );
       if (!textEvent.equals(binaryEvent)) {
         throw new Error(
-          `Text event ${currentEvent["value_text"]} does not equal binary event ${currentEvent["value_binary"]}`
+          `Text event ${currentEvent["value_text"]} does not equal binary event ${currentEvent["value_binary"]}`,
         );
       }
     }
@@ -559,7 +559,7 @@ export class IonEventStream {
             const symbol = symtab.getSymbolText(this.reader.numberValue()!);
             if (symbol === undefined || symbol === null) {
               throw new Error(
-                "Unresolvable symbol ID, symboltokens unsupported."
+                "Unresolvable symbol ID, symboltokens unsupported.",
               );
             }
             annotations.push(symbol);

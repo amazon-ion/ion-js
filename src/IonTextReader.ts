@@ -217,7 +217,7 @@ export class TextReader implements Reader {
           const symbol = this._symtab.getSymbolText(Number(tempStr));
           if (symbol === undefined)
             throw new Error(
-              "Unresolvable symbol ID, symboltokens unsupported."
+              "Unresolvable symbol ID, symboltokens unsupported.",
             );
           return symbol;
         }
@@ -301,7 +301,7 @@ export class TextReader implements Reader {
     }
     throw new Error(
       "bigIntValue() was called when the current value was a(n) " +
-        this._type!.name
+        this._type!.name,
     );
   }
 
@@ -349,7 +349,7 @@ export class TextReader implements Reader {
             const symbol = this._symtab.getSymbolText(symbolId);
             if (symbol === undefined)
               throw new Error(
-                "Unresolvable symbol ID, symboltokens unsupported."
+                "Unresolvable symbol ID, symboltokens unsupported.",
               );
             return symbol;
           }
@@ -375,7 +375,7 @@ export class TextReader implements Reader {
         return null;
       }
       throw new Error(
-        "Unable to provide a value for " + this._type.name + " containers."
+        "Unable to provide a value for " + this._type.name + " containers.",
       );
     }
     switch (this._type) {

@@ -23,7 +23,7 @@ export class SharedSymbolTable {
   constructor(
     private readonly _name: string,
     private readonly _version: number,
-    private readonly _symbols: string[]
+    private readonly _symbols: string[],
   ) {
     this._idsByText = new Map<string, number>();
     this._numberOfSymbols = this._symbols.length;
@@ -51,7 +51,7 @@ export class SharedSymbolTable {
   getSymbolText(symbolId: number): string | undefined {
     if (symbolId < 0) {
       throw new Error(
-        `Index ${symbolId} is out of bounds for the SharedSymbolTable name=${this.name}, version=${this.version}`
+        `Index ${symbolId} is out of bounds for the SharedSymbolTable name=${this.name}, version=${this.version}`,
       );
     }
     if (symbolId >= this.numberOfSymbols) {

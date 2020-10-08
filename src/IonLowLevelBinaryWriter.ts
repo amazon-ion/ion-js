@@ -62,7 +62,7 @@ export class LowLevelBinaryWriter {
     const leadingStopBit = 1;
     const signBit = 1;
     return Math.ceil(
-      (valueBits + trailingStopBits + leadingStopBit + signBit) / 8
+      (valueBits + trailingStopBits + leadingStopBit + signBit) / 8,
     );
   }
 
@@ -119,7 +119,7 @@ export class LowLevelBinaryWriter {
 
   writeVariableLengthSignedInt(originalValue: number): void {
     const tempBuf = new Uint8Array(
-      LowLevelBinaryWriter.getVariableLengthSignedIntSize(originalValue)
+      LowLevelBinaryWriter.getVariableLengthSignedIntSize(originalValue),
     );
     let value: number = Math.abs(originalValue);
     let i = tempBuf.length - 1;
@@ -145,7 +145,7 @@ export class LowLevelBinaryWriter {
 
   writeVariableLengthUnsignedInt(originalValue: number): void {
     const tempBuf = new Uint8Array(
-      LowLevelBinaryWriter.getVariableLengthUnsignedIntSize(originalValue)
+      LowLevelBinaryWriter.getVariableLengthUnsignedIntSize(originalValue),
     );
     let value: number = originalValue;
     let i = tempBuf.length;

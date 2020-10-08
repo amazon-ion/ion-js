@@ -19,7 +19,7 @@ const _fromJsConstructor: FromJsConstructor = new FromJsConstructorBuilder()
 export class String extends Value(
   global.String,
   IonTypes.STRING,
-  _fromJsConstructor
+  _fromJsConstructor,
 ) {
   /**
    * Constructor.

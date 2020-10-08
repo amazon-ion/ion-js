@@ -44,22 +44,22 @@ function _make_bool_array(str: string): boolean[] {
 }
 
 const _is_base64_char = _make_bool_array(
-  "+/0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+  "+/0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ",
 );
 const _is_hex_digit = _make_bool_array("0123456789abcdefABCDEF");
 const _is_letter: boolean[] = _make_bool_array(
-  "_$abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+  "_$abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ",
 );
 const _is_letter_or_digit = _make_bool_array(
-  "_$0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+  "_$0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ",
 );
 const _is_numeric_terminator: boolean[] = _make_bool_array(
-  "{}[](),\"' \t\n\r\v\u000c"
+  "{}[](),\"' \t\n\r\v\u000c",
 );
 const _is_operator_char = _make_bool_array("!#%&*+-./;<=>?@^`|~");
 const _is_whitespace = _make_bool_array(" \t\r\n\u000b\u000c");
 const isIdentifierArray: boolean[] = _make_bool_array(
-  "_$0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+  "_$0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ",
 );
 
 export function is_digit(ch: number): boolean {
@@ -433,7 +433,7 @@ function hexEscape(codePoint: number): number[] {
 function populateWithHexEscapes(
   escapes: EscapeIndex,
   start: number,
-  end?: number
+  end?: number,
 ) {
   if (end === undefined) {
     escapes[start] = hexEscape(start);

@@ -73,7 +73,7 @@ export class LocalSymbolTable {
   getSymbolText(symbolId: number): string | null {
     if (symbolId > this.maxId) throw new Error("SymbolID greater than maxID.");
     const importedSymbol: string | undefined = this.import.getSymbolText(
-      symbolId
+      symbolId,
     );
     if (importedSymbol !== undefined) return importedSymbol;
     const index = symbolId - this.offset;

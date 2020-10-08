@@ -182,7 +182,7 @@ export class ParserBinaryRaw {
 
     if (numberOfBits > 31) {
       throw new Error(
-        "VarUInt values larger than 31 bits must be read using SignAndMagnitudeInt."
+        "VarUInt values larger than 31 bits must be read using SignAndMagnitudeInt.",
       );
     }
 
@@ -206,7 +206,7 @@ export class ParserBinaryRaw {
     }
     if (bits > 32) {
       throw new Error(
-        "VarInt values larger than 32 bits must be read using SignAndMagnitudeInt"
+        "VarInt values larger than 32 bits must be read using SignAndMagnitudeInt",
       );
     }
     // now we put the sign on, if it's needed
@@ -215,7 +215,7 @@ export class ParserBinaryRaw {
 
   static _readSignedIntFrom(
     input: BinarySpan,
-    numberOfBytes: number
+    numberOfBytes: number,
   ): SignAndMagnitudeInt {
     if (numberOfBytes == 0) {
       return new SignAndMagnitudeInt(JsbiSupport.ZERO);
@@ -230,10 +230,10 @@ export class ParserBinaryRaw {
 
   static _readUnsignedIntAsBigIntFrom(
     input: BinarySpan,
-    numberOfBytes: number
+    numberOfBytes: number,
   ): JSBI {
     return JsbiSerde.fromUnsignedBytes(
-      Array.prototype.slice.call(input.view(numberOfBytes))
+      Array.prototype.slice.call(input.view(numberOfBytes)),
     );
   }
 
@@ -249,7 +249,7 @@ export class ParserBinaryRaw {
    */
   static _readUnsignedIntAsNumberFrom(
     input: BinarySpan,
-    numberOfBytes: number
+    numberOfBytes: number,
   ): number {
     let value = 0;
     let bytesRead = 0;
@@ -260,14 +260,14 @@ export class ParserBinaryRaw {
     } else if (numberOfBytes > 6) {
       throw new Error(
         `Attempted to read a ${numberOfBytes}-byte unsigned integer,` +
-          ` which is too large for a to be stored in a number without losing precision.`
+          ` which is too large for a to be stored in a number without losing precision.`,
       );
     }
 
     if (bytesAvailable < numberOfBytes) {
       throw new Error(
         `Attempted to read a ${numberOfBytes}-byte unsigned integer,` +
-          ` but only ${bytesAvailable} bytes were available.`
+          ` but only ${bytesAvailable} bytes were available.`,
       );
     }
 
@@ -294,7 +294,7 @@ export class ParserBinaryRaw {
    */
   private static readDecimalValueFrom(
     input: BinarySpan,
-    numberOfBytes: number
+    numberOfBytes: number,
   ): Decimal {
     // Decimal representations have two components: exponent (a VarInt) and coefficient (an Int).
     // The decimal’s value is: coefficient * 10 ^ exponent
@@ -307,7 +307,7 @@ export class ParserBinaryRaw {
 
     const signedInt = ParserBinaryRaw._readSignedIntFrom(
       input,
-      numberOfCoefficientBytes
+      numberOfCoefficientBytes,
     );
     const isNegative = signedInt.isNegative;
     const coefficient = isNegative
@@ -475,7 +475,7 @@ export class ParserBinaryRaw {
         return this._curr!;
       default:
         throw new Error(
-          "bigIntValue() was called when the current value was not an int."
+          "bigIntValue() was called when the current value was not an int.",
         );
     }
   }
@@ -606,7 +606,7 @@ export class ParserBinaryRaw {
       if (this._in.position() < end) {
         const deserializedSignedInt = ParserBinaryRaw._readSignedIntFrom(
           this._in,
-          end - this._in.position()
+          end - this._in.position(),
         );
         isNegative = deserializedSignedInt._isNegative;
         coefficient = deserializedSignedInt._magnitude;
@@ -614,7 +614,7 @@ export class ParserBinaryRaw {
       const dec = Decimal._fromBigIntCoefficient(
         isNegative,
         coefficient,
-        exponent
+        exponent,
       );
       const [_, fractionStr] = Timestamp._splitSecondsDecimal(dec);
       fractionalSeconds = Decimal.parse(secondInt! + "." + fractionStr)!;
@@ -627,7 +627,7 @@ export class ParserBinaryRaw {
       hour ? hour : 0,
       minute ? minute : 0,
       secondInt ? secondInt : 0,
-      0
+      0,
     );
     msSinceEpoch = Timestamp._adjustMsSinceEpochIfNeeded(year, msSinceEpoch);
     const date = new Date(msSinceEpoch);

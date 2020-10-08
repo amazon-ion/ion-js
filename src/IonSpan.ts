@@ -235,7 +235,7 @@ export class BinarySpan extends Span {
           this.position() +
           ", limit: " +
           this._limit +
-          ")"
+          ")",
       );
     }
     return this._src.subarray(this._pos, (this._pos += length));

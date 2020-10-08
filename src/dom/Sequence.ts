@@ -35,7 +35,7 @@ export function Sequence(ionType: IonType) {
         throw new Error(
           `Cannot index into a ${
             this.getType().name
-          } with a ${typeof pathHead}.`
+          } with a ${typeof pathHead}.`,
         );
       }
 
@@ -59,7 +59,7 @@ export function Sequence(ionType: IonType) {
     static _fromJsValue(jsValue: any, annotations: string[]): Value {
       if (!(jsValue instanceof Array)) {
         throw new Error(
-          `Cannot create a ${this.name} from: ${jsValue.toString()}`
+          `Cannot create a ${this.name} from: ${jsValue.toString()}`,
         );
       }
       const children = jsValue.map((child) => Value.from(child));

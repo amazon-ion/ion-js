@@ -120,7 +120,7 @@ export class JsbiSerde {
   private static calculateSizeThreshold(numberOfBytes: number): JSBI {
     const exponent: JSBI = JSBI.multiply(
       JSBI.BigInt(numberOfBytes),
-      this.BITS_PER_BYTE
+      this.BITS_PER_BYTE,
     );
     const threshold = JSBI.exponentiate(JsbiSupport.TWO, exponent);
     return JSBI.subtract(threshold, JsbiSupport.ONE);

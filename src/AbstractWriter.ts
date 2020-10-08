@@ -78,7 +78,7 @@ export abstract class AbstractWriter implements Writer {
       const fieldName = reader.fieldName();
       if (fieldName === null) {
         throw new Error(
-          "Cannot call writeValue() when the Writer is in a Struct but the Reader is not."
+          "Cannot call writeValue() when the Writer is in a Struct but the Reader is not.",
         );
       }
       this.writeFieldName(fieldName);
@@ -130,7 +130,7 @@ export abstract class AbstractWriter implements Writer {
         break;
       default:
         throw new Error(
-          "Unrecognized type " + (type !== null ? type.name : type)
+          "Unrecognized type " + (type !== null ? type.name : type),
         );
     }
     if (type.isContainer) {

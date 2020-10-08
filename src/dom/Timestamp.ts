@@ -19,7 +19,7 @@ const _fromJsConstructor: FromJsConstructor = new FromJsConstructorBuilder()
 export class Timestamp extends Value(
   Date,
   IonTypes.TIMESTAMP,
-  _fromJsConstructor
+  _fromJsConstructor,
 ) {
   protected _timestamp: ion.Timestamp;
   protected _date: Date;
@@ -31,7 +31,7 @@ export class Timestamp extends Value(
    */
   constructor(
     dateOrTimestamp: Date | ion.Timestamp,
-    annotations: string[] = []
+    annotations: string[] = [],
   ) {
     let date: Date;
     let timestamp: ion.Timestamp;
@@ -66,7 +66,7 @@ export class Timestamp extends Value(
       date.getUTCDate(),
       date.getUTCHours(),
       date.getUTCMinutes(),
-      fractionalSeconds
+      fractionalSeconds,
     );
   }
 

@@ -110,8 +110,8 @@ export class BinaryWriter extends AbstractWriter {
         this.getCurrentContainer(),
         IonTypes.BLOB,
         this.encodeAnnotations(this._annotations),
-        value
-      )
+        value,
+      ),
     );
   }
 
@@ -128,8 +128,8 @@ export class BinaryWriter extends AbstractWriter {
         this.writer,
         this.getCurrentContainer(),
         this.encodeAnnotations(this._annotations),
-        value
-      )
+        value,
+      ),
     );
   }
 
@@ -147,8 +147,8 @@ export class BinaryWriter extends AbstractWriter {
         this.getCurrentContainer(),
         IonTypes.CLOB,
         this.encodeAnnotations(this._annotations),
-        value
-      )
+        value,
+      ),
     );
   }
 
@@ -174,8 +174,8 @@ export class BinaryWriter extends AbstractWriter {
           this.getCurrentContainer(),
           IonTypes.DECIMAL,
           this.encodeAnnotations(this._annotations),
-          new Uint8Array(0)
-        )
+          new Uint8Array(0),
+        ),
       );
       return;
     }
@@ -191,7 +191,7 @@ export class BinaryWriter extends AbstractWriter {
       LowLevelBinaryWriter.getVariableLengthSignedIntSize(exponent) +
       (writeCoefficient ? coefficientBytes.length : 0);
     const writer: LowLevelBinaryWriter = new LowLevelBinaryWriter(
-      new Writeable(bufLen)
+      new Writeable(bufLen),
     );
     writer.writeVariableLengthSignedInt(exponent);
     if (writeCoefficient) {
@@ -203,8 +203,8 @@ export class BinaryWriter extends AbstractWriter {
         this.getCurrentContainer(),
         IonTypes.DECIMAL,
         this.encodeAnnotations(this._annotations),
-        writer.getBytes()
-      )
+        writer.getBytes(),
+      ),
     );
   }
 
@@ -234,8 +234,8 @@ export class BinaryWriter extends AbstractWriter {
         this.getCurrentContainer(),
         IonTypes.FLOAT,
         this.encodeAnnotations(this._annotations),
-        bytes
-      )
+        bytes,
+      ),
     );
   }
 
@@ -265,8 +265,8 @@ export class BinaryWriter extends AbstractWriter {
         this.getCurrentContainer(),
         IonTypes.FLOAT,
         this.encodeAnnotations(this._annotations),
-        bytes
-      )
+        bytes,
+      ),
     );
   }
 
@@ -283,8 +283,8 @@ export class BinaryWriter extends AbstractWriter {
         this.writer,
         this.getCurrentContainer(),
         this.encodeAnnotations(this._annotations),
-        value
-      )
+        value,
+      ),
     );
   }
 
@@ -298,8 +298,8 @@ export class BinaryWriter extends AbstractWriter {
         this.writer,
         this.getCurrentContainer(),
         type,
-        this.encodeAnnotations(this._annotations)
-      )
+        this.encodeAnnotations(this._annotations),
+      ),
     );
   }
 
@@ -317,8 +317,8 @@ export class BinaryWriter extends AbstractWriter {
         this.getCurrentContainer(),
         IonTypes.STRING,
         this.encodeAnnotations(this._annotations),
-        encodeUtf8(value)
-      )
+        encodeUtf8(value),
+      ),
     );
   }
 
@@ -330,7 +330,7 @@ export class BinaryWriter extends AbstractWriter {
     } else {
       const symbolId: number = this.symbolTable.addSymbol(value);
       const writer: LowLevelBinaryWriter = new LowLevelBinaryWriter(
-        new Writeable(LowLevelBinaryWriter.getUnsignedIntSize(symbolId))
+        new Writeable(LowLevelBinaryWriter.getUnsignedIntSize(symbolId)),
       );
       writer.writeUnsignedInt(symbolId);
       this.addNode(
@@ -339,8 +339,8 @@ export class BinaryWriter extends AbstractWriter {
           this.getCurrentContainer(),
           IonTypes.SYMBOL,
           this.encodeAnnotations(this._annotations),
-          writer.getBytes()
-        )
+          writer.getBytes(),
+        ),
       );
     }
   }
@@ -353,7 +353,7 @@ export class BinaryWriter extends AbstractWriter {
       return;
     }
     const writer: LowLevelBinaryWriter = new LowLevelBinaryWriter(
-      new Writeable(12)
+      new Writeable(12),
     ); //where does the 12 come from
     writer.writeVariableLengthSignedInt(value.getLocalOffset());
 
@@ -378,8 +378,8 @@ export class BinaryWriter extends AbstractWriter {
           writer.writeBytes(
             JsbiSerde.toSignedIntBytes(
               fractionalSeconds.getCoefficient(),
-              fractionalSeconds.isNegative()
-            )
+              fractionalSeconds.isNegative(),
+            ),
           );
         }
       }
@@ -390,8 +390,8 @@ export class BinaryWriter extends AbstractWriter {
         this.getCurrentContainer(),
         IonTypes.TIMESTAMP,
         this.encodeAnnotations(this._annotations),
-        writer.getBytes()
-      )
+        writer.getBytes(),
+      ),
     );
   }
 
@@ -405,8 +405,8 @@ export class BinaryWriter extends AbstractWriter {
             this.writer,
             this.getCurrentContainer(),
             type,
-            this.encodeAnnotations(this._annotations)
-          )
+            this.encodeAnnotations(this._annotations),
+          ),
         );
         break;
       case IonTypes.STRUCT:
@@ -414,8 +414,8 @@ export class BinaryWriter extends AbstractWriter {
           new StructNode(
             this.writer,
             this.getCurrentContainer(),
-            this.encodeAnnotations(this._annotations)
-          )
+            this.encodeAnnotations(this._annotations),
+          ),
         );
         this.state = States.STRUCT_FIELD;
         break;
@@ -466,7 +466,7 @@ export class BinaryWriter extends AbstractWriter {
     this.checkClosed();
     if (this.depth() > 0) {
       throw new Error(
-        "Writer has one or more open containers; call stepOut() for each container prior to close()"
+        "Writer has one or more open containers; call stepOut() for each container prior to close()",
       );
     }
     this.writeIvm();
@@ -526,7 +526,7 @@ export class BinaryWriter extends AbstractWriter {
     this.checkClosed();
     if (this.state === States.STRUCT_FIELD) {
       throw new Error(
-        "Expected a struct field name instead of a value, call writeFieldName(string) with the desired name before calling stepIn(IonType) or writeIonType()"
+        "Expected a struct field name instead of a value, call writeFieldName(string) with the desired name before calling stepIn(IonType) or writeIonType()",
       );
     }
   }
@@ -596,7 +596,7 @@ export abstract class AbstractNode implements Node {
     private readonly _writer: LowLevelBinaryWriter,
     private readonly parent: Node | null,
     private readonly _type: IonType,
-    private readonly annotations: Uint8Array
+    private readonly annotations: Uint8Array,
   ) {}
 
   get typeCode(): number {
@@ -618,7 +618,7 @@ export abstract class AbstractNode implements Node {
   writeTypeDescriptorAndLength(
     typeCode: TypeCodes,
     isNull: boolean,
-    length: number
+    length: number,
   ): void {
     let typeDescriptor: number = typeCode << 4;
     if (isNull) {
@@ -645,7 +645,7 @@ export abstract class AbstractNode implements Node {
   getAnnotatedContainerLength(): number {
     const annotationsLength = this.annotations.length;
     const annotationsLengthLength = LowLevelBinaryWriter.getVariableLengthUnsignedIntSize(
-      annotationsLength
+      annotationsLength,
     );
     const containedValueLength = this.getContainedValueLength();
     return annotationsLength + annotationsLengthLength + containedValueLength;
@@ -655,11 +655,11 @@ export abstract class AbstractNode implements Node {
     if (this.hasAnnotations()) {
       const annotationsLength = this.annotations.length;
       const annotationsLengthLength = LowLevelBinaryWriter.getVariableLengthUnsignedIntSize(
-        annotationsLength
+        annotationsLength,
       );
       const containedValueLength = this.getContainedValueLength();
       const containedValueLengthLength = AbstractNode.getLengthLength(
-        containedValueLength
+        containedValueLength,
       );
       return (
         TYPE_DESCRIPTOR_LENGTH +
@@ -686,7 +686,7 @@ export abstract class AbstractNode implements Node {
     this.writeTypeDescriptorAndLength(
       TypeCodes.ANNOTATION,
       false,
-      annotatedContainerLength
+      annotatedContainerLength,
     );
     this.writer.writeVariableLengthUnsignedInt(this.annotations.length);
     this.writer.writeBytes(new Uint8Array(this.annotations));
@@ -708,7 +708,7 @@ abstract class ContainerNode extends AbstractNode {
     writer: LowLevelBinaryWriter,
     parent: Node,
     type: IonType,
-    annotations: Uint8Array
+    annotations: Uint8Array,
   ) {
     super(writer, parent, type, annotations);
   }
@@ -726,7 +726,7 @@ class SequenceNode extends ContainerNode {
     writer: LowLevelBinaryWriter,
     parent: Node,
     type: IonType,
-    annotations: Uint8Array
+    annotations: Uint8Array,
   ) {
     super(writer, parent, type, annotations);
   }
@@ -740,7 +740,7 @@ class SequenceNode extends ContainerNode {
     this.writeTypeDescriptorAndLength(
       this.typeCode,
       false,
-      this.getValueLength()
+      this.getValueLength(),
     );
     for (const child of this.children) {
       child.write();
@@ -775,7 +775,7 @@ class StructNode extends ContainerNode {
   constructor(
     writer: LowLevelBinaryWriter,
     parent: Node,
-    annotations: Uint8Array
+    annotations: Uint8Array,
   ) {
     super(writer, parent, IonTypes.STRUCT, annotations);
   }
@@ -807,7 +807,7 @@ class StructNode extends ContainerNode {
     this.writeTypeDescriptorAndLength(
       this.typeCode,
       false,
-      this.getValueLength()
+      this.getValueLength(),
     );
     for (const field of this.fields) {
       this.writer.writeBytes(new Uint8Array(field.name));
@@ -831,7 +831,7 @@ class BooleanNode extends LeafNode {
     writer: LowLevelBinaryWriter,
     parent: Node,
     annotations: Uint8Array,
-    private readonly value: boolean
+    private readonly value: boolean,
   ) {
     super(writer, parent, IonTypes.BOOL, annotations);
   }
@@ -854,7 +854,7 @@ class IntNode extends LeafNode {
     writer: LowLevelBinaryWriter,
     parent: Node,
     annotations: Uint8Array,
-    private readonly value: number | JSBI
+    private readonly value: number | JSBI,
   ) {
     super(writer, parent, IonTypes.INT, annotations);
 
@@ -865,7 +865,7 @@ class IntNode extends LeafNode {
     if (JSBI.GT(this.value, 0)) {
       this.intTypeCode = TypeCodes.POSITIVE_INT;
       const writer: LowLevelBinaryWriter = new LowLevelBinaryWriter(
-        new Writeable(LowLevelBinaryWriter.getUnsignedIntSize(this.value))
+        new Writeable(LowLevelBinaryWriter.getUnsignedIntSize(this.value)),
       );
       writer.writeUnsignedInt(this.value);
       this.bytes = writer.getBytes();
@@ -882,7 +882,7 @@ class IntNode extends LeafNode {
         magnitude = Math.abs(value);
       }
       const writer: LowLevelBinaryWriter = new LowLevelBinaryWriter(
-        new Writeable(LowLevelBinaryWriter.getUnsignedIntSize(magnitude))
+        new Writeable(LowLevelBinaryWriter.getUnsignedIntSize(magnitude)),
       );
       writer.writeUnsignedInt(magnitude);
       this.bytes = writer.getBytes();
@@ -898,7 +898,7 @@ class IntNode extends LeafNode {
     this.writeTypeDescriptorAndLength(
       this.intTypeCode,
       false,
-      this.bytes.length
+      this.bytes.length,
     );
     this.writer.writeBytes(this.bytes);
   }
@@ -914,7 +914,7 @@ class BytesNode extends LeafNode {
     parent: Node,
     type: IonType,
     annotations: Uint8Array,
-    private readonly value: Uint8Array
+    private readonly value: Uint8Array,
   ) {
     super(writer, parent, type, annotations);
   }
@@ -935,7 +935,7 @@ export class NullNode extends LeafNode {
     writer: LowLevelBinaryWriter,
     parent: Node | null,
     type: IonType,
-    annotations: Uint8Array
+    annotations: Uint8Array,
   ) {
     super(writer, parent, type, annotations);
   }

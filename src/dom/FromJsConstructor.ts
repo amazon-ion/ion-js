@@ -47,7 +47,7 @@ export class FromJsConstructorBuilder {
     return new FromJsConstructor(
       this._primitives,
       this._classesToUnbox,
-      this._classes
+      this._classes,
     );
   }
 }
@@ -82,7 +82,7 @@ export class FromJsConstructor {
   constructor(
     private readonly _primitives: Set<string>,
     private readonly _classesToUnbox: Set<Constructor>,
-    private readonly _classes: Set<Constructor>
+    private readonly _classes: Set<Constructor>,
   ) {}
 
   /**
@@ -113,7 +113,7 @@ export class FromJsConstructor {
       }
 
       throw new Error(
-        `Unable to construct a(n) ${constructor.name} from a ${jsValue.constructor.name}.`
+        `Unable to construct a(n) ${constructor.name} from a ${jsValue.constructor.name}.`,
       );
     }
 
@@ -122,7 +122,7 @@ export class FromJsConstructor {
     }
 
     throw new Error(
-      `Unable to construct a(n) ${constructor.name} from a ${jsValueType}.`
+      `Unable to construct a(n) ${constructor.name} from a ${jsValueType}.`,
     );
   }
 }

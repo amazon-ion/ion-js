@@ -28,7 +28,7 @@ import { JsbiSupport } from "./JsbiSupport";
 export default class SignAndMagnitudeInt {
   constructor(
     public readonly _magnitude: JSBI,
-    public readonly _isNegative = JsbiSupport.isNegative(_magnitude)
+    public readonly _isNegative = JsbiSupport.isNegative(_magnitude),
   ) {}
 
   get magnitude(): JSBI {

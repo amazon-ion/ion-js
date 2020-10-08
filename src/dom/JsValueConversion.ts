@@ -53,7 +53,7 @@ export function _domConstructorFor(ionType: IonType): FromJsValue {
   const domConstructor = _getDomTypesByIonTypeMap().get(ionType)!;
   if (!_hasValue(domConstructor)) {
     throw new Error(
-      `No dom type constructor was found for Ion type ${ionType.name}`
+      `No dom type constructor was found for Ion type ${ionType.name}`,
     );
   }
   return domConstructor;
@@ -90,7 +90,7 @@ function _inferType(value: any): IonType {
     // case "symbol":
     default:
       throw new Error(
-        `Value.from() does not support the JS primitive type ${valueType}.`
+        `Value.from() does not support the JS primitive type ${valueType}.`,
       );
   }
 
@@ -112,7 +112,7 @@ function _inferType(value: any): IonType {
     // bigints (which aren't supported without Babel) while allowing other Object types
     // to be processed below.
     throw new Error(
-      "bigints are not supported without using Babel for JSBI compilation."
+      "bigints are not supported without using Babel for JSBI compilation.",
     );
   }
   if (value instanceof Number) {
@@ -143,7 +143,7 @@ function _inferType(value: any): IonType {
 // type using that value.
 export function _ionValueFromJsValue(
   value: any,
-  annotations: string[] = []
+  annotations: string[] = [],
 ): Value {
   const ionType = _inferType(value);
   const ionTypeConstructor: FromJsValue = _domConstructorFor(ionType);

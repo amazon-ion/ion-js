@@ -27,7 +27,7 @@ import { PathElement, Value } from "./Value";
 export class Struct extends Value(
   Object,
   IonTypes.STRUCT,
-  FromJsConstructor.NONE
+  FromJsConstructor.NONE,
 ) {
   /*
    * Stores the string/Value pairs that represent the fields of the struct. These values are stored
@@ -146,7 +146,7 @@ export class Struct extends Value(
       throw new Error(`Cannot create a dom.Struct from: ${jsValue.toString()}`);
     }
     const fields: Array<[string, Value]> = Object.entries(
-      jsValue
+      jsValue,
     ).map(([key, value]) => [key, Value.from(value)]);
     return new this(fields, annotations);
   }

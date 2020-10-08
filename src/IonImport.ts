@@ -35,7 +35,7 @@ export class Import {
   constructor(
     parent: Import | null,
     symbolTable: SharedSymbolTable,
-    length?: number | null
+    length?: number | null,
   ) {
     this._parent = parent;
     this._symbolTable = symbolTable;

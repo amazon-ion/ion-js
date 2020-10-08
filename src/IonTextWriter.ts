@@ -270,7 +270,7 @@ export class TextWriter extends AbstractWriter {
     _assertDefined(value);
     this._serializeValue(IonTypes.STRING, value, (value: string) => {
       this.writeable.writeBytes(
-        encodeUtf8('"' + escape(value, StringEscapes) + '"')
+        encodeUtf8('"' + escape(value, StringEscapes) + '"'),
       );
     });
   }
@@ -313,7 +313,7 @@ export class TextWriter extends AbstractWriter {
           this.depth() === 0
         ) {
           throw new Error(
-            "Unable to alter symbol table context, it allows invalid ion to be written."
+            "Unable to alter symbol table context, it allows invalid ion to be written.",
           );
         }
         this.writeContainer(type, CharCodes.LEFT_BRACE);
@@ -352,7 +352,7 @@ export class TextWriter extends AbstractWriter {
     //TODO clear out resources when writer uses more than a basic array/devs have built in IO support etc.
     if (this.depth() > 0) {
       throw new Error(
-        "Writer has one or more open containers; call stepOut() for each container prior to close()"
+        "Writer has one or more open containers; call stepOut() for each container prior to close()",
       );
     }
   }
@@ -364,7 +364,7 @@ export class TextWriter extends AbstractWriter {
   protected _serializeValue<T>(
     type: IonType,
     value: T,
-    serialize: Serializer<T>
+    serialize: Serializer<T>,
   ) {
     if (this.currentContainer.state === State.STRUCT_FIELD)
       throw new Error("Expecting a struct field");
@@ -442,7 +442,7 @@ export class TextWriter extends AbstractWriter {
       (isOperator(s) && this.currentContainer.containerType != IonTypes.SEXP)
     ) {
       this.writeable.writeBytes(
-        encodeUtf8("'" + escape(s, SymbolEscapes) + "'")
+        encodeUtf8("'" + escape(s, SymbolEscapes) + "'"),
       );
     } else {
       this.writeUtf8(s);

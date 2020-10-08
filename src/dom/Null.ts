@@ -44,7 +44,7 @@ export class Null extends Value(Object, IonTypes.NULL, FromJsConstructor.NONE) {
 
   private static _operationIsSupported(
     ionType: IonType,
-    operation: string
+    operation: string,
   ): boolean {
     return Null._supportedIonTypesByOperation.get(operation)!.has(ionType);
   }
@@ -71,7 +71,7 @@ export class Null extends Value(Object, IonTypes.NULL, FromJsConstructor.NONE) {
       return null;
     }
     throw new Error(
-      `${operation}() is not supported by Ion type ${this.getType().name}`
+      `${operation}() is not supported by Ion type ${this.getType().name}`,
     );
   }
 
@@ -80,11 +80,11 @@ export class Null extends Value(Object, IonTypes.NULL, FromJsConstructor.NONE) {
   private _unsupportedOperationOrNullDereference(operation: string): never {
     if (Null._operationIsSupported(this.getType(), operation)) {
       throw new Error(
-        `${operation}() called on a null ${this.getType().name}.`
+        `${operation}() called on a null ${this.getType().name}.`,
       );
     }
     throw new Error(
-      `${operation}() is not supported by Ion type ${this.getType().name}`
+      `${operation}() is not supported by Ion type ${this.getType().name}`,
     );
   }
 

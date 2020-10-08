@@ -83,7 +83,7 @@ function _loadValue(reader: Reader): Value {
   const ionType = reader.type();
   if (ionType === null) {
     throw new Error(
-      "loadValue() called when no further values were available to read."
+      "loadValue() called when no further values were available to read.",
     );
   }
   const annotations: string[] = reader.annotations();

@@ -230,7 +230,7 @@ export class BinaryReader implements Reader {
         return null;
       }
       throw new Error(
-        "Unable to provide a value for " + type.name + " containers."
+        "Unable to provide a value for " + type.name + " containers.",
       );
     }
     switch (type) {
@@ -272,7 +272,7 @@ export class BinaryReader implements Reader {
     if (symbolId > 0) {
       if (symbolId > this._symtab.maxId) {
         throw new Error(
-          "Symbol $" + symbolId.toString() + " greater than maxID."
+          "Symbol $" + symbolId.toString() + " greater than maxID.",
         );
       }
       s = this._symtab.getSymbolText(symbolId);
