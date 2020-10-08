@@ -165,8 +165,8 @@ export class IonEventStream {
       actualIndex < this.events.length &&
       expectedIndex < expected.events.length
     ) {
-      let actualEvent = this.events[actualIndex];
-      let expectedEvent = expected.events[expectedIndex];
+      const actualEvent = this.events[actualIndex];
+      const expectedEvent = expected.events[expectedIndex];
       if (actualEvent.eventType === IonEventType.SYMBOL_TABLE) actualIndex++;
       if (expectedEvent.eventType === IonEventType.SYMBOL_TABLE)
         expectedIndex++;
@@ -177,7 +177,7 @@ export class IonEventStream {
         continue;
       switch (actualEvent.eventType) {
         case IonEventType.SCALAR: {
-          let eventResult = actualEvent.compare(expectedEvent);
+          const eventResult = actualEvent.compare(expectedEvent);
           if (eventResult.result == ComparisonResultType.NOT_EQUAL) {
             eventResult.actualIndex = actualIndex;
             eventResult.expectedIndex = expectedIndex;
@@ -186,7 +186,7 @@ export class IonEventStream {
           break;
         }
         case IonEventType.CONTAINER_START: {
-          let eventResult = actualEvent.compare(expectedEvent);
+          const eventResult = actualEvent.compare(expectedEvent);
           if (eventResult.result == ComparisonResultType.NOT_EQUAL) {
             actualIndex += eventResult.actualIndex;
             expectedIndex += eventResult.expectedIndex;
@@ -238,8 +238,8 @@ export class IonEventStream {
         this.isEventStream = true;
         return;
       }
-      let currentContainer: IonEvent[] = [];
-      let currentContainerIndex: number[] = [];
+      const currentContainer: IonEvent[] = [];
+      const currentContainerIndex: number[] = [];
       while (true) {
         if (this.reader.isNull()) {
           this.events.push(
@@ -258,7 +258,7 @@ export class IonEventStream {
             case IonTypes.LIST:
             case IonTypes.SEXP:
             case IonTypes.STRUCT: {
-              let containerEvent = this.eventFactory.makeEvent(
+              const containerEvent = this.eventFactory.makeEvent(
                 IonEventType.CONTAINER_START,
                 tid,
                 this.reader.fieldName(),
@@ -346,15 +346,15 @@ export class IonEventStream {
   //(event_type: EventType, ion_type: IonType, field_name: SymbolToken, annotations: list<SymbolToken>, value_text: string, value_binary: list<byte>, imports: list<ImportDescriptor>, depth: int)
   private marshalStream(): void {
     this.events = [];
-    let currentContainer: IonEvent[] = [];
-    let currentContainerIndex: number[] = [];
+    const currentContainer: IonEvent[] = [];
+    const currentContainerIndex: number[] = [];
     for (
       let tid: IonType | null = this.reader.next();
       tid === IonTypes.STRUCT;
       tid = this.reader.next()
     ) {
       this.reader.stepIn();
-      let tempEvent: IonEvent = this.marshalEvent();
+      const tempEvent: IonEvent = this.marshalEvent();
       if (tempEvent.eventType === IonEventType.CONTAINER_START) {
         currentContainer.push(tempEvent);
         this.events.push(tempEvent);
@@ -377,9 +377,9 @@ export class IonEventStream {
   }
 
   private marshalEvent(): IonEvent {
-    let currentEvent = {};
+    const currentEvent = {};
     for (let tid: IonType | null; (tid = this.reader.next()); ) {
-      let fieldName = this.reader.fieldName();
+      const fieldName = this.reader.fieldName();
       if (fieldName && currentEvent[fieldName] !== undefined)
         throw new Error("Repeated event field: " + fieldName);
       switch (fieldName) {
@@ -409,9 +409,9 @@ export class IonEventStream {
           let tempString: string = this.reader.stringValue()!;
           if (tempString.substr(0, 5) === "$ion_")
             tempString = "$ion_user_value::" + tempString;
-          let tempReader: Reader = makeReader(tempString);
+          const tempReader: Reader = makeReader(tempString);
           tempReader.next();
-          let tempValue = tempReader.value();
+          const tempValue = tempReader.value();
           currentEvent["isNull"] = tempReader.isNull();
           currentEvent[fieldName] = tempValue;
           break;
@@ -453,13 +453,13 @@ export class IonEventStream {
       case "SYMBOL_TABLE":
         throw new Error("Symbol tables unsupported");
     }
-    let fieldname =
+    const fieldname =
       currentEvent["field_name"] !== undefined
         ? currentEvent["field_name"]
         : null;
     if (!currentEvent["annotations"]) currentEvent["annotations"] = [];
 
-    let textEvent = this.eventFactory.makeEvent(
+    const textEvent = this.eventFactory.makeEvent(
       eventType!,
       currentEvent["ion_type"],
       fieldname,
@@ -470,7 +470,7 @@ export class IonEventStream {
     );
 
     if (eventType! === IonEventType.SCALAR) {
-      let binaryEvent = this.eventFactory.makeEvent(
+      const binaryEvent = this.eventFactory.makeEvent(
         eventType,
         currentEvent["ion_type"],
         fieldname,
@@ -489,7 +489,7 @@ export class IonEventStream {
   }
 
   private parseIonType(): IonType {
-    let input: string = this.reader.stringValue()!.toLowerCase();
+    const input: string = this.reader.stringValue()!.toLowerCase();
     switch (input) {
       case "null": {
         return IonTypes.NULL;
@@ -537,7 +537,7 @@ export class IonEventStream {
   }
 
   private parseAnnotations(): string[] {
-    let annotations: string[] = [];
+    const annotations: string[] = [];
     if (this.reader.isNull()) {
       return annotations;
     } else {
@@ -545,9 +545,9 @@ export class IonEventStream {
       for (let tid; (tid = this.reader.next()); ) {
         if (tid == IonTypes.STRUCT) {
           this.reader.stepIn();
-          let type = this.reader.next();
+          const type = this.reader.next();
           if (this.reader.fieldName() == "text" && type == IonTypes.STRING) {
-            let text = this.reader.stringValue();
+            const text = this.reader.stringValue();
             if (text !== null) {
               annotations.push(text!);
             }
@@ -555,8 +555,8 @@ export class IonEventStream {
             this.reader.fieldName() == "importLocation" &&
             type == IonTypes.INT
           ) {
-            let symtab = defaultLocalSymbolTable();
-            let symbol = symtab.getSymbolText(this.reader.numberValue()!);
+            const symtab = defaultLocalSymbolTable();
+            const symbol = symtab.getSymbolText(this.reader.numberValue()!);
             if (symbol === undefined || symbol === null) {
               throw new Error(
                 "Unresolvable symbol ID, symboltokens unsupported."
@@ -576,7 +576,7 @@ export class IonEventStream {
     //convert list of ints to array of bytes and pass the currentBuffer to a binary reader, generate value from factory.
     //start with a null check
     if (this.reader.isNull()) return null;
-    let numBuffer: number[] = [];
+    const numBuffer: number[] = [];
     this.reader.stepIn();
     let tid: IonType | null = this.reader.next();
     while (tid) {
@@ -585,7 +585,7 @@ export class IonEventStream {
     }
     this.reader.stepOut();
     const bufArray = new Uint8Array(numBuffer as ReaderOctetBuffer);
-    let tempReader: Reader = new BinaryReader(new BinarySpan(bufArray));
+    const tempReader: Reader = new BinaryReader(new BinarySpan(bufArray));
     tempReader.next();
     return tempReader.value();
   }
@@ -604,9 +604,9 @@ export class IonEventStream {
       return null;
     }
     this.reader.stepIn();
-    let type = this.reader.next();
+    const type = this.reader.next();
     if (this.reader.fieldName() == "text" && type == IonTypes.STRING) {
-      let text = this.reader.stringValue();
+      const text = this.reader.stringValue();
       if (text !== null) {
         this.reader.stepOut();
         return text;
@@ -615,8 +615,8 @@ export class IonEventStream {
       this.reader.fieldName() == "importLocation" &&
       type == IonTypes.INT
     ) {
-      let symtab = defaultLocalSymbolTable();
-      let symbol = symtab.getSymbolText(this.reader.numberValue()!);
+      const symtab = defaultLocalSymbolTable();
+      const symbol = symtab.getSymbolText(this.reader.numberValue()!);
       if (symbol === undefined || symbol === null) {
         throw new Error("Unresolvable symbol ID, symboltokens unsupported.");
       }

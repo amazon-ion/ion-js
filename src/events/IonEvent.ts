@@ -216,10 +216,10 @@ abstract class AbstractIonEvent implements IonEvent {
         "Event depths don't match " + this.depth + " vs. " + expected.depth
       );
     }
-    let annotationResult = this.annotationCompare(expected.annotations);
+    const annotationResult = this.annotationCompare(expected.annotations);
     if (annotationResult.result === ComparisonResultType.NOT_EQUAL)
       return annotationResult;
-    let valueResult = this.valueCompare(expected);
+    const valueResult = this.valueCompare(expected);
     if (valueResult.result === ComparisonResultType.NOT_EQUAL)
       return valueResult;
     return new ComparisonResult(ComparisonResultType.EQUAL);
@@ -733,8 +733,8 @@ class IonStructEvent extends AbsIonContainerEvent {
         "Event types don't match"
       );
     }
-    let container = this.ionValue == null ? [] : this.ionValue;
-    let expectedContainer = expected.ionValue == null ? [] : expected.ionValue;
+    const container = this.ionValue == null ? [] : this.ionValue;
+    const expectedContainer = expected.ionValue == null ? [] : expected.ionValue;
     if (container.length !== expectedContainer.length)
       return new ComparisonResult(
         ComparisonResultType.NOT_EQUAL,
@@ -752,7 +752,7 @@ class IonStructEvent extends AbsIonContainerEvent {
     let matchFound: ComparisonResult = new ComparisonResult(
       ComparisonResultType.EQUAL
     );
-    let paired: boolean[] = new Array<boolean>(expectedEvents.length);
+    const paired: boolean[] = new Array<boolean>(expectedEvents.length);
     for (let i: number = 0; matchFound && i < actualEvents.length; i++) {
       matchFound.result = ComparisonResultType.NOT_EQUAL;
       for (
@@ -762,8 +762,8 @@ class IonStructEvent extends AbsIonContainerEvent {
         j++
       ) {
         if (!paired[j]) {
-          let child = actualEvents[i];
-          let expectedChild = expectedEvents[j];
+          const child = actualEvents[i];
+          const expectedChild = expectedEvents[j];
           matchFound = child.compare(expectedChild);
           if (matchFound.result == ComparisonResultType.EQUAL) paired[j] = true;
           if (
@@ -809,15 +809,15 @@ class IonListEvent extends AbsIonContainerEvent {
         ComparisonResultType.NOT_EQUAL,
         "Event types don't match"
       );
-    let container = this.ionValue == null ? [] : this.ionValue;
-    let expectedContainer = expected.ionValue == null ? [] : expected.ionValue;
+    const container = this.ionValue == null ? [] : this.ionValue;
+    const expectedContainer = expected.ionValue == null ? [] : expected.ionValue;
     if (container.length !== expectedContainer.length)
       return new ComparisonResult(
         ComparisonResultType.NOT_EQUAL,
         "List length don't match"
       );
     for (let i: number = 0; i < container.length; i++) {
-      let child = container[i];
+      const child = container[i];
       if (
         child.compare(expectedContainer[i]).result ==
         ComparisonResultType.NOT_EQUAL
@@ -853,16 +853,16 @@ class IonSexpEvent extends AbsIonContainerEvent {
         ComparisonResultType.NOT_EQUAL,
         "Event types don't match"
       );
-    let container = this.ionValue == null ? [] : this.ionValue;
-    let expectedContainer = expected.ionValue == null ? [] : expected.ionValue;
+    const container = this.ionValue == null ? [] : this.ionValue;
+    const expectedContainer = expected.ionValue == null ? [] : expected.ionValue;
     if (container.length !== expectedContainer.length)
       return new ComparisonResult(
         ComparisonResultType.NOT_EQUAL,
         "S-expression length don't match"
       );
     for (let i: number = 0; i < container.length; i++) {
-      let child = container[i];
-      let eventResult = child.compare(expectedContainer[i]);
+      const child = container[i];
+      const eventResult = child.compare(expectedContainer[i]);
       if (eventResult.result == ComparisonResultType.NOT_EQUAL) {
         return eventResult;
       } else if (child.eventType === IonEventType.CONTAINER_START) {
