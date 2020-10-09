@@ -109,8 +109,8 @@ export class JsbiSerde {
 
   // Called once during initialization. Creates an array of thresholds that can be referred to to determine how many
   // bytes will be needed to store the UInt encoding of a given JSBI value.
-  private static calculateSizeThresholds(): JSBI[] {
-    const thresholds: JSBI[] = [];
+  private static calculateSizeThresholds(): Array<JSBI> {
+    const thresholds: Array<JSBI> = [];
     for (let m = 1; m <= this.SERIALIZED_JSBI_SIZES_TO_PRECOMPUTE; m++) {
       thresholds.push(this.calculateSizeThreshold(m));
     }

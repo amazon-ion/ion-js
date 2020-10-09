@@ -116,7 +116,7 @@ export interface Value {
    * For the Struct type, returns an array containing the field name/value pairs in the Struct;
    * otherwise throws an Error.
    */
-  fields(): Array<[string, Value]>;
+  fields(): [string, Value][];
 
   /**
    * For the Struct, List, and SExpression types, returns an array containing the container's
@@ -280,7 +280,7 @@ export function Value<Clazz extends Constructor>(
       this._unsupportedOperation("fieldNames");
     }
 
-    fields(): Array<[string, Value]> {
+    fields(): [string, Value][] {
       this._unsupportedOperation("fields");
     }
 

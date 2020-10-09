@@ -13,6 +13,7 @@
     "no-string-literal": false,
     "no-conditional-assignment": false,
     "no-namespace": false,
+    "array-type": false,
     "no-trailing-whitespace": false,
     "interface-name": false,
     "no-empty-interface": false,

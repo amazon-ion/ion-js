@@ -83,8 +83,8 @@ function load_imports(reader: Reader, catalog: Catalog): Import {
   return import_;
 }
 
-function load_symbols(reader: Reader): Array<string | null> {
-  const symbols: Array<string | null> = [];
+function load_symbols(reader: Reader): (string | null)[] {
+  const symbols: (string | null)[] = [];
 
   reader.stepIn();
   while (reader.next()) {
@@ -106,7 +106,7 @@ export function makeSymbolTable(
   reader: Reader,
 ): LocalSymbolTable {
   let import_: Import | null = null;
-  let symbols: Array<string | null> = [];
+  let symbols: (string | null)[] = [];
   let foundSymbols: boolean = false;
   let foundImports: boolean = false;
 

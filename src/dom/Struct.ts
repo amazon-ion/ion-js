@@ -97,7 +97,7 @@ export class Struct extends Value(
     return Object.keys(this._fields);
   }
 
-  fields(): Array<[string, Value]> {
+  fields(): [string, Value][] {
     return Object.entries(this._fields);
   }
 
@@ -145,7 +145,7 @@ export class Struct extends Value(
     if (!(jsValue instanceof Object)) {
       throw new Error(`Cannot create a dom.Struct from: ${jsValue.toString()}`);
     }
-    const fields: Array<[string, Value]> = Object.entries(
+    const fields: [string, Value][] = Object.entries(
       jsValue,
     ).map(([key, value]) => [key, Value.from(value)]);
     return new this(fields, annotations);
