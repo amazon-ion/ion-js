@@ -92,8 +92,7 @@ export function decodeUtf8(bytes: Uint8Array): string {
         );
  }
     }
-    if (c <= 0xffff) { s += String.fromCharCode(c); }
-    else if (c <= 0x10ffff) {
+    if (c <= 0xffff) { s += String.fromCharCode(c); } else if (c <= 0x10ffff) {
       c -= 0x10000;
       s += String.fromCharCode((c >> 10) | 0xd800);
       s += String.fromCharCode((c & 0x3ff) | 0xdc00);

@@ -17,7 +17,6 @@
     "interface-name": false,
     "no-empty-interface": false,
     "variable-name": false,
-    "one-line": false,
     "arrow-parens": false,
     "comment-format": false,
     "triple-equals": false,

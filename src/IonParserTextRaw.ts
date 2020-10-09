@@ -375,9 +375,7 @@ export class ParserTextRaw {
       case T_FLOAT:
         return Number(s);
       case T_FLOAT_SPECIAL:
-        if (s == "+inf") { return Number.POSITIVE_INFINITY; }
-        else if (s == "-inf") { return Number.NEGATIVE_INFINITY; }
-        else if (s == "nan") { return Number.NaN; }
+        if (s == "+inf") { return Number.POSITIVE_INFINITY; } else if (s == "-inf") { return Number.NEGATIVE_INFINITY; } else if (s == "nan") { return Number.NaN; }
       default:
         throw new Error("can't convert to number");
     }
