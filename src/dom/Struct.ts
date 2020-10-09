@@ -52,11 +52,11 @@ export class Struct extends Value(
     return new Proxy(this, {
       // All values set by the user are stored in `this._fields` to avoid
       // potentially overwriting Struct methods.
-      set: function (target, name, value): boolean {
+      set: function(target, name, value): boolean {
         target._fields[name] = value;
         return true; // Indicates that the assignment succeeded
       },
-      get: function (target, name): any {
+      get: function(target, name): any {
         // Property accesses will look for matching Struct API properties before
         // looking for a matching field of the same name.
         if (name in target) {
@@ -64,7 +64,7 @@ export class Struct extends Value(
         }
         return target._fields[name];
       },
-      deleteProperty: function (target, name): boolean {
+      deleteProperty: function(target, name): boolean {
         // Property is deleted only if it's in _field Collection
         if (name in target._fields) {
           delete target._fields[name];

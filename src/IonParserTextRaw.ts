@@ -305,7 +305,7 @@ export class ParserTextRaw {
       39: this._read_value_helper_single, // '\'' == CH_SQ
       34: this._read_value_helper_double, // '\"' == CH_DQ
     };
-    const set_helper = function (str: string, fn: ReadValueHelper) {
+    const set_helper = function(str: string, fn: ReadValueHelper) {
       let i = str.length,
         ch;
       while (i > 0) {
@@ -776,7 +776,7 @@ export class ParserTextRaw {
     }
   }
 
-  private _read_value_helper_minus = function (
+  private _read_value_helper_minus = function(
     ch1: number,
     accept_operator_symbols: boolean,
     calling_op: ReadValueHelper,
@@ -1190,7 +1190,7 @@ export class ParserTextRaw {
     );
   }
 
-  private _read_string_helper = function (
+  private _read_string_helper = function(
     terminator: number,
     allow_new_line: boolean,
   ): void {
