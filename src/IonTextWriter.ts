@@ -262,8 +262,9 @@ export class TextWriter extends AbstractWriter {
     this.handleSeparator();
     this.writeAnnotations();
     this._writeNull(type);
-    if (this.currentContainer.containerType === IonTypes.STRUCT)
+    if (this.currentContainer.containerType === IonTypes.STRUCT) {
       this.currentContainer.state = State.STRUCT_FIELD;
+    }
   }
 
   writeString(value: string): void {
@@ -366,8 +367,9 @@ export class TextWriter extends AbstractWriter {
     value: T,
     serialize: Serializer<T>,
   ) {
-    if (this.currentContainer.state === State.STRUCT_FIELD)
+    if (this.currentContainer.state === State.STRUCT_FIELD) {
       throw new Error("Expecting a struct field");
+    }
     if (value === null) {
       this.writeNull(type);
       return;
@@ -375,8 +377,9 @@ export class TextWriter extends AbstractWriter {
     this.handleSeparator();
     this.writeAnnotations();
     serialize(value);
-    if (this.currentContainer.containerType === IonTypes.STRUCT)
+    if (this.currentContainer.containerType === IonTypes.STRUCT) {
       this.currentContainer.state = State.STRUCT_FIELD;
+    }
   }
 
   protected writeContainer(type: IonType, openingCharacter: number): void {

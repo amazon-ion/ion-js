@@ -63,7 +63,7 @@ const isIdentifierArray: boolean[] = _make_bool_array(
 );
 
 export function is_digit(ch: number): boolean {
-  if (ch < 48 || ch > 57) return false;
+  if (ch < 48 || ch > 57) { return false; }
   return true;
 }
 
@@ -95,15 +95,15 @@ export function asAscii(s: any): string {
 export function nextEscape(s: string, prev: number): number {
   // this actually counts backwards to -1
   while (prev-- > 0) {
-    if (needsEscape(s.charCodeAt(prev))) break;
+    if (needsEscape(s.charCodeAt(prev))) { break; }
   }
   return prev;
 }
 
 export function needsEscape(c: number): boolean {
-  if (c < 32) return true;
-  if (c > 126) return true;
-  if (c === DOUBLE_QUOTE || c === SINGLE_QUOTE || c === SLASH) return true;
+  if (c < 32) { return true; }
+  if (c > 126) { return true; }
+  if (c === DOUBLE_QUOTE || c === SINGLE_QUOTE || c === SLASH) { return true; }
   return false;
 }
 
@@ -114,7 +114,7 @@ export function escapeString(s: string, pos: number): string {
     s2;
  while (pos >= 0) {
     c = s.charCodeAt(pos);
-    if (!needsEscape(c)) break;
+    if (!needsEscape(c)) { break; }
     fixes.push([pos, c]);
     pos = nextEscape(s, pos);
   }
@@ -172,7 +172,7 @@ export function is_letter(ch: number): boolean {
 }
 
 export function isNumericTerminator(ch: number): boolean {
-  if (ch == -1) return true;
+  if (ch == -1) { return true; }
   return _is_numeric_terminator[ch];
 }
 
@@ -185,10 +185,10 @@ export function is_operator_char(ch: number): boolean {
 }
 
 export function is_whitespace(ch: number): boolean {
-  if (ch > 32) return false;
-  if (ch == this.WHITESPACE_COMMENT1) return true;
-  if (ch == this.WHITESPACE_COMMENT2) return true;
-  if (ch == this.ESCAPED_NEWLINE) return true;
+  if (ch > 32) { return false; }
+  if (ch == this.WHITESPACE_COMMENT1) { return true; }
+  if (ch == this.WHITESPACE_COMMENT2) { return true; }
+  if (ch == this.ESCAPED_NEWLINE) { return true; }
   return _is_whitespace[ch];
 }
 

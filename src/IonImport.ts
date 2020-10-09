@@ -60,7 +60,7 @@ export class Import {
   }
 
   getSymbolText(symbolId: number): string | undefined {
-    if (this.parent === undefined) throw new Error("Illegal parent state.");
+    if (this.parent === undefined) { throw new Error("Illegal parent state."); }
     if (this.parent !== null) {
       const parentSymbol = this.parent.getSymbolText(symbolId);
       if (parentSymbol) {

@@ -161,7 +161,7 @@ export class Decimal {
    */
   static parse(str: string): Decimal | null {
     let exponent = 0;
-    if (str === "null" || str === "null.decimal") return null;
+    if (str === "null" || str === "null.decimal") { return null; }
     const d = str.match("[d|D]");
     let exponentDelimiterIndex = str.length;
     if (d !== undefined && d !== null) {

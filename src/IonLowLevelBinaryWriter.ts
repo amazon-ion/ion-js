@@ -90,7 +90,7 @@ export class LowLevelBinaryWriter {
     tempBuf[--i] = value & 0xff;
 
     // Sign bit
-    if (1 / originalValue < 0) tempBuf[0] |= 0x80;
+    if (1 / originalValue < 0) { tempBuf[0] |= 0x80; }
 
     this.writeable.writeBytes(tempBuf);
   }

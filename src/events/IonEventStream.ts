@@ -167,14 +167,16 @@ export class IonEventStream {
     ) {
       const actualEvent = this.events[actualIndex];
       const expectedEvent = expected.events[expectedIndex];
-      if (actualEvent.eventType === IonEventType.SYMBOL_TABLE) actualIndex++;
-      if (expectedEvent.eventType === IonEventType.SYMBOL_TABLE)
+      if (actualEvent.eventType === IonEventType.SYMBOL_TABLE) { actualIndex++; }
+      if (expectedEvent.eventType === IonEventType.SYMBOL_TABLE) {
         expectedIndex++;
+      }
       if (
         actualEvent.eventType === IonEventType.SYMBOL_TABLE ||
         expectedEvent.eventType === IonEventType.SYMBOL_TABLE
-      )
+      ) {
         continue;
+      }
       switch (actualEvent.eventType) {
         case IonEventType.SCALAR: {
           const eventResult = actualEvent.compare(expectedEvent);
@@ -380,8 +382,9 @@ export class IonEventStream {
     const currentEvent = {};
     for (let tid: IonType | null; (tid = this.reader.next()); ) {
       const fieldName = this.reader.fieldName();
-      if (fieldName && currentEvent[fieldName] !== undefined)
+      if (fieldName && currentEvent[fieldName] !== undefined) {
         throw new Error("Repeated event field: " + fieldName);
+      }
       switch (fieldName) {
         case "event_type": {
           currentEvent[fieldName] = this.reader.stringValue();
@@ -407,8 +410,9 @@ export class IonEventStream {
 
         case "value_text": {
           let tempString: string = this.reader.stringValue()!;
-          if (tempString.substr(0, 5) === "$ion_")
+          if (tempString.substr(0, 5) === "$ion_") {
             tempString = "$ion_user_value::" + tempString;
+          }
           const tempReader: Reader = makeReader(tempString);
           tempReader.next();
           const tempValue = tempReader.value();
@@ -457,7 +461,7 @@ export class IonEventStream {
       currentEvent["field_name"] !== undefined
         ? currentEvent["field_name"]
         : null;
-    if (!currentEvent["annotations"]) currentEvent["annotations"] = [];
+    if (!currentEvent["annotations"]) { currentEvent["annotations"] = []; }
 
     const textEvent = this.eventFactory.makeEvent(
       eventType!,
@@ -575,7 +579,7 @@ export class IonEventStream {
   private parseBinaryValue(): any {
     //convert list of ints to array of bytes and pass the currentBuffer to a binary reader, generate value from factory.
     //start with a null check
-    if (this.reader.isNull()) return null;
+    if (this.reader.isNull()) { return null; }
     const numBuffer: number[] = [];
     this.reader.stepIn();
     let tid: IonType | null = this.reader.next();

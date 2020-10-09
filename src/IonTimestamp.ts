@@ -688,13 +688,14 @@ class _TimestampParser {
     while (pos < limit) {
       if (state.len === null) {
         const digits: string = _TimestampParser._readUnknownDigits(str, pos);
-        if (digits.length === 0)
+        if (digits.length === 0) {
           throw new Error("No digits found at pos: " + pos);
+        }
         v = parseInt(digits, 10);
         pos += digits.length;
       } else if (state.len > 0) {
         v = _TimestampParser._readDigits(str, pos, state.len);
-        if (v < 0) throw new Error("Non-digit value found at pos " + pos);
+        if (v < 0) { throw new Error("Non-digit value found at pos " + pos); }
         pos = pos + state.len;
       }
       v = v!;
@@ -730,10 +731,11 @@ class _TimestampParser {
           break;
         case _States.OFFSET_MINUTES:
           offset! += v;
-          if (v >= 60)
+          if (v >= 60) {
             throw new Error(
               "Minute offset " + String(v) + " above maximum or equal to : 60",
             );
+          }
           break;
         case _States.OFFSET_ZULU:
           offsetSign = 1;
@@ -751,8 +753,9 @@ class _TimestampParser {
       if (state.t !== null) {
         const c: string = String.fromCharCode(str.charCodeAt(pos));
         state = _TimestampParser._timeParserStates[state.t[c]];
-        if (state === undefined)
+        if (state === undefined) {
           throw new Error("State was not set pos:" + pos);
+        }
         if (state.f === _States.OFFSET_ZULU) {
           // TBD why is this a special case here?
           offsetSign = 1;

@@ -106,7 +106,7 @@ export class BinaryReader implements Reader {
   next(): IonType | null {
     this._annotations = null;
 
-    if (this._raw_type === EOF) return null;
+    if (this._raw_type === EOF) { return null; }
     for (
       this._raw_type = this._parser.next();
       this.depth() === 0;
@@ -114,11 +114,11 @@ export class BinaryReader implements Reader {
     ) {
       if (this._raw_type === TB_SYMBOL) {
         const raw: number | null = this._parser._getSid();
-        if (raw !== IVM.sid) break;
+        if (raw !== IVM.sid) { break; }
         this._symtab = defaultLocalSymbolTable();
       } else if (this._raw_type === TB_STRUCT) {
-        if (!this._parser.hasAnnotations()) break;
-        if (this._parser.getAnnotation(0) !== ion_symbol_table_sid) break;
+        if (!this._parser.hasAnnotations()) { break; }
+        if (this._parser.getAnnotation(0) !== ion_symbol_table_sid) { break; }
         this._symtab = makeSymbolTable(this._cat, this);
       } else {
         break;
@@ -128,8 +128,9 @@ export class BinaryReader implements Reader {
   }
 
   stepIn(): void {
-    if (!get_ion_type(this._raw_type)!.isContainer)
+    if (!get_ion_type(this._raw_type)!.isContainer) {
       throw new Error("Can't step in to a scalar value");
+    }
     this._parser.stepIn();
     this._raw_type = BOC;
   }
@@ -268,7 +269,7 @@ export class BinaryReader implements Reader {
 
   private getSymbolString(symbolId: number | null): string | null {
     let s: string | null = null;
-    if (symbolId === null) return null;
+    if (symbolId === null) { return null; }
     if (symbolId > 0) {
       if (symbolId > this._symtab.maxId) {
         throw new Error(

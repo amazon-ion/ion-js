@@ -732,12 +732,15 @@ export class ParserBinaryRaw {
   private load_ivm(): number {
     const t: ParserBinaryRaw = this;
     const span = t._in;
-    if (span.next() !== ivm_image_1)
+    if (span.next() !== ivm_image_1) {
       throw new Error("invalid binary Ion at " + span.position());
-    if (span.next() !== ivm_image_2)
+    }
+    if (span.next() !== ivm_image_2) {
       throw new Error("invalid binary Ion at " + span.position());
-    if (span.next() !== ivm_image_3)
+    }
+    if (span.next() !== ivm_image_3) {
       throw new Error("invalid binary Ion at " + span.position());
+    }
     t._curr = ivm_sid;
     t._len = 0;
     return IonBinary.TB_SYMBOL;
@@ -747,7 +750,7 @@ export class ParserBinaryRaw {
     const t: ParserBinaryRaw = this;
 
     let a, b, pos, limit, arr;
-    if ((pos = t._as) < 0) return; // nothing to do,
+    if ((pos = t._as) < 0) { return; } // nothing to do,
     arr = [];
     limit = t._ae;
     a = 0;
@@ -779,8 +782,8 @@ export class ParserBinaryRaw {
   }
 
   private load_value(): void {
-    if (this._curr != undefined) return; // current value is already loaded
-    if (this.isNull()) return;
+    if (this._curr != undefined) { return; } // current value is already loaded
+    if (this.isNull()) { return; }
     switch (this._raw_type) {
       case IonBinary.TB_BOOL:
         break;
@@ -811,7 +814,7 @@ export class ParserBinaryRaw {
         break;
       case IonBinary.TB_CLOB:
       case IonBinary.TB_BLOB:
-        if (this.isNull()) break;
+        if (this.isNull()) { break; }
         this._curr = this._in.chunk(this._len);
         break;
       default:

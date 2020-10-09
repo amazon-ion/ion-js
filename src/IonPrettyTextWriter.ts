@@ -61,8 +61,9 @@ export class PrettyTextWriter extends TextWriter {
     this.writePrettyValue();
     this.writeAnnotations();
     this._writeNull(type);
-    if (this.currentContainer.containerType === IonTypes.STRUCT)
+    if (this.currentContainer.containerType === IonTypes.STRUCT) {
       this.currentContainer.state = State.STRUCT_FIELD;
+    }
   }
 
   stepOut(): void {
@@ -96,8 +97,9 @@ export class PrettyTextWriter extends TextWriter {
   }
 
   _serializeValue<T>(type: IonType, value: T, serialize: Serializer<T>) {
-    if (this.currentContainer.state === State.STRUCT_FIELD)
+    if (this.currentContainer.state === State.STRUCT_FIELD) {
       throw new Error("Expecting a struct field");
+    }
     if (value === null) {
       this.writeNull(type);
       return;
@@ -107,8 +109,9 @@ export class PrettyTextWriter extends TextWriter {
     this.writePrettyValue();
     this.writeAnnotations();
     serialize(value);
-    if (this.currentContainer.containerType === IonTypes.STRUCT)
+    if (this.currentContainer.containerType === IonTypes.STRUCT) {
       this.currentContainer.state = State.STRUCT_FIELD;
+    }
   }
 
   writeContainer(type: IonType, openingCharacter: number): void {

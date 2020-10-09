@@ -114,12 +114,12 @@ export function makeSymbolTable(
   while (reader.next()) {
     switch (reader.fieldName()) {
       case "imports":
-        if (foundImports) throw new Error("Multiple import fields found.");
+        if (foundImports) { throw new Error("Multiple import fields found."); }
         import_ = load_imports(reader, catalog);
         foundImports = true;
         break;
       case "symbols":
-        if (foundSymbols) throw new Error("Multiple symbol fields found.");
+        if (foundSymbols) { throw new Error("Multiple symbol fields found."); }
         symbols = load_symbols(reader);
         foundSymbols = true;
         break;

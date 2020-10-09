@@ -781,8 +781,9 @@ class StructNode extends ContainerNode {
   }
 
   addChild(child: Node, fieldName?: Uint8Array): void {
-    if (fieldName === null || fieldName === undefined)
+    if (fieldName === null || fieldName === undefined) {
       throw new Error("Cannot add a value to a struct without a field name");
+    }
     this.fields.push({ name: fieldName, value: child });
   }
 
