@@ -776,7 +776,7 @@ class _TimestampParser {
       offset = offsetSign! * offset!;
     }
 
-    let seconds: Decimal | undefined = undefined;
+    let seconds: Decimal | undefined;
     if ((secondsInt !== undefined && secondsInt !== null) || fractionStr) {
       seconds = Decimal.parse(
         secondsInt! + "." + (fractionStr ? fractionStr : ""),

@@ -781,7 +781,7 @@ export class ParserTextRaw {
     accept_operator_symbols: boolean,
     calling_op: ReadValueHelper,
   ) {
-    let op = undefined,
+    let op,
       ch2 = this._peek();
     if (ch2 == CH_i) {
       ch2 = this._peek("inf");

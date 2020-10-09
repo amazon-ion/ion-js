@@ -18,7 +18,6 @@
     "no-empty-interface": false,
     "variable-name": false,
     "triple-equals": false,
-    "no-unnecessary-initializer": false,
     "no-empty": false,
     "object-literal-sort-keys": false,
     "radix": false,
