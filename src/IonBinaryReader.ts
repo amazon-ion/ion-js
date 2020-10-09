@@ -37,7 +37,7 @@ import { IonType } from "./IonType";
 import { IonTypes } from "./IonTypes";
 import { JsbiSupport } from "./JsbiSupport";
 
-const BOC = -2; //beginning of container?
+const BOC = -2; // beginning of container?
 const EOF = -1;
 const TB_NULL = 0;
 const TB_BOOL = 1;
@@ -279,8 +279,8 @@ export class BinaryReader implements Reader {
       s = this._symtab.getSymbolText(symbolId);
       if (s === undefined) {
         throw new Error("symbol is unresolvable");
-        //s = "$" + symbolId.toString();
-        //todo turn this back on once symbol table imports are supported and lst context transfer is supported.
+        // s = "$" + symbolId.toString();
+        // todo turn this back on once symbol table imports are supported and lst context transfer is supported.
       }
     } else if (symbolId === 0) {
       throw new Error("Symbol ID zero is unsupported");

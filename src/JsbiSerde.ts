@@ -16,7 +16,7 @@
 import JSBI from "jsbi";
 import { JsbiSupport } from "./JsbiSupport";
 
-//TODO: Add fast paths for JSBI values that can fit in a standard Number.
+// TODO: Add fast paths for JSBI values that can fit in a standard Number.
 /**
  * This class provides logic to convert JSBI values to and from the UInt, Int, VarUInt, and VarInt primitives from the
  * Ion spec.

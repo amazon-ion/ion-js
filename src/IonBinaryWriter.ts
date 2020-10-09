@@ -354,7 +354,7 @@ export class BinaryWriter extends AbstractWriter {
     }
     const writer: LowLevelBinaryWriter = new LowLevelBinaryWriter(
       new Writeable(12),
-    ); //where does the 12 come from
+    ); // where does the 12 come from
     writer.writeVariableLengthSignedInt(value.getLocalOffset());
 
     const date = value.getDate();
@@ -558,7 +558,7 @@ export class BinaryWriter extends AbstractWriter {
       this.stepIn(IonTypes.LIST);
       for (const symbol_ of this.symbolTable.symbols) {
         if (symbol_ !== undefined) {
-          //TODO investigate if this needs more error handling.
+          // TODO investigate if this needs more error handling.
           this.writeString(symbol_);
         }
       }

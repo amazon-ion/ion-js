@@ -225,7 +225,7 @@ export class BinarySpan extends Span {
     return this._src[this._pos++];
   }
 
-  //returns an array with the same backing buffer as the source.
+  // returns an array with the same backing buffer as the source.
   view(length: number): Uint8Array {
     if (this._pos + length > this._limit) {
       throw new Error(
@@ -241,7 +241,7 @@ export class BinarySpan extends Span {
     return this._src.subarray(this._pos, (this._pos += length));
   }
 
-  //returns an array with a new backing buffer.
+  // returns an array with a new backing buffer.
   chunk(length: number): Uint8Array {
     return new Uint8Array(this.view(length));
   }
@@ -271,7 +271,7 @@ export class BinarySpan extends Span {
   }
 
   clone(start: number, len: number): BinarySpan {
-    //this doesn't make sense
+    // this doesn't make sense
     return new BinarySpan(this._src.subarray(this._pos));
   }
 }

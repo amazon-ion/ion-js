@@ -129,7 +129,7 @@ abstract class AbstractIonEvent implements IonEvent {
   }
 
   writeSymbolToken(writer: Writer, text: string) {
-    //should be a struct with text/import descriptor?
+    // should be a struct with text/import descriptor?
     writer.writeSymbol(text);
   }
 
@@ -563,7 +563,7 @@ class IonSymbolEvent extends AbstractIonEvent {
     depth: number,
     ionValue: string,
   ) {
-    //if(ionValue === '$ion_1_0') ionValue = "$ion_user_value::" + ionValue;
+    // if(ionValue === '$ion_1_0') ionValue = "$ion_user_value::" + ionValue;
     super(eventType, ionType, fieldName, annotations, depth, ionValue);
   }
 
@@ -580,7 +580,7 @@ class IonSymbolEvent extends AbstractIonEvent {
     );
   }
   writeIonValue(writer: Writer): void {
-    writer.writeSymbol(this.ionValue); //if symboltokens text is unknown we will need to write out symboltable
+    writer.writeSymbol(this.ionValue); // if symboltokens text is unknown we will need to write out symboltable
   }
 }
 
@@ -728,12 +728,12 @@ abstract class AbsIonContainerEvent extends AbstractIonEvent {
   abstract valueCompare(expected: AbsIonContainerEvent);
 
   writeIonValue(writer: Writer): void {
-    //no op;
+    // no op;
   }
 }
 
 class IonStructEvent extends AbsIonContainerEvent {
-  //no embed support as of yet.
+  // no embed support as of yet.
   constructor(
     eventType: IonEventType,
     ionType: IonType,
@@ -744,7 +744,7 @@ class IonStructEvent extends AbsIonContainerEvent {
     super(eventType, ionType, fieldName, annotations, depth);
   }
 
-  //two way equivalence between the structEvents, they must have the exact same number of equivalent elements.
+  // two way equivalence between the structEvents, they must have the exact same number of equivalent elements.
   valueCompare(expected: IonStructEvent): ComparisonResult {
     if (!(expected instanceof IonStructEvent)) {
       return new ComparisonResult(
@@ -763,8 +763,8 @@ class IonStructEvent extends AbsIonContainerEvent {
     return this.structsCompare(container, expectedContainer);
   }
 
-  //for each actual ionEvent, searches for an equivalent expected ionEvent,
-  //equivalent pairings remove the paired expectedEvent from the search space.
+  // for each actual ionEvent, searches for an equivalent expected ionEvent,
+  // equivalent pairings remove the paired expectedEvent from the search space.
   structsCompare(
     actualEvents: AbstractIonEvent[],
     expectedEvents: AbstractIonEvent[],
@@ -903,7 +903,7 @@ class IonEndEvent extends AbstractIonEvent {
   }
 
   valueCompare(expected: IonEndEvent): ComparisonResult {
-    //should be null === null if they are both end events.
+    // should be null === null if they are both end events.
     if (
       expected instanceof IonEndEvent &&
       this.ionValue === expected.ionValue
@@ -917,6 +917,6 @@ class IonEndEvent extends AbstractIonEvent {
   }
 
   writeIonValue(writer: Writer): void {
-    //no op
+    // no op
   }
 }

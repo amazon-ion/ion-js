@@ -510,7 +510,7 @@ export function escape(input: string, escapes: EscapeIndex): string {
     escape = escapes[charCode];
     if (escape !== undefined) {
       for (let j = 0; j < escape.length; j++) {
-        escapeSeq += String.fromCharCode(escape[j]); //TODO this is slow we are going to need to replace this with just the string eventually instead of using the charcode crap.
+        escapeSeq += String.fromCharCode(escape[j]); // TODO this is slow we are going to need to replace this with just the string eventually instead of using the charcode crap.
       }
       escapedString += input.slice(lastIndex, i) + escapeSeq;
       lastIndex = i + 1;

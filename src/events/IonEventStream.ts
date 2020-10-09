@@ -209,7 +209,7 @@ export class IonEventStream {
         }
         case IonEventType.CONTAINER_END:
         case IonEventType.STREAM_END: {
-          //no op
+          // no op
           break;
         }
         default: {
@@ -345,7 +345,7 @@ export class IonEventStream {
     );
   }
 
-  //(event_type: EventType, ion_type: IonType, field_name: SymbolToken, annotations: list<SymbolToken>, value_text: string, value_binary: list<byte>, imports: list<ImportDescriptor>, depth: int)
+  // (event_type: EventType, ion_type: IonType, field_name: SymbolToken, annotations: list<SymbolToken>, value_text: string, value_binary: list<byte>, imports: list<ImportDescriptor>, depth: int)
   private marshalStream(): void {
     this.events = [];
     const currentContainer: IonEvent[] = [];
@@ -577,8 +577,8 @@ export class IonEventStream {
   }
 
   private parseBinaryValue(): any {
-    //convert list of ints to array of bytes and pass the currentBuffer to a binary reader, generate value from factory.
-    //start with a null check
+    // convert list of ints to array of bytes and pass the currentBuffer to a binary reader, generate value from factory.
+    // start with a null check
     if (this.reader.isNull()) { return null; }
     const numBuffer: number[] = [];
     this.reader.stepIn();
@@ -595,7 +595,7 @@ export class IonEventStream {
   }
 
   private parseImports(): any {
-    //TODO needed for symboltoken support.
+    // TODO needed for symboltoken support.
     return this.reader.value();
   }
 

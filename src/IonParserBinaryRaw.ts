@@ -687,7 +687,7 @@ export class ParserBinaryRaw {
       return undefined;
     }
     tb = t._in.next();
-    rt = high_nibble(tb); //load type
+    rt = high_nibble(tb); // load type
     t.load_length(tb);
     if (rt === IonBinary.TB_ANNOTATION) {
       if (t._len < 1 && t.depth() === 0) {

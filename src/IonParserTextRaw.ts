@@ -157,7 +157,7 @@ export function get_ion_type(t: number): IonType | null {
   }
 }
 
-//needs to differentiate between quoted text of 'null' and the symbol keyword null
+// needs to differentiate between quoted text of 'null' and the symbol keyword null
 function get_keyword_type(str: string): number {
   if (str === "null") { return T_NULL; }
   if (str === "true") { return T_BOOL; }
@@ -1020,7 +1020,7 @@ export class ParserTextRaw {
 
   private _readTimestamp(): void {
     this._start = this._in.position();
-    let ch = this._readPastNDigits(4); //reads past year, throws on non digits.
+    let ch = this._readPastNDigits(4); // reads past year, throws on non digits.
     if (ch === CH_T) {
       this._end = this._in.position();
       this._value_push(T_TIMESTAMP);
@@ -1029,7 +1029,7 @@ export class ParserTextRaw {
       throw new Error("Timestamp year must be followed by '-' or 'T'.");
     }
 
-    ch = this._readPastNDigits(2); //reads past month, throws on non digits.
+    ch = this._readPastNDigits(2); // reads past month, throws on non digits.
     if (ch === CH_T) {
       this._end = this._in.position();
       this._value_push(T_TIMESTAMP);
@@ -1038,7 +1038,7 @@ export class ParserTextRaw {
       throw new Error("Timestamp month must be followed by '-' or 'T'.");
     }
 
-    ch = this._readPastNDigits(2); //reads past day, throws on non digits.
+    ch = this._readPastNDigits(2); // reads past day, throws on non digits.
     if (IonText.isNumericTerminator(ch)) {
       this._unread(ch);
       this._end = this._in.position();
@@ -1052,7 +1052,7 @@ export class ParserTextRaw {
 
     const peekChar = this._in.peek();
     if (IonText.isNumericTerminator(peekChar)) {
-      //checks to see if timestamp value has terminated.
+      // checks to see if timestamp value has terminated.
       this._end = this._in.position();
       this._value_push(T_TIMESTAMP);
       return;
@@ -1062,18 +1062,18 @@ export class ParserTextRaw {
       );
     }
 
-    ch = this._readPastNDigits(2); //read past hour.
+    ch = this._readPastNDigits(2); // read past hour.
     if (ch !== CH_CL) {
       // :
       throw new Error("Timestamp time(hr:min) requires format of 00:00");
     }
 
-    ch = this._readPastNDigits(2); //read past minutes.
+    ch = this._readPastNDigits(2); // read past minutes.
     if (ch === CH_CL) {
-      //read seconds
+      // read seconds
       ch = this._readPastNDigits(2);
       if (ch === CH_DT) {
-        //read fractional seconds
+        // read fractional seconds
         if (!IonText.is_digit(this._read())) {
           throw new Error(
             "W3C timestamp spec requires atleast one digit after decimal point.",
@@ -1156,8 +1156,8 @@ export class ParserTextRaw {
       for (let i: number = 0; i < 3; i++) {
         this._read();
       }
-      //in tripleQuotes, index content of current triple quoted string,
-      //looking for more triple quotes
+      // in tripleQuotes, index content of current triple quoted string,
+      // looking for more triple quotes
       while (this._peek("'''") === ERROR) {
         ch = this._read();
         if (ch == CH_BS) {
@@ -1170,9 +1170,9 @@ export class ParserTextRaw {
         // read single quoted strings until we see the triple quoted terminator
         // if it's not a triple quote, it's just content
       }
-      //mark the possible end of the series of triplequotes, set the end of the value, it will reset later if further triple quotes are found after indexing through whitespace.
+      // mark the possible end of the series of triplequotes, set the end of the value, it will reset later if further triple quotes are found after indexing through whitespace.
       this._end = this._in.position();
-      //Index past the triple quote.
+      // Index past the triple quote.
       for (let i: number = 0; i < 3; i++) {
         this._read();
       }
@@ -1293,7 +1293,7 @@ export class ParserTextRaw {
     let ch,
       base64_chars = 0,
       trailers = 0;
-    this._start = this._in.position(); //is this going to be accurate where is the start being set that leads to this value?
+    this._start = this._in.position(); // is this going to be accurate where is the start being set that leads to this value?
     while (true) {
       ch = this._read();
       if (IonText.is_base64_char(ch)) {
@@ -1390,8 +1390,8 @@ export class ParserTextRaw {
     let tempIndex: number = entryIndex + 3;
     tempIndex = this.indexWhiteSpace(tempIndex, acceptComments);
     if (tempIndex + 2 <= end && this.verifyTriple(tempIndex)) {
-      //index === ' index + 1 === ' index + 2 === ' and not at the end of the value
-      return tempIndex + 4; //indexes us past the triple quote we just found
+      // index === ' index + 1 === ' index + 2 === ' and not at the end of the value
+      return tempIndex + 4; // indexes us past the triple quote we just found
     } else {
       return tempIndex + 1;
     }
@@ -1620,7 +1620,7 @@ export class ParserTextRaw {
     return ch;
   }
 
-  //peek does not work with the different types of string input.
+  // peek does not work with the different types of string input.
   private _peek(expected?: string): number {
     let ch,
       ii = 0;
@@ -1697,7 +1697,7 @@ export class ParserTextRaw {
   }
 
   private _readPastNDigits(n: number): number {
-    //This is clearly bugged it reads n + 1 digits.
+    // This is clearly bugged it reads n + 1 digits.
     this._readNDigits(n);
     return this._read();
   }

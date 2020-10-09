@@ -76,7 +76,7 @@ export class LowLevelBinaryWriter {
   }
 
   writeSignedInt(originalValue: number): void {
-    //TODO this should flip to different modes based on the length calculation because bit shifting will drop to 32 bits.
+    // TODO this should flip to different modes based on the length calculation because bit shifting will drop to 32 bits.
     const length = LowLevelBinaryWriter.getSignedIntSize(originalValue);
     let value: number = Math.abs(originalValue);
     const tempBuf = new Uint8Array(length);

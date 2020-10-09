@@ -150,7 +150,7 @@ export class PrettyTextWriter extends TextWriter {
             this.writePrettyNewLine(0);
             break;
           default:
-          //no op
+          // no op
         }
       }
     }

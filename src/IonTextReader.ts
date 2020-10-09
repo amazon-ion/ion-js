@@ -213,7 +213,7 @@ export class TextReader implements Reader {
       if (raw_type === T_IDENTIFIER && str.length > 1 && str[0] === "$") {
         const tempStr = str.substr(1, str.length);
         if (+tempStr === +tempStr) {
-          //look up sid, +str === +str is a one line is integer hack
+          // look up sid, +str === +str is a one line is integer hack
           const symbol = this._symtab.getSymbolText(Number(tempStr));
           if (symbol === undefined) {
             throw new Error(
@@ -346,7 +346,7 @@ export class TextReader implements Reader {
         ) {
           const tempStr = this._raw.substr(1, this._raw.length);
           if (+tempStr === +tempStr) {
-            //look up sid, +str === +str is a one line is integer hack
+            // look up sid, +str === +str is a one line is integer hack
             const symbolId = Number(tempStr);
             const symbol = this._symtab.getSymbolText(symbolId);
             if (symbol === undefined) {

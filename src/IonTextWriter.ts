@@ -350,7 +350,7 @@ export class TextWriter extends AbstractWriter {
   }
 
   close(): void {
-    //TODO clear out resources when writer uses more than a basic array/devs have built in IO support etc.
+    // TODO clear out resources when writer uses more than a basic array/devs have built in IO support etc.
     if (this.depth() > 0) {
       throw new Error(
         "Writer has one or more open containers; call stepOut() for each container prior to close()",
@@ -414,7 +414,7 @@ export class TextWriter extends AbstractWriter {
             this.writeable.writeByte(CharCodes.SPACE);
             break;
           default:
-          //no op
+          // no op
         }
       }
     }
