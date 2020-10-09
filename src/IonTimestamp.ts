@@ -609,11 +609,11 @@ class _TimeParserState {
 class _TimestampParser {
   private static _timeParserStates: _StateMap = {
     [_States.YEAR]: new _TimeParserState(_States.YEAR, 4, {
-      T: _States.OFFSET_UNKNOWN,
+      "T": _States.OFFSET_UNKNOWN,
       "-": _States.MONTH,
     }),
     [_States.MONTH]: new _TimeParserState(_States.MONTH, 2, {
-      T: _States.OFFSET_UNKNOWN,
+      "T": _States.OFFSET_UNKNOWN,
       "-": _States.DAY,
     }),
     [_States.DAY]: new _TimeParserState(_States.DAY, 2, { T: _States.HOUR }),
@@ -624,13 +624,13 @@ class _TimestampParser {
       ":": _States.SECONDS,
       "+": _States.OFFSET_POSITIVE,
       "-": _States.OFFSET_NEGATIVE,
-      Z: _States.OFFSET_ZULU,
+      "Z": _States.OFFSET_ZULU,
     }),
     [_States.SECONDS]: new _TimeParserState(_States.SECONDS, 2, {
       ".": _States.FRACTIONAL_SECONDS,
       "+": _States.OFFSET_POSITIVE,
       "-": _States.OFFSET_NEGATIVE,
-      Z: _States.OFFSET_ZULU,
+      "Z": _States.OFFSET_ZULU,
     }),
     [_States.FRACTIONAL_SECONDS]: new _TimeParserState(
       _States.FRACTIONAL_SECONDS,
@@ -638,7 +638,7 @@ class _TimestampParser {
       {
         "+": _States.OFFSET_POSITIVE,
         "-": _States.OFFSET_NEGATIVE,
-        Z: _States.OFFSET_ZULU,
+        "Z": _States.OFFSET_ZULU,
       },
     ),
     [_States.OFFSET_POSITIVE]: new _TimeParserState(
