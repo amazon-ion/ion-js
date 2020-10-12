@@ -18,12 +18,14 @@
     "interface-name": false,
     "no-empty-interface": false,
     "variable-name": false,
+    "trailing-comma": false,
     "triple-equals": false,
     "no-empty": false,
     "object-literal-sort-keys": false,
     "radix": false,
     "only-arrow-functions": false,
     "class-name": false,
+    "object-literal-key-quotes": false,
     "object-literal-shorthand": false,
     "interface-over-type-literal": false
   }
