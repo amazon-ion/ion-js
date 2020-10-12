@@ -27,6 +27,6 @@ export class IonType {
     /** Whether or not this type is an `int`, `float`, or `decimal`. */
     public readonly isNumeric: boolean,
     /** Whether or not this type is a `list`, `sexp`, or `struct`. */
-    public readonly isContainer: boolean,
+    public readonly isContainer: boolean
   ) {}
 }

@@ -43,7 +43,9 @@ export class Catalog {
       throw new Error("SymbolTable name must be defined.");
     }
     const versions = this.symbolTables[symbolTable.name];
-    if (versions === undefined) { this.symbolTables[symbolTable.name] = []; }
+    if (versions === undefined) {
+      this.symbolTables[symbolTable.name] = [];
+    }
     this.symbolTables[symbolTable.name][symbolTable.version] = symbolTable;
   }
 
@@ -54,9 +56,13 @@ export class Catalog {
    */
   getVersion(name: string, version: number): SharedSymbolTable | null {
     const tables: SharedSymbolTable[] = this.symbolTables[name];
-    if (!tables) { return null; }
+    if (!tables) {
+      return null;
+    }
     let table = tables[version];
-    if (!table) { table = tables[tables.length]; }
+    if (!table) {
+      table = tables[tables.length];
+    }
     return table ? table : null;
   }
 
@@ -67,7 +73,9 @@ export class Catalog {
    */
   getTable(name: string): SharedSymbolTable | null {
     const versions = this.symbolTables[name];
-    if (versions === undefined) { return null; }
+    if (versions === undefined) {
+      return null;
+    }
     return versions[versions.length - 1];
   }
 }

@@ -57,12 +57,12 @@ function load_imports(reader: Reader, catalog: Catalog): Import {
     if (name && name !== "$ion") {
       let symbolTable: SharedSymbolTable | null = catalog.getVersion(
         name,
-        version!,
+        version!
       );
       if (!symbolTable) {
         if (maxId === undefined) {
           throw new Error(
-            `No exact match found when trying to import symbol table ${name} version ${version}`,
+            `No exact match found when trying to import symbol table ${name} version ${version}`
           );
         } else {
           symbolTable = catalog.getTable(name);
@@ -103,7 +103,7 @@ function load_symbols(reader: Reader): (string | null)[] {
  */
 export function makeSymbolTable(
   catalog: Catalog,
-  reader: Reader,
+  reader: Reader
 ): LocalSymbolTable {
   let import_: Import | null = null;
   let symbols: (string | null)[] = [];
@@ -114,12 +114,16 @@ export function makeSymbolTable(
   while (reader.next()) {
     switch (reader.fieldName()) {
       case "imports":
-        if (foundImports) { throw new Error("Multiple import fields found."); }
+        if (foundImports) {
+          throw new Error("Multiple import fields found.");
+        }
         import_ = load_imports(reader, catalog);
         foundImports = true;
         break;
       case "symbols":
-        if (foundSymbols) { throw new Error("Multiple symbol fields found."); }
+        if (foundSymbols) {
+          throw new Error("Multiple symbol fields found.");
+        }
         symbols = load_symbols(reader);
         foundSymbols = true;
         break;

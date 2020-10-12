@@ -19,7 +19,7 @@ const _fromJsConstructor: FromJsConstructor = new FromJsConstructorBuilder()
 export class Decimal extends Value(
   Number,
   IonTypes.DECIMAL,
-  _fromJsConstructor,
+  _fromJsConstructor
 ) {
   private readonly _decimalValue: ion.Decimal;
   private readonly _numberValue: number;

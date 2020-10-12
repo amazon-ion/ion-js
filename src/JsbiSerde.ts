@@ -78,7 +78,9 @@ export class JsbiSerde {
     const sizeInBytes = this.getUnsignedIntSizeInBytes(value);
     const bytes = new Uint8Array(sizeInBytes);
     for (let m = sizeInBytes - 1; m >= 0; m--) {
-      const lastByte = JSBI.toNumber(JSBI.bitwiseAnd(value, this.BYTE_MAX_VALUE));
+      const lastByte = JSBI.toNumber(
+        JSBI.bitwiseAnd(value, this.BYTE_MAX_VALUE)
+      );
       value = JSBI.signedRightShift(value, this.BITS_PER_BYTE);
       bytes[m] = lastByte;
     }
@@ -120,7 +122,7 @@ export class JsbiSerde {
   private static calculateSizeThreshold(numberOfBytes: number): JSBI {
     const exponent: JSBI = JSBI.multiply(
       JSBI.BigInt(numberOfBytes),
-      this.BITS_PER_BYTE,
+      this.BITS_PER_BYTE
     );
     const threshold = JSBI.exponentiate(JsbiSupport.TWO, exponent);
     return JSBI.subtract(threshold, JsbiSupport.ONE);

@@ -44,26 +44,28 @@ function _make_bool_array(str: string): boolean[] {
 }
 
 const _is_base64_char = _make_bool_array(
-  "+/0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ",
+  "+/0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 );
 const _is_hex_digit = _make_bool_array("0123456789abcdefABCDEF");
 const _is_letter: boolean[] = _make_bool_array(
-  "_$abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ",
+  "_$abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 );
 const _is_letter_or_digit = _make_bool_array(
-  "_$0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ",
+  "_$0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 );
 const _is_numeric_terminator: boolean[] = _make_bool_array(
-  "{}[](),\"' \t\n\r\v\u000c",
+  "{}[](),\"' \t\n\r\v\u000c"
 );
 const _is_operator_char = _make_bool_array("!#%&*+-./;<=>?@^`|~");
 const _is_whitespace = _make_bool_array(" \t\r\n\u000b\u000c");
 const isIdentifierArray: boolean[] = _make_bool_array(
-  "_$0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ",
+  "_$0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 );
 
 export function is_digit(ch: number): boolean {
-  if (ch < 48 || ch > 57) { return false; }
+  if (ch < 48 || ch > 57) {
+    return false;
+  }
   return true;
 }
 
@@ -95,30 +97,38 @@ export function asAscii(s: any): string {
 export function nextEscape(s: string, prev: number): number {
   // this actually counts backwards to -1
   while (prev-- > 0) {
-    if (needsEscape(s.charCodeAt(prev))) { break; }
+    if (needsEscape(s.charCodeAt(prev))) {
+      break;
+    }
   }
   return prev;
 }
 
 export function needsEscape(c: number): boolean {
-  if (c < 32) { return true; }
-  if (c > 126) { return true; }
-  if (c === DOUBLE_QUOTE || c === SINGLE_QUOTE || c === SLASH) { return true; }
+  if (c < 32) {
+    return true;
+  }
+  if (c > 126) {
+    return true;
+  }
+  if (c === DOUBLE_QUOTE || c === SINGLE_QUOTE || c === SLASH) {
+    return true;
+  }
   return false;
 }
 
 export function escapeString(s: string, pos: number): string {
- const fixes: number[][] = [];
- let c,
-    ii,
-    s2;
- while (pos >= 0) {
+  const fixes: number[][] = [];
+  let c, ii, s2;
+  while (pos >= 0) {
     c = s.charCodeAt(pos);
-    if (!needsEscape(c)) { break; }
+    if (!needsEscape(c)) {
+      break;
+    }
     fixes.push([pos, c]);
     pos = nextEscape(s, pos);
   }
- if (fixes.length > 0) {
+  if (fixes.length > 0) {
     s2 = "";
     ii = fixes.length;
     pos = s.length;
@@ -137,7 +147,7 @@ export function escapeString(s: string, pos: number): string {
     }
     s = s2;
   }
- return s;
+  return s;
 }
 
 export function escapeSequence(c: number): string {
@@ -172,7 +182,9 @@ export function is_letter(ch: number): boolean {
 }
 
 export function isNumericTerminator(ch: number): boolean {
-  if (ch == -1) { return true; }
+  if (ch == -1) {
+    return true;
+  }
   return _is_numeric_terminator[ch];
 }
 
@@ -185,10 +197,18 @@ export function is_operator_char(ch: number): boolean {
 }
 
 export function is_whitespace(ch: number): boolean {
-  if (ch > 32) { return false; }
-  if (ch == this.WHITESPACE_COMMENT1) { return true; }
-  if (ch == this.WHITESPACE_COMMENT2) { return true; }
-  if (ch == this.ESCAPED_NEWLINE) { return true; }
+  if (ch > 32) {
+    return false;
+  }
+  if (ch == this.WHITESPACE_COMMENT1) {
+    return true;
+  }
+  if (ch == this.WHITESPACE_COMMENT2) {
+    return true;
+  }
+  if (ch == this.ESCAPED_NEWLINE) {
+    return true;
+  }
   return _is_whitespace[ch];
 }
 
@@ -267,58 +287,58 @@ const base64chars = [
   "/",
 ];
 const base64inv = {
-  "A": 0,
-  "B": 1,
-  "C": 2,
-  "D": 3,
-  "E": 4,
-  "F": 5,
-  "G": 6,
-  "H": 7,
-  "I": 8,
-  "J": 9,
-  "K": 10,
-  "L": 11,
-  "M": 12,
-  "N": 13,
-  "O": 14,
-  "P": 15,
-  "Q": 16,
-  "R": 17,
-  "S": 18,
-  "T": 19,
-  "U": 20,
-  "V": 21,
-  "W": 22,
-  "X": 23,
-  "Y": 24,
-  "Z": 25,
-  "a": 26,
-  "b": 27,
-  "c": 28,
-  "d": 29,
-  "e": 30,
-  "f": 31,
-  "g": 32,
-  "h": 33,
-  "i": 34,
-  "j": 35,
-  "k": 36,
-  "l": 37,
-  "m": 38,
-  "n": 39,
-  "o": 40,
-  "p": 41,
-  "q": 42,
-  "r": 43,
-  "s": 44,
-  "t": 45,
-  "u": 46,
-  "v": 47,
-  "w": 48,
-  "x": 49,
-  "y": 50,
-  "z": 51,
+  A: 0,
+  B: 1,
+  C: 2,
+  D: 3,
+  E: 4,
+  F: 5,
+  G: 6,
+  H: 7,
+  I: 8,
+  J: 9,
+  K: 10,
+  L: 11,
+  M: 12,
+  N: 13,
+  O: 14,
+  P: 15,
+  Q: 16,
+  R: 17,
+  S: 18,
+  T: 19,
+  U: 20,
+  V: 21,
+  W: 22,
+  X: 23,
+  Y: 24,
+  Z: 25,
+  a: 26,
+  b: 27,
+  c: 28,
+  d: 29,
+  e: 30,
+  f: 31,
+  g: 32,
+  h: 33,
+  i: 34,
+  j: 35,
+  k: 36,
+  l: 37,
+  m: 38,
+  n: 39,
+  o: 40,
+  p: 41,
+  q: 42,
+  r: 43,
+  s: 44,
+  t: 45,
+  u: 46,
+  v: 47,
+  w: 48,
+  x: 49,
+  y: 50,
+  z: 51,
   "0": 52,
   "1": 53,
   "2": 54,
@@ -433,7 +453,7 @@ function hexEscape(codePoint: number): number[] {
 function populateWithHexEscapes(
   escapes: EscapeIndex,
   start: number,
-  end?: number,
+  end?: number
 ) {
   if (end === undefined) {
     escapes[start] = hexEscape(start);

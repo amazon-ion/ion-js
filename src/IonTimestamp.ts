@@ -77,7 +77,7 @@ export class Timestamp {
     day: number | null = null,
     hour: number | null = null,
     minutes: number | null = null,
-    seconds: number | Decimal | null = null,
+    seconds: number | Decimal | null = null
   ) {
     this._localOffset = localOffset;
     this._year = year;
@@ -87,13 +87,13 @@ export class Timestamp {
       "Offset",
       this._localOffset,
       Timestamp._MIN_OFFSET,
-      Timestamp._MAX_OFFSET,
+      Timestamp._MAX_OFFSET
     );
     this._checkRequiredField(
       "Year",
       this._year,
       Timestamp._MIN_YEAR,
-      Timestamp._MAX_YEAR,
+      Timestamp._MAX_YEAR
     );
     this._month = this._checkOptionalField(
       "Month",
@@ -101,7 +101,7 @@ export class Timestamp {
       Timestamp._MIN_MONTH,
       Timestamp._MAX_MONTH,
       1,
-      TimestampPrecision.MONTH,
+      TimestampPrecision.MONTH
     );
     this._day = this._checkOptionalField(
       "Day",
@@ -109,7 +109,7 @@ export class Timestamp {
       Timestamp._MIN_DAY,
       Timestamp._MAX_DAY,
       1,
-      TimestampPrecision.DAY,
+      TimestampPrecision.DAY
     );
     this._hour = this._checkOptionalField(
       "Hour",
@@ -117,7 +117,7 @@ export class Timestamp {
       Timestamp._MIN_HOUR,
       Timestamp._MAX_HOUR,
       0,
-      TimestampPrecision.HOUR_AND_MINUTE,
+      TimestampPrecision.HOUR_AND_MINUTE
     );
     this._minutes = this._checkOptionalField(
       "Minutes",
@@ -125,13 +125,13 @@ export class Timestamp {
       Timestamp._MIN_MINUTE,
       Timestamp._MAX_MINUTE,
       0,
-      TimestampPrecision.HOUR_AND_MINUTE,
+      TimestampPrecision.HOUR_AND_MINUTE
     );
 
     if (typeof seconds === "number") {
       if (!Number.isInteger(seconds)) {
         throw new Error(
-          "The provided seconds number was not an integer (" + seconds + ")",
+          "The provided seconds number was not an integer (" + seconds + ")"
         );
       }
       this._secondsDecimal = new Decimal(seconds, 0);
@@ -147,7 +147,7 @@ export class Timestamp {
         "Seconds",
         this._secondsDecimal,
         Timestamp._MIN_SECONDS,
-        Timestamp._MAX_SECONDS,
+        Timestamp._MAX_SECONDS
       );
       this._precision = TimestampPrecision.SECONDS;
     }
@@ -169,7 +169,7 @@ export class Timestamp {
       if (this._month === 2 && this._day === 29) {
         if (!this._isLeapYear(this._year)) {
           throw new Error(
-            `Given February 29th but year ${this._year} is not a leap year`,
+            `Given February 29th but year ${this._year} is not a leap year`
           );
         }
       }
@@ -181,7 +181,7 @@ export class Timestamp {
       "Year",
       utcYear,
       Timestamp._MIN_YEAR,
-      Timestamp._MAX_YEAR,
+      Timestamp._MAX_YEAR
     );
   }
 
@@ -203,7 +203,7 @@ export class Timestamp {
    */
   static _adjustMsSinceEpochIfNeeded(
     year: number,
-    msSinceEpoch: number,
+    msSinceEpoch: number
   ): number {
     if (year >= 100) {
       return msSinceEpoch;
@@ -255,18 +255,20 @@ export class Timestamp {
     date: Date,
     localOffset: number,
     fractionalSeconds?: Decimal,
-    precision?: TimestampPrecision,
+    precision?: TimestampPrecision
   ): Timestamp {
     const msSinceEpoch = date.getTime() + localOffset * 60 * 1000;
     date = new Date(msSinceEpoch);
 
     let secondsDecimal: Decimal;
     if (fractionalSeconds != null) {
-      const [_, fractionStr] = Timestamp._splitSecondsDecimal(fractionalSeconds);
+      const [_, fractionStr] = Timestamp._splitSecondsDecimal(
+        fractionalSeconds
+      );
       secondsDecimal = Decimal.parse(date.getUTCSeconds() + "." + fractionStr)!;
     } else {
       secondsDecimal = Decimal.parse(
-        date.getUTCSeconds() + "." + date.getUTCMilliseconds(),
+        date.getUTCSeconds() + "." + date.getUTCMilliseconds()
       )!;
     }
 
@@ -277,14 +279,14 @@ export class Timestamp {
         return new Timestamp(
           localOffset,
           date.getUTCFullYear(),
-          date.getUTCMonth() + 1,
+          date.getUTCMonth() + 1
         );
       case TimestampPrecision.DAY:
         return new Timestamp(
           localOffset,
           date.getUTCFullYear(),
           date.getUTCMonth() + 1,
-          date.getUTCDate(),
+          date.getUTCDate()
         );
       case TimestampPrecision.HOUR_AND_MINUTE:
         return new Timestamp(
@@ -293,7 +295,7 @@ export class Timestamp {
           date.getUTCMonth() + 1,
           date.getUTCDate(),
           date.getUTCHours(),
-          date.getUTCMinutes(),
+          date.getUTCMinutes()
         );
       case TimestampPrecision.SECONDS:
       default:
@@ -304,7 +306,7 @@ export class Timestamp {
           date.getUTCDate(),
           date.getUTCHours(),
           date.getUTCMinutes(),
-          secondsDecimal,
+          secondsDecimal
         );
     }
   }
@@ -342,7 +344,7 @@ export class Timestamp {
     let ms = 0;
     if (this._precision === TimestampPrecision.SECONDS) {
       ms = Math.round(
-        (this._secondsDecimal.numberValue() - this.getSecondsInt()) * 1000,
+        (this._secondsDecimal.numberValue() - this.getSecondsInt()) * 1000
       );
     }
 
@@ -353,12 +355,12 @@ export class Timestamp {
       this._hour,
       this._minutes,
       this.getSecondsInt(),
-      ms,
+      ms
     );
 
     msSinceEpoch = Timestamp._adjustMsSinceEpochIfNeeded(
       this._year,
-      msSinceEpoch,
+      msSinceEpoch
     );
 
     const offsetShiftMs = this._localOffset * 60 * 1000;
@@ -384,7 +386,9 @@ export class Timestamp {
    * @hidden
    */
   _getFractionalSeconds(): Decimal {
-    const [_, fractionStr] = Timestamp._splitSecondsDecimal(this._secondsDecimal);
+    const [_, fractionStr] = Timestamp._splitSecondsDecimal(
+      this._secondsDecimal
+    );
     if (fractionStr === "") {
       return Decimal.ZERO;
     }
@@ -442,7 +446,7 @@ export class Timestamp {
         throw new Error("unrecognized timestamp precision " + this._precision);
       case TimestampPrecision.SECONDS:
         const [secondsStr, fractionStr] = Timestamp._splitSecondsDecimal(
-          this._secondsDecimal,
+          this._secondsDecimal
         );
         strVal = this._lpadZeros(secondsStr, 2);
         if (fractionStr.length > 0) {
@@ -495,7 +499,7 @@ export class Timestamp {
     fieldName: string,
     value: number,
     min: number,
-    max: number,
+    max: number
   ) {
     if (!_hasValue(value)) {
       throw new Error(`${fieldName} cannot be ${value}`);
@@ -509,7 +513,7 @@ export class Timestamp {
     min: number,
     max: number,
     defaultValue: number,
-    precision: TimestampPrecision,
+    precision: TimestampPrecision
   ): number {
     if (!_hasValue(value)) {
       return defaultValue;
@@ -523,7 +527,7 @@ export class Timestamp {
     fieldName: string,
     value: number | Decimal,
     min: number | Decimal,
-    max: number | Decimal,
+    max: number | Decimal
   ) {
     if (value instanceof Decimal) {
       if (
@@ -532,7 +536,7 @@ export class Timestamp {
           value.compareTo(max as Decimal) >= 0)
       ) {
         throw new Error(
-          `${fieldName} ${value} must be between ${min} inclusive, and ${max} exclusive`,
+          `${fieldName} ${value} must be between ${min} inclusive, and ${max} exclusive`
         );
       }
     } else {
@@ -541,7 +545,7 @@ export class Timestamp {
       }
       if (value < min || value > max) {
         throw new Error(
-          `${fieldName} ${value} must be between ${min} and ${max} inclusive`,
+          `${fieldName} ${value} must be between ${min} and ${max} inclusive`
         );
       }
     }
@@ -602,18 +606,18 @@ class _TimeParserState {
   constructor(
     public readonly f: _States,
     public readonly len: number | null,
-    public readonly t: _TransitionMap | null = null,
+    public readonly t: _TransitionMap | null = null
   ) {}
 }
 
 class _TimestampParser {
   private static _timeParserStates: _StateMap = {
     [_States.YEAR]: new _TimeParserState(_States.YEAR, 4, {
-      "T": _States.OFFSET_UNKNOWN,
+      T: _States.OFFSET_UNKNOWN,
       "-": _States.MONTH,
     }),
     [_States.MONTH]: new _TimeParserState(_States.MONTH, 2, {
-      "T": _States.OFFSET_UNKNOWN,
+      T: _States.OFFSET_UNKNOWN,
       "-": _States.DAY,
     }),
     [_States.DAY]: new _TimeParserState(_States.DAY, 2, { T: _States.HOUR }),
@@ -624,13 +628,13 @@ class _TimestampParser {
       ":": _States.SECONDS,
       "+": _States.OFFSET_POSITIVE,
       "-": _States.OFFSET_NEGATIVE,
-      "Z": _States.OFFSET_ZULU,
+      Z: _States.OFFSET_ZULU,
     }),
     [_States.SECONDS]: new _TimeParserState(_States.SECONDS, 2, {
       ".": _States.FRACTIONAL_SECONDS,
       "+": _States.OFFSET_POSITIVE,
       "-": _States.OFFSET_NEGATIVE,
-      "Z": _States.OFFSET_ZULU,
+      Z: _States.OFFSET_ZULU,
     }),
     [_States.FRACTIONAL_SECONDS]: new _TimeParserState(
       _States.FRACTIONAL_SECONDS,
@@ -638,18 +642,18 @@ class _TimestampParser {
       {
         "+": _States.OFFSET_POSITIVE,
         "-": _States.OFFSET_NEGATIVE,
-        "Z": _States.OFFSET_ZULU,
-      },
+        Z: _States.OFFSET_ZULU,
+      }
     ),
     [_States.OFFSET_POSITIVE]: new _TimeParserState(
       _States.OFFSET_POSITIVE,
       2,
-      { ":": _States.OFFSET_MINUTES },
+      { ":": _States.OFFSET_MINUTES }
     ),
     [_States.OFFSET_NEGATIVE]: new _TimeParserState(
       _States.OFFSET_NEGATIVE,
       2,
-      { ":": _States.OFFSET_MINUTES },
+      { ":": _States.OFFSET_MINUTES }
     ),
     [_States.OFFSET_MINUTES]: new _TimeParserState(_States.OFFSET_MINUTES, 2),
     [_States.OFFSET_ZULU]: new _TimeParserState(_States.OFFSET_ZULU, 0),
@@ -695,7 +699,9 @@ class _TimestampParser {
         pos += digits.length;
       } else if (state.len > 0) {
         v = _TimestampParser._readDigits(str, pos, state.len);
-        if (v < 0) { throw new Error("Non-digit value found at pos " + pos); }
+        if (v < 0) {
+          throw new Error("Non-digit value found at pos " + pos);
+        }
         pos = pos + state.len;
       }
       v = v!;
@@ -733,7 +739,7 @@ class _TimestampParser {
           offset! += v;
           if (v >= 60) {
             throw new Error(
-              "Minute offset " + String(v) + " above maximum or equal to : 60",
+              "Minute offset " + String(v) + " above maximum or equal to : 60"
             );
           }
           break;
@@ -768,7 +774,7 @@ class _TimestampParser {
     if (offset === null) {
       if (minute !== null) {
         throw new Error(
-          'invalid timestamp, missing local offset: "' + str + '"',
+          'invalid timestamp, missing local offset: "' + str + '"'
         );
       }
       offset = -0;
@@ -779,7 +785,7 @@ class _TimestampParser {
     let seconds: Decimal | undefined;
     if ((secondsInt !== undefined && secondsInt !== null) || fractionStr) {
       seconds = Decimal.parse(
-        secondsInt! + "." + (fractionStr ? fractionStr : ""),
+        secondsInt! + "." + (fractionStr ? fractionStr : "")
       )!;
     }
     return new Timestamp(offset, year, month, day, hour, minute, seconds);

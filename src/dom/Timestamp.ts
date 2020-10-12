@@ -19,7 +19,7 @@ const _fromJsConstructor: FromJsConstructor = new FromJsConstructorBuilder()
 export class Timestamp extends Value(
   Date,
   IonTypes.TIMESTAMP,
-  _fromJsConstructor,
+  _fromJsConstructor
 ) {
   protected _timestamp: ion.Timestamp;
   protected _date: Date;
@@ -31,7 +31,7 @@ export class Timestamp extends Value(
    */
   constructor(
     dateOrTimestamp: Date | ion.Timestamp,
-    annotations: string[] = [],
+    annotations: string[] = []
   ) {
     let date: Date;
     let timestamp: ion.Timestamp;
@@ -49,7 +49,8 @@ export class Timestamp extends Value(
   }
 
   private static _timestampFromDate(date: Date): ion.Timestamp {
-    const milliseconds = date.getUTCSeconds() * 1000 + date.getUTCMilliseconds();
+    const milliseconds =
+      date.getUTCSeconds() * 1000 + date.getUTCMilliseconds();
     const fractionalSeconds = new Decimal(milliseconds, -3);
 
     // `Date` objects do not store a timezone offset. If the offset is requested
@@ -66,7 +67,7 @@ export class Timestamp extends Value(
       date.getUTCDate(),
       date.getUTCHours(),
       date.getUTCMinutes(),
-      fractionalSeconds,
+      fractionalSeconds
     );
   }
 

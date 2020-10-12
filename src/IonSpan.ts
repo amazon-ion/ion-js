@@ -134,10 +134,14 @@ export class StringSpan extends Span {
   }
 
   unread(ch: number): void {
-    if (this._pos <= this._start) { Span.error(); }
+    if (this._pos <= this._start) {
+      Span.error();
+    }
     this._pos--;
     if (ch < 0) {
-      if (this.is_empty() != true) { Span.error(); }
+      if (this.is_empty() != true) {
+        Span.error();
+      }
       return;
     }
     // we can only unread across 1 new line
@@ -145,7 +149,9 @@ export class StringSpan extends Span {
       this._line_start = this._old_line_start;
       this._line--;
     }
-    if (ch != this.peek()) { Span.error(); } // DEBUG
+    if (ch != this.peek()) {
+      Span.error();
+    } // DEBUG
   }
 
   peek(): number {
@@ -160,7 +166,9 @@ export class StringSpan extends Span {
   }
 
   valueAt(ii: number): number {
-    if (ii < this._start || ii >= this._limit) { return EOF; }
+    if (ii < this._start || ii >= this._limit) {
+      return EOF;
+    }
     return this._src.charCodeAt(ii);
   }
 
@@ -235,7 +243,7 @@ export class BinarySpan extends Span {
           this.position() +
           ", limit: " +
           this._limit +
-          ")",
+          ")"
       );
     }
     return this._src.subarray(this._pos, (this._pos += length));
@@ -247,26 +255,38 @@ export class BinarySpan extends Span {
   }
 
   unread(b: number): void {
-    if (this._pos <= this._start) { Span.error(); }
+    if (this._pos <= this._start) {
+      Span.error();
+    }
     this._pos--;
     if (b == EOF) {
-      if (this.is_empty() == false) { Span.error(); }
+      if (this.is_empty() == false) {
+        Span.error();
+      }
     }
-    if (b != this.peek()) { Span.error(); } // DEBUG
+    if (b != this.peek()) {
+      Span.error();
+    } // DEBUG
   }
 
   peek(): number {
-    if (this.is_empty()) { return EOF; }
+    if (this.is_empty()) {
+      return EOF;
+    }
     return this._src[this._pos];
   }
 
   skip(dist: number): void {
     this._pos += dist;
-    if (this._pos > this._limit) { throw new Error("Skipped over end of source."); }
+    if (this._pos > this._limit) {
+      throw new Error("Skipped over end of source.");
+    }
   }
 
   valueAt(ii: number): number {
-    if (ii < this._start || ii >= this._limit) { return EOF; }
+    if (ii < this._start || ii >= this._limit) {
+      return EOF;
+    }
     return this._src[ii];
   }
 

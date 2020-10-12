@@ -23,7 +23,7 @@ export class SymbolToken {
 
   constructor(
     private text: string | null,
-    private sid: number = SymbolToken._UNKNOWN_SYMBOL_ID,
+    private sid: number = SymbolToken._UNKNOWN_SYMBOL_ID
   ) {}
 
   /**

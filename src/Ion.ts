@@ -39,7 +39,9 @@ function isBinary(buffer: Uint8Array): boolean {
     return false;
   }
   for (let i = 0; i < 4; i++) {
-    if (buffer[i] !== IVM.binary[i]) { return false; }
+    if (buffer[i] !== IVM.binary[i]) {
+      return false;
+    }
   }
   return true;
 }

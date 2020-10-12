@@ -60,7 +60,9 @@ export class LocalSymbolTable {
   addSymbol(symbol_: string | null): number {
     if (symbol_ !== null) {
       const existingSymbolId = this.getSymbolId(symbol_);
-      if (existingSymbolId !== undefined) { return existingSymbolId; }
+      if (existingSymbolId !== undefined) {
+        return existingSymbolId;
+      }
     }
     const symbolId = this.offset + this.symbols.length;
     this.symbols.push(symbol_);
@@ -71,11 +73,15 @@ export class LocalSymbolTable {
   }
 
   getSymbolText(symbolId: number): string | null {
-    if (symbolId > this.maxId) { throw new Error("SymbolID greater than maxID."); }
+    if (symbolId > this.maxId) {
+      throw new Error("SymbolID greater than maxID.");
+    }
     const importedSymbol: string | undefined = this.import.getSymbolText(
-      symbolId,
+      symbolId
     );
-    if (importedSymbol !== undefined) { return importedSymbol; }
+    if (importedSymbol !== undefined) {
+      return importedSymbol;
+    }
     const index = symbolId - this.offset;
     return this.symbols[index];
   }

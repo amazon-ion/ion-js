@@ -9,7 +9,7 @@ export class EventStreamError extends Error {
     type: string,
     message: string,
     index: number,
-    eventstream: IonEvent[],
+    eventstream: IonEvent[]
   ) {
     super();
     this.type = type;

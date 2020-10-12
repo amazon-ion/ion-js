@@ -37,7 +37,7 @@ export class ComparisonResult {
     result: ComparisonResultType = ComparisonResultType.EQUAL,
     message: string = "",
     actualIndex: number = 0,
-    expectedIndex: number = 0,
+    expectedIndex: number = 0
   ) {
     this.result = result;
     this.message = message;

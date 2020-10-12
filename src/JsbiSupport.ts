@@ -23,10 +23,10 @@ export class JsbiSupport {
   public static readonly ONE: JSBI = JSBI.BigInt(1);
   public static readonly TWO: JSBI = JSBI.BigInt(2);
   public static readonly NUMBER_MAX_SAFE_INTEGER: JSBI = JSBI.BigInt(
-    Number.MAX_SAFE_INTEGER,
+    Number.MAX_SAFE_INTEGER
   );
   public static readonly NUMBER_MIN_SAFE_INTEGER: JSBI = JSBI.BigInt(
-    Number.MIN_SAFE_INTEGER,
+    Number.MIN_SAFE_INTEGER
   );
 
   /**

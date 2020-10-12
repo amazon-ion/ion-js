@@ -38,7 +38,7 @@ const _fromJsConstructor: FromJsConstructor = new FromJsConstructorBuilder()
 export class Boolean extends Value(
   global.Boolean,
   IonTypes.BOOL,
-  _fromJsConstructor,
+  _fromJsConstructor
 ) {
   /**
    * Constructor.

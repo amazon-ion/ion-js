@@ -26,7 +26,7 @@ export class SubstituteSymbolTable extends SharedSymbolTable {
       throw new Error(
         "Cannot instantiate a SubstituteSymbolTable with a negative length. (" +
           length +
-          ")",
+          ")"
       );
     }
     super("_substitute", -1, []);
@@ -36,7 +36,7 @@ export class SubstituteSymbolTable extends SharedSymbolTable {
   getSymbolText(symbolId: number): string | undefined {
     if (symbolId < 0) {
       throw new Error(
-        `Index ${symbolId} is out of bounds for the SharedSymbolTable name=${this.name}, version=${this.version}`,
+        `Index ${symbolId} is out of bounds for the SharedSymbolTable name=${this.name}, version=${this.version}`
       );
     }
     return undefined;

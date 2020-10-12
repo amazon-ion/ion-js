@@ -182,7 +182,7 @@ const _DOM_VALUE_SIGNET = Symbol("ion.dom.Value");
 export function Value<Clazz extends Constructor>(
   BaseClass: Clazz,
   ionType: IonType,
-  fromJsConstructor: FromJsConstructor,
+  fromJsConstructor: FromJsConstructor
 ) {
   const newClass = class extends BaseClass implements Value {
     _ionType: IonType;
@@ -220,7 +220,7 @@ export function Value<Clazz extends Constructor>(
       throw new Error(
         `Value#${functionName}() is not supported by Ion type ${
           this.getType().name
-        }`,
+        }`
       );
     }
 
@@ -297,7 +297,7 @@ export function Value<Clazz extends Constructor>(
         return (this as unknown) as T;
       }
       throw new Error(
-        `${this.constructor.name} is not an instance of ${ionValueType.name}`,
+        `${this.constructor.name} is not an instance of ${ionValueType.name}`
       );
     }
 
@@ -375,7 +375,7 @@ export namespace Value {
         //       API (or similar) to be added to Value subclasses.
         throw new Error(
           "Value.from() does not support overriding the annotations on a dom.Value" +
-            " passed as an argument.",
+            " passed as an argument."
         );
       }
       return value as Value;

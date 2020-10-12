@@ -106,7 +106,9 @@ export class BinaryReader implements Reader {
   next(): IonType | null {
     this._annotations = null;
 
-    if (this._raw_type === EOF) { return null; }
+    if (this._raw_type === EOF) {
+      return null;
+    }
     for (
       this._raw_type = this._parser.next();
       this.depth() === 0;
@@ -114,11 +116,17 @@ export class BinaryReader implements Reader {
     ) {
       if (this._raw_type === TB_SYMBOL) {
         const raw: number | null = this._parser._getSid();
-        if (raw !== IVM.sid) { break; }
+        if (raw !== IVM.sid) {
+          break;
+        }
         this._symtab = defaultLocalSymbolTable();
       } else if (this._raw_type === TB_STRUCT) {
-        if (!this._parser.hasAnnotations()) { break; }
-        if (this._parser.getAnnotation(0) !== ion_symbol_table_sid) { break; }
+        if (!this._parser.hasAnnotations()) {
+          break;
+        }
+        if (this._parser.getAnnotation(0) !== ion_symbol_table_sid) {
+          break;
+        }
         this._symtab = makeSymbolTable(this._cat, this);
       } else {
         break;
@@ -231,7 +239,7 @@ export class BinaryReader implements Reader {
         return null;
       }
       throw new Error(
-        "Unable to provide a value for " + type.name + " containers.",
+        "Unable to provide a value for " + type.name + " containers."
       );
     }
     switch (type) {
@@ -269,11 +277,13 @@ export class BinaryReader implements Reader {
 
   private getSymbolString(symbolId: number | null): string | null {
     let s: string | null = null;
-    if (symbolId === null) { return null; }
+    if (symbolId === null) {
+      return null;
+    }
     if (symbolId > 0) {
       if (symbolId > this._symtab.maxId) {
         throw new Error(
-          "Symbol $" + symbolId.toString() + " greater than maxID.",
+          "Symbol $" + symbolId.toString() + " greater than maxID."
         );
       }
       s = this._symtab.getSymbolText(symbolId);

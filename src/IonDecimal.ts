@@ -85,7 +85,7 @@ export class Decimal {
   constructor(
     coefficient: number | JSBI | string,
     exponent?: number,
-    isNegative: boolean = false,
+    isNegative: boolean = false
   ) {
     if (typeof coefficient === "string") {
       return Decimal.parse(coefficient)!;
@@ -93,7 +93,7 @@ export class Decimal {
 
     if (!_hasValue(exponent)) {
       throw new Error(
-        "Decimal's constructor was called with a numeric coefficient but no exponent.",
+        "Decimal's constructor was called with a numeric coefficient but no exponent."
       );
     }
 
@@ -114,7 +114,7 @@ export class Decimal {
     }
 
     throw new Error(
-      `Unsupported parameter set (${coefficient}, ${exponent}, ${isNegative} passed to Decimal constructor.`,
+      `Unsupported parameter set (${coefficient}, ${exponent}, ${isNegative} passed to Decimal constructor.`
     );
   }
 
@@ -125,18 +125,18 @@ export class Decimal {
    */
   static _fromNumberCoefficient(
     coefficient: number,
-    exponent: number,
+    exponent: number
   ): Decimal {
     if (!Number.isInteger(coefficient)) {
       throw new Error(
-        "The provided coefficient was not an integer. (" + coefficient + ")",
+        "The provided coefficient was not an integer. (" + coefficient + ")"
       );
     }
     const isNegative = coefficient < 0 || Object.is(coefficient, -0);
     return this._fromBigIntCoefficient(
       isNegative,
       JSBI.BigInt(coefficient),
-      exponent,
+      exponent
     );
   }
 
@@ -147,7 +147,7 @@ export class Decimal {
   static _fromBigIntCoefficient(
     isNegative: boolean,
     coefficient: JSBI,
-    exponent: number,
+    exponent: number
   ): Decimal {
     const value = Object.create(this.prototype);
     value._initialize(isNegative, coefficient, exponent);
@@ -161,7 +161,9 @@ export class Decimal {
    */
   static parse(str: string): Decimal | null {
     let exponent = 0;
-    if (str === "null" || str === "null.decimal") { return null; }
+    if (str === "null" || str === "null.decimal") {
+      return null;
+    }
     const d = str.match("[d|D]");
     let exponentDelimiterIndex = str.length;
     if (d !== undefined && d !== null) {
@@ -366,7 +368,7 @@ export class Decimal {
   private _initialize(
     isNegative: boolean,
     coefficient: JSBI,
-    exponent: number,
+    exponent: number
   ) {
     this._isNegative = isNegative;
     this._coefficient = coefficient;
