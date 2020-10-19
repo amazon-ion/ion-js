@@ -34,7 +34,7 @@ const _escapeStrings = {
 
 function _make_bool_array(str: string): boolean[] {
   let i = str.length;
-  let a: boolean[] = [];
+  const a: boolean[] = [];
   a[128] = false;
   while (i > 0) {
     --i;
@@ -63,7 +63,9 @@ const isIdentifierArray: boolean[] = _make_bool_array(
 );
 
 export function is_digit(ch: number): boolean {
-  if (ch < 48 || ch > 57) return false;
+  if (ch < 48 || ch > 57) {
+    return false;
+  }
   return true;
 }
 
@@ -84,7 +86,7 @@ export function asAscii(s: any): string {
   } else if (typeof s == "number") {
     s = "" + s;
   } else if (typeof s != "string") {
-    let esc = nextEscape(s, s.length);
+    const esc = nextEscape(s, s.length);
     if (esc >= 0) {
       s = escapeString(s, esc);
     }
@@ -95,26 +97,34 @@ export function asAscii(s: any): string {
 export function nextEscape(s: string, prev: number): number {
   // this actually counts backwards to -1
   while (prev-- > 0) {
-    if (needsEscape(s.charCodeAt(prev))) break;
+    if (needsEscape(s.charCodeAt(prev))) {
+      break;
+    }
   }
   return prev;
 }
 
 export function needsEscape(c: number): boolean {
-  if (c < 32) return true;
-  if (c > 126) return true;
-  if (c === DOUBLE_QUOTE || c === SINGLE_QUOTE || c === SLASH) return true;
+  if (c < 32) {
+    return true;
+  }
+  if (c > 126) {
+    return true;
+  }
+  if (c === DOUBLE_QUOTE || c === SINGLE_QUOTE || c === SLASH) {
+    return true;
+  }
   return false;
 }
 
 export function escapeString(s: string, pos: number): string {
-  let fixes: number[][] = [],
-    c,
-    ii,
-    s2;
+  const fixes: number[][] = [];
+  let c, ii, s2;
   while (pos >= 0) {
     c = s.charCodeAt(pos);
-    if (!needsEscape(c)) break;
+    if (!needsEscape(c)) {
+      break;
+    }
     fixes.push([pos, c]);
     pos = nextEscape(s, pos);
   }
@@ -123,8 +133,8 @@ export function escapeString(s: string, pos: number): string {
     ii = fixes.length;
     pos = s.length;
     while (ii--) {
-      let fix = fixes[ii];
-      let tail_len = pos - fix[0] - 1;
+      const fix = fixes[ii];
+      const tail_len = pos - fix[0] - 1;
       if (tail_len > 0) {
         s2 = escapeSequence(fix[1]) + s.substring(fix[0] + 1, pos) + s2;
       } else {
@@ -172,7 +182,9 @@ export function is_letter(ch: number): boolean {
 }
 
 export function isNumericTerminator(ch: number): boolean {
-  if (ch == -1) return true;
+  if (ch == -1) {
+    return true;
+  }
   return _is_numeric_terminator[ch];
 }
 
@@ -185,10 +197,18 @@ export function is_operator_char(ch: number): boolean {
 }
 
 export function is_whitespace(ch: number): boolean {
-  if (ch > 32) return false;
-  if (ch == this.WHITESPACE_COMMENT1) return true;
-  if (ch == this.WHITESPACE_COMMENT2) return true;
-  if (ch == this.ESCAPED_NEWLINE) return true;
+  if (ch > 32) {
+    return false;
+  }
+  if (ch == this.WHITESPACE_COMMENT1) {
+    return true;
+  }
+  if (ch == this.WHITESPACE_COMMENT2) {
+    return true;
+  }
+  if (ch == this.ESCAPED_NEWLINE) {
+    return true;
+  }
   return _is_whitespace[ch];
 }
 
@@ -338,7 +358,7 @@ export function fromBase64(str: string): Uint8Array {
   for (let i = str.length - 1; str.charAt(i) == "="; i--) {
     pad++;
   }
-  let buf = new Uint8Array((str.length * 3) / 4 - pad);
+  const buf = new Uint8Array((str.length * 3) / 4 - pad);
   for (let i = 0; i < str.length - pad; i += 4) {
     const c0 = base64inv[str.charAt(i)],
       c1 = base64inv[str.charAt(i + 1)],
@@ -356,7 +376,7 @@ export function fromBase64(str: string): Uint8Array {
 }
 
 export function toBase64(buf: Uint8Array) {
-  let str = new Array(Math.ceil((buf.length * 4) / 3));
+  const str = new Array(Math.ceil((buf.length * 4) / 3));
   for (let i = 0; i < buf.length; i += 3) {
     const b0 = buf[i],
       b1 = buf[i + 1],
@@ -413,7 +433,7 @@ function backslashEscape(s: string): number[] {
 }
 
 function toCharCodes(s: string) {
-  let charCodes: number[] = new Array(s.length);
+  const charCodes: number[] = new Array(s.length);
   for (let i: number = 0; i < s.length; i++) {
     charCodes[i] = s.charCodeAt(i);
   }
@@ -444,7 +464,7 @@ function populateWithHexEscapes(
   }
 }
 
-let CommonEscapes: EscapeIndex = {};
+const CommonEscapes: EscapeIndex = {};
 CommonEscapes[CharCodes.NULL] = backslashEscape("0");
 populateWithHexEscapes(CommonEscapes, 1, 7);
 CommonEscapes[CharCodes.BELL] = backslashEscape("a");
@@ -475,8 +495,8 @@ export function isIdentifier(s: string): boolean {
     return false;
   }
   for (let i: number = 0; i < s.length; i++) {
-    let c: number = s.charCodeAt(i);
-    let b: boolean = isIdentifierArray[c];
+    const c: number = s.charCodeAt(i);
+    const b: boolean = isIdentifierArray[c];
     if (!b) {
       return false;
     }
@@ -486,8 +506,8 @@ export function isIdentifier(s: string): boolean {
 
 export function isOperator(s: string): boolean {
   for (let i: number = 0; i < s.length; i++) {
-    let c: number = s.charCodeAt(i);
-    let b: boolean = _is_operator_char[c];
+    const c: number = s.charCodeAt(i);
+    const b: boolean = _is_operator_char[c];
     if (!b) {
       return false;
     }
@@ -510,7 +530,7 @@ export function escape(input: string, escapes: EscapeIndex): string {
     escape = escapes[charCode];
     if (escape !== undefined) {
       for (let j = 0; j < escape.length; j++) {
-        escapeSeq += String.fromCharCode(escape[j]); //TODO this is slow we are going to need to replace this with just the string eventually instead of using the charcode crap.
+        escapeSeq += String.fromCharCode(escape[j]); // TODO this is slow we are going to need to replace this with just the string eventually instead of using the charcode crap.
       }
       escapedString += input.slice(lastIndex, i) + escapeSeq;
       lastIndex = i + 1;

@@ -1,6 +1,6 @@
-import { Value } from "./Value";
 import { IonTypes } from "../Ion";
 import { Sequence } from "./Sequence";
+import { Value } from "./Value";
 
 /**
  * Represents a list value in an Ion stream.

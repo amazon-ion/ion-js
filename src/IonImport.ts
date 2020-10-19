@@ -60,15 +60,17 @@ export class Import {
   }
 
   getSymbolText(symbolId: number): string | undefined {
-    if (this.parent === undefined) throw new Error("Illegal parent state.");
+    if (this.parent === undefined) {
+      throw new Error("Illegal parent state.");
+    }
     if (this.parent !== null) {
-      let parentSymbol = this.parent.getSymbolText(symbolId);
+      const parentSymbol = this.parent.getSymbolText(symbolId);
       if (parentSymbol) {
         return parentSymbol;
       }
     }
 
-    let index: number = symbolId - this.offset;
+    const index: number = symbolId - this.offset;
     if (index >= 0 && index < this.length) {
       return this.symbolTable.getSymbolText(index);
     }

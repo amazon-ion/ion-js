@@ -1,11 +1,11 @@
-import { Value } from "./Value";
 import * as ion from "../Ion";
 import { Decimal, IonTypes } from "../Ion";
+import { Writer } from "../Ion";
 import {
   FromJsConstructor,
   FromJsConstructorBuilder,
 } from "./FromJsConstructor";
-import { Writer } from "../Ion";
+import { Value } from "./Value";
 
 const _fromJsConstructor: FromJsConstructor = new FromJsConstructorBuilder()
   .withClasses(Date, ion.Timestamp)
@@ -49,8 +49,9 @@ export class Timestamp extends Value(
   }
 
   private static _timestampFromDate(date: Date): ion.Timestamp {
-    let milliseconds = date.getUTCSeconds() * 1000 + date.getUTCMilliseconds();
-    let fractionalSeconds = new Decimal(milliseconds, -3);
+    const milliseconds =
+      date.getUTCSeconds() * 1000 + date.getUTCMilliseconds();
+    const fractionalSeconds = new Decimal(milliseconds, -3);
 
     // `Date` objects do not store a timezone offset. If the offset is requested
     // via `.getTimezoneOffset()`, the configured offset of the host computer

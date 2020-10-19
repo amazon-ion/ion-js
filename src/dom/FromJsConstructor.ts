@@ -1,6 +1,6 @@
-import { Constructor, Value } from "./Value";
 import { dom, IonTypes } from "../Ion";
 import { _hasValue } from "../util";
+import { Constructor, Value } from "./Value";
 
 // Converts the provided Iterable into a Set. If no iterable is provided, returns an empty set.
 function _newSet<T>(values?: Iterable<T>): Set<T> {
@@ -100,7 +100,7 @@ export class FromJsConstructor {
       return new dom.Null(IonTypes.NULL, annotations);
     }
 
-    let jsValueType = typeof jsValue;
+    const jsValueType = typeof jsValue;
     if (jsValueType === "object") {
       // jsValue is an unsupported boxed primitive, but we can use it if we convert it to a primitive first
       if (this._classesToUnbox.has(jsValue.constructor)) {

@@ -13,10 +13,10 @@
  * permissions and limitations under the License.
  */
 
-import { Writer } from "./IonWriter";
-import { IonType } from "./IonType";
 import { Reader } from "./IonReader";
+import { IonType } from "./IonType";
 import { IonTypes } from "./IonTypes";
+import { Writer } from "./IonWriter";
 
 // TS workaround that avoids the need to copy all Writer method signatures into AbstractWriter
 export interface AbstractWriter extends Writer {}
@@ -69,13 +69,13 @@ export abstract class AbstractWriter implements Writer {
   }
 
   private _writeValue(reader: Reader): void {
-    let type: IonType | null = reader.type();
+    const type: IonType | null = reader.type();
     if (type === null) {
       return;
     }
 
     if (this._isInStruct()) {
-      let fieldName = reader.fieldName();
+      const fieldName = reader.fieldName();
       if (fieldName === null) {
         throw new Error(
           "Cannot call writeValue() when the Writer is in a Struct but the Reader is not."

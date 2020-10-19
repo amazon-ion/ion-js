@@ -1,9 +1,9 @@
+import JSBI from "jsbi";
+import { Decimal, dom, Timestamp } from "../Ion";
 import { IonType } from "../IonType";
 import { IonTypes } from "../IonTypes";
-import { Decimal, dom, Timestamp } from "../Ion";
-import { Value } from "./Value";
-import JSBI from "jsbi";
 import { _hasValue } from "../util";
+import { Value } from "./Value";
 
 // Typescript interfaces can be used to describe classes' static methods; this can
 // be a bit surprising as the methods in the interface are not marked 'static' and
@@ -50,7 +50,7 @@ function _getDomTypesByIonTypeMap(): Map<IonType, FromJsValue> {
 // Returns a dom type constructor for the provided IonType.
 // This function is exported to assist in unit testing but is not visible at the library level.
 export function _domConstructorFor(ionType: IonType): FromJsValue {
-  let domConstructor = _getDomTypesByIonTypeMap().get(ionType)!;
+  const domConstructor = _getDomTypesByIonTypeMap().get(ionType)!;
   if (!_hasValue(domConstructor)) {
     throw new Error(
       `No dom type constructor was found for Ion type ${ionType.name}`
@@ -70,7 +70,7 @@ function _inferType(value: any): IonType {
     return IonTypes.NULL;
   }
 
-  let valueType: string = typeof value;
+  const valueType: string = typeof value;
   switch (valueType) {
     case "string":
       return IonTypes.STRING;
@@ -145,7 +145,7 @@ export function _ionValueFromJsValue(
   value: any,
   annotations: string[] = []
 ): Value {
-  let ionType = _inferType(value);
-  let ionTypeConstructor: FromJsValue = _domConstructorFor(ionType);
+  const ionType = _inferType(value);
+  const ionTypeConstructor: FromJsValue = _domConstructorFor(ionType);
   return ionTypeConstructor._fromJsValue(value, annotations);
 }

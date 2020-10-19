@@ -13,8 +13,8 @@
  * permissions and limitations under the License.
  */
 
-import { getSystemSymbolTable } from "./IonSystemSymbolTable";
 import { SharedSymbolTable } from "./IonSharedSymbolTable";
+import { getSystemSymbolTable } from "./IonSystemSymbolTable";
 
 interface SymbolTableIndex {
   [name: string]: SharedSymbolTable[];
@@ -39,10 +39,13 @@ export class Catalog {
 
   /** Adds a new shared symbol table to this catalog. */
   add(symbolTable: SharedSymbolTable): void {
-    if (symbolTable.name === undefined || symbolTable.name === null)
+    if (symbolTable.name === undefined || symbolTable.name === null) {
       throw new Error("SymbolTable name must be defined.");
-    let versions = this.symbolTables[symbolTable.name];
-    if (versions === undefined) this.symbolTables[symbolTable.name] = [];
+    }
+    const versions = this.symbolTables[symbolTable.name];
+    if (versions === undefined) {
+      this.symbolTables[symbolTable.name] = [];
+    }
     this.symbolTables[symbolTable.name][symbolTable.version] = symbolTable;
   }
 
@@ -52,10 +55,14 @@ export class Catalog {
    * @return The symbol table or `null` if it does not exist in the {Catalog}.
    */
   getVersion(name: string, version: number): SharedSymbolTable | null {
-    let tables: SharedSymbolTable[] = this.symbolTables[name];
-    if (!tables) return null;
+    const tables: SharedSymbolTable[] = this.symbolTables[name];
+    if (!tables) {
+      return null;
+    }
     let table = tables[version];
-    if (!table) table = tables[tables.length];
+    if (!table) {
+      table = tables[tables.length];
+    }
     return table ? table : null;
   }
 
@@ -65,9 +72,10 @@ export class Catalog {
    * @return The symbol table or `null` if it does not exist in the {Catalog}.
    */
   getTable(name: string): SharedSymbolTable | null {
-    let versions = this.symbolTables[name],
-      table;
-    if (versions === undefined) return null;
+    const versions = this.symbolTables[name];
+    if (versions === undefined) {
+      return null;
+    }
     return versions[versions.length - 1];
   }
 }

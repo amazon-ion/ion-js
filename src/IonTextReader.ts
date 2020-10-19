@@ -19,6 +19,8 @@
 // Handles system symbols, and conversion from the parsed
 // input string to the desired Javascript value (scalar or
 // object, such as IonValue).
+import JSBI from "jsbi";
+import IntSize from "./IntSize";
 import { Catalog } from "./IonCatalog";
 import { Decimal } from "./IonDecimal";
 import {
@@ -26,16 +28,14 @@ import {
   LocalSymbolTable,
 } from "./IonLocalSymbolTable";
 import { get_ion_type, ParserTextRaw } from "./IonParserTextRaw";
-import { ion_symbol_table, makeSymbolTable } from "./IonSymbols";
-import { IonType } from "./IonType";
-import { IonTypes } from "./IonTypes";
 import { Reader } from "./IonReader";
 import { StringSpan } from "./IonSpan";
-import { Timestamp } from "./IonTimestamp";
+import { ion_symbol_table, makeSymbolTable } from "./IonSymbols";
 import { fromBase64 } from "./IonText";
-import JSBI from "jsbi";
+import { Timestamp } from "./IonTimestamp";
+import { IonType } from "./IonType";
+import { IonTypes } from "./IonTypes";
 import { JsbiSupport } from "./JsbiSupport";
-import IntSize from "./IntSize";
 
 const BEGINNING_OF_CONTAINER = -2; // cloned from IonParserTextRaw
 const EOF = -1;
@@ -69,8 +69,10 @@ export class TextReader implements Reader {
   }
 
   load_raw() {
-    let t: TextReader = this;
-    if (t._raw !== undefined) return;
+    const t: TextReader = this;
+    if (t._raw !== undefined) {
+      return;
+    }
     if (t._raw_type === T_CLOB2 || t._raw_type === T_CLOB3) {
       t._raw = t._parser.get_value_as_uint8array(t._raw_type);
     } else {
@@ -80,7 +82,7 @@ export class TextReader implements Reader {
 
   skip_past_container() {
     let type;
-    let d = this.depth(); // we want to have read the EOC that matches the container we just saw
+    const d = this.depth(); // we want to have read the EOC that matches the container we just saw
     this.stepIn();
     while (this.depth() > d) {
       type = this.next();
@@ -94,31 +96,43 @@ export class TextReader implements Reader {
   }
 
   isIVM(input: string, depth: number, annotations: string[]): boolean {
-    if (depth > 0) return false;
+    if (depth > 0) {
+      return false;
+    }
     const ivm = "$ion_1_0";
     const prefix = "$ion_";
-    if (input.length < ivm.length || annotations.length > 0) return false;
+    if (input.length < ivm.length || annotations.length > 0) {
+      return false;
+    }
 
     let i = 0;
 
     while (i < prefix.length) {
-      if (prefix.charAt(i) !== input.charAt(i)) return false;
+      if (prefix.charAt(i) !== input.charAt(i)) {
+        return false;
+      }
       i++;
     }
 
     while (i < input.length && input.charAt(i) != "_") {
-      let ch = input.charAt(i);
-      if (ch < "0" || ch > "9") return false;
+      const ch = input.charAt(i);
+      if (ch < "0" || ch > "9") {
+        return false;
+      }
       i++;
     }
     i++;
 
     while (i < input.length) {
-      let ch = input.charAt(i);
-      if (ch < "0" || ch > "9") return false;
+      const ch = input.charAt(i);
+      if (ch < "0" || ch > "9") {
+        return false;
+      }
       i++;
     }
-    if (input !== ivm) throw new Error("Only Ion version 1.0 is supported.");
+    if (input !== ivm) {
+      throw new Error("Only Ion version 1.0 is supported.");
+    }
     return true;
   }
 
@@ -128,7 +142,9 @@ export class TextReader implements Reader {
 
   next() {
     this._raw = undefined;
-    if (this._raw_type === EOF) return null;
+    if (this._raw_type === EOF) {
+      return null;
+    }
 
     if (
       this._raw_type !== BEGINNING_OF_CONTAINER &&
@@ -139,25 +155,37 @@ export class TextReader implements Reader {
       this.skip_past_container();
     }
 
-    let p: ParserTextRaw = this._parser;
+    const p: ParserTextRaw = this._parser;
     for (;;) {
       this._raw_type = p.next();
       if (this._raw_type === T_IDENTIFIER) {
-        if (this._depth > 0) break;
+        if (this._depth > 0) {
+          break;
+        }
         this.load_raw();
-        if (!this.isIVM(this._raw, this.depth(), this.annotations())) break;
+        if (!this.isIVM(this._raw, this.depth(), this.annotations())) {
+          break;
+        }
         this._symtab = defaultLocalSymbolTable();
         this._raw = undefined;
         this._raw_type = undefined;
       } else if (this._raw_type === T_STRING1) {
-        if (this._depth > 0) break;
+        if (this._depth > 0) {
+          break;
+        }
         this.load_raw();
-        if (this._raw !== "$ion_1_0") break;
+        if (this._raw !== "$ion_1_0") {
+          break;
+        }
         this._raw = undefined;
         this._raw_type = undefined;
       } else if (this._raw_type === T_STRUCT) {
-        if (p.annotations().length !== 1) break;
-        if (p.annotations()[0].getText() != ion_symbol_table) break;
+        if (p.annotations().length !== 1) {
+          break;
+        }
+        if (p.annotations()[0].getText() != ion_symbol_table) {
+          break;
+        }
         this._type = get_ion_type(this._raw_type);
         this._symtab = makeSymbolTable(this._cat, this);
         this._raw = undefined;
@@ -207,18 +235,19 @@ export class TextReader implements Reader {
   }
 
   fieldName(): string | null {
-    let str = this._parser.fieldName();
+    const str = this._parser.fieldName();
     if (str !== null) {
-      let raw_type = this._parser.fieldNameType();
+      const raw_type = this._parser.fieldNameType();
       if (raw_type === T_IDENTIFIER && str.length > 1 && str[0] === "$") {
-        let tempStr = str.substr(1, str.length);
+        const tempStr = str.substr(1, str.length);
         if (+tempStr === +tempStr) {
-          //look up sid, +str === +str is a one line is integer hack
-          let symbol = this._symtab.getSymbolText(Number(tempStr));
-          if (symbol === undefined)
+          // look up sid, +str === +str is a one line is integer hack
+          const symbol = this._symtab.getSymbolText(Number(tempStr));
+          if (symbol === undefined) {
             throw new Error(
               "Unresolvable symbol ID, symboltokens unsupported."
             );
+          }
           return symbol;
         }
       }
@@ -228,11 +257,11 @@ export class TextReader implements Reader {
 
   annotations(): string[] {
     return this._parser.annotations().map((st) => {
-      let text = st.getText();
+      const text = st.getText();
       if (text !== null) {
         return text;
       } else {
-        let symbol = this._symtab.getSymbolText(st.getSid());
+        const symbol = this._symtab.getSymbolText(st.getSid());
         if (symbol === undefined || symbol === null) {
           throw new Error("Unresolvable symbol ID, symboltokens unsupported.");
         }
@@ -242,14 +271,17 @@ export class TextReader implements Reader {
   }
 
   isNull(): boolean {
-    if (this._type === IonTypes.NULL) return true;
+    if (this._type === IonTypes.NULL) {
+      return true;
+    }
     return this._parser.isNull();
   }
 
   _stringRepresentation(): string | null {
     this.load_raw();
-    if (this.isNull())
+    if (this.isNull()) {
       return this._type === IonTypes.NULL ? "null" : "null." + this._type!.name;
+    }
     return this._raw;
   }
 
@@ -342,15 +374,16 @@ export class TextReader implements Reader {
           this._raw.length > 1 &&
           this._raw.charAt(0) === "$".charAt(0)
         ) {
-          let tempStr = this._raw.substr(1, this._raw.length);
+          const tempStr = this._raw.substr(1, this._raw.length);
           if (+tempStr === +tempStr) {
-            //look up sid, +str === +str is a one line is integer hack
-            let symbolId = Number(tempStr);
-            let symbol = this._symtab.getSymbolText(symbolId);
-            if (symbol === undefined)
+            // look up sid, +str === +str is a one line is integer hack
+            const symbolId = Number(tempStr);
+            const symbol = this._symtab.getSymbolText(symbolId);
+            if (symbol === undefined) {
               throw new Error(
                 "Unresolvable symbol ID, symboltokens unsupported."
               );
+            }
             return symbol;
           }
         }

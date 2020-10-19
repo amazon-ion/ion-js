@@ -1,6 +1,6 @@
-import { PathElement, Value } from "./Value";
 import { IonType, IonTypes, Writer } from "../Ion";
 import { FromJsConstructor } from "./FromJsConstructor";
+import { PathElement, Value } from "./Value";
 
 /**
  * This mixin constructs a new class that:
@@ -20,7 +20,7 @@ export function Sequence(ionType: IonType) {
     implements Value, Array<Value> {
     protected constructor(children: Value[], annotations: string[] = []) {
       super();
-      for (let child of children) {
+      for (const child of children) {
         this.push(child);
       }
       this._setAnnotations(annotations);
@@ -30,7 +30,7 @@ export function Sequence(ionType: IonType) {
       if (pathElements.length === 0) {
         throw new Error("Value#get requires at least one parameter.");
       }
-      let [pathHead, ...pathTail] = pathElements;
+      const [pathHead, ...pathTail] = pathElements;
       if (typeof pathHead !== "number") {
         throw new Error(
           `Cannot index into a ${
@@ -39,9 +39,9 @@ export function Sequence(ionType: IonType) {
         );
       }
 
-      let children = this as Value[];
-      let maybeChild: Value | undefined = children[pathHead];
-      let child: Value | null = maybeChild === undefined ? null : maybeChild;
+      const children = this as Value[];
+      const maybeChild: Value | undefined = children[pathHead];
+      const child: Value | null = maybeChild === undefined ? null : maybeChild;
       if (pathTail.length === 0 || child === null) {
         return child;
       }
@@ -62,14 +62,14 @@ export function Sequence(ionType: IonType) {
           `Cannot create a ${this.name} from: ${jsValue.toString()}`
         );
       }
-      let children = jsValue.map((child) => Value.from(child));
+      const children = jsValue.map((child) => Value.from(child));
       return new this(children, annotations);
     }
 
     writeTo(writer: Writer) {
       writer.setAnnotations(this.getAnnotations());
       writer.stepIn(ionType);
-      for (let child of this) {
+      for (const child of this) {
         child.writeTo(writer);
       }
       writer.stepOut();

@@ -1,11 +1,11 @@
-import { Value } from "./Value";
 import * as ion from "../Ion";
 import { IonTypes } from "../Ion";
+import { Writer } from "../Ion";
 import {
   FromJsConstructor,
   FromJsConstructorBuilder,
 } from "./FromJsConstructor";
-import { Writer } from "../Ion";
+import { Value } from "./Value";
 
 const _fromJsConstructor: FromJsConstructor = new FromJsConstructorBuilder()
   .withClasses(ion.Decimal)

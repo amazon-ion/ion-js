@@ -1,9 +1,9 @@
-import { Value } from "./Value";
 import { IonType } from "../Ion";
 import {
   FromJsConstructor,
   FromJsConstructorBuilder,
 } from "./FromJsConstructor";
+import { Value } from "./Value";
 
 const _fromJsConstructor: FromJsConstructor = new FromJsConstructorBuilder()
   .withClasses(Uint8Array)

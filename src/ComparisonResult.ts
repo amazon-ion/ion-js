@@ -24,7 +24,9 @@ export enum ComparisonResultType {
   ERROR = "ERROR",
 }
 
-/** comparison result with event index and message **/
+/**
+ * comparison result with event index and message
+ */
 export class ComparisonResult {
   message: string;
   result: ComparisonResultType;

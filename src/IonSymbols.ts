@@ -14,12 +14,12 @@
  */
 
 import { Catalog } from "./IonCatalog";
-import { getSystemSymbolTableImport } from "./IonSystemSymbolTable";
 import { Import } from "./IonImport";
 import { LocalSymbolTable } from "./IonLocalSymbolTable";
 import { Reader } from "./IonReader";
 import { SharedSymbolTable } from "./IonSharedSymbolTable";
 import { SubstituteSymbolTable } from "./IonSubstituteSymbolTable";
+import { getSystemSymbolTableImport } from "./IonSystemSymbolTable";
 
 export const ion_symbol_table = "$ion_symbol_table";
 export const ion_symbol_table_sid = 3;
@@ -84,7 +84,7 @@ function load_imports(reader: Reader, catalog: Catalog): Import {
 }
 
 function load_symbols(reader: Reader): (string | null)[] {
-  let symbols: (string | null)[] = [];
+  const symbols: (string | null)[] = [];
 
   reader.stepIn();
   while (reader.next()) {
@@ -114,12 +114,16 @@ export function makeSymbolTable(
   while (reader.next()) {
     switch (reader.fieldName()) {
       case "imports":
-        if (foundImports) throw new Error("Multiple import fields found.");
+        if (foundImports) {
+          throw new Error("Multiple import fields found.");
+        }
         import_ = load_imports(reader, catalog);
         foundImports = true;
         break;
       case "symbols":
-        if (foundSymbols) throw new Error("Multiple symbol fields found.");
+        if (foundSymbols) {
+          throw new Error("Multiple symbol fields found.");
+        }
         symbols = load_symbols(reader);
         foundSymbols = true;
         break;

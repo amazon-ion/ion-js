@@ -55,9 +55,11 @@ export class Writeable {
   }
 
   writeBytes(buf: Uint8Array, offset?: number, length?: number): void {
-    if (offset === undefined) offset = 0;
+    if (offset === undefined) {
+      offset = 0;
+    }
 
-    let writeLength =
+    const writeLength =
       length !== undefined
         ? Math.min(buf.length - offset, length)
         : buf.length - offset;
@@ -80,8 +82,10 @@ export class Writeable {
   }
 
   getBytes(): Uint8Array {
-    if (this.clean) return this.buffers[0];
-    let buffer = new Uint8Array(this.totalSize);
+    if (this.clean) {
+      return this.buffers[0];
+    }
+    const buffer = new Uint8Array(this.totalSize);
     let tempLength = 0;
     for (let i = 0; i < this.buffers.length - 1; i++) {
       buffer.set(this.buffers[i], tempLength);

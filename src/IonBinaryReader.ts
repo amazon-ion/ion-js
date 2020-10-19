@@ -19,25 +19,25 @@
 // Handles system symbols, and conversion from the parsed
 // input byte array  to the desired Javascript value (scalar or
 // object, such as IonValue).
+import JSBI from "jsbi";
+import IntSize from "./IntSize";
 import { Catalog } from "./IonCatalog";
+import { IVM } from "./IonConstants";
 import { Decimal } from "./IonDecimal";
 import {
   defaultLocalSymbolTable,
   LocalSymbolTable,
 } from "./IonLocalSymbolTable";
-import { ion_symbol_table_sid, makeSymbolTable } from "./IonSymbols";
-import { IonType } from "./IonType";
-import { IonTypes } from "./IonTypes";
-import { IVM } from "./IonConstants";
 import { ParserBinaryRaw } from "./IonParserBinaryRaw";
 import { Reader } from "./IonReader";
 import { BinarySpan } from "./IonSpan";
+import { ion_symbol_table_sid, makeSymbolTable } from "./IonSymbols";
 import { Timestamp } from "./IonTimestamp";
-import JSBI from "jsbi";
-import IntSize from "./IntSize";
+import { IonType } from "./IonType";
+import { IonTypes } from "./IonTypes";
 import { JsbiSupport } from "./JsbiSupport";
 
-const BOC = -2; //beginning of container?
+const BOC = -2; // beginning of container?
 const EOF = -1;
 const TB_NULL = 0;
 const TB_BOOL = 1;
@@ -106,19 +106,27 @@ export class BinaryReader implements Reader {
   next(): IonType | null {
     this._annotations = null;
 
-    if (this._raw_type === EOF) return null;
+    if (this._raw_type === EOF) {
+      return null;
+    }
     for (
       this._raw_type = this._parser.next();
       this.depth() === 0;
       this._raw_type = this._parser.next()
     ) {
       if (this._raw_type === TB_SYMBOL) {
-        let raw: number | null = this._parser._getSid();
-        if (raw !== IVM.sid) break;
+        const raw: number | null = this._parser._getSid();
+        if (raw !== IVM.sid) {
+          break;
+        }
         this._symtab = defaultLocalSymbolTable();
       } else if (this._raw_type === TB_STRUCT) {
-        if (!this._parser.hasAnnotations()) break;
-        if (this._parser.getAnnotation(0) !== ion_symbol_table_sid) break;
+        if (!this._parser.hasAnnotations()) {
+          break;
+        }
+        if (this._parser.getAnnotation(0) !== ion_symbol_table_sid) {
+          break;
+        }
         this._symtab = makeSymbolTable(this._cat, this);
       } else {
         break;
@@ -128,8 +136,9 @@ export class BinaryReader implements Reader {
   }
 
   stepIn(): void {
-    if (!get_ion_type(this._raw_type)!.isContainer)
+    if (!get_ion_type(this._raw_type)!.isContainer) {
       throw new Error("Can't step in to a scalar value");
+    }
     this._parser.stepIn();
     this._raw_type = BOC;
   }
@@ -197,8 +206,8 @@ export class BinaryReader implements Reader {
   }
 
   stringValue(): string | null {
-    let t: BinaryReader = this;
-    let p = t._parser;
+    const t: BinaryReader = this;
+    const p = t._parser;
     switch (get_ion_type(t._raw_type)) {
       case IonTypes.NULL:
         return null;
@@ -211,7 +220,7 @@ export class BinaryReader implements Reader {
         if (this.isNull()) {
           return null;
         }
-        let sid = p._getSid();
+        const sid = p._getSid();
         if (sid !== null) {
           return this.getSymbolString(sid);
         }
@@ -224,7 +233,7 @@ export class BinaryReader implements Reader {
   }
 
   value(): any {
-    let type = this.type();
+    const type = this.type();
     if (type && type.isContainer) {
       if (this.isNull()) {
         return null;
@@ -268,7 +277,9 @@ export class BinaryReader implements Reader {
 
   private getSymbolString(symbolId: number | null): string | null {
     let s: string | null = null;
-    if (symbolId === null) return null;
+    if (symbolId === null) {
+      return null;
+    }
     if (symbolId > 0) {
       if (symbolId > this._symtab.maxId) {
         throw new Error(
@@ -278,8 +289,8 @@ export class BinaryReader implements Reader {
       s = this._symtab.getSymbolText(symbolId);
       if (s === undefined) {
         throw new Error("symbol is unresolvable");
-        //s = "$" + symbolId.toString();
-        //todo turn this back on once symbol table imports are supported and lst context transfer is supported.
+        // s = "$" + symbolId.toString();
+        // todo turn this back on once symbol table imports are supported and lst context transfer is supported.
       }
     } else if (symbolId === 0) {
       throw new Error("Symbol ID zero is unsupported");

@@ -13,11 +13,11 @@
  * permissions and limitations under the License.
  */
 
-import { State, TextWriter } from "./IonTextWriter";
-import { Writeable } from "./IonWriteable";
 import { CharCodes } from "./IonText";
+import { State, TextWriter } from "./IonTextWriter";
 import { IonType } from "./IonType";
 import { IonTypes } from "./IonTypes";
+import { Writeable } from "./IonWriteable";
 
 type Serializer<T> = (value: T) => void;
 
@@ -61,12 +61,13 @@ export class PrettyTextWriter extends TextWriter {
     this.writePrettyValue();
     this.writeAnnotations();
     this._writeNull(type);
-    if (this.currentContainer.containerType === IonTypes.STRUCT)
+    if (this.currentContainer.containerType === IonTypes.STRUCT) {
       this.currentContainer.state = State.STRUCT_FIELD;
+    }
   }
 
   stepOut(): void {
-    let currentContainer = this.containerContext.pop();
+    const currentContainer = this.containerContext.pop();
     if (!currentContainer || !currentContainer.containerType) {
       throw new Error("Can't step out when not in a container");
     } else if (
@@ -96,8 +97,9 @@ export class PrettyTextWriter extends TextWriter {
   }
 
   _serializeValue<T>(type: IonType, value: T, serialize: Serializer<T>) {
-    if (this.currentContainer.state === State.STRUCT_FIELD)
+    if (this.currentContainer.state === State.STRUCT_FIELD) {
       throw new Error("Expecting a struct field");
+    }
     if (value === null) {
       this.writeNull(type);
       return;
@@ -107,8 +109,9 @@ export class PrettyTextWriter extends TextWriter {
     this.writePrettyValue();
     this.writeAnnotations();
     serialize(value);
-    if (this.currentContainer.containerType === IonTypes.STRUCT)
+    if (this.currentContainer.containerType === IonTypes.STRUCT) {
       this.currentContainer.state = State.STRUCT_FIELD;
+    }
   }
 
   writeContainer(type: IonType, openingCharacter: number): void {
@@ -147,7 +150,7 @@ export class PrettyTextWriter extends TextWriter {
             this.writePrettyNewLine(0);
             break;
           default:
-          //no op
+          // no op
         }
       }
     }

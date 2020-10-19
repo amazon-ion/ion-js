@@ -1,10 +1,10 @@
 import { IonTypes, Writer } from "../Ion";
-import { Value } from "./Value";
 import {
   FromJsConstructor,
   FromJsConstructorBuilder,
   Primitives,
 } from "./FromJsConstructor";
+import { Value } from "./Value";
 
 const _fromJsConstructor: FromJsConstructor = new FromJsConstructorBuilder()
   .withPrimitives(Primitives.Number)

@@ -28,12 +28,12 @@ export class Clob extends Lob(IonTypes.CLOB) {
     // See the Ion cookbook's guide to down-converting to JSON for details:
     // http://amzn.github.io/ion-docs/guides/cookbook.html#down-converting-to-json
     let encodedText = "";
-    for (let byte of this) {
+    for (const byte of this) {
       if (byte >= 32 && byte <= 126) {
         encodedText += String.fromCharCode(byte);
         continue;
       }
-      let hex = byte.toString(16);
+      const hex = byte.toString(16);
       if (hex.length == 1) {
         encodedText += "\\u000" + hex;
       } else {

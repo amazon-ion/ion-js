@@ -40,9 +40,9 @@ export default class SignAndMagnitudeInt {
   }
 
   public static fromNumber(value: number): SignAndMagnitudeInt {
-    let isNegative = value < 0 || Object.is(value, -0);
-    let absoluteValue = Math.abs(value);
-    let magnitude = JSBI.BigInt(absoluteValue);
+    const isNegative = value < 0 || Object.is(value, -0);
+    const absoluteValue = Math.abs(value);
+    const magnitude = JSBI.BigInt(absoluteValue);
     return new SignAndMagnitudeInt(magnitude, isNegative);
   }
 

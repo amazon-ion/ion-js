@@ -1,18 +1,18 @@
 import JSBI from "jsbi";
 import { IonTypes, Writer } from "../Ion";
-import { Constructor, Value } from "./Value";
 import {
   FromJsConstructor,
   FromJsConstructorBuilder,
   Primitives,
 } from "./FromJsConstructor";
+import { Constructor, Value } from "./Value";
 
 // JSBI is an irregular class type in that it provides no constructor, only static
 // constructor methods. This means that while it is a class type and `instanceof JSBI`
 // works as expected, the JSBI class does not conform to the typical Constructor
 // interface of new(...args) => any. Because FromJsConstructor will only use it for
 // instanceof tests, we can safely cast it as a Constructor to satisfy the compiler.
-let _jsbiConstructor: Constructor = (JSBI as unknown) as Constructor;
+const _jsbiConstructor: Constructor = (JSBI as unknown) as Constructor;
 const _fromJsConstructor: FromJsConstructor = new FromJsConstructorBuilder()
   .withPrimitives(Primitives.Number)
   .withClassesToUnbox(Number)
@@ -41,7 +41,7 @@ export class Integer extends Value(Number, IonTypes.INT, _fromJsConstructor) {
       this._numberValue = value;
       this._bigIntValue = null;
     } else {
-      let numberValue: number = JSBI.toNumber(value);
+      const numberValue: number = JSBI.toNumber(value);
       super(numberValue);
       this._bigIntValue = value;
       this._numberValue = numberValue;

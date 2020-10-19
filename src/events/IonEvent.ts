@@ -13,19 +13,19 @@
  * permissions and limitations under the License.
  */
 
-import { IonTypes } from "../IonTypes";
+import JSBI from "jsbi";
+import { ComparisonResult } from "../ComparisonResult";
+import { ComparisonResultType } from "../ComparisonResult";
+import { BinaryWriter } from "../IonBinaryWriter";
 import { Decimal } from "../IonDecimal";
+import { defaultLocalSymbolTable } from "../IonLocalSymbolTable";
+import { TextWriter } from "../IonTextWriter";
 import { Timestamp } from "../IonTimestamp";
 import { IonType } from "../IonType";
-import { Writer } from "../IonWriter";
-import { TextWriter } from "../IonTextWriter";
-import { Writeable } from "../IonWriteable";
-import { BinaryWriter } from "../IonBinaryWriter";
-import { defaultLocalSymbolTable } from "../IonLocalSymbolTable";
+import { IonTypes } from "../IonTypes";
 import { decodeUtf8 } from "../IonUnicode";
-import JSBI from "jsbi";
-import { ComparisonResultType } from "../ComparisonResult";
-import { ComparisonResult } from "../ComparisonResult";
+import { Writeable } from "../IonWriteable";
+import { Writer } from "../IonWriter";
 
 export enum IonEventType {
   SCALAR = 0,
@@ -129,7 +129,7 @@ abstract class AbstractIonEvent implements IonEvent {
   }
 
   writeSymbolToken(writer: Writer, text: string) {
-    //should be a struct with text/import descriptor?
+    // should be a struct with text/import descriptor?
     writer.writeSymbol(text);
   }
 
@@ -157,20 +157,20 @@ abstract class AbstractIonEvent implements IonEvent {
   }
 
   writeTextValue(writer: Writer): void {
-    let tempTextWriter = new TextWriter(new Writeable());
+    const tempTextWriter = new TextWriter(new Writeable());
     this.writeIonValue(tempTextWriter);
     tempTextWriter.close();
     writer.writeString(decodeUtf8(tempTextWriter.getBytes()));
   }
 
   writeBinaryValue(writer: Writer): void {
-    let tempBinaryWriter = new BinaryWriter(
+    const tempBinaryWriter = new BinaryWriter(
       defaultLocalSymbolTable(),
       new Writeable()
     );
     this.writeIonValue(tempBinaryWriter);
     tempBinaryWriter.close();
-    let binaryBuffer = tempBinaryWriter.getBytes();
+    const binaryBuffer = tempBinaryWriter.getBytes();
     writer.stepIn(IonTypes.LIST);
     for (let i = 0; i < binaryBuffer.length; i++) {
       writer.writeInt(binaryBuffer[i]);
@@ -216,19 +216,22 @@ abstract class AbstractIonEvent implements IonEvent {
         "Event depths don't match " + this.depth + " vs. " + expected.depth
       );
     }
-    let annotationResult = this.annotationCompare(expected.annotations);
-    if (annotationResult.result === ComparisonResultType.NOT_EQUAL)
+    const annotationResult = this.annotationCompare(expected.annotations);
+    if (annotationResult.result === ComparisonResultType.NOT_EQUAL) {
       return annotationResult;
-    let valueResult = this.valueCompare(expected);
-    if (valueResult.result === ComparisonResultType.NOT_EQUAL)
+    }
+    const valueResult = this.valueCompare(expected);
+    if (valueResult.result === ComparisonResultType.NOT_EQUAL) {
       return valueResult;
+    }
     return new ComparisonResult(ComparisonResultType.EQUAL);
   }
 
   annotationCompare(expectedAnnotations: string[]): ComparisonResult {
-    if (this.annotations === expectedAnnotations)
+    if (this.annotations === expectedAnnotations) {
       return new ComparisonResult(ComparisonResultType.EQUAL);
-    if (this.annotations.length !== expectedAnnotations.length)
+    }
+    if (this.annotations.length !== expectedAnnotations.length) {
       return new ComparisonResult(
         ComparisonResultType.NOT_EQUAL,
         "annotations length don't match" +
@@ -236,8 +239,9 @@ abstract class AbstractIonEvent implements IonEvent {
           " vs. " +
           expectedAnnotations.length
       );
+    }
     for (let i = 0; i < this.annotations.length; i++) {
-      if (this.annotations[i] !== expectedAnnotations[i])
+      if (this.annotations[i] !== expectedAnnotations[i]) {
         return new ComparisonResult(
           ComparisonResultType.NOT_EQUAL,
           "annotation value doesn't match" +
@@ -245,6 +249,7 @@ abstract class AbstractIonEvent implements IonEvent {
             " vs. " +
             expectedAnnotations[i]
         );
+      }
     }
     return new ComparisonResult(ComparisonResultType.EQUAL);
   }
@@ -415,8 +420,12 @@ class IonNullEvent extends AbstractIonEvent {
   }
 
   valueCompare(expected: IonEvent): ComparisonResult {
-    if (expected instanceof IonNullEvent && this.ionValue === expected.ionValue)
+    if (
+      expected instanceof IonNullEvent &&
+      this.ionValue === expected.ionValue
+    ) {
       return new ComparisonResult(ComparisonResultType.EQUAL);
+    }
     return new ComparisonResult(
       ComparisonResultType.NOT_EQUAL,
       this.ionValue + " vs. " + expected.ionValue
@@ -444,8 +453,9 @@ class IonIntEvent extends AbstractIonEvent {
     if (
       expected instanceof IonIntEvent &&
       JSBI.equal(this.ionValue, expected.ionValue)
-    )
+    ) {
       return new ComparisonResult(ComparisonResultType.EQUAL);
+    }
     return new ComparisonResult(
       ComparisonResultType.NOT_EQUAL,
       this.ionValue + " vs. " + expected.ionValue
@@ -470,8 +480,12 @@ class IonBoolEvent extends AbstractIonEvent {
   }
 
   valueCompare(expected: IonEvent): ComparisonResult {
-    if (expected instanceof IonBoolEvent && this.ionValue === expected.ionValue)
+    if (
+      expected instanceof IonBoolEvent &&
+      this.ionValue === expected.ionValue
+    ) {
       return new ComparisonResult(ComparisonResultType.EQUAL);
+    }
     return new ComparisonResult(
       ComparisonResultType.NOT_EQUAL,
       this.ionValue + " vs. " + expected.ionValue
@@ -496,13 +510,15 @@ class IonFloatEvent extends AbstractIonEvent {
   }
 
   valueCompare(expected: IonEvent): ComparisonResult {
-    if (isNaN(this.ionValue) && isNaN(expected.ionValue))
+    if (isNaN(this.ionValue) && isNaN(expected.ionValue)) {
       return new ComparisonResult(ComparisonResultType.EQUAL);
+    }
     if (
       expected instanceof IonFloatEvent &&
       this.ionValue === expected.ionValue
-    )
+    ) {
       return new ComparisonResult(ComparisonResultType.EQUAL);
+    }
     return new ComparisonResult(
       ComparisonResultType.NOT_EQUAL,
       this.ionValue + " vs. " + expected.ionValue
@@ -530,8 +546,9 @@ class IonDecimalEvent extends AbstractIonEvent {
     if (
       expected instanceof IonDecimalEvent &&
       this.ionValue.equals(expected.ionValue)
-    )
+    ) {
       return new ComparisonResult(ComparisonResultType.EQUAL);
+    }
     return new ComparisonResult(
       ComparisonResultType.NOT_EQUAL,
       this.ionValue + " vs. " + expected.ionValue
@@ -552,7 +569,7 @@ class IonSymbolEvent extends AbstractIonEvent {
     depth: number,
     ionValue: string
   ) {
-    //if(ionValue === '$ion_1_0') ionValue = "$ion_user_value::" + ionValue;
+    // if(ionValue === '$ion_1_0') ionValue = "$ion_user_value::" + ionValue;
     super(eventType, ionType, fieldName, annotations, depth, ionValue);
   }
 
@@ -560,15 +577,16 @@ class IonSymbolEvent extends AbstractIonEvent {
     if (
       expected instanceof IonSymbolEvent &&
       this.ionValue === expected.ionValue
-    )
+    ) {
       return new ComparisonResult(ComparisonResultType.EQUAL);
+    }
     return new ComparisonResult(
       ComparisonResultType.NOT_EQUAL,
       this.ionValue + " vs. " + expected.ionValue
     );
   }
   writeIonValue(writer: Writer): void {
-    writer.writeSymbol(this.ionValue); //if symboltokens text is unknown we will need to write out symboltable
+    writer.writeSymbol(this.ionValue); // if symboltokens text is unknown we will need to write out symboltable
   }
 }
 
@@ -588,8 +606,9 @@ class IonStringEvent extends AbstractIonEvent {
     if (
       expected instanceof IonStringEvent &&
       this.ionValue === expected.ionValue
-    )
+    ) {
       return new ComparisonResult(ComparisonResultType.EQUAL);
+    }
     return new ComparisonResult(
       ComparisonResultType.NOT_EQUAL,
       this.ionValue + " vs. " + expected.ionValue
@@ -617,8 +636,9 @@ class IonTimestampEvent extends AbstractIonEvent {
     if (
       expected instanceof IonTimestampEvent &&
       this.ionValue.equals(expected.ionValue)
-    )
+    ) {
       return new ComparisonResult(ComparisonResultType.EQUAL);
+    }
     return new ComparisonResult(
       ComparisonResultType.NOT_EQUAL,
       this.ionValue + " vs. " + expected.ionValue
@@ -643,19 +663,22 @@ class IonBlobEvent extends AbstractIonEvent {
   }
 
   valueCompare(expected: IonEvent): ComparisonResult {
-    if (!(expected instanceof IonBlobEvent))
+    if (!(expected instanceof IonBlobEvent)) {
       return new ComparisonResult(ComparisonResultType.NOT_EQUAL);
-    if (this.ionValue.length !== expected.ionValue.length)
+    }
+    if (this.ionValue.length !== expected.ionValue.length) {
       return new ComparisonResult(
         ComparisonResultType.NOT_EQUAL,
         "Blob length don't match"
       );
+    }
     for (let i = 0; i < this.ionValue.length; i++) {
-      if (this.ionValue[i] !== expected.ionValue[i])
+      if (this.ionValue[i] !== expected.ionValue[i]) {
         return new ComparisonResult(
           ComparisonResultType.NOT_EQUAL,
           this.ionValue[i] + " vs. " + expected.ionValue[i]
         );
+      }
     }
     return new ComparisonResult(ComparisonResultType.EQUAL);
   }
@@ -678,14 +701,16 @@ class IonClobEvent extends AbstractIonEvent {
   }
 
   valueCompare(expected: IonEvent): ComparisonResult {
-    if (!(expected instanceof IonClobEvent))
+    if (!(expected instanceof IonClobEvent)) {
       return new ComparisonResult(ComparisonResultType.NOT_EQUAL);
+    }
     for (let i = 0; i < this.ionValue.length; i++) {
-      if (this.ionValue[i] !== expected.ionValue[i])
+      if (this.ionValue[i] !== expected.ionValue[i]) {
         return new ComparisonResult(
           ComparisonResultType.NOT_EQUAL,
           this.ionValue[i] + " vs. " + expected.ionValue[i]
         );
+      }
     }
     return new ComparisonResult(ComparisonResultType.EQUAL);
   }
@@ -709,12 +734,12 @@ abstract class AbsIonContainerEvent extends AbstractIonEvent {
   abstract valueCompare(expected: AbsIonContainerEvent);
 
   writeIonValue(writer: Writer): void {
-    //no op;
+    // no op;
   }
 }
 
 class IonStructEvent extends AbsIonContainerEvent {
-  //no embed support as of yet.
+  // no embed support as of yet.
   constructor(
     eventType: IonEventType,
     ionType: IonType,
@@ -725,7 +750,7 @@ class IonStructEvent extends AbsIonContainerEvent {
     super(eventType, ionType, fieldName, annotations, depth);
   }
 
-  //two way equivalence between the structEvents, they must have the exact same number of equivalent elements.
+  // two way equivalence between the structEvents, they must have the exact same number of equivalent elements.
   valueCompare(expected: IonStructEvent): ComparisonResult {
     if (!(expected instanceof IonStructEvent)) {
       return new ComparisonResult(
@@ -733,18 +758,20 @@ class IonStructEvent extends AbsIonContainerEvent {
         "Event types don't match"
       );
     }
-    let container = this.ionValue == null ? [] : this.ionValue;
-    let expectedContainer = expected.ionValue == null ? [] : expected.ionValue;
-    if (container.length !== expectedContainer.length)
+    const container = this.ionValue == null ? [] : this.ionValue;
+    const expectedContainer =
+      expected.ionValue == null ? [] : expected.ionValue;
+    if (container.length !== expectedContainer.length) {
       return new ComparisonResult(
         ComparisonResultType.NOT_EQUAL,
         "Struct length don't match"
       );
+    }
     return this.structsCompare(container, expectedContainer);
   }
 
-  //for each actual ionEvent, searches for an equivalent expected ionEvent,
-  //equivalent pairings remove the paired expectedEvent from the search space.
+  // for each actual ionEvent, searches for an equivalent expected ionEvent,
+  // equivalent pairings remove the paired expectedEvent from the search space.
   structsCompare(
     actualEvents: AbstractIonEvent[],
     expectedEvents: AbstractIonEvent[]
@@ -752,7 +779,7 @@ class IonStructEvent extends AbsIonContainerEvent {
     let matchFound: ComparisonResult = new ComparisonResult(
       ComparisonResultType.EQUAL
     );
-    let paired: boolean[] = new Array<boolean>(expectedEvents.length);
+    const paired: boolean[] = new Array<boolean>(expectedEvents.length);
     for (let i: number = 0; matchFound && i < actualEvents.length; i++) {
       matchFound.result = ComparisonResultType.NOT_EQUAL;
       for (
@@ -762,10 +789,12 @@ class IonStructEvent extends AbsIonContainerEvent {
         j++
       ) {
         if (!paired[j]) {
-          let child = actualEvents[i];
-          let expectedChild = expectedEvents[j];
+          const child = actualEvents[i];
+          const expectedChild = expectedEvents[j];
           matchFound = child.compare(expectedChild);
-          if (matchFound.result == ComparisonResultType.EQUAL) paired[j] = true;
+          if (matchFound.result == ComparisonResultType.EQUAL) {
+            paired[j] = true;
+          }
           if (
             matchFound.result == ComparisonResultType.EQUAL &&
             child.eventType === IonEventType.CONTAINER_START
@@ -804,20 +833,23 @@ class IonListEvent extends AbsIonContainerEvent {
   }
 
   valueCompare(expected: IonListEvent): ComparisonResult {
-    if (!(expected instanceof IonListEvent))
+    if (!(expected instanceof IonListEvent)) {
       return new ComparisonResult(
         ComparisonResultType.NOT_EQUAL,
         "Event types don't match"
       );
-    let container = this.ionValue == null ? [] : this.ionValue;
-    let expectedContainer = expected.ionValue == null ? [] : expected.ionValue;
-    if (container.length !== expectedContainer.length)
+    }
+    const container = this.ionValue == null ? [] : this.ionValue;
+    const expectedContainer =
+      expected.ionValue == null ? [] : expected.ionValue;
+    if (container.length !== expectedContainer.length) {
       return new ComparisonResult(
         ComparisonResultType.NOT_EQUAL,
         "List length don't match"
       );
+    }
     for (let i: number = 0; i < container.length; i++) {
-      let child = container[i];
+      const child = container[i];
       if (
         child.compare(expectedContainer[i]).result ==
         ComparisonResultType.NOT_EQUAL
@@ -848,21 +880,24 @@ class IonSexpEvent extends AbsIonContainerEvent {
   }
 
   valueCompare(expected: IonSexpEvent): ComparisonResult {
-    if (!(expected instanceof IonSexpEvent))
+    if (!(expected instanceof IonSexpEvent)) {
       return new ComparisonResult(
         ComparisonResultType.NOT_EQUAL,
         "Event types don't match"
       );
-    let container = this.ionValue == null ? [] : this.ionValue;
-    let expectedContainer = expected.ionValue == null ? [] : expected.ionValue;
-    if (container.length !== expectedContainer.length)
+    }
+    const container = this.ionValue == null ? [] : this.ionValue;
+    const expectedContainer =
+      expected.ionValue == null ? [] : expected.ionValue;
+    if (container.length !== expectedContainer.length) {
       return new ComparisonResult(
         ComparisonResultType.NOT_EQUAL,
         "S-expression length don't match"
       );
+    }
     for (let i: number = 0; i < container.length; i++) {
-      let child = container[i];
-      let eventResult = child.compare(expectedContainer[i]);
+      const child = container[i];
+      const eventResult = child.compare(expectedContainer[i]);
       if (eventResult.result == ComparisonResultType.NOT_EQUAL) {
         return eventResult;
       } else if (child.eventType === IonEventType.CONTAINER_START) {
@@ -879,7 +914,7 @@ class IonEndEvent extends AbstractIonEvent {
   }
 
   valueCompare(expected: IonEndEvent): ComparisonResult {
-    //should be null === null if they are both end events.
+    // should be null === null if they are both end events.
     if (
       expected instanceof IonEndEvent &&
       this.ionValue === expected.ionValue
@@ -893,6 +928,6 @@ class IonEndEvent extends AbstractIonEvent {
   }
 
   writeIonValue(writer: Writer): void {
-    //no op
+    // no op
   }
 }

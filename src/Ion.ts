@@ -13,20 +13,20 @@
  * permissions and limitations under the License.
  */
 
+import IntSize from "./IntSize";
 import { BinaryReader } from "./IonBinaryReader";
+import { BinaryWriter } from "./IonBinaryWriter";
 import { Catalog } from "./IonCatalog";
 import { IVM } from "./IonConstants";
+import { defaultLocalSymbolTable } from "./IonLocalSymbolTable";
+import { PrettyTextWriter } from "./IonPrettyTextWriter";
 import { Reader } from "./IonReader";
 import { BinarySpan, StringSpan } from "./IonSpan";
 import { TextReader } from "./IonTextReader";
-import { Writer } from "./IonWriter";
 import { TextWriter } from "./IonTextWriter";
-import { PrettyTextWriter } from "./IonPrettyTextWriter";
-import { Writeable } from "./IonWriteable";
-import { BinaryWriter } from "./IonBinaryWriter";
-import { defaultLocalSymbolTable } from "./IonLocalSymbolTable";
 import { decodeUtf8 } from "./IonUnicode";
-import IntSize from "./IntSize";
+import { Writeable } from "./IonWriteable";
+import { Writer } from "./IonWriter";
 
 /**
  * Indicates whether the provided buffer contains binary Ion data.
@@ -39,7 +39,9 @@ function isBinary(buffer: Uint8Array): boolean {
     return false;
   }
   for (let i = 0; i < 4; i++) {
-    if (buffer[i] !== IVM.binary[i]) return false;
+    if (buffer[i] !== IVM.binary[i]) {
+      return false;
+    }
   }
   return true;
 }
@@ -58,7 +60,7 @@ export type ReaderBuffer = ReaderOctetBuffer | string;
  */
 export function makeReader(buf: ReaderBuffer): Reader {
   if (typeof buf === "string") {
-    return new TextReader(new StringSpan(<string>buf));
+    return new TextReader(new StringSpan(buf as string));
   }
   const bufArray = new Uint8Array(buf as ReaderOctetBuffer);
   if (isBinary(bufArray)) {
@@ -89,7 +91,7 @@ export function makeBinaryWriter(): Writer {
 
 // Used by the dump*() functions to write each of a sequence of values to the provided Writer.
 function _writeAllTo(writer: Writer, values: any[]): Uint8Array {
-  for (let value of values) {
+  for (const value of values) {
     dom.Value.from(value).writeTo(writer);
   }
   writer.close();

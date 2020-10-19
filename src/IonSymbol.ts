@@ -25,7 +25,7 @@ export class Symbol {
   }
 
   toString(): string {
-    let s =
+    const s =
       "sym::{id:" + asAscii(this.sid) + ',val:"' + asAscii(this.name) + '"';
     return s;
   }
