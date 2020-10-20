@@ -86,7 +86,7 @@ abstract class AbstractIonEvent implements IonEvent {
     writer.writeSymbol(IonEventType[this.eventType]);
     if (this.ionType !== null) {
       writer.writeFieldName("ion_type");
-      writer.writeSymbol(this.ionType.name);
+      writer.writeSymbol(this.ionType.name.toUpperCase());
     }
     if (this.fieldName !== null && this.fieldName !== undefined) {
       writer.writeFieldName("field_name");
