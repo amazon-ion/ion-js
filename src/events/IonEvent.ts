@@ -402,8 +402,9 @@ export class IonEventFactory {
       case IonEventType.SYMBOL_TABLE:
         throw new Error("symbol tables unsupported.");
       case IonEventType.CONTAINER_END:
+        return new IonEndEvent(eventType, depth, ionType!);
       case IonEventType.STREAM_END:
-        return new IonEndEvent(eventType, depth);
+        return new IonEndEvent(eventType, depth, ionType!);
     }
   }
 }
@@ -910,7 +911,11 @@ class IonSexpEvent extends AbsIonContainerEvent {
 
 class IonEndEvent extends AbstractIonEvent {
   constructor(eventType: IonEventType, depth: number) {
-    super(eventType, null, null, [], depth, undefined);
+    if(eventType === IonEventType.STREAM_END) {
+      super(eventType, null, null, [], depth, undefined)
+    } else {
+      super(eventType, ionType!, null, [], depth, undefined)
+    }
   }
 
   valueCompare(expected: IonEndEvent): ComparisonResult {
