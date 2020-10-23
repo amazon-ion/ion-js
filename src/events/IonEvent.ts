@@ -912,9 +912,9 @@ class IonSexpEvent extends AbsIonContainerEvent {
 class IonEndEvent extends AbstractIonEvent {
   constructor(eventType: IonEventType, depth: number, ionType: IonType) {
     if(eventType === IonEventType.STREAM_END) {
-      super(eventType, null, null, [], depth, undefined)
+      super(eventType, null, null, [], depth, undefined);
     } else {
-      super(eventType, ionType!, null, [], depth, undefined)
+      super(eventType, ionType!, null, [], depth, undefined);
     }
   }
 
