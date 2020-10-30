@@ -150,8 +150,8 @@ export class Compare {
             let expectedContainer: any = [];
             if (actual.isEmbedded(actualEvent) && expected.isEmbedded(expectedEvent)) {
                 //we found a list of strings that we need to interpret as top level ion text streams.
-                actualContainer = this.parseEmbeddedStream(actualEvent);
-                expectedContainer = this.parseEmbeddedStream(expectedEvent);
+                actualContainer = this.parseEmbeddedStream(actualEvent)
+                expectedContainer = this.parseEmbeddedStream(expectedEvent)
             } else {//we're in an sexp/list
                 actualContainer = this.parseContainer(actualEvent);
                 expectedContainer = this.parseContainer(expectedEvent);
@@ -218,11 +218,16 @@ export class Compare {
     // parse embedded stream into events
     private parseEmbeddedStream(event: IonEvent): any {
         let container: any = [];
+        let value = "";
         for (let j = 0; j < event.ionValue.length - 1; j++) {
-            if(event.ionValue[j].eventType == IonEventType.STREAM_END)
+            if(event.ionValue[j].eventType == IonEventType.STREAM_END) {
+                container.push(new IonEventStream(makeReader(value)));
+                value = "";
                 continue;
-            container.push(new IonEventStream(makeReader(event.ionValue[j].ionValue)));
+            }
+            value += event.ionValue[j].ionValue + " ";
         }
+
         return container;
     }
 }
