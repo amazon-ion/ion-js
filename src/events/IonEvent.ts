@@ -705,6 +705,12 @@ class IonClobEvent extends AbstractIonEvent {
     if (!(expected instanceof IonClobEvent)) {
       return new ComparisonResult(ComparisonResultType.NOT_EQUAL);
     }
+    if(this.ionValue.length !== expected.ionValue.length) {
+      return new ComparisonResult(
+          ComparisonResultType.NOT_EQUAL,
+          this.ionValue + " vs. " + expected.ionValue
+      );
+    }
     for (let i = 0; i < this.ionValue.length; i++) {
       if (this.ionValue[i] !== expected.ionValue[i]) {
         return new ComparisonResult(
@@ -713,6 +719,7 @@ class IonClobEvent extends AbstractIonEvent {
         );
       }
     }
+
     return new ComparisonResult(ComparisonResultType.EQUAL);
   }
 
