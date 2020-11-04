@@ -511,9 +511,6 @@ class IonFloatEvent extends AbstractIonEvent {
   }
 
   valueCompare(expected: IonEvent): ComparisonResult {
-    if (isNaN(this.ionValue) && isNaN(expected.ionValue)) {
-      return new ComparisonResult(ComparisonResultType.EQUAL);
-    }
     if (
       expected instanceof IonFloatEvent &&
       Object.is(this.ionValue, expected.ionValue)
