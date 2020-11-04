@@ -516,7 +516,7 @@ class IonFloatEvent extends AbstractIonEvent {
     }
     if (
       expected instanceof IonFloatEvent &&
-      this.ionValue === expected.ionValue
+      Object.is(this.ionValue, expected.ionValue)
     ) {
       return new ComparisonResult(ComparisonResultType.EQUAL);
     }
