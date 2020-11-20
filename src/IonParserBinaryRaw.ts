@@ -274,12 +274,13 @@ export class ParserBinaryRaw {
     while (bytesRead < numberOfBytes) {
       byte = input.next();
       bytesRead++;
-      // TODO: Bitshifting is faster than multiplication because it converts numbers to integer values,
-      //  but it loses precision on values larger than 31 bits. Consider optimizing this code path
-      //  for smaller values of `numberOfBytes`.
 
       // Avoid using bitshifting to preserve Number's precision beyond 31 bits.
-      value *= 256;
+      if (numberOfBytes < 4) {
+        value <<= 8;
+      } else {
+        value *= 256;
+      }
       value = value + byte;
     }
 
