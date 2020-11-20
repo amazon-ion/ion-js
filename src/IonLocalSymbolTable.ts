@@ -74,7 +74,9 @@ export class LocalSymbolTable {
 
   getSymbolText(symbolId: number): string | null {
     if (symbolId > this.maxId) {
-      throw new Error("Symbol $" + symbolId.toString() + " greater than maxID.");
+      throw new Error(
+        "Symbol $" + symbolId.toString() + " greater than maxID."
+      );
     }
     const importedSymbol: string | undefined = this.import.getSymbolText(
       symbolId
