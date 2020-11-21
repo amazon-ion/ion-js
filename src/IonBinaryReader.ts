@@ -281,11 +281,6 @@ export class BinaryReader implements Reader {
       return null;
     }
     if (symbolId > 0) {
-      if (symbolId > this._symtab.maxId) {
-        throw new Error(
-          "Symbol $" + symbolId.toString() + " greater than maxID."
-        );
-      }
       s = this._symtab.getSymbolText(symbolId);
       if (s === undefined) {
         throw new Error("symbol is unresolvable");
