@@ -24,7 +24,7 @@ import { getSystemSymbolTableImport } from "./IonSystemSymbolTable";
 export class LocalSymbolTable {
   private readonly _import: Import;
   private readonly offset: number;
-  private index: SymbolIndex = {};
+  private index: SymbolIndex = Object.create(null);
 
   constructor(theImport: Import | null, symbols: (string | null)[] = []) {
     if (theImport === null) {
@@ -35,7 +35,7 @@ export class LocalSymbolTable {
     this.offset = this._import.offset + this._import.length;
 
     for (const symbol_ of symbols) {
-      this.addSymbol(symbol_);
+      this.assignSymbolId(symbol_);
     }
   }
 
@@ -69,6 +69,23 @@ export class LocalSymbolTable {
     if (symbol_ !== null) {
       this.index[symbol_] = symbolId;
     }
+    return symbolId;
+  }
+
+  // Used during table initialization. Unlike `addSymbol`, `assignSymbolId` will not discard strings that are already
+  // in the symbol table. Ignoring duplicate symbols during table construction can cause symbol IDs that have already
+  // been used to encode data to become invalid. For example, if a stream uses symbols "foo", "bar", "baz" to encode
+  // its data even though "baz" was also defined in an imported table, discarding "baz" will cause data already encoded
+  // with that ID to become corrupted.
+  private assignSymbolId(symbol: string | null): number {
+    // Push the text onto the end of our array of strings no matter what
+    const symbolId = this.offset + this.symbols.length;
+    this.symbols.push(symbol);
+    // If this text isn't already in our index, go ahead and add it.
+    if (symbol !== null && this.getSymbolId(symbol) === undefined) {
+      this.index[symbol] = symbolId;
+    }
+    // Return the string's index in the symbol table, even if it isn't the lowest one.
     return symbolId;
   }
 
