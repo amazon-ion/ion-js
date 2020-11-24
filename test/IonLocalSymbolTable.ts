@@ -140,4 +140,16 @@ describe('Local symbol table', () => {
         assert.equal(originalId, duplicateId, "Duplicate symbol was not given original id");
         assert.equal(originalLength + 1, symbolTable.symbols.length, "Duplicate symbol added to symbol table");
     });
+
+    // See https://github.com/amzn/ion-js/issues/645
+    it('SST Object properties are not treated as symbols (Issue #645)', () => {
+        const symbolTable = defaultLocalSymbolTable();
+        symbolTable.addSymbol("foo");
+        assert.equal(symbolTable.getSymbolId("foo"), 10);
+
+        // 'size' has not been added to the symbol table.
+        // It is, however, a property (an accessor) on the 'Map' data type.
+        // Asking for its symbol ID should return undefined.
+        assert.isUndefined(symbolTable.getSymbolId("size"));
+    });
 });

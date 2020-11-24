@@ -30,7 +30,7 @@ export class SharedSymbolTable {
     // Iterate through the symbol array in reverse order so if the same string appears more than
     // once the smaller symbol ID is stored.
     for (let m = _symbols.length - 1; m >= 0; m--) {
-      this._idsByText[_symbols[m]] = m;
+      this._idsByText.set(_symbols[m], m);
     }
   }
 
@@ -61,6 +61,6 @@ export class SharedSymbolTable {
   }
 
   getSymbolId(text: string): number | undefined {
-    return this._idsByText[text];
+    return this._idsByText.get(text);
   }
 }
