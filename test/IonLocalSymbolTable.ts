@@ -151,5 +151,8 @@ describe('Local symbol table', () => {
         // It is, however, a property (an accessor) on the 'Map' data type.
         // Asking for its symbol ID should return undefined.
         assert.isUndefined(symbolTable.getSymbolId("size"));
+        // Same test for 'toString', which isn't a 'Map' property, but exists on JS Objects instantiated with the
+        // `{}` literal instead of `Object.create(null)`.
+        assert.isUndefined(symbolTable.getSymbolId('toString'));
     });
 });

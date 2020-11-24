@@ -24,7 +24,7 @@ import { getSystemSymbolTableImport } from "./IonSystemSymbolTable";
 export class LocalSymbolTable {
   private readonly _import: Import;
   private readonly offset: number;
-  private index: SymbolIndex = {};
+  private index: SymbolIndex = Object.create(null);
 
   constructor(theImport: Import | null, symbols: (string | null)[] = []) {
     if (theImport === null) {
