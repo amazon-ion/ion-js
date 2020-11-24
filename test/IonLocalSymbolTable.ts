@@ -16,7 +16,7 @@
 import {assert} from 'chai';
 import {LocalSymbolTable} from "../src/IonLocalSymbolTable";
 import {Import} from "../src/IonImport";
-import {getSystemSymbolTableImport} from "../src/IonSystemSymbolTable";
+import {getSystemSymbolTable, getSystemSymbolTableImport} from "../src/IonSystemSymbolTable";
 import {Catalog, defaultLocalSymbolTable, SharedSymbolTable} from "../src/Ion";
 
 let defaultCatalog = function () {
@@ -154,5 +154,15 @@ describe('Local symbol table', () => {
         // Same test for 'toString', which isn't a 'Map' property, but exists on JS Objects instantiated with the
         // `{}` literal instead of `Object.create(null)`.
         assert.isUndefined(symbolTable.getSymbolId('toString'));
+    });
+
+    // See https://github.com/amzn/ion-js/issues/649
+    it('Symbol tables do not discard duplicate text during instantiation (Issue #649)', () => {
+        const extraSymbols = ["foo", "foo", "bar", "bar"];
+        const symbolTable = new LocalSymbolTable(getSystemSymbolTableImport(), extraSymbols);
+        assert.equal(
+            symbolTable.maxId,
+            getSystemSymbolTable().numberOfSymbols + extraSymbols.length
+        );
     });
 });
