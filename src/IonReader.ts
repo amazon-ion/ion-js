@@ -42,6 +42,17 @@ export type ReaderScalarValue =
  */
 export interface Reader {
   /**
+   * Return the position of the current reader. 
+   * The position refers to the character distance between the char where the reader 
+   * stared (e.g. the first character of the file), and the current character the reader 
+   * is reading.
+   * 
+   * @returns a [[number]] type presenting the position of the character the reading is 
+   * currently reading.
+   */
+  position(): number | null;
+
+  /**
    * Advances the reader to the next value in the stream at the current depth.
    *
    * @return The corresponding [[IonType]] of the value the reader moves to, or `null`

@@ -317,6 +317,10 @@ export class ParserBinaryRaw {
     return Decimal._fromBigIntCoefficient(isNegative, coefficient, exponent);
   }
 
+  source(): BinarySpan {
+    return this._in;
+  }
+
   next(): any {
     if (this._curr === undefined && this._len > 0) {
       this._in.skip(this._len);
