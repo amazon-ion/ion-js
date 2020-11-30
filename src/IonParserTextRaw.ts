@@ -386,6 +386,10 @@ export class ParserTextRaw {
     return this._fieldnameType;
   }
 
+  source(): StringSpan {
+    return this._in;
+  }
+
   annotations(): SymbolToken[] {
     return this._ann;
   }
