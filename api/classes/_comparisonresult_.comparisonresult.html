@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>IonType | Ion-JS Library</title>
+	<title>ComparisonResult | Ion-JS Library</title>
 	<meta name="description" content="">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -54,13 +54,13 @@
 					<a href="../globals.html">Globals</a>
 				</li>
 				<li>
-					<a href="../modules/_iontype_.html">&quot;IonType&quot;</a>
+					<a href="../modules/_comparisonresult_.html">&quot;ComparisonResult&quot;</a>
 				</li>
 				<li>
-					<a href="_iontype_.iontype.html">IonType</a>
+					<a href="_comparisonresult_.comparisonresult.html">ComparisonResult</a>
 				</li>
 			</ul>
-			<h1>Class IonType</h1>
+			<h1>Class ComparisonResult</h1>
 		</div>
 	</div>
 </header>
@@ -70,7 +70,7 @@
 			<section class="tsd-panel tsd-comment">
 				<div class="tsd-comment tsd-typography">
 					<div class="lead">
-						<p>Ion value type enumeration class.</p>
+						<p>comparison result with event index and message</p>
 					</div>
 				</div>
 			</section>
@@ -78,7 +78,7 @@
 				<h3>Hierarchy</h3>
 				<ul class="tsd-hierarchy">
 					<li>
-						<span class="target">IonType</span>
+						<span class="target">ComparisonResult</span>
 					</li>
 				</ul>
 			</section>
@@ -89,18 +89,16 @@
 						<section class="tsd-index-section ">
 							<h3>Constructors</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-constructor tsd-parent-kind-class"><a href="_iontype_.iontype.html#constructor" class="tsd-kind-icon">constructor</a></li>
+								<li class="tsd-kind-constructor tsd-parent-kind-class"><a href="_comparisonresult_.comparisonresult.html#constructor" class="tsd-kind-icon">constructor</a></li>
 							</ul>
 						</section>
 						<section class="tsd-index-section ">
 							<h3>Properties</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-property tsd-parent-kind-class"><a href="_iontype_.iontype.html#binarytypeid" class="tsd-kind-icon">binary<wbr>Type<wbr>Id</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-class"><a href="_iontype_.iontype.html#iscontainer" class="tsd-kind-icon">is<wbr>Container</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-class"><a href="_iontype_.iontype.html#islob" class="tsd-kind-icon">is<wbr>Lob</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-class"><a href="_iontype_.iontype.html#isnumeric" class="tsd-kind-icon">is<wbr>Numeric</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-class"><a href="_iontype_.iontype.html#isscalar" class="tsd-kind-icon">is<wbr>Scalar</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-class"><a href="_iontype_.iontype.html#name" class="tsd-kind-icon">name</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="_comparisonresult_.comparisonresult.html#actualindex" class="tsd-kind-icon">actual<wbr>Index</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="_comparisonresult_.comparisonresult.html#expectedindex" class="tsd-kind-icon">expected<wbr>Index</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="_comparisonresult_.comparisonresult.html#message" class="tsd-kind-icon">message</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="_comparisonresult_.comparisonresult.html#result" class="tsd-kind-icon">result</a></li>
 							</ul>
 						</section>
 					</div>
@@ -112,37 +110,31 @@
 					<a name="constructor" class="tsd-anchor"></a>
 					<h3>constructor</h3>
 					<ul class="tsd-signatures tsd-kind-constructor tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">new <wbr>Ion<wbr>Type<span class="tsd-signature-symbol">(</span>binaryTypeId<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, name<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, isScalar<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span>, isLob<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span>, isNumeric<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span>, isContainer<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_iontype_.iontype.html" class="tsd-signature-type">IonType</a></li>
+						<li class="tsd-signature tsd-kind-icon">new <wbr>Comparison<wbr>Result<span class="tsd-signature-symbol">(</span>result<span class="tsd-signature-symbol">?: </span><a href="../enums/_comparisonresult_.comparisonresulttype.html" class="tsd-signature-type">ComparisonResultType</a>, message<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span>, actualIndex<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span>, expectedIndex<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_comparisonresult_.comparisonresult.html" class="tsd-signature-type">ComparisonResult</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/b358e06/src/IonType.ts#L17">src/IonType.ts:17</a></li>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/b358e06/src/ComparisonResult.ts#L34">src/ComparisonResult.ts:34</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>binaryTypeId: <span class="tsd-signature-type">number</span></h5>
+									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> result: <a href="../enums/_comparisonresult_.comparisonresulttype.html" class="tsd-signature-type">ComparisonResultType</a><span class="tsd-signature-symbol"> = ComparisonResultType.EQUAL</span></h5>
 								</li>
 								<li>
-									<h5>name: <span class="tsd-signature-type">string</span></h5>
+									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> message: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> = &quot;&quot;</span></h5>
 								</li>
 								<li>
-									<h5>isScalar: <span class="tsd-signature-type">boolean</span></h5>
+									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> actualIndex: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> = 0</span></h5>
 								</li>
 								<li>
-									<h5>isLob: <span class="tsd-signature-type">boolean</span></h5>
-								</li>
-								<li>
-									<h5>isNumeric: <span class="tsd-signature-type">boolean</span></h5>
-								</li>
-								<li>
-									<h5>isContainer: <span class="tsd-signature-type">boolean</span></h5>
+									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> expectedIndex: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> = 0</span></h5>
 								</li>
 							</ul>
-							<h4 class="tsd-returns-title">Returns <a href="_iontype_.iontype.html" class="tsd-signature-type">IonType</a></h4>
+							<h4 class="tsd-returns-title">Returns <a href="_comparisonresult_.comparisonresult.html" class="tsd-signature-type">ComparisonResult</a></h4>
 						</li>
 					</ul>
 				</section>
@@ -150,94 +142,44 @@
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Properties</h2>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
-					<a name="binarytypeid" class="tsd-anchor"></a>
-					<h3>binary<wbr>Type<wbr>Id</h3>
-					<div class="tsd-signature tsd-kind-icon">binary<wbr>Type<wbr>Id<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
+					<a name="actualindex" class="tsd-anchor"></a>
+					<h3>actual<wbr>Index</h3>
+					<div class="tsd-signature tsd-kind-icon">actual<wbr>Index<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/amzn/ion-js/blob/b358e06/src/IonType.ts#L20">src/IonType.ts:20</a></li>
+							<li>Defined in <a href="https://github.com/amzn/ion-js/blob/b358e06/src/ComparisonResult.ts#L33">src/ComparisonResult.ts:33</a></li>
 						</ul>
 					</aside>
-					<div class="tsd-comment tsd-typography">
-						<div class="lead">
-							<p>The binary type ID for this Ion Type.</p>
-						</div>
-					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
-					<a name="iscontainer" class="tsd-anchor"></a>
-					<h3>is<wbr>Container</h3>
-					<div class="tsd-signature tsd-kind-icon">is<wbr>Container<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span></div>
+					<a name="expectedindex" class="tsd-anchor"></a>
+					<h3>expected<wbr>Index</h3>
+					<div class="tsd-signature tsd-kind-icon">expected<wbr>Index<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/amzn/ion-js/blob/b358e06/src/IonType.ts#L30">src/IonType.ts:30</a></li>
+							<li>Defined in <a href="https://github.com/amzn/ion-js/blob/b358e06/src/ComparisonResult.ts#L34">src/ComparisonResult.ts:34</a></li>
 						</ul>
 					</aside>
-					<div class="tsd-comment tsd-typography">
-						<div class="lead">
-							<p>Whether or not this type is a <code>list</code>, <code>sexp</code>, or <code>struct</code>.</p>
-						</div>
-					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
-					<a name="islob" class="tsd-anchor"></a>
-					<h3>is<wbr>Lob</h3>
-					<div class="tsd-signature tsd-kind-icon">is<wbr>Lob<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span></div>
+					<a name="message" class="tsd-anchor"></a>
+					<h3>message</h3>
+					<div class="tsd-signature tsd-kind-icon">message<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/amzn/ion-js/blob/b358e06/src/IonType.ts#L26">src/IonType.ts:26</a></li>
+							<li>Defined in <a href="https://github.com/amzn/ion-js/blob/b358e06/src/ComparisonResult.ts#L31">src/ComparisonResult.ts:31</a></li>
 						</ul>
 					</aside>
-					<div class="tsd-comment tsd-typography">
-						<div class="lead">
-							<p>Whether or not this type is a <code>clob</code> or <code>blob</code>.</p>
-						</div>
-					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
-					<a name="isnumeric" class="tsd-anchor"></a>
-					<h3>is<wbr>Numeric</h3>
-					<div class="tsd-signature tsd-kind-icon">is<wbr>Numeric<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span></div>
+					<a name="result" class="tsd-anchor"></a>
+					<h3>result</h3>
+					<div class="tsd-signature tsd-kind-icon">result<span class="tsd-signature-symbol">:</span> <a href="../enums/_comparisonresult_.comparisonresulttype.html" class="tsd-signature-type">ComparisonResultType</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/amzn/ion-js/blob/b358e06/src/IonType.ts#L28">src/IonType.ts:28</a></li>
+							<li>Defined in <a href="https://github.com/amzn/ion-js/blob/b358e06/src/ComparisonResult.ts#L32">src/ComparisonResult.ts:32</a></li>
 						</ul>
 					</aside>
-					<div class="tsd-comment tsd-typography">
-						<div class="lead">
-							<p>Whether or not this type is an <code>int</code>, <code>float</code>, or <code>decimal</code>.</p>
-						</div>
-					</div>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
-					<a name="isscalar" class="tsd-anchor"></a>
-					<h3>is<wbr>Scalar</h3>
-					<div class="tsd-signature tsd-kind-icon">is<wbr>Scalar<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span></div>
-					<aside class="tsd-sources">
-						<ul>
-							<li>Defined in <a href="https://github.com/amzn/ion-js/blob/b358e06/src/IonType.ts#L24">src/IonType.ts:24</a></li>
-						</ul>
-					</aside>
-					<div class="tsd-comment tsd-typography">
-						<div class="lead">
-							<p>Whether or not this type is a scalar value.</p>
-						</div>
-					</div>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
-					<a name="name" class="tsd-anchor"></a>
-					<h3>name</h3>
-					<div class="tsd-signature tsd-kind-icon">name<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
-					<aside class="tsd-sources">
-						<ul>
-							<li>Defined in <a href="https://github.com/amzn/ion-js/blob/b358e06/src/IonType.ts#L22">src/IonType.ts:22</a></li>
-						</ul>
-					</aside>
-					<div class="tsd-comment tsd-typography">
-						<div class="lead">
-							<p>The textual name of this type.</p>
-						</div>
-					</div>
 				</section>
 			</section>
 		</div>
@@ -248,37 +190,34 @@
 						<a href="../globals.html"><em>Globals</em></a>
 					</li>
 					<li class="current tsd-kind-external-module">
-						<a href="../modules/_iontype_.html">&quot;<wbr>Ion<wbr>Type&quot;</a>
+						<a href="../modules/_comparisonresult_.html">&quot;<wbr>Comparison<wbr>Result&quot;</a>
 					</li>
 				</ul>
 			</nav>
 			<nav class="tsd-navigation secondary menu-sticky">
 				<ul class="before-current">
+					<li class=" tsd-kind-enum tsd-parent-kind-external-module">
+						<a href="../enums/_comparisonresult_.comparisonresulttype.html" class="tsd-kind-icon">Comparison<wbr>Result<wbr>Type</a>
+					</li>
 				</ul>
 				<ul class="current">
 					<li class="current tsd-kind-class tsd-parent-kind-external-module">
-						<a href="_iontype_.iontype.html" class="tsd-kind-icon">Ion<wbr>Type</a>
+						<a href="_comparisonresult_.comparisonresult.html" class="tsd-kind-icon">Comparison<wbr>Result</a>
 						<ul>
 							<li class=" tsd-kind-constructor tsd-parent-kind-class">
-								<a href="_iontype_.iontype.html#constructor" class="tsd-kind-icon">constructor</a>
+								<a href="_comparisonresult_.comparisonresult.html#constructor" class="tsd-kind-icon">constructor</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class">
-								<a href="_iontype_.iontype.html#binarytypeid" class="tsd-kind-icon">binary<wbr>Type<wbr>Id</a>
+								<a href="_comparisonresult_.comparisonresult.html#actualindex" class="tsd-kind-icon">actual<wbr>Index</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class">
-								<a href="_iontype_.iontype.html#iscontainer" class="tsd-kind-icon">is<wbr>Container</a>
+								<a href="_comparisonresult_.comparisonresult.html#expectedindex" class="tsd-kind-icon">expected<wbr>Index</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class">
-								<a href="_iontype_.iontype.html#islob" class="tsd-kind-icon">is<wbr>Lob</a>
+								<a href="_comparisonresult_.comparisonresult.html#message" class="tsd-kind-icon">message</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class">
-								<a href="_iontype_.iontype.html#isnumeric" class="tsd-kind-icon">is<wbr>Numeric</a>
-							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-class">
-								<a href="_iontype_.iontype.html#isscalar" class="tsd-kind-icon">is<wbr>Scalar</a>
-							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-class">
-								<a href="_iontype_.iontype.html#name" class="tsd-kind-icon">name</a>
+								<a href="_comparisonresult_.comparisonresult.html#result" class="tsd-kind-icon">result</a>
 							</li>
 						</ul>
 					</li>

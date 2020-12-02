@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>&quot;dom/Value&quot; | Ion-JS Library</title>
+	<title>IonEventFactory | Ion-JS Library</title>
 	<meta name="description" content="">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -54,85 +54,82 @@
 					<a href="../globals.html">Globals</a>
 				</li>
 				<li>
-					<a href="_dom_value_.html">&quot;dom/Value&quot;</a>
+					<a href="../modules/_events_ionevent_.html">&quot;events/IonEvent&quot;</a>
+				</li>
+				<li>
+					<a href="_events_ionevent_.ioneventfactory.html">IonEventFactory</a>
 				</li>
 			</ul>
-			<h1>External module &quot;dom/Value&quot;</h1>
+			<h1>Class IonEventFactory</h1>
 		</div>
 	</div>
 </header>
 <div class="container container-main">
 	<div class="row">
 		<div class="col-8 col-content">
+			<section class="tsd-panel tsd-hierarchy">
+				<h3>Hierarchy</h3>
+				<ul class="tsd-hierarchy">
+					<li>
+						<span class="target">IonEventFactory</span>
+					</li>
+				</ul>
+			</section>
 			<section class="tsd-panel-group tsd-index-group">
 				<h2>Index</h2>
 				<section class="tsd-panel tsd-index-panel">
 					<div class="tsd-index-content">
 						<section class="tsd-index-section ">
-							<h3>Modules</h3>
+							<h3>Methods</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-module tsd-parent-kind-external-module tsd-has-type-parameter"><a href="_dom_value_.value.html" class="tsd-kind-icon">Value</a></li>
-							</ul>
-						</section>
-						<section class="tsd-index-section ">
-							<h3>Interfaces</h3>
-							<ul class="tsd-index-list">
-								<li class="tsd-kind-interface tsd-parent-kind-external-module"><a href="../interfaces/_dom_value_.value-1.html" class="tsd-kind-icon">Value</a></li>
-							</ul>
-						</section>
-						<section class="tsd-index-section ">
-							<h3>Type aliases</h3>
-							<ul class="tsd-index-list">
-								<li class="tsd-kind-type-alias tsd-parent-kind-external-module tsd-has-type-parameter"><a href="_dom_value_.html#constructor" class="tsd-kind-icon">Constructor</a></li>
-								<li class="tsd-kind-type-alias tsd-parent-kind-external-module"><a href="_dom_value_.html#pathelement" class="tsd-kind-icon">Path<wbr>Element</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_events_ionevent_.ioneventfactory.html#makeevent" class="tsd-kind-icon">make<wbr>Event</a></li>
 							</ul>
 						</section>
 					</div>
 				</section>
 			</section>
 			<section class="tsd-panel-group tsd-member-group ">
-				<h2>Type aliases</h2>
-				<section class="tsd-panel tsd-member tsd-kind-type-alias tsd-parent-kind-external-module tsd-has-type-parameter">
-					<a name="constructor" class="tsd-anchor"></a>
-					<h3>Constructor</h3>
-					<div class="tsd-signature tsd-kind-icon">Constructor&lt;T&gt;<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">{}</span></div>
-					<aside class="tsd-sources">
-						<ul>
-							<li>Defined in <a href="https://github.com/amzn/ion-js/blob/b358e06/src/dom/Value.ts#L159">src/dom/Value.ts:159</a></li>
-						</ul>
-					</aside>
-					<div class="tsd-comment tsd-typography">
-						<div class="lead">
-							<p>A type alias for the constructor signature required for mixins.</p>
-						</div>
-					</div>
-					<h4 class="tsd-type-parameters-title">Type parameters</h4>
-					<ul class="tsd-type-parameters">
-						<li>
-							<h4>T</h4>
+				<h2>Methods</h2>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="makeevent" class="tsd-anchor"></a>
+					<h3>make<wbr>Event</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">make<wbr>Event<span class="tsd-signature-symbol">(</span>eventType<span class="tsd-signature-symbol">: </span><a href="../enums/_events_ionevent_.ioneventtype.html" class="tsd-signature-type">IonEventType</a>, ionType<span class="tsd-signature-symbol">: </span><a href="_iontype_.iontype.html" class="tsd-signature-type">IonType</a>, fieldName<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span>, depth<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, annotations<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span>, isNull<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span>, value<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../interfaces/_events_ionevent_.ionevent.html" class="tsd-signature-type">IonEvent</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/b358e06/src/events/IonEvent.ts#L259">src/events/IonEvent.ts:259</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>eventType: <a href="../enums/_events_ionevent_.ioneventtype.html" class="tsd-signature-type">IonEventType</a></h5>
+								</li>
+								<li>
+									<h5>ionType: <a href="_iontype_.iontype.html" class="tsd-signature-type">IonType</a></h5>
+								</li>
+								<li>
+									<h5>fieldName: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span></h5>
+								</li>
+								<li>
+									<h5>depth: <span class="tsd-signature-type">number</span></h5>
+								</li>
+								<li>
+									<h5>annotations: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span></h5>
+								</li>
+								<li>
+									<h5>isNull: <span class="tsd-signature-type">boolean</span></h5>
+								</li>
+								<li>
+									<h5>value: <span class="tsd-signature-type">any</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="../interfaces/_events_ionevent_.ionevent.html" class="tsd-signature-type">IonEvent</a></h4>
 						</li>
 					</ul>
-					<div class="tsd-type-declaration">
-						<h4>Type declaration</h4>
-						<ul class="tsd-parameters">
-						</ul>
-					</div>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-type-alias tsd-parent-kind-external-module">
-					<a name="pathelement" class="tsd-anchor"></a>
-					<h3>Path<wbr>Element</h3>
-					<div class="tsd-signature tsd-kind-icon">Path<wbr>Element<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">number</span></div>
-					<aside class="tsd-sources">
-						<ul>
-							<li>Defined in <a href="https://github.com/amzn/ion-js/blob/b358e06/src/dom/Value.ts#L154">src/dom/Value.ts:154</a></li>
-						</ul>
-					</aside>
-					<div class="tsd-comment tsd-typography">
-						<div class="lead">
-							<p>Represents data types that may be used to index into a Value.</p>
-						</div>
-						<p>See: Value#get</p>
-					</div>
 				</section>
 			</section>
 		</div>
@@ -143,25 +140,29 @@
 						<a href="../globals.html"><em>Globals</em></a>
 					</li>
 					<li class="current tsd-kind-external-module">
-						<a href="_dom_value_.html">&quot;dom/<wbr>Value&quot;</a>
-						<ul>
-							<li class=" tsd-kind-module tsd-parent-kind-external-module tsd-has-type-parameter">
-								<a href="_dom_value_.value.html">Value</a>
-							</li>
-						</ul>
+						<a href="../modules/_events_ionevent_.html">&quot;events/<wbr>Ion<wbr>Event&quot;</a>
 					</li>
 				</ul>
 			</nav>
 			<nav class="tsd-navigation secondary menu-sticky">
 				<ul class="before-current">
+					<li class=" tsd-kind-enum tsd-parent-kind-external-module">
+						<a href="../enums/_events_ionevent_.ioneventtype.html" class="tsd-kind-icon">Ion<wbr>Event<wbr>Type</a>
+					</li>
+				</ul>
+				<ul class="current">
+					<li class="current tsd-kind-class tsd-parent-kind-external-module">
+						<a href="_events_ionevent_.ioneventfactory.html" class="tsd-kind-icon">Ion<wbr>Event<wbr>Factory</a>
+						<ul>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_events_ionevent_.ioneventfactory.html#makeevent" class="tsd-kind-icon">make<wbr>Event</a>
+							</li>
+						</ul>
+					</li>
+				</ul>
+				<ul class="after-current">
 					<li class=" tsd-kind-interface tsd-parent-kind-external-module">
-						<a href="../interfaces/_dom_value_.value-1.html" class="tsd-kind-icon">Value</a>
-					</li>
-					<li class=" tsd-kind-type-alias tsd-parent-kind-external-module tsd-has-type-parameter">
-						<a href="_dom_value_.html#constructor" class="tsd-kind-icon">Constructor</a>
-					</li>
-					<li class=" tsd-kind-type-alias tsd-parent-kind-external-module">
-						<a href="_dom_value_.html#pathelement" class="tsd-kind-icon">Path<wbr>Element</a>
+						<a href="../interfaces/_events_ionevent_.ionevent.html" class="tsd-kind-icon">Ion<wbr>Event</a>
 					</li>
 				</ul>
 			</nav>

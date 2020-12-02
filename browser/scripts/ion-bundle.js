@@ -38,7 +38,7 @@ var AbstractWriter = /*#__PURE__*/function () {
     key: "addAnnotation",
     value: function addAnnotation(annotation) {
       if (!this._isString(annotation)) {
-        throw new Error('Annotation must be of type string.');
+        throw new Error("Annotation must be of type string.");
       }
 
       this._annotations.push(annotation);
@@ -47,9 +47,9 @@ var AbstractWriter = /*#__PURE__*/function () {
     key: "setAnnotations",
     value: function setAnnotations(annotations) {
       if (annotations === undefined || annotations === null) {
-        throw new Error('Annotations were undefined or null.');
+        throw new Error("Annotations were undefined or null.");
       } else if (!this._validateAnnotations(annotations)) {
-        throw new Error('Annotations must be of type string[].');
+        throw new Error("Annotations must be of type string[].");
       } else {
         this._annotations = annotations;
       }
@@ -160,7 +160,7 @@ var AbstractWriter = /*#__PURE__*/function () {
           break;
 
         default:
-          throw new Error('Unrecognized type ' + (type !== null ? type.name : type));
+          throw new Error("Unrecognized type " + (type !== null ? type.name : type));
       }
 
       if (type.isContainer) {
@@ -190,7 +190,7 @@ var AbstractWriter = /*#__PURE__*/function () {
   }, {
     key: "_isString",
     value: function _isString(input) {
-      return typeof input === 'string';
+      return typeof input === "string";
     }
   }]);
   return AbstractWriter;
@@ -198,7 +198,54 @@ var AbstractWriter = /*#__PURE__*/function () {
 
 exports.AbstractWriter = AbstractWriter;
 
-},{"./IonTypes":27,"@babel/runtime/helpers/classCallCheck":57,"@babel/runtime/helpers/createClass":58,"@babel/runtime/helpers/interopRequireDefault":64}],2:[function(require,module,exports){
+},{"./IonTypes":28,"@babel/runtime/helpers/classCallCheck":61,"@babel/runtime/helpers/createClass":63,"@babel/runtime/helpers/interopRequireDefault":69}],2:[function(require,module,exports){
+"use strict";
+/*!
+ * Copyright 2012 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * A copy of the License is located at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * or in the "license" file accompanying this file. This file is distributed
+ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
+
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
+
+var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime/helpers/classCallCheck"));
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.ComparisonResult = exports.ComparisonResultType = void 0;
+var ComparisonResultType;
+
+(function (ComparisonResultType) {
+  ComparisonResultType["EQUAL"] = "EQUAL";
+  ComparisonResultType["NOT_EQUAL"] = "NOT_EQUAL";
+  ComparisonResultType["ERROR"] = "ERROR";
+})(ComparisonResultType = exports.ComparisonResultType || (exports.ComparisonResultType = {}));
+
+var ComparisonResult = function ComparisonResult() {
+  var result = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : ComparisonResultType.EQUAL;
+  var message = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "";
+  var actualIndex = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
+  var expectedIndex = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 0;
+  (0, _classCallCheck2["default"])(this, ComparisonResult);
+  this.result = result;
+  this.message = message;
+  this.actualIndex = actualIndex;
+  this.expectedIndex = expectedIndex;
+};
+
+exports.ComparisonResult = ComparisonResult;
+
+},{"@babel/runtime/helpers/classCallCheck":61,"@babel/runtime/helpers/interopRequireDefault":69}],3:[function(require,module,exports){
 "use strict";
 /*!
  * Copyright 2012 Amazon.com, Inc. or its affiliates. All Rights Reserved.
@@ -228,7 +275,7 @@ var IntSize;
 
 exports["default"] = IntSize;
 
-},{}],3:[function(require,module,exports){
+},{}],4:[function(require,module,exports){
 "use strict";
 /*!
  * Copyright 2012 Amazon.com, Inc. or its affiliates. All Rights Reserved.
@@ -277,7 +324,7 @@ var __importStar = void 0 && (void 0).__importStar || function (mod) {
   if (mod && mod.__esModule) return mod;
   var result = {};
   if (mod != null) for (var k in mod) {
-    if (Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
   }
 
   __setModuleDefault(result, mod);
@@ -296,9 +343,19 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.dom = exports.IntSize = exports.dumpPrettyText = exports.dumpText = exports.dumpBinary = exports.makeBinaryWriter = exports.makePrettyWriter = exports.makeTextWriter = exports.makeReader = void 0;
 
+var IntSize_1 = __importDefault(require("./IntSize"));
+
+exports.IntSize = IntSize_1["default"];
+
 var IonBinaryReader_1 = require("./IonBinaryReader");
 
+var IonBinaryWriter_1 = require("./IonBinaryWriter");
+
 var IonConstants_1 = require("./IonConstants");
+
+var IonLocalSymbolTable_1 = require("./IonLocalSymbolTable");
+
+var IonPrettyTextWriter_1 = require("./IonPrettyTextWriter");
 
 var IonSpan_1 = require("./IonSpan");
 
@@ -306,19 +363,9 @@ var IonTextReader_1 = require("./IonTextReader");
 
 var IonTextWriter_1 = require("./IonTextWriter");
 
-var IonPrettyTextWriter_1 = require("./IonPrettyTextWriter");
-
-var IonWriteable_1 = require("./IonWriteable");
-
-var IonBinaryWriter_1 = require("./IonBinaryWriter");
-
-var IonLocalSymbolTable_1 = require("./IonLocalSymbolTable");
-
 var IonUnicode_1 = require("./IonUnicode");
 
-var IntSize_1 = __importDefault(require("./IntSize"));
-
-exports.IntSize = IntSize_1["default"];
+var IonWriteable_1 = require("./IonWriteable");
 
 function isBinary(buffer) {
   if (buffer.length < 4) {
@@ -326,7 +373,9 @@ function isBinary(buffer) {
   }
 
   for (var i = 0; i < 4; i++) {
-    if (buffer[i] !== IonConstants_1.IVM.binary[i]) return false;
+    if (buffer[i] !== IonConstants_1.IVM.binary[i]) {
+      return false;
+    }
   }
 
   return true;
@@ -522,7 +571,55 @@ Object.defineProperty(exports, "loadAll", {
   }
 });
 
-},{"./IntSize":2,"./IonBinaryReader":5,"./IonBinaryWriter":6,"./IonCatalog":7,"./IonConstants":8,"./IonDecimal":9,"./IonLocalSymbolTable":11,"./IonPrettyTextWriter":15,"./IonSharedSymbolTable":16,"./IonSpan":17,"./IonText":22,"./IonTextReader":23,"./IonTextWriter":24,"./IonTimestamp":25,"./IonType":26,"./IonTypes":27,"./IonUnicode":28,"./IonWriteable":29,"./dom":51}],4:[function(require,module,exports){
+var IonEvent_1 = require("./events/IonEvent");
+
+Object.defineProperty(exports, "IonEventType", {
+  enumerable: true,
+  get: function get() {
+    return IonEvent_1.IonEventType;
+  }
+});
+Object.defineProperty(exports, "IonEventFactory", {
+  enumerable: true,
+  get: function get() {
+    return IonEvent_1.IonEventFactory;
+  }
+});
+
+var IonEventStream_1 = require("./events/IonEventStream");
+
+Object.defineProperty(exports, "IonEventStream", {
+  enumerable: true,
+  get: function get() {
+    return IonEventStream_1.IonEventStream;
+  }
+});
+
+var EventStreamError_1 = require("./events/EventStreamError");
+
+Object.defineProperty(exports, "EventStreamError", {
+  enumerable: true,
+  get: function get() {
+    return EventStreamError_1.EventStreamError;
+  }
+});
+
+var ComparisonResult_1 = require("./ComparisonResult");
+
+Object.defineProperty(exports, "ComparisonResult", {
+  enumerable: true,
+  get: function get() {
+    return ComparisonResult_1.ComparisonResult;
+  }
+});
+Object.defineProperty(exports, "ComparisonResultType", {
+  enumerable: true,
+  get: function get() {
+    return ComparisonResult_1.ComparisonResultType;
+  }
+});
+
+},{"./ComparisonResult":2,"./IntSize":3,"./IonBinaryReader":6,"./IonBinaryWriter":7,"./IonCatalog":8,"./IonConstants":9,"./IonDecimal":10,"./IonLocalSymbolTable":12,"./IonPrettyTextWriter":16,"./IonSharedSymbolTable":17,"./IonSpan":18,"./IonText":23,"./IonTextReader":24,"./IonTextWriter":25,"./IonTimestamp":26,"./IonType":27,"./IonTypes":28,"./IonUnicode":29,"./IonWriteable":30,"./dom":52,"./events/EventStreamError":53,"./events/IonEvent":54,"./events/IonEventStream":55}],5:[function(require,module,exports){
 "use strict";
 /*!
  * Copyright 2012 Amazon.com, Inc. or its affiliates. All Rights Reserved.
@@ -566,7 +663,7 @@ exports.TB_SEXP = 12;
 exports.TB_STRUCT = 13;
 exports.TB_ANNOTATION = 14;
 
-},{}],5:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 "use strict";
 /*!
  * Copyright 2012 Amazon.com, Inc. or its affiliates. All Rights Reserved.
@@ -600,19 +697,19 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.BinaryReader = void 0;
 
+var IntSize_1 = __importDefault(require("./IntSize"));
+
 var IonCatalog_1 = require("./IonCatalog");
 
+var IonConstants_1 = require("./IonConstants");
+
 var IonLocalSymbolTable_1 = require("./IonLocalSymbolTable");
+
+var IonParserBinaryRaw_1 = require("./IonParserBinaryRaw");
 
 var IonSymbols_1 = require("./IonSymbols");
 
 var IonTypes_1 = require("./IonTypes");
-
-var IonConstants_1 = require("./IonConstants");
-
-var IonParserBinaryRaw_1 = require("./IonParserBinaryRaw");
-
-var IntSize_1 = __importDefault(require("./IntSize"));
 
 var JsbiSupport_1 = require("./JsbiSupport");
 
@@ -696,17 +793,29 @@ var BinaryReader = /*#__PURE__*/function () {
     key: "next",
     value: function next() {
       this._annotations = null;
-      if (this._raw_type === EOF) return null;
+
+      if (this._raw_type === EOF) {
+        return null;
+      }
 
       for (this._raw_type = this._parser.next(); this.depth() === 0; this._raw_type = this._parser.next()) {
         if (this._raw_type === TB_SYMBOL) {
           var raw = this._parser._getSid();
 
-          if (raw !== IonConstants_1.IVM.sid) break;
+          if (raw !== IonConstants_1.IVM.sid) {
+            break;
+          }
+
           this._symtab = IonLocalSymbolTable_1.defaultLocalSymbolTable();
         } else if (this._raw_type === TB_STRUCT) {
-          if (!this._parser.hasAnnotations()) break;
-          if (this._parser.getAnnotation(0) !== IonSymbols_1.ion_symbol_table_sid) break;
+          if (!this._parser.hasAnnotations()) {
+            break;
+          }
+
+          if (this._parser.getAnnotation(0) !== IonSymbols_1.ion_symbol_table_sid) {
+            break;
+          }
+
           this._symtab = IonSymbols_1.makeSymbolTable(this._cat, this);
         } else {
           break;
@@ -718,7 +827,9 @@ var BinaryReader = /*#__PURE__*/function () {
   }, {
     key: "stepIn",
     value: function stepIn() {
-      if (!get_ion_type(this._raw_type).isContainer) throw new Error("Can't step in to a scalar value");
+      if (!get_ion_type(this._raw_type).isContainer) {
+        throw new Error("Can't step in to a scalar value");
+      }
 
       this._parser.stepIn();
 
@@ -834,7 +945,7 @@ var BinaryReader = /*#__PURE__*/function () {
 
       }
 
-      throw new Error('Current value is not a string or symbol.');
+      throw new Error("Current value is not a string or symbol.");
     }
   }, {
     key: "timestampValue",
@@ -851,7 +962,7 @@ var BinaryReader = /*#__PURE__*/function () {
           return null;
         }
 
-        throw new Error('Unable to provide a value for ' + type.name + ' containers.');
+        throw new Error("Unable to provide a value for " + type.name + " containers.");
       }
 
       switch (type) {
@@ -882,7 +993,7 @@ var BinaryReader = /*#__PURE__*/function () {
           return this.timestampValue();
 
         default:
-          throw new Error('There is no current value.');
+          throw new Error("There is no current value.");
       }
     }
   }, {
@@ -902,22 +1013,21 @@ var BinaryReader = /*#__PURE__*/function () {
     key: "getSymbolString",
     value: function getSymbolString(symbolId) {
       var s = null;
-      if (symbolId === null) return null;
+
+      if (symbolId === null) {
+        return null;
+      }
 
       if (symbolId > 0) {
-        if (symbolId > this._symtab.maxId) {
-          throw new Error('Symbol $' + symbolId.toString() + ' greater than maxID.');
-        }
-
         s = this._symtab.getSymbolText(symbolId);
 
         if (s === undefined) {
-          throw new Error('symbol is unresolvable');
+          throw new Error("symbol is unresolvable");
         }
       } else if (symbolId === 0) {
-        throw new Error('Symbol ID zero is unsupported');
+        throw new Error("Symbol ID zero is unsupported");
       } else if (symbolId < 0) {
-        throw new Error('Negative symbol ID: ' + symbolId + ' is illegal.');
+        throw new Error("Negative symbol ID: " + symbolId + " is illegal.");
       }
 
       return s;
@@ -928,7 +1038,7 @@ var BinaryReader = /*#__PURE__*/function () {
 
 exports.BinaryReader = BinaryReader;
 
-},{"./IntSize":2,"./IonCatalog":7,"./IonConstants":8,"./IonLocalSymbolTable":11,"./IonParserBinaryRaw":13,"./IonSymbols":20,"./IonTypes":27,"./JsbiSupport":31,"@babel/runtime/helpers/classCallCheck":57,"@babel/runtime/helpers/createClass":58,"@babel/runtime/helpers/interopRequireDefault":64}],6:[function(require,module,exports){
+},{"./IntSize":3,"./IonCatalog":8,"./IonConstants":9,"./IonLocalSymbolTable":12,"./IonParserBinaryRaw":14,"./IonSymbols":21,"./IonTypes":28,"./JsbiSupport":32,"@babel/runtime/helpers/classCallCheck":61,"@babel/runtime/helpers/createClass":63,"@babel/runtime/helpers/interopRequireDefault":69}],7:[function(require,module,exports){
 "use strict";
 /*!
  * Copyright 2012 Amazon.com, Inc. or its affiliates. All Rights Reserved.
@@ -980,25 +1090,25 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.NullNode = exports.LeafNode = exports.AbstractNode = exports.BinaryWriter = void 0;
 
+var jsbi_1 = __importDefault(require("jsbi"));
+
 var AbstractWriter_1 = require("./AbstractWriter");
-
-var IonUnicode_1 = require("./IonUnicode");
-
-var IonTypes_1 = require("./IonTypes");
 
 var IonLowLevelBinaryWriter_1 = require("./IonLowLevelBinaryWriter");
 
 var IonTimestamp_1 = require("./IonTimestamp");
 
+var IonTypes_1 = require("./IonTypes");
+
+var IonUnicode_1 = require("./IonUnicode");
+
 var IonWriteable_1 = require("./IonWriteable");
 
-var util_1 = require("./util");
-
-var jsbi_1 = __importDefault(require("jsbi"));
+var JsbiSerde_1 = require("./JsbiSerde");
 
 var JsbiSupport_1 = require("./JsbiSupport");
 
-var JsbiSerde_1 = require("./JsbiSerde");
+var util_1 = require("./util");
 
 var MAJOR_VERSION = 1;
 var MINOR_VERSION = 0;
@@ -1379,10 +1489,10 @@ var BinaryWriter = /*#__PURE__*/function (_AbstractWriter_1$Abs) {
   }, {
     key: "writeIvm",
     value: function writeIvm() {
-      this.writer.writeByte(0xE0);
+      this.writer.writeByte(0xe0);
       this.writer.writeByte(MAJOR_VERSION);
       this.writer.writeByte(MINOR_VERSION);
-      this.writer.writeByte(0xEA);
+      this.writer.writeByte(0xea);
     }
   }, {
     key: "encodeAnnotations",
@@ -1463,18 +1573,18 @@ var BinaryWriter = /*#__PURE__*/function (_AbstractWriter_1$Abs) {
         return;
       }
 
-      this.setAnnotations(['$ion_symbol_table']);
+      this.setAnnotations(["$ion_symbol_table"]);
       this.stepIn(IonTypes_1.IonTypes.STRUCT);
 
       if (hasImports) {
-        this.writeFieldName('imports');
+        this.writeFieldName("imports");
         this.stepIn(IonTypes_1.IonTypes.LIST);
         this.writeImport(this.symbolTable["import"]);
         this.stepOut();
       }
 
       if (hasLocalSymbols) {
-        this.writeFieldName('symbols');
+        this.writeFieldName("symbols");
         this.stepIn(IonTypes_1.IonTypes.LIST);
 
         var _iterator3 = _createForOfIteratorHelper(this.symbolTable.symbols),
@@ -1509,11 +1619,11 @@ var BinaryWriter = /*#__PURE__*/function (_AbstractWriter_1$Abs) {
 
       this.writeImport(import_.parent);
       this.stepIn(IonTypes_1.IonTypes.STRUCT);
-      this.writeFieldName('name');
+      this.writeFieldName("name");
       this.writeString(import_.symbolTable.name);
-      this.writeFieldName('version');
+      this.writeFieldName("version");
       this.writeInt(import_.symbolTable.version);
-      this.writeFieldName('max_id');
+      this.writeFieldName("max_id");
       this.writeInt(import_.length);
       this.stepOut();
     }
@@ -1735,7 +1845,10 @@ var StructNode = /*#__PURE__*/function (_ContainerNode2) {
   (0, _createClass2["default"])(StructNode, [{
     key: "addChild",
     value: function addChild(child, fieldName) {
-      if (fieldName === null || fieldName === undefined) throw new Error("Cannot add a value to a struct without a field name");
+      if (fieldName === null || fieldName === undefined) {
+        throw new Error("Cannot add a value to a struct without a field name");
+      }
+
       this.fields.push({
         name: fieldName,
         value: child
@@ -1864,8 +1977,8 @@ var IntNode = /*#__PURE__*/function (_LeafNode2) {
     _this5 = _super7.call(this, writer, parent, IonTypes_1.IonTypes.INT, annotations);
     _this5.value = value;
 
-    if (!(typeof _this5.value === 'number' || _this5.value instanceof jsbi_1["default"])) {
-      throw new Error('Expected ' + _this5.value + ' to be a number or JSBI');
+    if (!(typeof _this5.value === "number" || _this5.value instanceof jsbi_1["default"])) {
+      throw new Error("Expected " + _this5.value + " to be a number or JSBI");
     }
 
     if (jsbi_1["default"].GT(_this5.value, 0)) {
@@ -1976,7 +2089,7 @@ var NullNode = /*#__PURE__*/function (_LeafNode4) {
 
 exports.NullNode = NullNode;
 
-},{"./AbstractWriter":1,"./IonLowLevelBinaryWriter":12,"./IonTimestamp":25,"./IonTypes":27,"./IonUnicode":28,"./IonWriteable":29,"./JsbiSerde":30,"./JsbiSupport":31,"./util":52,"@babel/runtime/helpers/classCallCheck":57,"@babel/runtime/helpers/createClass":58,"@babel/runtime/helpers/get":61,"@babel/runtime/helpers/getPrototypeOf":62,"@babel/runtime/helpers/inherits":63,"@babel/runtime/helpers/interopRequireDefault":64,"@babel/runtime/helpers/possibleConstructorReturn":69,"jsbi":76}],7:[function(require,module,exports){
+},{"./AbstractWriter":1,"./IonLowLevelBinaryWriter":13,"./IonTimestamp":26,"./IonTypes":28,"./IonUnicode":29,"./IonWriteable":30,"./JsbiSerde":31,"./JsbiSupport":32,"./util":56,"@babel/runtime/helpers/classCallCheck":61,"@babel/runtime/helpers/createClass":63,"@babel/runtime/helpers/get":66,"@babel/runtime/helpers/getPrototypeOf":67,"@babel/runtime/helpers/inherits":68,"@babel/runtime/helpers/interopRequireDefault":69,"@babel/runtime/helpers/possibleConstructorReturn":76,"jsbi":84}],8:[function(require,module,exports){
 "use strict";
 /*!
  * Copyright 2012 Amazon.com, Inc. or its affiliates. All Rights Reserved.
@@ -2020,26 +2133,44 @@ var Catalog = /*#__PURE__*/function () {
   (0, _createClass2["default"])(Catalog, [{
     key: "add",
     value: function add(symbolTable) {
-      if (symbolTable.name === undefined || symbolTable.name === null) throw new Error("SymbolTable name must be defined.");
+      if (symbolTable.name === undefined || symbolTable.name === null) {
+        throw new Error("SymbolTable name must be defined.");
+      }
+
       var versions = this.symbolTables[symbolTable.name];
-      if (versions === undefined) this.symbolTables[symbolTable.name] = [];
+
+      if (versions === undefined) {
+        this.symbolTables[symbolTable.name] = [];
+      }
+
       this.symbolTables[symbolTable.name][symbolTable.version] = symbolTable;
     }
   }, {
     key: "getVersion",
     value: function getVersion(name, version) {
       var tables = this.symbolTables[name];
-      if (!tables) return null;
+
+      if (!tables) {
+        return null;
+      }
+
       var table = tables[version];
-      if (!table) table = tables[tables.length];
+
+      if (!table) {
+        table = tables[tables.length];
+      }
+
       return table ? table : null;
     }
   }, {
     key: "getTable",
     value: function getTable(name) {
-      var versions = this.symbolTables[name],
-          table;
-      if (versions === undefined) return null;
+      var versions = this.symbolTables[name];
+
+      if (versions === undefined) {
+        return null;
+      }
+
       return versions[versions.length - 1];
     }
   }]);
@@ -2048,7 +2179,7 @@ var Catalog = /*#__PURE__*/function () {
 
 exports.Catalog = Catalog;
 
-},{"./IonSystemSymbolTable":21,"@babel/runtime/helpers/classCallCheck":57,"@babel/runtime/helpers/createClass":58,"@babel/runtime/helpers/interopRequireDefault":64}],8:[function(require,module,exports){
+},{"./IonSystemSymbolTable":22,"@babel/runtime/helpers/classCallCheck":61,"@babel/runtime/helpers/createClass":63,"@babel/runtime/helpers/interopRequireDefault":69}],9:[function(require,module,exports){
 "use strict";
 /*!
  * Copyright 2012 Amazon.com, Inc. or its affiliates. All Rights Reserved.
@@ -2072,11 +2203,11 @@ exports.IVM = exports.EOF = void 0;
 exports.EOF = -1;
 exports.IVM = {
   text: "$ion_1_0",
-  binary: new Uint8Array([0xE0, 0x01, 0x00, 0xEA]),
+  binary: new Uint8Array([0xe0, 0x01, 0x00, 0xea]),
   sid: 2
 };
 
-},{}],9:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 "use strict";
 /*!
  * Copyright 2012 Amazon.com, Inc. or its affiliates. All Rights Reserved.
@@ -2114,257 +2245,257 @@ exports.Decimal = void 0;
 
 var jsbi_1 = __importDefault(require("jsbi"));
 
-var util_1 = require("./util");
-
 var JsbiSupport_1 = require("./JsbiSupport");
 
-var Decimal = function () {
-  var Decimal = /*#__PURE__*/function () {
-    function Decimal(coefficient, exponent) {
-      var isNegative = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
-      (0, _classCallCheck2["default"])(this, Decimal);
+var util_1 = require("./util");
 
-      if (typeof coefficient === "string") {
-        return Decimal.parse(coefficient);
-      }
+var Decimal = /*#__PURE__*/function () {
+  function Decimal(coefficient, exponent) {
+    var isNegative = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+    (0, _classCallCheck2["default"])(this, Decimal);
 
-      if (!util_1._hasValue(exponent)) {
-        throw new Error("Decimal's constructor was called with a numeric coefficient but no exponent.");
-      }
-
-      if (typeof coefficient === "number") {
-        return Decimal._fromNumberCoefficient(coefficient, exponent);
-      }
-
-      if (coefficient instanceof jsbi_1["default"]) {
-        if (!util_1._hasValue(isNegative)) {
-          isNegative = JsbiSupport_1.JsbiSupport.isNegative(coefficient);
-        } else if (isNegative != JsbiSupport_1.JsbiSupport.isNegative(coefficient)) {
-          coefficient = jsbi_1["default"].unaryMinus(coefficient);
-        }
-
-        return Decimal._fromBigIntCoefficient(isNegative, coefficient, exponent);
-      }
-
-      throw new Error("Unsupported parameter set (".concat(coefficient, ", ").concat(exponent, ", ").concat(isNegative, " passed to Decimal constructor."));
+    if (typeof coefficient === "string") {
+      return Decimal.parse(coefficient);
     }
 
-    (0, _createClass2["default"])(Decimal, [{
-      key: "isNegative",
-      value: function isNegative() {
-        return this._isNegative;
+    if (!util_1._hasValue(exponent)) {
+      throw new Error("Decimal's constructor was called with a numeric coefficient but no exponent.");
+    }
+
+    if (typeof coefficient === "number") {
+      return Decimal._fromNumberCoefficient(coefficient, exponent);
+    }
+
+    if (coefficient instanceof jsbi_1["default"]) {
+      if (!util_1._hasValue(isNegative)) {
+        isNegative = JsbiSupport_1.JsbiSupport.isNegative(coefficient);
+      } else if (isNegative != JsbiSupport_1.JsbiSupport.isNegative(coefficient)) {
+        coefficient = jsbi_1["default"].unaryMinus(coefficient);
       }
-    }, {
-      key: "numberValue",
-      value: function numberValue() {
-        if (this._isNegativeZero()) {
-          return -0;
-        }
 
-        return jsbi_1["default"].toNumber(this._coefficient) * Math.pow(10, this._exponent);
+      return Decimal._fromBigIntCoefficient(isNegative, coefficient, exponent);
+    }
+
+    throw new Error("Unsupported parameter set (".concat(coefficient, ", ").concat(exponent, ", ").concat(isNegative, " passed to Decimal constructor."));
+  }
+
+  (0, _createClass2["default"])(Decimal, [{
+    key: "isNegative",
+    value: function isNegative() {
+      return this._isNegative;
+    }
+  }, {
+    key: "numberValue",
+    value: function numberValue() {
+      if (this._isNegativeZero()) {
+        return -0;
       }
-    }, {
-      key: "intValue",
-      value: function intValue() {
-        return Math.trunc(this.numberValue());
+
+      return jsbi_1["default"].toNumber(this._coefficient) * Math.pow(10, this._exponent);
+    }
+  }, {
+    key: "intValue",
+    value: function intValue() {
+      return Math.trunc(this.numberValue());
+    }
+  }, {
+    key: "toString",
+    value: function toString() {
+      var cStr = this._coefficient.toString();
+
+      if (cStr[0] === "-") {
+        cStr = cStr.substr(1, cStr.length);
       }
-    }, {
-      key: "toString",
-      value: function toString() {
-        var cStr = this._coefficient.toString();
 
-        if (cStr[0] === '-') {
-          cStr = cStr.substr(1, cStr.length);
-        }
+      var precision = cStr.length;
+      var adjustedExponent = this._exponent + (precision - 1);
+      var s = "";
 
-        var precision = cStr.length;
-        var adjustedExponent = this._exponent + (precision - 1);
-        var s = '';
-
-        if (this._exponent <= 0 && adjustedExponent >= -6) {
-          if (this._exponent === 0) {
-            s += cStr;
-          } else {
-            if (cStr.length <= -this._exponent) {
-              cStr = '0'.repeat(-this._exponent - cStr.length + 1) + cStr;
-              s += cStr.substr(0, 1) + '.' + cStr.substr(1);
-            } else {
-              s += cStr.substr(0, precision + this._exponent) + '.' + cStr.substr(precision + this._exponent);
-            }
-          }
+      if (this._exponent <= 0 && adjustedExponent >= -6) {
+        if (this._exponent === 0) {
+          s += cStr;
         } else {
-          s += cStr[0];
-
-          if (cStr.length > 1) {
-            s += '.' + cStr.substr(1);
+          if (cStr.length <= -this._exponent) {
+            cStr = "0".repeat(-this._exponent - cStr.length + 1) + cStr;
+            s += cStr.substr(0, 1) + "." + cStr.substr(1);
+          } else {
+            s += cStr.substr(0, precision + this._exponent) + "." + cStr.substr(precision + this._exponent);
           }
+        }
+      } else {
+        s += cStr[0];
 
-          s += 'E' + (adjustedExponent > 0 ? '+' : '') + adjustedExponent;
+        if (cStr.length > 1) {
+          s += "." + cStr.substr(1);
         }
 
-        return (this.isNegative() ? '-' : '') + s;
+        s += "E" + (adjustedExponent > 0 ? "+" : "") + adjustedExponent;
       }
-    }, {
-      key: "toJSON",
-      value: function toJSON() {
-        return this.numberValue();
-      }
-    }, {
-      key: "getCoefficient",
-      value: function getCoefficient() {
-        return this._coefficient;
-      }
-    }, {
-      key: "getExponent",
-      value: function getExponent() {
-        return this._exponent;
-      }
-    }, {
-      key: "equals",
-      value: function equals(that) {
-        return this.getExponent() === that.getExponent() && util_1._sign(this.getExponent()) === util_1._sign(that.getExponent()) && this.isNegative() === that.isNegative() && jsbi_1["default"].equal(this.getCoefficient(), that.getCoefficient());
-      }
-    }, {
-      key: "compareTo",
-      value: function compareTo(that) {
-        if (JsbiSupport_1.JsbiSupport.isZero(this._coefficient) && JsbiSupport_1.JsbiSupport.isZero(that._coefficient)) {
-          return 0;
-        }
 
-        var neg = this.isNegative();
-
-        if (neg !== that.isNegative()) {
-          return neg ? -1 : 1;
-        }
-
-        var _this$_compareToParam = this._compareToParams(),
-            _this$_compareToParam2 = (0, _slicedToArray2["default"])(_this$_compareToParam, 3),
-            thisCoefficientStr = _this$_compareToParam2[0],
-            thisPrecision = _this$_compareToParam2[1],
-            thisMagnitude = _this$_compareToParam2[2];
-
-        var _that$_compareToParam = that._compareToParams(),
-            _that$_compareToParam2 = (0, _slicedToArray2["default"])(_that$_compareToParam, 3),
-            thatCoefficientStr = _that$_compareToParam2[0],
-            thatPrecision = _that$_compareToParam2[1],
-            thatMagnitude = _that$_compareToParam2[2];
-
-        if (thisMagnitude > thatMagnitude) {
-          return neg ? -1 : 1;
-        } else if (thisMagnitude < thatMagnitude) {
-          return neg ? 1 : -1;
-        }
-
-        if (thisCoefficientStr.length < thatCoefficientStr.length) {
-          thisCoefficientStr += '0'.repeat(thatPrecision - thisPrecision);
-        } else if (thisCoefficientStr.length > thatCoefficientStr.length) {
-          thatCoefficientStr += '0'.repeat(thisPrecision - thatPrecision);
-        }
-
-        var thisJsbi = jsbi_1["default"].BigInt(thisCoefficientStr);
-        var thatJsbi = jsbi_1["default"].BigInt(thatCoefficientStr);
-
-        if (jsbi_1["default"].greaterThan(thisJsbi, thatJsbi)) {
-          return neg ? -1 : 1;
-        } else if (jsbi_1["default"].lessThan(thisJsbi, thatJsbi)) {
-          return neg ? 1 : -1;
-        }
-
+      return (this.isNegative() ? "-" : "") + s;
+    }
+  }, {
+    key: "toJSON",
+    value: function toJSON() {
+      return this.numberValue();
+    }
+  }, {
+    key: "getCoefficient",
+    value: function getCoefficient() {
+      return this._coefficient;
+    }
+  }, {
+    key: "getExponent",
+    value: function getExponent() {
+      return this._exponent;
+    }
+  }, {
+    key: "equals",
+    value: function equals(that) {
+      return this.getExponent() === that.getExponent() && util_1._sign(this.getExponent()) === util_1._sign(that.getExponent()) && this.isNegative() === that.isNegative() && jsbi_1["default"].equal(this.getCoefficient(), that.getCoefficient());
+    }
+  }, {
+    key: "compareTo",
+    value: function compareTo(that) {
+      if (JsbiSupport_1.JsbiSupport.isZero(this._coefficient) && JsbiSupport_1.JsbiSupport.isZero(that._coefficient)) {
         return 0;
       }
-    }, {
-      key: "_initialize",
-      value: function _initialize(isNegative, coefficient, exponent) {
-        this._isNegative = isNegative;
-        this._coefficient = coefficient;
 
-        if (Object.is(-0, exponent)) {
-          exponent = 0;
-        }
+      var neg = this.isNegative();
 
-        this._exponent = exponent;
+      if (neg !== that.isNegative()) {
+        return neg ? -1 : 1;
       }
-    }, {
-      key: "_isNegativeZero",
-      value: function _isNegativeZero() {
-        return this.isNegative() && JsbiSupport_1.JsbiSupport.isZero(this._coefficient);
+
+      var _this$_compareToParam = this._compareToParams(),
+          _this$_compareToParam2 = (0, _slicedToArray2["default"])(_this$_compareToParam, 3),
+          thisCoefficientStr = _this$_compareToParam2[0],
+          thisPrecision = _this$_compareToParam2[1],
+          thisMagnitude = _this$_compareToParam2[2];
+
+      var _that$_compareToParam = that._compareToParams(),
+          _that$_compareToParam2 = (0, _slicedToArray2["default"])(_that$_compareToParam, 3),
+          thatCoefficientStr = _that$_compareToParam2[0],
+          thatPrecision = _that$_compareToParam2[1],
+          thatMagnitude = _that$_compareToParam2[2];
+
+      if (thisMagnitude > thatMagnitude) {
+        return neg ? -1 : 1;
+      } else if (thisMagnitude < thatMagnitude) {
+        return neg ? 1 : -1;
       }
-    }, {
-      key: "_compareToParams",
-      value: function _compareToParams() {
-        var coefficientStr = this.isNegative() ? this._coefficient.toString().substring(1) : this._coefficient.toString();
-        var precision = coefficientStr.length;
-        var magnitude = precision + this._exponent;
 
-        if (magnitude <= 0) {
-          magnitude -= 1;
-        }
-
-        if (JsbiSupport_1.JsbiSupport.isZero(this._coefficient)) {
-          magnitude = -Infinity;
-        }
-
-        return [coefficientStr, precision, magnitude];
+      if (thisCoefficientStr.length < thatCoefficientStr.length) {
+        thisCoefficientStr += "0".repeat(thatPrecision - thisPrecision);
+      } else if (thisCoefficientStr.length > thatCoefficientStr.length) {
+        thatCoefficientStr += "0".repeat(thisPrecision - thatPrecision);
       }
-    }], [{
-      key: "_fromNumberCoefficient",
-      value: function _fromNumberCoefficient(coefficient, exponent) {
-        if (!Number.isInteger(coefficient)) {
-          throw new Error("The provided coefficient was not an integer. (" + coefficient + ")");
-        }
 
-        var isNegative = coefficient < 0 || Object.is(coefficient, -0);
-        return this._fromBigIntCoefficient(isNegative, jsbi_1["default"].BigInt(coefficient), exponent);
+      var thisJsbi = jsbi_1["default"].BigInt(thisCoefficientStr);
+      var thatJsbi = jsbi_1["default"].BigInt(thatCoefficientStr);
+
+      if (jsbi_1["default"].greaterThan(thisJsbi, thatJsbi)) {
+        return neg ? -1 : 1;
+      } else if (jsbi_1["default"].lessThan(thisJsbi, thatJsbi)) {
+        return neg ? 1 : -1;
       }
-    }, {
-      key: "_fromBigIntCoefficient",
-      value: function _fromBigIntCoefficient(isNegative, coefficient, exponent) {
-        var value = Object.create(this.prototype);
 
-        value._initialize(isNegative, coefficient, exponent);
+      return 0;
+    }
+  }, {
+    key: "_initialize",
+    value: function _initialize(isNegative, coefficient, exponent) {
+      this._isNegative = isNegative;
+      this._coefficient = coefficient;
 
-        return value;
+      if (Object.is(-0, exponent)) {
+        exponent = 0;
       }
-    }, {
-      key: "parse",
-      value: function parse(str) {
-        var exponent = 0;
-        if (str === 'null' || str === 'null.decimal') return null;
-        var d = str.match('[d|D]');
-        var exponentDelimiterIndex = str.length;
 
-        if (d !== undefined && d !== null) {
-          exponent = Number(str.substring(d.index + 1, str.length));
-          exponentDelimiterIndex = d.index;
-        }
+      this._exponent = exponent;
+    }
+  }, {
+    key: "_isNegativeZero",
+    value: function _isNegativeZero() {
+      return this.isNegative() && JsbiSupport_1.JsbiSupport.isZero(this._coefficient);
+    }
+  }, {
+    key: "_compareToParams",
+    value: function _compareToParams() {
+      var coefficientStr = this.isNegative() ? this._coefficient.toString().substring(1) : this._coefficient.toString();
+      var precision = coefficientStr.length;
+      var magnitude = precision + this._exponent;
 
-        var f = str.match('\\.');
-        var coefficientText;
-
-        if (f) {
-          var exponentShift = d ? d.index - 1 - f.index : str.length - 1 - f.index;
-          exponent -= exponentShift;
-          coefficientText = str.substring(0, f.index) + str.substring(f.index + 1, exponentDelimiterIndex);
-        } else {
-          coefficientText = str.substring(0, exponentDelimiterIndex);
-        }
-
-        var coefficient = jsbi_1["default"].BigInt(coefficientText);
-        var isNegative = JsbiSupport_1.JsbiSupport.isNegative(coefficient) || coefficientText.startsWith("-0");
-        return Decimal._fromBigIntCoefficient(isNegative, coefficient, exponent);
+      if (magnitude <= 0) {
+        magnitude -= 1;
       }
-    }]);
-    return Decimal;
-  }();
 
-  Decimal.ZERO = new Decimal(0, 0);
-  Decimal.ONE = new Decimal(1, 0);
+      if (JsbiSupport_1.JsbiSupport.isZero(this._coefficient)) {
+        magnitude = -Infinity;
+      }
+
+      return [coefficientStr, precision, magnitude];
+    }
+  }], [{
+    key: "_fromNumberCoefficient",
+    value: function _fromNumberCoefficient(coefficient, exponent) {
+      if (!Number.isInteger(coefficient)) {
+        throw new Error("The provided coefficient was not an integer. (" + coefficient + ")");
+      }
+
+      var isNegative = coefficient < 0 || Object.is(coefficient, -0);
+      return this._fromBigIntCoefficient(isNegative, jsbi_1["default"].BigInt(coefficient), exponent);
+    }
+  }, {
+    key: "_fromBigIntCoefficient",
+    value: function _fromBigIntCoefficient(isNegative, coefficient, exponent) {
+      var value = Object.create(this.prototype);
+
+      value._initialize(isNegative, coefficient, exponent);
+
+      return value;
+    }
+  }, {
+    key: "parse",
+    value: function parse(str) {
+      var exponent = 0;
+
+      if (str === "null" || str === "null.decimal") {
+        return null;
+      }
+
+      var d = str.match("[d|D]");
+      var exponentDelimiterIndex = str.length;
+
+      if (d !== undefined && d !== null) {
+        exponent = Number(str.substring(d.index + 1, str.length));
+        exponentDelimiterIndex = d.index;
+      }
+
+      var f = str.match("\\.");
+      var coefficientText;
+
+      if (f) {
+        var exponentShift = d ? d.index - 1 - f.index : str.length - 1 - f.index;
+        exponent -= exponentShift;
+        coefficientText = str.substring(0, f.index) + str.substring(f.index + 1, exponentDelimiterIndex);
+      } else {
+        coefficientText = str.substring(0, exponentDelimiterIndex);
+      }
+
+      var coefficient = jsbi_1["default"].BigInt(coefficientText);
+      var isNegative = JsbiSupport_1.JsbiSupport.isNegative(coefficient) || coefficientText.startsWith("-0");
+      return Decimal._fromBigIntCoefficient(isNegative, coefficient, exponent);
+    }
+  }]);
   return Decimal;
 }();
 
 exports.Decimal = Decimal;
+Decimal.ZERO = new Decimal(0, 0);
+Decimal.ONE = new Decimal(1, 0);
 
-},{"./JsbiSupport":31,"./util":52,"@babel/runtime/helpers/classCallCheck":57,"@babel/runtime/helpers/createClass":58,"@babel/runtime/helpers/interopRequireDefault":64,"@babel/runtime/helpers/slicedToArray":71,"jsbi":76}],10:[function(require,module,exports){
+},{"./JsbiSupport":32,"./util":56,"@babel/runtime/helpers/classCallCheck":61,"@babel/runtime/helpers/createClass":63,"@babel/runtime/helpers/interopRequireDefault":69,"@babel/runtime/helpers/slicedToArray":78,"jsbi":84}],11:[function(require,module,exports){
 "use strict";
 /*!
  * Copyright 2012 Amazon.com, Inc. or its affiliates. All Rights Reserved.
@@ -2404,7 +2535,9 @@ var Import = /*#__PURE__*/function () {
   (0, _createClass2["default"])(Import, [{
     key: "getSymbolText",
     value: function getSymbolText(symbolId) {
-      if (this.parent === undefined) throw new Error("Illegal parent state.");
+      if (this.parent === undefined) {
+        throw new Error("Illegal parent state.");
+      }
 
       if (this.parent !== null) {
         var parentSymbol = this.parent.getSymbolText(symbolId);
@@ -2469,7 +2602,7 @@ var Import = /*#__PURE__*/function () {
 
 exports.Import = Import;
 
-},{"@babel/runtime/helpers/classCallCheck":57,"@babel/runtime/helpers/createClass":58,"@babel/runtime/helpers/interopRequireDefault":64}],11:[function(require,module,exports){
+},{"@babel/runtime/helpers/classCallCheck":61,"@babel/runtime/helpers/createClass":63,"@babel/runtime/helpers/interopRequireDefault":69}],12:[function(require,module,exports){
 "use strict";
 /*!
  * Copyright 2012 Amazon.com, Inc. or its affiliates. All Rights Reserved.
@@ -2509,7 +2642,7 @@ var LocalSymbolTable = /*#__PURE__*/function () {
   function LocalSymbolTable(theImport) {
     var symbols = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
     (0, _classCallCheck2["default"])(this, LocalSymbolTable);
-    this.index = {};
+    this.index = Object.create(null);
     this._symbols = [];
 
     if (theImport === null) {
@@ -2526,7 +2659,7 @@ var LocalSymbolTable = /*#__PURE__*/function () {
     try {
       for (_iterator.s(); !(_step = _iterator.n()).done;) {
         var symbol_ = _step.value;
-        this.addSymbol(symbol_);
+        this.assignSymbolId(symbol_);
       }
     } catch (err) {
       _iterator.e(err);
@@ -2545,7 +2678,10 @@ var LocalSymbolTable = /*#__PURE__*/function () {
     value: function addSymbol(symbol_) {
       if (symbol_ !== null) {
         var existingSymbolId = this.getSymbolId(symbol_);
-        if (existingSymbolId !== undefined) return existingSymbolId;
+
+        if (existingSymbolId !== undefined) {
+          return existingSymbolId;
+        }
       }
 
       var symbolId = this.offset + this.symbols.length;
@@ -2558,11 +2694,30 @@ var LocalSymbolTable = /*#__PURE__*/function () {
       return symbolId;
     }
   }, {
+    key: "assignSymbolId",
+    value: function assignSymbolId(symbol) {
+      var symbolId = this.offset + this.symbols.length;
+      this.symbols.push(symbol);
+
+      if (symbol !== null && this.getSymbolId(symbol) === undefined) {
+        this.index[symbol] = symbolId;
+      }
+
+      return symbolId;
+    }
+  }, {
     key: "getSymbolText",
     value: function getSymbolText(symbolId) {
-      if (symbolId > this.maxId) throw new Error("SymbolID greater than maxID.");
+      if (symbolId > this.maxId) {
+        throw new Error("Symbol $" + symbolId.toString() + " greater than maxID.");
+      }
+
       var importedSymbol = this["import"].getSymbolText(symbolId);
-      if (importedSymbol !== undefined) return importedSymbol;
+
+      if (importedSymbol !== undefined) {
+        return importedSymbol;
+      }
+
       var index = symbolId - this.offset;
       return this.symbols[index];
     }
@@ -2598,7 +2753,7 @@ function defaultLocalSymbolTable() {
 
 exports.defaultLocalSymbolTable = defaultLocalSymbolTable;
 
-},{"./IonSystemSymbolTable":21,"@babel/runtime/helpers/classCallCheck":57,"@babel/runtime/helpers/createClass":58,"@babel/runtime/helpers/interopRequireDefault":64}],12:[function(require,module,exports){
+},{"./IonSystemSymbolTable":22,"@babel/runtime/helpers/classCallCheck":61,"@babel/runtime/helpers/createClass":63,"@babel/runtime/helpers/interopRequireDefault":69}],13:[function(require,module,exports){
 "use strict";
 /*!
  * Copyright 2012 Amazon.com, Inc. or its affiliates. All Rights Reserved.
@@ -2651,12 +2806,16 @@ var LowLevelBinaryWriter = /*#__PURE__*/function () {
       var i = tempBuf.length;
 
       while (value >= 128) {
-        tempBuf[--i] = value & 0xFF;
+        tempBuf[--i] = value & 0xff;
         value >>>= 8;
       }
 
-      tempBuf[--i] = value & 0xFF;
-      if (1 / originalValue < 0) tempBuf[0] |= 0x80;
+      tempBuf[--i] = value & 0xff;
+
+      if (1 / originalValue < 0) {
+        tempBuf[0] |= 0x80;
+      }
+
       this.writeable.writeBytes(tempBuf);
     }
   }, {
@@ -2688,7 +2847,7 @@ var LowLevelBinaryWriter = /*#__PURE__*/function () {
       var i = tempBuf.length - 1;
 
       while (value >= 64) {
-        tempBuf[i--] = value & 0x7F;
+        tempBuf[i--] = value & 0x7f;
         value >>>= 7;
       }
 
@@ -2707,11 +2866,11 @@ var LowLevelBinaryWriter = /*#__PURE__*/function () {
       var tempBuf = new Uint8Array(LowLevelBinaryWriter.getVariableLengthUnsignedIntSize(originalValue));
       var value = originalValue;
       var i = tempBuf.length;
-      tempBuf[--i] = value & 0x7F | 0x80;
+      tempBuf[--i] = value & 0x7f | 0x80;
       value >>>= 7;
 
       while (value > 0) {
-        tempBuf[--i] = value & 0x7F;
+        tempBuf[--i] = value & 0x7f;
         value >>>= 7;
       }
 
@@ -2756,7 +2915,7 @@ var LowLevelBinaryWriter = /*#__PURE__*/function () {
         return 1;
       }
 
-      var numberOfBits = Math.floor(Math['log2'](value)) + 1;
+      var numberOfBits = Math.floor(Math["log2"](value)) + 1;
       var numberOfBytes = Math.ceil(numberOfBits / 8);
       return numberOfBytes;
     }
@@ -2769,7 +2928,7 @@ var LowLevelBinaryWriter = /*#__PURE__*/function () {
         return 1;
       }
 
-      var valueBits = Math.floor(Math['log2'](absoluteValue)) + 1;
+      var valueBits = Math.floor(Math["log2"](absoluteValue)) + 1;
       var trailingStopBits = Math.floor(valueBits / 7);
       var leadingStopBit = 1;
       var signBit = 1;
@@ -2782,7 +2941,7 @@ var LowLevelBinaryWriter = /*#__PURE__*/function () {
         return 1;
       }
 
-      var valueBits = Math.floor(Math['log2'](value)) + 1;
+      var valueBits = Math.floor(Math["log2"](value)) + 1;
       var stopBits = Math.ceil(valueBits / 7);
       return Math.ceil((valueBits + stopBits) / 8);
     }
@@ -2792,7 +2951,7 @@ var LowLevelBinaryWriter = /*#__PURE__*/function () {
 
 exports.LowLevelBinaryWriter = LowLevelBinaryWriter;
 
-},{"./JsbiSerde":30,"@babel/runtime/helpers/classCallCheck":57,"@babel/runtime/helpers/createClass":58,"@babel/runtime/helpers/interopRequireDefault":64,"jsbi":76}],13:[function(require,module,exports){
+},{"./JsbiSerde":31,"@babel/runtime/helpers/classCallCheck":61,"@babel/runtime/helpers/createClass":63,"@babel/runtime/helpers/interopRequireDefault":69,"jsbi":84}],14:[function(require,module,exports){
 "use strict";
 /*!
  * Copyright 2012 Amazon.com, Inc. or its affiliates. All Rights Reserved.
@@ -2843,7 +3002,7 @@ var __importStar = void 0 && (void 0).__importStar || function (mod) {
   if (mod && mod.__esModule) return mod;
   var result = {};
   if (mod != null) for (var k in mod) {
-    if (Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
   }
 
   __setModuleDefault(result, mod);
@@ -2864,23 +3023,23 @@ exports.ParserBinaryRaw = void 0;
 
 var jsbi_1 = __importDefault(require("jsbi"));
 
-var JsbiSupport_1 = require("./JsbiSupport");
-
 var IonBinary = __importStar(require("./IonBinary"));
-
-var IonUnicode_1 = require("./IonUnicode");
-
-var IonDecimal_1 = require("./IonDecimal");
-
-var IonTypes_1 = require("./IonTypes");
 
 var IonConstants_1 = require("./IonConstants");
 
+var IonDecimal_1 = require("./IonDecimal");
+
 var IonTimestamp_1 = require("./IonTimestamp");
 
-var SignAndMagnitudeInt_1 = __importDefault(require("./SignAndMagnitudeInt"));
+var IonTypes_1 = require("./IonTypes");
+
+var IonUnicode_1 = require("./IonUnicode");
 
 var JsbiSerde_1 = require("./JsbiSerde");
+
+var JsbiSupport_1 = require("./JsbiSupport");
+
+var SignAndMagnitudeInt_1 = __importDefault(require("./SignAndMagnitudeInt"));
 
 var EOF = -1;
 var TB_DATAGRAM = 20;
@@ -2930,7 +3089,7 @@ function get_ion_type(rt) {
       return IonTypes_1.IonTypes.STRUCT;
 
     default:
-      throw new Error('Unrecognized type code ' + rt);
+      throw new Error("Unrecognized type code " + rt);
   }
 }
 
@@ -3003,9 +3162,8 @@ var ParserBinaryRaw = /*#__PURE__*/function () {
   }, {
     key: "stepIn",
     value: function stepIn() {
-      var len,
-          ts,
-          t = this;
+      var len, ts;
+      var t = this;
 
       switch (t._raw_type) {
         case IonBinary.TB_STRUCT:
@@ -3031,14 +3189,11 @@ var ParserBinaryRaw = /*#__PURE__*/function () {
   }, {
     key: "stepOut",
     value: function stepOut() {
-      var parent_type,
-          ts,
-          l,
-          r,
-          t = this;
+      var parent_type, ts, l, r;
+      var t = this;
 
       if (t._ts.length < 2) {
-        throw new Error('Cannot stepOut any further, already at top level');
+        throw new Error("Cannot stepOut any further, already at top level");
       }
 
       ts = t._ts.pop();
@@ -3075,8 +3230,7 @@ var ParserBinaryRaw = /*#__PURE__*/function () {
   }, {
     key: "getAnnotations",
     value: function getAnnotations() {
-      var a,
-          t = this;
+      var t = this;
 
       if (t._a === undefined || t._a.length === 0) {
         t.load_annotation_values();
@@ -3087,8 +3241,7 @@ var ParserBinaryRaw = /*#__PURE__*/function () {
   }, {
     key: "getAnnotation",
     value: function getAnnotation(index) {
-      var a,
-          t = this;
+      var t = this;
 
       if (t._a === undefined || t._a.length === 0) {
         t.load_annotation_values();
@@ -3129,7 +3282,7 @@ var ParserBinaryRaw = /*#__PURE__*/function () {
           return this._curr;
 
         default:
-          throw new Error('Current value is not a blob or clob.');
+          throw new Error("Current value is not a blob or clob.");
       }
     }
   }, {
@@ -3147,7 +3300,7 @@ var ParserBinaryRaw = /*#__PURE__*/function () {
           return this._curr;
       }
 
-      throw new Error('Current value is not a Boolean.');
+      throw new Error("Current value is not a Boolean.");
     }
   }, {
     key: "decimalValue",
@@ -3165,7 +3318,7 @@ var ParserBinaryRaw = /*#__PURE__*/function () {
           return this._curr;
       }
 
-      throw new Error('Current value is not a decimal.');
+      throw new Error("Current value is not a decimal.");
     }
   }, {
     key: "bigIntValue",
@@ -3184,7 +3337,7 @@ var ParserBinaryRaw = /*#__PURE__*/function () {
           return this._curr;
 
         default:
-          throw new Error('bigIntValue() was called when the current value was not an int.');
+          throw new Error("bigIntValue() was called when the current value was not an int.");
       }
     }
   }, {
@@ -3213,7 +3366,7 @@ var ParserBinaryRaw = /*#__PURE__*/function () {
           return this._curr;
 
         default:
-          throw new Error('Current value is not a float or int.');
+          throw new Error("Current value is not a float or int.");
       }
     }
   }, {
@@ -3233,7 +3386,7 @@ var ParserBinaryRaw = /*#__PURE__*/function () {
           return this._curr;
       }
 
-      throw new Error('Current value is not a string or symbol.');
+      throw new Error("Current value is not a string or symbol.");
     }
   }, {
     key: "timestampValue",
@@ -3251,7 +3404,7 @@ var ParserBinaryRaw = /*#__PURE__*/function () {
           return this._curr;
       }
 
-      throw new Error('Current value is not a timestamp.');
+      throw new Error("Current value is not a timestamp.");
     }
   }, {
     key: "read_binary_float",
@@ -3307,7 +3460,7 @@ var ParserBinaryRaw = /*#__PURE__*/function () {
       if (this._in.position() < end) {
         year = this.readVarUnsignedInt();
       } else {
-        throw new Error('Timestamps must include a year.');
+        throw new Error("Timestamps must include a year.");
       }
 
       if (this._in.position() < end) {
@@ -3324,7 +3477,7 @@ var ParserBinaryRaw = /*#__PURE__*/function () {
         hour = this.readVarUnsignedInt();
 
         if (this._in.position() >= end) {
-          throw new Error('Timestamps with an hour must include a minute.');
+          throw new Error("Timestamps with an hour must include a minute.");
         } else {
           minute = this.readVarUnsignedInt();
         }
@@ -3356,7 +3509,7 @@ var ParserBinaryRaw = /*#__PURE__*/function () {
             _ = _IonTimestamp_1$Times2[0],
             fractionStr = _IonTimestamp_1$Times2[1];
 
-        fractionalSeconds = IonDecimal_1.Decimal.parse(secondInt + '.' + fractionStr);
+        fractionalSeconds = IonDecimal_1.Decimal.parse(secondInt + "." + fractionStr);
       }
 
       var msSinceEpoch = Date.UTC(year, month ? month - 1 : 0, day ? day : 1, hour ? hour : 0, minute ? minute : 0, secondInt ? secondInt : 0, 0);
@@ -3478,9 +3631,19 @@ var ParserBinaryRaw = /*#__PURE__*/function () {
     value: function load_ivm() {
       var t = this;
       var span = t._in;
-      if (span.next() !== ivm_image_1) throw new Error("invalid binary Ion at " + span.position());
-      if (span.next() !== ivm_image_2) throw new Error("invalid binary Ion at " + span.position());
-      if (span.next() !== ivm_image_3) throw new Error("invalid binary Ion at " + span.position());
+
+      if (span.next() !== ivm_image_1) {
+        throw new Error("invalid binary Ion at " + span.position());
+      }
+
+      if (span.next() !== ivm_image_2) {
+        throw new Error("invalid binary Ion at " + span.position());
+      }
+
+      if (span.next() !== ivm_image_3) {
+        throw new Error("invalid binary Ion at " + span.position());
+      }
+
       t._curr = ivm_sid;
       t._len = 0;
       return IonBinary.TB_SYMBOL;
@@ -3490,7 +3653,11 @@ var ParserBinaryRaw = /*#__PURE__*/function () {
     value: function load_annotation_values() {
       var t = this;
       var a, b, pos, limit, arr;
-      if ((pos = t._as) < 0) return;
+
+      if ((pos = t._as) < 0) {
+        return;
+      }
+
       arr = [];
       limit = t._ae;
       a = 0;
@@ -3502,7 +3669,7 @@ var ParserBinaryRaw = /*#__PURE__*/function () {
 
         if ((b & VINT_FLAG) !== 0) {
           if (a === 0) {
-            throw new Error('Symbol ID zero is unsupported.');
+            throw new Error("Symbol ID zero is unsupported.");
           }
 
           arr.push(a);
@@ -3524,8 +3691,13 @@ var ParserBinaryRaw = /*#__PURE__*/function () {
   }, {
     key: "load_value",
     value: function load_value() {
-      if (this._curr != undefined) return;
-      if (this.isNull()) return;
+      if (this._curr != undefined) {
+        return;
+      }
+
+      if (this.isNull()) {
+        return;
+      }
 
       switch (this._raw_type) {
         case IonBinary.TB_BOOL:
@@ -3566,12 +3738,15 @@ var ParserBinaryRaw = /*#__PURE__*/function () {
 
         case IonBinary.TB_CLOB:
         case IonBinary.TB_BLOB:
-          if (this.isNull()) break;
+          if (this.isNull()) {
+            break;
+          }
+
           this._curr = this._in.chunk(this._len);
           break;
 
         default:
-          throw new Error('Unexpected type: ' + this._raw_type);
+          throw new Error("Unexpected type: " + this._raw_type);
       }
     }
   }], [{
@@ -3609,7 +3784,7 @@ var ParserBinaryRaw = /*#__PURE__*/function () {
 
       while (true) {
         _byte = input.next();
-        magnitude = magnitude << 7 | _byte & 0x7F;
+        magnitude = magnitude << 7 | _byte & 0x7f;
         numberOfBits += 7;
 
         if (_byte & 0x80) {
@@ -3631,13 +3806,13 @@ var ParserBinaryRaw = /*#__PURE__*/function () {
 
       var isNegative = v & 0x40;
       var stopBit = v & 0x80;
-      v &= 0x3F;
+      v &= 0x3f;
       var bits = 6;
 
       while (!stopBit) {
         _byte2 = input.next();
         stopBit = _byte2 & 0x80;
-        _byte2 &= 0x7F;
+        _byte2 &= 0x7f;
         v <<= 7;
         v |= _byte2;
         bits += 7;
@@ -3659,7 +3834,7 @@ var ParserBinaryRaw = /*#__PURE__*/function () {
       var bytes = input.view(numberOfBytes);
       var isNegative = (bytes[0] & 0x80) == 0x80;
       var numbers = Array.prototype.slice.call(bytes);
-      numbers[0] = bytes[0] & 0x7F;
+      numbers[0] = bytes[0] & 0x7f;
       var magnitude = JsbiSerde_1.JsbiSerde.fromUnsignedBytes(numbers);
       return new SignAndMagnitudeInt_1["default"](magnitude, isNegative);
     }
@@ -3690,7 +3865,13 @@ var ParserBinaryRaw = /*#__PURE__*/function () {
       while (bytesRead < numberOfBytes) {
         _byte3 = input.next();
         bytesRead++;
-        value *= 256;
+
+        if (numberOfBytes < 4) {
+          value <<= 8;
+        } else {
+          value *= 256;
+        }
+
         value = value + _byte3;
       }
 
@@ -3718,7 +3899,7 @@ var ParserBinaryRaw = /*#__PURE__*/function () {
 
 exports.ParserBinaryRaw = ParserBinaryRaw;
 
-},{"./IonBinary":4,"./IonConstants":8,"./IonDecimal":9,"./IonTimestamp":25,"./IonTypes":27,"./IonUnicode":28,"./JsbiSerde":30,"./JsbiSupport":31,"./SignAndMagnitudeInt":32,"@babel/runtime/helpers/classCallCheck":57,"@babel/runtime/helpers/createClass":58,"@babel/runtime/helpers/interopRequireDefault":64,"@babel/runtime/helpers/slicedToArray":71,"jsbi":76}],14:[function(require,module,exports){
+},{"./IonBinary":5,"./IonConstants":9,"./IonDecimal":10,"./IonTimestamp":26,"./IonTypes":28,"./IonUnicode":29,"./JsbiSerde":31,"./JsbiSupport":32,"./SignAndMagnitudeInt":33,"@babel/runtime/helpers/classCallCheck":61,"@babel/runtime/helpers/createClass":63,"@babel/runtime/helpers/interopRequireDefault":69,"@babel/runtime/helpers/slicedToArray":78,"jsbi":84}],15:[function(require,module,exports){
 "use strict";
 /*!
  * Copyright 2012 Amazon.com, Inc. or its affiliates. All Rights Reserved.
@@ -3767,7 +3948,7 @@ var __importStar = void 0 && (void 0).__importStar || function (mod) {
   if (mod && mod.__esModule) return mod;
   var result = {};
   if (mod != null) for (var k in mod) {
-    if (Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
   }
 
   __setModuleDefault(result, mod);
@@ -3825,7 +4006,7 @@ var CH_BS = 92;
 var CH_FORWARD_SLASH = "/".charCodeAt(0);
 var CH_AS = 42;
 var CH_SQ = 39;
-var CH_DOUBLE_QUOTE = "\"".charCodeAt(0);
+var CH_DOUBLE_QUOTE = '"'.charCodeAt(0);
 var CH_CM = 44;
 var CH_OP = 40;
 var CH_CP = 41;
@@ -3945,29 +4126,86 @@ function get_ion_type(t) {
 exports.get_ion_type = get_ion_type;
 
 function get_keyword_type(str) {
-  if (str === "null") return T_NULL;
-  if (str === "true") return T_BOOL;
-  if (str === "false") return T_BOOL;
-  if (str === "nan") return T_FLOAT_SPECIAL;
-  if (str === "+inf") return T_FLOAT_SPECIAL;
-  if (str === "-inf") return T_FLOAT_SPECIAL;
+  if (str === "null") {
+    return T_NULL;
+  }
+
+  if (str === "true") {
+    return T_BOOL;
+  }
+
+  if (str === "false") {
+    return T_BOOL;
+  }
+
+  if (str === "nan") {
+    return T_FLOAT_SPECIAL;
+  }
+
+  if (str === "+inf") {
+    return T_FLOAT_SPECIAL;
+  }
+
+  if (str === "-inf") {
+    return T_FLOAT_SPECIAL;
+  }
+
   throw new Error("Unknown keyword: " + str + ".");
 }
 
 function get_type_from_name(str) {
-  if (str === "null") return T_NULL;
-  if (str === "bool") return T_BOOL;
-  if (str === "int") return T_INT;
-  if (str === "float") return T_FLOAT;
-  if (str === "decimal") return T_DECIMAL;
-  if (str === "timestamp") return T_TIMESTAMP;
-  if (str === "symbol") return T_IDENTIFIER;
-  if (str === "string") return T_STRING2;
-  if (str === "clob") return T_CLOB2;
-  if (str === "blob") return T_BLOB;
-  if (str === "sexp") return T_SEXP;
-  if (str === "list") return T_LIST;
-  if (str === "struct") return T_STRUCT;
+  if (str === "null") {
+    return T_NULL;
+  }
+
+  if (str === "bool") {
+    return T_BOOL;
+  }
+
+  if (str === "int") {
+    return T_INT;
+  }
+
+  if (str === "float") {
+    return T_FLOAT;
+  }
+
+  if (str === "decimal") {
+    return T_DECIMAL;
+  }
+
+  if (str === "timestamp") {
+    return T_TIMESTAMP;
+  }
+
+  if (str === "symbol") {
+    return T_IDENTIFIER;
+  }
+
+  if (str === "string") {
+    return T_STRING2;
+  }
+
+  if (str === "clob") {
+    return T_CLOB2;
+  }
+
+  if (str === "blob") {
+    return T_BLOB;
+  }
+
+  if (str === "sexp") {
+    return T_SEXP;
+  }
+
+  if (str === "list") {
+    return T_LIST;
+  }
+
+  if (str === "struct") {
+    return T_STRUCT;
+  }
+
   throw new Error("Unknown type: " + str + ".");
 }
 
@@ -4044,16 +4282,34 @@ function get_hex_value(ch) {
 }
 
 function is_valid_base64_length(char_length, trailer_length) {
-  if (trailer_length > 2) return false;
-  if ((char_length + trailer_length & 0x3) != 0) return false;
+  if (trailer_length > 2) {
+    return false;
+  }
+
+  if ((char_length + trailer_length & 0x3) != 0) {
+    return false;
+  }
+
   return true;
 }
 
 function is_valid_string_char(ch, allow_new_line) {
-  if (ch == CH_CR) return allow_new_line;
-  if (ch == CH_NL) return allow_new_line;
-  if (IonText.is_whitespace(ch)) return true;
-  if (ch < 32) return false;
+  if (ch == CH_CR) {
+    return allow_new_line;
+  }
+
+  if (ch == CH_NL) {
+    return allow_new_line;
+  }
+
+  if (IonText.is_whitespace(ch)) {
+    return true;
+  }
+
+  if (ch < 32) {
+    return false;
+  }
+
   return true;
 }
 
@@ -4064,7 +4320,7 @@ var ParserTextRaw = /*#__PURE__*/function () {
     this._curr_null = false;
 
     this._read_value_helper_minus = function (ch1, accept_operator_symbols, calling_op) {
-      var op = undefined,
+      var op,
           ch2 = this._peek();
 
       if (ch2 == CH_i) {
@@ -4101,7 +4357,9 @@ var ParserTextRaw = /*#__PURE__*/function () {
           this._read_string_escape_sequence();
         } else if (ch == terminator) {
           break;
-        } else if (!is_valid_string_char(ch, allow_new_line)) throw new Error("invalid character " + ch + " in string");
+        } else if (!is_valid_string_char(ch, allow_new_line)) {
+          throw new Error("invalid character " + ch + " in string");
+        }
       }
     };
 
@@ -4193,7 +4451,10 @@ var ParserTextRaw = /*#__PURE__*/function () {
   }, {
     key: "numberValue",
     value: function numberValue() {
-      if (this.isNull()) return null;
+      if (this.isNull()) {
+        return null;
+      }
+
       var s = this.get_value_as_string(this._curr);
 
       switch (this._curr) {
@@ -4205,7 +4466,13 @@ var ParserTextRaw = /*#__PURE__*/function () {
           return Number(s);
 
         case T_FLOAT_SPECIAL:
-          if (s == "+inf") return Number.POSITIVE_INFINITY;else if (s == "-inf") return Number.NEGATIVE_INFINITY;else if (s == "nan") return Number.NaN;
+          if (s == "+inf") {
+            return Number.POSITIVE_INFINITY;
+          } else if (s == "-inf") {
+            return Number.NEGATIVE_INFINITY;
+          } else if (s == "nan") {
+            return Number.NaN;
+          }
 
         default:
           throw new Error("can't convert to number");
@@ -4214,7 +4481,10 @@ var ParserTextRaw = /*#__PURE__*/function () {
   }, {
     key: "booleanValue",
     value: function booleanValue() {
-      if (this.isNull()) return null;
+      if (this.isNull()) {
+        return null;
+      }
+
       var s = this.get_value_as_string(T_BOOL);
 
       if (s === "true") {
@@ -4452,7 +4722,7 @@ var ParserTextRaw = /*#__PURE__*/function () {
         case CH_SQ:
           op = this._read_string1;
 
-          if (this._peek("\'\'") != ERROR) {
+          if (this._peek("''") != ERROR) {
             op = this._read_string3;
           }
 
@@ -4483,7 +4753,10 @@ var ParserTextRaw = /*#__PURE__*/function () {
         this._load_field_name();
 
         ch = this._read_after_whitespace(true);
-        if (ch != CH_CL) this._error("expected ':'");
+
+        if (ch != CH_CL) {
+          this._error("expected ':'");
+        }
 
         this._ops.unshift(this._read_struct_comma);
 
@@ -4542,7 +4815,9 @@ var ParserTextRaw = /*#__PURE__*/function () {
 
       switch (this._fieldnameType) {
         case T_IDENTIFIER:
-          if (IonText_1.is_keyword(s)) throw new Error("can't use '" + s + "' as a fieldname without quotes");
+          if (IonText_1.is_keyword(s)) {
+            throw new Error("can't use '" + s + "' as a fieldname without quotes");
+          }
 
         case T_STRING1:
         case T_STRING2:
@@ -4603,8 +4878,9 @@ var ParserTextRaw = /*#__PURE__*/function () {
   }, {
     key: "_read_value_helper_curly",
     value: function _read_value_helper_curly(ch1, accept_operator_symbols, calling_op) {
-      var ch3,
-          ch2 = this._read();
+      var ch3;
+
+      var ch2 = this._read();
 
       if (ch2 == CH_LEFT_CURLY) {
         ch3 = this._read_after_whitespace(false);
@@ -4659,7 +4935,7 @@ var ParserTextRaw = /*#__PURE__*/function () {
     value: function _read_value_helper_single(ch1, accept_operator_symbols, calling_op) {
       var op;
 
-      if (this._peek("\'\'") != ERROR) {
+      if (this._peek("''") != ERROR) {
         op = this._read_string3;
         op.call(this);
       } else {
@@ -4683,7 +4959,10 @@ var ParserTextRaw = /*#__PURE__*/function () {
 
       var type = this._value_pop();
 
-      if (type != T_IDENTIFIER) throw new Error("Expecting symbol here.");
+      if (type != T_IDENTIFIER) {
+        throw new Error("Expecting symbol here.");
+      }
+
       var symbol = this.get_value_as_string(type);
 
       if (IonText_1.is_keyword(symbol)) {
@@ -4697,11 +4976,16 @@ var ParserTextRaw = /*#__PURE__*/function () {
 
             var ch = this._read();
 
-            if (IonText.is_letter(ch) !== true) throw new Error("Expected type name after 'null.'");
+            if (IonText.is_letter(ch) !== true) {
+              throw new Error("Expected type name after 'null.'");
+            }
 
             this._read_symbol();
 
-            if (this._value_pop() !== T_IDENTIFIER) throw new Error("Expected type name after 'null.'");
+            if (this._value_pop() !== T_IDENTIFIER) {
+              throw new Error("Expected type name after 'null.'");
+            }
+
             symbol = this.get_value_as_string(T_IDENTIFIER);
             kwt = get_type_from_name(symbol);
           }
@@ -4720,7 +5004,7 @@ var ParserTextRaw = /*#__PURE__*/function () {
           var sid = this._parseSymbolId(symbol);
 
           if (sid === 0) {
-            throw new Error('Symbol ID zero is not supported.');
+            throw new Error("Symbol ID zero is not supported.");
           } else if (isNaN(sid)) {
             this._ann.push(new IonSymbolToken_1.SymbolToken(symbol));
           } else {
@@ -4766,7 +5050,10 @@ var ParserTextRaw = /*#__PURE__*/function () {
       var ch, t;
       this._start = this._in.position();
       ch = this._read();
-      if (ch == CH_MS) ch = this._read();
+
+      if (ch == CH_MS) {
+        ch = this._read();
+      }
 
       if (ch == CH_0) {
         ch = this._peek();
@@ -4956,14 +5243,19 @@ var ParserTextRaw = /*#__PURE__*/function () {
         ch = this._readPastNDigits(2);
 
         if (ch === CH_DT) {
-          if (!IonText.is_digit(this._read())) throw new Error("W3C timestamp spec requires atleast one digit after decimal point.");
+          if (!IonText.is_digit(this._read())) {
+            throw new Error("W3C timestamp spec requires atleast one digit after decimal point.");
+          }
 
           while (IonText.is_digit(ch = this._read())) {}
         }
       }
 
       if (ch === CH_Z) {
-        if (!IonText.isNumericTerminator(this._peek())) throw new Error("Illegal terminator after Zulu offset.");
+        if (!IonText.isNumericTerminator(this._peek())) {
+          throw new Error("Illegal terminator after Zulu offset.");
+        }
+
         this._end = this._in.position();
 
         this._value_push(T_TIMESTAMP);
@@ -4974,12 +5266,19 @@ var ParserTextRaw = /*#__PURE__*/function () {
       }
 
       ch = this._readPastNDigits(2);
-      if (ch !== CH_CL) throw new Error("Timestamp offset(hr:min) requires format of +/-00:00.");
+
+      if (ch !== CH_CL) {
+        throw new Error("Timestamp offset(hr:min) requires format of +/-00:00.");
+      }
 
       this._readNDigits(2);
 
       ch = this._peek();
-      if (!IonText.isNumericTerminator(ch)) throw new Error("Improperly formatted timestamp.");
+
+      if (!IonText.isNumericTerminator(ch)) {
+        throw new Error("Improperly formatted timestamp.");
+      }
+
       this._end = this._in.position();
 
       this._value_push(T_TIMESTAMP);
@@ -4992,7 +5291,10 @@ var ParserTextRaw = /*#__PURE__*/function () {
 
       for (;;) {
         ch = this._read();
-        if (!IonText.is_letter_or_digit(ch)) break;
+
+        if (!IonText.is_letter_or_digit(ch)) {
+          break;
+        }
       }
 
       this._unread(ch);
@@ -5009,7 +5311,10 @@ var ParserTextRaw = /*#__PURE__*/function () {
 
       for (;;) {
         ch = this._read();
-        if (!IonText.is_operator_char(ch)) break;
+
+        if (!IonText.is_operator_char(ch)) {
+          break;
+        }
       }
 
       this._end = this._in.position() - 1;
@@ -5039,25 +5344,33 @@ var ParserTextRaw = /*#__PURE__*/function () {
   }, {
     key: "_read_string3",
     value: function _read_string3(recognizeComments) {
-      if (recognizeComments === undefined) recognizeComments = true;
+      if (recognizeComments === undefined) {
+        recognizeComments = true;
+      }
+
       var ch;
 
       this._unread(this._peek(""));
 
-      for (this._start = this._in.position() + 3; this._peek("\'\'\'") !== ERROR; this._in.unread(this._read_after_whitespace(recognizeComments))) {
+      for (this._start = this._in.position() + 3; this._peek("'''") !== ERROR; this._in.unread(this._read_after_whitespace(recognizeComments))) {
         for (var i = 0; i < 3; i++) {
           this._read();
         }
 
-        while (this._peek("\'\'\'") === ERROR) {
+        while (this._peek("'''") === ERROR) {
           ch = this._read();
 
           if (ch == CH_BS) {
             this._read_string_escape_sequence();
           }
 
-          if (ch === EOF) throw new Error('Closing triple quotes not found.');
-          if (!is_valid_string_char(ch, true)) throw new Error("invalid character " + ch + " in string");
+          if (ch === EOF) {
+            throw new Error("Closing triple quotes not found.");
+          }
+
+          if (!is_valid_string_char(ch, true)) {
+            throw new Error("invalid character " + ch + " in string");
+          }
         }
 
         this._end = this._in.position();
@@ -5098,7 +5411,11 @@ var ParserTextRaw = /*#__PURE__*/function () {
 
         case ESC_nl3:
           ch = this._read();
-          if (ch != ESC_nl2) this._unread(ch);
+
+          if (ch != ESC_nl2) {
+            this._unread(ch);
+          }
+
           break;
 
         case ESC_x:
@@ -5123,19 +5440,21 @@ var ParserTextRaw = /*#__PURE__*/function () {
           break;
 
         default:
-          this._error('unexpected character: ' + ch + ' after escape slash');
+          this._error("unexpected character: " + ch + " after escape slash");
 
       }
     }
   }, {
     key: "_test_string_as_annotation",
     value: function _test_string_as_annotation(op) {
-      var s,
-          ch,
-          is_ann,
-          t = this._value_pop();
+      var s, ch, is_ann;
 
-      if (t != T_STRING1 && t != T_STRING3) this._error("expecting quoted symbol here");
+      var t = this._value_pop();
+
+      if (t != T_STRING1 && t != T_STRING3) {
+        this._error("expecting quoted symbol here");
+      }
+
       s = this.get_value_as_string(t);
       ch = this._read_after_whitespace(true);
 
@@ -5163,7 +5482,10 @@ var ParserTextRaw = /*#__PURE__*/function () {
       this._read_string2();
 
       t = this._value_pop();
-      if (t != T_STRING2) this._error("string expected");
+
+      if (t != T_STRING2) {
+        this._error("string expected");
+      }
 
       this._value_push(T_CLOB2);
 
@@ -5177,7 +5499,10 @@ var ParserTextRaw = /*#__PURE__*/function () {
       this._read_string3(false);
 
       t = this._value_pop();
-      if (t != T_STRING3) this._error("string expected");
+
+      if (t != T_STRING3) {
+        this._error("string expected");
+      }
 
       this._value_push(T_CLOB3);
 
@@ -5207,8 +5532,13 @@ var ParserTextRaw = /*#__PURE__*/function () {
         ch = this._read_after_whitespace(false);
       }
 
-      if (ch != CH_CC || this._read() != CH_CC) throw new Error("Invalid blob");
-      if (!is_valid_base64_length(base64_chars, trailers)) throw new Error("Invalid base64 value");
+      if (ch != CH_CC || this._read() != CH_CC) {
+        throw new Error("Invalid blob");
+      }
+
+      if (!is_valid_base64_length(base64_chars, trailers)) {
+        throw new Error("Invalid base64 value");
+      }
 
       this._value_push(T_BLOB);
     }
@@ -5224,12 +5554,12 @@ var ParserTextRaw = /*#__PURE__*/function () {
   }, {
     key: "isHighSurrogate",
     value: function isHighSurrogate(ch) {
-      return ch >= 0xD800 && ch <= 0xDBFF;
+      return ch >= 0xd800 && ch <= 0xdbff;
     }
   }, {
     key: "isLowSurrogate",
     value: function isLowSurrogate(ch) {
-      return ch >= 0xDC00 && ch <= 0xDFFF;
+      return ch >= 0xdc00 && ch <= 0xdfff;
     }
   }, {
     key: "indexWhiteSpace",
@@ -5381,7 +5711,11 @@ var ParserTextRaw = /*#__PURE__*/function () {
     key: "_read_escape_sequence",
     value: function _read_escape_sequence(ii, end) {
       var ch;
-      if (ii + 1 >= end) throw new Error("Invalid escape sequence.");
+
+      if (ii + 1 >= end) {
+        throw new Error("Invalid escape sequence.");
+      }
+
       ch = this._in.valueAt(ii + 1);
       this._esc_len = 1;
 
@@ -5547,12 +5881,22 @@ var ParserTextRaw = /*#__PURE__*/function () {
 
       for (;;) {
         ch = this._read();
-        if (ch == EOF) break;
-        if (ch == CH_NL) break;
+
+        if (ch == EOF) {
+          break;
+        }
+
+        if (ch == CH_NL) {
+          break;
+        }
 
         if (ch == CH_CR) {
           ch = this._read();
-          if (ch != CH_NL) this._unread(ch);
+
+          if (ch != CH_NL) {
+            this._unread(ch);
+          }
+
           break;
         }
       }
@@ -5564,11 +5908,17 @@ var ParserTextRaw = /*#__PURE__*/function () {
 
       for (;;) {
         ch = this._read();
-        if (ch == EOF) break;
+
+        if (ch == EOF) {
+          break;
+        }
 
         if (ch == CH_AS) {
           ch = this._read();
-          if (ch == CH_FORWARD_SLASH) break;
+
+          if (ch == CH_FORWARD_SLASH) {
+            break;
+          }
         }
       }
     }
@@ -5610,7 +5960,11 @@ var ParserTextRaw = /*#__PURE__*/function () {
 
       while (ii < expected.length) {
         ch = this._read();
-        if (ch != expected.charCodeAt(ii)) break;
+
+        if (ch != expected.charCodeAt(ii)) {
+          break;
+        }
+
         ii++;
       }
 
@@ -5635,9 +5989,12 @@ var ParserTextRaw = /*#__PURE__*/function () {
     value: function _peek_4_digits(ch1) {
       var ii,
           ch,
-          is_digits = true,
-          chars = [];
-      if (!IonText.is_digit(ch1)) return ERROR;
+          is_digits = true;
+      var chars = [];
+
+      if (!IonText.is_digit(ch1)) {
+        return ERROR;
+      }
 
       for (ii = 0; ii < 3; ii++) {
         ch = this._read();
@@ -5660,11 +6017,16 @@ var ParserTextRaw = /*#__PURE__*/function () {
   }, {
     key: "_read_required_digits",
     value: function _read_required_digits(ch) {
-      if (!IonText.is_digit(ch)) return ERROR;
+      if (!IonText.is_digit(ch)) {
+        return ERROR;
+      }
 
       for (;;) {
         ch = this._read();
-        if (!IonText.is_digit(ch)) break;
+
+        if (!IonText.is_digit(ch)) {
+          break;
+        }
       }
 
       return ch;
@@ -5682,10 +6044,15 @@ var ParserTextRaw = /*#__PURE__*/function () {
     key: "_readNDigits",
     value: function _readNDigits(n) {
       var ch;
-      if (n <= 0) throw new Error("Cannot read a lack of or negative number of digits.");
+
+      if (n <= 0) {
+        throw new Error("Cannot read a lack of or negative number of digits.");
+      }
 
       while (n--) {
-        if (!IonText.is_digit(ch = this._read())) throw new Error("Expected digit, got: " + String.fromCharCode(ch));
+        if (!IonText.is_digit(ch = this._read())) {
+          throw new Error("Expected digit, got: " + String.fromCharCode(ch));
+        }
       }
 
       return ch;
@@ -5700,11 +6067,16 @@ var ParserTextRaw = /*#__PURE__*/function () {
   }, {
     key: "_read_required_hex_digits",
     value: function _read_required_hex_digits(ch) {
-      if (!IonText.is_hex_digit(ch)) return ERROR;
+      if (!IonText.is_hex_digit(ch)) {
+        return ERROR;
+      }
 
       for (;;) {
         ch = this._read();
-        if (!IonText.is_hex_digit(ch)) break;
+
+        if (!IonText.is_hex_digit(ch)) {
+          break;
+        }
       }
 
       return ch;
@@ -5732,12 +6104,12 @@ var ParserTextRaw = /*#__PURE__*/function () {
   }, {
     key: "_parseSymbolId",
     value: function _parseSymbolId(s) {
-      if (s[0] !== '$') {
+      if (s[0] !== "$") {
         return NaN;
       }
 
       for (var i = 1; i < s.length; i++) {
-        if (s[i] < '0' || s[i] > '9') {
+        if (s[i] < "0" || s[i] > "9") {
           return NaN;
         }
       }
@@ -5757,7 +6129,7 @@ var ParserTextRaw = /*#__PURE__*/function () {
 
 exports.ParserTextRaw = ParserTextRaw;
 
-},{"./IonSymbolToken":19,"./IonText":22,"./IonTypes":27,"./JsbiSupport":31,"@babel/runtime/helpers/classCallCheck":57,"@babel/runtime/helpers/createClass":58,"@babel/runtime/helpers/interopRequireDefault":64,"jsbi":76}],15:[function(require,module,exports){
+},{"./IonSymbolToken":20,"./IonText":23,"./IonTypes":28,"./JsbiSupport":32,"@babel/runtime/helpers/classCallCheck":61,"@babel/runtime/helpers/createClass":63,"@babel/runtime/helpers/interopRequireDefault":69,"jsbi":84}],16:[function(require,module,exports){
 "use strict";
 /*!
  * Copyright 2012 Amazon.com, Inc. or its affiliates. All Rights Reserved.
@@ -5795,9 +6167,9 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.PrettyTextWriter = void 0;
 
-var IonTextWriter_1 = require("./IonTextWriter");
-
 var IonText_1 = require("./IonText");
+
+var IonTextWriter_1 = require("./IonTextWriter");
 
 var IonTypes_1 = require("./IonTypes");
 
@@ -5852,7 +6224,9 @@ var PrettyTextWriter = /*#__PURE__*/function (_IonTextWriter_1$Text) {
 
       this._writeNull(type);
 
-      if (this.currentContainer.containerType === IonTypes_1.IonTypes.STRUCT) this.currentContainer.state = IonTextWriter_1.State.STRUCT_FIELD;
+      if (this.currentContainer.containerType === IonTypes_1.IonTypes.STRUCT) {
+        this.currentContainer.state = IonTextWriter_1.State.STRUCT_FIELD;
+      }
     }
   }, {
     key: "stepOut",
@@ -5891,7 +6265,9 @@ var PrettyTextWriter = /*#__PURE__*/function (_IonTextWriter_1$Text) {
   }, {
     key: "_serializeValue",
     value: function _serializeValue(type, value, serialize) {
-      if (this.currentContainer.state === IonTextWriter_1.State.STRUCT_FIELD) throw new Error("Expecting a struct field");
+      if (this.currentContainer.state === IonTextWriter_1.State.STRUCT_FIELD) {
+        throw new Error("Expecting a struct field");
+      }
 
       if (value === null) {
         this.writeNull(type);
@@ -5902,7 +6278,10 @@ var PrettyTextWriter = /*#__PURE__*/function (_IonTextWriter_1$Text) {
       this.writePrettyValue();
       this.writeAnnotations();
       serialize(value);
-      if (this.currentContainer.containerType === IonTypes_1.IonTypes.STRUCT) this.currentContainer.state = IonTextWriter_1.State.STRUCT_FIELD;
+
+      if (this.currentContainer.containerType === IonTypes_1.IonTypes.STRUCT) {
+        this.currentContainer.state = IonTextWriter_1.State.STRUCT_FIELD;
+      }
     }
   }, {
     key: "writeContainer",
@@ -5981,7 +6360,7 @@ var PrettyTextWriter = /*#__PURE__*/function (_IonTextWriter_1$Text) {
 
 exports.PrettyTextWriter = PrettyTextWriter;
 
-},{"./IonText":22,"./IonTextWriter":24,"./IonTypes":27,"@babel/runtime/helpers/classCallCheck":57,"@babel/runtime/helpers/createClass":58,"@babel/runtime/helpers/getPrototypeOf":62,"@babel/runtime/helpers/inherits":63,"@babel/runtime/helpers/interopRequireDefault":64,"@babel/runtime/helpers/possibleConstructorReturn":69}],16:[function(require,module,exports){
+},{"./IonText":23,"./IonTextWriter":25,"./IonTypes":28,"@babel/runtime/helpers/classCallCheck":61,"@babel/runtime/helpers/createClass":63,"@babel/runtime/helpers/getPrototypeOf":67,"@babel/runtime/helpers/inherits":68,"@babel/runtime/helpers/interopRequireDefault":69,"@babel/runtime/helpers/possibleConstructorReturn":76}],17:[function(require,module,exports){
 "use strict";
 /*!
  * Copyright 2012 Amazon.com, Inc. or its affiliates. All Rights Reserved.
@@ -6019,7 +6398,7 @@ var SharedSymbolTable = /*#__PURE__*/function () {
     this._numberOfSymbols = this._symbols.length;
 
     for (var m = _symbols.length - 1; m >= 0; m--) {
-      this._idsByText[_symbols[m]] = m;
+      this._idsByText.set(_symbols[m], m);
     }
   }
 
@@ -6039,7 +6418,7 @@ var SharedSymbolTable = /*#__PURE__*/function () {
   }, {
     key: "getSymbolId",
     value: function getSymbolId(text) {
-      return this._idsByText[text];
+      return this._idsByText.get(text);
     }
   }, {
     key: "numberOfSymbols",
@@ -6062,7 +6441,7 @@ var SharedSymbolTable = /*#__PURE__*/function () {
 
 exports.SharedSymbolTable = SharedSymbolTable;
 
-},{"@babel/runtime/helpers/classCallCheck":57,"@babel/runtime/helpers/createClass":58,"@babel/runtime/helpers/interopRequireDefault":64}],17:[function(require,module,exports){
+},{"@babel/runtime/helpers/classCallCheck":61,"@babel/runtime/helpers/createClass":63,"@babel/runtime/helpers/interopRequireDefault":69}],18:[function(require,module,exports){
 "use strict";
 /*!
  * Copyright 2012 Amazon.com, Inc. or its affiliates. All Rights Reserved.
@@ -6216,11 +6595,17 @@ var StringSpan = /*#__PURE__*/function (_Span) {
   }, {
     key: "unread",
     value: function unread(ch) {
-      if (this._pos <= this._start) Span.error();
+      if (this._pos <= this._start) {
+        Span.error();
+      }
+
       this._pos--;
 
       if (ch < 0) {
-        if (this.is_empty() != true) Span.error();
+        if (this.is_empty() != true) {
+          Span.error();
+        }
+
         return;
       }
 
@@ -6229,7 +6614,9 @@ var StringSpan = /*#__PURE__*/function (_Span) {
         this._line--;
       }
 
-      if (ch != this.peek()) Span.error();
+      if (ch != this.peek()) {
+        Span.error();
+      }
     }
   }, {
     key: "peek",
@@ -6248,7 +6635,10 @@ var StringSpan = /*#__PURE__*/function (_Span) {
   }, {
     key: "valueAt",
     value: function valueAt(ii) {
-      if (ii < this._start || ii >= this._limit) return IonConstants_1.EOF;
+      if (ii < this._start || ii >= this._limit) {
+        return IonConstants_1.EOF;
+      }
+
       return this._src.charCodeAt(ii);
     }
   }, {
@@ -6335,7 +6725,7 @@ var BinarySpan = /*#__PURE__*/function (_Span2) {
     key: "view",
     value: function view(length) {
       if (this._pos + length > this._limit) {
-        throw new Error('Unable to read ' + length + ' bytes (position: ' + this.position() + ', limit: ' + this._limit + ')');
+        throw new Error("Unable to read " + length + " bytes (position: " + this.position() + ", limit: " + this._limit + ")");
       }
 
       return this._src.subarray(this._pos, this._pos += length);
@@ -6348,31 +6738,47 @@ var BinarySpan = /*#__PURE__*/function (_Span2) {
   }, {
     key: "unread",
     value: function unread(b) {
-      if (this._pos <= this._start) Span.error();
+      if (this._pos <= this._start) {
+        Span.error();
+      }
+
       this._pos--;
 
       if (b == IonConstants_1.EOF) {
-        if (this.is_empty() == false) Span.error();
+        if (this.is_empty() == false) {
+          Span.error();
+        }
       }
 
-      if (b != this.peek()) Span.error();
+      if (b != this.peek()) {
+        Span.error();
+      }
     }
   }, {
     key: "peek",
     value: function peek() {
-      if (this.is_empty()) return IonConstants_1.EOF;
+      if (this.is_empty()) {
+        return IonConstants_1.EOF;
+      }
+
       return this._src[this._pos];
     }
   }, {
     key: "skip",
     value: function skip(dist) {
       this._pos += dist;
-      if (this._pos > this._limit) throw new Error("Skipped over end of source.");
+
+      if (this._pos > this._limit) {
+        throw new Error("Skipped over end of source.");
+      }
     }
   }, {
     key: "valueAt",
     value: function valueAt(ii) {
-      if (ii < this._start || ii >= this._limit) return IonConstants_1.EOF;
+      if (ii < this._start || ii >= this._limit) {
+        return IonConstants_1.EOF;
+      }
+
       return this._src[ii];
     }
   }, {
@@ -6386,7 +6792,7 @@ var BinarySpan = /*#__PURE__*/function (_Span2) {
 
 exports.BinarySpan = BinarySpan;
 
-},{"./IonConstants":8,"@babel/runtime/helpers/classCallCheck":57,"@babel/runtime/helpers/createClass":58,"@babel/runtime/helpers/getPrototypeOf":62,"@babel/runtime/helpers/inherits":63,"@babel/runtime/helpers/interopRequireDefault":64,"@babel/runtime/helpers/possibleConstructorReturn":69}],18:[function(require,module,exports){
+},{"./IonConstants":9,"@babel/runtime/helpers/classCallCheck":61,"@babel/runtime/helpers/createClass":63,"@babel/runtime/helpers/getPrototypeOf":67,"@babel/runtime/helpers/inherits":68,"@babel/runtime/helpers/interopRequireDefault":69,"@babel/runtime/helpers/possibleConstructorReturn":76}],19:[function(require,module,exports){
 "use strict";
 /*!
  * Copyright 2012 Amazon.com, Inc. or its affiliates. All Rights Reserved.
@@ -6465,7 +6871,7 @@ var SubstituteSymbolTable = /*#__PURE__*/function (_IonSharedSymbolTable) {
 
 exports.SubstituteSymbolTable = SubstituteSymbolTable;
 
-},{"./IonSharedSymbolTable":16,"@babel/runtime/helpers/classCallCheck":57,"@babel/runtime/helpers/createClass":58,"@babel/runtime/helpers/getPrototypeOf":62,"@babel/runtime/helpers/inherits":63,"@babel/runtime/helpers/interopRequireDefault":64,"@babel/runtime/helpers/possibleConstructorReturn":69}],19:[function(require,module,exports){
+},{"./IonSharedSymbolTable":17,"@babel/runtime/helpers/classCallCheck":61,"@babel/runtime/helpers/createClass":63,"@babel/runtime/helpers/getPrototypeOf":67,"@babel/runtime/helpers/inherits":68,"@babel/runtime/helpers/interopRequireDefault":69,"@babel/runtime/helpers/possibleConstructorReturn":76}],20:[function(require,module,exports){
 "use strict";
 /*!
  * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
@@ -6493,36 +6899,32 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.SymbolToken = void 0;
 
-var SymbolToken = function () {
-  var SymbolToken = /*#__PURE__*/function () {
-    function SymbolToken(text) {
-      var sid = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : SymbolToken._UNKNOWN_SYMBOL_ID;
-      (0, _classCallCheck2["default"])(this, SymbolToken);
-      this.text = text;
-      this.sid = sid;
+var SymbolToken = /*#__PURE__*/function () {
+  function SymbolToken(text) {
+    var sid = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : SymbolToken._UNKNOWN_SYMBOL_ID;
+    (0, _classCallCheck2["default"])(this, SymbolToken);
+    this.text = text;
+    this.sid = sid;
+  }
+
+  (0, _createClass2["default"])(SymbolToken, [{
+    key: "getText",
+    value: function getText() {
+      return this.text;
     }
-
-    (0, _createClass2["default"])(SymbolToken, [{
-      key: "getText",
-      value: function getText() {
-        return this.text;
-      }
-    }, {
-      key: "getSid",
-      value: function getSid() {
-        return this.sid;
-      }
-    }]);
-    return SymbolToken;
-  }();
-
-  SymbolToken._UNKNOWN_SYMBOL_ID = -1;
+  }, {
+    key: "getSid",
+    value: function getSid() {
+      return this.sid;
+    }
+  }]);
   return SymbolToken;
 }();
 
 exports.SymbolToken = SymbolToken;
+SymbolToken._UNKNOWN_SYMBOL_ID = -1;
 
-},{"@babel/runtime/helpers/classCallCheck":57,"@babel/runtime/helpers/createClass":58,"@babel/runtime/helpers/interopRequireDefault":64}],20:[function(require,module,exports){
+},{"@babel/runtime/helpers/classCallCheck":61,"@babel/runtime/helpers/createClass":63,"@babel/runtime/helpers/interopRequireDefault":69}],21:[function(require,module,exports){
 "use strict";
 /*!
  * Copyright 2012 Amazon.com, Inc. or its affiliates. All Rights Reserved.
@@ -6544,13 +6946,13 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.makeSymbolTable = exports.ion_symbol_table_sid = exports.ion_symbol_table = void 0;
 
-var IonSystemSymbolTable_1 = require("./IonSystemSymbolTable");
-
 var IonImport_1 = require("./IonImport");
 
 var IonLocalSymbolTable_1 = require("./IonLocalSymbolTable");
 
 var IonSubstituteSymbolTable_1 = require("./IonSubstituteSymbolTable");
+
+var IonSystemSymbolTable_1 = require("./IonSystemSymbolTable");
 
 exports.ion_symbol_table = "$ion_symbol_table";
 exports.ion_symbol_table_sid = 3;
@@ -6632,13 +7034,19 @@ function makeSymbolTable(catalog, reader) {
   while (reader.next()) {
     switch (reader.fieldName()) {
       case "imports":
-        if (foundImports) throw new Error("Multiple import fields found.");
+        if (foundImports) {
+          throw new Error("Multiple import fields found.");
+        }
+
         import_ = load_imports(reader, catalog);
         foundImports = true;
         break;
 
       case "symbols":
-        if (foundSymbols) throw new Error("Multiple symbol fields found.");
+        if (foundSymbols) {
+          throw new Error("Multiple symbol fields found.");
+        }
+
         symbols = load_symbols(reader);
         foundSymbols = true;
         break;
@@ -6651,7 +7059,7 @@ function makeSymbolTable(catalog, reader) {
 
 exports.makeSymbolTable = makeSymbolTable;
 
-},{"./IonImport":10,"./IonLocalSymbolTable":11,"./IonSubstituteSymbolTable":18,"./IonSystemSymbolTable":21}],21:[function(require,module,exports){
+},{"./IonImport":11,"./IonLocalSymbolTable":12,"./IonSubstituteSymbolTable":19,"./IonSystemSymbolTable":22}],22:[function(require,module,exports){
 "use strict";
 /*!
  * Copyright 2012 Amazon.com, Inc. or its affiliates. All Rights Reserved.
@@ -6691,7 +7099,7 @@ function getSystemSymbolTableImport() {
 
 exports.getSystemSymbolTableImport = getSystemSymbolTableImport;
 
-},{"./IonImport":10,"./IonSharedSymbolTable":16}],22:[function(require,module,exports){
+},{"./IonImport":11,"./IonSharedSymbolTable":17}],23:[function(require,module,exports){
 "use strict";
 /*!
  * Copyright 2012 Amazon.com, Inc. or its affiliates. All Rights Reserved.
@@ -6728,8 +7136,8 @@ var _escapeStrings = {
   9: "\\t",
   10: "\\n",
   13: "\\r",
-  DOUBLE_QUOTE: "\\\"",
-  SINGLE_QUOTE: "\\\'",
+  DOUBLE_QUOTE: '\\"',
+  SINGLE_QUOTE: "\\'",
   SLASH: "\\\\"
 };
 
@@ -6763,7 +7171,10 @@ var _is_whitespace = _make_bool_array(" \t\r\n\x0B\f");
 var isIdentifierArray = _make_bool_array("_$0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ");
 
 function is_digit(ch) {
-  if (ch < 48 || ch > 57) return false;
+  if (ch < 48 || ch > 57) {
+    return false;
+  }
+
   return true;
 }
 
@@ -6776,11 +7187,11 @@ function is_keyword(str) {
 exports.is_keyword = is_keyword;
 
 function asAscii(s) {
-  if (typeof s === 'undefined') {
+  if (typeof s === "undefined") {
     s = "undefined::null";
-  } else if (typeof s == 'number') {
+  } else if (typeof s == "number") {
     s = "" + s;
-  } else if (typeof s != 'string') {
+  } else if (typeof s != "string") {
     var esc = nextEscape(s, s.length);
 
     if (esc >= 0) {
@@ -6795,7 +7206,9 @@ exports.asAscii = asAscii;
 
 function nextEscape(s, prev) {
   while (prev-- > 0) {
-    if (needsEscape(s.charCodeAt(prev))) break;
+    if (needsEscape(s.charCodeAt(prev))) {
+      break;
+    }
   }
 
   return prev;
@@ -6804,23 +7217,34 @@ function nextEscape(s, prev) {
 exports.nextEscape = nextEscape;
 
 function needsEscape(c) {
-  if (c < 32) return true;
-  if (c > 126) return true;
-  if (c === DOUBLE_QUOTE || c === SINGLE_QUOTE || c === SLASH) return true;
+  if (c < 32) {
+    return true;
+  }
+
+  if (c > 126) {
+    return true;
+  }
+
+  if (c === DOUBLE_QUOTE || c === SINGLE_QUOTE || c === SLASH) {
+    return true;
+  }
+
   return false;
 }
 
 exports.needsEscape = needsEscape;
 
 function escapeString(s, pos) {
-  var fixes = [],
-      c,
-      ii,
-      s2;
+  var fixes = [];
+  var c, ii, s2;
 
   while (pos >= 0) {
     c = s.charCodeAt(pos);
-    if (!needsEscape(c)) break;
+
+    if (!needsEscape(c)) {
+      break;
+    }
+
     fixes.push([pos, c]);
     pos = nextEscape(s, pos);
   }
@@ -6858,10 +7282,10 @@ exports.escapeString = escapeString;
 function escapeSequence(c) {
   var s = _escapeStrings[c];
 
-  if (typeof s === 'undefined') {
+  if (typeof s === "undefined") {
     if (c < 256) {
       s = "\\x" + toHex(c, 2);
-    } else if (c <= 0xFFFF) {
+    } else if (c <= 0xffff) {
       s = "\\u" + toHex(c, 4);
     } else {
       s = "\\U" + toHex(c, 8);
@@ -6898,7 +7322,10 @@ function is_letter(ch) {
 exports.is_letter = is_letter;
 
 function isNumericTerminator(ch) {
-  if (ch == -1) return true;
+  if (ch == -1) {
+    return true;
+  }
+
   return _is_numeric_terminator[ch];
 }
 
@@ -6917,10 +7344,22 @@ function is_operator_char(ch) {
 exports.is_operator_char = is_operator_char;
 
 function is_whitespace(ch) {
-  if (ch > 32) return false;
-  if (ch == this.WHITESPACE_COMMENT1) return true;
-  if (ch == this.WHITESPACE_COMMENT2) return true;
-  if (ch == this.ESCAPED_NEWLINE) return true;
+  if (ch > 32) {
+    return false;
+  }
+
+  if (ch == this.WHITESPACE_COMMENT1) {
+    return true;
+  }
+
+  if (ch == this.WHITESPACE_COMMENT2) {
+    return true;
+  }
+
+  if (ch == this.ESCAPED_NEWLINE) {
+    return true;
+  }
+
   return _is_whitespace[ch];
 }
 
@@ -6937,78 +7376,78 @@ function is_hex_digit(ch) {
 }
 
 exports.is_hex_digit = is_hex_digit;
-var base64chars = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '+', '/'];
+var base64chars = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "+", "/"];
 var base64inv = {
-  'A': 0,
-  'B': 1,
-  'C': 2,
-  'D': 3,
-  'E': 4,
-  'F': 5,
-  'G': 6,
-  'H': 7,
-  'I': 8,
-  'J': 9,
-  'K': 10,
-  'L': 11,
-  'M': 12,
-  'N': 13,
-  'O': 14,
-  'P': 15,
-  'Q': 16,
-  'R': 17,
-  'S': 18,
-  'T': 19,
-  'U': 20,
-  'V': 21,
-  'W': 22,
-  'X': 23,
-  'Y': 24,
-  'Z': 25,
-  'a': 26,
-  'b': 27,
-  'c': 28,
-  'd': 29,
-  'e': 30,
-  'f': 31,
-  'g': 32,
-  'h': 33,
-  'i': 34,
-  'j': 35,
-  'k': 36,
-  'l': 37,
-  'm': 38,
-  'n': 39,
-  'o': 40,
-  'p': 41,
-  'q': 42,
-  'r': 43,
-  's': 44,
-  't': 45,
-  'u': 46,
-  'v': 47,
-  'w': 48,
-  'x': 49,
-  'y': 50,
-  'z': 51,
-  '0': 52,
-  '1': 53,
-  '2': 54,
-  '3': 55,
-  '4': 56,
-  '5': 57,
-  '6': 58,
-  '7': 59,
-  '8': 60,
-  '9': 61,
-  '+': 62,
-  '/': 63
+  A: 0,
+  B: 1,
+  C: 2,
+  D: 3,
+  E: 4,
+  F: 5,
+  G: 6,
+  H: 7,
+  I: 8,
+  J: 9,
+  K: 10,
+  L: 11,
+  M: 12,
+  N: 13,
+  O: 14,
+  P: 15,
+  Q: 16,
+  R: 17,
+  S: 18,
+  T: 19,
+  U: 20,
+  V: 21,
+  W: 22,
+  X: 23,
+  Y: 24,
+  Z: 25,
+  a: 26,
+  b: 27,
+  c: 28,
+  d: 29,
+  e: 30,
+  f: 31,
+  g: 32,
+  h: 33,
+  i: 34,
+  j: 35,
+  k: 36,
+  l: 37,
+  m: 38,
+  n: 39,
+  o: 40,
+  p: 41,
+  q: 42,
+  r: 43,
+  s: 44,
+  t: 45,
+  u: 46,
+  v: 47,
+  w: 48,
+  x: 49,
+  y: 50,
+  z: 51,
+  "0": 52,
+  "1": 53,
+  "2": 54,
+  "3": 55,
+  "4": 56,
+  "5": 57,
+  "6": 58,
+  "7": 59,
+  "8": 60,
+  "9": 61,
+  "+": 62,
+  "/": 63
 };
 
 function fromBase64(str) {
   var pad = 0;
 
-  for (var i = str.length - 1; str.charAt(i) == '='; i--) {
+  for (var i = str.length - 1; str.charAt(i) == "="; i--) {
     pad++;
   }
 
@@ -7052,14 +7491,14 @@ function toBase64(buf) {
       if (i + 2 < buf.length) {
         str[i * 4 / 3 + 3] = base64chars[b2 & 63];
       } else {
-        return str.join('') + '=';
+        return str.join("") + "=";
       }
     } else {
-      return str.join('') + '==';
+      return str.join("") + "==";
     }
   }
 
-  return str.join('');
+  return str.join("");
 }
 
 exports.toBase64 = toBase64;
@@ -7128,17 +7567,17 @@ function populateWithHexEscapes(escapes, start, end) {
 }
 
 var CommonEscapes = {};
-CommonEscapes[CharCodes.NULL] = backslashEscape('0');
+CommonEscapes[CharCodes.NULL] = backslashEscape("0");
 populateWithHexEscapes(CommonEscapes, 1, 7);
-CommonEscapes[CharCodes.BELL] = backslashEscape('a');
-CommonEscapes[CharCodes.BACKSPACE] = backslashEscape('b');
-CommonEscapes[CharCodes.HORIZONTAL_TAB] = backslashEscape('t');
-CommonEscapes[CharCodes.LINE_FEED] = backslashEscape('n');
-CommonEscapes[CharCodes.VERTICAL_TAB] = backslashEscape('v');
-CommonEscapes[CharCodes.FORM_FEED] = backslashEscape('f');
-CommonEscapes[CharCodes.CARRIAGE_RETURN] = backslashEscape('r');
+CommonEscapes[CharCodes.BELL] = backslashEscape("a");
+CommonEscapes[CharCodes.BACKSPACE] = backslashEscape("b");
+CommonEscapes[CharCodes.HORIZONTAL_TAB] = backslashEscape("t");
+CommonEscapes[CharCodes.LINE_FEED] = backslashEscape("n");
+CommonEscapes[CharCodes.VERTICAL_TAB] = backslashEscape("v");
+CommonEscapes[CharCodes.FORM_FEED] = backslashEscape("f");
+CommonEscapes[CharCodes.CARRIAGE_RETURN] = backslashEscape("r");
 populateWithHexEscapes(CommonEscapes, 14, 32);
-CommonEscapes[CharCodes.BACKSLASH] = backslashEscape('\\');
+CommonEscapes[CharCodes.BACKSLASH] = backslashEscape("\\");
 populateWithHexEscapes(CommonEscapes, 0x7f, 0xa0);
 exports.ClobEscapes = (0, _extends2["default"])({}, CommonEscapes);
 exports.ClobEscapes[CharCodes.DOUBLE_QUOTE] = backslashEscape('"');
@@ -7191,8 +7630,8 @@ function isDigit(charCode) {
 exports.isDigit = isDigit;
 
 function escape(input, escapes) {
-  var escapedString = '';
-  var escapeSeq = '';
+  var escapedString = "";
+  var escapeSeq = "";
   var charCode;
   var escape;
   var lastIndex = 0;
@@ -7208,7 +7647,7 @@ function escape(input, escapes) {
 
       escapedString += input.slice(lastIndex, i) + escapeSeq;
       lastIndex = i + 1;
-      escapeSeq = '';
+      escapeSeq = "";
     }
   }
 
@@ -7217,7 +7656,7 @@ function escape(input, escapes) {
 
 exports.escape = escape;
 
-},{"@babel/runtime/helpers/extends":60,"@babel/runtime/helpers/interopRequireDefault":64}],23:[function(require,module,exports){
+},{"@babel/runtime/helpers/extends":65,"@babel/runtime/helpers/interopRequireDefault":69}],24:[function(require,module,exports){
 "use strict";
 /*!
  * Copyright 2012 Amazon.com, Inc. or its affiliates. All Rights Reserved.
@@ -7251,6 +7690,8 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.TextReader = void 0;
 
+var IntSize_1 = __importDefault(require("./IntSize"));
+
 var IonCatalog_1 = require("./IonCatalog");
 
 var IonDecimal_1 = require("./IonDecimal");
@@ -7261,15 +7702,13 @@ var IonParserTextRaw_1 = require("./IonParserTextRaw");
 
 var IonSymbols_1 = require("./IonSymbols");
 
-var IonTypes_1 = require("./IonTypes");
+var IonText_1 = require("./IonText");
 
 var IonTimestamp_1 = require("./IonTimestamp");
 
-var IonText_1 = require("./IonText");
+var IonTypes_1 = require("./IonTypes");
 
 var JsbiSupport_1 = require("./JsbiSupport");
-
-var IntSize_1 = __importDefault(require("./IntSize"));
 
 var BEGINNING_OF_CONTAINER = -2;
 var EOF = -1;
@@ -7300,7 +7739,10 @@ var TextReader = /*#__PURE__*/function () {
     key: "load_raw",
     value: function load_raw() {
       var t = this;
-      if (t._raw !== undefined) return;
+
+      if (t._raw !== undefined) {
+        return;
+      }
 
       if (t._raw_type === T_CLOB2 || t._raw_type === T_CLOB3) {
         t._raw = t._parser.get_value_as_uint8array(t._raw_type);
@@ -7328,20 +7770,34 @@ var TextReader = /*#__PURE__*/function () {
   }, {
     key: "isIVM",
     value: function isIVM(input, depth, annotations) {
-      if (depth > 0) return false;
+      if (depth > 0) {
+        return false;
+      }
+
       var ivm = "$ion_1_0";
       var prefix = "$ion_";
-      if (input.length < ivm.length || annotations.length > 0) return false;
+
+      if (input.length < ivm.length || annotations.length > 0) {
+        return false;
+      }
+
       var i = 0;
 
       while (i < prefix.length) {
-        if (prefix.charAt(i) !== input.charAt(i)) return false;
+        if (prefix.charAt(i) !== input.charAt(i)) {
+          return false;
+        }
+
         i++;
       }
 
-      while (i < input.length && input.charAt(i) != '_') {
+      while (i < input.length && input.charAt(i) != "_") {
         var ch = input.charAt(i);
-        if (ch < '0' || ch > '9') return false;
+
+        if (ch < "0" || ch > "9") {
+          return false;
+        }
+
         i++;
       }
 
@@ -7350,11 +7806,17 @@ var TextReader = /*#__PURE__*/function () {
       while (i < input.length) {
         var _ch = input.charAt(i);
 
-        if (_ch < '0' || _ch > '9') return false;
+        if (_ch < "0" || _ch > "9") {
+          return false;
+        }
+
         i++;
       }
 
-      if (input !== ivm) throw new Error("Only Ion version 1.0 is supported.");
+      if (input !== ivm) {
+        throw new Error("Only Ion version 1.0 is supported.");
+      }
+
       return true;
     }
   }, {
@@ -7366,7 +7828,10 @@ var TextReader = /*#__PURE__*/function () {
     key: "next",
     value: function next() {
       this._raw = undefined;
-      if (this._raw_type === EOF) return null;
+
+      if (this._raw_type === EOF) {
+        return null;
+      }
 
       if (this._raw_type !== BEGINNING_OF_CONTAINER && !this.isNull() && this._type && this._type.isContainer) {
         this.skip_past_container();
@@ -7378,21 +7843,41 @@ var TextReader = /*#__PURE__*/function () {
         this._raw_type = p.next();
 
         if (this._raw_type === T_IDENTIFIER) {
-          if (this._depth > 0) break;
+          if (this._depth > 0) {
+            break;
+          }
+
           this.load_raw();
-          if (!this.isIVM(this._raw, this.depth(), this.annotations())) break;
+
+          if (!this.isIVM(this._raw, this.depth(), this.annotations())) {
+            break;
+          }
+
           this._symtab = IonLocalSymbolTable_1.defaultLocalSymbolTable();
           this._raw = undefined;
           this._raw_type = undefined;
         } else if (this._raw_type === T_STRING1) {
-          if (this._depth > 0) break;
+          if (this._depth > 0) {
+            break;
+          }
+
           this.load_raw();
-          if (this._raw !== "$ion_1_0") break;
+
+          if (this._raw !== "$ion_1_0") {
+            break;
+          }
+
           this._raw = undefined;
           this._raw_type = undefined;
         } else if (this._raw_type === T_STRUCT) {
-          if (p.annotations().length !== 1) break;
-          if (p.annotations()[0].getText() != IonSymbols_1.ion_symbol_table) break;
+          if (p.annotations().length !== 1) {
+            break;
+          }
+
+          if (p.annotations()[0].getText() != IonSymbols_1.ion_symbol_table) {
+            break;
+          }
+
           this._type = IonParserTextRaw_1.get_ion_type(this._raw_type);
           this._symtab = IonSymbols_1.makeSymbolTable(this._cat, this);
           this._raw = undefined;
@@ -7434,7 +7919,7 @@ var TextReader = /*#__PURE__*/function () {
       this._raw_type = undefined;
 
       if (this._depth <= 0) {
-        throw new Error('Cannot stepOut any further, already at top level');
+        throw new Error("Cannot stepOut any further, already at top level");
       }
 
       this._depth--;
@@ -7457,13 +7942,16 @@ var TextReader = /*#__PURE__*/function () {
       if (str !== null) {
         var raw_type = this._parser.fieldNameType();
 
-        if (raw_type === T_IDENTIFIER && str.length > 1 && str[0] === '$') {
+        if (raw_type === T_IDENTIFIER && str.length > 1 && str[0] === "$") {
           var tempStr = str.substr(1, str.length);
 
           if (+tempStr === +tempStr) {
             var symbol = this._symtab.getSymbolText(Number(tempStr));
 
-            if (symbol === undefined) throw new Error("Unresolvable symbol ID, symboltokens unsupported.");
+            if (symbol === undefined) {
+              throw new Error("Unresolvable symbol ID, symboltokens unsupported.");
+            }
+
             return symbol;
           }
         }
@@ -7495,14 +7983,21 @@ var TextReader = /*#__PURE__*/function () {
   }, {
     key: "isNull",
     value: function isNull() {
-      if (this._type === IonTypes_1.IonTypes.NULL) return true;
+      if (this._type === IonTypes_1.IonTypes.NULL) {
+        return true;
+      }
+
       return this._parser.isNull();
     }
   }, {
     key: "_stringRepresentation",
     value: function _stringRepresentation() {
       this.load_raw();
-      if (this.isNull()) return this._type === IonTypes_1.IonTypes.NULL ? "null" : "null." + this._type.name;
+
+      if (this.isNull()) {
+        return this._type === IonTypes_1.IonTypes.NULL ? "null" : "null." + this._type.name;
+      }
+
       return this._raw;
     }
   }, {
@@ -7516,7 +8011,7 @@ var TextReader = /*#__PURE__*/function () {
           return this._parser.booleanValue();
       }
 
-      throw new Error('Current value is not a Boolean.');
+      throw new Error("Current value is not a Boolean.");
     }
   }, {
     key: "byteValue",
@@ -7542,7 +8037,7 @@ var TextReader = /*#__PURE__*/function () {
           return this._raw;
       }
 
-      throw new Error('Current value is not a blob or clob.');
+      throw new Error("Current value is not a blob or clob.");
     }
   }, {
     key: "decimalValue",
@@ -7555,7 +8050,7 @@ var TextReader = /*#__PURE__*/function () {
           return IonDecimal_1.Decimal.parse(this._stringRepresentation());
       }
 
-      throw new Error('Current value is not a decimal.');
+      throw new Error("Current value is not a decimal.");
     }
   }, {
     key: "bigIntValue",
@@ -7568,7 +8063,7 @@ var TextReader = /*#__PURE__*/function () {
           return this._parser.bigIntValue();
       }
 
-      throw new Error('bigIntValue() was called when the current value was a(n) ' + this._type.name);
+      throw new Error("bigIntValue() was called when the current value was a(n) " + this._type.name);
     }
   }, {
     key: "intSize",
@@ -7591,7 +8086,7 @@ var TextReader = /*#__PURE__*/function () {
           return this._parser.numberValue();
       }
 
-      throw new Error('Current value is not a float or int.');
+      throw new Error("Current value is not a float or int.");
     }
   }, {
     key: "stringValue",
@@ -7614,7 +8109,7 @@ var TextReader = /*#__PURE__*/function () {
             return null;
           }
 
-          if (this._raw_type === T_IDENTIFIER && this._raw.length > 1 && this._raw.charAt(0) === '$'.charAt(0)) {
+          if (this._raw_type === T_IDENTIFIER && this._raw.length > 1 && this._raw.charAt(0) === "$".charAt(0)) {
             var tempStr = this._raw.substr(1, this._raw.length);
 
             if (+tempStr === +tempStr) {
@@ -7622,7 +8117,10 @@ var TextReader = /*#__PURE__*/function () {
 
               var symbol = this._symtab.getSymbolText(symbolId);
 
-              if (symbol === undefined) throw new Error("Unresolvable symbol ID, symboltokens unsupported.");
+              if (symbol === undefined) {
+                throw new Error("Unresolvable symbol ID, symboltokens unsupported.");
+              }
+
               return symbol;
             }
           }
@@ -7630,7 +8128,7 @@ var TextReader = /*#__PURE__*/function () {
           return this._raw;
       }
 
-      throw new Error('Current value is not a string or symbol.');
+      throw new Error("Current value is not a string or symbol.");
     }
   }, {
     key: "timestampValue",
@@ -7643,7 +8141,7 @@ var TextReader = /*#__PURE__*/function () {
           return IonTimestamp_1.Timestamp.parse(this._stringRepresentation());
       }
 
-      throw new Error('Current value is not a timestamp.');
+      throw new Error("Current value is not a timestamp.");
     }
   }, {
     key: "value",
@@ -7653,7 +8151,7 @@ var TextReader = /*#__PURE__*/function () {
           return null;
         }
 
-        throw new Error('Unable to provide a value for ' + this._type.name + ' containers.');
+        throw new Error("Unable to provide a value for " + this._type.name + " containers.");
       }
 
       switch (this._type) {
@@ -7684,7 +8182,7 @@ var TextReader = /*#__PURE__*/function () {
           return this.timestampValue();
 
         default:
-          throw new Error('There is no current value.');
+          throw new Error("There is no current value.");
       }
     }
   }]);
@@ -7693,7 +8191,7 @@ var TextReader = /*#__PURE__*/function () {
 
 exports.TextReader = TextReader;
 
-},{"./IntSize":2,"./IonCatalog":7,"./IonDecimal":9,"./IonLocalSymbolTable":11,"./IonParserTextRaw":14,"./IonSymbols":20,"./IonText":22,"./IonTimestamp":25,"./IonTypes":27,"./JsbiSupport":31,"@babel/runtime/helpers/classCallCheck":57,"@babel/runtime/helpers/createClass":58,"@babel/runtime/helpers/interopRequireDefault":64}],24:[function(require,module,exports){
+},{"./IntSize":3,"./IonCatalog":8,"./IonDecimal":10,"./IonLocalSymbolTable":12,"./IonParserTextRaw":15,"./IonSymbols":21,"./IonText":23,"./IonTimestamp":26,"./IonTypes":28,"./JsbiSupport":32,"@babel/runtime/helpers/classCallCheck":61,"@babel/runtime/helpers/createClass":63,"@babel/runtime/helpers/interopRequireDefault":69}],25:[function(require,module,exports){
 "use strict";
 /*!
  * Copyright 2012 Amazon.com, Inc. or its affiliates. All Rights Reserved.
@@ -7745,19 +8243,19 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.TextWriter = exports.Context = exports.State = void 0;
 
-var AbstractWriter_1 = require("./AbstractWriter");
+var jsbi_1 = __importDefault(require("jsbi"));
 
-var IonUnicode_1 = require("./IonUnicode");
+var AbstractWriter_1 = require("./AbstractWriter");
 
 var IonText_1 = require("./IonText");
 
 var IonTypes_1 = require("./IonTypes");
 
-var util_1 = require("./util");
+var IonUnicode_1 = require("./IonUnicode");
 
 var JsbiSupport_1 = require("./JsbiSupport");
 
-var jsbi_1 = __importDefault(require("jsbi"));
+var util_1 = require("./util");
 
 var State;
 
@@ -7808,7 +8306,7 @@ var TextWriter = /*#__PURE__*/function (_AbstractWriter_1$Abs) {
       util_1._assertDefined(value);
 
       this._serializeValue(IonTypes_1.IonTypes.BLOB, value, function (value) {
-        _this2.writeable.writeBytes(IonUnicode_1.encodeUtf8('{{' + IonText_1.toBase64(value) + '}}'));
+        _this2.writeable.writeBytes(IonUnicode_1.encodeUtf8("{{" + IonText_1.toBase64(value) + "}}"));
       });
     }
   }, {
@@ -7873,7 +8371,7 @@ var TextWriter = /*#__PURE__*/function (_AbstractWriter_1$Abs) {
       util_1._assertDefined(value);
 
       this._serializeValue(IonTypes_1.IonTypes.DECIMAL, value, function (value) {
-        var s = '';
+        var s = "";
         var coefficient = value.getCoefficient();
 
         if (jsbi_1["default"].lessThan(coefficient, JsbiSupport_1.JsbiSupport.ZERO)) {
@@ -7881,14 +8379,14 @@ var TextWriter = /*#__PURE__*/function (_AbstractWriter_1$Abs) {
         }
 
         if (value.isNegative()) {
-          s += '-';
+          s += "-";
         }
 
         var exponent = value.getExponent();
         var scale = -exponent;
 
         if (exponent == 0) {
-          s += coefficient + '.';
+          s += coefficient + ".";
         } else if (exponent < 0) {
           var significantDigits = coefficient.toString().length;
           var adjustedExponent = significantDigits - 1 - scale;
@@ -7896,19 +8394,19 @@ var TextWriter = /*#__PURE__*/function (_AbstractWriter_1$Abs) {
           if (adjustedExponent >= 0) {
             var wholeDigits = significantDigits - scale;
             s += coefficient.toString().substring(0, wholeDigits);
-            s += '.';
+            s += ".";
             s += coefficient.toString().substring(wholeDigits, significantDigits);
           } else if (adjustedExponent >= -6) {
-            s += '0.';
-            s += '00000'.substring(0, scale - significantDigits);
+            s += "0.";
+            s += "00000".substring(0, scale - significantDigits);
             s += coefficient;
           } else {
             s += coefficient;
-            s += 'd-';
+            s += "d-";
             s += scale.toString();
           }
         } else {
-          s += coefficient + 'd' + exponent;
+          s += coefficient + "d" + exponent;
         }
 
         _this5.writeUtf8(s);
@@ -7986,7 +8484,9 @@ var TextWriter = /*#__PURE__*/function (_AbstractWriter_1$Abs) {
 
       this._writeNull(type);
 
-      if (this.currentContainer.containerType === IonTypes_1.IonTypes.STRUCT) this.currentContainer.state = State.STRUCT_FIELD;
+      if (this.currentContainer.containerType === IonTypes_1.IonTypes.STRUCT) {
+        this.currentContainer.state = State.STRUCT_FIELD;
+      }
     }
   }, {
     key: "writeString",
@@ -8038,7 +8538,7 @@ var TextWriter = /*#__PURE__*/function (_AbstractWriter_1$Abs) {
           break;
 
         case IonTypes_1.IonTypes.STRUCT:
-          if (this._annotations !== undefined && this._annotations[0] === '$ion_symbol_table' && this.depth() === 0) {
+          if (this._annotations !== undefined && this._annotations[0] === "$ion_symbol_table" && this.depth() === 0) {
             throw new Error("Unable to alter symbol table context, it allows invalid ion to be written.");
           }
 
@@ -8092,7 +8592,9 @@ var TextWriter = /*#__PURE__*/function (_AbstractWriter_1$Abs) {
   }, {
     key: "_serializeValue",
     value: function _serializeValue(type, value, serialize) {
-      if (this.currentContainer.state === State.STRUCT_FIELD) throw new Error("Expecting a struct field");
+      if (this.currentContainer.state === State.STRUCT_FIELD) {
+        throw new Error("Expecting a struct field");
+      }
 
       if (value === null) {
         this.writeNull(type);
@@ -8102,7 +8604,10 @@ var TextWriter = /*#__PURE__*/function (_AbstractWriter_1$Abs) {
       this.handleSeparator();
       this.writeAnnotations();
       serialize(value);
-      if (this.currentContainer.containerType === IonTypes_1.IonTypes.STRUCT) this.currentContainer.state = State.STRUCT_FIELD;
+
+      if (this.currentContainer.containerType === IonTypes_1.IonTypes.STRUCT) {
+        this.currentContainer.state = State.STRUCT_FIELD;
+      }
     }
   }, {
     key: "writeContainer",
@@ -8159,7 +8664,7 @@ var TextWriter = /*#__PURE__*/function (_AbstractWriter_1$Abs) {
         for (_iterator.s(); !(_step = _iterator.n()).done;) {
           var annotation = _step.value;
           this.writeSymbolToken(annotation);
-          this.writeUtf8('::');
+          this.writeUtf8("::");
         }
       } catch (err) {
         _iterator.e(err);
@@ -8191,7 +8696,7 @@ var TextWriter = /*#__PURE__*/function (_AbstractWriter_1$Abs) {
   }, {
     key: "isSid",
     value: function isSid(s) {
-      if (s.length > 1 && s.charAt(0) === '$'.charAt(0)) {
+      if (s.length > 1 && s.charAt(0) === "$".charAt(0)) {
         var t = s.substr(1, s.length);
         return +t === +t;
       }
@@ -8223,7 +8728,7 @@ var TextWriter = /*#__PURE__*/function (_AbstractWriter_1$Abs) {
         text = "-0e0";
       } else {
         text = value.toExponential();
-        var plusSignIndex = text.lastIndexOf('+');
+        var plusSignIndex = text.lastIndexOf("+");
 
         if (plusSignIndex > -1) {
           text = text.slice(0, plusSignIndex) + text.slice(plusSignIndex + 1);
@@ -8238,7 +8743,7 @@ var TextWriter = /*#__PURE__*/function (_AbstractWriter_1$Abs) {
 
 exports.TextWriter = TextWriter;
 
-},{"./AbstractWriter":1,"./IonText":22,"./IonTypes":27,"./IonUnicode":28,"./JsbiSupport":31,"./util":52,"@babel/runtime/helpers/assertThisInitialized":56,"@babel/runtime/helpers/classCallCheck":57,"@babel/runtime/helpers/createClass":58,"@babel/runtime/helpers/getPrototypeOf":62,"@babel/runtime/helpers/inherits":63,"@babel/runtime/helpers/interopRequireDefault":64,"@babel/runtime/helpers/possibleConstructorReturn":69,"jsbi":76}],25:[function(require,module,exports){
+},{"./AbstractWriter":1,"./IonText":23,"./IonTypes":28,"./IonUnicode":29,"./JsbiSupport":32,"./util":56,"@babel/runtime/helpers/assertThisInitialized":60,"@babel/runtime/helpers/classCallCheck":61,"@babel/runtime/helpers/createClass":63,"@babel/runtime/helpers/getPrototypeOf":67,"@babel/runtime/helpers/inherits":68,"@babel/runtime/helpers/interopRequireDefault":69,"@babel/runtime/helpers/possibleConstructorReturn":76,"jsbi":84}],26:[function(require,module,exports){
 "use strict";
 /*!
  * Copyright 2012 Amazon.com, Inc. or its affiliates. All Rights Reserved.
@@ -8265,6 +8770,8 @@ var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime/helpers/cl
 
 var _createClass2 = _interopRequireDefault(require("@babel/runtime/helpers/createClass"));
 
+var _TimestampParser$_tim;
+
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
@@ -8286,360 +8793,356 @@ var TimestampPrecision;
   TimestampPrecision[TimestampPrecision["SECONDS"] = 5] = "SECONDS";
 })(TimestampPrecision = exports.TimestampPrecision || (exports.TimestampPrecision = {}));
 
-var Timestamp = function () {
-  var Timestamp = /*#__PURE__*/function () {
-    function Timestamp(localOffset, year) {
-      var month = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
-      var day = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
-      var hour = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : null;
-      var minutes = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : null;
-      var seconds = arguments.length > 6 && arguments[6] !== undefined ? arguments[6] : null;
-      (0, _classCallCheck2["default"])(this, Timestamp);
-      this._localOffset = localOffset;
-      this._year = year;
-      this._precision = TimestampPrecision.YEAR;
+var Timestamp = /*#__PURE__*/function () {
+  function Timestamp(localOffset, year) {
+    var month = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
+    var day = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
+    var hour = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : null;
+    var minutes = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : null;
+    var seconds = arguments.length > 6 && arguments[6] !== undefined ? arguments[6] : null;
+    (0, _classCallCheck2["default"])(this, Timestamp);
+    this._localOffset = localOffset;
+    this._year = year;
+    this._precision = TimestampPrecision.YEAR;
 
-      this._checkRequiredField('Offset', this._localOffset, Timestamp._MIN_OFFSET, Timestamp._MAX_OFFSET);
+    this._checkRequiredField("Offset", this._localOffset, Timestamp._MIN_OFFSET, Timestamp._MAX_OFFSET);
 
-      this._checkRequiredField('Year', this._year, Timestamp._MIN_YEAR, Timestamp._MAX_YEAR);
+    this._checkRequiredField("Year", this._year, Timestamp._MIN_YEAR, Timestamp._MAX_YEAR);
 
-      this._month = this._checkOptionalField('Month', month, Timestamp._MIN_MONTH, Timestamp._MAX_MONTH, 1, TimestampPrecision.MONTH);
-      this._day = this._checkOptionalField('Day', day, Timestamp._MIN_DAY, Timestamp._MAX_DAY, 1, TimestampPrecision.DAY);
-      this._hour = this._checkOptionalField('Hour', hour, Timestamp._MIN_HOUR, Timestamp._MAX_HOUR, 0, TimestampPrecision.HOUR_AND_MINUTE);
-      this._minutes = this._checkOptionalField('Minutes', minutes, Timestamp._MIN_MINUTE, Timestamp._MAX_MINUTE, 0, TimestampPrecision.HOUR_AND_MINUTE);
+    this._month = this._checkOptionalField("Month", month, Timestamp._MIN_MONTH, Timestamp._MAX_MONTH, 1, TimestampPrecision.MONTH);
+    this._day = this._checkOptionalField("Day", day, Timestamp._MIN_DAY, Timestamp._MAX_DAY, 1, TimestampPrecision.DAY);
+    this._hour = this._checkOptionalField("Hour", hour, Timestamp._MIN_HOUR, Timestamp._MAX_HOUR, 0, TimestampPrecision.HOUR_AND_MINUTE);
+    this._minutes = this._checkOptionalField("Minutes", minutes, Timestamp._MIN_MINUTE, Timestamp._MAX_MINUTE, 0, TimestampPrecision.HOUR_AND_MINUTE);
 
-      if (typeof seconds === 'number') {
-        if (!Number.isInteger(seconds)) {
-          throw new Error('The provided seconds number was not an integer (' + seconds + ')');
-        }
-
-        this._secondsDecimal = new IonDecimal_1.Decimal(seconds, 0);
-      } else {
-        if (seconds !== null) {
-          this._secondsDecimal = seconds;
-        }
+    if (typeof seconds === "number") {
+      if (!Number.isInteger(seconds)) {
+        throw new Error("The provided seconds number was not an integer (" + seconds + ")");
       }
 
-      if (this._secondsDecimal === null || this._secondsDecimal === undefined) {
-        this._secondsDecimal = IonDecimal_1.Decimal.ZERO;
-      } else {
-        this._checkFieldRange('Seconds', this._secondsDecimal, Timestamp._MIN_SECONDS, Timestamp._MAX_SECONDS);
-
-        this._precision = TimestampPrecision.SECONDS;
+      this._secondsDecimal = new IonDecimal_1.Decimal(seconds, 0);
+    } else {
+      if (seconds !== null) {
+        this._secondsDecimal = seconds;
       }
-
-      if (this._precision <= TimestampPrecision.DAY) {
-        this._localOffset = -0;
-      }
-
-      if (this._precision > TimestampPrecision.MONTH) {
-        var tempDate = new Date(this._year, this._month, 0);
-        tempDate.setUTCFullYear(this._year);
-
-        if (this._day > tempDate.getDate()) {
-          throw new Error("Month ".concat(this._month, " has less than ").concat(this._day, " days"));
-        }
-
-        if (this._month === 2 && this._day === 29) {
-          if (!this._isLeapYear(this._year)) {
-            throw new Error("Given February 29th but year ".concat(this._year, " is not a leap year"));
-          }
-        }
-      }
-
-      var utcYear = this.getDate().getUTCFullYear();
-
-      this._checkFieldRange('Year', utcYear, Timestamp._MIN_YEAR, Timestamp._MAX_YEAR);
     }
 
-    (0, _createClass2["default"])(Timestamp, [{
-      key: "getLocalOffset",
-      value: function getLocalOffset() {
-        return this._localOffset;
-      }
-    }, {
-      key: "getPrecision",
-      value: function getPrecision() {
-        return this._precision;
-      }
-    }, {
-      key: "getDate",
-      value: function getDate() {
-        var ms = 0;
+    if (this._secondsDecimal === null || this._secondsDecimal === undefined) {
+      this._secondsDecimal = IonDecimal_1.Decimal.ZERO;
+    } else {
+      this._checkFieldRange("Seconds", this._secondsDecimal, Timestamp._MIN_SECONDS, Timestamp._MAX_SECONDS);
 
-        if (this._precision === TimestampPrecision.SECONDS) {
-          ms = Math.round((this._secondsDecimal.numberValue() - this.getSecondsInt()) * 1000);
+      this._precision = TimestampPrecision.SECONDS;
+    }
+
+    if (this._precision <= TimestampPrecision.DAY) {
+      this._localOffset = -0;
+    }
+
+    if (this._precision > TimestampPrecision.MONTH) {
+      var tempDate = new Date(this._year, this._month, 0);
+      tempDate.setUTCFullYear(this._year);
+
+      if (this._day > tempDate.getDate()) {
+        throw new Error("Month ".concat(this._month, " has less than ").concat(this._day, " days"));
+      }
+
+      if (this._month === 2 && this._day === 29) {
+        if (!this._isLeapYear(this._year)) {
+          throw new Error("Given February 29th but year ".concat(this._year, " is not a leap year"));
         }
-
-        var msSinceEpoch = Date.UTC(this._year, this._precision === TimestampPrecision.YEAR ? 0 : this._month - 1, this._day, this._hour, this._minutes, this.getSecondsInt(), ms);
-        msSinceEpoch = Timestamp._adjustMsSinceEpochIfNeeded(this._year, msSinceEpoch);
-        var offsetShiftMs = this._localOffset * 60 * 1000;
-        return new Date(msSinceEpoch - offsetShiftMs);
       }
-    }, {
-      key: "getSecondsInt",
-      value: function getSecondsInt() {
-        return this._secondsDecimal.intValue();
+    }
+
+    var utcYear = this.getDate().getUTCFullYear();
+
+    this._checkFieldRange("Year", utcYear, Timestamp._MIN_YEAR, Timestamp._MAX_YEAR);
+  }
+
+  (0, _createClass2["default"])(Timestamp, [{
+    key: "getLocalOffset",
+    value: function getLocalOffset() {
+      return this._localOffset;
+    }
+  }, {
+    key: "getPrecision",
+    value: function getPrecision() {
+      return this._precision;
+    }
+  }, {
+    key: "getDate",
+    value: function getDate() {
+      var ms = 0;
+
+      if (this._precision === TimestampPrecision.SECONDS) {
+        ms = Math.round((this._secondsDecimal.numberValue() - this.getSecondsInt()) * 1000);
       }
-    }, {
-      key: "getSecondsDecimal",
-      value: function getSecondsDecimal() {
-        return this._secondsDecimal;
+
+      var msSinceEpoch = Date.UTC(this._year, this._precision === TimestampPrecision.YEAR ? 0 : this._month - 1, this._day, this._hour, this._minutes, this.getSecondsInt(), ms);
+      msSinceEpoch = Timestamp._adjustMsSinceEpochIfNeeded(this._year, msSinceEpoch);
+      var offsetShiftMs = this._localOffset * 60 * 1000;
+      return new Date(msSinceEpoch - offsetShiftMs);
+    }
+  }, {
+    key: "getSecondsInt",
+    value: function getSecondsInt() {
+      return this._secondsDecimal.intValue();
+    }
+  }, {
+    key: "getSecondsDecimal",
+    value: function getSecondsDecimal() {
+      return this._secondsDecimal;
+    }
+  }, {
+    key: "_getFractionalSeconds",
+    value: function _getFractionalSeconds() {
+      var _Timestamp$_splitSeco = Timestamp._splitSecondsDecimal(this._secondsDecimal),
+          _Timestamp$_splitSeco2 = (0, _slicedToArray2["default"])(_Timestamp$_splitSeco, 2),
+          _ = _Timestamp$_splitSeco2[0],
+          fractionStr = _Timestamp$_splitSeco2[1];
+
+      if (fractionStr === "") {
+        return IonDecimal_1.Decimal.ZERO;
       }
-    }, {
-      key: "_getFractionalSeconds",
-      value: function _getFractionalSeconds() {
-        var _Timestamp$_splitSeco = Timestamp._splitSecondsDecimal(this._secondsDecimal),
-            _Timestamp$_splitSeco2 = (0, _slicedToArray2["default"])(_Timestamp$_splitSeco, 2),
-            _ = _Timestamp$_splitSeco2[0],
-            fractionStr = _Timestamp$_splitSeco2[1];
 
-        if (fractionStr === '') {
-          return IonDecimal_1.Decimal.ZERO;
-        }
+      return IonDecimal_1.Decimal.parse(fractionStr + "d-" + fractionStr.length);
+    }
+  }, {
+    key: "equals",
+    value: function equals(that) {
+      return this.getPrecision() === that.getPrecision() && this.getLocalOffset() === that.getLocalOffset() && util_1._sign(this.getLocalOffset()) === util_1._sign(that.getLocalOffset()) && this.compareTo(that) === 0 && this._secondsDecimal.equals(that._secondsDecimal);
+    }
+  }, {
+    key: "compareTo",
+    value: function compareTo(that) {
+      var thisMs = this.getDate().getTime();
+      var thatMs = that.getDate().getTime();
 
-        return IonDecimal_1.Decimal.parse(fractionStr + 'd-' + fractionStr.length);
+      if (thisMs === thatMs) {
+        return this.getSecondsDecimal().compareTo(that.getSecondsDecimal());
       }
-    }, {
-      key: "equals",
-      value: function equals(that) {
-        return this.getPrecision() === that.getPrecision() && this.getLocalOffset() === that.getLocalOffset() && util_1._sign(this.getLocalOffset()) === util_1._sign(that.getLocalOffset()) && this.compareTo(that) === 0 && this._secondsDecimal.equals(that._secondsDecimal);
-      }
-    }, {
-      key: "compareTo",
-      value: function compareTo(that) {
-        var thisMs = this.getDate().getTime();
-        var thatMs = that.getDate().getTime();
 
-        if (thisMs === thatMs) {
-          return this.getSecondsDecimal().compareTo(that.getSecondsDecimal());
-        }
+      return thisMs < thatMs ? -1 : 1;
+    }
+  }, {
+    key: "toString",
+    value: function toString() {
+      var strVal = "";
 
-        return thisMs < thatMs ? -1 : 1;
-      }
-    }, {
-      key: "toString",
-      value: function toString() {
-        var strVal = "";
+      switch (this._precision) {
+        default:
+          throw new Error("unrecognized timestamp precision " + this._precision);
 
-        switch (this._precision) {
-          default:
-            throw new Error("unrecognized timestamp precision " + this._precision);
+        case TimestampPrecision.SECONDS:
+          var _Timestamp$_splitSeco3 = Timestamp._splitSecondsDecimal(this._secondsDecimal),
+              _Timestamp$_splitSeco4 = (0, _slicedToArray2["default"])(_Timestamp$_splitSeco3, 2),
+              secondsStr = _Timestamp$_splitSeco4[0],
+              fractionStr = _Timestamp$_splitSeco4[1];
 
-          case TimestampPrecision.SECONDS:
-            var _Timestamp$_splitSeco3 = Timestamp._splitSecondsDecimal(this._secondsDecimal),
-                _Timestamp$_splitSeco4 = (0, _slicedToArray2["default"])(_Timestamp$_splitSeco3, 2),
-                secondsStr = _Timestamp$_splitSeco4[0],
-                fractionStr = _Timestamp$_splitSeco4[1];
+          strVal = this._lpadZeros(secondsStr, 2);
 
-            strVal = this._lpadZeros(secondsStr, 2);
+          if (fractionStr.length > 0) {
+            strVal += "." + fractionStr;
+          }
 
-            if (fractionStr.length > 0) {
-              strVal += '.' + fractionStr;
-            }
+        case TimestampPrecision.HOUR_AND_MINUTE:
+          strVal = this._lpadZeros(this._minutes, 2) + (strVal ? ":" + strVal : "");
+          strVal = this._lpadZeros(this._hour, 2) + (strVal ? ":" + strVal : "");
 
-          case TimestampPrecision.HOUR_AND_MINUTE:
-            strVal = this._lpadZeros(this._minutes, 2) + (strVal ? ":" + strVal : "");
-            strVal = this._lpadZeros(this._hour, 2) + (strVal ? ":" + strVal : "");
+        case TimestampPrecision.DAY:
+          strVal = this._lpadZeros(this._day, 2) + (strVal ? "T" + strVal : "T");
 
-          case TimestampPrecision.DAY:
-            strVal = this._lpadZeros(this._day, 2) + (strVal ? "T" + strVal : "T");
+        case TimestampPrecision.MONTH:
+          strVal = this._lpadZeros(this._month, 2) + (strVal ? "-" + strVal : "");
 
-          case TimestampPrecision.MONTH:
-            strVal = this._lpadZeros(this._month, 2) + (strVal ? "-" + strVal : "");
-
-          case TimestampPrecision.YEAR:
-            if (this._precision === TimestampPrecision.YEAR) {
-              strVal = this._lpadZeros(this._year, 4) + "T";
-            } else if (this._precision === TimestampPrecision.MONTH) {
-              strVal = this._lpadZeros(this._year, 4) + "-" + strVal + "T";
-            } else {
-              strVal = this._lpadZeros(this._year, 4) + "-" + strVal;
-            }
-
-        }
-
-        var o = this._localOffset;
-
-        if (this._precision > TimestampPrecision.DAY) {
-          if (o === 0 && util_1._sign(o) === 1) {
-            strVal = strVal + "Z";
+        case TimestampPrecision.YEAR:
+          if (this._precision === TimestampPrecision.YEAR) {
+            strVal = this._lpadZeros(this._year, 4) + "T";
+          } else if (this._precision === TimestampPrecision.MONTH) {
+            strVal = this._lpadZeros(this._year, 4) + "-" + strVal + "T";
           } else {
-            strVal += (util_1._sign(o) === -1 ? '-' : '+') + this._lpadZeros(Math.floor(Math.abs(o) / 60), 2) + ':' + this._lpadZeros(Math.abs(o) % 60, 2);
+            strVal = this._lpadZeros(this._year, 4) + "-" + strVal;
           }
-        }
 
-        return strVal;
       }
-    }, {
-      key: "toJSON",
-      value: function toJSON() {
-        return this.getDate().toISOString();
-      }
-    }, {
-      key: "_checkRequiredField",
-      value: function _checkRequiredField(fieldName, value, min, max) {
-        if (!util_1._hasValue(value)) {
-          throw new Error("".concat(fieldName, " cannot be ").concat(value));
-        }
 
-        this._checkFieldRange(fieldName, value, min, max);
-      }
-    }, {
-      key: "_checkOptionalField",
-      value: function _checkOptionalField(fieldName, value, min, max, defaultValue, precision) {
-        if (!util_1._hasValue(value)) {
-          return defaultValue;
-        }
+      var o = this._localOffset;
 
-        this._checkFieldRange(fieldName, value, min, max);
-
-        this._precision = precision;
-        return value;
-      }
-    }, {
-      key: "_checkFieldRange",
-      value: function _checkFieldRange(fieldName, value, min, max) {
-        if (value instanceof IonDecimal_1.Decimal) {
-          if (util_1._hasValue(value) && (value.compareTo(min) < 0 || value.compareTo(max) >= 0)) {
-            throw new Error("".concat(fieldName, " ").concat(value, " must be between ").concat(min, " inclusive, and ").concat(max, " exclusive"));
-          }
+      if (this._precision > TimestampPrecision.DAY) {
+        if (o === 0 && util_1._sign(o) === 1) {
+          strVal = strVal + "Z";
         } else {
-          if (!Number.isInteger(value)) {
-            throw new Error("".concat(fieldName, " ").concat(value, " must be an integer"));
-          }
-
-          if (value < min || value > max) {
-            throw new Error("".concat(fieldName, " ").concat(value, " must be between ").concat(min, " and ").concat(max, " inclusive"));
-          }
+          strVal += (util_1._sign(o) === -1 ? "-" : "+") + this._lpadZeros(Math.floor(Math.abs(o) / 60), 2) + ":" + this._lpadZeros(Math.abs(o) % 60, 2);
         }
       }
-    }, {
-      key: "_isLeapYear",
-      value: function _isLeapYear(year) {
-        if (year % 4 !== 0) {
-          return false;
+
+      return strVal;
+    }
+  }, {
+    key: "toJSON",
+    value: function toJSON() {
+      return this.getDate().toISOString();
+    }
+  }, {
+    key: "_checkRequiredField",
+    value: function _checkRequiredField(fieldName, value, min, max) {
+      if (!util_1._hasValue(value)) {
+        throw new Error("".concat(fieldName, " cannot be ").concat(value));
+      }
+
+      this._checkFieldRange(fieldName, value, min, max);
+    }
+  }, {
+    key: "_checkOptionalField",
+    value: function _checkOptionalField(fieldName, value, min, max, defaultValue, precision) {
+      if (!util_1._hasValue(value)) {
+        return defaultValue;
+      }
+
+      this._checkFieldRange(fieldName, value, min, max);
+
+      this._precision = precision;
+      return value;
+    }
+  }, {
+    key: "_checkFieldRange",
+    value: function _checkFieldRange(fieldName, value, min, max) {
+      if (value instanceof IonDecimal_1.Decimal) {
+        if (util_1._hasValue(value) && (value.compareTo(min) < 0 || value.compareTo(max) >= 0)) {
+          throw new Error("".concat(fieldName, " ").concat(value, " must be between ").concat(min, " inclusive, and ").concat(max, " exclusive"));
+        }
+      } else {
+        if (!Number.isInteger(value)) {
+          throw new Error("".concat(fieldName, " ").concat(value, " must be an integer"));
         }
 
-        if (year % 400 === 0) {
-          return true;
+        if (value < min || value > max) {
+          throw new Error("".concat(fieldName, " ").concat(value, " must be between ").concat(min, " and ").concat(max, " inclusive"));
         }
+      }
+    }
+  }, {
+    key: "_isLeapYear",
+    value: function _isLeapYear(year) {
+      if (year % 4 !== 0) {
+        return false;
+      }
 
-        if (year % 100 === 0) {
-          return year < 1600;
-        }
-
+      if (year % 400 === 0) {
         return true;
       }
-    }, {
-      key: "_lpadZeros",
-      value: function _lpadZeros(v, size) {
-        var s = v.toString();
 
-        if (s.length <= size) {
-          return '0'.repeat(size - s.length) + s;
-        }
-
-        throw new Error("Unable to fit '" + s + "' into " + size + " characters");
+      if (year % 100 === 0) {
+        return year < 1600;
       }
-    }], [{
-      key: "parse",
-      value: function parse(str) {
-        return _TimestampParser._parse(str);
+
+      return true;
+    }
+  }, {
+    key: "_lpadZeros",
+    value: function _lpadZeros(v, size) {
+      var s = v.toString();
+
+      if (s.length <= size) {
+        return "0".repeat(size - s.length) + s;
       }
-    }, {
-      key: "_adjustMsSinceEpochIfNeeded",
-      value: function _adjustMsSinceEpochIfNeeded(year, msSinceEpoch) {
-        if (year >= 100) {
-          return msSinceEpoch;
-        }
 
-        var date = new Date(msSinceEpoch);
-        date.setUTCFullYear(year);
-        return date.getTime();
+      throw new Error("Unable to fit '" + s + "' into " + size + " characters");
+    }
+  }], [{
+    key: "parse",
+    value: function parse(str) {
+      return _TimestampParser._parse(str);
+    }
+  }, {
+    key: "_adjustMsSinceEpochIfNeeded",
+    value: function _adjustMsSinceEpochIfNeeded(year, msSinceEpoch) {
+      if (year >= 100) {
+        return msSinceEpoch;
       }
-    }, {
-      key: "_splitSecondsDecimal",
-      value: function _splitSecondsDecimal(secondsDecimal) {
-        var coefStr = secondsDecimal.getCoefficient().toString();
-        var exp = secondsDecimal.getExponent();
-        var secondsStr = '';
-        var fractionStr = '';
 
-        if (exp < 0) {
-          var idx = Math.max(coefStr.length + exp, 0);
-          secondsStr = coefStr.substr(0, idx);
-          fractionStr = coefStr.substr(idx);
+      var date = new Date(msSinceEpoch);
+      date.setUTCFullYear(year);
+      return date.getTime();
+    }
+  }, {
+    key: "_splitSecondsDecimal",
+    value: function _splitSecondsDecimal(secondsDecimal) {
+      var coefStr = secondsDecimal.getCoefficient().toString();
+      var exp = secondsDecimal.getExponent();
+      var secondsStr = "";
+      var fractionStr = "";
 
-          if (-secondsDecimal.getExponent() - coefStr.length > 0) {
-            fractionStr = '0'.repeat(-exp - coefStr.length) + fractionStr;
-          }
-        } else if (exp > 0) {
-          secondsStr = coefStr + '0'.repeat(exp);
-        } else {
-          secondsStr = coefStr;
+      if (exp < 0) {
+        var idx = Math.max(coefStr.length + exp, 0);
+        secondsStr = coefStr.substr(0, idx);
+        fractionStr = coefStr.substr(idx);
+
+        if (-secondsDecimal.getExponent() - coefStr.length > 0) {
+          fractionStr = "0".repeat(-exp - coefStr.length) + fractionStr;
         }
-
-        return [secondsStr, fractionStr];
+      } else if (exp > 0) {
+        secondsStr = coefStr + "0".repeat(exp);
+      } else {
+        secondsStr = coefStr;
       }
-    }, {
-      key: "_valueOf",
-      value: function _valueOf(date, localOffset, fractionalSeconds, precision) {
-        var msSinceEpoch = date.getTime() + localOffset * 60 * 1000;
-        date = new Date(msSinceEpoch);
-        var secondsDecimal;
 
-        if (fractionalSeconds != null) {
-          var _Timestamp$_splitSeco5 = Timestamp._splitSecondsDecimal(fractionalSeconds),
-              _Timestamp$_splitSeco6 = (0, _slicedToArray2["default"])(_Timestamp$_splitSeco5, 2),
-              _ = _Timestamp$_splitSeco6[0],
-              fractionStr = _Timestamp$_splitSeco6[1];
+      return [secondsStr, fractionStr];
+    }
+  }, {
+    key: "_valueOf",
+    value: function _valueOf(date, localOffset, fractionalSeconds, precision) {
+      var msSinceEpoch = date.getTime() + localOffset * 60 * 1000;
+      date = new Date(msSinceEpoch);
+      var secondsDecimal;
 
-          secondsDecimal = IonDecimal_1.Decimal.parse(date.getUTCSeconds() + '.' + fractionStr);
-        } else {
-          secondsDecimal = IonDecimal_1.Decimal.parse(date.getUTCSeconds() + '.' + date.getUTCMilliseconds());
-        }
+      if (fractionalSeconds != null) {
+        var _Timestamp$_splitSeco5 = Timestamp._splitSecondsDecimal(fractionalSeconds),
+            _Timestamp$_splitSeco6 = (0, _slicedToArray2["default"])(_Timestamp$_splitSeco5, 2),
+            _ = _Timestamp$_splitSeco6[0],
+            fractionStr = _Timestamp$_splitSeco6[1];
 
-        switch (precision) {
-          case TimestampPrecision.YEAR:
-            return new Timestamp(localOffset, date.getUTCFullYear());
-
-          case TimestampPrecision.MONTH:
-            return new Timestamp(localOffset, date.getUTCFullYear(), date.getUTCMonth() + 1);
-
-          case TimestampPrecision.DAY:
-            return new Timestamp(localOffset, date.getUTCFullYear(), date.getUTCMonth() + 1, date.getUTCDate());
-
-          case TimestampPrecision.HOUR_AND_MINUTE:
-            return new Timestamp(localOffset, date.getUTCFullYear(), date.getUTCMonth() + 1, date.getUTCDate(), date.getUTCHours(), date.getUTCMinutes());
-
-          case TimestampPrecision.SECONDS:
-          default:
-            return new Timestamp(localOffset, date.getUTCFullYear(), date.getUTCMonth() + 1, date.getUTCDate(), date.getUTCHours(), date.getUTCMinutes(), secondsDecimal);
-        }
+        secondsDecimal = IonDecimal_1.Decimal.parse(date.getUTCSeconds() + "." + fractionStr);
+      } else {
+        secondsDecimal = IonDecimal_1.Decimal.parse(date.getUTCSeconds() + "." + date.getUTCMilliseconds());
       }
-    }]);
-    return Timestamp;
-  }();
 
-  Timestamp._MIN_SECONDS = IonDecimal_1.Decimal.ZERO;
-  Timestamp._MAX_SECONDS = IonDecimal_1.Decimal.parse('60');
-  Timestamp._MIN_MINUTE = 0;
-  Timestamp._MAX_MINUTE = 59;
-  Timestamp._MIN_HOUR = 0;
-  Timestamp._MAX_HOUR = 23;
-  Timestamp._MIN_DAY = 1;
-  Timestamp._MAX_DAY = 31;
-  Timestamp._MIN_MONTH = 1;
-  Timestamp._MAX_MONTH = 12;
-  Timestamp._MIN_YEAR = 1;
-  Timestamp._MAX_YEAR = 9999;
-  Timestamp._MIN_OFFSET = -23 * 60 - 59;
-  Timestamp._MAX_OFFSET = 23 * 60 + 59;
+      switch (precision) {
+        case TimestampPrecision.YEAR:
+          return new Timestamp(localOffset, date.getUTCFullYear());
+
+        case TimestampPrecision.MONTH:
+          return new Timestamp(localOffset, date.getUTCFullYear(), date.getUTCMonth() + 1);
+
+        case TimestampPrecision.DAY:
+          return new Timestamp(localOffset, date.getUTCFullYear(), date.getUTCMonth() + 1, date.getUTCDate());
+
+        case TimestampPrecision.HOUR_AND_MINUTE:
+          return new Timestamp(localOffset, date.getUTCFullYear(), date.getUTCMonth() + 1, date.getUTCDate(), date.getUTCHours(), date.getUTCMinutes());
+
+        case TimestampPrecision.SECONDS:
+        default:
+          return new Timestamp(localOffset, date.getUTCFullYear(), date.getUTCMonth() + 1, date.getUTCDate(), date.getUTCHours(), date.getUTCMinutes(), secondsDecimal);
+      }
+    }
+  }]);
   return Timestamp;
 }();
 
 exports.Timestamp = Timestamp;
+Timestamp._MIN_SECONDS = IonDecimal_1.Decimal.ZERO;
+Timestamp._MAX_SECONDS = IonDecimal_1.Decimal.parse("60");
+Timestamp._MIN_MINUTE = 0;
+Timestamp._MAX_MINUTE = 59;
+Timestamp._MIN_HOUR = 0;
+Timestamp._MAX_HOUR = 23;
+Timestamp._MIN_DAY = 1;
+Timestamp._MAX_DAY = 31;
+Timestamp._MIN_MONTH = 1;
+Timestamp._MAX_MONTH = 12;
+Timestamp._MIN_YEAR = 1;
+Timestamp._MAX_YEAR = 9999;
+Timestamp._MIN_OFFSET = -23 * 60 - 59;
+Timestamp._MAX_OFFSET = 23 * 60 + 59;
 
 var _States;
 
@@ -8666,218 +9169,227 @@ var _TimeParserState = function _TimeParserState(f, len) {
   this.t = t;
 };
 
-var _TimestampParser = function () {
-  var _TimestampParser$_tim;
+var _TimestampParser = /*#__PURE__*/function () {
+  function _TimestampParser() {
+    (0, _classCallCheck2["default"])(this, _TimestampParser);
+  }
 
-  var _TimestampParser = /*#__PURE__*/function () {
-    function _TimestampParser() {
-      (0, _classCallCheck2["default"])(this, _TimestampParser);
-    }
+  (0, _createClass2["default"])(_TimestampParser, null, [{
+    key: "_parse",
+    value: function _parse(str) {
+      if (str.length < 1) {
+        return null;
+      }
 
-    (0, _createClass2["default"])(_TimestampParser, null, [{
-      key: "_parse",
-      value: function _parse(str) {
-        if (str.length < 1) {
+      if (str.charCodeAt(0) === 110) {
+        if (str === "null" || str === "null.timestamp") {
           return null;
         }
 
-        if (str.charCodeAt(0) === 110) {
-          if (str === "null" || str === "null.timestamp") {
-            return null;
+        throw new Error("Illegal timestamp: " + str);
+      }
+
+      var offsetSign;
+      var offset = null;
+      var year = 0;
+      var month = null;
+      var day = null;
+      var hour = null;
+      var minute = null;
+      var secondsInt = null;
+      var fractionStr = "";
+      var pos = 0;
+      var state = _TimestampParser._timeParserStates[_States.YEAR];
+      var limit = str.length;
+      var v;
+
+      while (pos < limit) {
+        if (state.len === null) {
+          var digits = _TimestampParser._readUnknownDigits(str, pos);
+
+          if (digits.length === 0) {
+            throw new Error("No digits found at pos: " + pos);
           }
 
-          throw new Error("Illegal timestamp: " + str);
+          v = parseInt(digits, 10);
+          pos += digits.length;
+        } else if (state.len > 0) {
+          v = _TimestampParser._readDigits(str, pos, state.len);
+
+          if (v < 0) {
+            throw new Error("Non-digit value found at pos " + pos);
+          }
+
+          pos = pos + state.len;
         }
 
-        var offsetSign;
-        var offset = null;
-        var year = 0;
-        var month = null;
-        var day = null;
-        var hour = null;
-        var minute = null;
-        var secondsInt = null;
-        var fractionStr = '';
-        var pos = 0;
-        var state = _TimestampParser._timeParserStates[_States.YEAR];
-        var limit = str.length;
-        var v;
+        v = v;
 
-        while (pos < limit) {
-          if (state.len === null) {
-            var digits = _TimestampParser._readUnknownDigits(str, pos);
-
-            if (digits.length === 0) throw new Error("No digits found at pos: " + pos);
-            v = parseInt(digits, 10);
-            pos += digits.length;
-          } else if (state.len > 0) {
-            v = _TimestampParser._readDigits(str, pos, state.len);
-            if (v < 0) throw new Error("Non-digit value found at pos " + pos);
-            pos = pos + state.len;
-          }
-
-          v = v;
-
-          switch (state.f) {
-            case _States.YEAR:
-              year = v;
-              break;
-
-            case _States.MONTH:
-              month = v;
-              break;
-
-            case _States.DAY:
-              day = v;
-              break;
-
-            case _States.HOUR:
-              hour = v;
-              break;
-
-            case _States.MINUTE:
-              minute = v;
-              break;
-
-            case _States.SECONDS:
-              secondsInt = v;
-              break;
-
-            case _States.FRACTIONAL_SECONDS:
-              fractionStr = str.substring(20, pos);
-              break;
-
-            case _States.OFFSET_POSITIVE:
-              offsetSign = 1;
-              offset = v * 60;
-              break;
-
-            case _States.OFFSET_NEGATIVE:
-              offsetSign = -1;
-              offset = v * 60;
-              break;
-
-            case _States.OFFSET_MINUTES:
-              offset += v;
-              if (v >= 60) throw new Error("Minute offset " + String(v) + " above maximum or equal to : 60");
-              break;
-
-            case _States.OFFSET_ZULU:
-              offsetSign = 1;
-              offset = 0;
-              break;
-
-            case _States.OFFSET_UNKNOWN:
-              offset = -0;
-              break;
-
-            default:
-              throw new Error("invalid internal state");
-          }
-
-          if (pos >= limit) {
+        switch (state.f) {
+          case _States.YEAR:
+            year = v;
             break;
-          }
 
-          if (state.t !== null) {
-            var c = String.fromCharCode(str.charCodeAt(pos));
-            state = _TimestampParser._timeParserStates[state.t[c]];
-            if (state === undefined) throw new Error("State was not set pos:" + pos);
+          case _States.MONTH:
+            month = v;
+            break;
 
-            if (state.f === _States.OFFSET_ZULU) {
-              offsetSign = 1;
-              offset = 0;
+          case _States.DAY:
+            day = v;
+            break;
+
+          case _States.HOUR:
+            hour = v;
+            break;
+
+          case _States.MINUTE:
+            minute = v;
+            break;
+
+          case _States.SECONDS:
+            secondsInt = v;
+            break;
+
+          case _States.FRACTIONAL_SECONDS:
+            fractionStr = str.substring(20, pos);
+            break;
+
+          case _States.OFFSET_POSITIVE:
+            offsetSign = 1;
+            offset = v * 60;
+            break;
+
+          case _States.OFFSET_NEGATIVE:
+            offsetSign = -1;
+            offset = v * 60;
+            break;
+
+          case _States.OFFSET_MINUTES:
+            offset += v;
+
+            if (v >= 60) {
+              throw new Error("Minute offset " + String(v) + " above maximum or equal to : 60");
             }
-          }
 
-          pos++;
-        }
-
-        if (offset === null) {
-          if (minute !== null) {
-            throw new Error('invalid timestamp, missing local offset: "' + str + '"');
-          }
-
-          offset = -0;
-        } else {
-          offset = offsetSign * offset;
-        }
-
-        var seconds = undefined;
-
-        if (secondsInt !== undefined && secondsInt !== null || fractionStr) {
-          seconds = IonDecimal_1.Decimal.parse(secondsInt + '.' + (fractionStr ? fractionStr : ''));
-        }
-
-        return new Timestamp(offset, year, month, day, hour, minute, seconds);
-      }
-    }, {
-      key: "_readUnknownDigits",
-      value: function _readUnknownDigits(str, pos) {
-        var i = pos;
-
-        for (; i < str.length; i++) {
-          if (!IonText_1.isDigit(str.charCodeAt(i))) {
             break;
+
+          case _States.OFFSET_ZULU:
+            offsetSign = 1;
+            offset = 0;
+            break;
+
+          case _States.OFFSET_UNKNOWN:
+            offset = -0;
+            break;
+
+          default:
+            throw new Error("invalid internal state");
+        }
+
+        if (pos >= limit) {
+          break;
+        }
+
+        if (state.t !== null) {
+          var c = String.fromCharCode(str.charCodeAt(pos));
+          state = _TimestampParser._timeParserStates[state.t[c]];
+
+          if (state === undefined) {
+            throw new Error("State was not set pos:" + pos);
+          }
+
+          if (state.f === _States.OFFSET_ZULU) {
+            offsetSign = 1;
+            offset = 0;
           }
         }
 
-        return str.substring(pos, i);
+        pos++;
       }
-    }, {
-      key: "_readDigits",
-      value: function _readDigits(str, pos, len) {
-        var v = 0;
 
-        for (var i = pos; i < pos + len; i++) {
-          var c = str.charCodeAt(i) - 48;
-
-          if (c < 0 && c > 9) {
-            return -1;
-          }
-
-          v = v * 10 + c;
+      if (offset === null) {
+        if (minute !== null) {
+          throw new Error('invalid timestamp, missing local offset: "' + str + '"');
         }
 
-        return v;
+        offset = -0;
+      } else {
+        offset = offsetSign * offset;
       }
-    }]);
-    return _TimestampParser;
-  }();
 
-  _TimestampParser._timeParserStates = (_TimestampParser$_tim = {}, (0, _defineProperty2["default"])(_TimestampParser$_tim, _States.YEAR, new _TimeParserState(_States.YEAR, 4, {
-    "T": _States.OFFSET_UNKNOWN,
-    "-": _States.MONTH
-  })), (0, _defineProperty2["default"])(_TimestampParser$_tim, _States.MONTH, new _TimeParserState(_States.MONTH, 2, {
-    "T": _States.OFFSET_UNKNOWN,
-    "-": _States.DAY
-  })), (0, _defineProperty2["default"])(_TimestampParser$_tim, _States.DAY, new _TimeParserState(_States.DAY, 2, {
-    "T": _States.HOUR
-  })), (0, _defineProperty2["default"])(_TimestampParser$_tim, _States.HOUR, new _TimeParserState(_States.HOUR, 2, {
-    ":": _States.MINUTE
-  })), (0, _defineProperty2["default"])(_TimestampParser$_tim, _States.MINUTE, new _TimeParserState(_States.MINUTE, 2, {
-    ":": _States.SECONDS,
-    "+": _States.OFFSET_POSITIVE,
-    "-": _States.OFFSET_NEGATIVE,
-    "Z": _States.OFFSET_ZULU
-  })), (0, _defineProperty2["default"])(_TimestampParser$_tim, _States.SECONDS, new _TimeParserState(_States.SECONDS, 2, {
-    ".": _States.FRACTIONAL_SECONDS,
-    "+": _States.OFFSET_POSITIVE,
-    "-": _States.OFFSET_NEGATIVE,
-    "Z": _States.OFFSET_ZULU
-  })), (0, _defineProperty2["default"])(_TimestampParser$_tim, _States.FRACTIONAL_SECONDS, new _TimeParserState(_States.FRACTIONAL_SECONDS, null, {
-    "+": _States.OFFSET_POSITIVE,
-    "-": _States.OFFSET_NEGATIVE,
-    "Z": _States.OFFSET_ZULU
-  })), (0, _defineProperty2["default"])(_TimestampParser$_tim, _States.OFFSET_POSITIVE, new _TimeParserState(_States.OFFSET_POSITIVE, 2, {
-    ":": _States.OFFSET_MINUTES
-  })), (0, _defineProperty2["default"])(_TimestampParser$_tim, _States.OFFSET_NEGATIVE, new _TimeParserState(_States.OFFSET_NEGATIVE, 2, {
-    ":": _States.OFFSET_MINUTES
-  })), (0, _defineProperty2["default"])(_TimestampParser$_tim, _States.OFFSET_MINUTES, new _TimeParserState(_States.OFFSET_MINUTES, 2)), (0, _defineProperty2["default"])(_TimestampParser$_tim, _States.OFFSET_ZULU, new _TimeParserState(_States.OFFSET_ZULU, 0)), (0, _defineProperty2["default"])(_TimestampParser$_tim, _States.OFFSET_UNKNOWN, new _TimeParserState(_States.OFFSET_UNKNOWN, 0)), _TimestampParser$_tim);
+      var seconds;
+
+      if (secondsInt !== undefined && secondsInt !== null || fractionStr) {
+        seconds = IonDecimal_1.Decimal.parse(secondsInt + "." + (fractionStr ? fractionStr : ""));
+      }
+
+      return new Timestamp(offset, year, month, day, hour, minute, seconds);
+    }
+  }, {
+    key: "_readUnknownDigits",
+    value: function _readUnknownDigits(str, pos) {
+      var i = pos;
+
+      for (; i < str.length; i++) {
+        if (!IonText_1.isDigit(str.charCodeAt(i))) {
+          break;
+        }
+      }
+
+      return str.substring(pos, i);
+    }
+  }, {
+    key: "_readDigits",
+    value: function _readDigits(str, pos, len) {
+      var v = 0;
+
+      for (var i = pos; i < pos + len; i++) {
+        var c = str.charCodeAt(i) - 48;
+
+        if (c < 0 && c > 9) {
+          return -1;
+        }
+
+        v = v * 10 + c;
+      }
+
+      return v;
+    }
+  }]);
   return _TimestampParser;
 }();
 
-},{"./IonDecimal":9,"./IonText":22,"./util":52,"@babel/runtime/helpers/classCallCheck":57,"@babel/runtime/helpers/createClass":58,"@babel/runtime/helpers/defineProperty":59,"@babel/runtime/helpers/interopRequireDefault":64,"@babel/runtime/helpers/slicedToArray":71}],26:[function(require,module,exports){
+_TimestampParser._timeParserStates = (_TimestampParser$_tim = {}, (0, _defineProperty2["default"])(_TimestampParser$_tim, _States.YEAR, new _TimeParserState(_States.YEAR, 4, {
+  T: _States.OFFSET_UNKNOWN,
+  "-": _States.MONTH
+})), (0, _defineProperty2["default"])(_TimestampParser$_tim, _States.MONTH, new _TimeParserState(_States.MONTH, 2, {
+  T: _States.OFFSET_UNKNOWN,
+  "-": _States.DAY
+})), (0, _defineProperty2["default"])(_TimestampParser$_tim, _States.DAY, new _TimeParserState(_States.DAY, 2, {
+  T: _States.HOUR
+})), (0, _defineProperty2["default"])(_TimestampParser$_tim, _States.HOUR, new _TimeParserState(_States.HOUR, 2, {
+  ":": _States.MINUTE
+})), (0, _defineProperty2["default"])(_TimestampParser$_tim, _States.MINUTE, new _TimeParserState(_States.MINUTE, 2, {
+  ":": _States.SECONDS,
+  "+": _States.OFFSET_POSITIVE,
+  "-": _States.OFFSET_NEGATIVE,
+  Z: _States.OFFSET_ZULU
+})), (0, _defineProperty2["default"])(_TimestampParser$_tim, _States.SECONDS, new _TimeParserState(_States.SECONDS, 2, {
+  ".": _States.FRACTIONAL_SECONDS,
+  "+": _States.OFFSET_POSITIVE,
+  "-": _States.OFFSET_NEGATIVE,
+  Z: _States.OFFSET_ZULU
+})), (0, _defineProperty2["default"])(_TimestampParser$_tim, _States.FRACTIONAL_SECONDS, new _TimeParserState(_States.FRACTIONAL_SECONDS, null, {
+  "+": _States.OFFSET_POSITIVE,
+  "-": _States.OFFSET_NEGATIVE,
+  Z: _States.OFFSET_ZULU
+})), (0, _defineProperty2["default"])(_TimestampParser$_tim, _States.OFFSET_POSITIVE, new _TimeParserState(_States.OFFSET_POSITIVE, 2, {
+  ":": _States.OFFSET_MINUTES
+})), (0, _defineProperty2["default"])(_TimestampParser$_tim, _States.OFFSET_NEGATIVE, new _TimeParserState(_States.OFFSET_NEGATIVE, 2, {
+  ":": _States.OFFSET_MINUTES
+})), (0, _defineProperty2["default"])(_TimestampParser$_tim, _States.OFFSET_MINUTES, new _TimeParserState(_States.OFFSET_MINUTES, 2)), (0, _defineProperty2["default"])(_TimestampParser$_tim, _States.OFFSET_ZULU, new _TimeParserState(_States.OFFSET_ZULU, 0)), (0, _defineProperty2["default"])(_TimestampParser$_tim, _States.OFFSET_UNKNOWN, new _TimeParserState(_States.OFFSET_UNKNOWN, 0)), _TimestampParser$_tim);
+
+},{"./IonDecimal":10,"./IonText":23,"./util":56,"@babel/runtime/helpers/classCallCheck":61,"@babel/runtime/helpers/createClass":63,"@babel/runtime/helpers/defineProperty":64,"@babel/runtime/helpers/interopRequireDefault":69,"@babel/runtime/helpers/slicedToArray":78}],27:[function(require,module,exports){
 "use strict";
 /*!
  * Copyright 2012 Amazon.com, Inc. or its affiliates. All Rights Reserved.
@@ -8915,7 +9427,7 @@ var IonType = function IonType(binaryTypeId, name, isScalar, isLob, isNumeric, i
 
 exports.IonType = IonType;
 
-},{"@babel/runtime/helpers/classCallCheck":57,"@babel/runtime/helpers/interopRequireDefault":64}],27:[function(require,module,exports){
+},{"@babel/runtime/helpers/classCallCheck":61,"@babel/runtime/helpers/interopRequireDefault":69}],28:[function(require,module,exports){
 "use strict";
 /*!
  * Copyright 2012 Amazon.com, Inc. or its affiliates. All Rights Reserved.
@@ -8955,7 +9467,7 @@ exports.IonTypes = {
   STRUCT: new IonType_1.IonType(13, "struct", false, false, false, true)
 };
 
-},{"./IonType":26}],28:[function(require,module,exports){
+},{"./IonType":27}],29:[function(require,module,exports){
 "use strict";
 /*!
  * Copyright 2012 Amazon.com, Inc. or its affiliates. All Rights Reserved.
@@ -8979,8 +9491,8 @@ exports.decodeUtf8 = exports.encodeUtf8 = void 0;
 
 function encodeUtf8(s) {
   var i = 0,
-      bytes = new Uint8Array(s.length * 4),
       c;
+  var bytes = new Uint8Array(s.length * 4);
 
   for (var ci = 0; ci < s.length; ci++) {
     c = s.charCodeAt(ci);
@@ -8994,13 +9506,22 @@ function encodeUtf8(s) {
       bytes[i++] = c >> 6 | 192;
     } else {
       if (c > 0xd7ff && c < 0xdc00) {
-        if (++ci >= s.length) throw new Error('UTF-8 encode: incomplete surrogate pair');
+        if (++ci >= s.length) {
+          throw new Error("UTF-8 encode: incomplete surrogate pair");
+        }
+
         var c2 = s.charCodeAt(ci);
-        if (c2 < 0xdc00 || c2 > 0xdfff) throw new Error('UTF-8 encode: second surrogate character 0x' + c2.toString(16) + ' at index ' + ci + ' out of range');
+
+        if (c2 < 0xdc00 || c2 > 0xdfff) {
+          throw new Error("UTF-8 encode: second surrogate character 0x" + c2.toString(16) + " at index " + ci + " out of range");
+        }
+
         c = 0x10000 + ((c & 0x03ff) << 10) + (c2 & 0x03ff);
         bytes[i++] = c >> 18 | 240;
         bytes[i++] = c >> 12 & 63 | 128;
-      } else bytes[i++] = c >> 12 | 224;
+      } else {
+        bytes[i++] = c >> 12 | 224;
+      }
 
       bytes[i++] = c >> 6 & 63 | 128;
     }
@@ -9015,7 +9536,7 @@ exports.encodeUtf8 = encodeUtf8;
 
 function decodeUtf8(bytes) {
   var i = 0,
-      s = '',
+      s = "",
       c;
 
   while (i < bytes.length) {
@@ -9023,22 +9544,37 @@ function decodeUtf8(bytes) {
 
     if (c > 127) {
       if (c > 191 && c < 224) {
-        if (i >= bytes.length) throw new Error('UTF-8 decode: incomplete 2-byte sequence');
+        if (i >= bytes.length) {
+          throw new Error("UTF-8 decode: incomplete 2-byte sequence");
+        }
+
         c = (c & 31) << 6 | bytes[i++] & 63;
       } else if (c > 223 && c < 240) {
-        if (i + 1 >= bytes.length) throw new Error('UTF-8 decode: incomplete 3-byte sequence');
+        if (i + 1 >= bytes.length) {
+          throw new Error("UTF-8 decode: incomplete 3-byte sequence");
+        }
+
         c = (c & 15) << 12 | (bytes[i++] & 63) << 6 | bytes[i++] & 63;
       } else if (c > 239 && c < 248) {
-        if (i + 2 >= bytes.length) throw new Error('UTF-8 decode: incomplete 4-byte sequence');
+        if (i + 2 >= bytes.length) {
+          throw new Error("UTF-8 decode: incomplete 4-byte sequence");
+        }
+
         c = (c & 7) << 18 | (bytes[i++] & 63) << 12 | (bytes[i++] & 63) << 6 | bytes[i++] & 63;
-      } else throw new Error('UTF-8 decode: unknown multibyte start 0x' + c.toString(16) + ' at index ' + (i - 1));
+      } else {
+        throw new Error("UTF-8 decode: unknown multibyte start 0x" + c.toString(16) + " at index " + (i - 1));
+      }
     }
 
-    if (c <= 0xffff) s += String.fromCharCode(c);else if (c <= 0x10ffff) {
+    if (c <= 0xffff) {
+      s += String.fromCharCode(c);
+    } else if (c <= 0x10ffff) {
       c -= 0x10000;
       s += String.fromCharCode(c >> 10 | 0xd800);
-      s += String.fromCharCode(c & 0x3FF | 0xdc00);
-    } else throw new Error('UTF-8 decode: code point 0x' + c.toString(16) + ' exceeds UTF-16 reach');
+      s += String.fromCharCode(c & 0x3ff | 0xdc00);
+    } else {
+      throw new Error("UTF-8 decode: code point 0x" + c.toString(16) + " exceeds UTF-16 reach");
+    }
   }
 
   return s;
@@ -9046,7 +9582,7 @@ function decodeUtf8(bytes) {
 
 exports.decodeUtf8 = decodeUtf8;
 
-},{}],29:[function(require,module,exports){
+},{}],30:[function(require,module,exports){
 "use strict";
 /*!
  * Copyright 2012 Amazon.com, Inc. or its affiliates. All Rights Reserved.
@@ -9098,7 +9634,10 @@ var Writeable = /*#__PURE__*/function () {
   }, {
     key: "writeBytes",
     value: function writeBytes(buf, offset, length) {
-      if (offset === undefined) offset = 0;
+      if (offset === undefined) {
+        offset = 0;
+      }
+
       var writeLength = length !== undefined ? Math.min(buf.length - offset, length) : buf.length - offset;
 
       if (writeLength < this.currentBuffer.length - this.index - 1) {
@@ -9115,7 +9654,10 @@ var Writeable = /*#__PURE__*/function () {
   }, {
     key: "getBytes",
     value: function getBytes() {
-      if (this.clean) return this.buffers[0];
+      if (this.clean) {
+        return this.buffers[0];
+      }
+
       var buffer = new Uint8Array(this.totalSize);
       var tempLength = 0;
 
@@ -9152,7 +9694,7 @@ var Writeable = /*#__PURE__*/function () {
 
 exports.Writeable = Writeable;
 
-},{"@babel/runtime/helpers/classCallCheck":57,"@babel/runtime/helpers/createClass":58,"@babel/runtime/helpers/interopRequireDefault":64}],30:[function(require,module,exports){
+},{"@babel/runtime/helpers/classCallCheck":61,"@babel/runtime/helpers/createClass":63,"@babel/runtime/helpers/interopRequireDefault":69}],31:[function(require,module,exports){
 "use strict";
 /*!
  * Copyright 2012 Amazon.com, Inc. or its affiliates. All Rights Reserved.
@@ -9190,114 +9732,110 @@ var jsbi_1 = __importDefault(require("jsbi"));
 
 var JsbiSupport_1 = require("./JsbiSupport");
 
-var JsbiSerde = function () {
-  var JsbiSerde = /*#__PURE__*/function () {
-    function JsbiSerde() {
-      (0, _classCallCheck2["default"])(this, JsbiSerde);
+var JsbiSerde = /*#__PURE__*/function () {
+  function JsbiSerde() {
+    (0, _classCallCheck2["default"])(this, JsbiSerde);
+  }
+
+  (0, _createClass2["default"])(JsbiSerde, null, [{
+    key: "toSignedIntBytes",
+    value: function toSignedIntBytes(value, isNegative) {
+      var bytes = this.toUnsignedIntBytes(value);
+
+      if (bytes[0] >= 128) {
+        var extendedBytes = new Uint8Array(bytes.length + 1);
+        extendedBytes.set(bytes, 1);
+        bytes = extendedBytes;
+      }
+
+      if (isNegative) {
+        bytes[0] += 0x80;
+      }
+
+      return bytes;
     }
+  }, {
+    key: "fromUnsignedBytes",
+    value: function fromUnsignedBytes(bytes) {
+      var magnitude = JsbiSupport_1.JsbiSupport.ZERO;
 
-    (0, _createClass2["default"])(JsbiSerde, null, [{
-      key: "toSignedIntBytes",
-      value: function toSignedIntBytes(value, isNegative) {
-        var bytes = this.toUnsignedIntBytes(value);
+      for (var m = 0; m < bytes.length; m++) {
+        var _byte = jsbi_1["default"].BigInt(bytes[m]);
 
-        if (bytes[0] >= 128) {
-          var extendedBytes = new Uint8Array(bytes.length + 1);
-          extendedBytes.set(bytes, 1);
-          bytes = extendedBytes;
-        }
-
-        if (isNegative) {
-          bytes[0] += 0x80;
-        }
-
-        return bytes;
+        magnitude = jsbi_1["default"].leftShift(magnitude, this.BITS_PER_BYTE);
+        magnitude = jsbi_1["default"].bitwiseOr(magnitude, _byte);
       }
-    }, {
-      key: "fromUnsignedBytes",
-      value: function fromUnsignedBytes(bytes) {
-        var magnitude = JsbiSupport_1.JsbiSupport.ZERO;
 
-        for (var m = 0; m < bytes.length; m++) {
-          var _byte = jsbi_1["default"].BigInt(bytes[m]);
-
-          magnitude = jsbi_1["default"].leftShift(magnitude, this.BITS_PER_BYTE);
-          magnitude = jsbi_1["default"].bitwiseOr(magnitude, _byte);
-        }
-
-        return magnitude;
+      return magnitude;
+    }
+  }, {
+    key: "toUnsignedIntBytes",
+    value: function toUnsignedIntBytes(value) {
+      if (JsbiSupport_1.JsbiSupport.isNegative(value)) {
+        value = jsbi_1["default"].unaryMinus(value);
       }
-    }, {
-      key: "toUnsignedIntBytes",
-      value: function toUnsignedIntBytes(value) {
-        if (JsbiSupport_1.JsbiSupport.isNegative(value)) {
-          value = jsbi_1["default"].unaryMinus(value);
-        }
 
-        var sizeInBytes = this.getUnsignedIntSizeInBytes(value);
-        var bytes = new Uint8Array(sizeInBytes);
+      var sizeInBytes = this.getUnsignedIntSizeInBytes(value);
+      var bytes = new Uint8Array(sizeInBytes);
 
-        for (var m = sizeInBytes - 1; m >= 0; m--) {
-          var lastByte = jsbi_1["default"].toNumber(jsbi_1["default"].bitwiseAnd(value, this.BYTE_MAX_VALUE));
-          value = jsbi_1["default"].signedRightShift(value, this.BITS_PER_BYTE);
-          bytes[m] = lastByte;
-        }
-
-        return bytes;
+      for (var m = sizeInBytes - 1; m >= 0; m--) {
+        var lastByte = jsbi_1["default"].toNumber(jsbi_1["default"].bitwiseAnd(value, this.BYTE_MAX_VALUE));
+        value = jsbi_1["default"].signedRightShift(value, this.BITS_PER_BYTE);
+        bytes[m] = lastByte;
       }
-    }, {
-      key: "getUnsignedIntSizeInBytes",
-      value: function getUnsignedIntSizeInBytes(value) {
-        for (var m = 0; m < this.SIZE_THRESHOLDS.length; m++) {
-          var _threshold = this.SIZE_THRESHOLDS[m];
 
-          if (jsbi_1["default"].lessThanOrEqual(value, _threshold)) {
-            return m + 1;
-          }
+      return bytes;
+    }
+  }, {
+    key: "getUnsignedIntSizeInBytes",
+    value: function getUnsignedIntSizeInBytes(value) {
+      for (var m = 0; m < this.SIZE_THRESHOLDS.length; m++) {
+        var _threshold = this.SIZE_THRESHOLDS[m];
+
+        if (jsbi_1["default"].lessThanOrEqual(value, _threshold)) {
+          return m + 1;
         }
-
-        var sizeInBytes = this.SIZE_THRESHOLDS.length;
-        var threshold = this.calculateSizeThreshold(sizeInBytes);
-
-        while (jsbi_1["default"].greaterThan(value, threshold)) {
-          sizeInBytes++;
-          threshold = this.calculateSizeThreshold(sizeInBytes);
-        }
-
-        return sizeInBytes;
       }
-    }, {
-      key: "calculateSizeThresholds",
-      value: function calculateSizeThresholds() {
-        var thresholds = [];
 
-        for (var m = 1; m <= this.SERIALIZED_JSBI_SIZES_TO_PRECOMPUTE; m++) {
-          thresholds.push(this.calculateSizeThreshold(m));
-        }
+      var sizeInBytes = this.SIZE_THRESHOLDS.length;
+      var threshold = this.calculateSizeThreshold(sizeInBytes);
 
-        return thresholds;
+      while (jsbi_1["default"].greaterThan(value, threshold)) {
+        sizeInBytes++;
+        threshold = this.calculateSizeThreshold(sizeInBytes);
       }
-    }, {
-      key: "calculateSizeThreshold",
-      value: function calculateSizeThreshold(numberOfBytes) {
-        var exponent = jsbi_1["default"].multiply(jsbi_1["default"].BigInt(numberOfBytes), this.BITS_PER_BYTE);
-        var threshold = jsbi_1["default"].exponentiate(JsbiSupport_1.JsbiSupport.TWO, exponent);
-        return jsbi_1["default"].subtract(threshold, JsbiSupport_1.JsbiSupport.ONE);
-      }
-    }]);
-    return JsbiSerde;
-  }();
 
-  JsbiSerde.SERIALIZED_JSBI_SIZES_TO_PRECOMPUTE = 64;
-  JsbiSerde.BITS_PER_BYTE = jsbi_1["default"].BigInt(8);
-  JsbiSerde.BYTE_MAX_VALUE = jsbi_1["default"].BigInt(0xFF);
-  JsbiSerde.SIZE_THRESHOLDS = JsbiSerde.calculateSizeThresholds();
+      return sizeInBytes;
+    }
+  }, {
+    key: "calculateSizeThresholds",
+    value: function calculateSizeThresholds() {
+      var thresholds = [];
+
+      for (var m = 1; m <= this.SERIALIZED_JSBI_SIZES_TO_PRECOMPUTE; m++) {
+        thresholds.push(this.calculateSizeThreshold(m));
+      }
+
+      return thresholds;
+    }
+  }, {
+    key: "calculateSizeThreshold",
+    value: function calculateSizeThreshold(numberOfBytes) {
+      var exponent = jsbi_1["default"].multiply(jsbi_1["default"].BigInt(numberOfBytes), this.BITS_PER_BYTE);
+      var threshold = jsbi_1["default"].exponentiate(JsbiSupport_1.JsbiSupport.TWO, exponent);
+      return jsbi_1["default"].subtract(threshold, JsbiSupport_1.JsbiSupport.ONE);
+    }
+  }]);
   return JsbiSerde;
 }();
 
 exports.JsbiSerde = JsbiSerde;
+JsbiSerde.SERIALIZED_JSBI_SIZES_TO_PRECOMPUTE = 64;
+JsbiSerde.BITS_PER_BYTE = jsbi_1["default"].BigInt(8);
+JsbiSerde.BYTE_MAX_VALUE = jsbi_1["default"].BigInt(0xff);
+JsbiSerde.SIZE_THRESHOLDS = JsbiSerde.calculateSizeThresholds();
 
-},{"./JsbiSupport":31,"@babel/runtime/helpers/classCallCheck":57,"@babel/runtime/helpers/createClass":58,"@babel/runtime/helpers/interopRequireDefault":64,"jsbi":76}],31:[function(require,module,exports){
+},{"./JsbiSupport":32,"@babel/runtime/helpers/classCallCheck":61,"@babel/runtime/helpers/createClass":63,"@babel/runtime/helpers/interopRequireDefault":69,"jsbi":84}],32:[function(require,module,exports){
 "use strict";
 /*!
  * Copyright 2012 Amazon.com, Inc. or its affiliates. All Rights Reserved.
@@ -9333,74 +9871,70 @@ exports.JsbiSupport = void 0;
 
 var jsbi_1 = __importDefault(require("jsbi"));
 
-var JsbiSupport = function () {
-  var JsbiSupport = /*#__PURE__*/function () {
-    function JsbiSupport() {
-      (0, _classCallCheck2["default"])(this, JsbiSupport);
+var JsbiSupport = /*#__PURE__*/function () {
+  function JsbiSupport() {
+    (0, _classCallCheck2["default"])(this, JsbiSupport);
+  }
+
+  (0, _createClass2["default"])(JsbiSupport, null, [{
+    key: "isZero",
+    value: function isZero(value) {
+      return jsbi_1["default"].equal(value, JsbiSupport.ZERO);
     }
+  }, {
+    key: "isNegative",
+    value: function isNegative(value) {
+      return jsbi_1["default"].lessThan(value, JsbiSupport.ZERO);
+    }
+  }, {
+    key: "bigIntFromString",
+    value: function bigIntFromString(text) {
+      var isNegative = false;
+      var magnitudeText = text.trimLeft();
 
-    (0, _createClass2["default"])(JsbiSupport, null, [{
-      key: "isZero",
-      value: function isZero(value) {
-        return jsbi_1["default"].equal(value, JsbiSupport.ZERO);
+      if (text.startsWith("-")) {
+        isNegative = true;
+        magnitudeText = text.substring(1);
       }
-    }, {
-      key: "isNegative",
-      value: function isNegative(value) {
-        return jsbi_1["default"].lessThan(value, JsbiSupport.ZERO);
+
+      var bigInt = jsbi_1["default"].BigInt(magnitudeText);
+
+      if (isNegative) {
+        bigInt = jsbi_1["default"].unaryMinus(bigInt);
       }
-    }, {
-      key: "bigIntFromString",
-      value: function bigIntFromString(text) {
-        var isNegative = false;
-        var magnitudeText = text.trimLeft();
 
-        if (text.startsWith('-')) {
-          isNegative = true;
-          magnitudeText = text.substring(1);
-        }
-
-        var bigInt = jsbi_1["default"].BigInt(magnitudeText);
-
-        if (isNegative) {
-          bigInt = jsbi_1["default"].unaryMinus(bigInt);
-        }
-
-        return bigInt;
+      return bigInt;
+    }
+  }, {
+    key: "clampToSafeIntegerRange",
+    value: function clampToSafeIntegerRange(value) {
+      if (jsbi_1["default"].greaterThan(value, this.NUMBER_MAX_SAFE_INTEGER)) {
+        return Number.MAX_SAFE_INTEGER;
       }
-    }, {
-      key: "clampToSafeIntegerRange",
-      value: function clampToSafeIntegerRange(value) {
-        if (jsbi_1["default"].greaterThan(value, this.NUMBER_MAX_SAFE_INTEGER)) {
-          return Number.MAX_SAFE_INTEGER;
-        }
 
-        if (jsbi_1["default"].lessThan(value, this.NUMBER_MIN_SAFE_INTEGER)) {
-          return Number.MIN_SAFE_INTEGER;
-        }
-
-        return jsbi_1["default"].toNumber(value);
+      if (jsbi_1["default"].lessThan(value, this.NUMBER_MIN_SAFE_INTEGER)) {
+        return Number.MIN_SAFE_INTEGER;
       }
-    }, {
-      key: "isSafeInteger",
-      value: function isSafeInteger(value) {
-        return jsbi_1["default"].greaterThanOrEqual(value, this.NUMBER_MIN_SAFE_INTEGER) && jsbi_1["default"].lessThanOrEqual(value, this.NUMBER_MAX_SAFE_INTEGER);
-      }
-    }]);
-    return JsbiSupport;
-  }();
 
-  JsbiSupport.ZERO = jsbi_1["default"].BigInt(0);
-  JsbiSupport.ONE = jsbi_1["default"].BigInt(1);
-  JsbiSupport.TWO = jsbi_1["default"].BigInt(2);
-  JsbiSupport.NUMBER_MAX_SAFE_INTEGER = jsbi_1["default"].BigInt(Number.MAX_SAFE_INTEGER);
-  JsbiSupport.NUMBER_MIN_SAFE_INTEGER = jsbi_1["default"].BigInt(Number.MIN_SAFE_INTEGER);
+      return jsbi_1["default"].toNumber(value);
+    }
+  }, {
+    key: "isSafeInteger",
+    value: function isSafeInteger(value) {
+      return jsbi_1["default"].greaterThanOrEqual(value, this.NUMBER_MIN_SAFE_INTEGER) && jsbi_1["default"].lessThanOrEqual(value, this.NUMBER_MAX_SAFE_INTEGER);
+    }
+  }]);
   return JsbiSupport;
 }();
 
 exports.JsbiSupport = JsbiSupport;
+JsbiSupport.ZERO = jsbi_1["default"].BigInt(0);
+JsbiSupport.ONE = jsbi_1["default"].BigInt(1);
+JsbiSupport.TWO = jsbi_1["default"].BigInt(2);
+JsbiSupport.NUMBER_MAX_SAFE_INTEGER = jsbi_1["default"].BigInt(Number.MAX_SAFE_INTEGER);
+JsbiSupport.NUMBER_MIN_SAFE_INTEGER = jsbi_1["default"].BigInt(Number.MIN_SAFE_INTEGER);
 
-},{"@babel/runtime/helpers/classCallCheck":57,"@babel/runtime/helpers/createClass":58,"@babel/runtime/helpers/interopRequireDefault":64,"jsbi":76}],32:[function(require,module,exports){
+},{"@babel/runtime/helpers/classCallCheck":61,"@babel/runtime/helpers/createClass":63,"@babel/runtime/helpers/interopRequireDefault":69,"jsbi":84}],33:[function(require,module,exports){
 "use strict";
 /*!
  * Copyright 2012 Amazon.com, Inc. or its affiliates. All Rights Reserved.
@@ -9475,7 +10009,7 @@ var SignAndMagnitudeInt = /*#__PURE__*/function () {
 
 exports["default"] = SignAndMagnitudeInt;
 
-},{"./JsbiSupport":31,"@babel/runtime/helpers/classCallCheck":57,"@babel/runtime/helpers/createClass":58,"@babel/runtime/helpers/interopRequireDefault":64,"jsbi":76}],33:[function(require,module,exports){
+},{"./JsbiSupport":32,"@babel/runtime/helpers/classCallCheck":61,"@babel/runtime/helpers/createClass":63,"@babel/runtime/helpers/interopRequireDefault":69,"jsbi":84}],34:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -9531,8 +10065,8 @@ var Blob = /*#__PURE__*/function (_Lob_1$Lob) {
 
 exports.Blob = Blob;
 
-},{"../Ion":3,"./Lob":42,"@babel/runtime/helpers/classCallCheck":57,"@babel/runtime/helpers/createClass":58,"@babel/runtime/helpers/getPrototypeOf":62,"@babel/runtime/helpers/inherits":63,"@babel/runtime/helpers/interopRequireDefault":64,"@babel/runtime/helpers/possibleConstructorReturn":69}],34:[function(require,module,exports){
-(function (global){
+},{"../Ion":4,"./Lob":43,"@babel/runtime/helpers/classCallCheck":61,"@babel/runtime/helpers/createClass":63,"@babel/runtime/helpers/getPrototypeOf":67,"@babel/runtime/helpers/inherits":68,"@babel/runtime/helpers/interopRequireDefault":69,"@babel/runtime/helpers/possibleConstructorReturn":76}],35:[function(require,module,exports){
+(function (global){(function (){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -9558,9 +10092,9 @@ exports.Boolean = void 0;
 
 var Ion_1 = require("../Ion");
 
-var Value_1 = require("./Value");
-
 var FromJsConstructor_1 = require("./FromJsConstructor");
+
+var Value_1 = require("./Value");
 
 var _fromJsConstructor = new FromJsConstructor_1.FromJsConstructorBuilder().withPrimitives(FromJsConstructor_1.Primitives.Boolean).withClassesToUnbox(global.Boolean).build();
 
@@ -9598,8 +10132,8 @@ var Boolean = /*#__PURE__*/function (_Value_1$Value) {
 
 exports.Boolean = Boolean;
 
-}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../Ion":3,"./FromJsConstructor":38,"./Value":50,"@babel/runtime/helpers/classCallCheck":57,"@babel/runtime/helpers/createClass":58,"@babel/runtime/helpers/getPrototypeOf":62,"@babel/runtime/helpers/inherits":63,"@babel/runtime/helpers/interopRequireDefault":64,"@babel/runtime/helpers/possibleConstructorReturn":69}],35:[function(require,module,exports){
+}).call(this)}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{"../Ion":4,"./FromJsConstructor":39,"./Value":51,"@babel/runtime/helpers/classCallCheck":61,"@babel/runtime/helpers/createClass":63,"@babel/runtime/helpers/getPrototypeOf":67,"@babel/runtime/helpers/inherits":68,"@babel/runtime/helpers/interopRequireDefault":69,"@babel/runtime/helpers/possibleConstructorReturn":76}],36:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -9653,7 +10187,7 @@ var Clob = /*#__PURE__*/function (_Lob_1$Lob) {
   }, {
     key: "toJSON",
     value: function toJSON() {
-      var encodedText = '';
+      var encodedText = "";
 
       var _iterator = _createForOfIteratorHelper(this),
           _step;
@@ -9689,7 +10223,7 @@ var Clob = /*#__PURE__*/function (_Lob_1$Lob) {
 
 exports.Clob = Clob;
 
-},{"../Ion":3,"./Lob":42,"@babel/runtime/helpers/classCallCheck":57,"@babel/runtime/helpers/createClass":58,"@babel/runtime/helpers/getPrototypeOf":62,"@babel/runtime/helpers/inherits":63,"@babel/runtime/helpers/interopRequireDefault":64,"@babel/runtime/helpers/possibleConstructorReturn":69}],36:[function(require,module,exports){
+},{"../Ion":4,"./Lob":43,"@babel/runtime/helpers/classCallCheck":61,"@babel/runtime/helpers/createClass":63,"@babel/runtime/helpers/getPrototypeOf":67,"@babel/runtime/helpers/inherits":68,"@babel/runtime/helpers/interopRequireDefault":69,"@babel/runtime/helpers/possibleConstructorReturn":76}],37:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -9734,7 +10268,7 @@ var __importStar = void 0 && (void 0).__importStar || function (mod) {
   if (mod && mod.__esModule) return mod;
   var result = {};
   if (mod != null) for (var k in mod) {
-    if (Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
   }
 
   __setModuleDefault(result, mod);
@@ -9747,13 +10281,13 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.Decimal = void 0;
 
-var Value_1 = require("./Value");
-
 var ion = __importStar(require("../Ion"));
 
 var Ion_1 = require("../Ion");
 
 var FromJsConstructor_1 = require("./FromJsConstructor");
+
+var Value_1 = require("./Value");
 
 var _fromJsConstructor = new FromJsConstructor_1.FromJsConstructorBuilder().withClasses(ion.Decimal).build();
 
@@ -9808,7 +10342,7 @@ var Decimal = /*#__PURE__*/function (_Value_1$Value) {
 
 exports.Decimal = Decimal;
 
-},{"../Ion":3,"./FromJsConstructor":38,"./Value":50,"@babel/runtime/helpers/classCallCheck":57,"@babel/runtime/helpers/createClass":58,"@babel/runtime/helpers/getPrototypeOf":62,"@babel/runtime/helpers/inherits":63,"@babel/runtime/helpers/interopRequireDefault":64,"@babel/runtime/helpers/possibleConstructorReturn":69}],37:[function(require,module,exports){
+},{"../Ion":4,"./FromJsConstructor":39,"./Value":51,"@babel/runtime/helpers/classCallCheck":61,"@babel/runtime/helpers/createClass":63,"@babel/runtime/helpers/getPrototypeOf":67,"@babel/runtime/helpers/inherits":68,"@babel/runtime/helpers/interopRequireDefault":69,"@babel/runtime/helpers/possibleConstructorReturn":76}],38:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -9834,9 +10368,9 @@ exports.Float = void 0;
 
 var Ion_1 = require("../Ion");
 
-var Value_1 = require("./Value");
-
 var FromJsConstructor_1 = require("./FromJsConstructor");
+
+var Value_1 = require("./Value");
 
 var _fromJsConstructor = new FromJsConstructor_1.FromJsConstructorBuilder().withPrimitives(FromJsConstructor_1.Primitives.Number).withClassesToUnbox(Number).build();
 
@@ -9874,7 +10408,7 @@ var Float = /*#__PURE__*/function (_Value_1$Value) {
 
 exports.Float = Float;
 
-},{"../Ion":3,"./FromJsConstructor":38,"./Value":50,"@babel/runtime/helpers/classCallCheck":57,"@babel/runtime/helpers/createClass":58,"@babel/runtime/helpers/getPrototypeOf":62,"@babel/runtime/helpers/inherits":63,"@babel/runtime/helpers/interopRequireDefault":64,"@babel/runtime/helpers/possibleConstructorReturn":69}],38:[function(require,module,exports){
+},{"../Ion":4,"./FromJsConstructor":39,"./Value":51,"@babel/runtime/helpers/classCallCheck":61,"@babel/runtime/helpers/createClass":63,"@babel/runtime/helpers/getPrototypeOf":67,"@babel/runtime/helpers/inherits":68,"@babel/runtime/helpers/interopRequireDefault":69,"@babel/runtime/helpers/possibleConstructorReturn":76}],39:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -10004,7 +10538,7 @@ exports.Primitives = {
   String: "string"
 };
 
-},{"../Ion":3,"../util":52,"@babel/runtime/helpers/classCallCheck":57,"@babel/runtime/helpers/createClass":58,"@babel/runtime/helpers/interopRequireDefault":64,"@babel/runtime/helpers/typeof":74}],39:[function(require,module,exports){
+},{"../Ion":4,"../util":56,"@babel/runtime/helpers/classCallCheck":61,"@babel/runtime/helpers/createClass":63,"@babel/runtime/helpers/interopRequireDefault":69,"@babel/runtime/helpers/typeof":81}],40:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -10038,9 +10572,9 @@ var jsbi_1 = __importDefault(require("jsbi"));
 
 var Ion_1 = require("../Ion");
 
-var Value_1 = require("./Value");
-
 var FromJsConstructor_1 = require("./FromJsConstructor");
+
+var Value_1 = require("./Value");
 
 var _jsbiConstructor = jsbi_1["default"];
 
@@ -10118,7 +10652,7 @@ var Integer = /*#__PURE__*/function (_Value_1$Value) {
 
 exports.Integer = Integer;
 
-},{"../Ion":3,"./FromJsConstructor":38,"./Value":50,"@babel/runtime/helpers/classCallCheck":57,"@babel/runtime/helpers/createClass":58,"@babel/runtime/helpers/getPrototypeOf":62,"@babel/runtime/helpers/inherits":63,"@babel/runtime/helpers/interopRequireDefault":64,"@babel/runtime/helpers/possibleConstructorReturn":69,"jsbi":76}],40:[function(require,module,exports){
+},{"../Ion":4,"./FromJsConstructor":39,"./Value":51,"@babel/runtime/helpers/classCallCheck":61,"@babel/runtime/helpers/createClass":63,"@babel/runtime/helpers/getPrototypeOf":67,"@babel/runtime/helpers/inherits":68,"@babel/runtime/helpers/interopRequireDefault":69,"@babel/runtime/helpers/possibleConstructorReturn":76,"jsbi":84}],41:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -10136,11 +10670,11 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports._ionValueFromJsValue = exports._domConstructorFor = void 0;
 
-var IonTypes_1 = require("../IonTypes");
+var jsbi_1 = __importDefault(require("jsbi"));
 
 var Ion_1 = require("../Ion");
 
-var jsbi_1 = __importDefault(require("jsbi"));
+var IonTypes_1 = require("../IonTypes");
 
 var util_1 = require("../util");
 
@@ -10199,8 +10733,8 @@ function _inferType(value) {
 
   if (value instanceof jsbi_1["default"]) {
     return IonTypes_1.IonTypes.INT;
-  } else if (typeof value === 'bigint') {
-    throw new Error('bigints are not supported without using Babel for JSBI compilation.');
+  } else if (typeof value === "bigint") {
+    throw new Error("bigints are not supported without using Babel for JSBI compilation.");
   }
 
   if (value instanceof Number) {
@@ -10246,7 +10780,7 @@ function _ionValueFromJsValue(value) {
 
 exports._ionValueFromJsValue = _ionValueFromJsValue;
 
-},{"../Ion":3,"../IonTypes":27,"../util":52,"@babel/runtime/helpers/interopRequireDefault":64,"@babel/runtime/helpers/typeof":74,"jsbi":76}],41:[function(require,module,exports){
+},{"../Ion":4,"../IonTypes":28,"../util":56,"@babel/runtime/helpers/interopRequireDefault":69,"@babel/runtime/helpers/typeof":81,"jsbi":84}],42:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -10288,7 +10822,7 @@ var List = /*#__PURE__*/function (_Sequence_1$Sequence) {
 
 exports.List = List;
 
-},{"../Ion":3,"./Sequence":45,"@babel/runtime/helpers/classCallCheck":57,"@babel/runtime/helpers/getPrototypeOf":62,"@babel/runtime/helpers/inherits":63,"@babel/runtime/helpers/interopRequireDefault":64,"@babel/runtime/helpers/possibleConstructorReturn":69}],42:[function(require,module,exports){
+},{"../Ion":4,"./Sequence":46,"@babel/runtime/helpers/classCallCheck":61,"@babel/runtime/helpers/getPrototypeOf":67,"@babel/runtime/helpers/inherits":68,"@babel/runtime/helpers/interopRequireDefault":69,"@babel/runtime/helpers/possibleConstructorReturn":76}],43:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -10312,9 +10846,9 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.Lob = void 0;
 
-var Value_1 = require("./Value");
-
 var FromJsConstructor_1 = require("./FromJsConstructor");
+
+var Value_1 = require("./Value");
 
 var _fromJsConstructor = new FromJsConstructor_1.FromJsConstructorBuilder().withClasses(Uint8Array).build();
 
@@ -10348,7 +10882,7 @@ function Lob(ionType) {
 
 exports.Lob = Lob;
 
-},{"./FromJsConstructor":38,"./Value":50,"@babel/runtime/helpers/classCallCheck":57,"@babel/runtime/helpers/createClass":58,"@babel/runtime/helpers/getPrototypeOf":62,"@babel/runtime/helpers/inherits":63,"@babel/runtime/helpers/interopRequireDefault":64,"@babel/runtime/helpers/possibleConstructorReturn":69}],43:[function(require,module,exports){
+},{"./FromJsConstructor":39,"./Value":51,"@babel/runtime/helpers/classCallCheck":61,"@babel/runtime/helpers/createClass":63,"@babel/runtime/helpers/getPrototypeOf":67,"@babel/runtime/helpers/inherits":68,"@babel/runtime/helpers/interopRequireDefault":69,"@babel/runtime/helpers/possibleConstructorReturn":76}],44:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -10374,144 +10908,140 @@ exports.Null = void 0;
 
 var Ion_1 = require("../Ion");
 
-var Value_1 = require("./Value");
-
 var FromJsConstructor_1 = require("./FromJsConstructor");
 
-var Null = function () {
-  var Null = /*#__PURE__*/function (_Value_1$Value) {
-    (0, _inherits2["default"])(Null, _Value_1$Value);
+var Value_1 = require("./Value");
 
-    var _super = _createSuper(Null);
+var Null = /*#__PURE__*/function (_Value_1$Value) {
+  (0, _inherits2["default"])(Null, _Value_1$Value);
 
-    function Null() {
-      var _this;
+  var _super = _createSuper(Null);
 
-      var ionType = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : Ion_1.IonTypes.NULL;
-      var annotations = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
-      (0, _classCallCheck2["default"])(this, Null);
-      _this = _super.call(this);
-      _this._ionType = ionType;
+  function Null() {
+    var _this;
 
-      _this._setAnnotations(annotations);
+    var ionType = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : Ion_1.IonTypes.NULL;
+    var annotations = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
+    (0, _classCallCheck2["default"])(this, Null);
+    _this = _super.call(this);
+    _this._ionType = ionType;
 
-      return _this;
+    _this._setAnnotations(annotations);
+
+    return _this;
+  }
+
+  (0, _createClass2["default"])(Null, [{
+    key: "isNull",
+    value: function isNull() {
+      return true;
     }
-
-    (0, _createClass2["default"])(Null, [{
-      key: "isNull",
-      value: function isNull() {
-        return true;
-      }
-    }, {
-      key: "_convertToJsNull",
-      value: function _convertToJsNull(operation) {
-        if (Null._operationIsSupported(this.getType(), operation)) {
-          return null;
-        }
-
-        throw new Error("".concat(operation, "() is not supported by Ion type ").concat(this.getType().name));
-      }
-    }, {
-      key: "_unsupportedOperationOrNullDereference",
-      value: function _unsupportedOperationOrNullDereference(operation) {
-        if (Null._operationIsSupported(this.getType(), operation)) {
-          throw new Error("".concat(operation, "() called on a null ").concat(this.getType().name, "."));
-        }
-
-        throw new Error("".concat(operation, "() is not supported by Ion type ").concat(this.getType().name));
-      }
-    }, {
-      key: "booleanValue",
-      value: function booleanValue() {
-        return this._convertToJsNull('booleanValue');
-      }
-    }, {
-      key: "numberValue",
-      value: function numberValue() {
-        return this._convertToJsNull('numberValue');
-      }
-    }, {
-      key: "bigIntValue",
-      value: function bigIntValue() {
-        return this._convertToJsNull('bigIntValue');
-      }
-    }, {
-      key: "decimalValue",
-      value: function decimalValue() {
-        return this._convertToJsNull('decimalValue');
-      }
-    }, {
-      key: "stringValue",
-      value: function stringValue() {
-        return this._convertToJsNull('stringValue');
-      }
-    }, {
-      key: "dateValue",
-      value: function dateValue() {
-        return this._convertToJsNull('dateValue');
-      }
-    }, {
-      key: "uInt8ArrayValue",
-      value: function uInt8ArrayValue() {
-        return this._convertToJsNull('uInt8ArrayValue');
-      }
-    }, {
-      key: "fieldNames",
-      value: function fieldNames() {
-        this._unsupportedOperationOrNullDereference('fieldNames');
-      }
-    }, {
-      key: "fields",
-      value: function fields() {
-        this._unsupportedOperationOrNullDereference('fields');
-      }
-    }, {
-      key: "elements",
-      value: function elements() {
-        this._unsupportedOperationOrNullDereference('elements');
-      }
-    }, {
-      key: "get",
-      value: function get() {
+  }, {
+    key: "_convertToJsNull",
+    value: function _convertToJsNull(operation) {
+      if (Null._operationIsSupported(this.getType(), operation)) {
         return null;
       }
-    }, {
-      key: "toString",
-      value: function toString() {
-        if (this.getType() == Ion_1.IonTypes.NULL) {
-          return 'null';
-        }
 
-        return 'null.' + this._ionType.name;
+      throw new Error("".concat(operation, "() is not supported by Ion type ").concat(this.getType().name));
+    }
+  }, {
+    key: "_unsupportedOperationOrNullDereference",
+    value: function _unsupportedOperationOrNullDereference(operation) {
+      if (Null._operationIsSupported(this.getType(), operation)) {
+        throw new Error("".concat(operation, "() called on a null ").concat(this.getType().name, "."));
       }
-    }, {
-      key: "toJSON",
-      value: function toJSON() {
-        return null;
-      }
-    }, {
-      key: "writeTo",
-      value: function writeTo(writer) {
-        writer.setAnnotations(this.getAnnotations());
-        writer.writeNull(this.getType());
-      }
-    }], [{
-      key: "_operationIsSupported",
-      value: function _operationIsSupported(ionType, operation) {
-        return Null._supportedIonTypesByOperation.get(operation).has(ionType);
-      }
-    }]);
-    return Null;
-  }(Value_1.Value(Object, Ion_1.IonTypes.NULL, FromJsConstructor_1.FromJsConstructor.NONE));
 
-  Null._supportedIonTypesByOperation = new Map([['booleanValue', new Set([Ion_1.IonTypes.BOOL])], ['numberValue', new Set([Ion_1.IonTypes.INT, Ion_1.IonTypes.FLOAT, Ion_1.IonTypes.DECIMAL])], ['bigIntValue', new Set([Ion_1.IonTypes.INT])], ['decimalValue', new Set([Ion_1.IonTypes.DECIMAL])], ['stringValue', new Set([Ion_1.IonTypes.STRING, Ion_1.IonTypes.SYMBOL])], ['dateValue', new Set([Ion_1.IonTypes.TIMESTAMP])], ['timestampValue', new Set([Ion_1.IonTypes.TIMESTAMP])], ['uInt8ArrayValue', new Set([Ion_1.IonTypes.BLOB, Ion_1.IonTypes.CLOB])], ['fields', new Set([Ion_1.IonTypes.STRUCT])], ['fieldNames', new Set([Ion_1.IonTypes.STRUCT])], ['elements', new Set([Ion_1.IonTypes.LIST, Ion_1.IonTypes.SEXP, Ion_1.IonTypes.STRUCT])]]);
+      throw new Error("".concat(operation, "() is not supported by Ion type ").concat(this.getType().name));
+    }
+  }, {
+    key: "booleanValue",
+    value: function booleanValue() {
+      return this._convertToJsNull("booleanValue");
+    }
+  }, {
+    key: "numberValue",
+    value: function numberValue() {
+      return this._convertToJsNull("numberValue");
+    }
+  }, {
+    key: "bigIntValue",
+    value: function bigIntValue() {
+      return this._convertToJsNull("bigIntValue");
+    }
+  }, {
+    key: "decimalValue",
+    value: function decimalValue() {
+      return this._convertToJsNull("decimalValue");
+    }
+  }, {
+    key: "stringValue",
+    value: function stringValue() {
+      return this._convertToJsNull("stringValue");
+    }
+  }, {
+    key: "dateValue",
+    value: function dateValue() {
+      return this._convertToJsNull("dateValue");
+    }
+  }, {
+    key: "uInt8ArrayValue",
+    value: function uInt8ArrayValue() {
+      return this._convertToJsNull("uInt8ArrayValue");
+    }
+  }, {
+    key: "fieldNames",
+    value: function fieldNames() {
+      this._unsupportedOperationOrNullDereference("fieldNames");
+    }
+  }, {
+    key: "fields",
+    value: function fields() {
+      this._unsupportedOperationOrNullDereference("fields");
+    }
+  }, {
+    key: "elements",
+    value: function elements() {
+      this._unsupportedOperationOrNullDereference("elements");
+    }
+  }, {
+    key: "get",
+    value: function get() {
+      return null;
+    }
+  }, {
+    key: "toString",
+    value: function toString() {
+      if (this.getType() == Ion_1.IonTypes.NULL) {
+        return "null";
+      }
+
+      return "null." + this._ionType.name;
+    }
+  }, {
+    key: "toJSON",
+    value: function toJSON() {
+      return null;
+    }
+  }, {
+    key: "writeTo",
+    value: function writeTo(writer) {
+      writer.setAnnotations(this.getAnnotations());
+      writer.writeNull(this.getType());
+    }
+  }], [{
+    key: "_operationIsSupported",
+    value: function _operationIsSupported(ionType, operation) {
+      return Null._supportedIonTypesByOperation.get(operation).has(ionType);
+    }
+  }]);
   return Null;
-}();
+}(Value_1.Value(Object, Ion_1.IonTypes.NULL, FromJsConstructor_1.FromJsConstructor.NONE));
 
 exports.Null = Null;
+Null._supportedIonTypesByOperation = new Map([["booleanValue", new Set([Ion_1.IonTypes.BOOL])], ["numberValue", new Set([Ion_1.IonTypes.INT, Ion_1.IonTypes.FLOAT, Ion_1.IonTypes.DECIMAL])], ["bigIntValue", new Set([Ion_1.IonTypes.INT])], ["decimalValue", new Set([Ion_1.IonTypes.DECIMAL])], ["stringValue", new Set([Ion_1.IonTypes.STRING, Ion_1.IonTypes.SYMBOL])], ["dateValue", new Set([Ion_1.IonTypes.TIMESTAMP])], ["timestampValue", new Set([Ion_1.IonTypes.TIMESTAMP])], ["uInt8ArrayValue", new Set([Ion_1.IonTypes.BLOB, Ion_1.IonTypes.CLOB])], ["fields", new Set([Ion_1.IonTypes.STRUCT])], ["fieldNames", new Set([Ion_1.IonTypes.STRUCT])], ["elements", new Set([Ion_1.IonTypes.LIST, Ion_1.IonTypes.SEXP, Ion_1.IonTypes.STRUCT])]]);
 
-},{"../Ion":3,"./FromJsConstructor":38,"./Value":50,"@babel/runtime/helpers/classCallCheck":57,"@babel/runtime/helpers/createClass":58,"@babel/runtime/helpers/getPrototypeOf":62,"@babel/runtime/helpers/inherits":63,"@babel/runtime/helpers/interopRequireDefault":64,"@babel/runtime/helpers/possibleConstructorReturn":69}],44:[function(require,module,exports){
+},{"../Ion":4,"./FromJsConstructor":39,"./Value":51,"@babel/runtime/helpers/classCallCheck":61,"@babel/runtime/helpers/createClass":63,"@babel/runtime/helpers/getPrototypeOf":67,"@babel/runtime/helpers/inherits":68,"@babel/runtime/helpers/interopRequireDefault":69,"@babel/runtime/helpers/possibleConstructorReturn":76}],45:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -10553,7 +11083,7 @@ var SExpression = /*#__PURE__*/function (_Sequence_1$Sequence) {
   (0, _createClass2["default"])(SExpression, [{
     key: "toString",
     value: function toString() {
-      return '(' + this.join(' ') + ')';
+      return "(" + this.join(" ") + ")";
     }
   }]);
   return SExpression;
@@ -10561,7 +11091,7 @@ var SExpression = /*#__PURE__*/function (_Sequence_1$Sequence) {
 
 exports.SExpression = SExpression;
 
-},{"../Ion":3,"./Sequence":45,"@babel/runtime/helpers/classCallCheck":57,"@babel/runtime/helpers/createClass":58,"@babel/runtime/helpers/getPrototypeOf":62,"@babel/runtime/helpers/inherits":63,"@babel/runtime/helpers/interopRequireDefault":64,"@babel/runtime/helpers/possibleConstructorReturn":69}],45:[function(require,module,exports){
+},{"../Ion":4,"./Sequence":46,"@babel/runtime/helpers/classCallCheck":61,"@babel/runtime/helpers/createClass":63,"@babel/runtime/helpers/getPrototypeOf":67,"@babel/runtime/helpers/inherits":68,"@babel/runtime/helpers/interopRequireDefault":69,"@babel/runtime/helpers/possibleConstructorReturn":76}],46:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -10595,9 +11125,9 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.Sequence = void 0;
 
-var Value_1 = require("./Value");
-
 var FromJsConstructor_1 = require("./FromJsConstructor");
+
+var Value_1 = require("./Value");
 
 function Sequence(ionType) {
   return /*#__PURE__*/function (_Value_1$Value) {
@@ -10640,7 +11170,7 @@ function Sequence(ionType) {
         }
 
         if (pathElements.length === 0) {
-          throw new Error('Value#get requires at least one parameter.');
+          throw new Error("Value#get requires at least one parameter.");
         }
 
         var pathHead = pathElements[0],
@@ -10668,7 +11198,7 @@ function Sequence(ionType) {
     }, {
       key: "toString",
       value: function toString() {
-        return '[' + this.join(', ') + ']';
+        return "[" + this.join(", ") + "]";
       }
     }, {
       key: "writeTo",
@@ -10711,8 +11241,8 @@ function Sequence(ionType) {
 
 exports.Sequence = Sequence;
 
-},{"./FromJsConstructor":38,"./Value":50,"@babel/runtime/helpers/classCallCheck":57,"@babel/runtime/helpers/createClass":58,"@babel/runtime/helpers/getPrototypeOf":62,"@babel/runtime/helpers/inherits":63,"@babel/runtime/helpers/interopRequireDefault":64,"@babel/runtime/helpers/possibleConstructorReturn":69,"@babel/runtime/helpers/toConsumableArray":73,"@babel/runtime/helpers/typeof":74}],46:[function(require,module,exports){
-(function (global){
+},{"./FromJsConstructor":39,"./Value":51,"@babel/runtime/helpers/classCallCheck":61,"@babel/runtime/helpers/createClass":63,"@babel/runtime/helpers/getPrototypeOf":67,"@babel/runtime/helpers/inherits":68,"@babel/runtime/helpers/interopRequireDefault":69,"@babel/runtime/helpers/possibleConstructorReturn":76,"@babel/runtime/helpers/toConsumableArray":80,"@babel/runtime/helpers/typeof":81}],47:[function(require,module,exports){
+(function (global){(function (){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -10738,9 +11268,9 @@ exports.String = void 0;
 
 var Ion_1 = require("../Ion");
 
-var Value_1 = require("./Value");
-
 var FromJsConstructor_1 = require("./FromJsConstructor");
+
+var Value_1 = require("./Value");
 
 var _fromJsConstructor = new FromJsConstructor_1.FromJsConstructorBuilder().withPrimitives(FromJsConstructor_1.Primitives.String).withClassesToUnbox(global.String).build();
 
@@ -10778,8 +11308,8 @@ var String = /*#__PURE__*/function (_Value_1$Value) {
 
 exports.String = String;
 
-}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../Ion":3,"./FromJsConstructor":38,"./Value":50,"@babel/runtime/helpers/classCallCheck":57,"@babel/runtime/helpers/createClass":58,"@babel/runtime/helpers/getPrototypeOf":62,"@babel/runtime/helpers/inherits":63,"@babel/runtime/helpers/interopRequireDefault":64,"@babel/runtime/helpers/possibleConstructorReturn":69}],47:[function(require,module,exports){
+}).call(this)}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{"../Ion":4,"./FromJsConstructor":39,"./Value":51,"@babel/runtime/helpers/classCallCheck":61,"@babel/runtime/helpers/createClass":63,"@babel/runtime/helpers/getPrototypeOf":67,"@babel/runtime/helpers/inherits":68,"@babel/runtime/helpers/interopRequireDefault":69,"@babel/runtime/helpers/possibleConstructorReturn":76}],48:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -10817,11 +11347,11 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.Struct = void 0;
 
-var Value_1 = require("./Value");
-
 var Ion_1 = require("../Ion");
 
 var FromJsConstructor_1 = require("./FromJsConstructor");
+
+var Value_1 = require("./Value");
 
 var Struct = /*#__PURE__*/function (_Value_1$Value) {
   (0, _inherits2["default"])(Struct, _Value_1$Value);
@@ -10866,6 +11396,13 @@ var Struct = /*#__PURE__*/function (_Value_1$Value) {
         }
 
         return target._fields[name];
+      },
+      deleteProperty: function deleteProperty(target, name) {
+        if (name in target._fields) {
+          delete target._fields[name];
+        }
+
+        return true;
       }
     }));
   }
@@ -10878,7 +11415,7 @@ var Struct = /*#__PURE__*/function (_Value_1$Value) {
       }
 
       if (pathElements.length === 0) {
-        throw new Error('Value#get requires at least one parameter.');
+        throw new Error("Value#get requires at least one parameter.");
       }
 
       var pathHead = pathElements[0],
@@ -10923,13 +11460,13 @@ var Struct = /*#__PURE__*/function (_Value_1$Value) {
   }, {
     key: "toString",
     value: function toString() {
-      return '{' + (0, _toConsumableArray2["default"])(this.fields()).map(function (_ref) {
+      return "{" + (0, _toConsumableArray2["default"])(this.fields()).map(function (_ref) {
         var _ref2 = (0, _slicedToArray2["default"])(_ref, 2),
             name = _ref2[0],
             value = _ref2[1];
 
-        return name + ': ' + value;
-      }).join(', ') + '}';
+        return name + ": " + value;
+      }).join(", ") + "}";
     }
   }, {
     key: "writeTo",
@@ -10958,6 +11495,16 @@ var Struct = /*#__PURE__*/function (_Value_1$Value) {
       writer.stepOut();
     }
   }, {
+    key: "deleteField",
+    value: function deleteField(name) {
+      if (name in this._fields) {
+        delete this._fields[name];
+        return true;
+      }
+
+      return false;
+    }
+  }, {
     key: "toJSON",
     value: function toJSON() {
       return this._fields;
@@ -10984,8 +11531,8 @@ var Struct = /*#__PURE__*/function (_Value_1$Value) {
 
 exports.Struct = Struct;
 
-},{"../Ion":3,"./FromJsConstructor":38,"./Value":50,"@babel/runtime/helpers/assertThisInitialized":56,"@babel/runtime/helpers/classCallCheck":57,"@babel/runtime/helpers/createClass":58,"@babel/runtime/helpers/getPrototypeOf":62,"@babel/runtime/helpers/inherits":63,"@babel/runtime/helpers/interopRequireDefault":64,"@babel/runtime/helpers/possibleConstructorReturn":69,"@babel/runtime/helpers/slicedToArray":71,"@babel/runtime/helpers/toConsumableArray":73,"@babel/runtime/helpers/typeof":74}],48:[function(require,module,exports){
-(function (global){
+},{"../Ion":4,"./FromJsConstructor":39,"./Value":51,"@babel/runtime/helpers/assertThisInitialized":60,"@babel/runtime/helpers/classCallCheck":61,"@babel/runtime/helpers/createClass":63,"@babel/runtime/helpers/getPrototypeOf":67,"@babel/runtime/helpers/inherits":68,"@babel/runtime/helpers/interopRequireDefault":69,"@babel/runtime/helpers/possibleConstructorReturn":76,"@babel/runtime/helpers/slicedToArray":78,"@babel/runtime/helpers/toConsumableArray":80,"@babel/runtime/helpers/typeof":81}],49:[function(require,module,exports){
+(function (global){(function (){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -11011,9 +11558,9 @@ exports.Symbol = void 0;
 
 var Ion_1 = require("../Ion");
 
-var Value_1 = require("./Value");
-
 var FromJsConstructor_1 = require("./FromJsConstructor");
+
+var Value_1 = require("./Value");
 
 var _fromJsConstructor = new FromJsConstructor_1.FromJsConstructorBuilder().withPrimitives(FromJsConstructor_1.Primitives.String).withClassesToUnbox(global.String).build();
 
@@ -11051,8 +11598,8 @@ var _Symbol = /*#__PURE__*/function (_Value_1$Value) {
 
 exports.Symbol = _Symbol;
 
-}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../Ion":3,"./FromJsConstructor":38,"./Value":50,"@babel/runtime/helpers/classCallCheck":57,"@babel/runtime/helpers/createClass":58,"@babel/runtime/helpers/getPrototypeOf":62,"@babel/runtime/helpers/inherits":63,"@babel/runtime/helpers/interopRequireDefault":64,"@babel/runtime/helpers/possibleConstructorReturn":69}],49:[function(require,module,exports){
+}).call(this)}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{"../Ion":4,"./FromJsConstructor":39,"./Value":51,"@babel/runtime/helpers/classCallCheck":61,"@babel/runtime/helpers/createClass":63,"@babel/runtime/helpers/getPrototypeOf":67,"@babel/runtime/helpers/inherits":68,"@babel/runtime/helpers/interopRequireDefault":69,"@babel/runtime/helpers/possibleConstructorReturn":76}],50:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -11097,7 +11644,7 @@ var __importStar = void 0 && (void 0).__importStar || function (mod) {
   if (mod && mod.__esModule) return mod;
   var result = {};
   if (mod != null) for (var k in mod) {
-    if (Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
   }
 
   __setModuleDefault(result, mod);
@@ -11110,13 +11657,13 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.Timestamp = void 0;
 
-var Value_1 = require("./Value");
-
 var ion = __importStar(require("../Ion"));
 
 var Ion_1 = require("../Ion");
 
 var FromJsConstructor_1 = require("./FromJsConstructor");
+
+var Value_1 = require("./Value");
 
 var _fromJsConstructor = new FromJsConstructor_1.FromJsConstructorBuilder().withClasses(Date, ion.Timestamp).build();
 
@@ -11179,7 +11726,7 @@ var Timestamp = /*#__PURE__*/function (_Value_1$Value) {
 
 exports.Timestamp = Timestamp;
 
-},{"../Ion":3,"./FromJsConstructor":38,"./Value":50,"@babel/runtime/helpers/classCallCheck":57,"@babel/runtime/helpers/createClass":58,"@babel/runtime/helpers/getPrototypeOf":62,"@babel/runtime/helpers/inherits":63,"@babel/runtime/helpers/interopRequireDefault":64,"@babel/runtime/helpers/possibleConstructorReturn":69}],50:[function(require,module,exports){
+},{"../Ion":4,"./FromJsConstructor":39,"./Value":51,"@babel/runtime/helpers/classCallCheck":61,"@babel/runtime/helpers/createClass":63,"@babel/runtime/helpers/getPrototypeOf":67,"@babel/runtime/helpers/inherits":68,"@babel/runtime/helpers/interopRequireDefault":69,"@babel/runtime/helpers/possibleConstructorReturn":76}],51:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -11226,7 +11773,7 @@ var __importStar = void 0 && (void 0).__importStar || function (mod) {
   if (mod && mod.__esModule) return mod;
   var result = {};
   if (mod != null) for (var k in mod) {
-    if (Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
   }
 
   __setModuleDefault(result, mod);
@@ -11239,9 +11786,9 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.Value = void 0;
 
-var JsValueConversion = __importStar(require("./JsValueConversion"));
-
 var util_1 = require("../util");
+
+var JsValueConversion = __importStar(require("./JsValueConversion"));
 
 var _DOM_VALUE_SIGNET = Symbol("ion.dom.Value");
 
@@ -11304,62 +11851,62 @@ function Value(BaseClass, ionType, fromJsConstructor) {
     }, {
       key: "booleanValue",
       value: function booleanValue() {
-        this._unsupportedOperation('booleanValue');
+        this._unsupportedOperation("booleanValue");
       }
     }, {
       key: "numberValue",
       value: function numberValue() {
-        this._unsupportedOperation('numberValue');
+        this._unsupportedOperation("numberValue");
       }
     }, {
       key: "bigIntValue",
       value: function bigIntValue() {
-        this._unsupportedOperation('bigIntValue');
+        this._unsupportedOperation("bigIntValue");
       }
     }, {
       key: "decimalValue",
       value: function decimalValue() {
-        this._unsupportedOperation('decimalValue');
+        this._unsupportedOperation("decimalValue");
       }
     }, {
       key: "stringValue",
       value: function stringValue() {
-        this._unsupportedOperation('stringValue');
+        this._unsupportedOperation("stringValue");
       }
     }, {
       key: "dateValue",
       value: function dateValue() {
-        this._unsupportedOperation('dateValue');
+        this._unsupportedOperation("dateValue");
       }
     }, {
       key: "timestampValue",
       value: function timestampValue() {
-        this._unsupportedOperation('timestampValue');
+        this._unsupportedOperation("timestampValue");
       }
     }, {
       key: "uInt8ArrayValue",
       value: function uInt8ArrayValue() {
-        this._unsupportedOperation('uInt8ArrayValue');
+        this._unsupportedOperation("uInt8ArrayValue");
       }
     }, {
       key: "fieldNames",
       value: function fieldNames() {
-        this._unsupportedOperation('fieldNames');
+        this._unsupportedOperation("fieldNames");
       }
     }, {
       key: "fields",
       value: function fields() {
-        this._unsupportedOperation('fields');
+        this._unsupportedOperation("fields");
       }
     }, {
       key: "elements",
       value: function elements() {
-        this._unsupportedOperation('elements');
+        this._unsupportedOperation("elements");
       }
     }, {
       key: "get",
       value: function get() {
-        this._unsupportedOperation('get');
+        this._unsupportedOperation("get");
       }
     }, {
       key: "as",
@@ -11373,7 +11920,12 @@ function Value(BaseClass, ionType, fromJsConstructor) {
     }, {
       key: "writeTo",
       value: function writeTo(writer) {
-        this._unsupportedOperation('writeTo');
+        this._unsupportedOperation("writeTo");
+      }
+    }, {
+      key: "deleteField",
+      value: function deleteField(name) {
+        this._unsupportedOperation("deleteField");
       }
     }], [{
       key: "_getIonType",
@@ -11423,7 +11975,7 @@ Object.defineProperty(Value, Symbol.hasInstance, {
   }
 });
 
-},{"../util":52,"./JsValueConversion":40,"@babel/runtime/helpers/assertThisInitialized":56,"@babel/runtime/helpers/classCallCheck":57,"@babel/runtime/helpers/createClass":58,"@babel/runtime/helpers/getPrototypeOf":62,"@babel/runtime/helpers/inherits":63,"@babel/runtime/helpers/interopRequireDefault":64,"@babel/runtime/helpers/possibleConstructorReturn":69}],51:[function(require,module,exports){
+},{"../util":56,"./JsValueConversion":41,"@babel/runtime/helpers/assertThisInitialized":60,"@babel/runtime/helpers/classCallCheck":61,"@babel/runtime/helpers/createClass":63,"@babel/runtime/helpers/getPrototypeOf":67,"@babel/runtime/helpers/inherits":68,"@babel/runtime/helpers/interopRequireDefault":69,"@babel/runtime/helpers/possibleConstructorReturn":76}],52:[function(require,module,exports){
 "use strict";
 
 var __createBinding = void 0 && (void 0).__createBinding || (Object.create ? function (o, m, k, k2) {
@@ -11452,7 +12004,7 @@ var __importStar = void 0 && (void 0).__importStar || function (mod) {
   if (mod && mod.__esModule) return mod;
   var result = {};
   if (mod != null) for (var k in mod) {
-    if (Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
   }
 
   __setModuleDefault(result, mod);
@@ -11469,31 +12021,31 @@ var ion = __importStar(require("../Ion"));
 
 var Ion_1 = require("../Ion");
 
-var Struct_1 = require("./Struct");
-
-var List_1 = require("./List");
-
-var SExpression_1 = require("./SExpression");
-
-var Null_1 = require("./Null");
-
-var Integer_1 = require("./Integer");
-
-var Float_1 = require("./Float");
-
-var Decimal_1 = require("./Decimal");
-
-var Timestamp_1 = require("./Timestamp");
-
-var Symbol_1 = require("./Symbol");
-
-var Clob_1 = require("./Clob");
-
-var Blob_1 = require("./Blob");
+var IonBinaryReader_1 = require("../IonBinaryReader");
 
 var IonTextReader_1 = require("../IonTextReader");
 
-var IonBinaryReader_1 = require("../IonBinaryReader");
+var Blob_1 = require("./Blob");
+
+var Clob_1 = require("./Clob");
+
+var Decimal_1 = require("./Decimal");
+
+var Float_1 = require("./Float");
+
+var Integer_1 = require("./Integer");
+
+var List_1 = require("./List");
+
+var Null_1 = require("./Null");
+
+var SExpression_1 = require("./SExpression");
+
+var Struct_1 = require("./Struct");
+
+var Symbol_1 = require("./Symbol");
+
+var Timestamp_1 = require("./Timestamp");
 
 function loadAll(ionData) {
   var reader = _createReader(ionData);
@@ -11748,7 +12300,1553 @@ Object.defineProperty(exports, "SExpression", {
   }
 });
 
-},{"../Ion":3,"../IonBinaryReader":5,"../IonTextReader":23,"./Blob":33,"./Boolean":34,"./Clob":35,"./Decimal":36,"./Float":37,"./Integer":39,"./List":41,"./Null":43,"./SExpression":44,"./String":46,"./Struct":47,"./Symbol":48,"./Timestamp":49,"./Value":50}],52:[function(require,module,exports){
+},{"../Ion":4,"../IonBinaryReader":6,"../IonTextReader":24,"./Blob":34,"./Boolean":35,"./Clob":36,"./Decimal":37,"./Float":38,"./Integer":40,"./List":42,"./Null":44,"./SExpression":45,"./String":47,"./Struct":48,"./Symbol":49,"./Timestamp":50,"./Value":51}],53:[function(require,module,exports){
+"use strict";
+
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
+
+var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime/helpers/classCallCheck"));
+
+var _inherits2 = _interopRequireDefault(require("@babel/runtime/helpers/inherits"));
+
+var _possibleConstructorReturn2 = _interopRequireDefault(require("@babel/runtime/helpers/possibleConstructorReturn"));
+
+var _getPrototypeOf2 = _interopRequireDefault(require("@babel/runtime/helpers/getPrototypeOf"));
+
+var _wrapNativeSuper2 = _interopRequireDefault(require("@babel/runtime/helpers/wrapNativeSuper"));
+
+function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = (0, _getPrototypeOf2["default"])(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = (0, _getPrototypeOf2["default"])(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return (0, _possibleConstructorReturn2["default"])(this, result); }; }
+
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.EventStreamError = void 0;
+
+var EventStreamError = /*#__PURE__*/function (_Error) {
+  (0, _inherits2["default"])(EventStreamError, _Error);
+
+  var _super = _createSuper(EventStreamError);
+
+  function EventStreamError(type, message, index, eventstream) {
+    var _this;
+
+    (0, _classCallCheck2["default"])(this, EventStreamError);
+    _this = _super.call(this);
+    _this.type = type;
+    _this.index = index;
+    _this.message = message;
+    _this.eventstream = eventstream;
+    return _this;
+  }
+
+  return EventStreamError;
+}( /*#__PURE__*/(0, _wrapNativeSuper2["default"])(Error));
+
+exports.EventStreamError = EventStreamError;
+
+},{"@babel/runtime/helpers/classCallCheck":61,"@babel/runtime/helpers/getPrototypeOf":67,"@babel/runtime/helpers/inherits":68,"@babel/runtime/helpers/interopRequireDefault":69,"@babel/runtime/helpers/possibleConstructorReturn":76,"@babel/runtime/helpers/wrapNativeSuper":83}],54:[function(require,module,exports){
+"use strict";
+/*!
+ * Copyright 2012 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * A copy of the License is located at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * or in the "license" file accompanying this file. This file is distributed
+ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
+
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
+
+var _inherits2 = _interopRequireDefault(require("@babel/runtime/helpers/inherits"));
+
+var _possibleConstructorReturn2 = _interopRequireDefault(require("@babel/runtime/helpers/possibleConstructorReturn"));
+
+var _getPrototypeOf2 = _interopRequireDefault(require("@babel/runtime/helpers/getPrototypeOf"));
+
+var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime/helpers/classCallCheck"));
+
+var _createClass2 = _interopRequireDefault(require("@babel/runtime/helpers/createClass"));
+
+function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = (0, _getPrototypeOf2["default"])(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = (0, _getPrototypeOf2["default"])(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return (0, _possibleConstructorReturn2["default"])(this, result); }; }
+
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
+var __importDefault = void 0 && (void 0).__importDefault || function (mod) {
+  return mod && mod.__esModule ? mod : {
+    "default": mod
+  };
+};
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.IonEventFactory = exports.IonEventType = void 0;
+
+var jsbi_1 = __importDefault(require("jsbi"));
+
+var ComparisonResult_1 = require("../ComparisonResult");
+
+var ComparisonResult_2 = require("../ComparisonResult");
+
+var IonBinaryWriter_1 = require("../IonBinaryWriter");
+
+var IonLocalSymbolTable_1 = require("../IonLocalSymbolTable");
+
+var IonTextWriter_1 = require("../IonTextWriter");
+
+var IonTypes_1 = require("../IonTypes");
+
+var IonUnicode_1 = require("../IonUnicode");
+
+var IonWriteable_1 = require("../IonWriteable");
+
+var IonEventType;
+
+(function (IonEventType) {
+  IonEventType[IonEventType["SCALAR"] = 0] = "SCALAR";
+  IonEventType[IonEventType["CONTAINER_START"] = 1] = "CONTAINER_START";
+  IonEventType[IonEventType["CONTAINER_END"] = 2] = "CONTAINER_END";
+  IonEventType[IonEventType["SYMBOL_TABLE"] = 3] = "SYMBOL_TABLE";
+  IonEventType[IonEventType["STREAM_END"] = 4] = "STREAM_END";
+})(IonEventType = exports.IonEventType || (exports.IonEventType = {}));
+
+var AbstractIonEvent = /*#__PURE__*/function () {
+  function AbstractIonEvent(eventType, ionType, fieldName, annotations, depth, ionValue) {
+    (0, _classCallCheck2["default"])(this, AbstractIonEvent);
+    this.eventType = eventType;
+    this.ionType = ionType;
+    this.fieldName = fieldName;
+    this.annotations = annotations;
+    this.depth = depth;
+    this.ionValue = ionValue;
+  }
+
+  (0, _createClass2["default"])(AbstractIonEvent, [{
+    key: "write",
+    value: function write(writer) {
+      writer.stepIn(IonTypes_1.IonTypes.STRUCT);
+      writer.writeFieldName("event_type");
+      writer.writeSymbol(IonEventType[this.eventType]);
+
+      if (this.ionType !== null) {
+        writer.writeFieldName("ion_type");
+        writer.writeSymbol(this.ionType.name.toUpperCase());
+      }
+
+      if (this.fieldName !== null && this.fieldName !== undefined) {
+        writer.writeFieldName("field_name");
+        writer.stepIn(IonTypes_1.IonTypes.STRUCT);
+        writer.writeFieldName("text");
+        writer.writeString(this.fieldName);
+        writer.stepOut();
+      }
+
+      if (this.annotations !== null) {
+        writer.writeFieldName("annotations");
+        this.writeAnnotations(writer);
+      }
+
+      if (this.eventType === IonEventType.SCALAR) {
+        this.writeValues(writer);
+      }
+
+      writer.writeFieldName("depth");
+      writer.writeInt(this.depth);
+      writer.stepOut();
+    }
+  }, {
+    key: "writeAnnotations",
+    value: function writeAnnotations(writer) {
+      if (this.annotations === undefined) {
+        writer.writeNull(IonTypes_1.IonTypes.LIST);
+        return;
+      }
+
+      writer.stepIn(IonTypes_1.IonTypes.LIST);
+
+      for (var i = 0; i < this.annotations.length; i++) {
+        writer.stepIn(IonTypes_1.IonTypes.STRUCT);
+        writer.writeFieldName("text");
+        writer.writeString(this.annotations[i]);
+        writer.stepOut();
+      }
+
+      writer.stepOut();
+    }
+  }, {
+    key: "writeSymbolToken",
+    value: function writeSymbolToken(writer, text) {
+      writer.writeSymbol(text);
+    }
+  }, {
+    key: "writeImportDescriptor",
+    value: function writeImportDescriptor(writer) {
+      writer.writeNull(IonTypes_1.IonTypes.STRUCT);
+    }
+  }, {
+    key: "writeValues",
+    value: function writeValues(writer) {
+      if (this.eventType === IonEventType.SCALAR) {
+        writer.writeFieldName("value_text");
+        this.writeTextValue(writer);
+        writer.writeFieldName("value_binary");
+        this.writeBinaryValue(writer);
+      }
+    }
+  }, {
+    key: "writeTextValue",
+    value: function writeTextValue(writer) {
+      var tempTextWriter = new IonTextWriter_1.TextWriter(new IonWriteable_1.Writeable());
+      this.writeIonValue(tempTextWriter);
+      tempTextWriter.close();
+      writer.writeString(IonUnicode_1.decodeUtf8(tempTextWriter.getBytes()));
+    }
+  }, {
+    key: "writeBinaryValue",
+    value: function writeBinaryValue(writer) {
+      var tempBinaryWriter = new IonBinaryWriter_1.BinaryWriter(IonLocalSymbolTable_1.defaultLocalSymbolTable(), new IonWriteable_1.Writeable());
+      this.writeIonValue(tempBinaryWriter);
+      tempBinaryWriter.close();
+      var binaryBuffer = tempBinaryWriter.getBytes();
+      writer.stepIn(IonTypes_1.IonTypes.LIST);
+
+      for (var i = 0; i < binaryBuffer.length; i++) {
+        writer.writeInt(binaryBuffer[i]);
+      }
+
+      writer.stepOut();
+    }
+  }, {
+    key: "equals",
+    value: function equals(expected) {
+      return this.compare(expected).result == ComparisonResult_2.ComparisonResultType.EQUAL;
+    }
+  }, {
+    key: "compare",
+    value: function compare(expected) {
+      var _a, _b;
+
+      if (this.eventType !== expected.eventType) {
+        return new ComparisonResult_1.ComparisonResult(ComparisonResult_2.ComparisonResultType.NOT_EQUAL, "Event types don't match");
+      }
+
+      if (this.ionType !== expected.ionType) {
+        return new ComparisonResult_1.ComparisonResult(ComparisonResult_2.ComparisonResultType.NOT_EQUAL, "Ion types don't match " + ((_a = this.ionType) === null || _a === void 0 ? void 0 : _a.name) + " vs. " + ((_b = expected.ionType) === null || _b === void 0 ? void 0 : _b.name));
+      }
+
+      if (this.fieldName !== expected.fieldName) {
+        return new ComparisonResult_1.ComparisonResult(ComparisonResult_2.ComparisonResultType.NOT_EQUAL, "Field names don't match " + this.fieldName + " vs. " + expected.fieldName);
+      }
+
+      if (this.depth !== expected.depth) {
+        return new ComparisonResult_1.ComparisonResult(ComparisonResult_2.ComparisonResultType.NOT_EQUAL, "Event depths don't match " + this.depth + " vs. " + expected.depth);
+      }
+
+      var annotationResult = this.annotationCompare(expected.annotations);
+
+      if (annotationResult.result === ComparisonResult_2.ComparisonResultType.NOT_EQUAL) {
+        return annotationResult;
+      }
+
+      var valueResult = this.valueCompare(expected);
+
+      if (valueResult.result === ComparisonResult_2.ComparisonResultType.NOT_EQUAL) {
+        return valueResult;
+      }
+
+      return new ComparisonResult_1.ComparisonResult(ComparisonResult_2.ComparisonResultType.EQUAL);
+    }
+  }, {
+    key: "annotationCompare",
+    value: function annotationCompare(expectedAnnotations) {
+      if (this.annotations === expectedAnnotations) {
+        return new ComparisonResult_1.ComparisonResult(ComparisonResult_2.ComparisonResultType.EQUAL);
+      }
+
+      if (this.annotations.length !== expectedAnnotations.length) {
+        return new ComparisonResult_1.ComparisonResult(ComparisonResult_2.ComparisonResultType.NOT_EQUAL, "annotations length don't match" + this.annotations.length + " vs. " + expectedAnnotations.length);
+      }
+
+      for (var i = 0; i < this.annotations.length; i++) {
+        if (this.annotations[i] !== expectedAnnotations[i]) {
+          return new ComparisonResult_1.ComparisonResult(ComparisonResult_2.ComparisonResultType.NOT_EQUAL, "annotation value doesn't match" + this.annotations[i] + " vs. " + expectedAnnotations[i]);
+        }
+      }
+
+      return new ComparisonResult_1.ComparisonResult(ComparisonResult_2.ComparisonResultType.EQUAL);
+    }
+  }]);
+  return AbstractIonEvent;
+}();
+
+var IonEventFactory = /*#__PURE__*/function () {
+  function IonEventFactory() {
+    (0, _classCallCheck2["default"])(this, IonEventFactory);
+  }
+
+  (0, _createClass2["default"])(IonEventFactory, [{
+    key: "makeEvent",
+    value: function makeEvent(eventType, ionType, fieldName, depth, annotations, isNull, value) {
+      if (isNull) {
+        return new IonNullEvent(eventType, ionType, fieldName, annotations, depth);
+      }
+
+      switch (eventType) {
+        case IonEventType.SCALAR:
+        case IonEventType.CONTAINER_START:
+          switch (ionType) {
+            case IonTypes_1.IonTypes.BOOL:
+              {
+                return new IonBoolEvent(eventType, ionType, fieldName, annotations, depth, value);
+              }
+
+            case IonTypes_1.IonTypes.INT:
+              {
+                return new IonIntEvent(eventType, ionType, fieldName, annotations, depth, value);
+              }
+
+            case IonTypes_1.IonTypes.FLOAT:
+              {
+                return new IonFloatEvent(eventType, ionType, fieldName, annotations, depth, value);
+              }
+
+            case IonTypes_1.IonTypes.DECIMAL:
+              {
+                return new IonDecimalEvent(eventType, ionType, fieldName, annotations, depth, value);
+              }
+
+            case IonTypes_1.IonTypes.SYMBOL:
+              {
+                return new IonSymbolEvent(eventType, ionType, fieldName, annotations, depth, value);
+              }
+
+            case IonTypes_1.IonTypes.STRING:
+              {
+                return new IonStringEvent(eventType, ionType, fieldName, annotations, depth, value);
+              }
+
+            case IonTypes_1.IonTypes.TIMESTAMP:
+              {
+                return new IonTimestampEvent(eventType, ionType, fieldName, annotations, depth, value);
+              }
+
+            case IonTypes_1.IonTypes.BLOB:
+              {
+                return new IonBlobEvent(eventType, ionType, fieldName, annotations, depth, value);
+              }
+
+            case IonTypes_1.IonTypes.CLOB:
+              {
+                return new IonClobEvent(eventType, ionType, fieldName, annotations, depth, value);
+              }
+
+            case IonTypes_1.IonTypes.LIST:
+              {
+                return new IonListEvent(eventType, ionType, fieldName, annotations, depth);
+              }
+
+            case IonTypes_1.IonTypes.SEXP:
+              {
+                return new IonSexpEvent(eventType, ionType, fieldName, annotations, depth);
+              }
+
+            case IonTypes_1.IonTypes.STRUCT:
+              {
+                return new IonStructEvent(eventType, ionType, fieldName, annotations, depth);
+              }
+
+            default:
+              {
+                throw new Error("IonType " + ionType.name + " unexpected.");
+              }
+          }
+
+        case IonEventType.SYMBOL_TABLE:
+          throw new Error("symbol tables unsupported.");
+
+        case IonEventType.CONTAINER_END:
+          return new IonEndEvent(eventType, depth, ionType);
+
+        case IonEventType.STREAM_END:
+          return new IonEndEvent(eventType, depth, ionType);
+      }
+    }
+  }]);
+  return IonEventFactory;
+}();
+
+exports.IonEventFactory = IonEventFactory;
+
+var IonNullEvent = /*#__PURE__*/function (_AbstractIonEvent) {
+  (0, _inherits2["default"])(IonNullEvent, _AbstractIonEvent);
+
+  var _super = _createSuper(IonNullEvent);
+
+  function IonNullEvent(eventType, ionType, fieldName, annotations, depth) {
+    (0, _classCallCheck2["default"])(this, IonNullEvent);
+    return _super.call(this, eventType, ionType, fieldName, annotations, depth, null);
+  }
+
+  (0, _createClass2["default"])(IonNullEvent, [{
+    key: "valueCompare",
+    value: function valueCompare(expected) {
+      if (expected instanceof IonNullEvent && this.ionValue === expected.ionValue) {
+        return new ComparisonResult_1.ComparisonResult(ComparisonResult_2.ComparisonResultType.EQUAL);
+      }
+
+      return new ComparisonResult_1.ComparisonResult(ComparisonResult_2.ComparisonResultType.NOT_EQUAL, this.ionValue + " vs. " + expected.ionValue);
+    }
+  }, {
+    key: "writeIonValue",
+    value: function writeIonValue(writer) {
+      writer.writeNull(this.ionType !== null ? this.ionType : IonTypes_1.IonTypes.NULL);
+    }
+  }]);
+  return IonNullEvent;
+}(AbstractIonEvent);
+
+var IonIntEvent = /*#__PURE__*/function (_AbstractIonEvent2) {
+  (0, _inherits2["default"])(IonIntEvent, _AbstractIonEvent2);
+
+  var _super2 = _createSuper(IonIntEvent);
+
+  function IonIntEvent(eventType, ionType, fieldName, annotations, depth, ionValue) {
+    (0, _classCallCheck2["default"])(this, IonIntEvent);
+    return _super2.call(this, eventType, ionType, fieldName, annotations, depth, ionValue);
+  }
+
+  (0, _createClass2["default"])(IonIntEvent, [{
+    key: "valueCompare",
+    value: function valueCompare(expected) {
+      if (expected instanceof IonIntEvent && jsbi_1["default"].equal(this.ionValue, expected.ionValue)) {
+        return new ComparisonResult_1.ComparisonResult(ComparisonResult_2.ComparisonResultType.EQUAL);
+      }
+
+      return new ComparisonResult_1.ComparisonResult(ComparisonResult_2.ComparisonResultType.NOT_EQUAL, this.ionValue + " vs. " + expected.ionValue);
+    }
+  }, {
+    key: "writeIonValue",
+    value: function writeIonValue(writer) {
+      writer.writeInt(this.ionValue);
+    }
+  }]);
+  return IonIntEvent;
+}(AbstractIonEvent);
+
+var IonBoolEvent = /*#__PURE__*/function (_AbstractIonEvent3) {
+  (0, _inherits2["default"])(IonBoolEvent, _AbstractIonEvent3);
+
+  var _super3 = _createSuper(IonBoolEvent);
+
+  function IonBoolEvent(eventType, ionType, fieldName, annotations, depth, ionValue) {
+    (0, _classCallCheck2["default"])(this, IonBoolEvent);
+    return _super3.call(this, eventType, ionType, fieldName, annotations, depth, ionValue);
+  }
+
+  (0, _createClass2["default"])(IonBoolEvent, [{
+    key: "valueCompare",
+    value: function valueCompare(expected) {
+      if (expected instanceof IonBoolEvent && this.ionValue === expected.ionValue) {
+        return new ComparisonResult_1.ComparisonResult(ComparisonResult_2.ComparisonResultType.EQUAL);
+      }
+
+      return new ComparisonResult_1.ComparisonResult(ComparisonResult_2.ComparisonResultType.NOT_EQUAL, this.ionValue + " vs. " + expected.ionValue);
+    }
+  }, {
+    key: "writeIonValue",
+    value: function writeIonValue(writer) {
+      writer.writeBoolean(this.ionValue);
+    }
+  }]);
+  return IonBoolEvent;
+}(AbstractIonEvent);
+
+var IonFloatEvent = /*#__PURE__*/function (_AbstractIonEvent4) {
+  (0, _inherits2["default"])(IonFloatEvent, _AbstractIonEvent4);
+
+  var _super4 = _createSuper(IonFloatEvent);
+
+  function IonFloatEvent(eventType, ionType, fieldName, annotations, depth, ionValue) {
+    (0, _classCallCheck2["default"])(this, IonFloatEvent);
+    return _super4.call(this, eventType, ionType, fieldName, annotations, depth, ionValue);
+  }
+
+  (0, _createClass2["default"])(IonFloatEvent, [{
+    key: "valueCompare",
+    value: function valueCompare(expected) {
+      if (expected instanceof IonFloatEvent && Object.is(this.ionValue, expected.ionValue)) {
+        return new ComparisonResult_1.ComparisonResult(ComparisonResult_2.ComparisonResultType.EQUAL);
+      }
+
+      return new ComparisonResult_1.ComparisonResult(ComparisonResult_2.ComparisonResultType.NOT_EQUAL, this.ionValue + " vs. " + expected.ionValue);
+    }
+  }, {
+    key: "writeIonValue",
+    value: function writeIonValue(writer) {
+      writer.writeFloat64(this.ionValue);
+    }
+  }]);
+  return IonFloatEvent;
+}(AbstractIonEvent);
+
+var IonDecimalEvent = /*#__PURE__*/function (_AbstractIonEvent5) {
+  (0, _inherits2["default"])(IonDecimalEvent, _AbstractIonEvent5);
+
+  var _super5 = _createSuper(IonDecimalEvent);
+
+  function IonDecimalEvent(eventType, ionType, fieldName, annotations, depth, ionValue) {
+    (0, _classCallCheck2["default"])(this, IonDecimalEvent);
+    return _super5.call(this, eventType, ionType, fieldName, annotations, depth, ionValue);
+  }
+
+  (0, _createClass2["default"])(IonDecimalEvent, [{
+    key: "valueCompare",
+    value: function valueCompare(expected) {
+      if (expected instanceof IonDecimalEvent && this.ionValue.equals(expected.ionValue)) {
+        return new ComparisonResult_1.ComparisonResult(ComparisonResult_2.ComparisonResultType.EQUAL);
+      }
+
+      return new ComparisonResult_1.ComparisonResult(ComparisonResult_2.ComparisonResultType.NOT_EQUAL, this.ionValue + " vs. " + expected.ionValue);
+    }
+  }, {
+    key: "writeIonValue",
+    value: function writeIonValue(writer) {
+      writer.writeDecimal(this.ionValue);
+    }
+  }]);
+  return IonDecimalEvent;
+}(AbstractIonEvent);
+
+var IonSymbolEvent = /*#__PURE__*/function (_AbstractIonEvent6) {
+  (0, _inherits2["default"])(IonSymbolEvent, _AbstractIonEvent6);
+
+  var _super6 = _createSuper(IonSymbolEvent);
+
+  function IonSymbolEvent(eventType, ionType, fieldName, annotations, depth, ionValue) {
+    (0, _classCallCheck2["default"])(this, IonSymbolEvent);
+    return _super6.call(this, eventType, ionType, fieldName, annotations, depth, ionValue);
+  }
+
+  (0, _createClass2["default"])(IonSymbolEvent, [{
+    key: "valueCompare",
+    value: function valueCompare(expected) {
+      if (expected instanceof IonSymbolEvent && this.ionValue === expected.ionValue) {
+        return new ComparisonResult_1.ComparisonResult(ComparisonResult_2.ComparisonResultType.EQUAL);
+      }
+
+      return new ComparisonResult_1.ComparisonResult(ComparisonResult_2.ComparisonResultType.NOT_EQUAL, this.ionValue + " vs. " + expected.ionValue);
+    }
+  }, {
+    key: "writeIonValue",
+    value: function writeIonValue(writer) {
+      writer.writeSymbol(this.ionValue);
+    }
+  }]);
+  return IonSymbolEvent;
+}(AbstractIonEvent);
+
+var IonStringEvent = /*#__PURE__*/function (_AbstractIonEvent7) {
+  (0, _inherits2["default"])(IonStringEvent, _AbstractIonEvent7);
+
+  var _super7 = _createSuper(IonStringEvent);
+
+  function IonStringEvent(eventType, ionType, fieldName, annotations, depth, ionValue) {
+    (0, _classCallCheck2["default"])(this, IonStringEvent);
+    return _super7.call(this, eventType, ionType, fieldName, annotations, depth, ionValue);
+  }
+
+  (0, _createClass2["default"])(IonStringEvent, [{
+    key: "valueCompare",
+    value: function valueCompare(expected) {
+      if (expected instanceof IonStringEvent && this.ionValue === expected.ionValue) {
+        return new ComparisonResult_1.ComparisonResult(ComparisonResult_2.ComparisonResultType.EQUAL);
+      }
+
+      return new ComparisonResult_1.ComparisonResult(ComparisonResult_2.ComparisonResultType.NOT_EQUAL, this.ionValue + " vs. " + expected.ionValue);
+    }
+  }, {
+    key: "writeIonValue",
+    value: function writeIonValue(writer) {
+      writer.writeString(this.ionValue);
+    }
+  }]);
+  return IonStringEvent;
+}(AbstractIonEvent);
+
+var IonTimestampEvent = /*#__PURE__*/function (_AbstractIonEvent8) {
+  (0, _inherits2["default"])(IonTimestampEvent, _AbstractIonEvent8);
+
+  var _super8 = _createSuper(IonTimestampEvent);
+
+  function IonTimestampEvent(eventType, ionType, fieldName, annotations, depth, ionValue) {
+    (0, _classCallCheck2["default"])(this, IonTimestampEvent);
+    return _super8.call(this, eventType, ionType, fieldName, annotations, depth, ionValue);
+  }
+
+  (0, _createClass2["default"])(IonTimestampEvent, [{
+    key: "valueCompare",
+    value: function valueCompare(expected) {
+      if (expected instanceof IonTimestampEvent && this.ionValue.equals(expected.ionValue)) {
+        return new ComparisonResult_1.ComparisonResult(ComparisonResult_2.ComparisonResultType.EQUAL);
+      }
+
+      return new ComparisonResult_1.ComparisonResult(ComparisonResult_2.ComparisonResultType.NOT_EQUAL, this.ionValue + " vs. " + expected.ionValue);
+    }
+  }, {
+    key: "writeIonValue",
+    value: function writeIonValue(writer) {
+      writer.writeTimestamp(this.ionValue);
+    }
+  }]);
+  return IonTimestampEvent;
+}(AbstractIonEvent);
+
+var IonBlobEvent = /*#__PURE__*/function (_AbstractIonEvent9) {
+  (0, _inherits2["default"])(IonBlobEvent, _AbstractIonEvent9);
+
+  var _super9 = _createSuper(IonBlobEvent);
+
+  function IonBlobEvent(eventType, ionType, fieldName, annotations, depth, ionValue) {
+    (0, _classCallCheck2["default"])(this, IonBlobEvent);
+    return _super9.call(this, eventType, ionType, fieldName, annotations, depth, ionValue);
+  }
+
+  (0, _createClass2["default"])(IonBlobEvent, [{
+    key: "valueCompare",
+    value: function valueCompare(expected) {
+      if (!(expected instanceof IonBlobEvent)) {
+        return new ComparisonResult_1.ComparisonResult(ComparisonResult_2.ComparisonResultType.NOT_EQUAL);
+      }
+
+      if (this.ionValue.length !== expected.ionValue.length) {
+        return new ComparisonResult_1.ComparisonResult(ComparisonResult_2.ComparisonResultType.NOT_EQUAL, "Blob length don't match");
+      }
+
+      for (var i = 0; i < this.ionValue.length; i++) {
+        if (this.ionValue[i] !== expected.ionValue[i]) {
+          return new ComparisonResult_1.ComparisonResult(ComparisonResult_2.ComparisonResultType.NOT_EQUAL, this.ionValue[i] + " vs. " + expected.ionValue[i]);
+        }
+      }
+
+      return new ComparisonResult_1.ComparisonResult(ComparisonResult_2.ComparisonResultType.EQUAL);
+    }
+  }, {
+    key: "writeIonValue",
+    value: function writeIonValue(writer) {
+      writer.writeBlob(this.ionValue);
+    }
+  }]);
+  return IonBlobEvent;
+}(AbstractIonEvent);
+
+var IonClobEvent = /*#__PURE__*/function (_AbstractIonEvent10) {
+  (0, _inherits2["default"])(IonClobEvent, _AbstractIonEvent10);
+
+  var _super10 = _createSuper(IonClobEvent);
+
+  function IonClobEvent(eventType, ionType, fieldName, annotations, depth, ionValue) {
+    (0, _classCallCheck2["default"])(this, IonClobEvent);
+    return _super10.call(this, eventType, ionType, fieldName, annotations, depth, ionValue);
+  }
+
+  (0, _createClass2["default"])(IonClobEvent, [{
+    key: "valueCompare",
+    value: function valueCompare(expected) {
+      if (!(expected instanceof IonClobEvent)) {
+        return new ComparisonResult_1.ComparisonResult(ComparisonResult_2.ComparisonResultType.NOT_EQUAL);
+      }
+
+      if (this.ionValue.length !== expected.ionValue.length) {
+        return new ComparisonResult_1.ComparisonResult(ComparisonResult_2.ComparisonResultType.NOT_EQUAL, this.ionValue + " vs. " + expected.ionValue);
+      }
+
+      for (var i = 0; i < this.ionValue.length; i++) {
+        if (this.ionValue[i] !== expected.ionValue[i]) {
+          return new ComparisonResult_1.ComparisonResult(ComparisonResult_2.ComparisonResultType.NOT_EQUAL, this.ionValue[i] + " vs. " + expected.ionValue[i]);
+        }
+      }
+
+      return new ComparisonResult_1.ComparisonResult(ComparisonResult_2.ComparisonResultType.EQUAL);
+    }
+  }, {
+    key: "writeIonValue",
+    value: function writeIonValue(writer) {
+      writer.writeClob(this.ionValue);
+    }
+  }]);
+  return IonClobEvent;
+}(AbstractIonEvent);
+
+var AbsIonContainerEvent = /*#__PURE__*/function (_AbstractIonEvent11) {
+  (0, _inherits2["default"])(AbsIonContainerEvent, _AbstractIonEvent11);
+
+  var _super11 = _createSuper(AbsIonContainerEvent);
+
+  function AbsIonContainerEvent(eventType, ionType, fieldName, annotations, depth) {
+    (0, _classCallCheck2["default"])(this, AbsIonContainerEvent);
+    return _super11.call(this, eventType, ionType, fieldName, annotations, depth, null);
+  }
+
+  (0, _createClass2["default"])(AbsIonContainerEvent, [{
+    key: "writeIonValue",
+    value: function writeIonValue(writer) {}
+  }]);
+  return AbsIonContainerEvent;
+}(AbstractIonEvent);
+
+var IonStructEvent = /*#__PURE__*/function (_AbsIonContainerEvent) {
+  (0, _inherits2["default"])(IonStructEvent, _AbsIonContainerEvent);
+
+  var _super12 = _createSuper(IonStructEvent);
+
+  function IonStructEvent(eventType, ionType, fieldName, annotations, depth) {
+    (0, _classCallCheck2["default"])(this, IonStructEvent);
+    return _super12.call(this, eventType, ionType, fieldName, annotations, depth);
+  }
+
+  (0, _createClass2["default"])(IonStructEvent, [{
+    key: "valueCompare",
+    value: function valueCompare(expected) {
+      if (!(expected instanceof IonStructEvent)) {
+        return new ComparisonResult_1.ComparisonResult(ComparisonResult_2.ComparisonResultType.NOT_EQUAL, "Event types don't match");
+      }
+
+      var container = this.ionValue == null ? [] : this.ionValue;
+      var expectedContainer = expected.ionValue == null ? [] : expected.ionValue;
+
+      if (container.length !== expectedContainer.length) {
+        return new ComparisonResult_1.ComparisonResult(ComparisonResult_2.ComparisonResultType.NOT_EQUAL, "Struct length don't match");
+      }
+
+      return this.structsCompare(container, expectedContainer);
+    }
+  }, {
+    key: "structsCompare",
+    value: function structsCompare(actualEvents, expectedEvents) {
+      var matchFound = new ComparisonResult_1.ComparisonResult(ComparisonResult_2.ComparisonResultType.EQUAL);
+      var paired = new Array(expectedEvents.length);
+
+      for (var i = 0; matchFound && i < actualEvents.length; i++) {
+        matchFound.result = ComparisonResult_2.ComparisonResultType.NOT_EQUAL;
+
+        for (var j = 0; matchFound.result == ComparisonResult_2.ComparisonResultType.NOT_EQUAL && j < expectedEvents.length; j++) {
+          if (!paired[j]) {
+            var child = actualEvents[i];
+            var expectedChild = expectedEvents[j];
+            matchFound = child.compare(expectedChild);
+
+            if (matchFound.result == ComparisonResult_2.ComparisonResultType.EQUAL) {
+              paired[j] = true;
+            }
+
+            if (matchFound.result == ComparisonResult_2.ComparisonResultType.EQUAL && child.eventType === IonEventType.CONTAINER_START) {
+              for (var k = 0; k < expectedChild.ionValue.length; k++) {
+                paired[k + j + 1] = true;
+              }
+
+              i += child.ionValue.length;
+            }
+          }
+        }
+      }
+
+      for (var _i = 0; _i < paired.length; _i++) {
+        if (!paired[_i]) {
+          matchFound = new ComparisonResult_1.ComparisonResult(ComparisonResult_2.ComparisonResultType.NOT_EQUAL, "Didn't find matching field for " + expectedEvents[_i].fieldName);
+          break;
+        }
+      }
+
+      return matchFound;
+    }
+  }]);
+  return IonStructEvent;
+}(AbsIonContainerEvent);
+
+var IonListEvent = /*#__PURE__*/function (_AbsIonContainerEvent2) {
+  (0, _inherits2["default"])(IonListEvent, _AbsIonContainerEvent2);
+
+  var _super13 = _createSuper(IonListEvent);
+
+  function IonListEvent(eventType, ionType, fieldName, annotations, depth) {
+    (0, _classCallCheck2["default"])(this, IonListEvent);
+    return _super13.call(this, eventType, ionType, fieldName, annotations, depth);
+  }
+
+  (0, _createClass2["default"])(IonListEvent, [{
+    key: "valueCompare",
+    value: function valueCompare(expected) {
+      if (!(expected instanceof IonListEvent)) {
+        return new ComparisonResult_1.ComparisonResult(ComparisonResult_2.ComparisonResultType.NOT_EQUAL, "Event types don't match");
+      }
+
+      var container = this.ionValue == null ? [] : this.ionValue;
+      var expectedContainer = expected.ionValue == null ? [] : expected.ionValue;
+
+      if (container.length !== expectedContainer.length) {
+        return new ComparisonResult_1.ComparisonResult(ComparisonResult_2.ComparisonResultType.NOT_EQUAL, "List length don't match");
+      }
+
+      for (var i = 0; i < container.length; i++) {
+        var child = container[i];
+
+        if (child.compare(expectedContainer[i]).result == ComparisonResult_2.ComparisonResultType.NOT_EQUAL) {
+          return new ComparisonResult_1.ComparisonResult(ComparisonResult_2.ComparisonResultType.NOT_EQUAL, child.ionValue + " vs. " + expectedContainer[i].ionValue, i + 1, i + 1);
+        } else if (child.eventType === IonEventType.CONTAINER_START) {
+          i += child.ionValue.length;
+        }
+      }
+
+      return new ComparisonResult_1.ComparisonResult(ComparisonResult_2.ComparisonResultType.EQUAL);
+    }
+  }]);
+  return IonListEvent;
+}(AbsIonContainerEvent);
+
+var IonSexpEvent = /*#__PURE__*/function (_AbsIonContainerEvent3) {
+  (0, _inherits2["default"])(IonSexpEvent, _AbsIonContainerEvent3);
+
+  var _super14 = _createSuper(IonSexpEvent);
+
+  function IonSexpEvent(eventType, ionType, fieldName, annotations, depth) {
+    (0, _classCallCheck2["default"])(this, IonSexpEvent);
+    return _super14.call(this, eventType, ionType, fieldName, annotations, depth);
+  }
+
+  (0, _createClass2["default"])(IonSexpEvent, [{
+    key: "valueCompare",
+    value: function valueCompare(expected) {
+      if (!(expected instanceof IonSexpEvent)) {
+        return new ComparisonResult_1.ComparisonResult(ComparisonResult_2.ComparisonResultType.NOT_EQUAL, "Event types don't match");
+      }
+
+      var container = this.ionValue == null ? [] : this.ionValue;
+      var expectedContainer = expected.ionValue == null ? [] : expected.ionValue;
+
+      if (container.length !== expectedContainer.length) {
+        return new ComparisonResult_1.ComparisonResult(ComparisonResult_2.ComparisonResultType.NOT_EQUAL, "S-expression length don't match");
+      }
+
+      for (var i = 0; i < container.length; i++) {
+        var child = container[i];
+        var eventResult = child.compare(expectedContainer[i]);
+
+        if (eventResult.result == ComparisonResult_2.ComparisonResultType.NOT_EQUAL) {
+          return eventResult;
+        } else if (child.eventType === IonEventType.CONTAINER_START) {
+          i += child.ionValue.length;
+        }
+      }
+
+      return new ComparisonResult_1.ComparisonResult(ComparisonResult_2.ComparisonResultType.EQUAL);
+    }
+  }]);
+  return IonSexpEvent;
+}(AbsIonContainerEvent);
+
+var IonEndEvent = /*#__PURE__*/function (_AbstractIonEvent12) {
+  (0, _inherits2["default"])(IonEndEvent, _AbstractIonEvent12);
+
+  var _super15 = _createSuper(IonEndEvent);
+
+  function IonEndEvent(eventType, depth, ionType) {
+    var _this;
+
+    (0, _classCallCheck2["default"])(this, IonEndEvent);
+
+    if (eventType === IonEventType.STREAM_END) {
+      _this = _super15.call(this, eventType, null, null, [], depth, undefined);
+    } else {
+      _this = _super15.call(this, eventType, ionType, null, [], depth, undefined);
+    }
+
+    return (0, _possibleConstructorReturn2["default"])(_this);
+  }
+
+  (0, _createClass2["default"])(IonEndEvent, [{
+    key: "valueCompare",
+    value: function valueCompare(expected) {
+      if (expected instanceof IonEndEvent && this.ionValue === expected.ionValue) {
+        return new ComparisonResult_1.ComparisonResult(ComparisonResult_2.ComparisonResultType.EQUAL);
+      }
+
+      return new ComparisonResult_1.ComparisonResult(ComparisonResult_2.ComparisonResultType.NOT_EQUAL, this.ionValue + " vs. " + expected.ionValue);
+    }
+  }, {
+    key: "writeIonValue",
+    value: function writeIonValue(writer) {}
+  }]);
+  return IonEndEvent;
+}(AbstractIonEvent);
+
+},{"../ComparisonResult":2,"../IonBinaryWriter":7,"../IonLocalSymbolTable":12,"../IonTextWriter":25,"../IonTypes":28,"../IonUnicode":29,"../IonWriteable":30,"@babel/runtime/helpers/classCallCheck":61,"@babel/runtime/helpers/createClass":63,"@babel/runtime/helpers/getPrototypeOf":67,"@babel/runtime/helpers/inherits":68,"@babel/runtime/helpers/interopRequireDefault":69,"@babel/runtime/helpers/possibleConstructorReturn":76,"jsbi":84}],55:[function(require,module,exports){
+"use strict";
+/*!
+ * Copyright 2012 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * A copy of the License is located at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * or in the "license" file accompanying this file. This file is distributed
+ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
+
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
+
+var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime/helpers/classCallCheck"));
+
+var _createClass2 = _interopRequireDefault(require("@babel/runtime/helpers/createClass"));
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.IonEventStream = void 0;
+
+var ComparisonResult_1 = require("../ComparisonResult");
+
+var ComparisonResult_2 = require("../ComparisonResult");
+
+var Ion_1 = require("../Ion");
+
+var IonBinaryReader_1 = require("../IonBinaryReader");
+
+var IonSpan_1 = require("../IonSpan");
+
+var IonTypes_1 = require("../IonTypes");
+
+var EventStreamError_1 = require("./EventStreamError");
+
+var IonEvent_1 = require("./IonEvent");
+
+var READ = "READ";
+var WRITE = "WRITE";
+
+var IonEventStream = /*#__PURE__*/function () {
+  function IonEventStream(reader) {
+    (0, _classCallCheck2["default"])(this, IonEventStream);
+    this.events = [];
+    this.reader = reader;
+    this.eventFactory = new IonEvent_1.IonEventFactory();
+    this.isEventStream = false;
+    this.generateStream();
+  }
+
+  (0, _createClass2["default"])(IonEventStream, [{
+    key: "writeEventStream",
+    value: function writeEventStream(writer) {
+      writer.writeSymbol("$ion_event_stream");
+
+      for (var i = 0; i < this.events.length; i++) {
+        this.events[i].write(writer);
+      }
+    }
+  }, {
+    key: "writeIon",
+    value: function writeIon(writer) {
+      try {
+        var tempEvent;
+        var isEmbedded = false;
+
+        for (var indice = 0; indice < this.events.length; indice++) {
+          tempEvent = this.events[indice];
+
+          if (tempEvent.fieldName !== null) {
+            writer.writeFieldName(tempEvent.fieldName);
+          }
+
+          if ((tempEvent.ionType == IonTypes_1.IonTypes.SEXP || tempEvent.ionType == IonTypes_1.IonTypes.LIST) && this.isEmbedded(tempEvent)) {
+            isEmbedded = true;
+          }
+
+          writer.setAnnotations(tempEvent.annotations);
+
+          switch (tempEvent.eventType) {
+            case IonEvent_1.IonEventType.SCALAR:
+              if (tempEvent.ionValue == null) {
+                writer.writeNull(tempEvent.ionType);
+                return;
+              }
+
+              if (isEmbedded) {
+                writer.writeString(tempEvent.ionValue.toString());
+                break;
+              }
+
+              switch (tempEvent.ionType) {
+                case IonTypes_1.IonTypes.BOOL:
+                  writer.writeBoolean(tempEvent.ionValue);
+                  break;
+
+                case IonTypes_1.IonTypes.STRING:
+                  writer.writeString(tempEvent.ionValue);
+                  break;
+
+                case IonTypes_1.IonTypes.SYMBOL:
+                  writer.writeSymbol(tempEvent.ionValue);
+                  break;
+
+                case IonTypes_1.IonTypes.INT:
+                  writer.writeInt(tempEvent.ionValue);
+                  break;
+
+                case IonTypes_1.IonTypes.DECIMAL:
+                  writer.writeDecimal(tempEvent.ionValue);
+                  break;
+
+                case IonTypes_1.IonTypes.FLOAT:
+                  writer.writeFloat64(tempEvent.ionValue);
+                  break;
+
+                case IonTypes_1.IonTypes.NULL:
+                  writer.writeNull(tempEvent.ionType);
+                  break;
+
+                case IonTypes_1.IonTypes.TIMESTAMP:
+                  writer.writeTimestamp(tempEvent.ionValue);
+                  break;
+
+                case IonTypes_1.IonTypes.CLOB:
+                  writer.writeClob(tempEvent.ionValue);
+                  break;
+
+                case IonTypes_1.IonTypes.BLOB:
+                  writer.writeBlob(tempEvent.ionValue);
+                  break;
+
+                default:
+                  throw new Error("unexpected type: " + tempEvent.ionType.name);
+              }
+
+              break;
+
+            case IonEvent_1.IonEventType.CONTAINER_START:
+              writer.stepIn(tempEvent.ionType);
+              break;
+
+            case IonEvent_1.IonEventType.CONTAINER_END:
+              if (isEmbedded) {
+                isEmbedded = false;
+              }
+
+              writer.stepOut();
+              break;
+
+            case IonEvent_1.IonEventType.STREAM_END:
+              break;
+
+            case IonEvent_1.IonEventType.SYMBOL_TABLE:
+              throw new Error("Symboltables unsupported.");
+
+            default:
+              throw new Error("Unexpected event type: " + tempEvent.eventType);
+          }
+        }
+
+        writer.close();
+      } catch (error) {
+        throw new EventStreamError_1.EventStreamError(WRITE, error.message, this.events.length, this.events);
+      }
+    }
+  }, {
+    key: "getEvents",
+    value: function getEvents() {
+      return this.events;
+    }
+  }, {
+    key: "equals",
+    value: function equals(expected) {
+      return this.compare(expected).result == ComparisonResult_2.ComparisonResultType.EQUAL;
+    }
+  }, {
+    key: "compare",
+    value: function compare(expected) {
+      var actualIndex = 0;
+      var expectedIndex = 0;
+
+      if (this.events.length != expected.events.length) {
+        return new ComparisonResult_1.ComparisonResult(ComparisonResult_2.ComparisonResultType.NOT_EQUAL, "The event streams have different lengths");
+      }
+
+      while (actualIndex < this.events.length && expectedIndex < expected.events.length) {
+        var actualEvent = this.events[actualIndex];
+        var expectedEvent = expected.events[expectedIndex];
+
+        if (actualEvent.eventType === IonEvent_1.IonEventType.SYMBOL_TABLE) {
+          actualIndex++;
+        }
+
+        if (expectedEvent.eventType === IonEvent_1.IonEventType.SYMBOL_TABLE) {
+          expectedIndex++;
+        }
+
+        if (actualEvent.eventType === IonEvent_1.IonEventType.SYMBOL_TABLE || expectedEvent.eventType === IonEvent_1.IonEventType.SYMBOL_TABLE) {
+          continue;
+        }
+
+        switch (actualEvent.eventType) {
+          case IonEvent_1.IonEventType.SCALAR:
+            {
+              var eventResult = actualEvent.compare(expectedEvent);
+
+              if (eventResult.result == ComparisonResult_2.ComparisonResultType.NOT_EQUAL) {
+                eventResult.actualIndex = actualIndex;
+                eventResult.expectedIndex = expectedIndex;
+                return eventResult;
+              }
+
+              break;
+            }
+
+          case IonEvent_1.IonEventType.CONTAINER_START:
+            {
+              var _eventResult = actualEvent.compare(expectedEvent);
+
+              if (_eventResult.result == ComparisonResult_2.ComparisonResultType.NOT_EQUAL) {
+                actualIndex += _eventResult.actualIndex;
+                expectedIndex += _eventResult.expectedIndex;
+                _eventResult.actualIndex = actualIndex;
+                _eventResult.expectedIndex = expectedIndex;
+                return _eventResult;
+              } else {
+                if (actualEvent.ionValue !== null && expectedEvent.ionValue !== null) {
+                  actualIndex = actualIndex + actualEvent.ionValue.length;
+                  expectedIndex = expectedIndex + expectedEvent.ionValue.length;
+                }
+              }
+
+              break;
+            }
+
+          case IonEvent_1.IonEventType.CONTAINER_END:
+          case IonEvent_1.IonEventType.STREAM_END:
+            {
+              break;
+            }
+
+          default:
+            {
+              throw new Error("Unexpected event type: " + actualEvent.eventType);
+            }
+        }
+
+        actualIndex++;
+        expectedIndex++;
+      }
+
+      return new ComparisonResult_1.ComparisonResult(ComparisonResult_2.ComparisonResultType.EQUAL);
+    }
+  }, {
+    key: "isEmbedded",
+    value: function isEmbedded(event) {
+      if (event.annotations[0] === "embedded_documents") {
+        return true;
+      }
+
+      return false;
+    }
+  }, {
+    key: "generateStream",
+    value: function generateStream() {
+      try {
+        var tid = this.reader.next();
+
+        if (tid === IonTypes_1.IonTypes.SYMBOL && this.reader.stringValue() === "$ion_event_stream") {
+          this.marshalStream();
+          this.isEventStream = true;
+          return;
+        }
+
+        var currentContainer = [];
+        var currentContainerIndex = [];
+
+        while (true) {
+          if (this.reader.isNull()) {
+            this.events.push(this.eventFactory.makeEvent(IonEvent_1.IonEventType.SCALAR, tid, this.reader.fieldName(), this.reader.depth(), this.reader.annotations(), true, this.reader.value()));
+          } else {
+            switch (tid) {
+              case IonTypes_1.IonTypes.LIST:
+              case IonTypes_1.IonTypes.SEXP:
+              case IonTypes_1.IonTypes.STRUCT:
+                {
+                  var containerEvent = this.eventFactory.makeEvent(IonEvent_1.IonEventType.CONTAINER_START, tid, this.reader.fieldName(), this.reader.depth(), this.reader.annotations(), false, null);
+                  this.events.push(containerEvent);
+                  currentContainer.push(containerEvent);
+                  currentContainerIndex.push(this.events.length);
+                  this.reader.stepIn();
+                  break;
+                }
+
+              case null:
+                {
+                  if (this.reader.depth() === 0) {
+                    this.events.push(this.eventFactory.makeEvent(IonEvent_1.IonEventType.STREAM_END, IonTypes_1.IonTypes.NULL, null, this.reader.depth(), [], false, undefined));
+                    return;
+                  } else {
+                    this.reader.stepOut();
+                    this.endContainer(currentContainer.pop(), currentContainerIndex.pop());
+                  }
+
+                  break;
+                }
+
+              default:
+                {
+                  this.events.push(this.eventFactory.makeEvent(IonEvent_1.IonEventType.SCALAR, tid, this.reader.fieldName(), this.reader.depth(), this.reader.annotations(), false, this.reader.value()));
+                  break;
+                }
+            }
+          }
+
+          tid = this.reader.next();
+        }
+      } catch (error) {
+        throw new EventStreamError_1.EventStreamError(READ, error.message, this.events.length, this.events);
+      }
+    }
+  }, {
+    key: "endContainer",
+    value: function endContainer(thisContainer, thisContainerIndex) {
+      this.events.push(this.eventFactory.makeEvent(IonEvent_1.IonEventType.CONTAINER_END, thisContainer.ionType, null, thisContainer.depth, [], false, null));
+      thisContainer.ionValue = this.events.slice(thisContainerIndex, this.events.length);
+    }
+  }, {
+    key: "marshalStream",
+    value: function marshalStream() {
+      this.events = [];
+      var currentContainer = [];
+      var currentContainerIndex = [];
+
+      for (var tid = this.reader.next(); tid === IonTypes_1.IonTypes.STRUCT; tid = this.reader.next()) {
+        this.reader.stepIn();
+        var tempEvent = this.marshalEvent();
+
+        if (tempEvent.eventType === IonEvent_1.IonEventType.CONTAINER_START) {
+          currentContainer.push(tempEvent);
+          this.events.push(tempEvent);
+          currentContainerIndex.push(this.events.length);
+        } else if (tempEvent.eventType === IonEvent_1.IonEventType.CONTAINER_END) {
+          this.endContainer(currentContainer.pop(), currentContainerIndex.pop());
+        } else if (tempEvent.eventType === IonEvent_1.IonEventType.SCALAR || tempEvent.eventType === IonEvent_1.IonEventType.STREAM_END) {
+          this.events.push(tempEvent);
+        } else {
+          throw new Error("Unexpected eventType: " + tempEvent.eventType);
+        }
+
+        this.reader.stepOut();
+      }
+    }
+  }, {
+    key: "marshalEvent",
+    value: function marshalEvent() {
+      var currentEvent = {};
+
+      for (var tid; tid = this.reader.next();) {
+        var fieldName = this.reader.fieldName();
+
+        if (fieldName && currentEvent[fieldName] !== undefined) {
+          throw new Error("Repeated event field: " + fieldName);
+        }
+
+        switch (fieldName) {
+          case "event_type":
+            {
+              currentEvent[fieldName] = this.reader.stringValue();
+              break;
+            }
+
+          case "ion_type":
+            {
+              currentEvent[fieldName] = this.parseIonType();
+              break;
+            }
+
+          case "field_name":
+            {
+              currentEvent[fieldName] = this.resolveFieldNameFromSerializedSymbolToken();
+              break;
+            }
+
+          case "annotations":
+            {
+              currentEvent[fieldName] = this.parseAnnotations();
+              break;
+            }
+
+          case "value_text":
+            {
+              var tempString = this.reader.stringValue();
+
+              if (tempString.substr(0, 5) === "$ion_") {
+                tempString = "$ion_user_value::" + tempString;
+              }
+
+              var tempReader = Ion_1.makeReader(tempString);
+              tempReader.next();
+              var tempValue = tempReader.value();
+              currentEvent["isNull"] = tempReader.isNull();
+              currentEvent[fieldName] = tempValue;
+              break;
+            }
+
+          case "value_binary":
+            {
+              currentEvent[fieldName] = this.parseBinaryValue();
+              break;
+            }
+
+          case "imports":
+            {
+              currentEvent[fieldName] = this.parseImports();
+              break;
+            }
+
+          case "depth":
+            {
+              currentEvent[fieldName] = this.reader.numberValue();
+              break;
+            }
+
+          default:
+            throw new Error("Unexpected event field: " + fieldName);
+        }
+      }
+
+      var eventType;
+
+      switch (currentEvent["event_type"]) {
+        case "CONTAINER_START":
+          eventType = IonEvent_1.IonEventType.CONTAINER_START;
+          break;
+
+        case "STREAM_END":
+          eventType = IonEvent_1.IonEventType.STREAM_END;
+          break;
+
+        case "CONTAINER_END":
+          eventType = IonEvent_1.IonEventType.CONTAINER_END;
+          break;
+
+        case "SCALAR":
+          eventType = IonEvent_1.IonEventType.SCALAR;
+          break;
+
+        case "SYMBOL_TABLE":
+          throw new Error("Symbol tables unsupported");
+      }
+
+      var fieldname = currentEvent["field_name"] !== undefined ? currentEvent["field_name"] : null;
+
+      if (!currentEvent["annotations"]) {
+        currentEvent["annotations"] = [];
+      }
+
+      var textEvent = this.eventFactory.makeEvent(eventType, currentEvent["ion_type"], fieldname, currentEvent["depth"], currentEvent["annotations"], currentEvent["isNull"], currentEvent["value_text"]);
+
+      if (eventType === IonEvent_1.IonEventType.SCALAR) {
+        var binaryEvent = this.eventFactory.makeEvent(eventType, currentEvent["ion_type"], fieldname, currentEvent["depth"], currentEvent["annotations"], currentEvent["isNull"], currentEvent["value_binary"]);
+
+        if (!textEvent.equals(binaryEvent)) {
+          throw new Error("Text event ".concat(currentEvent["value_text"], " does not equal binary event ").concat(currentEvent["value_binary"]));
+        }
+      }
+
+      return textEvent;
+    }
+  }, {
+    key: "parseIonType",
+    value: function parseIonType() {
+      var input = this.reader.stringValue().toLowerCase();
+
+      switch (input) {
+        case "null":
+          {
+            return IonTypes_1.IonTypes.NULL;
+          }
+
+        case "bool":
+          {
+            return IonTypes_1.IonTypes.BOOL;
+          }
+
+        case "int":
+          {
+            return IonTypes_1.IonTypes.INT;
+          }
+
+        case "float":
+          {
+            return IonTypes_1.IonTypes.FLOAT;
+          }
+
+        case "decimal":
+          {
+            return IonTypes_1.IonTypes.DECIMAL;
+          }
+
+        case "timestamp":
+          {
+            return IonTypes_1.IonTypes.TIMESTAMP;
+          }
+
+        case "symbol":
+          {
+            return IonTypes_1.IonTypes.SYMBOL;
+          }
+
+        case "string":
+          {
+            return IonTypes_1.IonTypes.STRING;
+          }
+
+        case "clob":
+          {
+            return IonTypes_1.IonTypes.CLOB;
+          }
+
+        case "blob":
+          {
+            return IonTypes_1.IonTypes.BLOB;
+          }
+
+        case "list":
+          {
+            return IonTypes_1.IonTypes.LIST;
+          }
+
+        case "sexp":
+          {
+            return IonTypes_1.IonTypes.SEXP;
+          }
+
+        case "struct":
+          {
+            return IonTypes_1.IonTypes.STRUCT;
+          }
+
+        default:
+          {
+            throw new Error("i: " + input);
+          }
+      }
+    }
+  }, {
+    key: "parseAnnotations",
+    value: function parseAnnotations() {
+      var annotations = [];
+
+      if (this.reader.isNull()) {
+        return annotations;
+      } else {
+        this.reader.stepIn();
+
+        for (var tid; tid = this.reader.next();) {
+          if (tid == IonTypes_1.IonTypes.STRUCT) {
+            this.reader.stepIn();
+            var type = this.reader.next();
+
+            if (this.reader.fieldName() == "text" && type == IonTypes_1.IonTypes.STRING) {
+              var text = this.reader.stringValue();
+
+              if (text !== null) {
+                annotations.push(text);
+              }
+            } else if (this.reader.fieldName() == "importLocation" && type == IonTypes_1.IonTypes.INT) {
+              var symtab = Ion_1.defaultLocalSymbolTable();
+              var symbol = symtab.getSymbolText(this.reader.numberValue());
+
+              if (symbol === undefined || symbol === null) {
+                throw new Error("Unresolvable symbol ID, symboltokens unsupported.");
+              }
+
+              annotations.push(symbol);
+            }
+
+            this.reader.stepOut();
+          }
+        }
+
+        this.reader.stepOut();
+        return annotations;
+      }
+    }
+  }, {
+    key: "parseBinaryValue",
+    value: function parseBinaryValue() {
+      if (this.reader.isNull()) {
+        return null;
+      }
+
+      var numBuffer = [];
+      this.reader.stepIn();
+      var tid = this.reader.next();
+
+      while (tid) {
+        numBuffer.push(this.reader.numberValue());
+        tid = this.reader.next();
+      }
+
+      this.reader.stepOut();
+      var bufArray = new Uint8Array(numBuffer);
+      var tempReader = new IonBinaryReader_1.BinaryReader(new IonSpan_1.BinarySpan(bufArray));
+      tempReader.next();
+      return tempReader.value();
+    }
+  }, {
+    key: "parseImports",
+    value: function parseImports() {
+      return this.reader.value();
+    }
+  }, {
+    key: "resolveFieldNameFromSerializedSymbolToken",
+    value: function resolveFieldNameFromSerializedSymbolToken() {
+      if (this.reader.isNull()) {
+        return null;
+      }
+
+      this.reader.stepIn();
+      var type = this.reader.next();
+
+      if (this.reader.fieldName() == "text" && type == IonTypes_1.IonTypes.STRING) {
+        var text = this.reader.stringValue();
+
+        if (text !== null) {
+          this.reader.stepOut();
+          return text;
+        }
+      } else if (this.reader.fieldName() == "importLocation" && type == IonTypes_1.IonTypes.INT) {
+        var symtab = Ion_1.defaultLocalSymbolTable();
+        var symbol = symtab.getSymbolText(this.reader.numberValue());
+
+        if (symbol === undefined || symbol === null) {
+          throw new Error("Unresolvable symbol ID, symboltokens unsupported.");
+        }
+
+        this.reader.stepOut();
+        return symbol;
+      }
+
+      return null;
+    }
+  }]);
+  return IonEventStream;
+}();
+
+exports.IonEventStream = IonEventStream;
+
+},{"../ComparisonResult":2,"../Ion":4,"../IonBinaryReader":6,"../IonSpan":18,"../IonTypes":28,"./EventStreamError":53,"./IonEvent":54,"@babel/runtime/helpers/classCallCheck":61,"@babel/runtime/helpers/createClass":63,"@babel/runtime/helpers/interopRequireDefault":69}],56:[function(require,module,exports){
 "use strict";
 /*!
  * Copyright 2012 Amazon.com, Inc. or its affiliates. All Rights Reserved.
@@ -11790,7 +13888,7 @@ function _assertDefined(value) {
 
 exports._assertDefined = _assertDefined;
 
-},{}],53:[function(require,module,exports){
+},{}],57:[function(require,module,exports){
 function _arrayLikeToArray(arr, len) {
   if (len == null || len > arr.length) len = arr.length;
 
@@ -11802,13 +13900,13 @@ function _arrayLikeToArray(arr, len) {
 }
 
 module.exports = _arrayLikeToArray;
-},{}],54:[function(require,module,exports){
+},{}],58:[function(require,module,exports){
 function _arrayWithHoles(arr) {
   if (Array.isArray(arr)) return arr;
 }
 
 module.exports = _arrayWithHoles;
-},{}],55:[function(require,module,exports){
+},{}],59:[function(require,module,exports){
 var arrayLikeToArray = require("./arrayLikeToArray");
 
 function _arrayWithoutHoles(arr) {
@@ -11816,7 +13914,7 @@ function _arrayWithoutHoles(arr) {
 }
 
 module.exports = _arrayWithoutHoles;
-},{"./arrayLikeToArray":53}],56:[function(require,module,exports){
+},{"./arrayLikeToArray":57}],60:[function(require,module,exports){
 function _assertThisInitialized(self) {
   if (self === void 0) {
     throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
@@ -11826,7 +13924,7 @@ function _assertThisInitialized(self) {
 }
 
 module.exports = _assertThisInitialized;
-},{}],57:[function(require,module,exports){
+},{}],61:[function(require,module,exports){
 function _classCallCheck(instance, Constructor) {
   if (!(instance instanceof Constructor)) {
     throw new TypeError("Cannot call a class as a function");
@@ -11834,7 +13932,30 @@ function _classCallCheck(instance, Constructor) {
 }
 
 module.exports = _classCallCheck;
-},{}],58:[function(require,module,exports){
+},{}],62:[function(require,module,exports){
+var setPrototypeOf = require("./setPrototypeOf");
+
+var isNativeReflectConstruct = require("./isNativeReflectConstruct");
+
+function _construct(Parent, args, Class) {
+  if (isNativeReflectConstruct()) {
+    module.exports = _construct = Reflect.construct;
+  } else {
+    module.exports = _construct = function _construct(Parent, args, Class) {
+      var a = [null];
+      a.push.apply(a, args);
+      var Constructor = Function.bind.apply(Parent, a);
+      var instance = new Constructor();
+      if (Class) setPrototypeOf(instance, Class.prototype);
+      return instance;
+    };
+  }
+
+  return _construct.apply(null, arguments);
+}
+
+module.exports = _construct;
+},{"./isNativeReflectConstruct":71,"./setPrototypeOf":77}],63:[function(require,module,exports){
 function _defineProperties(target, props) {
   for (var i = 0; i < props.length; i++) {
     var descriptor = props[i];
@@ -11852,7 +13973,7 @@ function _createClass(Constructor, protoProps, staticProps) {
 }
 
 module.exports = _createClass;
-},{}],59:[function(require,module,exports){
+},{}],64:[function(require,module,exports){
 function _defineProperty(obj, key, value) {
   if (key in obj) {
     Object.defineProperty(obj, key, {
@@ -11869,7 +13990,7 @@ function _defineProperty(obj, key, value) {
 }
 
 module.exports = _defineProperty;
-},{}],60:[function(require,module,exports){
+},{}],65:[function(require,module,exports){
 function _extends() {
   module.exports = _extends = Object.assign || function (target) {
     for (var i = 1; i < arguments.length; i++) {
@@ -11889,7 +14010,7 @@ function _extends() {
 }
 
 module.exports = _extends;
-},{}],61:[function(require,module,exports){
+},{}],66:[function(require,module,exports){
 var superPropBase = require("./superPropBase");
 
 function _get(target, property, receiver) {
@@ -11913,7 +14034,7 @@ function _get(target, property, receiver) {
 }
 
 module.exports = _get;
-},{"./superPropBase":72}],62:[function(require,module,exports){
+},{"./superPropBase":79}],67:[function(require,module,exports){
 function _getPrototypeOf(o) {
   module.exports = _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) {
     return o.__proto__ || Object.getPrototypeOf(o);
@@ -11922,7 +14043,7 @@ function _getPrototypeOf(o) {
 }
 
 module.exports = _getPrototypeOf;
-},{}],63:[function(require,module,exports){
+},{}],68:[function(require,module,exports){
 var setPrototypeOf = require("./setPrototypeOf");
 
 function _inherits(subClass, superClass) {
@@ -11941,7 +14062,7 @@ function _inherits(subClass, superClass) {
 }
 
 module.exports = _inherits;
-},{"./setPrototypeOf":70}],64:[function(require,module,exports){
+},{"./setPrototypeOf":77}],69:[function(require,module,exports){
 function _interopRequireDefault(obj) {
   return obj && obj.__esModule ? obj : {
     "default": obj
@@ -11949,13 +14070,34 @@ function _interopRequireDefault(obj) {
 }
 
 module.exports = _interopRequireDefault;
-},{}],65:[function(require,module,exports){
+},{}],70:[function(require,module,exports){
+function _isNativeFunction(fn) {
+  return Function.toString.call(fn).indexOf("[native code]") !== -1;
+}
+
+module.exports = _isNativeFunction;
+},{}],71:[function(require,module,exports){
+function _isNativeReflectConstruct() {
+  if (typeof Reflect === "undefined" || !Reflect.construct) return false;
+  if (Reflect.construct.sham) return false;
+  if (typeof Proxy === "function") return true;
+
+  try {
+    Date.prototype.toString.call(Reflect.construct(Date, [], function () {}));
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
+module.exports = _isNativeReflectConstruct;
+},{}],72:[function(require,module,exports){
 function _iterableToArray(iter) {
   if (typeof Symbol !== "undefined" && Symbol.iterator in Object(iter)) return Array.from(iter);
 }
 
 module.exports = _iterableToArray;
-},{}],66:[function(require,module,exports){
+},{}],73:[function(require,module,exports){
 function _iterableToArrayLimit(arr, i) {
   if (typeof Symbol === "undefined" || !(Symbol.iterator in Object(arr))) return;
   var _arr = [];
@@ -11984,20 +14126,20 @@ function _iterableToArrayLimit(arr, i) {
 }
 
 module.exports = _iterableToArrayLimit;
-},{}],67:[function(require,module,exports){
+},{}],74:[function(require,module,exports){
 function _nonIterableRest() {
   throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
 }
 
 module.exports = _nonIterableRest;
-},{}],68:[function(require,module,exports){
+},{}],75:[function(require,module,exports){
 function _nonIterableSpread() {
   throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
 }
 
 module.exports = _nonIterableSpread;
-},{}],69:[function(require,module,exports){
-var _typeof = require("../helpers/typeof");
+},{}],76:[function(require,module,exports){
+var _typeof = require("@babel/runtime/helpers/typeof");
 
 var assertThisInitialized = require("./assertThisInitialized");
 
@@ -12010,7 +14152,7 @@ function _possibleConstructorReturn(self, call) {
 }
 
 module.exports = _possibleConstructorReturn;
-},{"../helpers/typeof":74,"./assertThisInitialized":56}],70:[function(require,module,exports){
+},{"./assertThisInitialized":60,"@babel/runtime/helpers/typeof":81}],77:[function(require,module,exports){
 function _setPrototypeOf(o, p) {
   module.exports = _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) {
     o.__proto__ = p;
@@ -12021,7 +14163,7 @@ function _setPrototypeOf(o, p) {
 }
 
 module.exports = _setPrototypeOf;
-},{}],71:[function(require,module,exports){
+},{}],78:[function(require,module,exports){
 var arrayWithHoles = require("./arrayWithHoles");
 
 var iterableToArrayLimit = require("./iterableToArrayLimit");
@@ -12035,7 +14177,7 @@ function _slicedToArray(arr, i) {
 }
 
 module.exports = _slicedToArray;
-},{"./arrayWithHoles":54,"./iterableToArrayLimit":66,"./nonIterableRest":67,"./unsupportedIterableToArray":75}],72:[function(require,module,exports){
+},{"./arrayWithHoles":58,"./iterableToArrayLimit":73,"./nonIterableRest":74,"./unsupportedIterableToArray":82}],79:[function(require,module,exports){
 var getPrototypeOf = require("./getPrototypeOf");
 
 function _superPropBase(object, property) {
@@ -12048,7 +14190,7 @@ function _superPropBase(object, property) {
 }
 
 module.exports = _superPropBase;
-},{"./getPrototypeOf":62}],73:[function(require,module,exports){
+},{"./getPrototypeOf":67}],80:[function(require,module,exports){
 var arrayWithoutHoles = require("./arrayWithoutHoles");
 
 var iterableToArray = require("./iterableToArray");
@@ -12062,7 +14204,7 @@ function _toConsumableArray(arr) {
 }
 
 module.exports = _toConsumableArray;
-},{"./arrayWithoutHoles":55,"./iterableToArray":65,"./nonIterableSpread":68,"./unsupportedIterableToArray":75}],74:[function(require,module,exports){
+},{"./arrayWithoutHoles":59,"./iterableToArray":72,"./nonIterableSpread":75,"./unsupportedIterableToArray":82}],81:[function(require,module,exports){
 function _typeof(obj) {
   "@babel/helpers - typeof";
 
@@ -12080,7 +14222,7 @@ function _typeof(obj) {
 }
 
 module.exports = _typeof;
-},{}],75:[function(require,module,exports){
+},{}],82:[function(require,module,exports){
 var arrayLikeToArray = require("./arrayLikeToArray");
 
 function _unsupportedIterableToArray(o, minLen) {
@@ -12093,8 +14235,52 @@ function _unsupportedIterableToArray(o, minLen) {
 }
 
 module.exports = _unsupportedIterableToArray;
-},{"./arrayLikeToArray":53}],76:[function(require,module,exports){
+},{"./arrayLikeToArray":57}],83:[function(require,module,exports){
+var getPrototypeOf = require("./getPrototypeOf");
+
+var setPrototypeOf = require("./setPrototypeOf");
+
+var isNativeFunction = require("./isNativeFunction");
+
+var construct = require("./construct");
+
+function _wrapNativeSuper(Class) {
+  var _cache = typeof Map === "function" ? new Map() : undefined;
+
+  module.exports = _wrapNativeSuper = function _wrapNativeSuper(Class) {
+    if (Class === null || !isNativeFunction(Class)) return Class;
+
+    if (typeof Class !== "function") {
+      throw new TypeError("Super expression must either be null or a function");
+    }
+
+    if (typeof _cache !== "undefined") {
+      if (_cache.has(Class)) return _cache.get(Class);
+
+      _cache.set(Class, Wrapper);
+    }
+
+    function Wrapper() {
+      return construct(Class, arguments, getPrototypeOf(this).constructor);
+    }
+
+    Wrapper.prototype = Object.create(Class.prototype, {
+      constructor: {
+        value: Wrapper,
+        enumerable: false,
+        writable: true,
+        configurable: true
+      }
+    });
+    return setPrototypeOf(Wrapper, Class);
+  };
+
+  return _wrapNativeSuper(Class);
+}
+
+module.exports = _wrapNativeSuper;
+},{"./construct":62,"./getPrototypeOf":67,"./isNativeFunction":70,"./setPrototypeOf":77}],84:[function(require,module,exports){
 (function(e,t){"object"==typeof exports&&"undefined"!=typeof module?module.exports=t():"function"==typeof define&&define.amd?define(t):(e=e||self,e.JSBI=t())})(this,function(){'use strict';function e(t){return e="function"==typeof Symbol&&"symbol"==typeof Symbol.iterator?function(e){return typeof e}:function(e){return e&&"function"==typeof Symbol&&e.constructor===Symbol&&e!==Symbol.prototype?"symbol":typeof e},e(t)}function t(e,t){if(!(e instanceof t))throw new TypeError("Cannot call a class as a function")}function i(e,t){for(var _,n=0;n<t.length;n++)_=t[n],_.enumerable=_.enumerable||!1,_.configurable=!0,"value"in _&&(_.writable=!0),Object.defineProperty(e,_.key,_)}function _(e,t,_){return t&&i(e.prototype,t),_&&i(e,_),e}function n(e,t){if("function"!=typeof t&&null!==t)throw new TypeError("Super expression must either be null or a function");e.prototype=Object.create(t&&t.prototype,{constructor:{value:e,writable:!0,configurable:!0}}),t&&l(e,t)}function g(e){return g=Object.setPrototypeOf?Object.getPrototypeOf:function(e){return e.__proto__||Object.getPrototypeOf(e)},g(e)}function l(e,t){return l=Object.setPrototypeOf||function(e,t){return e.__proto__=t,e},l(e,t)}function o(){if("undefined"==typeof Reflect||!Reflect.construct)return!1;if(Reflect.construct.sham)return!1;if("function"==typeof Proxy)return!0;try{return Date.prototype.toString.call(Reflect.construct(Date,[],function(){})),!0}catch(t){return!1}}function a(){return a=o()?Reflect.construct:function(e,t,i){var _=[null];_.push.apply(_,t);var n=Function.bind.apply(e,_),g=new n;return i&&l(g,i.prototype),g},a.apply(null,arguments)}function s(e){return-1!==Function.toString.call(e).indexOf("[native code]")}function u(e){var t="function"==typeof Map?new Map:void 0;return u=function(e){function i(){return a(e,arguments,g(this).constructor)}if(null===e||!s(e))return e;if("function"!=typeof e)throw new TypeError("Super expression must either be null or a function");if("undefined"!=typeof t){if(t.has(e))return t.get(e);t.set(e,i)}return i.prototype=Object.create(e.prototype,{constructor:{value:i,enumerable:!1,writable:!0,configurable:!0}}),l(i,e)},u(e)}function r(e){if(void 0===e)throw new ReferenceError("this hasn't been initialised - super() hasn't been called");return e}function d(e,t){return t&&("object"==typeof t||"function"==typeof t)?t:r(e)}var h=function(i){var o=Math.abs,a=Math.max,s=Math.imul,u=Math.clz32;function l(e,i){var _;if(t(this,l),e>l.__kMaxLength)throw new RangeError("Maximum BigInt size exceeded");return _=d(this,g(l).call(this,e)),_.sign=i,_}return n(l,i),_(l,[{key:"toDebugString",value:function(){var e=["BigInt["],t=!0,i=!1,_=void 0;try{for(var n,g,l=this[Symbol.iterator]();!(t=(n=l.next()).done);t=!0)g=n.value,e.push((g?(g>>>0).toString(16):g)+", ")}catch(e){i=!0,_=e}finally{try{t||null==l.return||l.return()}finally{if(i)throw _}}return e.push("]"),e.join("")}},{key:"toString",value:function(){var e=0<arguments.length&&void 0!==arguments[0]?arguments[0]:10;if(2>e||36<e)throw new RangeError("toString() radix argument must be between 2 and 36");return 0===this.length?"0":0==(e&e-1)?l.__toStringBasePowerOfTwo(this,e):l.__toStringGeneric(this,e,!1)}},{key:"__copy",value:function(){for(var e=new l(this.length,this.sign),t=0;t<this.length;t++)e[t]=this[t];return e}},{key:"__trim",value:function(){for(var e=this.length,t=this[e-1];0===t;)e--,t=this[e-1],this.pop();return 0===e&&(this.sign=!1),this}},{key:"__initializeDigits",value:function(){for(var e=0;e<this.length;e++)this[e]=0}},{key:"__clzmsd",value:function(){return u(this[this.length-1])}},{key:"__inplaceMultiplyAdd",value:function(e,t,_){_>this.length&&(_=this.length);for(var n=65535&e,g=e>>>16,l=0,o=65535&t,a=t>>>16,u=0;u<_;u++){var r=this.__digit(u),d=65535&r,h=r>>>16,b=s(d,n),m=s(d,g),c=s(h,n),v=s(h,g),y=o+(65535&b),f=a+l+(y>>>16)+(b>>>16)+(65535&m)+(65535&c);o=(m>>>16)+(c>>>16)+(65535&v)+(f>>>16),l=o>>>16,o&=65535,a=v>>>16;this.__setDigit(u,65535&y|f<<16)}if(0!==l||0!==o||0!==a)throw new Error("implementation bug")}},{key:"__inplaceAdd",value:function(e,t,_){for(var n,g=0,l=0;l<_;l++)n=this.__halfDigit(t+l)+e.__halfDigit(l)+g,g=n>>>16,this.__setHalfDigit(t+l,n);return g}},{key:"__inplaceSub",value:function(e,t,_){var n=0;if(1&t){t>>=1;for(var g=this.__digit(t),l=65535&g,o=0;o<_-1>>>1;o++){var a=e.__digit(o),s=(g>>>16)-(65535&a)-n;n=1&s>>>16,this.__setDigit(t+o,s<<16|65535&l),g=this.__digit(t+o+1),l=(65535&g)-(a>>>16)-n,n=1&l>>>16}var u=e.__digit(o),r=(g>>>16)-(65535&u)-n;n=1&r>>>16,this.__setDigit(t+o,r<<16|65535&l);if(t+o+1>=this.length)throw new RangeError("out of bounds");0==(1&_)&&(g=this.__digit(t+o+1),l=(65535&g)-(u>>>16)-n,n=1&l>>>16,this.__setDigit(t+e.length,4294901760&g|65535&l))}else{t>>=1;for(var d=0;d<e.length-1;d++){var h=this.__digit(t+d),b=e.__digit(d),m=(65535&h)-(65535&b)-n;n=1&m>>>16;var c=(h>>>16)-(b>>>16)-n;n=1&c>>>16,this.__setDigit(t+d,c<<16|65535&m)}var v=this.__digit(t+d),y=e.__digit(d),f=(65535&v)-(65535&y)-n;n=1&f>>>16;var k=0;0==(1&_)&&(k=(v>>>16)-(y>>>16)-n,n=1&k>>>16),this.__setDigit(t+d,k<<16|65535&f)}return n}},{key:"__inplaceRightShift",value:function(e){if(0!==e){for(var t,_=this.__digit(0)>>>e,n=this.length-1,g=0;g<n;g++)t=this.__digit(g+1),this.__setDigit(g,t<<32-e|_),_=t>>>e;this.__setDigit(n,_)}}},{key:"__digit",value:function(e){return this[e]}},{key:"__unsignedDigit",value:function(e){return this[e]>>>0}},{key:"__setDigit",value:function(e,t){this[e]=0|t}},{key:"__setDigitGrow",value:function(e,t){this[e]=0|t}},{key:"__halfDigitLength",value:function(){var e=this.length;return 65535>=this.__unsignedDigit(e-1)?2*e-1:2*e}},{key:"__halfDigit",value:function(e){return 65535&this[e>>>1]>>>((1&e)<<4)}},{key:"__setHalfDigit",value:function(e,t){var i=e>>>1,_=this.__digit(i),n=1&e?65535&_|t<<16:4294901760&_|65535&t;this.__setDigit(i,n)}}],[{key:"BigInt",value:function(t){var i=Math.floor,_=Number.isFinite;if("number"==typeof t){if(0===t)return l.__zero();if((0|t)===t)return 0>t?l.__oneDigit(-t,!0):l.__oneDigit(t,!1);if(!_(t)||i(t)!==t)throw new RangeError("The number "+t+" cannot be converted to BigInt because it is not an integer");return l.__fromDouble(t)}if("string"==typeof t){var n=l.__fromString(t);if(null===n)throw new SyntaxError("Cannot convert "+t+" to a BigInt");return n}if("boolean"==typeof t)return!0===t?l.__oneDigit(1,!1):l.__zero();if("object"===e(t)){if(t.constructor===l)return t;var g=l.__toPrimitive(t);return l.BigInt(g)}throw new TypeError("Cannot convert "+t+" to a BigInt")}},{key:"toNumber",value:function(e){var t=e.length;if(0===t)return 0;if(1===t){var i=e.__unsignedDigit(0);return e.sign?-i:i}var _=e.__digit(t-1),n=u(_),g=32*t-n;if(1024<g)return e.sign?-Infinity:1/0;var o=g-1,a=_,s=t-1,r=n+1,d=32===r?0:a<<r;d>>>=12;var h=r-12,b=12<=r?0:a<<20+r,m=20+r;0<h&&0<s&&(s--,a=e.__digit(s),d|=a>>>32-h,b=a<<h,m=h),0<m&&0<s&&(s--,a=e.__digit(s),b|=a>>>32-m,m-=32);var c=l.__decideRounding(e,m,s,a);if((1===c||0===c&&1==(1&b))&&(b=b+1>>>0,0===b&&(d++,0!=d>>>20&&(d=0,o++,1023<o))))return e.sign?-Infinity:1/0;var v=e.sign?-2147483648:0;return o=o+1023<<20,l.__kBitConversionInts[1]=v|o|d,l.__kBitConversionInts[0]=b,l.__kBitConversionDouble[0]}},{key:"unaryMinus",value:function(e){if(0===e.length)return e;var t=e.__copy();return t.sign=!e.sign,t}},{key:"bitwiseNot",value:function(e){return e.sign?l.__absoluteSubOne(e).__trim():l.__absoluteAddOne(e,!0)}},{key:"exponentiate",value:function(e,t){if(t.sign)throw new RangeError("Exponent must be positive");if(0===t.length)return l.__oneDigit(1,!1);if(0===e.length)return e;if(1===e.length&&1===e.__digit(0))return e.sign&&0==(1&t.__digit(0))?l.unaryMinus(e):e;if(1<t.length)throw new RangeError("BigInt too big");var i=t.__unsignedDigit(0);if(1===i)return e;if(i>=l.__kMaxLengthBits)throw new RangeError("BigInt too big");if(1===e.length&&2===e.__digit(0)){var _=1+(i>>>5),n=e.sign&&0!=(1&i),g=new l(_,n);g.__initializeDigits();var o=1<<(31&i);return g.__setDigit(_-1,o),g}var a=null,s=e;for(0!=(1&i)&&(a=e),i>>=1;0!==i;i>>=1)s=l.multiply(s,s),0!=(1&i)&&(null===a?a=s:a=l.multiply(a,s));return a}},{key:"multiply",value:function(e,t){if(0===e.length)return e;if(0===t.length)return t;var _=e.length+t.length;32<=e.__clzmsd()+t.__clzmsd()&&_--;var n=new l(_,e.sign!==t.sign);n.__initializeDigits();for(var g=0;g<e.length;g++)l.__multiplyAccumulate(t,e.__digit(g),n,g);return n.__trim()}},{key:"divide",value:function(e,t){if(0===t.length)throw new RangeError("Division by zero");if(0>l.__absoluteCompare(e,t))return l.__zero();var i,_=e.sign!==t.sign,n=t.__unsignedDigit(0);if(1===t.length&&65535>=n){if(1===n)return _===e.sign?e:l.unaryMinus(e);i=l.__absoluteDivSmall(e,n,null)}else i=l.__absoluteDivLarge(e,t,!0,!1);return i.sign=_,i.__trim()}},{key:"remainder",value:function e(t,i){if(0===i.length)throw new RangeError("Division by zero");if(0>l.__absoluteCompare(t,i))return t;var _=i.__unsignedDigit(0);if(1===i.length&&65535>=_){if(1===_)return l.__zero();var n=l.__absoluteModSmall(t,_);return 0===n?l.__zero():l.__oneDigit(n,t.sign)}var e=l.__absoluteDivLarge(t,i,!1,!0);return e.sign=t.sign,e.__trim()}},{key:"add",value:function(e,t){var i=e.sign;return i===t.sign?l.__absoluteAdd(e,t,i):0<=l.__absoluteCompare(e,t)?l.__absoluteSub(e,t,i):l.__absoluteSub(t,e,!i)}},{key:"subtract",value:function(e,t){var i=e.sign;return i===t.sign?0<=l.__absoluteCompare(e,t)?l.__absoluteSub(e,t,i):l.__absoluteSub(t,e,!i):l.__absoluteAdd(e,t,i)}},{key:"leftShift",value:function(e,t){return 0===t.length||0===e.length?e:t.sign?l.__rightShiftByAbsolute(e,t):l.__leftShiftByAbsolute(e,t)}},{key:"signedRightShift",value:function(e,t){return 0===t.length||0===e.length?e:t.sign?l.__leftShiftByAbsolute(e,t):l.__rightShiftByAbsolute(e,t)}},{key:"unsignedRightShift",value:function(){throw new TypeError("BigInts have no unsigned right shift; use >> instead")}},{key:"lessThan",value:function(e,t){return 0>l.__compareToBigInt(e,t)}},{key:"lessThanOrEqual",value:function(e,t){return 0>=l.__compareToBigInt(e,t)}},{key:"greaterThan",value:function(e,t){return 0<l.__compareToBigInt(e,t)}},{key:"greaterThanOrEqual",value:function(e,t){return 0<=l.__compareToBigInt(e,t)}},{key:"equal",value:function(e,t){if(e.sign!==t.sign)return!1;if(e.length!==t.length)return!1;for(var _=0;_<e.length;_++)if(e.__digit(_)!==t.__digit(_))return!1;return!0}},{key:"notEqual",value:function(e,t){return!l.equal(e,t)}},{key:"bitwiseAnd",value:function(e,t){if(!e.sign&&!t.sign)return l.__absoluteAnd(e,t).__trim();if(e.sign&&t.sign){var i=a(e.length,t.length)+1,_=l.__absoluteSubOne(e,i),n=l.__absoluteSubOne(t);return _=l.__absoluteOr(_,n,_),l.__absoluteAddOne(_,!0,_).__trim()}if(e.sign){var g=[t,e];e=g[0],t=g[1]}return l.__absoluteAndNot(e,l.__absoluteSubOne(t)).__trim()}},{key:"bitwiseXor",value:function(e,t){if(!e.sign&&!t.sign)return l.__absoluteXor(e,t).__trim();if(e.sign&&t.sign){var i=a(e.length,t.length),_=l.__absoluteSubOne(e,i),n=l.__absoluteSubOne(t);return l.__absoluteXor(_,n,_).__trim()}var g=a(e.length,t.length)+1;if(e.sign){var o=[t,e];e=o[0],t=o[1]}var s=l.__absoluteSubOne(t,g);return s=l.__absoluteXor(s,e,s),l.__absoluteAddOne(s,!0,s).__trim()}},{key:"bitwiseOr",value:function(e,t){var i=a(e.length,t.length);if(!e.sign&&!t.sign)return l.__absoluteOr(e,t).__trim();if(e.sign&&t.sign){var _=l.__absoluteSubOne(e,i),n=l.__absoluteSubOne(t);return _=l.__absoluteAnd(_,n,_),l.__absoluteAddOne(_,!0,_).__trim()}if(e.sign){var g=[t,e];e=g[0],t=g[1]}var o=l.__absoluteSubOne(t,i);return o=l.__absoluteAndNot(o,e,o),l.__absoluteAddOne(o,!0,o).__trim()}},{key:"asIntN",value:function(e,t){if(0===t.length)return t;if(0===e)return l.__zero();if(e>=l.__kMaxLengthBits)return t;var _=e+31>>>5;if(t.length<_)return t;var n=t.__unsignedDigit(_-1),g=1<<(31&e-1);if(t.length===_&&n<g)return t;if(!((n&g)===g))return l.__truncateToNBits(e,t);if(!t.sign)return l.__truncateAndSubFromPowerOfTwo(e,t,!0);if(0==(n&g-1)){for(var o=_-2;0<=o;o--)if(0!==t.__digit(o))return l.__truncateAndSubFromPowerOfTwo(e,t,!1);return t.length===_&&n===g?t:l.__truncateToNBits(e,t)}return l.__truncateAndSubFromPowerOfTwo(e,t,!1)}},{key:"asUintN",value:function(e,t){if(0===t.length)return t;if(0===e)return l.__zero();if(t.sign){if(e>l.__kMaxLengthBits)throw new RangeError("BigInt too big");return l.__truncateAndSubFromPowerOfTwo(e,t,!1)}if(e>=l.__kMaxLengthBits)return t;var i=e+31>>>5;if(t.length<i)return t;var _=31&e;if(t.length==i){if(0==_)return t;var n=t.__digit(i-1);if(0==n>>>_)return t}return l.__truncateToNBits(e,t)}},{key:"ADD",value:function(e,t){if(e=l.__toPrimitive(e),t=l.__toPrimitive(t),"string"==typeof e)return"string"!=typeof t&&(t=t.toString()),e+t;if("string"==typeof t)return e.toString()+t;if(e=l.__toNumeric(e),t=l.__toNumeric(t),l.__isBigInt(e)&&l.__isBigInt(t))return l.add(e,t);if("number"==typeof e&&"number"==typeof t)return e+t;throw new TypeError("Cannot mix BigInt and other types, use explicit conversions")}},{key:"LT",value:function(e,t){return l.__compare(e,t,0)}},{key:"LE",value:function(e,t){return l.__compare(e,t,1)}},{key:"GT",value:function(e,t){return l.__compare(e,t,2)}},{key:"GE",value:function(e,t){return l.__compare(e,t,3)}},{key:"EQ",value:function(t,i){for(;;){if(l.__isBigInt(t))return l.__isBigInt(i)?l.equal(t,i):l.EQ(i,t);if("number"==typeof t){if(l.__isBigInt(i))return l.__equalToNumber(i,t);if("object"!==e(i))return t==i;i=l.__toPrimitive(i)}else if("string"==typeof t){if(l.__isBigInt(i))return t=l.__fromString(t),null!==t&&l.equal(t,i);if("object"!==e(i))return t==i;i=l.__toPrimitive(i)}else if("boolean"==typeof t){if(l.__isBigInt(i))return l.__equalToNumber(i,+t);if("object"!==e(i))return t==i;i=l.__toPrimitive(i)}else if("symbol"===e(t)){if(l.__isBigInt(i))return!1;if("object"!==e(i))return t==i;i=l.__toPrimitive(i)}else if("object"===e(t)){if("object"===e(i)&&i.constructor!==l)return t==i;t=l.__toPrimitive(t)}else return t==i}}},{key:"NE",value:function(e,t){return!l.EQ(e,t)}},{key:"__zero",value:function(){return new l(0,!1)}},{key:"__oneDigit",value:function(e,t){var i=new l(1,t);return i.__setDigit(0,e),i}},{key:"__decideRounding",value:function(e,t,i,_){if(0<t)return-1;var n;if(0>t)n=-t-1;else{if(0===i)return-1;i--,_=e.__digit(i),n=31}var g=1<<n;if(0==(_&g))return-1;if(g-=1,0!=(_&g))return 1;for(;0<i;)if(i--,0!==e.__digit(i))return 1;return 0}},{key:"__fromDouble",value:function(e){l.__kBitConversionDouble[0]=e;var t,i=2047&l.__kBitConversionInts[1]>>>20,_=i-1023,n=(_>>>5)+1,g=new l(n,0>e),o=1048575&l.__kBitConversionInts[1]|1048576,a=l.__kBitConversionInts[0],s=20,u=31&_,r=0;if(u<s){var d=s-u;r=d+32,t=o>>>d,o=o<<32-d|a>>>d,a<<=32-d}else if(u===s)r=32,t=o,o=a;else{var h=u-s;r=32-h,t=o<<h|a>>>32-h,o=a<<h}g.__setDigit(n-1,t);for(var b=n-2;0<=b;b--)0<r?(r-=32,t=o,o=a):t=0,g.__setDigit(b,t);return g.__trim()}},{key:"__isWhitespace",value:function(e){return!!(13>=e&&9<=e)||(159>=e?32==e:131071>=e?160==e||5760==e:196607>=e?(e&=131071,10>=e||40==e||41==e||47==e||95==e||4096==e):65279==e)}},{key:"__fromString",value:function(e){var t=1<arguments.length&&void 0!==arguments[1]?arguments[1]:0,i=0,_=e.length,n=0;if(n===_)return l.__zero();for(var g=e.charCodeAt(n);l.__isWhitespace(g);){if(++n===_)return l.__zero();g=e.charCodeAt(n)}if(43===g){if(++n===_)return null;g=e.charCodeAt(n),i=1}else if(45===g){if(++n===_)return null;g=e.charCodeAt(n),i=-1}if(0===t){if(t=10,48===g){if(++n===_)return l.__zero();if(g=e.charCodeAt(n),88===g||120===g){if(t=16,++n===_)return null;g=e.charCodeAt(n)}else if(79===g||111===g){if(t=8,++n===_)return null;g=e.charCodeAt(n)}else if(66===g||98===g){if(t=2,++n===_)return null;g=e.charCodeAt(n)}}}else if(16===t&&48===g){if(++n===_)return l.__zero();if(g=e.charCodeAt(n),88===g||120===g){if(++n===_)return null;g=e.charCodeAt(n)}}for(;48===g;){if(++n===_)return l.__zero();g=e.charCodeAt(n)}var o=_-n,a=l.__kMaxBitsPerChar[t],s=l.__kBitsPerCharTableMultiplier-1;if(o>1073741824/a)return null;var u=a*o+s>>>l.__kBitsPerCharTableShift,r=new l(u+31>>>5,!1),h=10>t?t:10,b=10<t?t-10:0;if(0==(t&t-1)){a>>=l.__kBitsPerCharTableShift;var c=[],v=[],y=!1;do{for(var f,k=0,D=0;;){if(f=void 0,g-48>>>0<h)f=g-48;else if((32|g)-97>>>0<b)f=(32|g)-87;else{y=!0;break}if(D+=a,k=k<<a|f,++n===_){y=!0;break}if(g=e.charCodeAt(n),32<D+a)break}c.push(k),v.push(D)}while(!y);l.__fillFromParts(r,c,v)}else{r.__initializeDigits();var p=!1,B=0;do{for(var S,C=0,A=1;;){if(S=void 0,g-48>>>0<h)S=g-48;else if((32|g)-97>>>0<b)S=(32|g)-87;else{p=!0;break}var T=A*t;if(4294967295<T)break;if(A=T,C=C*t+S,B++,++n===_){p=!0;break}g=e.charCodeAt(n)}s=32*l.__kBitsPerCharTableMultiplier-1;var m=a*B+s>>>l.__kBitsPerCharTableShift+5;r.__inplaceMultiplyAdd(A,C,m)}while(!p)}for(;n!==_;){if(!l.__isWhitespace(g))return null;g=e.charCodeAt(n++)}return 0!==i&&10!==t?null:(r.sign=-1===i,r.__trim())}},{key:"__fillFromParts",value:function(e,t,_){for(var n=0,g=0,l=0,o=t.length-1;0<=o;o--){var a=t[o],s=_[o];g|=a<<l,l+=s,32===l?(e.__setDigit(n++,g),l=0,g=0):32<l&&(e.__setDigit(n++,g),l-=32,g=a>>>s-l)}if(0!==g){if(n>=e.length)throw new Error("implementation bug");e.__setDigit(n++,g)}for(;n<e.length;n++)e.__setDigit(n,0)}},{key:"__toStringBasePowerOfTwo",value:function(e,t){var _=e.length,n=t-1;n=(85&n>>>1)+(85&n),n=(51&n>>>2)+(51&n),n=(15&n>>>4)+(15&n);var g=n,o=t-1,a=e.__digit(_-1),s=u(a),r=0|(32*_-s+g-1)/g;if(e.sign&&r++,268435456<r)throw new Error("string too long");for(var d=Array(r),h=r-1,b=0,m=0,c=0;c<_-1;c++){var v=e.__digit(c),y=(b|v<<m)&o;d[h--]=l.__kConversionChars[y];var f=g-m;for(b=v>>>f,m=32-f;m>=g;)d[h--]=l.__kConversionChars[b&o],b>>>=g,m-=g}var k=(b|a<<m)&o;for(d[h--]=l.__kConversionChars[k],b=a>>>g-m;0!==b;)d[h--]=l.__kConversionChars[b&o],b>>>=g;if(e.sign&&(d[h--]="-"),-1!==h)throw new Error("implementation bug");return d.join("")}},{key:"__toStringGeneric",value:function(e,t,_){var n=e.length;if(0===n)return"";if(1===n){var g=e.__unsignedDigit(0).toString(t);return!1===_&&e.sign&&(g="-"+g),g}var o=32*n-u(e.__digit(n-1)),a=l.__kMaxBitsPerChar[t],s=a-1,r=o*l.__kBitsPerCharTableMultiplier;r+=s-1,r=0|r/s;var d,h,b=r+1>>1,m=l.exponentiate(l.__oneDigit(t,!1),l.__oneDigit(b,!1)),c=m.__unsignedDigit(0);if(1===m.length&&65535>=c){d=new l(e.length,!1),d.__initializeDigits();for(var v,y=0,f=2*e.length-1;0<=f;f--)v=y<<16|e.__halfDigit(f),d.__setHalfDigit(f,0|v/c),y=0|v%c;h=y.toString(t)}else{var k=l.__absoluteDivLarge(e,m,!0,!0);d=k.quotient;var D=k.remainder.__trim();h=l.__toStringGeneric(D,t,!0)}d.__trim();for(var p=l.__toStringGeneric(d,t,!0);h.length<b;)h="0"+h;return!1===_&&e.sign&&(p="-"+p),p+h}},{key:"__unequalSign",value:function(e){return e?-1:1}},{key:"__absoluteGreater",value:function(e){return e?-1:1}},{key:"__absoluteLess",value:function(e){return e?1:-1}},{key:"__compareToBigInt",value:function(e,t){var i=e.sign;if(i!==t.sign)return l.__unequalSign(i);var _=l.__absoluteCompare(e,t);return 0<_?l.__absoluteGreater(i):0>_?l.__absoluteLess(i):0}},{key:"__compareToNumber",value:function(e,t){if(!0|t){var i=e.sign,_=0>t;if(i!==_)return l.__unequalSign(i);if(0===e.length){if(_)throw new Error("implementation bug");return 0===t?0:-1}if(1<e.length)return l.__absoluteGreater(i);var n=o(t),g=e.__unsignedDigit(0);return g>n?l.__absoluteGreater(i):g<n?l.__absoluteLess(i):0}return l.__compareToDouble(e,t)}},{key:"__compareToDouble",value:function(e,t){if(t!==t)return t;if(t===1/0)return-1;if(t===-Infinity)return 1;var i=e.sign;if(i!==0>t)return l.__unequalSign(i);if(0===t)throw new Error("implementation bug: should be handled elsewhere");if(0===e.length)return-1;l.__kBitConversionDouble[0]=t;var _=2047&l.__kBitConversionInts[1]>>>20;if(2047==_)throw new Error("implementation bug: handled elsewhere");var n=_-1023;if(0>n)return l.__absoluteGreater(i);var g=e.length,o=e.__digit(g-1),a=u(o),s=32*g-a,r=n+1;if(s<r)return l.__absoluteLess(i);if(s>r)return l.__absoluteGreater(i);var d=1048576|1048575&l.__kBitConversionInts[1],h=l.__kBitConversionInts[0],b=20,m=31-a;if(m!==(s-1)%31)throw new Error("implementation bug");var c,v=0;if(m<b){var y=b-m;v=y+32,c=d>>>y,d=d<<32-y|h>>>y,h<<=32-y}else if(m===b)v=32,c=d,d=h;else{var f=m-b;v=32-f,c=d<<f|h>>>32-f,d=h<<f}if(o>>>=0,c>>>=0,o>c)return l.__absoluteGreater(i);if(o<c)return l.__absoluteLess(i);for(var k=g-2;0<=k;k--){0<v?(v-=32,c=d>>>0,d=h,h=0):c=0;var D=e.__unsignedDigit(k);if(D>c)return l.__absoluteGreater(i);if(D<c)return l.__absoluteLess(i)}if(0!==d||0!==h){if(0===v)throw new Error("implementation bug");return l.__absoluteLess(i)}return 0}},{key:"__equalToNumber",value:function(e,t){return t|0===t?0===t?0===e.length:1===e.length&&e.sign===0>t&&e.__unsignedDigit(0)===o(t):0===l.__compareToDouble(e,t)}},{key:"__comparisonResultToBool",value:function(e,t){switch(t){case 0:return 0>e;case 1:return 0>=e;case 2:return 0<e;case 3:return 0<=e;}throw new Error("unreachable")}},{key:"__compare",value:function(e,t,i){if(e=l.__toPrimitive(e),t=l.__toPrimitive(t),"string"==typeof e&&"string"==typeof t)switch(i){case 0:return e<t;case 1:return e<=t;case 2:return e>t;case 3:return e>=t;}if(l.__isBigInt(e)&&"string"==typeof t)return t=l.__fromString(t),null!==t&&l.__comparisonResultToBool(l.__compareToBigInt(e,t),i);if("string"==typeof e&&l.__isBigInt(t))return e=l.__fromString(e),null!==e&&l.__comparisonResultToBool(l.__compareToBigInt(e,t),i);if(e=l.__toNumeric(e),t=l.__toNumeric(t),l.__isBigInt(e)){if(l.__isBigInt(t))return l.__comparisonResultToBool(l.__compareToBigInt(e,t),i);if("number"!=typeof t)throw new Error("implementation bug");return l.__comparisonResultToBool(l.__compareToNumber(e,t),i)}if("number"!=typeof e)throw new Error("implementation bug");if(l.__isBigInt(t))return l.__comparisonResultToBool(l.__compareToNumber(t,e),2^i);if("number"!=typeof t)throw new Error("implementation bug");return 0===i?e<t:1===i?e<=t:2===i?e>t:3===i?e>=t:void 0}},{key:"__absoluteAdd",value:function(e,t,_){if(e.length<t.length)return l.__absoluteAdd(t,e,_);if(0===e.length)return e;if(0===t.length)return e.sign===_?e:l.unaryMinus(e);var n=e.length;(0===e.__clzmsd()||t.length===e.length&&0===t.__clzmsd())&&n++;for(var g=new l(n,_),o=0,a=0;a<t.length;a++){var s=t.__digit(a),u=e.__digit(a),r=(65535&u)+(65535&s)+o,d=(u>>>16)+(s>>>16)+(r>>>16);o=d>>>16,g.__setDigit(a,65535&r|d<<16)}for(;a<e.length;a++){var h=e.__digit(a),b=(65535&h)+o,m=(h>>>16)+(b>>>16);o=m>>>16,g.__setDigit(a,65535&b|m<<16)}return a<g.length&&g.__setDigit(a,o),g.__trim()}},{key:"__absoluteSub",value:function(e,t,_){if(0===e.length)return e;if(0===t.length)return e.sign===_?e:l.unaryMinus(e);for(var n=new l(e.length,_),g=0,o=0;o<t.length;o++){var a=e.__digit(o),s=t.__digit(o),u=(65535&a)-(65535&s)-g;g=1&u>>>16;var r=(a>>>16)-(s>>>16)-g;g=1&r>>>16,n.__setDigit(o,65535&u|r<<16)}for(;o<e.length;o++){var d=e.__digit(o),h=(65535&d)-g;g=1&h>>>16;var b=(d>>>16)-g;g=1&b>>>16,n.__setDigit(o,65535&h|b<<16)}return n.__trim()}},{key:"__absoluteAddOne",value:function(e,t){var _=2<arguments.length&&void 0!==arguments[2]?arguments[2]:null,n=e.length;null===_?_=new l(n,t):_.sign=t;for(var g=!0,o=0;o<n;o++){var a=e.__digit(o),s=-1===a;g&&(a=0|a+1),g=s,_.__setDigit(o,a)}return g&&_.__setDigitGrow(n,1),_}},{key:"__absoluteSubOne",value:function(e,t){var _=e.length;t=t||_;for(var n=new l(t,!1),g=!0,o=0;o<_;o++){var a=e.__digit(o),s=0===a;g&&(a=0|a-1),g=s,n.__setDigit(o,a)}for(var u=_;u<t;u++)n.__setDigit(u,0);return n}},{key:"__absoluteAnd",value:function(e,t){var _=2<arguments.length&&void 0!==arguments[2]?arguments[2]:null,n=e.length,g=t.length,o=g;if(n<g){o=n;var a=e,s=n;e=t,n=g,t=a,g=s}var u=o;null===_?_=new l(u,!1):u=_.length;for(var r=0;r<o;r++)_.__setDigit(r,e.__digit(r)&t.__digit(r));for(;r<u;r++)_.__setDigit(r,0);return _}},{key:"__absoluteAndNot",value:function(e,t){var _=2<arguments.length&&void 0!==arguments[2]?arguments[2]:null,n=e.length,g=t.length,o=g;n<g&&(o=n);var a=n;null===_?_=new l(a,!1):a=_.length;for(var s=0;s<o;s++)_.__setDigit(s,e.__digit(s)&~t.__digit(s));for(;s<n;s++)_.__setDigit(s,e.__digit(s));for(;s<a;s++)_.__setDigit(s,0);return _}},{key:"__absoluteOr",value:function(e,t){var _=2<arguments.length&&void 0!==arguments[2]?arguments[2]:null,n=e.length,g=t.length,o=g;if(n<g){o=n;var a=e,s=n;e=t,n=g,t=a,g=s}var u=n;null===_?_=new l(u,!1):u=_.length;for(var r=0;r<o;r++)_.__setDigit(r,e.__digit(r)|t.__digit(r));for(;r<n;r++)_.__setDigit(r,e.__digit(r));for(;r<u;r++)_.__setDigit(r,0);return _}},{key:"__absoluteXor",value:function(e,t){var _=2<arguments.length&&void 0!==arguments[2]?arguments[2]:null,n=e.length,g=t.length,o=g;if(n<g){o=n;var a=e,s=n;e=t,n=g,t=a,g=s}var u=n;null===_?_=new l(u,!1):u=_.length;for(var r=0;r<o;r++)_.__setDigit(r,e.__digit(r)^t.__digit(r));for(;r<n;r++)_.__setDigit(r,e.__digit(r));for(;r<u;r++)_.__setDigit(r,0);return _}},{key:"__absoluteCompare",value:function(e,t){var _=e.length-t.length;if(0!=_)return _;for(var n=e.length-1;0<=n&&e.__digit(n)===t.__digit(n);)n--;return 0>n?0:e.__unsignedDigit(n)>t.__unsignedDigit(n)?1:-1}},{key:"__multiplyAccumulate",value:function(e,t,_,n){if(0!==t){for(var g=65535&t,l=t>>>16,o=0,a=0,u=0,r=0;r<e.length;r++,n++){var d=_.__digit(n),h=65535&d,b=d>>>16,m=e.__digit(r),c=65535&m,v=m>>>16,y=s(c,g),f=s(c,l),k=s(v,g),D=s(v,l);h+=a+(65535&y),b+=u+o+(h>>>16)+(y>>>16)+(65535&f)+(65535&k),o=b>>>16,a=(f>>>16)+(k>>>16)+(65535&D)+o,o=a>>>16,a&=65535,u=D>>>16,d=65535&h|b<<16,_.__setDigit(n,d)}for(;0!==o||0!==a||0!==u;n++){var p=_.__digit(n),B=(65535&p)+a,S=(p>>>16)+(B>>>16)+u+o;a=0,u=0,o=S>>>16,p=65535&B|S<<16,_.__setDigit(n,p)}}}},{key:"__internalMultiplyAdd",value:function(e,t,_,g,l){for(var o=_,a=0,u=0;u<g;u++){var r=e.__digit(u),d=s(65535&r,t),h=(65535&d)+a+o;o=h>>>16;var b=s(r>>>16,t),m=(65535&b)+(d>>>16)+o;o=m>>>16,a=b>>>16,l.__setDigit(u,m<<16|65535&h)}if(l.length>g)for(l.__setDigit(g++,o+a);g<l.length;)l.__setDigit(g++,0);else if(0!==o+a)throw new Error("implementation bug")}},{key:"__absoluteDivSmall",value:function(e,t,_){null===_&&(_=new l(e.length,!1));for(var n=0,g=2*e.length-1;0<=g;g-=2){var o=(n<<16|e.__halfDigit(g))>>>0,a=0|o/t;n=0|o%t,o=(n<<16|e.__halfDigit(g-1))>>>0;var s=0|o/t;n=0|o%t,_.__setDigit(g>>>1,a<<16|s)}return _}},{key:"__absoluteModSmall",value:function(e,t){for(var _,n=0,g=2*e.length-1;0<=g;g--)_=(n<<16|e.__halfDigit(g))>>>0,n=0|_%t;return n}},{key:"__absoluteDivLarge",value:function(e,t,i,_){var g=t.__halfDigitLength(),n=t.length,o=e.__halfDigitLength()-g,a=null;i&&(a=new l(o+2>>>1,!1),a.__initializeDigits());var r=new l(g+2>>>1,!1);r.__initializeDigits();var d=l.__clz16(t.__halfDigit(g-1));0<d&&(t=l.__specialLeftShift(t,d,0));for(var h=l.__specialLeftShift(e,d,1),u=t.__halfDigit(g-1),b=0,m=o;0<=m;m--){var v=65535,y=h.__halfDigit(m+g);if(y!==u){var f=(y<<16|h.__halfDigit(m+g-1))>>>0;v=0|f/u;for(var k=0|f%u,D=t.__halfDigit(g-2),p=h.__halfDigit(m+g-2);s(v,D)>>>0>(k<<16|p)>>>0&&(v--,k+=u,!(65535<k)););}l.__internalMultiplyAdd(t,v,0,n,r);var B=h.__inplaceSub(r,m,g+1);0!==B&&(B=h.__inplaceAdd(t,m,g),h.__setHalfDigit(m+g,h.__halfDigit(m+g)+B),v--),i&&(1&m?b=v<<16:a.__setDigit(m>>>1,b|v))}return _?(h.__inplaceRightShift(d),i?{quotient:a,remainder:h}:h):i?a:void 0}},{key:"__clz16",value:function(e){return u(e)-16}},{key:"__specialLeftShift",value:function(e,t,_){var g=e.length,n=new l(g+_,!1);if(0===t){for(var o=0;o<g;o++)n.__setDigit(o,e.__digit(o));return 0<_&&n.__setDigit(g,0),n}for(var a,s=0,u=0;u<g;u++)a=e.__digit(u),n.__setDigit(u,a<<t|s),s=a>>>32-t;return 0<_&&n.__setDigit(g,s),n}},{key:"__leftShiftByAbsolute",value:function(e,t){var _=l.__toShiftAmount(t);if(0>_)throw new RangeError("BigInt too big");var n=_>>>5,g=31&_,o=e.length,a=0!==g&&0!=e.__digit(o-1)>>>32-g,s=o+n+(a?1:0),u=new l(s,e.sign);if(0===g){for(var r=0;r<n;r++)u.__setDigit(r,0);for(;r<s;r++)u.__setDigit(r,e.__digit(r-n))}else{for(var h=0,b=0;b<n;b++)u.__setDigit(b,0);for(var m,c=0;c<o;c++)m=e.__digit(c),u.__setDigit(c+n,m<<g|h),h=m>>>32-g;if(a)u.__setDigit(o+n,h);else if(0!==h)throw new Error("implementation bug")}return u.__trim()}},{key:"__rightShiftByAbsolute",value:function(e,t){var _=e.length,n=e.sign,g=l.__toShiftAmount(t);if(0>g)return l.__rightShiftByMaximum(n);var o=g>>>5,a=31&g,s=_-o;if(0>=s)return l.__rightShiftByMaximum(n);var u=!1;if(n){if(0!=(e.__digit(o)&(1<<a)-1))u=!0;else for(var r=0;r<o;r++)if(0!==e.__digit(r)){u=!0;break}}if(u&&0===a){var h=e.__digit(_-1);0==~h&&s++}var b=new l(s,n);if(0===a)for(var m=o;m<_;m++)b.__setDigit(m-o,e.__digit(m));else{for(var c,v=e.__digit(o)>>>a,y=_-o-1,f=0;f<y;f++)c=e.__digit(f+o+1),b.__setDigit(f,c<<32-a|v),v=c>>>a;b.__setDigit(y,v)}return u&&(b=l.__absoluteAddOne(b,!0,b)),b.__trim()}},{key:"__rightShiftByMaximum",value:function(e){return e?l.__oneDigit(1,!0):l.__zero()}},{key:"__toShiftAmount",value:function(e){if(1<e.length)return-1;var t=e.__unsignedDigit(0);return t>l.__kMaxLengthBits?-1:t}},{key:"__toPrimitive",value:function(t){var i=1<arguments.length&&void 0!==arguments[1]?arguments[1]:"default";if("object"!==e(t))return t;if(t.constructor===l)return t;var _=t[Symbol.toPrimitive];if(_){var n=_(i);if("object"!==e(n))return n;throw new TypeError("Cannot convert object to primitive value")}var g=t.valueOf;if(g){var o=g.call(t);if("object"!==e(o))return o}var a=t.toString;if(a){var s=a.call(t);if("object"!==e(s))return s}throw new TypeError("Cannot convert object to primitive value")}},{key:"__toNumeric",value:function(e){return l.__isBigInt(e)?e:+e}},{key:"__isBigInt",value:function(t){return"object"===e(t)&&t.constructor===l}},{key:"__truncateToNBits",value:function(e,t){for(var _=e+31>>>5,n=new l(_,t.sign),g=_-1,o=0;o<g;o++)n.__setDigit(o,t.__digit(o));var a=t.__digit(g);if(0!=(31&e)){var s=32-(31&e);a=a<<s>>>s}return n.__setDigit(g,a),n.__trim()}},{key:"__truncateAndSubFromPowerOfTwo",value:function(e,t,_){for(var n=Math.min,g=e+31>>>5,o=new l(g,_),a=0,s=g-1,u=0,r=n(s,t.length);a<r;a++){var d=t.__digit(a),h=0-(65535&d)-u;u=1&h>>>16;var b=0-(d>>>16)-u;u=1&b>>>16,o.__setDigit(a,65535&h|b<<16)}for(;a<s;a++)o.__setDigit(a,0|-u);var m,c=s<t.length?t.__digit(s):0,v=31&e;if(0===v){var y=0-(65535&c)-u;u=1&y>>>16;var f=0-(c>>>16)-u;m=65535&y|f<<16}else{var k=32-v;c=c<<k>>>k;var D=1<<32-k,p=(65535&D)-(65535&c)-u;u=1&p>>>16;var B=(D>>>16)-(c>>>16)-u;m=65535&p|B<<16,m&=D-1}return o.__setDigit(s,m),o.__trim()}},{key:"__digitPow",value:function(e,t){for(var i=1;0<t;)1&t&&(i*=e),t>>>=1,e*=e;return i}}]),l}(u(Array));return h.__kMaxLength=33554432,h.__kMaxLengthBits=h.__kMaxLength<<5,h.__kMaxBitsPerChar=[0,0,32,51,64,75,83,90,96,102,107,111,115,119,122,126,128,131,134,136,139,141,143,145,147,149,151,153,154,156,158,159,160,162,163,165,166],h.__kBitsPerCharTableShift=5,h.__kBitsPerCharTableMultiplier=1<<h.__kBitsPerCharTableShift,h.__kConversionChars=["0","1","2","3","4","5","6","7","8","9","a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z"],h.__kBitConversionBuffer=new ArrayBuffer(8),h.__kBitConversionDouble=new Float64Array(h.__kBitConversionBuffer),h.__kBitConversionInts=new Int32Array(h.__kBitConversionBuffer),h});
 
-},{}]},{},[3])(3)
+},{}]},{},[4])(4)
 });

@@ -117,6 +117,7 @@
 								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_dom_value_.value-1.html#booleanvalue" class="tsd-kind-icon">boolean<wbr>Value</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_dom_value_.value-1.html#datevalue" class="tsd-kind-icon">date<wbr>Value</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_dom_value_.value-1.html#decimalvalue" class="tsd-kind-icon">decimal<wbr>Value</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_dom_value_.value-1.html#deletefield" class="tsd-kind-icon">delete<wbr>Field</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_dom_value_.value-1.html#elements" class="tsd-kind-icon">elements</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_dom_value_.value-1.html#fieldnames" class="tsd-kind-icon">field<wbr>Names</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_dom_value_.value-1.html#fields" class="tsd-kind-icon">fields</a></li>
@@ -146,7 +147,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/3a88880/src/dom/Value.ts#L133">src/dom/Value.ts:133</a></li>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/b358e06/src/dom/Value.ts#L133">src/dom/Value.ts:133</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -182,7 +183,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/3a88880/src/dom/Value.ts#L58">src/dom/Value.ts:58</a></li>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/b358e06/src/dom/Value.ts#L58">src/dom/Value.ts:58</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -205,7 +206,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/3a88880/src/dom/Value.ts#L43">src/dom/Value.ts:43</a></li>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/b358e06/src/dom/Value.ts#L43">src/dom/Value.ts:43</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -228,7 +229,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/3a88880/src/dom/Value.ts#L79">src/dom/Value.ts:79</a></li>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/b358e06/src/dom/Value.ts#L79">src/dom/Value.ts:79</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -253,7 +254,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/3a88880/src/dom/Value.ts#L64">src/dom/Value.ts:64</a></li>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/b358e06/src/dom/Value.ts#L64">src/dom/Value.ts:64</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -267,6 +268,35 @@
 					</ul>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface">
+					<a name="deletefield" class="tsd-anchor"></a>
+					<h3>delete<wbr>Field</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
+						<li class="tsd-signature tsd-kind-icon">delete<wbr>Field<span class="tsd-signature-symbol">(</span>name<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/b358e06/src/dom/Value.ts#L146">src/dom/Value.ts:146</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>For the Struct type, deletes the field with provided name if present. Returns a boolean
+									indicating whether the Struct was modified. For all other types, throws an Error.</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>name: <span class="tsd-signature-type">string</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface">
 					<a name="elements" class="tsd-anchor"></a>
 					<h3>elements</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
@@ -276,7 +306,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/3a88880/src/dom/Value.ts#L125">src/dom/Value.ts:125</a></li>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/b358e06/src/dom/Value.ts#L125">src/dom/Value.ts:125</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -299,7 +329,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/3a88880/src/dom/Value.ts#L113">src/dom/Value.ts:113</a></li>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/b358e06/src/dom/Value.ts#L113">src/dom/Value.ts:113</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -322,7 +352,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/3a88880/src/dom/Value.ts#L119">src/dom/Value.ts:119</a></li>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/b358e06/src/dom/Value.ts#L119">src/dom/Value.ts:119</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -345,7 +375,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/3a88880/src/dom/Value.ts#L107">src/dom/Value.ts:107</a></li>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/b358e06/src/dom/Value.ts#L107">src/dom/Value.ts:107</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -386,7 +416,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/3a88880/src/dom/Value.ts#L32">src/dom/Value.ts:32</a></li>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/b358e06/src/dom/Value.ts#L32">src/dom/Value.ts:32</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -409,7 +439,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/3a88880/src/dom/Value.ts#L26">src/dom/Value.ts:26</a></li>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/b358e06/src/dom/Value.ts#L26">src/dom/Value.ts:26</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -431,7 +461,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/3a88880/src/dom/Value.ts#L37">src/dom/Value.ts:37</a></li>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/b358e06/src/dom/Value.ts#L37">src/dom/Value.ts:37</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -453,7 +483,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/3a88880/src/dom/Value.ts#L52">src/dom/Value.ts:52</a></li>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/b358e06/src/dom/Value.ts#L52">src/dom/Value.ts:52</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -478,7 +508,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/3a88880/src/dom/Value.ts#L70">src/dom/Value.ts:70</a></li>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/b358e06/src/dom/Value.ts#L70">src/dom/Value.ts:70</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -501,7 +531,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/3a88880/src/dom/Value.ts#L85">src/dom/Value.ts:85</a></li>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/b358e06/src/dom/Value.ts#L85">src/dom/Value.ts:85</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -524,7 +554,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/3a88880/src/dom/Value.ts#L91">src/dom/Value.ts:91</a></li>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/b358e06/src/dom/Value.ts#L91">src/dom/Value.ts:91</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -547,7 +577,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/3a88880/src/dom/Value.ts#L140">src/dom/Value.ts:140</a></li>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/b358e06/src/dom/Value.ts#L140">src/dom/Value.ts:140</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -608,6 +638,9 @@
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-interface">
 								<a href="_dom_value_.value-1.html#decimalvalue" class="tsd-kind-icon">decimal<wbr>Value</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-interface">
+								<a href="_dom_value_.value-1.html#deletefield" class="tsd-kind-icon">delete<wbr>Field</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-interface">
 								<a href="_dom_value_.value-1.html#elements" class="tsd-kind-icon">elements</a>
