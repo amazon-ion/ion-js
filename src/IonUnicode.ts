@@ -13,10 +13,10 @@
  * permissions and limitations under the License.
  */
 
-import {TextDecoder} from "util";
+import { TextDecoder } from "util";
 
 // verify if TextDecoder exists globally or not
-let textDecoder = TextDecoder ? new TextDecoder("utf8", {fatal: true}) : null;
+let textDecoder = TextDecoder ? new TextDecoder("utf8", { fatal: true }) : null;
 
 /**
  * @file Constants and helper methods for Unicode.
@@ -66,7 +66,7 @@ export function encodeUtf8(s: string): Uint8Array {
 
 export function decodeUtf8(bytes: Uint8Array): string {
   // for bytes > 512 use TextDecoder method - decode()
-  if(bytes.length > 512 && textDecoder != null) {
+  if (bytes.length > 512 && textDecoder != null) {
     return textDecoder.decode(bytes);
   }
   let i = 0,
