@@ -249,4 +249,64 @@ class IonTextReaderTests {
             IonTextReaderTests.ivmTest(textReader, unsupportedIVM[i], false, 0, ["taco"]);
         }
     }
+
+    @test "get position from reader" () {
+        const ionToRead = "ann1::{ key: valX } ann2::{ keyX: ['v1', 'v2'], keyY: ['v3', 'v4'] }";
+        const ionTextReader = ion.makeReader(ionToRead);
+        
+        // vertical bar '|' indicate the position
+        const pos1 = ionTextReader.position();
+        // |ann1::{ key: valX } ann2::{ keyX: ['v1', 'v2'], keyY: ['v3', 'v4'] }
+        assert.equal(pos1, 0);
+        
+        ionTextReader.next();
+        // ann1::{| key: valX } ann2::{ keyX: ['v1', 'v2'], keyY: ['v3', 'v4'] }
+        const pos2 = ionTextReader.position();
+        assert.equal(pos2, 7);
+
+        ionTextReader.stepIn();
+        ionTextReader.next();
+        // ann1::{ key: valX |} ann2::{ keyX: ['v1', 'v2'], keyY: ['v3', 'v4'] }
+        const pos7 = ionTextReader.position();
+        assert.equal(pos7, 18);
+        
+        ionTextReader.stepOut();
+        ionTextReader.next();
+        // ann1::{ key: valX } ann2::{| keyX: ['v1', 'v2'], keyY: ['v3', 'v4'] }
+        const pos3 = ionTextReader.position();
+        assert.equal(pos3, 27);
+        
+        ionTextReader.stepIn();
+        ionTextReader.next();
+        // ann1::{ key: valX } ann2::{ keyX: [|'v1', 'v2'], keyY: ['v3', 'v4'] }
+        const pos4 = ionTextReader.position();
+        assert.equal(pos4, 35);
+        
+        ionTextReader.stepIn();
+        ionTextReader.next();
+        // ann1::{ key: valX } ann2::{ keyX: ['v1'|, 'v2'], keyY: ['v3', 'v4'] }
+        const pos5 = ionTextReader.position();
+        assert.equal(pos5, 39);
+        
+        ionTextReader.stepOut();
+        // ann1::{ key: valX } ann2::{ keyX: ['v1', 'v2']|, keyY: ['v3', 'v4'] }
+        const pos6 = ionTextReader.position();
+        assert.equal(pos6, 46);
+    }
+
+    @test "get position from multi-byte" () {
+
+        const s1 = '好'; // 1 UTF-16 code unit
+        const s2 = 'の'; // 1 UTF-16 code unit
+        const s3 = 'ç'; // 1 UTF-16 code unit
+        const s4 = '👩'; // 2 UTF-16 code unit
+        const s5 = '👩🏽'; // 3 UTF-16 code unit
+        const reader: ion.Reader = ion.makeReader("\"s\" \"好\" \"ç\" \"👩\" \"👩🏽\"");
+
+        const pos = [3, 7, 11, 16, 23];
+        let i = 0;
+        while (reader.next()) {
+            assert.equal(reader.position(), pos[i++]);
+        }
+    }
 }
