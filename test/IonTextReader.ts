@@ -296,12 +296,12 @@ class IonTextReaderTests {
 
     @test "get position from multi-byte" () {
 
-        const s0 = 's'; // 0073
-        const s1 = '好'; // 597d
-        const s2 = 'の'; // 306e
-        const s3 = 'ç'; // 00e7
-        const s4 = '👩'; // d83d dc69
-        const s5 = '👩🏽'; // d83d dc69 d83c dffd
+        // const s0 = 's'; // \u0073
+        // const s1 = '好'; // \u597d
+        // const s2 = 'の'; // \u306e
+        // const s3 = 'ç'; // \u00e7
+        // const s4 = '👩'; // \ud83d \udc69
+        // const s5 = '👩🏽'; // \ud83d \udc69 \ud83c \udffd
         const reader: ion.Reader = ion.makeReader("\"s\" \"好\" \"の\" \"ç\" \"👩\" \"👩🏽\"");
 
         const pos = [3, 7, 11, 15, 20, 27];
