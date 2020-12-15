@@ -27,6 +27,7 @@ describe('Binary Reader', () => {
         assert.deepEqual(reader.timestampValue(), timestamp);
     });
     it('test position', () => {
+        // In the comments below, the vertical bar '|' indicates the current position of the cursor at each step.
         const ionBinary: Uint8Array = ion.dumpBinary(null, 7, -17, "Hello", [1, 2, 3]);
         // [|0xE0, 0x1, 0x0, 0xEA, |0xF, |0x21, 0x7, |0x31, 0x11, |0x85, 0x48, 0x65, 0x6C, 0x6C, 0x6F, |0xB6, 0x21, 0x1, 0x21, 0x2, 0x21, 0x3 |]
         //   Version                null  7           -17          "hello"                              [1,2,3]
@@ -71,6 +72,5 @@ describe('Binary Reader', () => {
         // out of stream
         // [0xE0, 0x1, 0x0, 0xEA, 0xF, 0x21, 0x7, 0x31, 0x11, 0x85, 0x48, 0x65, 0x6C, 0x6C, 0x6F, 0xB6, 0x21, 0x1, 0x21, 0x2, 0x21, 0x3]|
         assert.equal(binaryReader.position(), 22);
-
     });
 });

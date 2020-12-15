@@ -254,7 +254,7 @@ class IonTextReaderTests {
         const ionToRead = "ann1::{ key: valX } ann2::{ keyX: ['v1', 'v2'], keyY: ['v3', 'v4'] }";
         const ionTextReader = ion.makeReader(ionToRead);
         
-        // vertical bar '|' indicate the position
+        // In the comments below, the vertical bar '|' indicates the current position of the cursor at each step.
         const pos1 = ionTextReader.position();
         // |ann1::{ key: valX } ann2::{ keyX: ['v1', 'v2'], keyY: ['v3', 'v4'] }
         assert.equal(pos1, 0);
@@ -296,12 +296,12 @@ class IonTextReaderTests {
 
     @test "get position from multi-byte" () {
 
-        // const s0 = 's'; // \u0073
-        // const s1 = '好'; // \u597d
-        // const s2 = 'の'; // \u306e
-        // const s3 = 'ç'; // \u00e7
-        // const s4 = '👩'; // \ud83d \udc69
-        // const s5 = '👩🏽'; // \ud83d \udc69 \ud83c \udffd
+        // 's': \u0073
+        // '好': \u597d
+        // 'の': \u306e
+        // 'ç': \u00e7
+        // '👩': \ud83d \udc69
+        // '👩🏽': \ud83d \udc69 \ud83c \udffd
         const reader: ion.Reader = ion.makeReader("\"s\" \"好\" \"の\" \"ç\" \"👩\" \"👩🏽\"");
 
         const pos = [3, 7, 11, 15, 20, 27];
