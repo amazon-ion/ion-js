@@ -292,6 +292,11 @@ class IonTextReaderTests {
         // ann1::{ key: valX } ann2::{ keyX: ['v1', 'v2']|, keyY: ['v3', 'v4'] }
         const pos6 = ionTextReader.position();
         assert.equal(pos6, 46);
+
+        ionTextReader.stepOut();
+        // ann1::{ key: valX } ann2::{ keyX: ['v1', 'v2'], keyY: ['v3', 'v4'] }|
+        const pos8 = ionTextReader.position();
+        assert.equal(pos8, 68);
     }
 
     @test "get position from multi-byte" () {
