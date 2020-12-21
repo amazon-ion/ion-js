@@ -658,12 +658,13 @@ export abstract class AbstractNode implements Node {
         annotationsLength
       );
       const containedValueLength = this.getContainedValueLength();
-      const containedValueLengthLength = AbstractNode.getLengthLength(
-        containedValueLength
+
+      const annotationsWrapperLengthLength = AbstractNode.getLengthLength(
+        containedValueLength + annotationsLength + annotationsLengthLength
       );
       return (
         TYPE_DESCRIPTOR_LENGTH +
-        containedValueLengthLength +
+        annotationsWrapperLengthLength +
         annotationsLengthLength +
         annotationsLength
       );
@@ -768,7 +769,7 @@ interface Field {
   value: Node;
 }
 
-class StructNode extends ContainerNode {
+export class StructNode extends ContainerNode {
   private fields: Field[] = [];
   private length: number;
 

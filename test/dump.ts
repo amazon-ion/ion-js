@@ -74,7 +74,7 @@ describe('dump*()', () => {
         writer.close();
         assert.deepEqual(ionBinary, writer.getBytes());
     });
-    it('Struct with annotations', () => {
+    it('Struct with annotated field large enough to require a VarUInt length', () => {
         let ionText = "{a: b:: \"abcdefghijkl\"}";
         let ionValue = ion.load(ionText);
         let binaryIonBytes = ion.dumpBinary(ionValue);
