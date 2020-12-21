@@ -140,6 +140,10 @@ export class TextReader implements Reader {
     return false;
   }
 
+  position() {
+    return this._parser.source().position();
+  }
+
   next() {
     this._raw = undefined;
     if (this._raw_type === EOF) {

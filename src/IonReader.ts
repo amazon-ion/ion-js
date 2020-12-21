@@ -42,6 +42,28 @@ export type ReaderScalarValue =
  */
 export interface Reader {
   /**
+   * Returns the Reader's offset from the beginning of its input.
+   *
+   * For binary Readers, the return value is the number of bytes that have
+   * been processed.
+   *
+   * For text Readers, the return value is the number of UTF-16 code units
+   * that have been processed, regardless of the input's original encoding.
+   * For more on JavaScript's in-memory representation of text, see:
+   * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/length#Description
+   *
+   * Note that a Reader cannot safely skip to a given position in input without
+   * processing the stream leading up to that position. This is because there are
+   * mid-stream system level values that must be processed to guarantee that the
+   * Reader is in a valid state. It is safe, however, to start at the beginning of a data
+   * source and call next() until you reach the desired position, as the reader
+   * will still have the opportunity to process system-level values along the way.)
+   *
+   * @returns the [[number]] of bytes or UTF-16 code units that the reader has processed.
+   */
+  position(): number;
+
+  /**
    * Advances the reader to the next value in the stream at the current depth.
    *
    * @return The corresponding [[IonType]] of the value the reader moves to, or `null`
