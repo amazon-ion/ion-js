@@ -74,4 +74,10 @@ describe('dump*()', () => {
         writer.close();
         assert.deepEqual(ionBinary, writer.getBytes());
     });
+    it('Struct with annotations', () => {
+        let ionText = "{a: b:: \"abcdefghijkl\"}";
+        let ionValue = ion.load(ionText);
+        let binaryIonBytes = ion.dumpBinary(ionValue);
+        let ionBinaryValue = ion.load(binaryIonBytes);
+    })
 });
