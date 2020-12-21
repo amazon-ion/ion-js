@@ -769,7 +769,7 @@ interface Field {
   value: Node;
 }
 
-export class StructNode extends ContainerNode {
+class StructNode extends ContainerNode {
   private fields: Field[] = [];
   private length: number;
 
