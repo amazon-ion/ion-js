@@ -96,22 +96,6 @@ function get_ion_type(rt: number): IonType {
   }
 }
 
-const TS_SHIFT = 5;
-const TS_MASK = 0x1f;
-
-function encode_type_stack(type_, len) {
-  const ts = (len << TS_SHIFT) | (type_ & TS_MASK);
-  return ts;
-}
-
-function decode_type_stack_type(ts) {
-  return ts & TS_MASK;
-}
-
-function decode_type_stack_len(ts) {
-  return ts >>> TS_SHIFT;
-}
-
 const VINT_SHIFT = 7;
 const VINT_MASK = 0x7f;
 const VINT_FLAG = 0x80;
@@ -131,6 +115,17 @@ const ivm_image_1 = IVM.binary[1];
 const ivm_image_2 = IVM.binary[2];
 const ivm_image_3 = IVM.binary[3];
 
+// stack pointer for _ts to store length and type information of container
+class stackPointer{
+  len: number;
+  type: number;
+
+  constructor(len: number, type:number) {
+    this.len = len;
+    this.type = type;
+  }
+}
+
 export class ParserBinaryRaw {
   private _in: BinarySpan;
   private _raw_type: number = EOF;
@@ -141,7 +136,7 @@ export class ParserBinaryRaw {
   private _as: number = -1;
   private _ae: number = -1;
   private _a = [];
-  private _ts = [TB_DATAGRAM];
+  private _ts = [new stackPointer(0, TB_DATAGRAM)];
   private _in_struct: boolean = false;
 
   constructor(source: BinarySpan) {
@@ -341,7 +336,7 @@ export class ParserBinaryRaw {
         throw new Error("you can only 'stepIn' to a container");
     }
     len = t._in.getRemaining() - t._len; // when we stepOut we'll have consumed this value
-    ts = encode_type_stack(t._raw_type, len); // (l << TS_SHIFT) | (t._raw_type & TS_MASK);
+    ts = new stackPointer(len, t._raw_type); // add len and type information to stack
     t._ts.push(ts);
     t._in_struct = t._raw_type === IonBinary.TB_STRUCT;
     t._in.setRemaining(t._len);
@@ -355,8 +350,8 @@ export class ParserBinaryRaw {
       throw new Error("Cannot stepOut any further, already at top level");
     }
     ts = t._ts.pop();
-    l = decode_type_stack_len(ts);
-    parent_type = decode_type_stack_type(t._ts[t._ts.length - 1]);
+    l = ts.len;
+    parent_type = t._ts[t._ts.length - 1].type; 
     t._in_struct = parent_type === IonBinary.TB_STRUCT;
     t.clear_value();
 
