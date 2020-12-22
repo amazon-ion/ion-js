@@ -116,11 +116,11 @@ const ivm_image_2 = IVM.binary[2];
 const ivm_image_3 = IVM.binary[3];
 
 // stack pointer for _ts to store length and type information of container
-class stackPointer{
+class stackPointer {
   len: number;
   type: number;
 
-  constructor(len: number, type:number) {
+  constructor(len: number, type: number) {
     this.len = len;
     this.type = type;
   }
@@ -351,7 +351,7 @@ export class ParserBinaryRaw {
     }
     ts = t._ts.pop();
     l = ts.len;
-    parent_type = t._ts[t._ts.length - 1].type; 
+    parent_type = t._ts[t._ts.length - 1].type;
     t._in_struct = parent_type === IonBinary.TB_STRUCT;
     t.clear_value();
 
