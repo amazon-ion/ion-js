@@ -13,6 +13,16 @@
  * permissions and limitations under the License.
  */
 
+const JS_DECODER_MAX_BYTES = 512;
+
+// Check whether this runtime supports the `TextDecoder` feature
+let textDecoder;
+if (global["TextDecoder"] != null) {
+  textDecoder = new global["TextDecoder"]("utf8", { fatal: true });
+} else {
+  textDecoder = null;
+}
+
 /**
  * @file Constants and helper methods for Unicode.
  * @see https://amzn.github.io/ion-docs/stringclob.html
@@ -60,6 +70,10 @@ export function encodeUtf8(s: string): Uint8Array {
 }
 
 export function decodeUtf8(bytes: Uint8Array): string {
+  // for bytes > 512 use TextDecoder method - decode()
+  if (bytes.length > JS_DECODER_MAX_BYTES && textDecoder != null) {
+    return textDecoder.decode(bytes);
+  }
   let i = 0,
     s = "",
     c;
