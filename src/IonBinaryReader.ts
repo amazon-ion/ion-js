@@ -103,6 +103,10 @@ export class BinaryReader implements Reader {
     this._raw_type = BOC;
   }
 
+  position(): number {
+    return this._parser.source().position();
+  }
+
   next(): IonType | null {
     this._annotations = null;
 
