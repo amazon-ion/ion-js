@@ -1,5 +1,5 @@
 // Base Typscript Compiler Configuration
-// Targets ES6 Module system and ES6 feature set.
+// Targets CommonJS Module system and ES6 feature set.
 {
   "include": [
     "src/**/*"
@@ -20,7 +20,7 @@
     "strict": false,
     "strictNullChecks": true,
     "rootDirs": ["src", "test"],
-    "outDir": "dist/es6/es6",
+    "outDir": "dist/commonjs/es6",
     "experimentalDecorators": true
   }
 }
