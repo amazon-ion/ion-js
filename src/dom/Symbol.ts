@@ -41,7 +41,7 @@ export class Symbol extends Value(String, IonTypes.SYMBOL, _fromJsConstructor) {
   }
 
   ionEquals(expectedValue: Symbol): boolean {
-    if(!(expectedValue instanceof Symbol)) {
+    if (!(expectedValue instanceof Symbol)) {
       return false;
     }
     return this.compareValue(expectedValue) === 0;

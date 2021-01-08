@@ -162,11 +162,13 @@ export interface Value {
    *
    * @param expectedValue   other Ion Value to be compared with this Ion Value.
    * @param options         options provided for equivalence as below
-   *        epsilon         This is used by Float for an equality with epsilon. (Default: null)
-   *        strict          This is used for a strict equality, which considers the annotations as well.
-   *                        (Default: true)
+   *        epsilon         used by Float for an equality with given epsilon precision. (Default: null)
+   *        strict          specifies whether equality should be strict or non strict. (Default: true)
    */
-  equals(expectedValue: Value, options?: {epsilon?: number| null, strict?: boolean}): boolean;
+  equals(
+    expectedValue: Value,
+    options?: { epsilon?: number | null; strict?: boolean }
+  ): boolean;
 }
 
 /**
@@ -371,19 +373,31 @@ export function Value<Clazz extends Constructor>(
      * Data or Ion Complex Data value. The list of annotations, A is an tuple of Ion
      * Symbols (a specific type of Ion Primitive).
      */
-    ionEquals(expectedValue: Value, options: {epsilon?: number | null, strict?: boolean} = {epsilon: null, strict: true}): boolean{
+    ionEquals(
+      expectedValue: Value,
+      options: { epsilon?: number | null; strict?: boolean } = {
+        epsilon: null,
+        strict: true,
+      }
+    ): boolean {
       this._unsupportedOperation("ionEquals");
     }
 
-    equals(expectedValue: Value, options: {epsilon?: number | null, strict?: boolean} = {epsilon: null, strict: true}): boolean {
-      if(options.strict) {
+    equals(
+      expectedValue: Value,
+      options: { epsilon?: number | null; strict?: boolean } = {
+        epsilon: null,
+        strict: true,
+      }
+    ): boolean {
+      if (options.strict) {
         let actualAnnotations = this.getAnnotations();
         let expectedAnnotations = expectedValue.getAnnotations();
-        if(actualAnnotations.length !== expectedAnnotations.length) {
+        if (actualAnnotations.length !== expectedAnnotations.length) {
           return false;
         }
-        for(let i=0; i < actualAnnotations.length; i++) {
-          if(actualAnnotations[i].localeCompare(expectedAnnotations[i])) {
+        for (let i = 0; i < actualAnnotations.length; i++) {
+          if (actualAnnotations[i].localeCompare(expectedAnnotations[i])) {
             return false;
           }
         }

@@ -41,7 +41,7 @@ export class String extends Value(
   }
 
   ionEquals(expectedValue: String): boolean {
-    if(!(expectedValue instanceof String)) {
+    if (!(expectedValue instanceof String)) {
       return false;
     }
     return this.compareValue(expectedValue) === 0;

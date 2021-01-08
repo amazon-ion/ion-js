@@ -58,10 +58,10 @@ export class Decimal extends Value(
   }
 
   ionEquals(expectedValue: Decimal): boolean {
-    if(!(expectedValue instanceof  Decimal)) {
+    if (!(expectedValue instanceof Decimal)) {
       return false;
     }
-    if(!this.decimalValue().equals(expectedValue.decimalValue())) {
+    if (!this.decimalValue().equals(expectedValue.decimalValue())) {
       return false;
     }
     return true;

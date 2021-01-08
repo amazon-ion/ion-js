@@ -60,7 +60,7 @@ export class Boolean extends Value(
   }
 
   ionEquals(expectedValue: Boolean): boolean {
-    if(!(expectedValue instanceof  Boolean)) {
+    if (!(expectedValue instanceof Boolean)) {
       return false;
     }
     if (this.booleanValue() !== expectedValue.booleanValue()) {

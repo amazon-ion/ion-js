@@ -1,4 +1,4 @@
-import { IonTypes, Writer} from "../Ion";
+import { IonTypes, Writer } from "../Ion";
 import { FromJsConstructor } from "./FromJsConstructor";
 import { PathElement, Value } from "./Value";
 
@@ -152,21 +152,26 @@ export class Struct extends Value(
   }
 
   ionEquals(expectedValue: Struct): boolean {
-    if(!(expectedValue instanceof  Struct)) {
+    if (!(expectedValue instanceof Struct)) {
       return false;
     }
-    if(this.fields().length !== expectedValue.fields().length) {
+    if (this.fields().length !== expectedValue.fields().length) {
       return false;
     }
     let matchFound: boolean = true;
     const paired: boolean[] = new Array<boolean>(expectedValue.fields().length);
     for (let i: number = 0; matchFound && i < this.fields().length; i++) {
       matchFound = false;
-      for (let j: number = 0; !matchFound && j < expectedValue.fields().length; j++) {
+      for (
+        let j: number = 0;
+        !matchFound && j < expectedValue.fields().length;
+        j++
+      ) {
         if (!paired[j]) {
           const child = this.fields()[i];
           const expectedChild = expectedValue.fields()[j];
-          matchFound = child[0] === (expectedChild[0]) && child[1].equals(expectedChild[1]);
+          matchFound =
+            child[0] === expectedChild[0] && child[1].equals(expectedChild[1]);
           if (matchFound) {
             paired[j] = true;
           }

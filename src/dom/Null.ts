@@ -152,10 +152,10 @@ export class Null extends Value(Object, IonTypes.NULL, FromJsConstructor.NONE) {
   }
 
   ionEquals(expectedValue: Null): boolean {
-    if(!(expectedValue instanceof Null)) {
+    if (!(expectedValue instanceof Null)) {
       return false;
     }
-    if(this._ionType.name !== expectedValue._ionType.name) {
+    if (this._ionType.name !== expectedValue._ionType.name) {
       return false;
     }
     return true;

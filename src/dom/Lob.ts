@@ -1,4 +1,4 @@
-import {IonType, IonTypes} from "../Ion";
+import { IonType, IonTypes } from "../Ion";
 import {
   FromJsConstructor,
   FromJsConstructorBuilder,
@@ -35,7 +35,7 @@ export function Lob(ionType: IonType) {
     }
 
     ionEquals(expectedValue: Value): boolean {
-      if(expectedValue.getType() !== IonTypes.CLOB) {
+      if (expectedValue.getType() !== IonTypes.CLOB) {
         if (expectedValue.getType() !== IonTypes.BLOB) {
           return false;
         }
@@ -43,7 +43,7 @@ export function Lob(ionType: IonType) {
 
       let current = this.uInt8ArrayValue();
       let expected = expectedValue.uInt8ArrayValue();
-      if(current.length !== expected!.length) {
+      if (current.length !== expected!.length) {
         return false;
       }
       for (let i = 0; i < current.length; i++) {

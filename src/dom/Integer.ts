@@ -81,7 +81,7 @@ export class Integer extends Value(Number, IonTypes.INT, _fromJsConstructor) {
   }
 
   ionEquals(expectedValue: Integer): boolean {
-    if(!(expectedValue instanceof Integer)) {
+    if (!(expectedValue instanceof Integer)) {
       return false;
     }
     return JSBI.EQ(this.numberValue(), expectedValue.numberValue());

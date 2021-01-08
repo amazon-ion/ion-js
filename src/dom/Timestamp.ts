@@ -84,12 +84,20 @@ export class Timestamp extends Value(
     writer.writeTimestamp(this.timestampValue());
   }
 
-  ionEquals(expectedValue: Timestamp, options: {epsilon?: number| null, strict?: boolean} = {epsilon: null, strict: true}): boolean {
-    if(!(expectedValue instanceof Timestamp)) {
+  ionEquals(
+    expectedValue: Timestamp,
+    options: { epsilon?: number | null; strict?: boolean } = {
+      epsilon: null,
+      strict: true,
+    }
+  ): boolean {
+    if (!(expectedValue instanceof Timestamp)) {
       return false;
     }
-    if(!options.strict) {
-      return this.timestampValue().compareTo(expectedValue.timestampValue()) === 0;
+    if (!options.strict) {
+      return (
+        this.timestampValue().compareTo(expectedValue.timestampValue()) === 0
+      );
     }
     return this.timestampValue().equals(expectedValue.timestampValue());
   }
