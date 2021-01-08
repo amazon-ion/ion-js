@@ -1,4 +1,4 @@
-import { IonType, IonTypes, Writer } from "../Ion";
+import {IonType, IonTypes, Writer} from "../Ion";
 import { FromJsConstructor } from "./FromJsConstructor";
 import { PathElement, Value } from "./Value";
 
@@ -73,6 +73,25 @@ export function Sequence(ionType: IonType) {
         child.writeTo(writer);
       }
       writer.stepOut();
+    }
+
+    ionEquals(expectedValue: Value): boolean {
+      if(expectedValue.getType() !== IonTypes.LIST) {
+        if (expectedValue.getType() !== IonTypes.SEXP) {
+          return false;
+        }
+      }
+      if(this.elements().length !== expectedValue.elements().length){
+        return false;
+      }
+      let actualSequence = this.elements();
+      let expectedSequence = expectedValue.elements();
+      for(let i= 0; i< actualSequence.length ; i ++){
+        if(!actualSequence[i].equals(expectedSequence[i])){
+          return false;
+        }
+      }
+      return true;
     }
   };
 }

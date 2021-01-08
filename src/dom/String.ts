@@ -39,4 +39,15 @@ export class String extends Value(
     writer.setAnnotations(this.getAnnotations());
     writer.writeString(this.stringValue());
   }
+
+  ionEquals(expectedValue: String): boolean {
+    if(!(expectedValue instanceof String)) {
+      return false;
+    }
+    return this.compareValue(expectedValue) === 0;
+  }
+
+  compareValue(expectedValue: String): number {
+    return this.stringValue().localeCompare(expectedValue.stringValue());
+  }
 }

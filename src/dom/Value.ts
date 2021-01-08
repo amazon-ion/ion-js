@@ -144,6 +144,29 @@ export interface Value {
    * indicating whether the Struct was modified. For all other types, throws an Error.
    */
   deleteField(name: string): boolean;
+
+  /**
+   * For checking equivalence of two Ion Values represented by dom.Value.
+   *
+   * Strict equivalence refers to Ion data model equivalence
+   * as defined above and by Ion Specification[1]
+   *
+   * Structural or non-strict equivalence follows the same rules as strict equivalence,
+   * except that
+   *
+   *   1. Annotations are not considered, and
+   *   2. Timestamps that represent the same instant in time are always
+   *      considered equivalent.
+   *
+   * [1] http://amzn.github.io/ion-docs/docs/spec.html
+   *
+   * @param expectedValue   other Ion Value to be compared with this Ion Value.
+   * @param options         options provided for equivalence as below
+   *        epsilon         This is used by Float for an equality with epsilon. (Default: null)
+   *        strict          This is used for a strict equality, which considers the annotations as well.
+   *                        (Default: true)
+   */
+  equals(expectedValue: Value, options?: {epsilon?: number| null, strict?: boolean}): boolean;
 }
 
 /**
@@ -307,6 +330,65 @@ export function Value<Clazz extends Constructor>(
 
     deleteField(name: string): boolean {
       this._unsupportedOperation("deleteField");
+    }
+
+    /**
+     * Helper method to be implemented by each dom.Value with individual equivalence logic.
+     *
+     * Ion Equivalence
+     * In order to make Ion a useful model to describe data, we must first define
+     * the notion of equivalence for all values representable in Ion. Equivalence
+     * with respect to Ion values means that if two Ion values, X and Y, are
+     * equivalent, they represent the same data and can be substituted for the other
+     * without loss of information.
+     *
+     * This relationship is:
+     *     1. symmetric: X is equivalent to Y if and only if Y is equivalent to X.
+     *     2. transitive: if X is equivalent to Y and Y is equivalent to Z, then X is
+     *        equivalent to Z.
+     *     3. reflexive: X is equivalent to X.
+     *
+     * Ordered Sequence Equivalence:
+     * When an ordered sequence (i.e. tuple) of elements is specified in this
+     * document, equivalence over such an ordered sequence is defined as follows.
+     *
+     * A tuple, A = (a1, a2, ..., an), is equivalent to another tuple, B = (b1, b2,
+     * ..., bm) if and only if the cardinality (number of elements) of A equals the
+     * cardinality of B (i.e. n == m) and ai is equivalent to bi for i = 1 ... n.
+     *
+     * Un-Ordered Sequence Equivalence:
+     * When an un-ordered sequence (i.e. bag or multi-set) is specified in this
+     * document, equivalence over such a sequence is defined as follows.
+     *
+     * A bag, A = {a1, a2, ..., an} is equivalent to B = {b1, b2, ..., bm} if and
+     * only if the cardinality of A is equal to the cardinality of B and for each
+     * element, x, in A there exists a distinct element, y, in B for which x is
+     * equivalent to y.
+     *
+     * Values:
+     * Any arbitrary, atomic value in the Ion Language can be denoted as the tuple,
+     * (A, V), where A is an ordered list of annotations, and V is an Ion Primitive
+     * Data or Ion Complex Data value. The list of annotations, A is an tuple of Ion
+     * Symbols (a specific type of Ion Primitive).
+     */
+    ionEquals(expectedValue: Value, options: {epsilon?: number | null, strict?: boolean} = {epsilon: null, strict: true}): boolean{
+      this._unsupportedOperation("ionEquals");
+    }
+
+    equals(expectedValue: Value, options: {epsilon?: number | null, strict?: boolean} = {epsilon: null, strict: true}): boolean {
+      if(options.strict) {
+        let actualAnnotations = this.getAnnotations();
+        let expectedAnnotations = expectedValue.getAnnotations();
+        if(actualAnnotations.length !== expectedAnnotations.length) {
+          return false;
+        }
+        for(let i=0; i < actualAnnotations.length; i++) {
+          if(actualAnnotations[i].localeCompare(expectedAnnotations[i])) {
+            return false;
+          }
+        }
+      }
+      return this.ionEquals(expectedValue, options);
     }
 
     // Returns the IonType associated with a particular dom.Value subclass. Useful for testing.

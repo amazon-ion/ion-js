@@ -1,4 +1,4 @@
-import { IonTypes, Writer } from "../Ion";
+import { IonTypes, Writer} from "../Ion";
 import { FromJsConstructor } from "./FromJsConstructor";
 import { PathElement, Value } from "./Value";
 
@@ -149,5 +149,37 @@ export class Struct extends Value(
       jsValue
     ).map(([key, value]) => [key, Value.from(value)]);
     return new this(fields, annotations);
+  }
+
+  ionEquals(expectedValue: Struct): boolean {
+    if(!(expectedValue instanceof  Struct)) {
+      return false;
+    }
+    if(this.fields().length !== expectedValue.fields().length) {
+      return false;
+    }
+    let matchFound: boolean = true;
+    const paired: boolean[] = new Array<boolean>(expectedValue.fields().length);
+    for (let i: number = 0; matchFound && i < this.fields().length; i++) {
+      matchFound = false;
+      for (let j: number = 0; !matchFound && j < expectedValue.fields().length; j++) {
+        if (!paired[j]) {
+          const child = this.fields()[i];
+          const expectedChild = expectedValue.fields()[j];
+          matchFound = child[0] === (expectedChild[0]) && child[1].equals(expectedChild[1]);
+          if (matchFound) {
+            paired[j] = true;
+          }
+        }
+      }
+    }
+    // set matchFound to the first pair that didn't find a matching field if any
+    for (let i: number = 0; i < paired.length; i++) {
+      if (!paired[i]) {
+        matchFound = false;
+        break;
+      }
+    }
+    return matchFound;
   }
 }

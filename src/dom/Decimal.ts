@@ -56,4 +56,14 @@ export class Decimal extends Value(
     writer.setAnnotations(this.getAnnotations());
     writer.writeDecimal(this.decimalValue());
   }
+
+  ionEquals(expectedValue: Decimal): boolean {
+    if(!(expectedValue instanceof  Decimal)) {
+      return false;
+    }
+    if(!this.decimalValue().equals(expectedValue.decimalValue())) {
+      return false;
+    }
+    return true;
+  }
 }

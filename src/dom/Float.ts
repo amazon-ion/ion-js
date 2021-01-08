@@ -35,4 +35,18 @@ export class Float extends Value(Number, IonTypes.FLOAT, _fromJsConstructor) {
     writer.setAnnotations(this.getAnnotations());
     writer.writeFloat64(this.numberValue());
   }
+
+  ionEquals(expectedValue: Float, options: {epsilon?: number | null, strict?: boolean} = {epsilon: null, strict: true}): boolean {
+    if(!(expectedValue instanceof Float)) {
+      return false;
+    }
+    let result: boolean = Object.is(this.numberValue(), expectedValue.numberValue());
+
+    if(options.epsilon != null) {
+      if(result || Math.abs(this.numberValue() - expectedValue.numberValue()) <= options.epsilon){
+        return true;
+      }
+    }
+    return result;
+  }
 }

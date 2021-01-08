@@ -79,4 +79,11 @@ export class Integer extends Value(Number, IonTypes.INT, _fromJsConstructor) {
       writer.writeInt(this._bigIntValue);
     }
   }
+
+  ionEquals(expectedValue: Integer): boolean {
+    if(!(expectedValue instanceof Integer)) {
+      return false;
+    }
+    return JSBI.EQ(this.numberValue(), expectedValue.numberValue());
+  }
 }

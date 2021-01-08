@@ -58,4 +58,14 @@ export class Boolean extends Value(
     writer.setAnnotations(this.getAnnotations());
     writer.writeBoolean(this.booleanValue());
   }
+
+  ionEquals(expectedValue: Boolean): boolean {
+    if(!(expectedValue instanceof  Boolean)) {
+      return false;
+    }
+    if (this.booleanValue() !== expectedValue.booleanValue()) {
+      return false;
+    }
+    return true;
+  }
 }

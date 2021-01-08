@@ -39,4 +39,15 @@ export class Symbol extends Value(String, IonTypes.SYMBOL, _fromJsConstructor) {
     writer.setAnnotations(this.getAnnotations());
     writer.writeSymbol(this.stringValue());
   }
+
+  ionEquals(expectedValue: Symbol): boolean {
+    if(!(expectedValue instanceof Symbol)) {
+      return false;
+    }
+    return this.compareValue(expectedValue) === 0;
+  }
+
+  compareValue(expectedValue: Symbol): number {
+    return this.stringValue().localeCompare(expectedValue.stringValue());
+  }
 }
