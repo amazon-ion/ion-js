@@ -85,20 +85,42 @@ export class Timestamp extends Value(
   }
 
   ionEquals(
-    expectedValue: Timestamp,
-    options: { epsilon?: number | null; strict?: boolean } = {
+    expectedValue: any,
+    options: {
+      epsilon?: number | null;
+      ignoreAnnotations?: boolean;
+      ignoreTimestampPrecision?: boolean;
+      onlyCompareIon?: boolean;
+    } = {
       epsilon: null,
-      strict: true,
+      ignoreAnnotations: false,
+      ignoreTimestampPrecision: false,
+      onlyCompareIon: true,
     }
   ): boolean {
-    if (!(expectedValue instanceof Timestamp)) {
+    // check if it is a valid JS Object or dom.Value Object based on options.onlyCompareIon value
+    if (
+      !(
+        (options.onlyCompareIon && expectedValue instanceof Timestamp) ||
+        (!options.onlyCompareIon &&
+          (expectedValue instanceof ion.Timestamp ||
+            expectedValue instanceof global.Date))
+      )
+    ) {
       return false;
     }
-    if (!options.strict) {
-      return (
-        this.timestampValue().compareTo(expectedValue.timestampValue()) === 0
-      );
+    if (expectedValue instanceof Timestamp) {
+      expectedValue = expectedValue.timestampValue();
+    } else if (expectedValue instanceof global.Date) {
+      if (this.dateValue().getTime() === expectedValue.getTime()) {
+        return true;
+      } else {
+        return false;
+      }
     }
-    return this.timestampValue().equals(expectedValue.timestampValue());
+    if (options.ignoreTimestampPrecision) {
+      return this.timestampValue().compareTo(expectedValue) === 0;
+    }
+    return this.timestampValue().equals(expectedValue);
   }
 }

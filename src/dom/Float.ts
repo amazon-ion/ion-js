@@ -37,25 +37,36 @@ export class Float extends Value(Number, IonTypes.FLOAT, _fromJsConstructor) {
   }
 
   ionEquals(
-    expectedValue: Float,
-    options: { epsilon?: number | null; strict?: boolean } = {
+    expectedValue: any,
+    options: {
+      epsilon?: number | null;
+      ignoreAnnotations?: boolean;
+      ignoreTimestampPrecision?: boolean;
+      onlyCompareIon?: boolean;
+    } = {
       epsilon: null,
-      strict: true,
+      ignoreAnnotations: false,
+      ignoreTimestampPrecision: false,
+      onlyCompareIon: true,
     }
   ): boolean {
-    if (!(expectedValue instanceof Float)) {
+    if (options.onlyCompareIon && expectedValue instanceof Float) {
+      expectedValue = expectedValue.numberValue();
+    } else if (
+      !options.onlyCompareIon &&
+      (typeof expectedValue === "number" ||
+        expectedValue instanceof global.Number)
+    ) {
+      expectedValue = expectedValue.valueOf();
+    } else {
       return false;
     }
-    let result: boolean = Object.is(
-      this.numberValue(),
-      expectedValue.numberValue()
-    );
+    let result: boolean = Object.is(this.numberValue(), expectedValue);
 
     if (options.epsilon != null) {
       if (
         result ||
-        Math.abs(this.numberValue() - expectedValue.numberValue()) <=
-          options.epsilon
+        Math.abs(this.numberValue() - expectedValue) <= options.epsilon
       ) {
         return true;
       }

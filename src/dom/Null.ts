@@ -151,13 +151,34 @@ export class Null extends Value(Object, IonTypes.NULL, FromJsConstructor.NONE) {
     writer.writeNull(this.getType());
   }
 
-  ionEquals(expectedValue: Null): boolean {
-    if (!(expectedValue instanceof Null)) {
+  ionEquals(
+    expectedValue: any,
+    options: {
+      epsilon?: number | null;
+      ignoreAnnotations?: boolean;
+      ignoreTimestampPrecision?: boolean;
+      onlyCompareIon?: boolean;
+    } = {
+      epsilon: null,
+      ignoreAnnotations: false,
+      ignoreTimestampPrecision: false,
+      onlyCompareIon: true,
+    }
+  ): boolean {
+    if (
+      options.onlyCompareIon &&
+      expectedValue instanceof Null &&
+      this._ionType.name === expectedValue._ionType.name
+    ) {
+      return true;
+    } else if (
+      !options.onlyCompareIon &&
+      expectedValue === null &&
+      this._ionType.name === "null"
+    ) {
+      return true;
+    } else {
       return false;
     }
-    if (this._ionType.name !== expectedValue._ionType.name) {
-      return false;
-    }
-    return true;
   }
 }

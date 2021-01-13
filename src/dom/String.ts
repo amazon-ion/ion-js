@@ -40,14 +40,35 @@ export class String extends Value(
     writer.writeString(this.stringValue());
   }
 
-  ionEquals(expectedValue: String): boolean {
-    if (!(expectedValue instanceof String)) {
+  ionEquals(
+    expectedValue: any,
+    options: {
+      epsilon?: number | null;
+      ignoreAnnotations?: boolean;
+      ignoreTimestampPrecision?: boolean;
+      onlyCompareIon?: boolean;
+    } = {
+      epsilon: null,
+      ignoreAnnotations: false,
+      ignoreTimestampPrecision: false,
+      onlyCompareIon: true,
+    }
+  ): boolean {
+    if (options.onlyCompareIon && expectedValue instanceof String) {
+      expectedValue = expectedValue.stringValue();
+    } else if (
+      !options.onlyCompareIon &&
+      (typeof expectedValue === "string" ||
+        expectedValue instanceof global.String)
+    ) {
+      expectedValue = expectedValue.valueOf();
+    } else {
       return false;
     }
     return this.compareValue(expectedValue) === 0;
   }
 
-  compareValue(expectedValue: String): number {
-    return this.stringValue().localeCompare(expectedValue.stringValue());
+  compareValue(expectedValue: string): number {
+    return this.stringValue().localeCompare(expectedValue);
   }
 }

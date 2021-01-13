@@ -59,11 +59,32 @@ export class Boolean extends Value(
     writer.writeBoolean(this.booleanValue());
   }
 
-  ionEquals(expectedValue: Boolean): boolean {
-    if (!(expectedValue instanceof Boolean)) {
+  ionEquals(
+    expectedValue: any,
+    options: {
+      epsilon?: number | null;
+      ignoreAnnotations?: boolean;
+      ignoreTimestampPrecision?: boolean;
+      onlyCompareIon?: boolean;
+    } = {
+      epsilon: null,
+      ignoreAnnotations: false,
+      ignoreTimestampPrecision: false,
+      onlyCompareIon: true,
+    }
+  ): boolean {
+    if (options.onlyCompareIon && expectedValue instanceof Boolean) {
+      expectedValue = expectedValue.booleanValue();
+    } else if (
+      !options.onlyCompareIon &&
+      (typeof expectedValue === "boolean" ||
+        expectedValue instanceof global.Boolean)
+    ) {
+      expectedValue = expectedValue.valueOf();
+    } else {
       return false;
     }
-    if (this.booleanValue() !== expectedValue.booleanValue()) {
+    if (this.booleanValue() !== expectedValue) {
       return false;
     }
     return true;

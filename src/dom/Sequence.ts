@@ -75,19 +75,41 @@ export function Sequence(ionType: IonType) {
       writer.stepOut();
     }
 
-    ionEquals(expectedValue: Value): boolean {
-      if (expectedValue.getType() !== IonTypes.LIST) {
-        if (expectedValue.getType() !== IonTypes.SEXP) {
-          return false;
-        }
+    ionEquals(
+      expectedValue: any,
+      options: {
+        epsilon?: number | null;
+        ignoreAnnotations?: boolean;
+        ignoreTimestampPrecision?: boolean;
+        onlyCompareIon?: boolean;
+      } = {
+        epsilon: null,
+        ignoreAnnotations: false,
+        ignoreTimestampPrecision: false,
+        onlyCompareIon: true,
       }
-      if (this.elements().length !== expectedValue.elements().length) {
+    ): boolean {
+      // check if it is a valid JS Object or dom.Value Object based on options.onlyCompareIon value
+      if (
+        !(
+          (options.onlyCompareIon &&
+            (expectedValue.getType() === IonTypes.LIST ||
+              expectedValue.getType() === IonTypes.SEXP)) ||
+          (!options.onlyCompareIon && expectedValue instanceof global.Array)
+        )
+      ) {
         return false;
       }
+      if (options.onlyCompareIon) {
+        expectedValue = expectedValue.elements();
+      }
       let actualSequence = this.elements();
-      let expectedSequence = expectedValue.elements();
+      let expectedSequence = expectedValue;
+      if (actualSequence.length !== expectedSequence.length) {
+        return false;
+      }
       for (let i = 0; i < actualSequence.length; i++) {
-        if (!actualSequence[i].equals(expectedSequence[i])) {
+        if (!actualSequence[i].equals(expectedSequence[i], options)) {
           return false;
         }
       }

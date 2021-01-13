@@ -160,14 +160,23 @@ export interface Value {
    *
    * [1] http://amzn.github.io/ion-docs/docs/spec.html
    *
-   * @param expectedValue   other Ion Value to be compared with this Ion Value.
-   * @param options         options provided for equivalence as below
-   *        epsilon         used by Float for an equality with given epsilon precision. (Default: null)
-   *        strict          specifies whether equality should be strict or non strict. (Default: true)
+   * @param expectedValue               other Ion Value to be compared with this Ion Value.
+   * @param options                     options provided for equivalence as below
+   *        epsilon                     used by Float for an equality with given epsilon precision. (Default: null)
+   *        ignoreAnnotations           specifies whether to ignore annotations or not for equality. (Default: false)
+   *        ignoreTimestampPrecision    specifies whether to ignore timestamp local offset and precision
+   *                                    or not for equality. (Default: false)
+   *        onlyCompareIon              specifies if only dom.Values should be considered for equality
+   *                                    or can be JS object as well. (Default: true)
    */
   equals(
-    expectedValue: Value,
-    options?: { epsilon?: number | null; strict?: boolean }
+    expectedValue: any,
+    options?: {
+      epsilon?: number | null;
+      ignoreAnnotations?: boolean;
+      ignoreTimestampPrecision?: boolean;
+      onlyCompareIon?: boolean;
+    }
   ): boolean;
 }
 
@@ -373,26 +382,47 @@ export function Value<Clazz extends Constructor>(
      * Data or Ion Complex Data value. The list of annotations, A is an tuple of Ion
      * Symbols (a specific type of Ion Primitive).
      */
-    ionEquals(
-      expectedValue: Value,
-      options: { epsilon?: number | null; strict?: boolean } = {
+    protected ionEquals(
+      expectedValue: any,
+      options: {
+        epsilon?: number | null;
+        ignoreAnnotations?: boolean;
+        ignoreTimestampPrecision?: boolean;
+        onlyCompareIon?: boolean;
+      } = {
         epsilon: null,
-        strict: true,
+        ignoreAnnotations: false,
+        ignoreTimestampPrecision: false,
+        onlyCompareIon: true,
       }
     ): boolean {
       this._unsupportedOperation("ionEquals");
     }
 
     equals(
-      expectedValue: Value,
-      options: { epsilon?: number | null; strict?: boolean } = {
+      expectedValue: any,
+      options: {
+        epsilon?: number | null;
+        ignoreAnnotations?: boolean;
+        ignoreTimestampPrecision?: boolean;
+        onlyCompareIon?: boolean;
+      } = {
         epsilon: null,
-        strict: true,
+        ignoreAnnotations: false,
+        ignoreTimestampPrecision: false,
+        onlyCompareIon: true,
       }
     ): boolean {
-      if (options.strict) {
+      if (options.onlyCompareIon === false) {
+        options.ignoreAnnotations = true;
+        options.ignoreTimestampPrecision = true;
+      }
+      if (!options.ignoreAnnotations) {
+        if (!(expectedValue instanceof Value)) {
+          return false;
+        }
         let actualAnnotations = this.getAnnotations();
-        let expectedAnnotations = expectedValue.getAnnotations();
+        let expectedAnnotations = (expectedValue as Value).getAnnotations();
         if (actualAnnotations.length !== expectedAnnotations.length) {
           return false;
         }
@@ -477,6 +507,22 @@ export namespace Value {
       return value as Value;
     }
     return JsValueConversion._ionValueFromJsValue(value, annotations);
+  }
+
+  // a namespace with pre-filled option values for STRICT and NON STRICT(RELAXED) equality check
+  export namespace Equality {
+    export const STRICT = {
+      ignoreAnnotations: false,
+      ignoreTimestampPrecision: false,
+      onlyCompareIon: false,
+      epsilon: null,
+    };
+    export const RELAXED = {
+      ignoreAnnotations: true,
+      ignoreTimestampPrecision: true,
+      onlyCompareIon: true,
+      epsilon: null,
+    };
   }
 }
 

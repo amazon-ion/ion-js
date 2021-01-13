@@ -151,27 +151,45 @@ export class Struct extends Value(
     return new this(fields, annotations);
   }
 
-  ionEquals(expectedValue: Struct): boolean {
-    if (!(expectedValue instanceof Struct)) {
+  ionEquals(
+    expectedValue: any,
+    options: {
+      epsilon?: number | null;
+      ignoreAnnotations?: boolean;
+      ignoreTimestampPrecision?: boolean;
+      onlyCompareIon?: boolean;
+    } = {
+      epsilon: null,
+      ignoreAnnotations: false,
+      ignoreTimestampPrecision: false,
+      onlyCompareIon: true,
+    }
+  ): boolean {
+    if (options.onlyCompareIon && expectedValue instanceof Struct) {
+      expectedValue = expectedValue.fields();
+    } else if (
+      !options.onlyCompareIon &&
+      (typeof expectedValue === "object" ||
+        expectedValue instanceof global.Object)
+    ) {
+      expectedValue = Object.entries(expectedValue);
+    } else {
       return false;
     }
-    if (this.fields().length !== expectedValue.fields().length) {
+    if (this.fields().length !== expectedValue.length) {
       return false;
     }
     let matchFound: boolean = true;
-    const paired: boolean[] = new Array<boolean>(expectedValue.fields().length);
+    const paired: boolean[] = new Array<boolean>(expectedValue.length);
     for (let i: number = 0; matchFound && i < this.fields().length; i++) {
       matchFound = false;
-      for (
-        let j: number = 0;
-        !matchFound && j < expectedValue.fields().length;
-        j++
-      ) {
+      for (let j: number = 0; !matchFound && j < expectedValue.length; j++) {
         if (!paired[j]) {
           const child = this.fields()[i];
-          const expectedChild = expectedValue.fields()[j];
+          const expectedChild = expectedValue[j];
           matchFound =
-            child[0] === expectedChild[0] && child[1].equals(expectedChild[1]);
+            child[0] === expectedChild[0] &&
+            child[1].equals(expectedChild[1], options);
           if (matchFound) {
             paired[j] = true;
           }

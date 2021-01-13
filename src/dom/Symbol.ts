@@ -40,14 +40,35 @@ export class Symbol extends Value(String, IonTypes.SYMBOL, _fromJsConstructor) {
     writer.writeSymbol(this.stringValue());
   }
 
-  ionEquals(expectedValue: Symbol): boolean {
-    if (!(expectedValue instanceof Symbol)) {
+  ionEquals(
+    expectedValue: any,
+    options: {
+      epsilon?: number | null;
+      ignoreAnnotations?: boolean;
+      ignoreTimestampPrecision?: boolean;
+      onlyCompareIon?: boolean;
+    } = {
+      epsilon: null,
+      ignoreAnnotations: false,
+      ignoreTimestampPrecision: false,
+      onlyCompareIon: true,
+    }
+  ): boolean {
+    if (options.onlyCompareIon && expectedValue instanceof Symbol) {
+      expectedValue = expectedValue.stringValue();
+    } else if (
+      !options.onlyCompareIon &&
+      (typeof expectedValue === "string" ||
+        expectedValue instanceof global.String)
+    ) {
+      expectedValue = expectedValue.valueOf();
+    } else {
       return false;
     }
     return this.compareValue(expectedValue) === 0;
   }
 
-  compareValue(expectedValue: Symbol): number {
-    return this.stringValue().localeCompare(expectedValue.stringValue());
+  compareValue(expectedValue: string): number {
+    return this.stringValue().localeCompare(expectedValue);
   }
 }

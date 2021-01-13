@@ -80,10 +80,31 @@ export class Integer extends Value(Number, IonTypes.INT, _fromJsConstructor) {
     }
   }
 
-  ionEquals(expectedValue: Integer): boolean {
-    if (!(expectedValue instanceof Integer)) {
+  ionEquals(
+    expectedValue: any,
+    options: {
+      epsilon?: number | null;
+      ignoreAnnotations?: boolean;
+      ignoreTimestampPrecision?: boolean;
+      onlyCompareIon?: boolean;
+    } = {
+      epsilon: null,
+      ignoreAnnotations: false,
+      ignoreTimestampPrecision: false,
+      onlyCompareIon: true,
+    }
+  ): boolean {
+    if (options.onlyCompareIon && expectedValue instanceof Integer) {
+      expectedValue = expectedValue.numberValue();
+    } else if (
+      !options.onlyCompareIon &&
+      (typeof expectedValue === "number" ||
+        expectedValue instanceof global.Number)
+    ) {
+      expectedValue = expectedValue.valueOf();
+    } else {
       return false;
     }
-    return JSBI.EQ(this.numberValue(), expectedValue.numberValue());
+    return JSBI.EQ(this.numberValue(), expectedValue);
   }
 }

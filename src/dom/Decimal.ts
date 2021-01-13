@@ -6,6 +6,7 @@ import {
   FromJsConstructorBuilder,
 } from "./FromJsConstructor";
 import { Value } from "./Value";
+import JSBI from "jsbi";
 
 const _fromJsConstructor: FromJsConstructor = new FromJsConstructorBuilder()
   .withClasses(ion.Decimal)
@@ -57,11 +58,39 @@ export class Decimal extends Value(
     writer.writeDecimal(this.decimalValue());
   }
 
-  ionEquals(expectedValue: Decimal): boolean {
-    if (!(expectedValue instanceof Decimal)) {
+  ionEquals(
+    expectedValue: any,
+    options: {
+      epsilon?: number | null;
+      ignoreAnnotations?: boolean;
+      ignoreTimestampPrecision?: boolean;
+      onlyCompareIon?: boolean;
+    } = {
+      epsilon: null,
+      ignoreAnnotations: false,
+      ignoreTimestampPrecision: false,
+      onlyCompareIon: true,
+    }
+  ): boolean {
+    // check if it is a valid JS Object or dom.Value Object based on options.onlyCompareIon value
+    if (
+      !(
+        (options.onlyCompareIon && expectedValue instanceof Decimal) ||
+        (!options.onlyCompareIon &&
+          (expectedValue instanceof ion.Decimal ||
+            expectedValue instanceof Number ||
+            typeof expectedValue === "number"))
+      )
+    ) {
       return false;
     }
-    if (!this.decimalValue().equals(expectedValue.decimalValue())) {
+    if (expectedValue instanceof Decimal) {
+      expectedValue = expectedValue.decimalValue();
+    }
+    if (expectedValue instanceof Number || typeof expectedValue === "number") {
+      expectedValue = new ion.Decimal(expectedValue.toString());
+    }
+    if (!this.decimalValue().equals(expectedValue)) {
       return false;
     }
     return true;
