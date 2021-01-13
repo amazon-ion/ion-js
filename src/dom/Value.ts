@@ -382,7 +382,8 @@ export function Value<Clazz extends Constructor>(
      * Data or Ion Complex Data value. The list of annotations, A is an tuple of Ion
      * Symbols (a specific type of Ion Primitive).
      */
-    protected ionEquals(
+    // Class expressions (like this mixin) cannot have private or protected methods.
+    _ionEquals(
       expectedValue: any,
       options: {
         epsilon?: number | null;
@@ -432,7 +433,7 @@ export function Value<Clazz extends Constructor>(
           }
         }
       }
-      return this.ionEquals(expectedValue, options);
+      return this._ionEquals(expectedValue, options);
     }
 
     // Returns the IonType associated with a particular dom.Value subclass. Useful for testing.

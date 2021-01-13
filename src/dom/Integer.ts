@@ -80,7 +80,7 @@ export class Integer extends Value(Number, IonTypes.INT, _fromJsConstructor) {
     }
   }
 
-  ionEquals(
+  _ionEquals(
     expectedValue: any,
     options: {
       epsilon?: number | null;

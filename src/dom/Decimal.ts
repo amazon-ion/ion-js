@@ -58,7 +58,7 @@ export class Decimal extends Value(
     writer.writeDecimal(this.decimalValue());
   }
 
-  ionEquals(
+  _ionEquals(
     expectedValue: any,
     options: {
       epsilon?: number | null;
@@ -88,6 +88,8 @@ export class Decimal extends Value(
       expectedValue = expectedValue.decimalValue();
     }
     if (expectedValue instanceof Number || typeof expectedValue === "number") {
+      // calling numberValue() on ion.Decimal is lossy and could result in imprecise comparisons
+      // hence converting number to ion.Decimal for comparison even though it maybe expensive
       expectedValue = new ion.Decimal(expectedValue.toString());
     }
     if (!this.decimalValue().equals(expectedValue)) {

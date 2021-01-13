@@ -40,7 +40,7 @@ export class String extends Value(
     writer.writeString(this.stringValue());
   }
 
-  ionEquals(
+  _ionEquals(
     expectedValue: any,
     options: {
       epsilon?: number | null;

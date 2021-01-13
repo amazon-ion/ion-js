@@ -34,7 +34,7 @@ export function Lob(ionType: IonType) {
       return this;
     }
 
-    ionEquals(
+    _ionEquals(
       expectedValue: any,
       options: {
         epsilon?: number | null;

@@ -75,7 +75,7 @@ export function Sequence(ionType: IonType) {
       writer.stepOut();
     }
 
-    ionEquals(
+    _ionEquals(
       expectedValue: any,
       options: {
         epsilon?: number | null;

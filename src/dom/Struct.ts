@@ -151,7 +151,7 @@ export class Struct extends Value(
     return new this(fields, annotations);
   }
 
-  ionEquals(
+  _ionEquals(
     expectedValue: any,
     options: {
       epsilon?: number | null;
