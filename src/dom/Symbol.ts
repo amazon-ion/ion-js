@@ -46,17 +46,17 @@ export class Symbol extends Value(String, IonTypes.SYMBOL, _fromJsConstructor) {
       epsilon?: number | null;
       ignoreAnnotations?: boolean;
       ignoreTimestampPrecision?: boolean;
-      compareOnlyIon?: boolean;
+      onlyCompareIon?: boolean;
     } = {
       epsilon: null,
       ignoreAnnotations: false,
       ignoreTimestampPrecision: false,
-      compareOnlyIon: true,
+      onlyCompareIon: true,
     }
   ): boolean {
     let isSupportedType: boolean = false;
     let valueToCompare: any = null;
-    if (options.compareOnlyIon) {
+    if (options.onlyCompareIon) {
       // `compareOnlyIon` requires that the provided value be an ion.dom.Symbol instance.
       if (other instanceof Symbol) {
         isSupportedType = true;

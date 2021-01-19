@@ -168,7 +168,7 @@ export interface Value {
    *        ignoreAnnotations           specifies whether to ignore annotations or not for equality. (Default: false)
    *        ignoreTimestampPrecision    specifies whether to ignore timestamp local offset and precision
    *                                    or not for equality. (Default: false)
-   *        compareOnlyIon:              specifies if only dom.Values should be considered for equality
+   *        onlyCompareIon:             specifies if only dom.Values should be considered for equality
    *                                    or can be JS object as well. (Default: true)
    */
   equals(
@@ -177,7 +177,7 @@ export interface Value {
       epsilon?: number | null;
       ignoreAnnotations?: boolean;
       ignoreTimestampPrecision?: boolean;
-      compareOnlyIon?: boolean;
+      onlyCompareIon?: boolean;
     }
   ): boolean;
 }
@@ -355,12 +355,12 @@ export function Value<Clazz extends Constructor>(
         epsilon?: number | null;
         ignoreAnnotations?: boolean;
         ignoreTimestampPrecision?: boolean;
-        compareOnlyIon?: boolean;
+        onlyCompareIon?: boolean;
       } = {
         epsilon: null,
         ignoreAnnotations: false,
         ignoreTimestampPrecision: false,
-        compareOnlyIon: true,
+        onlyCompareIon: true,
       }
     ): boolean {
       this._unsupportedOperation("_ionEquals");
@@ -375,15 +375,15 @@ export function Value<Clazz extends Constructor>(
         epsilon?: number | null;
         ignoreAnnotations?: boolean;
         ignoreTimestampPrecision?: boolean;
-        compareOnlyIon?: boolean;
+        onlyCompareIon?: boolean;
       } = {
         epsilon: null,
         ignoreAnnotations: false,
         ignoreTimestampPrecision: false,
-        compareOnlyIon: true,
+        onlyCompareIon: true,
       }
     ): boolean {
-      if (options.compareOnlyIon === false) {
+      if (options.onlyCompareIon === false) {
         options.ignoreAnnotations = true;
         options.ignoreTimestampPrecision = true;
       }
@@ -486,13 +486,13 @@ export namespace Value {
     export const STRICT = {
       ignoreAnnotations: false,
       ignoreTimestampPrecision: false,
-      compareOnlyIon: false,
+      onlyCompareIon: false,
       epsilon: null,
     };
     export const RELAXED = {
       ignoreAnnotations: true,
       ignoreTimestampPrecision: true,
-      compareOnlyIon: true,
+      onlyCompareIon: true,
       epsilon: null,
     };
   }

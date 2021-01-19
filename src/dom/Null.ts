@@ -157,17 +157,17 @@ export class Null extends Value(Object, IonTypes.NULL, FromJsConstructor.NONE) {
       epsilon?: number | null;
       ignoreAnnotations?: boolean;
       ignoreTimestampPrecision?: boolean;
-      compareOnlyIon?: boolean;
+      onlyCompareIon?: boolean;
     } = {
       epsilon: null,
       ignoreAnnotations: false,
       ignoreTimestampPrecision: false,
-      compareOnlyIon: true,
+      onlyCompareIon: true,
     }
   ): boolean {
     let isSupportedType: boolean = false;
     let valueToCompare: any = null;
-    if (options.compareOnlyIon) {
+    if (options.onlyCompareIon) {
       // `compareOnlyIon` requires that the provided value be an ion.dom.Null instance.
       if (other instanceof Null) {
         isSupportedType = true;
