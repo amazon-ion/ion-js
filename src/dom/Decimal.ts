@@ -59,42 +59,45 @@ export class Decimal extends Value(
   }
 
   _ionEquals(
-    expectedValue: any,
+    other: any,
     options: {
       epsilon?: number | null;
       ignoreAnnotations?: boolean;
       ignoreTimestampPrecision?: boolean;
-      onlyCompareIon?: boolean;
+      compareOnlyIon?: boolean;
     } = {
       epsilon: null,
       ignoreAnnotations: false,
       ignoreTimestampPrecision: false,
-      onlyCompareIon: true,
+      compareOnlyIon: true,
     }
   ): boolean {
-    // check if it is a valid JS Object or dom.Value Object based on options.onlyCompareIon value
-    if (
-      !(
-        (options.onlyCompareIon && expectedValue instanceof Decimal) ||
-        (!options.onlyCompareIon &&
-          (expectedValue instanceof ion.Decimal ||
-            expectedValue instanceof Number ||
-            typeof expectedValue === "number"))
-      )
-    ) {
+    let isSupportedType: boolean = false;
+    let valueToCompare: any = null;
+    if (options.compareOnlyIon) {
+      // `compareOnlyIon` requires that the provided value be an ion.dom.Decimal instance.
+      if (other instanceof Decimal) {
+        isSupportedType = true;
+        valueToCompare = other.decimalValue();
+      }
+    } else {
+      // We will consider other Decimal-ish types
+      if (other instanceof ion.Decimal) {
+        // expectedValue is a non-DOM Decimal
+        isSupportedType = true;
+        valueToCompare = other;
+      } else if (other instanceof Number || typeof other === "number") {
+        isSupportedType = true;
+        // calling numberValue() on ion.Decimal is lossy and could result in imprecise comparisons
+        // hence converting number to ion.Decimal for comparison even though it maybe expensive
+        valueToCompare = new ion.Decimal(other.toString());
+      }
+    }
+
+    if (!isSupportedType) {
       return false;
     }
-    if (expectedValue instanceof Decimal) {
-      expectedValue = expectedValue.decimalValue();
-    }
-    if (expectedValue instanceof Number || typeof expectedValue === "number") {
-      // calling numberValue() on ion.Decimal is lossy and could result in imprecise comparisons
-      // hence converting number to ion.Decimal for comparison even though it maybe expensive
-      expectedValue = new ion.Decimal(expectedValue.toString());
-    }
-    if (!this.decimalValue().equals(expectedValue)) {
-      return false;
-    }
-    return true;
+
+    return this.decimalValue().equals(valueToCompare);
   }
 }

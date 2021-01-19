@@ -146,10 +146,11 @@ export interface Value {
   deleteField(name: string): boolean;
 
   /**
-   * For checking equivalence of two Ion Values represented by dom.Value.
+   * For checking equivalence of an Ion Values represented by dom.Value with the other value represented
+   * by dom.Value or an JS object.
    *
    * Strict equivalence refers to Ion data model equivalence
-   * as defined above and by Ion Specification[1]
+   * as defined in Ion Equivalence[1] and by Ion Specification[2]
    *
    * Structural or non-strict equivalence follows the same rules as strict equivalence,
    * except that
@@ -158,24 +159,25 @@ export interface Value {
    *   2. Timestamps that represent the same instant in time are always
    *      considered equivalent.
    *
-   * [1] http://amzn.github.io/ion-docs/docs/spec.html
+   * [1] https://www.javadoc.io/doc/com.amazon.ion/ion-java/latest/com/amazon/ion/util/Equivalence.html
+   * [2] http://amzn.github.io/ion-docs/docs/spec.html
    *
-   * @param expectedValue               other Ion Value to be compared with this Ion Value.
+   * @param other                       other Ion Value to be compared with this Ion Value.
    * @param options                     options provided for equivalence as below
    *        epsilon                     used by Float for an equality with given epsilon precision. (Default: null)
    *        ignoreAnnotations           specifies whether to ignore annotations or not for equality. (Default: false)
    *        ignoreTimestampPrecision    specifies whether to ignore timestamp local offset and precision
    *                                    or not for equality. (Default: false)
-   *        onlyCompareIon              specifies if only dom.Values should be considered for equality
+   *        compareOnlyIon:              specifies if only dom.Values should be considered for equality
    *                                    or can be JS object as well. (Default: true)
    */
   equals(
-    expectedValue: any,
+    other: any,
     options?: {
       epsilon?: number | null;
       ignoreAnnotations?: boolean;
       ignoreTimestampPrecision?: boolean;
-      onlyCompareIon?: boolean;
+      compareOnlyIon?: boolean;
     }
   ): boolean;
 }
@@ -344,96 +346,65 @@ export function Value<Clazz extends Constructor>(
     }
 
     /**
-     * Helper method to be implemented by each dom.Value with individual equivalence logic.
-     *
-     * Ion Equivalence
-     * In order to make Ion a useful model to describe data, we must first define
-     * the notion of equivalence for all values representable in Ion. Equivalence
-     * with respect to Ion values means that if two Ion values, X and Y, are
-     * equivalent, they represent the same data and can be substituted for the other
-     * without loss of information.
-     *
-     * This relationship is:
-     *     1. symmetric: X is equivalent to Y if and only if Y is equivalent to X.
-     *     2. transitive: if X is equivalent to Y and Y is equivalent to Z, then X is
-     *        equivalent to Z.
-     *     3. reflexive: X is equivalent to X.
-     *
-     * Ordered Sequence Equivalence:
-     * When an ordered sequence (i.e. tuple) of elements is specified in this
-     * document, equivalence over such an ordered sequence is defined as follows.
-     *
-     * A tuple, A = (a1, a2, ..., an), is equivalent to another tuple, B = (b1, b2,
-     * ..., bm) if and only if the cardinality (number of elements) of A equals the
-     * cardinality of B (i.e. n == m) and ai is equivalent to bi for i = 1 ... n.
-     *
-     * Un-Ordered Sequence Equivalence:
-     * When an un-ordered sequence (i.e. bag or multi-set) is specified in this
-     * document, equivalence over such a sequence is defined as follows.
-     *
-     * A bag, A = {a1, a2, ..., an} is equivalent to B = {b1, b2, ..., bm} if and
-     * only if the cardinality of A is equal to the cardinality of B and for each
-     * element, x, in A there exists a distinct element, y, in B for which x is
-     * equivalent to y.
-     *
-     * Values:
-     * Any arbitrary, atomic value in the Ion Language can be denoted as the tuple,
-     * (A, V), where A is an ordered list of annotations, and V is an Ion Primitive
-     * Data or Ion Complex Data value. The list of annotations, A is an tuple of Ion
-     * Symbols (a specific type of Ion Primitive).
+     * Helper method to be implemented by each subclass of dom.Value with individual equivalence logic.
      */
     // Class expressions (like this mixin) cannot have private or protected methods.
     _ionEquals(
-      expectedValue: any,
+      other: any,
       options: {
         epsilon?: number | null;
         ignoreAnnotations?: boolean;
         ignoreTimestampPrecision?: boolean;
-        onlyCompareIon?: boolean;
+        compareOnlyIon?: boolean;
       } = {
         epsilon: null,
         ignoreAnnotations: false,
         ignoreTimestampPrecision: false,
-        onlyCompareIon: true,
+        compareOnlyIon: true,
       }
     ): boolean {
-      this._unsupportedOperation("ionEquals");
+      this._unsupportedOperation("_ionEquals");
     }
 
+    /**
+     * Implementation of the dom.Value interface method equals()
+     */
     equals(
-      expectedValue: any,
+      other: any,
       options: {
         epsilon?: number | null;
         ignoreAnnotations?: boolean;
         ignoreTimestampPrecision?: boolean;
-        onlyCompareIon?: boolean;
+        compareOnlyIon?: boolean;
       } = {
         epsilon: null,
         ignoreAnnotations: false,
         ignoreTimestampPrecision: false,
-        onlyCompareIon: true,
+        compareOnlyIon: true,
       }
     ): boolean {
-      if (options.onlyCompareIon === false) {
+      if (options.compareOnlyIon === false) {
         options.ignoreAnnotations = true;
         options.ignoreTimestampPrecision = true;
       }
       if (!options.ignoreAnnotations) {
-        if (!(expectedValue instanceof Value)) {
+        if (!(other instanceof Value)) {
           return false;
         }
         let actualAnnotations = this.getAnnotations();
-        let expectedAnnotations = (expectedValue as Value).getAnnotations();
+        let expectedAnnotations = (other as Value).getAnnotations();
         if (actualAnnotations.length !== expectedAnnotations.length) {
           return false;
         }
         for (let i = 0; i < actualAnnotations.length; i++) {
-          if (actualAnnotations[i].localeCompare(expectedAnnotations[i])) {
+          if (
+            actualAnnotations[i].localeCompare(expectedAnnotations[i]) !== 0
+          ) {
             return false;
           }
         }
       }
-      return this._ionEquals(expectedValue, options);
+      return this._ionEquals(other, options);
     }
 
     // Returns the IonType associated with a particular dom.Value subclass. Useful for testing.
@@ -515,13 +486,13 @@ export namespace Value {
     export const STRICT = {
       ignoreAnnotations: false,
       ignoreTimestampPrecision: false,
-      onlyCompareIon: false,
+      compareOnlyIon: false,
       epsilon: null,
     };
     export const RELAXED = {
       ignoreAnnotations: true,
       ignoreTimestampPrecision: true,
-      onlyCompareIon: true,
+      compareOnlyIon: true,
       epsilon: null,
     };
   }

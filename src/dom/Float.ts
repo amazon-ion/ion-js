@@ -37,36 +37,45 @@ export class Float extends Value(Number, IonTypes.FLOAT, _fromJsConstructor) {
   }
 
   _ionEquals(
-    expectedValue: any,
+    other: any,
     options: {
       epsilon?: number | null;
       ignoreAnnotations?: boolean;
       ignoreTimestampPrecision?: boolean;
-      onlyCompareIon?: boolean;
+      compareOnlyIon?: boolean;
     } = {
       epsilon: null,
       ignoreAnnotations: false,
       ignoreTimestampPrecision: false,
-      onlyCompareIon: true,
+      compareOnlyIon: true,
     }
   ): boolean {
-    if (options.onlyCompareIon && expectedValue instanceof Float) {
-      expectedValue = expectedValue.numberValue();
-    } else if (
-      !options.onlyCompareIon &&
-      (typeof expectedValue === "number" ||
-        expectedValue instanceof global.Number)
-    ) {
-      expectedValue = expectedValue.valueOf();
+    let isSupportedType: boolean = false;
+    let valueToCompare: any = null;
+    if (options.compareOnlyIon) {
+      // `compareOnlyIon` requires that the provided value be an ion.dom.Float instance.
+      if (other instanceof Float) {
+        isSupportedType = true;
+        valueToCompare = other.numberValue();
+      }
     } else {
+      // We will consider other Float-ish types
+      if (other instanceof global.Number || typeof other === "number") {
+        isSupportedType = true;
+        valueToCompare = other.valueOf();
+      }
+    }
+
+    if (!isSupportedType) {
       return false;
     }
-    let result: boolean = Object.is(this.numberValue(), expectedValue);
+
+    let result: boolean = Object.is(this.numberValue(), valueToCompare);
 
     if (options.epsilon != null) {
       if (
         result ||
-        Math.abs(this.numberValue() - expectedValue) <= options.epsilon
+        Math.abs(this.numberValue() - valueToCompare) <= options.epsilon
       ) {
         return true;
       }

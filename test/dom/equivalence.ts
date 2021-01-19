@@ -23,9 +23,9 @@ describe("Equivalence", () => {
     assert.isTrue(nullValue3.equals(nullValue4));
     assert.isFalse(nullValue3.equals(nullValue5));
     // Equivalence between JS Value and Ion DOM Value
-    assert.isTrue(nullValue3.equals(null, { onlyCompareIon: false }));
+    assert.isTrue(nullValue3.equals(null, { compareOnlyIon: false }));
     assert.isFalse(nullValue3.equals(null));
-    assert.isFalse(nullValue1.equals(null, { onlyCompareIon: false }));
+    assert.isFalse(nullValue1.equals(null, { compareOnlyIon: false }));
   });
 
   it("equals() for Boolean", () => {
@@ -39,11 +39,11 @@ describe("Equivalence", () => {
     assert.isTrue(bool1.equals(bool3, Value.Equality.RELAXED));
     assert.isFalse(bool1.equals(bool4));
     // Equivalence between JS Value and Ion DOM Value
-    assert.isTrue(bool1.equals(false, { onlyCompareIon: false }));
+    assert.isTrue(bool1.equals(false, { compareOnlyIon: false }));
     assert.isFalse(bool1.equals(false));
-    assert.isFalse(bool1.equals(true, { onlyCompareIon: false }));
-    assert.isTrue(bool1.equals(new Boolean(false), { onlyCompareIon: false }));
-    assert.isFalse(bool1.equals(new Boolean(true), { onlyCompareIon: false }));
+    assert.isFalse(bool1.equals(true, { compareOnlyIon: false }));
+    assert.isTrue(bool1.equals(new Boolean(false), { compareOnlyIon: false }));
+    assert.isFalse(bool1.equals(new Boolean(true), { compareOnlyIon: false }));
   });
 
   it("equals() for Integer", () => {
@@ -57,11 +57,11 @@ describe("Equivalence", () => {
     assert.isTrue(int1.equals(int3, Value.Equality.RELAXED));
     assert.isFalse(int1.equals(int4));
     // Equivalence between JS Value and Ion DOM Value
-    assert.isTrue(int1.equals(7, { onlyCompareIon: false }));
+    assert.isTrue(int1.equals(7, { compareOnlyIon: false }));
     assert.isFalse(int1.equals(7));
-    assert.isFalse(int1.equals(10, { onlyCompareIon: false }));
-    assert.isTrue(int1.equals(new Number(7), { onlyCompareIon: false }));
-    assert.isFalse(int1.equals(new Number(10), { onlyCompareIon: false }));
+    assert.isFalse(int1.equals(10, { compareOnlyIon: false }));
+    assert.isTrue(int1.equals(new Number(7), { compareOnlyIon: false }));
+    assert.isFalse(int1.equals(new Number(10), { compareOnlyIon: false }));
   });
 
   it("equals() for Float", () => {
@@ -81,14 +81,14 @@ describe("Equivalence", () => {
     assert.isTrue(float3.equals(float5, { epsilon: 0.5 }));
     assert.isFalse(float3.equals(float5, { epsilon: 0.2 }));
     // Equivalence between JS Value and Ion DOM Value
-    assert.isTrue(float1.equals(1.5, { onlyCompareIon: false }));
+    assert.isTrue(float1.equals(1.5, { compareOnlyIon: false }));
     assert.isFalse(float1.equals(1.5));
-    assert.isFalse(float1.equals(1.2, { onlyCompareIon: false }));
-    assert.isTrue(float1.equals(1.2, { onlyCompareIon: false, epsilon: 0.5 }));
-    assert.isTrue(float1.equals(new Number(1.5), { onlyCompareIon: false }));
-    assert.isFalse(float1.equals(new Number(1.2), { onlyCompareIon: false }));
+    assert.isFalse(float1.equals(1.2, { compareOnlyIon: false }));
+    assert.isTrue(float1.equals(1.2, { compareOnlyIon: false, epsilon: 0.5 }));
+    assert.isTrue(float1.equals(new Number(1.5), { compareOnlyIon: false }));
+    assert.isFalse(float1.equals(new Number(1.2), { compareOnlyIon: false }));
     assert.isTrue(
-      float1.equals(new Number(1.2), { onlyCompareIon: false, epsilon: 0.5 })
+      float1.equals(new Number(1.2), { compareOnlyIon: false, epsilon: 0.5 })
     );
   });
 
@@ -102,10 +102,10 @@ describe("Equivalence", () => {
     assert.isFalse(decimal3.equals(decimal1));
     // Equivalence between JS Value and Ion DOM Value
     assert.isTrue(
-      decimal1.equals(new Decimal("101.5"), { onlyCompareIon: false })
+      decimal1.equals(new Decimal("101.5"), { compareOnlyIon: false })
     );
     assert.isFalse(
-      decimal1.equals(new Decimal("105.8"), { onlyCompareIon: false })
+      decimal1.equals(new Decimal("105.8"), { compareOnlyIon: false })
     );
   });
 
@@ -123,12 +123,12 @@ describe("Equivalence", () => {
     // Equivalence between JS Value and Ion DOM Value
     assert.isTrue(
       timestamp1.equals(new Date("2020-01-16T20:15:54.066Z"), {
-        onlyCompareIon: false,
+        compareOnlyIon: false,
       })
     );
     assert.isFalse(
       timestamp1.equals(new Date("2020-02-16T20:15:54.066Z"), {
-        onlyCompareIon: false,
+        compareOnlyIon: false,
       })
     );
   });
@@ -141,14 +141,14 @@ describe("Equivalence", () => {
     assert.isTrue(symbol1.equals(symbol2));
     assert.isFalse(symbol1.equals(symbol3));
     // Equivalence between JS Value and Ion DOM Value
-    assert.isTrue(symbol1.equals("Saturn", { onlyCompareIon: false }));
+    assert.isTrue(symbol1.equals("Saturn", { compareOnlyIon: false }));
     assert.isTrue(
-      symbol1.equals(new String("Saturn"), { onlyCompareIon: false })
+      symbol1.equals(new String("Saturn"), { compareOnlyIon: false })
     );
     assert.isFalse(
-      symbol1.equals(new String("Jupiter"), { onlyCompareIon: false })
+      symbol1.equals(new String("Jupiter"), { compareOnlyIon: false })
     );
-    assert.isFalse(symbol1.equals("Jupiter", { onlyCompareIon: false }));
+    assert.isFalse(symbol1.equals("Jupiter", { compareOnlyIon: false }));
     assert.isFalse(symbol1.equals(new String("Saturn")));
     assert.isFalse(symbol1.equals("Saturn"));
   });
@@ -161,14 +161,14 @@ describe("Equivalence", () => {
     assert.isTrue(string1.equals(string2));
     assert.isFalse(string1.equals(string3));
     // Equivalence between JS Value and Ion DOM Value
-    assert.isTrue(string1.equals("Saturn", { onlyCompareIon: false }));
+    assert.isTrue(string1.equals("Saturn", { compareOnlyIon: false }));
     assert.isTrue(
-      string1.equals(new String("Saturn"), { onlyCompareIon: false })
+      string1.equals(new String("Saturn"), { compareOnlyIon: false })
     );
     assert.isFalse(
-      string1.equals(new String("Jupiter"), { onlyCompareIon: false })
+      string1.equals(new String("Jupiter"), { compareOnlyIon: false })
     );
-    assert.isFalse(string1.equals("Jupiter", { onlyCompareIon: false }));
+    assert.isFalse(string1.equals("Jupiter", { compareOnlyIon: false }));
     assert.isFalse(string1.equals(new String("Saturn")));
     assert.isFalse(string1.equals("Saturn"));
   });
@@ -184,12 +184,12 @@ describe("Equivalence", () => {
     // Equivalence between JS Value and Ion DOM Value
     assert.isTrue(
       clob4.equals(new Uint8Array([72, 101, 108, 108, 111]), {
-        onlyCompareIon: false,
+        compareOnlyIon: false,
       })
     );
     assert.isFalse(
       clob4.equals(new Uint8Array([72, 101, 108, 108]), {
-        onlyCompareIon: false,
+        compareOnlyIon: false,
       })
     );
   });
@@ -221,11 +221,11 @@ describe("Equivalence", () => {
     // Equivalence between JS Value and Ion DOM Value
     assert.isTrue(
       list1.equals(["Mercury", "Venus", "Earth", "Mars"], {
-        onlyCompareIon: false,
+        compareOnlyIon: false,
       })
     );
     assert.isFalse(
-      list1.equals(["Mercury", "Venus", "Earth"], { onlyCompareIon: false })
+      list1.equals(["Mercury", "Venus", "Earth"], { compareOnlyIon: false })
     );
   });
 
@@ -309,7 +309,7 @@ describe("Equivalence", () => {
           },
           age: 41,
         },
-        { onlyCompareIon: false }
+        { compareOnlyIon: false }
       )
     );
     assert.isFalse(
@@ -321,7 +321,7 @@ describe("Equivalence", () => {
             last: "Jingleheimer-Schmidt",
           },
         },
-        { onlyCompareIon: false }
+        { compareOnlyIon: false }
       )
     );
   });
@@ -331,7 +331,7 @@ describe("Equivalence", () => {
     )!;
     assert.isTrue(
       value.equals([{ foo: 7, bar: true, baz: 98.6, qux: "Hello" }], {
-        onlyCompareIon: false,
+        compareOnlyIon: false,
       })
     );
   });
@@ -340,7 +340,7 @@ describe("Equivalence", () => {
     assert.isTrue(
       value.equals(
         { foo: [9, 8, 7, 6, 5, 4, 3, 2, 1, 0] },
-        { onlyCompareIon: false }
+        { compareOnlyIon: false }
       )
     );
   });

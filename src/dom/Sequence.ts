@@ -76,35 +76,44 @@ export function Sequence(ionType: IonType) {
     }
 
     _ionEquals(
-      expectedValue: any,
+      other: any,
       options: {
         epsilon?: number | null;
         ignoreAnnotations?: boolean;
         ignoreTimestampPrecision?: boolean;
-        onlyCompareIon?: boolean;
+        compareOnlyIon?: boolean;
       } = {
         epsilon: null,
         ignoreAnnotations: false,
         ignoreTimestampPrecision: false,
-        onlyCompareIon: true,
+        compareOnlyIon: true,
       }
     ): boolean {
-      // check if it is a valid JS Object or dom.Value Object based on options.onlyCompareIon value
-      if (
-        !(
-          (options.onlyCompareIon &&
-            (expectedValue.getType() === IonTypes.LIST ||
-              expectedValue.getType() === IonTypes.SEXP)) ||
-          (!options.onlyCompareIon && expectedValue instanceof global.Array)
-        )
-      ) {
+      let isSupportedType: boolean = false;
+      let valueToCompare: any = null;
+      if (options.compareOnlyIon) {
+        // `compareOnlyIon` requires that the provided value be an ion.dom.Sequence instance.
+        if (
+          other.getType() === IonTypes.LIST ||
+          other.getType() === IonTypes.SEXP
+        ) {
+          isSupportedType = true;
+          valueToCompare = other.elements();
+        }
+      } else {
+        // We will consider other Sequence-ish types
+        if (other instanceof global.Array) {
+          isSupportedType = true;
+          valueToCompare = other;
+        }
+      }
+
+      if (!isSupportedType) {
         return false;
       }
-      if (options.onlyCompareIon) {
-        expectedValue = expectedValue.elements();
-      }
+
       let actualSequence = this.elements();
-      let expectedSequence = expectedValue;
+      let expectedSequence = valueToCompare;
       if (actualSequence.length !== expectedSequence.length) {
         return false;
       }

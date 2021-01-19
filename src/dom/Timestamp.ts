@@ -85,42 +85,49 @@ export class Timestamp extends Value(
   }
 
   _ionEquals(
-    expectedValue: any,
+    other: any,
     options: {
       epsilon?: number | null;
       ignoreAnnotations?: boolean;
       ignoreTimestampPrecision?: boolean;
-      onlyCompareIon?: boolean;
+      compareOnlyIon?: boolean;
     } = {
       epsilon: null,
       ignoreAnnotations: false,
       ignoreTimestampPrecision: false,
-      onlyCompareIon: true,
+      compareOnlyIon: true,
     }
   ): boolean {
-    // check if it is a valid JS Object or dom.Value Object based on options.onlyCompareIon value
-    if (
-      !(
-        (options.onlyCompareIon && expectedValue instanceof Timestamp) ||
-        (!options.onlyCompareIon &&
-          (expectedValue instanceof ion.Timestamp ||
-            expectedValue instanceof global.Date))
-      )
-    ) {
-      return false;
-    }
-    if (expectedValue instanceof Timestamp) {
-      expectedValue = expectedValue.timestampValue();
-    } else if (expectedValue instanceof global.Date) {
-      if (this.dateValue().getTime() === expectedValue.getTime()) {
-        return true;
-      } else {
-        return false;
+    let isSupportedType: boolean = false;
+    let valueToCompare: any = null;
+    if (options.compareOnlyIon) {
+      // `compareOnlyIon` requires that the provided value be an ion.dom.Timestamp instance.
+      if (other instanceof Timestamp) {
+        isSupportedType = true;
+        valueToCompare = other.timestampValue();
+      }
+    } else {
+      // We will consider other Timestamp-ish types
+      if (other instanceof ion.Timestamp) {
+        // expectedValue is a non-DOM Timestamp
+        isSupportedType = true;
+        valueToCompare = other;
+      } else if (other instanceof global.Date) {
+        if (this.dateValue().getTime() === other.getTime()) {
+          return true;
+        } else {
+          return false;
+        }
       }
     }
-    if (options.ignoreTimestampPrecision) {
-      return this.timestampValue().compareTo(expectedValue) === 0;
+
+    if (!isSupportedType) {
+      return false;
     }
-    return this.timestampValue().equals(expectedValue);
+
+    if (options.ignoreTimestampPrecision) {
+      return this.timestampValue().compareTo(valueToCompare) === 0;
+    }
+    return this.timestampValue().equals(valueToCompare);
   }
 }

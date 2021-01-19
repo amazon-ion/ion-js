@@ -81,30 +81,39 @@ export class Integer extends Value(Number, IonTypes.INT, _fromJsConstructor) {
   }
 
   _ionEquals(
-    expectedValue: any,
+    other: any,
     options: {
       epsilon?: number | null;
       ignoreAnnotations?: boolean;
       ignoreTimestampPrecision?: boolean;
-      onlyCompareIon?: boolean;
+      compareOnlyIon?: boolean;
     } = {
       epsilon: null,
       ignoreAnnotations: false,
       ignoreTimestampPrecision: false,
-      onlyCompareIon: true,
+      compareOnlyIon: true,
     }
   ): boolean {
-    if (options.onlyCompareIon && expectedValue instanceof Integer) {
-      expectedValue = expectedValue.numberValue();
-    } else if (
-      !options.onlyCompareIon &&
-      (typeof expectedValue === "number" ||
-        expectedValue instanceof global.Number)
-    ) {
-      expectedValue = expectedValue.valueOf();
+    let isSupportedType: boolean = false;
+    let valueToCompare: any = null;
+    if (options.compareOnlyIon) {
+      // `compareOnlyIon` requires that the provided value be an ion.dom.Integer instance.
+      if (other instanceof Integer) {
+        isSupportedType = true;
+        valueToCompare = other.numberValue();
+      }
     } else {
+      // We will consider other Integer-ish types
+      if (other instanceof global.Number || typeof other === "number") {
+        isSupportedType = true;
+        valueToCompare = other.valueOf();
+      }
+    }
+
+    if (!isSupportedType) {
       return false;
     }
-    return JSBI.EQ(this.numberValue(), expectedValue);
+
+    return JSBI.EQ(this.numberValue(), valueToCompare);
   }
 }

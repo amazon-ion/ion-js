@@ -152,33 +152,38 @@ export class Null extends Value(Object, IonTypes.NULL, FromJsConstructor.NONE) {
   }
 
   _ionEquals(
-    expectedValue: any,
+    other: any,
     options: {
       epsilon?: number | null;
       ignoreAnnotations?: boolean;
       ignoreTimestampPrecision?: boolean;
-      onlyCompareIon?: boolean;
+      compareOnlyIon?: boolean;
     } = {
       epsilon: null,
       ignoreAnnotations: false,
       ignoreTimestampPrecision: false,
-      onlyCompareIon: true,
+      compareOnlyIon: true,
     }
   ): boolean {
-    if (
-      options.onlyCompareIon &&
-      expectedValue instanceof Null &&
-      this._ionType.name === expectedValue._ionType.name
-    ) {
-      return true;
-    } else if (
-      !options.onlyCompareIon &&
-      expectedValue === null &&
-      this._ionType.name === "null"
-    ) {
-      return true;
+    let isSupportedType: boolean = false;
+    let valueToCompare: any = null;
+    if (options.compareOnlyIon) {
+      // `compareOnlyIon` requires that the provided value be an ion.dom.Null instance.
+      if (other instanceof Null) {
+        isSupportedType = true;
+        valueToCompare = other;
+      }
     } else {
+      // We will consider other Null-ish types
+      if (other === null && this._ionType.name === "null") {
+        return true;
+      }
+    }
+
+    if (!isSupportedType) {
       return false;
     }
+
+    return this._ionType.name === valueToCompare._ionType.name;
   }
 }

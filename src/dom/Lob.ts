@@ -35,37 +35,44 @@ export function Lob(ionType: IonType) {
     }
 
     _ionEquals(
-      expectedValue: any,
+      other: any,
       options: {
         epsilon?: number | null;
         ignoreAnnotations?: boolean;
         ignoreTimestampPrecision?: boolean;
-        onlyCompareIon?: boolean;
+        compareOnlyIon?: boolean;
       } = {
         epsilon: null,
         ignoreAnnotations: false,
         ignoreTimestampPrecision: false,
-        onlyCompareIon: true,
+        compareOnlyIon: true,
       }
     ): boolean {
-      if (options.onlyCompareIon) {
-        if (expectedValue.getType() !== IonTypes.CLOB) {
-          if (expectedValue.getType() !== IonTypes.BLOB) {
-            return false;
-          }
+      let isSupportedType: boolean = false;
+      let valueToCompare: any = null;
+      if (options.compareOnlyIon) {
+        // `compareOnlyIon` requires that the provided value be an ion.dom.Lob instance.
+        if (
+          other.getType() === IonTypes.CLOB ||
+          other.getType() === IonTypes.BLOB
+        ) {
+          isSupportedType = true;
+          valueToCompare = other.uInt8ArrayValue();
         }
-        expectedValue = expectedValue.uInt8ArrayValue();
-      } else if (
-        !options.onlyCompareIon &&
-        expectedValue instanceof global.Uint8Array
-      ) {
-        expectedValue = expectedValue.valueOf();
       } else {
+        // We will consider other Lob-ish types
+        if (other instanceof global.Uint8Array) {
+          isSupportedType = true;
+          valueToCompare = other.valueOf();
+        }
+      }
+
+      if (!isSupportedType) {
         return false;
       }
 
       let current = this.uInt8ArrayValue();
-      let expected = expectedValue;
+      let expected = valueToCompare;
       if (current.length !== expected.length) {
         return false;
       }
