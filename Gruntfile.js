@@ -37,13 +37,13 @@ module.exports = function(grunt) {
     },
     ts: {
       'es6-es6': {
-        tsconfig: 'tsconfig.json'
+        tsconfig: 'tsconfig.es6.json'
       },
       'amd-es6': {
         tsconfig: 'tsconfig.amd.json'
       },
       'commonjs-es6': {
-        tsconfig: 'tsconfig.commonjs.json'
+        tsconfig: 'tsconfig.json'
       },
       'test-driver' : {
         tsconfig: './test-driver/tsconfig.json'

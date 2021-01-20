@@ -74,4 +74,40 @@ describe('dump*()', () => {
         writer.close();
         assert.deepEqual(ionBinary, writer.getBytes());
     });
+    it('Struct with annotated field large enough to require a VarUInt length', () => {
+        let ionText = "{a: b:: \"abcdefghijkl\"}";
+        let ionValue = ion.load(ionText);
+        let binaryIonBytes = ion.dumpBinary(ionValue);
+        let ionBinaryValue = ion.load(binaryIonBytes);
+        assert.deepEqual(ionValue, ionBinaryValue);
+    });
+    it('Struct with annotated field large enough to require a VarUInt length', () => {
+        // this ionText is taken from https://github.com/amzn/ion-js/issues/621
+        let ionText = "'com.example.organization.model.data.ClassName2@1.0'::{\n" +
+            "  values: [\n" +
+            "    'com.example.organization.model.data.ClassName1@1.0'::{\n" +
+            "      field_name_1: 'com.example.organization.model.types.ClassName1@1.0'::{\n" +
+            "        field_name_2: 'com.example.organization.model.types.ClassName2@1.0'::{\n" +
+            "          field_name_3: 9999999999.00,\n" +
+            "          field_name_4: ABC\n" +
+            "        }\n" +
+            "      },\n" +
+            "      field_name_5: AB\n" +
+            "    },\n" +
+            "    'com.example.organization.model.data.ClassName1@1.0'::{\n" +
+            "      field_name_1: 'com.example.organization.model.types.ClassName1@1.0'::{\n" +
+            "        field_name_2: 'com.example.organization.model.types.ClassName2@1.0'::{\n" +
+            "          field_name_3: 9999999999.00,\n" +
+            "          field_name_4: DEF\n" +
+            "        }\n" +
+            "      },\n" +
+            "      field_name_5: CD\n" +
+            "    }\n" +
+            "  ]\n" +
+            "}";
+        let ionValue = ion.load(ionText);
+        let binaryIonBytes = ion.dumpBinary(ionValue);
+        let ionBinaryValue = ion.load(binaryIonBytes);
+        assert.deepEqual(ionValue, ionBinaryValue);
+    })
 });
