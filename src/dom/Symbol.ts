@@ -39,4 +39,45 @@ export class Symbol extends Value(String, IonTypes.SYMBOL, _fromJsConstructor) {
     writer.setAnnotations(this.getAnnotations());
     writer.writeSymbol(this.stringValue());
   }
+
+  _ionEquals(
+    other: any,
+    options: {
+      epsilon?: number | null;
+      ignoreAnnotations?: boolean;
+      ignoreTimestampPrecision?: boolean;
+      onlyCompareIon?: boolean;
+    } = {
+      epsilon: null,
+      ignoreAnnotations: false,
+      ignoreTimestampPrecision: false,
+      onlyCompareIon: true,
+    }
+  ): boolean {
+    let isSupportedType: boolean = false;
+    let valueToCompare: any = null;
+    if (options.onlyCompareIon) {
+      // `compareOnlyIon` requires that the provided value be an ion.dom.Symbol instance.
+      if (other instanceof Symbol) {
+        isSupportedType = true;
+        valueToCompare = other.stringValue();
+      }
+    } else {
+      // We will consider other Symbol-ish types
+      if (typeof other === "string" || other instanceof global.String) {
+        isSupportedType = true;
+        valueToCompare = other.valueOf();
+      }
+    }
+
+    if (!isSupportedType) {
+      return false;
+    }
+
+    return this.compareValue(valueToCompare) === 0;
+  }
+
+  compareValue(expectedValue: string): number {
+    return this.stringValue().localeCompare(expectedValue);
+  }
 }

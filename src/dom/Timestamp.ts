@@ -83,4 +83,51 @@ export class Timestamp extends Value(
     writer.setAnnotations(this.getAnnotations());
     writer.writeTimestamp(this.timestampValue());
   }
+
+  _ionEquals(
+    other: any,
+    options: {
+      epsilon?: number | null;
+      ignoreAnnotations?: boolean;
+      ignoreTimestampPrecision?: boolean;
+      onlyCompareIon?: boolean;
+    } = {
+      epsilon: null,
+      ignoreAnnotations: false,
+      ignoreTimestampPrecision: false,
+      onlyCompareIon: true,
+    }
+  ): boolean {
+    let isSupportedType: boolean = false;
+    let valueToCompare: any = null;
+    if (options.onlyCompareIon) {
+      // `compareOnlyIon` requires that the provided value be an ion.dom.Timestamp instance.
+      if (other instanceof Timestamp) {
+        isSupportedType = true;
+        valueToCompare = other.timestampValue();
+      }
+    } else {
+      // We will consider other Timestamp-ish types
+      if (other instanceof ion.Timestamp) {
+        // expectedValue is a non-DOM Timestamp
+        isSupportedType = true;
+        valueToCompare = other;
+      } else if (other instanceof global.Date) {
+        if (this.dateValue().getTime() === other.getTime()) {
+          return true;
+        } else {
+          return false;
+        }
+      }
+    }
+
+    if (!isSupportedType) {
+      return false;
+    }
+
+    if (options.ignoreTimestampPrecision) {
+      return this.timestampValue().compareTo(valueToCompare) === 0;
+    }
+    return this.timestampValue().equals(valueToCompare);
+  }
 }

@@ -6,6 +6,7 @@ import {
   FromJsConstructorBuilder,
 } from "./FromJsConstructor";
 import { Value } from "./Value";
+import JSBI from "jsbi";
 
 const _fromJsConstructor: FromJsConstructor = new FromJsConstructorBuilder()
   .withClasses(ion.Decimal)
@@ -55,5 +56,48 @@ export class Decimal extends Value(
   writeTo(writer: Writer): void {
     writer.setAnnotations(this.getAnnotations());
     writer.writeDecimal(this.decimalValue());
+  }
+
+  _ionEquals(
+    other: any,
+    options: {
+      epsilon?: number | null;
+      ignoreAnnotations?: boolean;
+      ignoreTimestampPrecision?: boolean;
+      onlyCompareIon?: boolean;
+    } = {
+      epsilon: null,
+      ignoreAnnotations: false,
+      ignoreTimestampPrecision: false,
+      onlyCompareIon: true,
+    }
+  ): boolean {
+    let isSupportedType: boolean = false;
+    let valueToCompare: any = null;
+    if (options.onlyCompareIon) {
+      // `compareOnlyIon` requires that the provided value be an ion.dom.Decimal instance.
+      if (other instanceof Decimal) {
+        isSupportedType = true;
+        valueToCompare = other.decimalValue();
+      }
+    } else {
+      // We will consider other Decimal-ish types
+      if (other instanceof ion.Decimal) {
+        // expectedValue is a non-DOM Decimal
+        isSupportedType = true;
+        valueToCompare = other;
+      } else if (other instanceof Number || typeof other === "number") {
+        isSupportedType = true;
+        // calling numberValue() on ion.Decimal is lossy and could result in imprecise comparisons
+        // hence converting number to ion.Decimal for comparison even though it maybe expensive
+        valueToCompare = new ion.Decimal(other.toString());
+      }
+    }
+
+    if (!isSupportedType) {
+      return false;
+    }
+
+    return this.decimalValue().equals(valueToCompare);
   }
 }

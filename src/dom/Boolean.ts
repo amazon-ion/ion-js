@@ -58,4 +58,44 @@ export class Boolean extends Value(
     writer.setAnnotations(this.getAnnotations());
     writer.writeBoolean(this.booleanValue());
   }
+
+  _ionEquals(
+    other: any,
+    options: {
+      epsilon?: number | null;
+      ignoreAnnotations?: boolean;
+      ignoreTimestampPrecision?: boolean;
+      onlyCompareIon?: boolean;
+    } = {
+      epsilon: null,
+      ignoreAnnotations: false,
+      ignoreTimestampPrecision: false,
+      onlyCompareIon: true,
+    }
+  ): boolean {
+    let isSupportedType: boolean = false;
+    let valueToCompare: any = null;
+    if (options.onlyCompareIon) {
+      // `compareOnlyIon` requires that the provided value be an ion.dom.Boolean instance.
+      if (other instanceof Boolean) {
+        isSupportedType = true;
+        valueToCompare = other.booleanValue();
+      }
+    } else {
+      // We will consider other Boolean-ish types
+      if (typeof other === "boolean" || other instanceof global.Boolean) {
+        isSupportedType = true;
+        valueToCompare = other.valueOf();
+      }
+    }
+
+    if (!isSupportedType) {
+      return false;
+    }
+
+    if (this.booleanValue() !== valueToCompare) {
+      return false;
+    }
+    return true;
+  }
 }

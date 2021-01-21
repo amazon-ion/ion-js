@@ -1,4 +1,4 @@
-import { IonType } from "../Ion";
+import { IonType, IonTypes } from "../Ion";
 import {
   FromJsConstructor,
   FromJsConstructorBuilder,
@@ -32,6 +32,56 @@ export function Lob(ionType: IonType) {
 
     uInt8ArrayValue(): Uint8Array {
       return this;
+    }
+
+    _ionEquals(
+      other: any,
+      options: {
+        epsilon?: number | null;
+        ignoreAnnotations?: boolean;
+        ignoreTimestampPrecision?: boolean;
+        onlyCompareIon?: boolean;
+      } = {
+        epsilon: null,
+        ignoreAnnotations: false,
+        ignoreTimestampPrecision: false,
+        onlyCompareIon: true,
+      }
+    ): boolean {
+      let isSupportedType: boolean = false;
+      let valueToCompare: any = null;
+      if (options.onlyCompareIon) {
+        // `compareOnlyIon` requires that the provided value be an ion.dom.Lob instance.
+        if (
+          other.getType() === IonTypes.CLOB ||
+          other.getType() === IonTypes.BLOB
+        ) {
+          isSupportedType = true;
+          valueToCompare = other.uInt8ArrayValue();
+        }
+      } else {
+        // We will consider other Lob-ish types
+        if (other instanceof global.Uint8Array) {
+          isSupportedType = true;
+          valueToCompare = other.valueOf();
+        }
+      }
+
+      if (!isSupportedType) {
+        return false;
+      }
+
+      let current = this.uInt8ArrayValue();
+      let expected = valueToCompare;
+      if (current.length !== expected.length) {
+        return false;
+      }
+      for (let i = 0; i < current.length; i++) {
+        if (current[i] !== expected[i]) {
+          return false;
+        }
+      }
+      return true;
     }
   };
 }

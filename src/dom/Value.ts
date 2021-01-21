@@ -144,6 +144,42 @@ export interface Value {
    * indicating whether the Struct was modified. For all other types, throws an Error.
    */
   deleteField(name: string): boolean;
+
+  /**
+   * For checking equivalence of an Ion Values represented by dom.Value with the other value represented
+   * by dom.Value or an JS object.
+   *
+   * Strict equivalence refers to Ion data model equivalence
+   * as defined in Ion Equivalence[1] and by Ion Specification[2]
+   *
+   * Structural or non-strict equivalence follows the same rules as strict equivalence,
+   * except that
+   *
+   *   1. Annotations are not considered, and
+   *   2. Timestamps that represent the same instant in time are always
+   *      considered equivalent.
+   *
+   * [1] https://www.javadoc.io/doc/com.amazon.ion/ion-java/latest/com/amazon/ion/util/Equivalence.html
+   * [2] http://amzn.github.io/ion-docs/docs/spec.html
+   *
+   * @param other                       other Ion Value to be compared with this Ion Value.
+   * @param options                     options provided for equivalence as below
+   *        epsilon                     used by Float for an equality with given epsilon precision. (Default: null)
+   *        ignoreAnnotations           specifies whether to ignore annotations or not for equality. (Default: false)
+   *        ignoreTimestampPrecision    specifies whether to ignore timestamp local offset and precision
+   *                                    or not for equality. (Default: false)
+   *        onlyCompareIon:             specifies if only dom.Values should be considered for equality
+   *                                    or can be JS object as well. (Default: true)
+   */
+  equals(
+    other: any,
+    options?: {
+      epsilon?: number | null;
+      ignoreAnnotations?: boolean;
+      ignoreTimestampPrecision?: boolean;
+      onlyCompareIon?: boolean;
+    }
+  ): boolean;
 }
 
 /**
@@ -309,6 +345,68 @@ export function Value<Clazz extends Constructor>(
       this._unsupportedOperation("deleteField");
     }
 
+    /**
+     * Helper method to be implemented by each subclass of dom.Value with individual equivalence logic.
+     */
+    // Class expressions (like this mixin) cannot have private or protected methods.
+    _ionEquals(
+      other: any,
+      options: {
+        epsilon?: number | null;
+        ignoreAnnotations?: boolean;
+        ignoreTimestampPrecision?: boolean;
+        onlyCompareIon?: boolean;
+      } = {
+        epsilon: null,
+        ignoreAnnotations: false,
+        ignoreTimestampPrecision: false,
+        onlyCompareIon: true,
+      }
+    ): boolean {
+      this._unsupportedOperation("_ionEquals");
+    }
+
+    /**
+     * Implementation of the dom.Value interface method equals()
+     */
+    equals(
+      other: any,
+      options: {
+        epsilon?: number | null;
+        ignoreAnnotations?: boolean;
+        ignoreTimestampPrecision?: boolean;
+        onlyCompareIon?: boolean;
+      } = {
+        epsilon: null,
+        ignoreAnnotations: false,
+        ignoreTimestampPrecision: false,
+        onlyCompareIon: true,
+      }
+    ): boolean {
+      if (options.onlyCompareIon === false) {
+        options.ignoreAnnotations = true;
+        options.ignoreTimestampPrecision = true;
+      }
+      if (!options.ignoreAnnotations) {
+        if (!(other instanceof Value)) {
+          return false;
+        }
+        let actualAnnotations = this.getAnnotations();
+        let expectedAnnotations = (other as Value).getAnnotations();
+        if (actualAnnotations.length !== expectedAnnotations.length) {
+          return false;
+        }
+        for (let i = 0; i < actualAnnotations.length; i++) {
+          if (
+            actualAnnotations[i].localeCompare(expectedAnnotations[i]) !== 0
+          ) {
+            return false;
+          }
+        }
+      }
+      return this._ionEquals(other, options);
+    }
+
     // Returns the IonType associated with a particular dom.Value subclass. Useful for testing.
     static _getIonType(): IonType {
       return ionType;
@@ -381,6 +479,22 @@ export namespace Value {
       return value as Value;
     }
     return JsValueConversion._ionValueFromJsValue(value, annotations);
+  }
+
+  // a namespace with pre-filled option values for STRICT and NON STRICT(RELAXED) equality check
+  export namespace Equality {
+    export const STRICT = {
+      ignoreAnnotations: false,
+      ignoreTimestampPrecision: false,
+      onlyCompareIon: false,
+      epsilon: null,
+    };
+    export const RELAXED = {
+      ignoreAnnotations: true,
+      ignoreTimestampPrecision: true,
+      onlyCompareIon: true,
+      epsilon: null,
+    };
   }
 }
 

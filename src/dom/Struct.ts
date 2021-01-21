@@ -150,4 +150,68 @@ export class Struct extends Value(
     ).map(([key, value]) => [key, Value.from(value)]);
     return new this(fields, annotations);
   }
+
+  _ionEquals(
+    other: any,
+    options: {
+      epsilon?: number | null;
+      ignoreAnnotations?: boolean;
+      ignoreTimestampPrecision?: boolean;
+      onlyCompareIon?: boolean;
+    } = {
+      epsilon: null,
+      ignoreAnnotations: false,
+      ignoreTimestampPrecision: false,
+      onlyCompareIon: true,
+    }
+  ): boolean {
+    let isSupportedType: boolean = false;
+    let valueToCompare: any = null;
+    if (options.onlyCompareIon) {
+      // `compareOnlyIon` requires that the provided value be an ion.dom.Struct instance.
+      if (other instanceof Struct) {
+        isSupportedType = true;
+        valueToCompare = other.fields();
+      }
+    } else {
+      // We will consider other Struct-ish types
+      if (typeof other === "object" || other instanceof global.Object) {
+        isSupportedType = true;
+        valueToCompare = Object.entries(other);
+      }
+    }
+
+    if (!isSupportedType) {
+      return false;
+    }
+
+    if (this.fields().length !== valueToCompare.length) {
+      return false;
+    }
+    let matchFound: boolean = true;
+    const paired: boolean[] = new Array<boolean>(valueToCompare.length);
+    for (let i: number = 0; matchFound && i < this.fields().length; i++) {
+      matchFound = false;
+      for (let j: number = 0; !matchFound && j < valueToCompare.length; j++) {
+        if (!paired[j]) {
+          const child = this.fields()[i];
+          const expectedChild = valueToCompare[j];
+          matchFound =
+            child[0] === expectedChild[0] &&
+            child[1].equals(expectedChild[1], options);
+          if (matchFound) {
+            paired[j] = true;
+          }
+        }
+      }
+    }
+    // set matchFound to the first pair that didn't find a matching field if any
+    for (let i: number = 0; i < paired.length; i++) {
+      if (!paired[i]) {
+        matchFound = false;
+        break;
+      }
+    }
+    return matchFound;
+  }
 }

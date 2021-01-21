@@ -79,4 +79,41 @@ export class Integer extends Value(Number, IonTypes.INT, _fromJsConstructor) {
       writer.writeInt(this._bigIntValue);
     }
   }
+
+  _ionEquals(
+    other: any,
+    options: {
+      epsilon?: number | null;
+      ignoreAnnotations?: boolean;
+      ignoreTimestampPrecision?: boolean;
+      onlyCompareIon?: boolean;
+    } = {
+      epsilon: null,
+      ignoreAnnotations: false,
+      ignoreTimestampPrecision: false,
+      onlyCompareIon: true,
+    }
+  ): boolean {
+    let isSupportedType: boolean = false;
+    let valueToCompare: any = null;
+    if (options.onlyCompareIon) {
+      // `compareOnlyIon` requires that the provided value be an ion.dom.Integer instance.
+      if (other instanceof Integer) {
+        isSupportedType = true;
+        valueToCompare = other.numberValue();
+      }
+    } else {
+      // We will consider other Integer-ish types
+      if (other instanceof global.Number || typeof other === "number") {
+        isSupportedType = true;
+        valueToCompare = other.valueOf();
+      }
+    }
+
+    if (!isSupportedType) {
+      return false;
+    }
+
+    return JSBI.EQ(this.numberValue(), valueToCompare);
+  }
 }

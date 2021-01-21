@@ -35,4 +35,51 @@ export class Float extends Value(Number, IonTypes.FLOAT, _fromJsConstructor) {
     writer.setAnnotations(this.getAnnotations());
     writer.writeFloat64(this.numberValue());
   }
+
+  _ionEquals(
+    other: any,
+    options: {
+      epsilon?: number | null;
+      ignoreAnnotations?: boolean;
+      ignoreTimestampPrecision?: boolean;
+      onlyCompareIon?: boolean;
+    } = {
+      epsilon: null,
+      ignoreAnnotations: false,
+      ignoreTimestampPrecision: false,
+      onlyCompareIon: true,
+    }
+  ): boolean {
+    let isSupportedType: boolean = false;
+    let valueToCompare: any = null;
+    if (options.onlyCompareIon) {
+      // `compareOnlyIon` requires that the provided value be an ion.dom.Float instance.
+      if (other instanceof Float) {
+        isSupportedType = true;
+        valueToCompare = other.numberValue();
+      }
+    } else {
+      // We will consider other Float-ish types
+      if (other instanceof global.Number || typeof other === "number") {
+        isSupportedType = true;
+        valueToCompare = other.valueOf();
+      }
+    }
+
+    if (!isSupportedType) {
+      return false;
+    }
+
+    let result: boolean = Object.is(this.numberValue(), valueToCompare);
+
+    if (options.epsilon != null) {
+      if (
+        result ||
+        Math.abs(this.numberValue() - valueToCompare) <= options.epsilon
+      ) {
+        return true;
+      }
+    }
+    return result;
+  }
 }

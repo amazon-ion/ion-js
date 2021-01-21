@@ -74,5 +74,55 @@ export function Sequence(ionType: IonType) {
       }
       writer.stepOut();
     }
+
+    _ionEquals(
+      other: any,
+      options: {
+        epsilon?: number | null;
+        ignoreAnnotations?: boolean;
+        ignoreTimestampPrecision?: boolean;
+        onlyCompareIon?: boolean;
+      } = {
+        epsilon: null,
+        ignoreAnnotations: false,
+        ignoreTimestampPrecision: false,
+        onlyCompareIon: true,
+      }
+    ): boolean {
+      let isSupportedType: boolean = false;
+      let valueToCompare: any = null;
+      if (options.onlyCompareIon) {
+        // `compareOnlyIon` requires that the provided value be an ion.dom.Sequence instance.
+        if (
+          other.getType() === IonTypes.LIST ||
+          other.getType() === IonTypes.SEXP
+        ) {
+          isSupportedType = true;
+          valueToCompare = other.elements();
+        }
+      } else {
+        // We will consider other Sequence-ish types
+        if (other instanceof global.Array) {
+          isSupportedType = true;
+          valueToCompare = other;
+        }
+      }
+
+      if (!isSupportedType) {
+        return false;
+      }
+
+      let actualSequence = this.elements();
+      let expectedSequence = valueToCompare;
+      if (actualSequence.length !== expectedSequence.length) {
+        return false;
+      }
+      for (let i = 0; i < actualSequence.length; i++) {
+        if (!actualSequence[i].equals(expectedSequence[i], options)) {
+          return false;
+        }
+      }
+      return true;
+    }
   };
 }
