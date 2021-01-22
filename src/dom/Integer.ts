@@ -107,6 +107,9 @@ export class Integer extends Value(Number, IonTypes.INT, _fromJsConstructor) {
       if (other instanceof global.Number || typeof other === "number") {
         isSupportedType = true;
         valueToCompare = other.valueOf();
+      } else if (other instanceof JSBI) {
+        isSupportedType = true;
+        valueToCompare = other;
       }
     }
 

@@ -1,6 +1,7 @@
 import { assert } from "chai";
 import { Value, load } from "../../src/dom";
 import { Decimal } from "../../src/IonDecimal";
+import JSBI from "jsbi";
 
 /**
  * This file contains 'equals()' tests for each Ion data type:
@@ -62,6 +63,8 @@ describe("Equivalence", () => {
     assert.isFalse(int1.equals(10, { onlyCompareIon: false }));
     assert.isTrue(int1.equals(new Number(7), { onlyCompareIon: false }));
     assert.isFalse(int1.equals(new Number(10), { onlyCompareIon: false }));
+    assert.isTrue(int1.equals(JSBI.BigInt(7), { onlyCompareIon: false }));
+    assert.isFalse(int1.equals(JSBI.BigInt(10), { onlyCompareIon: false }));
   });
 
   it("equals() for Float", () => {
