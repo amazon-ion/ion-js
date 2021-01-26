@@ -19,10 +19,10 @@ import * as ion from '../src/Ion';
 
 @suite('Text Reader')
 class IonTextReaderTests {
-    private static first_value_equal(input, expected) {
+    private static escapeTerminatorTest(input, expected) {
         let reader = ion.makeReader(input);
         reader.next();
-        assert.equal(reader.value(), expected);
+        assert.equal(reader.stringValue(), expected);
     }
 
     private static ivmTest(reader, value, expected, depth, annotations) {
@@ -41,7 +41,7 @@ class IonTextReaderTests {
         let ionReader = ion.makeReader(ionToRead);
         ionReader.next();
 
-        assert.equal(ionReader.value(), "string");
+        assert.equal(ionReader.stringValue(), "string");
     }
 
     @test "Read emoji with modifier"() {
@@ -60,7 +60,7 @@ class IonTextReaderTests {
         let ionReader = ion.makeReader(ionToRead);
         ionReader.next();
 
-        assert.equal(ionReader.value(), true);
+        assert.equal(ionReader.booleanValue(), true);
     }
 
     @test "Read clob value"() {
@@ -68,7 +68,7 @@ class IonTextReaderTests {
         let ionReader = ion.makeReader(ionToRead);
         ionReader.next();
 
-        assert.deepEqual(ionReader.value(), Uint8Array.from([194, 128]));
+        assert.deepEqual(ionReader.byteValue(), Uint8Array.from([194, 128]));
     }
 
     @test "Read boolean value in struct"() {
@@ -78,7 +78,7 @@ class IonTextReaderTests {
         ionReader.stepIn();
         ionReader.next();
 
-        assert.equal(ionReader.value(), false);
+        assert.equal(ionReader.booleanValue(), false);
     }
 
     @test "resolves symbol IDs"() {
@@ -88,13 +88,13 @@ class IonTextReaderTests {
         ionReader.stepIn();
         ionReader.next();
         assert.equal(ionReader.fieldName(), 'version');
-        assert.equal(ionReader.value(), 'imports');
+        assert.equal(ionReader.stringValue(), 'imports');
         ionReader.next();
         assert.equal(ionReader.fieldName(), "rock");
-        assert.equal(ionReader.value(), "paper");
+        assert.equal(ionReader.stringValue(), "paper");
         ionReader.next();
         assert.equal(ionReader.fieldName(), "scissors");
-        assert.equal(ionReader.value(), 'taco');
+        assert.equal(ionReader.stringValue(), 'taco');
     }
 
     @test "Parse through struct"() {
@@ -108,7 +108,7 @@ class IonTextReaderTests {
         ionReader.next();
 
         assert.equal(ionReader.fieldName(), "key");
-        assert.equal(ionReader.value(), "string");
+        assert.equal(ionReader.stringValue(), "string");
 
         assert.isNull(ionReader.next());
     }
@@ -133,7 +133,7 @@ class IonTextReaderTests {
         ionReader.next();
 
         assert.equal(ionReader.fieldName(), "key2");
-        assert.equal(ionReader.value(), "string2");
+        assert.equal(ionReader.stringValue(), "string2");
 
         assert.isNull(ionReader.next());
     }
@@ -177,10 +177,10 @@ class IonTextReaderTests {
         ionReader.stepIn(); // Step into the array.
 
         ionReader.next();
-        assert.equal(ionReader.value(), "v1");
+        assert.equal(ionReader.stringValue(), "v1");
 
         ionReader.next();
-        assert.equal(ionReader.value(), "v2");
+        assert.equal(ionReader.stringValue(), "v2");
 
         assert.isNull(ionReader.next());
     }
@@ -202,10 +202,10 @@ class IonTextReaderTests {
         ionReader.stepIn(); // Step into the inner array.
 
         ionReader.next();
-        assert.equal(ionReader.value(), "v1");
+        assert.equal(ionReader.stringValue(), "v1");
 
         ionReader.next();
-        assert.equal(ionReader.value(), "v2");
+        assert.equal(ionReader.stringValue(), "v2");
 
         assert.isNull(ionReader.next());
     }
@@ -218,15 +218,15 @@ class IonTextReaderTests {
     }
 
     @test "Parses escaped terminators correctly."() {
-        IonTextReaderTests.first_value_equal("'abc\\''", "abc'");
-        IonTextReaderTests.first_value_equal("'''abc\\''''", "abc'");
-        IonTextReaderTests.first_value_equal("'abc\\'' taco", "abc'");
-        IonTextReaderTests.first_value_equal("'''abc\\'''' taco", "abc'");
-        IonTextReaderTests.first_value_equal("'''abc\\'''' '''''' taco", "abc'");
-        IonTextReaderTests.first_value_equal('"abc\\""', 'abc"');
-        IonTextReaderTests.first_value_equal('"abc\\"" taco', 'abc"');
-        IonTextReaderTests.first_value_equal("'\\\n'", "");
-        IonTextReaderTests.first_value_equal("'''short1\\\n'''\n\n'''\\\nmulti-line string\nwith embedded\\nnew line\ncharacters\\\n'''", "short1multi-line string\nwith embedded\nnew line\ncharacters");
+        IonTextReaderTests.escapeTerminatorTest("'abc\\''", "abc'");
+        IonTextReaderTests.escapeTerminatorTest("'''abc\\''''", "abc'");
+        IonTextReaderTests.escapeTerminatorTest("'abc\\'' taco", "abc'");
+        IonTextReaderTests.escapeTerminatorTest("'''abc\\'''' taco", "abc'");
+        IonTextReaderTests.escapeTerminatorTest("'''abc\\'''' '''''' taco", "abc'");
+        IonTextReaderTests.escapeTerminatorTest('"abc\\""', 'abc"');
+        IonTextReaderTests.escapeTerminatorTest('"abc\\"" taco', 'abc"');
+        IonTextReaderTests.escapeTerminatorTest("'\\\n'", "");
+        IonTextReaderTests.escapeTerminatorTest("'''short1\\\n'''\n\n'''\\\nmulti-line string\nwith embedded\\nnew line\ncharacters\\\n'''", "short1multi-line string\nwith embedded\nnew line\ncharacters");
 
     };
 
