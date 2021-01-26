@@ -77,13 +77,6 @@ function domRoundTripTest(typeName: string, ...valuesToRoundTrip: any[]) {
         // Load the serialized version of the value
         let roundTripped = load(writer.getBytes())!;
         // Verify that nothing was lost in the round trip
-        assert.isNotNull(roundTripped);
-        assert.equal(domValue.isNull(), roundTripped.isNull());
-        assert.equal(domValue.getType(), roundTripped.getType());
-        assert.deepEqual(
-          domValue.getAnnotations(),
-          roundTripped.getAnnotations()
-        );
         assert.isTrue(domValue.equals(roundTripped));
       });
     }
@@ -97,10 +90,6 @@ function domRoundTripTest(typeName: string, ...valuesToRoundTrip: any[]) {
  *
  * @param jsValue               A JS value to pass to Value.from().
  * @param expectedIonType       The new dom.Value's expected Ion type.
- * @param equalityTest          A function that tests whether the new dom.Value is equal to the provided jsValue.
- * @param expectValue           If specified, `equalityTest` will compare the new dom.Value to `expectValue` instead of
- *                              comparing it to `jsValue`. This is helpful if jsValue is a boxed primitive
- *                              but you want to test for equality with the primitive representation.
  */
 function domValueTest(jsValue, expectedIonType) {
   function validateDomValue(domValue: Value, annotations) {
