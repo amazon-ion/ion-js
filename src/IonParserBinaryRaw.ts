@@ -486,7 +486,7 @@ export class ParserBinaryRaw {
           return null;
         }
         this.load_value();
-        if(this._curr instanceof JSBI) {
+        if (this._curr instanceof JSBI) {
           const bigInt: JSBI = this._curr!;
           return JSBI.toNumber(bigInt);
         }
@@ -781,7 +781,7 @@ export class ParserBinaryRaw {
     if (this._len === 0) {
       return JsbiSupport.ZERO;
     }
-    if(this._len < 6) {
+    if (this._len < 6) {
       return this.readUnsignedIntAsNumber();
     }
     return this.readUnsignedIntAsBigInt();
