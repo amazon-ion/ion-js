@@ -133,6 +133,7 @@ export interface Reader {
    * @return `null` if the current Ion value [[isNull]].
    *
    * @throw Error when the reader is not positioned on a `clob` or `blob` typed value.
+   * @deprecated Since version 4.2.  Use the `uInt8ArrayValue` method instead
    */
   byteValue(): Uint8Array | null;
 

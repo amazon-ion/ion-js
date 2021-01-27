@@ -300,22 +300,7 @@ export class TextReader implements Reader {
   }
 
   byteValue(): Uint8Array | null {
-    this.load_raw();
-    switch (this._type) {
-      case IonTypes.NULL:
-        return null;
-      case IonTypes.BLOB:
-        if (this.isNull()) {
-          return null;
-        }
-        return fromBase64(this._raw);
-      case IonTypes.CLOB:
-        if (this.isNull()) {
-          return null;
-        }
-        return this._raw;
-    }
-    throw new Error("Current value is not a blob or clob.");
+    return this.uInt8ArrayValue();
   }
 
   uInt8ArrayValue(): Uint8Array | null {
