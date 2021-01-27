@@ -318,6 +318,25 @@ export class TextReader implements Reader {
     throw new Error("Current value is not a blob or clob.");
   }
 
+  uInt8ArrayValue(): Uint8Array | null {
+    this.load_raw();
+    switch (this._type) {
+      case IonTypes.NULL:
+        return null;
+      case IonTypes.BLOB:
+        if (this.isNull()) {
+          return null;
+        }
+        return fromBase64(this._raw);
+      case IonTypes.CLOB:
+        if (this.isNull()) {
+          return null;
+        }
+        return this._raw;
+    }
+    throw new Error("Current value is not a blob or clob.");
+  }
+
   decimalValue(): Decimal | null {
     switch (this._type) {
       case IonTypes.NULL:

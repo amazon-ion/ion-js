@@ -43,7 +43,7 @@
 //    stringValue
 //    decimalValue
 //    timestampValue
-//    byteValue
+//    uInt8ArrayValue
 
 import JSBI from "jsbi";
 import * as IonBinary from "./IonBinary";
@@ -416,6 +416,22 @@ export class ParserBinaryRaw {
   }
 
   byteValue(): Uint8Array | null {
+    switch (this._raw_type) {
+      case IonBinary.TB_NULL:
+        return null;
+      case IonBinary.TB_CLOB:
+      case IonBinary.TB_BLOB:
+        if (this.isNull()) {
+          return null;
+        }
+        this.load_value();
+        return this._curr!;
+      default:
+        throw new Error("Current value is not a blob or clob.");
+    }
+  }
+
+  uInt8ArrayValue(): Uint8Array | null {
     switch (this._raw_type) {
       case IonBinary.TB_NULL:
         return null;

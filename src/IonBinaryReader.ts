@@ -186,6 +186,10 @@ export class BinaryReader implements Reader {
     return this._parser.byteValue();
   }
 
+  uInt8ArrayValue(): Uint8Array | null {
+    return this._parser.uInt8ArrayValue();
+  }
+
   booleanValue(): boolean | null {
     return this._parser.booleanValue();
   }
