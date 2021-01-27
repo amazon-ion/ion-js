@@ -100,13 +100,13 @@ export class Integer extends Value(Number, IonTypes.INT, _fromJsConstructor) {
       // `compareOnlyIon` requires that the provided value be an ion.dom.Integer instance.
       if (other instanceof Integer) {
         isSupportedType = true;
-        valueToCompare = other.numberValue();
+        valueToCompare = other.bigIntValue();
       }
     } else {
       // We will consider other Integer-ish types
       if (other instanceof global.Number || typeof other === "number") {
         isSupportedType = true;
-        valueToCompare = other.valueOf();
+        valueToCompare = JSBI.BigInt(other.valueOf());
       } else if (other instanceof JSBI) {
         isSupportedType = true;
         valueToCompare = other;
@@ -117,6 +117,6 @@ export class Integer extends Value(Number, IonTypes.INT, _fromJsConstructor) {
       return false;
     }
 
-    return JSBI.EQ(this.numberValue(), valueToCompare);
+    return JSBI.equal(this.bigIntValue(), valueToCompare);
   }
 }
