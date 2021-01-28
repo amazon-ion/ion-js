@@ -43,7 +43,7 @@
 //    stringValue
 //    decimalValue
 //    timestampValue
-//    byteValue
+//    uInt8ArrayValue
 
 import JSBI from "jsbi";
 import * as IonBinary from "./IonBinary";
@@ -416,6 +416,10 @@ export class ParserBinaryRaw {
   }
 
   byteValue(): Uint8Array | null {
+    return this.uInt8ArrayValue();
+  }
+
+  uInt8ArrayValue(): Uint8Array | null {
     switch (this._raw_type) {
       case IonBinary.TB_NULL:
         return null;
