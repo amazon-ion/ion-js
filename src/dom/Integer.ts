@@ -96,17 +96,33 @@ export class Integer extends Value(Number, IonTypes.INT, _fromJsConstructor) {
   ): boolean {
     let isSupportedType: boolean = false;
     let valueToCompare: any = null;
+    if (other instanceof Integer) {
+      isSupportedType = true;
+      if (this._bigIntValue == null && other._bigIntValue == null) {
+        valueToCompare = other.numberValue();
+      } else {
+        // One of them is a JSBI
+        valueToCompare = other.bigIntValue();
+      }
+    }
+
     if (options.onlyCompareIon) {
       // `compareOnlyIon` requires that the provided value be an ion.dom.Integer instance.
-      if (other instanceof Integer) {
-        isSupportedType = true;
+      if (this._bigIntValue == null && other._bigIntValue == null) {
+        valueToCompare = other.numberValue();
+      } else {
+        // One of them is a JSBI
         valueToCompare = other.bigIntValue();
       }
     } else {
       // We will consider other Integer-ish types
       if (other instanceof global.Number || typeof other === "number") {
         isSupportedType = true;
-        valueToCompare = JSBI.BigInt(other.valueOf());
+        if (this.bigIntValue == null) {
+          valueToCompare = other.valueOf();
+        } else {
+          valueToCompare = JSBI.BigInt(other.valueOf());
+        }
       } else if (other instanceof JSBI) {
         isSupportedType = true;
         valueToCompare = other;
@@ -117,6 +133,9 @@ export class Integer extends Value(Number, IonTypes.INT, _fromJsConstructor) {
       return false;
     }
 
-    return JSBI.equal(this.bigIntValue(), valueToCompare);
+    if (valueToCompare instanceof JSBI) {
+      return JSBI.equal(this.bigIntValue(), valueToCompare);
+    }
+    return this.numberValue() == valueToCompare;
   }
 }
