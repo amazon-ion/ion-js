@@ -300,6 +300,10 @@ export class TextReader implements Reader {
   }
 
   byteValue(): Uint8Array | null {
+    return this.uInt8ArrayValue();
+  }
+
+  uInt8ArrayValue(): Uint8Array | null {
     this.load_raw();
     switch (this._type) {
       case IonTypes.NULL:

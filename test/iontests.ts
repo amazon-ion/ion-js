@@ -295,7 +295,7 @@ function roundTripEventStreams(input: string | Buffer) {
 //       (e.g., a class that implements IonReader)
 let allValueMethods = [
   "booleanValue",
-  "byteValue",
+  "uInt8ArrayValue",
   "decimalValue",
   "numberValue",
   "stringValue",
@@ -304,7 +304,7 @@ let allValueMethods = [
 let nonThrowingMethods = {
   null: {
     booleanValue: 1,
-    byteValue: 1,
+    uInt8ArrayValue: 1,
     decimalValue: 1,
     numberValue: 1,
     stringValue: 1,
@@ -317,8 +317,8 @@ let nonThrowingMethods = {
   timestamp: { timestampValue: 1 },
   symbol: { stringValue: 1 },
   string: { stringValue: 1 },
-  clob: { byteValue: 1 },
-  blob: { byteValue: 1 },
+  clob: { uInt8ArrayValue: 1 },
+  blob: { uInt8ArrayValue: 1 },
   list: {},
   sexp: {},
   struct: {},

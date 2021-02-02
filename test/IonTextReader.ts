@@ -68,7 +68,7 @@ class IonTextReaderTests {
         let ionReader = ion.makeReader(ionToRead);
         ionReader.next();
 
-        assert.deepEqual(ionReader.byteValue(), Uint8Array.from([194, 128]));
+        assert.deepEqual(ionReader.uInt8ArrayValue(), Uint8Array.from([194, 128]));
     }
 
     @test "Read boolean value in struct"() {
