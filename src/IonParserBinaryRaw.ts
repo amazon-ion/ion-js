@@ -490,8 +490,11 @@ export class ParserBinaryRaw {
           return null;
         }
         this.load_value();
-        const bigInt: JSBI = this._curr!;
-        return JSBI.toNumber(bigInt);
+        if (this._curr instanceof JSBI) {
+          const bigInt: JSBI = this._curr!;
+          return JSBI.toNumber(bigInt);
+        }
+        return this._curr!;
       case IonBinary.TB_FLOAT:
         if (this.isNull()) {
           return null;
@@ -775,10 +778,15 @@ export class ParserBinaryRaw {
   /**
    * Positive integers and negative integers are both encoded as an unsigned integer magnitude.
    * This function will read in the magnitude, leaving it to the caller to set the value's sign as appropriate.
+   *
+   * It returns `number` for `_len` less than 6 bytes. Otherwise, it returns `JSBI.BigInt` value.
    */
-  private _readIntegerMagnitude(): JSBI {
+  private _readIntegerMagnitude(): JSBI | number {
     if (this._len === 0) {
       return JsbiSupport.ZERO;
+    }
+    if (this._len < 6) {
+      return this.readUnsignedIntAsNumber();
     }
     return this.readUnsignedIntAsBigInt();
   }
@@ -797,7 +805,8 @@ export class ParserBinaryRaw {
         this._curr = this._readIntegerMagnitude();
         break;
       case IonBinary.TB_NEG_INT:
-        this._curr = JSBI.unaryMinus(this._readIntegerMagnitude());
+        let value = this._readIntegerMagnitude();
+        this._curr = value instanceof JSBI ? JSBI.unaryMinus(value) : -value;
         break;
       case IonBinary.TB_FLOAT:
         this._curr = this.read_binary_float();

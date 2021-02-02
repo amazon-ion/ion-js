@@ -451,11 +451,20 @@ class IonIntEvent extends AbstractIonEvent {
   }
 
   valueCompare(expected: IonEvent): ComparisonResult {
-    if (
-      expected instanceof IonIntEvent &&
-      JSBI.equal(this.ionValue, expected.ionValue)
-    ) {
-      return new ComparisonResult(ComparisonResultType.EQUAL);
+    if (expected instanceof IonIntEvent) {
+      // convert both values to `JSBI.BigInt` first and then compare for precision.
+      let actualValue =
+        this.ionValue instanceof JSBI
+          ? this.ionValue
+          : JSBI.BigInt(this.ionValue);
+      let expectedValue =
+        expected.ionValue instanceof JSBI
+          ? expected.ionValue
+          : JSBI.BigInt(expected.ionValue);
+
+      if (JSBI.equal(actualValue, expectedValue)) {
+        return new ComparisonResult(ComparisonResultType.EQUAL);
+      }
     }
     return new ComparisonResult(
       ComparisonResultType.NOT_EQUAL,
