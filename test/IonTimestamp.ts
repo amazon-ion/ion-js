@@ -242,4 +242,11 @@ describe("Timestamp", () => {
         assert.deepEqual(ts.getSecondsDecimal(), ion.Decimal.parse('45'));
         assert.deepEqual(ts._getFractionalSeconds(), ion.Decimal.ZERO);
     });
+    it('constructor with Date', () => {
+        const date = new Date(2000, 0, 1, 12, 30, 45);
+        let timestamp1 = new ion.Timestamp(-7 * 60, 2000, 1, 1, 12, 30, 45);
+        let timestamp2 = ion.Timestamp.fromDate(date);
+        assert.equal(timestamp1!.equals(timestamp2!), timestamp1 === timestamp2);  // data model equivalence
+
+    })
 });

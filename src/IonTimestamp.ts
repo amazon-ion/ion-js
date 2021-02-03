@@ -186,6 +186,23 @@ export class Timestamp {
   }
 
   /**
+   * Static factory method for creating a Timestamp from a JavaScript Date object
+   *
+   * @param date - valid JavaScript date object
+   */
+  static fromDate(date: Date): Timestamp {
+    const seconds = new Decimal(date.getSeconds(), (date.getMilliseconds() / 1000))
+    return new Timestamp(
+      date.getTimezoneOffset() / 60,
+      date.getFullYear(),
+      date.getMonth() + 1,
+      date.getDate(),
+      date.getHours(),
+      date.getMinutes(),
+      seconds)  
+  }
+
+  /**
    * Parses a string and returns a corresponding Timestamp object.
    * The provided string must be a text-encoded Timestamp as specified
    * in the Ion specification.
