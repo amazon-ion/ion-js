@@ -191,7 +191,10 @@ export class Timestamp {
    * @param date - valid JavaScript date object
    */
   static fromDate(date: Date): Timestamp {
-    const seconds = new Decimal(date.getSeconds(), (date.getMilliseconds() / 1000))
+    const seconds = new Decimal(
+      date.getSeconds(),
+      date.getMilliseconds() / 1000
+    );
     return new Timestamp(
       date.getTimezoneOffset() / 60,
       date.getFullYear(),
@@ -199,7 +202,8 @@ export class Timestamp {
       date.getDate(),
       date.getHours(),
       date.getMinutes(),
-      seconds)  
+      seconds
+    );
   }
 
   /**
