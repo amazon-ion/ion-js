@@ -126,11 +126,15 @@ function _loadValue(reader: Reader): Value {
 }
 
 function _loadStruct(reader: Reader): Struct {
-  const children: Map<string, Value> = new Map();
+  const children: Map<string, Value[]> = new Map();
   const annotations: string[] = reader.annotations();
   reader.stepIn();
   while (reader.next()) {
-    children.set(reader.fieldName()!, _loadValue(reader));
+    if (children.has(reader.fieldName()!)) {
+      children.get(reader.fieldName()!)!.push(_loadValue(reader));
+    } else {
+      children.set(reader.fieldName()!, [_loadValue(reader)]);
+    }
   }
   reader.stepOut();
   return new Struct(children.entries(), annotations);
