@@ -347,4 +347,13 @@ describe("Equivalence", () => {
       )
     );
   });
+  it("equals() for Struct with duplicate fields", () => {
+    let value1: Value = load("{ foo: 'bar', foo: 'baz' }")!;
+    let value2: Value = load("{ foo: 'bar', foo: 'baz' }")!;
+    let value3: Value = load("{ foo: 'bar', foo: 'qux' }")!;
+
+    assert.isTrue(value1.equals(value2));
+    assert.isTrue(value1.equals(value2));
+    assert.isFalse(value1.equals(value3));
+  });
 });

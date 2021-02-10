@@ -228,11 +228,13 @@ export class Struct extends Value(
 
   // helper function for comparison of all values of a field
   _ionValueEquals(child: Value[], expectedChild: Value[], options): boolean {
-    for (const value of child) {
-      for (const expectedValue of expectedChild) {
-        if (!value.equals(expectedValue, options)) {
-          return false;
-        }
+    if (child.length !== expectedChild.length) {
+      return false;
+    }
+
+    for (let i: number = 0; i < child.length; i++) {
+      if (!child[i].equals(expectedChild[i], options)) {
+        return false;
       }
     }
     return true;

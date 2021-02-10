@@ -492,4 +492,29 @@ describe('DOM', () => {
 
       assert.equal(2, s.fields().length)
    });
+
+   it('load() Struct with duplicate fields as any', () => {
+      let s: any = load(
+          'foo::bar::{' +
+          'age: 55, ' +
+          'age: 41' +
+          '}'
+      )!;
+
+      assert.equal(IonTypes.STRUCT, s.getType());
+      assert.deepEqual(['foo', 'bar'], s.getAnnotations());
+
+      // Field access return last value for a fieldname
+      assert.equal(41, s.age);
+
+      // Iteration
+      for (let [fieldName, values] of s) {
+         assert.isTrue(typeof fieldName === "string");
+         assert.isTrue(fieldName.length > 0);
+         values.forEach(value => assert.isFalse(value.isNull()));
+      }
+
+      // length is 1 with two values: 55, 41
+      assert.equal(1, s.fields().length)
+   });
 });
