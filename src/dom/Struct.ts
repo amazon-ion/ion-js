@@ -41,7 +41,10 @@ export class Struct extends Value(
    * @param fields        An iterator of field name/value pairs to represent as a struct.
    * @param annotations   An optional array of strings to associate with this null value.
    */
-  constructor(fields: Iterable<[string, Value]> | Iterable<[string, Value[]]>, annotations: string[] = []) {
+  constructor(
+    fields: Iterable<[string, Value]> | Iterable<[string, Value[]]>,
+    annotations: string[] = []
+  ) {
     super();
     for (const [fieldName, fieldValue] of fields) {
       this._fields[fieldName] = fieldValue;
@@ -114,7 +117,7 @@ export class Struct extends Value(
       return child!;
     }
     let values: Value[] | undefined = [];
-    child.forEach(value => values!.push(...value.getAll(...pathTail)!));
+    child.forEach((value) => values!.push(...value.getAll(...pathTail)!));
     return values!;
   }
 
@@ -233,7 +236,11 @@ export class Struct extends Value(
           const expectedChild = valueToCompare[j];
           matchFound =
             child[0] === expectedChild[0] &&
-            this._ionValueEquals(child[1].sort(), expectedChild[1].sort(), options);
+            this._ionValueEquals(
+              child[1].sort(),
+              expectedChild[1].sort(),
+              options
+            );
           if (matchFound) {
             paired[j] = true;
           }
