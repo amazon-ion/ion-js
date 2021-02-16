@@ -455,7 +455,7 @@ describe('DOM', () => {
       assert.equal("Jacob", s.get("name", "middle")!.stringValue());
 
       // Iteration
-      for (let [fieldName, values] of s.fields()) {
+      for (let [fieldName, values] of s.allFields()) {
          assert.isTrue(typeof fieldName === "string");
          assert.isTrue(fieldName.length > 0);
          values.forEach(value => {assert.isFalse(value.isNull())});
@@ -501,11 +501,35 @@ describe('DOM', () => {
           '}'
       )!;
 
+      let s1: Value = load(
+          'foo::bar::{' +
+          'name: {' +
+          'first: "John", ' +
+          'middle: "Jacob", ' +
+          'last: "Jingleheimer-Schmidt",' +
+          '},' +
+          'name: {' +
+          'first: "Jessie", ' +
+          'middle: "Bob", ' +
+          'last: "Pinkman",' +
+          '},' +
+          'age: 41' +
+          '}'
+      )!;
       assert.equal(IonTypes.STRUCT, s.getType());
       assert.deepEqual(['foo', 'bar'], s.getAnnotations());
 
       // Field access return last value for a fieldname
       assert.equal(41, s.age);
+
+      // get all values for given field name
+      assert.equal(55, s.getAll("age")[0]);
+      assert.equal(41, s.getAll("age")[1]);
+      assert.equal(2, s.getAll("age").length);
+      assert.isTrue(s1.getAll('name','middle')![0].equals("Jacob", {onlyCompareIon: false}));
+      assert.isTrue(s1.getAll('name','middle')![1].equals("Bob", {onlyCompareIon: false}));
+      assert.equal(2, s1.getAll('name','middle')!.length);
+
 
       // Iteration
       for (let [fieldName, values] of s) {

@@ -41,7 +41,7 @@ export class Struct extends Value(
    * @param fields        An iterator of field name/value pairs to represent as a struct.
    * @param annotations   An optional array of strings to associate with this null value.
    */
-  constructor(fields: Iterable<[string, Value[]]>, annotations: string[] = []) {
+  constructor(fields: Iterable<[string, Value]> | Iterable<[string, Value[]]>, annotations: string[] = []) {
     super();
     for (const [fieldName, fieldValue] of fields) {
       this._fields[fieldName] = fieldValue;
@@ -98,11 +98,35 @@ export class Struct extends Value(
     return child[child.length - 1]!.get(...pathTail);
   }
 
+  getAll(...pathElements: PathElement[]): Value[] | null {
+    if (pathElements.length === 0) {
+      throw new Error("Value#get requires at least one parameter.");
+    }
+    const [pathHead, ...pathTail] = pathElements;
+    if (typeof pathHead !== "string") {
+      throw new Error(`Cannot index into a struct with a ${typeof pathHead}.`);
+    }
+    const child: Value[] | undefined = this._fields[pathHead];
+    if (child === undefined) {
+      return null;
+    }
+    if (pathTail.length === 0) {
+      return child!;
+    }
+    let values: Value[] | undefined = [];
+    child.forEach(value => values!.push(...value.getAll(...pathTail)!));
+    return values!;
+  }
+
   fieldNames(): string[] {
     return Object.keys(this._fields);
   }
 
-  fields(): [string, Value[]][] {
+  allFields(): [string, Value[]][] {
+    return Object.entries(this._fields);
+  }
+
+  fields(): [string, Value][] {
     return Object.entries(this._fields);
   }
 
@@ -110,7 +134,7 @@ export class Struct extends Value(
     return Object.values(this._fields);
   }
 
-  [Symbol.iterator](): IterableIterator<[string, Value[]]> {
+  [Symbol.iterator](): IterableIterator<[string, Value]> {
     return this.fields()[Symbol.iterator]();
   }
 
@@ -127,9 +151,9 @@ export class Struct extends Value(
   writeTo(writer: Writer): void {
     writer.setAnnotations(this.getAnnotations());
     writer.stepIn(IonTypes.STRUCT);
-    for (const [fieldName, values] of this) {
-      writer.writeFieldName(fieldName);
+    for (const [fieldName, values] of this.allFields()) {
       for (let value of values) {
+        writer.writeFieldName(fieldName);
         value.writeTo(writer);
       }
     }
@@ -146,7 +170,7 @@ export class Struct extends Value(
 
   toJSON() {
     let normalizedFields = Object.create(null);
-    for (const [key, values] of this) {
+    for (const [key, values] of this.allFields()) {
       normalizedFields[key] = values[values.length - 1];
     }
     return normalizedFields;
@@ -188,7 +212,7 @@ export class Struct extends Value(
       // We will consider other Struct-ish types
       if (typeof other === "object" || other instanceof global.Object) {
         isSupportedType = true;
-        valueToCompare = Value.from(other).fields();
+        valueToCompare = Value.from(other).allFields();
       }
     }
 
@@ -196,20 +220,20 @@ export class Struct extends Value(
       return false;
     }
 
-    if (this.fields().length !== valueToCompare.length) {
+    if (this.allFields().length !== valueToCompare.length) {
       return false;
     }
     let matchFound: boolean = true;
     const paired: boolean[] = new Array<boolean>(valueToCompare.length);
-    for (let i: number = 0; matchFound && i < this.fields().length; i++) {
+    for (let i: number = 0; matchFound && i < this.allFields().length; i++) {
       matchFound = false;
       for (let j: number = 0; !matchFound && j < valueToCompare.length; j++) {
         if (!paired[j]) {
-          const child = this.fields()[i];
+          const child = this.allFields()[i];
           const expectedChild = valueToCompare[j];
           matchFound =
             child[0] === expectedChild[0] &&
-            this._ionValueEquals(child[1], expectedChild[1], options);
+            this._ionValueEquals(child[1].sort(), expectedChild[1].sort(), options);
           if (matchFound) {
             paired[j] = true;
           }

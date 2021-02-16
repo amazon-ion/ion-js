@@ -107,6 +107,14 @@ export interface Value {
   get(...pathElements: PathElement[]): Value | null;
 
   /**
+   * For the Struct type, returns an array containing all the values for given field name or field name path
+   *
+   * @param One or more values to be used to index into the Value.
+   * @returns null if no value is found at the specified path. Otherwise, returns the discovered Value.
+   */
+  getAll(...pathElements: PathElement[]): Value[] | null;
+
+  /**
    * For the Struct type, returns an array containing the names of the fields in the Struct;
    * otherwise throws an Error.
    */
@@ -116,7 +124,13 @@ export interface Value {
    * For the Struct type, returns an array containing the field name/value pairs in the Struct;
    * otherwise throws an Error.
    */
-  fields(): [string, Value[]][];
+  fields(): [string, Value][];
+
+  /**
+   * For the Struct type, returns an array containing the field name/values pairs in the Struct;
+   * otherwise throws an Error.
+   */
+  allFields(): [string, Value[]][];
 
   /**
    * For the Struct, List, and SExpression types, returns an array containing the container's
@@ -316,8 +330,12 @@ export function Value<Clazz extends Constructor>(
       this._unsupportedOperation("fieldNames");
     }
 
-    fields(): [string, Value[]][] {
+    fields(): [string, Value][] {
       this._unsupportedOperation("fields");
+    }
+
+    allFields(): [string, Value[]][] {
+      this._unsupportedOperation("allFields");
     }
 
     elements(): Value[] {
@@ -326,6 +344,10 @@ export function Value<Clazz extends Constructor>(
 
     get(...pathElements: PathElement[]): Value | null {
       this._unsupportedOperation("get");
+    }
+
+    getAll(...pathElements: PathElement[]): Value[] | null {
+      this._unsupportedOperation("getAll");
     }
 
     as<T extends Value>(ionValueType: Constructor<T>): T {
