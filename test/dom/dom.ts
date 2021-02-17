@@ -484,10 +484,10 @@ describe('DOM', () => {
       assert.equal("Jacob", s["name"]["middle"]);
 
       // Iteration
-      for (let [fieldName, values] of s) {
+      for (let [fieldName, value] of s) {
          assert.isTrue(typeof fieldName === "string");
          assert.isTrue(fieldName.length > 0);
-         values.forEach(value => assert.isFalse(value.isNull()));
+         assert.isFalse(value.isNull());
       }
 
       assert.equal(2, s.fields().length)
@@ -532,10 +532,10 @@ describe('DOM', () => {
 
 
       // Iteration
-      for (let [fieldName, values] of s) {
+      for (let [fieldName, value] of s) {
          assert.isTrue(typeof fieldName === "string");
          assert.isTrue(fieldName.length > 0);
-         values.forEach(value => assert.isFalse(value.isNull()));
+         assert.isFalse(value.isNull());
       }
 
       // length is 1 with two values: 55, 41

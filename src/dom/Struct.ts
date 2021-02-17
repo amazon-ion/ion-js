@@ -46,8 +46,11 @@ export class Struct extends Value(
     annotations: string[] = []
   ) {
     super();
+    // Struct fields will always be stored as (fieldName, fieldValues) => (string, Value[])
     for (const [fieldName, fieldValue] of fields) {
-      this._fields[fieldName] = fieldValue;
+      this._fields[fieldName] = Array.isArray(fieldValue)
+        ? fieldValue
+        : [fieldValue];
     }
     this._setAnnotations(annotations);
 
@@ -130,7 +133,11 @@ export class Struct extends Value(
   }
 
   fields(): [string, Value][] {
-    return Object.entries(this._fields);
+    let singleValueFields = Object.create(null);
+    for (const [fieldName, values] of this.allFields()) {
+      singleValueFields[fieldName] = values[values.length - 1];
+    }
+    return Object.entries(singleValueFields);
   }
 
   elements(): Value[] {
@@ -144,7 +151,7 @@ export class Struct extends Value(
   toString(): string {
     return (
       "{" +
-      [...this.fields()]
+      [...this.allFields()]
         .map(([name, value]) => name + ": " + value)
         .join(", ") +
       "}"
@@ -173,8 +180,8 @@ export class Struct extends Value(
 
   toJSON() {
     let normalizedFields = Object.create(null);
-    for (const [key, values] of this.allFields()) {
-      normalizedFields[key] = values[values.length - 1];
+    for (const [key, value] of this.fields()) {
+      normalizedFields[key] = value;
     }
     return normalizedFields;
   }
@@ -209,7 +216,7 @@ export class Struct extends Value(
       // `compareOnlyIon` requires that the provided value be an ion.dom.Struct instance.
       if (other instanceof Struct) {
         isSupportedType = true;
-        valueToCompare = other.fields();
+        valueToCompare = other.allFields();
       }
     } else {
       // We will consider other Struct-ish types
