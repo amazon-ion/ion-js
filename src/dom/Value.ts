@@ -107,7 +107,19 @@ export interface Value {
   get(...pathElements: PathElement[]): Value | null;
 
   /**
-   * For the Struct type, returns an array containing all the values for given field name or field name path
+   * Like the `get(PathElement[])` method, but returns *all* of the values associated
+   * with a given field name instead of just the last one. For example, for the
+   * following struct:
+   *
+   *     {
+   *         foo: 1,
+   *         foo: null,
+   *         foo: true,
+   *     }
+   *
+   * a call to `get("foo")` would return a `dom.Boolean` representing `true`
+   * while a call to `getAll("foo")` would return an `Array` of
+   * `dom.Value`s: `[1, null, true]`.
    *
    * @param One or more values to be used to index into the Value.
    * @returns null if no value is found at the specified path. Otherwise, returns the discovered Value.
@@ -127,8 +139,20 @@ export interface Value {
   fields(): [string, Value][];
 
   /**
-   * For the Struct type, returns an array containing the field name/values pairs in the Struct;
-   * otherwise throws an Error.
+   * Like the `fields()` method, but returns an array containing the field name/value pairs with *all* of
+   * the associated values to a field name, instead of field name/value pairs with just the last associated value
+   * to a field name. For example, for the
+   * following struct:
+   *
+   *     {
+   *         foo: 1,
+   *         foo: null,
+   *         foo: true,
+   *     }
+   *
+   * a call to `fields()` would return a field name "foo" with a `dom.Boolean` representing `true`
+   * while a call to `allFields()` would return  a field name "foo" with an `Array` of
+   * `dom.Value`s: `[1, null, true]`.
    */
   allFields(): [string, Value[]][];
 
