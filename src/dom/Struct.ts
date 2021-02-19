@@ -48,9 +48,8 @@ export class Struct extends Value(
     super();
     // Struct fields will always be stored as (fieldName, fieldValues) => (string, Value[])
     for (const [fieldName, fieldValue] of fields) {
-      this._fields[fieldName] = Array.isArray(fieldValue)
-        ? fieldValue
-        : [fieldValue];
+      this._fields[fieldName] =
+        fieldValue instanceof Value ? [fieldValue] : fieldValue;
     }
     this._setAnnotations(annotations);
 
