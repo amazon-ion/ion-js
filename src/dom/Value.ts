@@ -107,6 +107,26 @@ export interface Value {
   get(...pathElements: PathElement[]): Value | null;
 
   /**
+   * Like the `get(PathElement[])` method, but returns *all* of the values associated
+   * with a given field name instead of just the last one. For example, for the
+   * following struct:
+   *
+   *     {
+   *         foo: 1,
+   *         foo: null,
+   *         foo: true,
+   *     }
+   *
+   * a call to `get("foo")` would return a `dom.Boolean` representing `true`
+   * while a call to `getAll("foo")` would return an `Array` of
+   * `dom.Value`s: `[1, null, true]`.
+   *
+   * @param One or more values to be used to index into the Value.
+   * @returns null if no value is found at the specified path. Otherwise, returns the discovered Value.
+   */
+  getAll(...pathElements: PathElement[]): Value[] | null;
+
+  /**
    * For the Struct type, returns an array containing the names of the fields in the Struct;
    * otherwise throws an Error.
    */
@@ -117,6 +137,24 @@ export interface Value {
    * otherwise throws an Error.
    */
   fields(): [string, Value][];
+
+  /**
+   * Like the `fields()` method, but returns an array containing the field name/value pairs with *all* of
+   * the associated values to a field name, instead of field name/value pairs with just the last associated value
+   * to a field name. For example, for the
+   * following struct:
+   *
+   *     {
+   *         foo: 1,
+   *         foo: null,
+   *         foo: true,
+   *     }
+   *
+   * a call to `fields()` would return a field name "foo" with a `dom.Boolean` representing `true`
+   * while a call to `allFields()` would return  a field name "foo" with an `Array` of
+   * `dom.Value`s: `[1, null, true]`.
+   */
+  allFields(): [string, Value[]][];
 
   /**
    * For the Struct, List, and SExpression types, returns an array containing the container's
@@ -320,12 +358,20 @@ export function Value<Clazz extends Constructor>(
       this._unsupportedOperation("fields");
     }
 
+    allFields(): [string, Value[]][] {
+      this._unsupportedOperation("allFields");
+    }
+
     elements(): Value[] {
       this._unsupportedOperation("elements");
     }
 
     get(...pathElements: PathElement[]): Value | null {
       this._unsupportedOperation("get");
+    }
+
+    getAll(...pathElements: PathElement[]): Value[] | null {
+      this._unsupportedOperation("getAll");
     }
 
     as<T extends Value>(ionValueType: Constructor<T>): T {

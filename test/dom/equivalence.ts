@@ -347,4 +347,18 @@ describe("Equivalence", () => {
       )
     );
   });
+  it("equals() for Struct with duplicate fields", () => {
+    let value1: Value = load("{ foo: 'bar', foo: 'baz' }")!;
+    let value2: Value = load("{ foo: 'bar', foo: 'baz' }")!;
+    let value3: Value = load("{ foo: 'bar', foo: 'qux' }")!;
+    let value4: Value = load("{ foo: 1, baz: true, foo: 2 }")!;
+    let value5: Value = load("{ foo: 2, foo: 1, baz: true }")!;
+
+    assert.isTrue(value1.equals(value2));
+    assert.isTrue(value2.equals(value1));
+    assert.isFalse(value1.equals(value3));
+
+    // Equivalence for unordered fields
+    assert.isTrue(value4.equals(value5));
+  });
 });
