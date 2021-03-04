@@ -84,7 +84,7 @@ export class Timestamp extends Value(
     writer.writeTimestamp(this.timestampValue());
   }
 
-  _ionEquals(
+  _valueEquals(
     other: any,
     options: {
       epsilon?: number | null;

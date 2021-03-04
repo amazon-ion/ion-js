@@ -195,7 +195,7 @@ export class Struct extends Value(
     return new this(fields, annotations);
   }
 
-  _ionEquals(
+  _valueEquals(
     other: any,
     options: {
       epsilon?: number | null;
@@ -270,8 +270,14 @@ export class Struct extends Value(
     }
 
     for (let i: number = 0; i < child.length; i++) {
-      if (!child[i].equals(expectedChild[i], options)) {
-        return false;
+      if (options.onlyCompareIon) {
+        if (!child[i].ionEquals(expectedChild[i], options)) {
+          return false;
+        }
+      } else {
+        if (!child[i].equals(expectedChild[i])) {
+          return false;
+        }
       }
     }
     return true;

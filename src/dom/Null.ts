@@ -151,7 +151,7 @@ export class Null extends Value(Object, IonTypes.NULL, FromJsConstructor.NONE) {
     writer.writeNull(this.getType());
   }
 
-  _ionEquals(
+  _valueEquals(
     other: any,
     options: {
       epsilon?: number | null;

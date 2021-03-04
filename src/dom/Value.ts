@@ -185,7 +185,7 @@ export interface Value {
 
   /**
    * For checking equivalence of an Ion Values represented by dom.Value with the other value represented
-   * by dom.Value or an JS object.
+   * by dom.Value.
    *
    * Strict equivalence refers to Ion data model equivalence
    * as defined in Ion Equivalence[1] and by Ion Specification[2]
@@ -206,18 +206,21 @@ export interface Value {
    *        ignoreAnnotations           specifies whether to ignore annotations or not for equality. (Default: false)
    *        ignoreTimestampPrecision    specifies whether to ignore timestamp local offset and precision
    *                                    or not for equality. (Default: false)
-   *        onlyCompareIon:             specifies if only dom.Values should be considered for equality
-   *                                    or can be JS object as well. (Default: true)
    */
-  equals(
+  ionEquals(
     other: any,
     options?: {
       epsilon?: number | null;
       ignoreAnnotations?: boolean;
       ignoreTimestampPrecision?: boolean;
-      onlyCompareIon?: boolean;
     }
   ): boolean;
+
+  /**
+   * For checking non-strict equivalence of an Ion Values represented by dom.Value with the other value represented
+   * by an JS object.
+   */
+  equals(other: any): boolean;
 }
 
 /**
@@ -395,7 +398,7 @@ export function Value<Clazz extends Constructor>(
      * Helper method to be implemented by each subclass of dom.Value with individual equivalence logic.
      */
     // Class expressions (like this mixin) cannot have private or protected methods.
-    _ionEquals(
+    _valueEquals(
       other: any,
       options: {
         epsilon?: number | null;
@@ -409,30 +412,35 @@ export function Value<Clazz extends Constructor>(
         onlyCompareIon: true,
       }
     ): boolean {
-      this._unsupportedOperation("_ionEquals");
+      this._unsupportedOperation("_valueEquals");
     }
 
     /**
      * Implementation of the dom.Value interface method equals()
      */
-    equals(
+    equals(other: any): boolean {
+      return this._valueEquals(other, {
+        onlyCompareIon: false,
+        ignoreTimestampPrecision: true,
+        ignoreAnnotations: true,
+      });
+    }
+
+    /**
+     * Implementation of the dom.Value interface method ionEquals()
+     */
+    ionEquals(
       other: any,
       options: {
         epsilon?: number | null;
         ignoreAnnotations?: boolean;
         ignoreTimestampPrecision?: boolean;
-        onlyCompareIon?: boolean;
       } = {
         epsilon: null,
         ignoreAnnotations: false,
         ignoreTimestampPrecision: false,
-        onlyCompareIon: true,
       }
     ): boolean {
-      if (options.onlyCompareIon === false) {
-        options.ignoreAnnotations = true;
-        options.ignoreTimestampPrecision = true;
-      }
       if (!options.ignoreAnnotations) {
         if (!(other instanceof Value)) {
           return false;
@@ -450,7 +458,12 @@ export function Value<Clazz extends Constructor>(
           }
         }
       }
-      return this._ionEquals(other, options);
+      let ion_options = {
+        onlyCompareIon: true,
+        ignoreTimestampPrecision: options.ignoreTimestampPrecision,
+        epsilon: options.epsilon,
+      };
+      return this._valueEquals(other, ion_options);
     }
 
     // Returns the IonType associated with a particular dom.Value subclass. Useful for testing.
@@ -532,13 +545,11 @@ export namespace Value {
     export const STRICT = {
       ignoreAnnotations: false,
       ignoreTimestampPrecision: false,
-      onlyCompareIon: false,
       epsilon: null,
     };
     export const RELAXED = {
       ignoreAnnotations: true,
       ignoreTimestampPrecision: true,
-      onlyCompareIon: true,
       epsilon: null,
     };
   }

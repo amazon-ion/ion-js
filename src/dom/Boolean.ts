@@ -59,7 +59,7 @@ export class Boolean extends Value(
     writer.writeBoolean(this.booleanValue());
   }
 
-  _ionEquals(
+  _valueEquals(
     other: any,
     options: {
       epsilon?: number | null;

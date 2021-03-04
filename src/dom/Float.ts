@@ -36,7 +36,7 @@ export class Float extends Value(Number, IonTypes.FLOAT, _fromJsConstructor) {
     writer.writeFloat64(this.numberValue());
   }
 
-  _ionEquals(
+  _valueEquals(
     other: any,
     options: {
       epsilon?: number | null;

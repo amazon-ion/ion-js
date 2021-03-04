@@ -40,7 +40,7 @@ export class Symbol extends Value(String, IonTypes.SYMBOL, _fromJsConstructor) {
     writer.writeSymbol(this.stringValue());
   }
 
-  _ionEquals(
+  _valueEquals(
     other: any,
     options: {
       epsilon?: number | null;
