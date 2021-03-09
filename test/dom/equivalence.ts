@@ -87,12 +87,12 @@ describe("Equivalence", () => {
     assert.isTrue(float1.equals(1.5));
     assert.isFalse(float1.ionEquals(1.5));
     assert.isFalse(float1.equals(1.2));
-    // assert.isTrue(float1.equals(1.2, {epsilon: 0.5}));
+    assert.isTrue(float1.equals(1.2, {epsilon: 0.5}));
     assert.isTrue(float1.equals(new Number(1.5)));
     assert.isFalse(float1.equals(new Number(1.2)));
-    // assert.isTrue(
-    //     float1.equals(new Number(1.2), {epsilon: 0.5})
-    // );
+    assert.isTrue(
+        float1.equals(new Number(1.2), {epsilon: 0.5})
+    );
   });
 
   it("equals() for Decimal", () => {

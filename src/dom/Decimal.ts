@@ -7,6 +7,7 @@ import {
 } from "./FromJsConstructor";
 import { Value } from "./Value";
 import JSBI from "jsbi";
+import { Float } from "./Float";
 
 const _fromJsConstructor: FromJsConstructor = new FromJsConstructorBuilder()
   .withClasses(ion.Decimal)
@@ -79,6 +80,10 @@ export class Decimal extends Value(
       if (other instanceof Decimal) {
         isSupportedType = true;
         valueToCompare = other.decimalValue();
+      }
+      if (other instanceof Float) {
+        isSupportedType = true;
+        valueToCompare = new ion.Decimal(other.toString());
       }
     } else {
       // We will consider other Decimal-ish types

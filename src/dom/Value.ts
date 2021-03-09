@@ -217,10 +217,21 @@ export interface Value {
   ): boolean;
 
   /**
-   * For checking non-strict equivalence of an Ion Values represented by dom.Value with the other value represented
-   * by an JS object.
+   * Compares this instance of dom.Value to the provided value and returns true
+   * if they are equal. If `other` is a dom.Value, this comparison checks for structural
+   * (or "non-strict") equivalence. If `other` is a native JS value, this comparison will
+   * convert it to an Ion value and then check for structural equivalence.
+   *
+   * @param other                       other Ion Value or Js Object to be compared with this Ion Value.
+   * @param options                     options provided for equivalence as below
+   *        epsilon                     used by Float for an equality with given epsilon precision. (Default: null)
    */
-  equals(other: any): boolean;
+  equals(
+    other: any,
+    options?: {
+      epsilon?: number | null;
+    }
+  ): boolean;
 }
 
 /**
@@ -418,11 +429,19 @@ export function Value<Clazz extends Constructor>(
     /**
      * Implementation of the dom.Value interface method equals()
      */
-    equals(other: any): boolean {
+    equals(
+      other: any,
+      options: { epsilon?: number | null } = { epsilon: null }
+    ): boolean {
+      let onlyCompareIon = false;
+      if (other instanceof Value) {
+        onlyCompareIon = true;
+      }
       return this._valueEquals(other, {
-        onlyCompareIon: false,
+        onlyCompareIon: onlyCompareIon,
         ignoreTimestampPrecision: true,
         ignoreAnnotations: true,
+        epsilon: options.epsilon,
       });
     }
 
@@ -430,7 +449,7 @@ export function Value<Clazz extends Constructor>(
      * Implementation of the dom.Value interface method ionEquals()
      */
     ionEquals(
-      other: any,
+      other: Value,
       options: {
         epsilon?: number | null;
         ignoreAnnotations?: boolean;
