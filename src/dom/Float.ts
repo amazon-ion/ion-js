@@ -5,6 +5,8 @@ import {
   Primitives,
 } from "./FromJsConstructor";
 import { Value } from "./Value";
+import { Decimal } from "./Decimal";
+import * as ion from "../Ion";
 
 const _fromJsConstructor: FromJsConstructor = new FromJsConstructorBuilder()
   .withPrimitives(Primitives.Number)
@@ -43,11 +45,13 @@ export class Float extends Value(Number, IonTypes.FLOAT, _fromJsConstructor) {
       ignoreAnnotations?: boolean;
       ignoreTimestampPrecision?: boolean;
       onlyCompareIon?: boolean;
+      equals: boolean;
     } = {
       epsilon: null,
       ignoreAnnotations: false,
       ignoreTimestampPrecision: false,
       onlyCompareIon: true,
+      equals: false,
     }
   ): boolean {
     let isSupportedType: boolean = false;
@@ -57,6 +61,12 @@ export class Float extends Value(Number, IonTypes.FLOAT, _fromJsConstructor) {
       if (other instanceof Float) {
         isSupportedType = true;
         valueToCompare = other.numberValue();
+      }
+
+      // if other is Decimal convert both values to Decimal for comparison.
+      if (options.equals === true && other instanceof Decimal) {
+        let thisValue = new ion.Decimal(other.toString());
+        return thisValue!.equals(other.decimalValue());
       }
     } else {
       // We will consider other Float-ish types

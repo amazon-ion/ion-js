@@ -6,7 +6,6 @@ import {
   FromJsConstructorBuilder,
 } from "./FromJsConstructor";
 import { Value } from "./Value";
-import JSBI from "jsbi";
 import { Float } from "./Float";
 
 const _fromJsConstructor: FromJsConstructor = new FromJsConstructorBuilder()
@@ -66,11 +65,13 @@ export class Decimal extends Value(
       ignoreAnnotations?: boolean;
       ignoreTimestampPrecision?: boolean;
       onlyCompareIon?: boolean;
+      equals: boolean;
     } = {
       epsilon: null,
       ignoreAnnotations: false,
       ignoreTimestampPrecision: false,
       onlyCompareIon: true,
+      equals: false,
     }
   ): boolean {
     let isSupportedType: boolean = false;
@@ -81,7 +82,7 @@ export class Decimal extends Value(
         isSupportedType = true;
         valueToCompare = other.decimalValue();
       }
-      if (other instanceof Float) {
+      if (options.equals === true && other instanceof Float) {
         isSupportedType = true;
         valueToCompare = new ion.Decimal(other.toString());
       }

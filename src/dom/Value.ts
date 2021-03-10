@@ -416,11 +416,13 @@ export function Value<Clazz extends Constructor>(
         ignoreAnnotations?: boolean;
         ignoreTimestampPrecision?: boolean;
         onlyCompareIon?: boolean;
+        equals: boolean; // to indicate the comparison type equals(true) or ionEquals(false)
       } = {
         epsilon: null,
         ignoreAnnotations: false,
         ignoreTimestampPrecision: false,
         onlyCompareIon: true,
+        equals: false,
       }
     ): boolean {
       this._unsupportedOperation("_valueEquals");
@@ -442,6 +444,7 @@ export function Value<Clazz extends Constructor>(
         ignoreTimestampPrecision: true,
         ignoreAnnotations: true,
         epsilon: options.epsilon,
+        equals: true,
       });
     }
 
@@ -481,6 +484,7 @@ export function Value<Clazz extends Constructor>(
         onlyCompareIon: true,
         ignoreTimestampPrecision: options.ignoreTimestampPrecision,
         epsilon: options.epsilon,
+        equals: false,
       };
       return this._valueEquals(other, ion_options);
     }
@@ -557,20 +561,6 @@ export namespace Value {
       return value as Value;
     }
     return JsValueConversion._ionValueFromJsValue(value, annotations);
-  }
-
-  // a namespace with pre-filled option values for STRICT and NON STRICT(RELAXED) equality check
-  export namespace Equality {
-    export const STRICT = {
-      ignoreAnnotations: false,
-      ignoreTimestampPrecision: false,
-      epsilon: null,
-    };
-    export const RELAXED = {
-      ignoreAnnotations: true,
-      ignoreTimestampPrecision: true,
-      epsilon: null,
-    };
   }
 }
 

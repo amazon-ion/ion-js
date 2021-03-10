@@ -37,7 +37,7 @@ describe("Equivalence", () => {
     assert.isTrue(bool1.ionEquals(bool2));
     // annotations should match for strict comparison
     assert.isFalse(bool1.ionEquals(bool3));
-    assert.isTrue(bool1.ionEquals(bool3, Value.Equality.RELAXED));
+    assert.isTrue(bool1.equals(bool3));
     assert.isFalse(bool1.ionEquals(bool4));
     // Equivalence between JS Value and Ion DOM Value
     assert.isTrue(bool1.equals(false));
@@ -55,7 +55,7 @@ describe("Equivalence", () => {
     assert.isTrue(int1.ionEquals(int2));
     // annotations should match for strict comparison
     assert.isFalse(int1.ionEquals(int3));
-    assert.isTrue(int1.ionEquals(int3, Value.Equality.RELAXED));
+    assert.isTrue(int1.equals(int3));
     assert.isFalse(int1.ionEquals(int4));
     // Equivalence between JS Value and Ion DOM Value
     assert.isTrue(int1.equals(7));
@@ -77,7 +77,7 @@ describe("Equivalence", () => {
     assert.isTrue(float1.ionEquals(float2));
     // annotations should match for strict comparison
     assert.isFalse(float1.ionEquals(float3));
-    assert.isTrue(float1.ionEquals(float3, Value.Equality.RELAXED));
+    assert.isTrue(float1.equals(float3));
     // Decimal and Float values will not be equivalent
     assert.isFalse(float1.ionEquals(float4));
     // both values should be at least equivalent by epsilon value
@@ -122,7 +122,7 @@ describe("Equivalence", () => {
     // In strict mode the precision and local offsets are also compared
     assert.isFalse(timestamp1.ionEquals(timestamp3));
     // Non strict mode precision and local offset are ignored along with annotations
-    assert.isTrue(timestamp3.ionEquals(timestamp4, Value.Equality.RELAXED));
+    assert.isTrue(timestamp3.equals(timestamp4));
     // Equivalence between JS Value and Ion DOM Value
     assert.isTrue(
       timestamp1.equals(new Date("2020-01-16T20:15:54.066Z"))
@@ -197,7 +197,7 @@ describe("Equivalence", () => {
 
     assert.isTrue(blob1.ionEquals(blob2));
     assert.isFalse(blob1.ionEquals(blob3));
-    assert.isTrue(blob1.ionEquals(blob4, Value.Equality.RELAXED));
+    assert.isTrue(blob1.equals(blob4));
   });
 
   it("equals() for List", () => {
@@ -290,7 +290,7 @@ describe("Equivalence", () => {
     assert.isFalse(struct1.ionEquals(struct4));
     assert.isFalse(struct4.ionEquals(struct1));
     // annotations should match for strict comparison
-    assert.isTrue(struct4.ionEquals(struct5, Value.Equality.RELAXED));
+    assert.isTrue(struct4.equals(struct5));
     // Equivalence between JS Value and Ion DOM Value
     assert.isTrue(
       struct1.equals(
