@@ -219,8 +219,7 @@ export interface Value {
   /**
    * Compares this instance of dom.Value to the provided value and returns true
    * if they are equal. If `other` is a dom.Value, this comparison checks for structural
-   * (or "non-strict") equivalence. If `other` is a native JS value, this comparison will
-   * convert it to an Ion value and then check for structural equivalence.
+   * (or "non-strict") equivalence.
    *
    * @param other                       other Ion Value or Js Object to be compared with this Ion Value.
    * @param options                     options provided for equivalence as below
