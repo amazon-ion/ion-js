@@ -85,7 +85,7 @@ export class Decimal extends Value(
       isSupportedType = true;
       valueToCompare = new ion.Decimal(other.toString());
     }
-    if(!options.onlyCompareIon) {
+    if (!options.onlyCompareIon) {
       // We will consider other Decimal-ish types
       if (other instanceof ion.Decimal) {
         // expectedValue is a non-DOM Decimal
