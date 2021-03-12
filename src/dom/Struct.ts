@@ -212,12 +212,11 @@ export class Struct extends Value(
     let isSupportedType: boolean = false;
     let valueToCompare: any = null;
 
-    // `compareOnlyIon` requires that the provided value be an ion.dom.Struct instance.
+    // if the provided value is an ion.dom.Struct instance.
     if (other instanceof Struct) {
       isSupportedType = true;
       valueToCompare = other.allFields();
-    }
-    if (!options.onlyCompareIon) {
+    } else if (!options.onlyCompareIon) {
       // We will consider other Struct-ish types
       if (typeof other === "object" || other instanceof global.Object) {
         isSupportedType = true;

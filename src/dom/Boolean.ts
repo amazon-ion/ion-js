@@ -75,12 +75,11 @@ export class Boolean extends Value(
   ): boolean {
     let isSupportedType: boolean = false;
     let valueToCompare: any = null;
-    // `compareOnlyIon` requires that the provided value be an ion.dom.Boolean instance.
+    // if the provided value is an ion.dom.Boolean instance.
     if (other instanceof Boolean) {
       isSupportedType = true;
       valueToCompare = other.booleanValue();
-    }
-    if (!options.onlyCompareIon) {
+    } else if (!options.onlyCompareIon) {
       // We will consider other Boolean-ish types
       if (typeof other === "boolean" || other instanceof global.Boolean) {
         isSupportedType = true;

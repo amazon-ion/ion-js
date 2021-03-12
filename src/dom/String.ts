@@ -57,12 +57,11 @@ export class String extends Value(
     let isSupportedType: boolean = false;
     let valueToCompare: any = null;
 
-    // `compareOnlyIon` requires that the provided value be an ion.dom.String instance.
+    // if the provided value is an ion.dom.String instance.
     if (other instanceof String) {
       isSupportedType = true;
       valueToCompare = other.stringValue();
-    }
-    if (!options.onlyCompareIon) {
+    } else if (!options.onlyCompareIon) {
       // We will consider other String-ish types
       if (typeof other === "string" || other instanceof global.String) {
         isSupportedType = true;

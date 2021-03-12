@@ -76,16 +76,14 @@ export class Decimal extends Value(
   ): boolean {
     let isSupportedType: boolean = false;
     let valueToCompare: any = null;
-    // `compareOnlyIon` requires that the provided value be an ion.dom.Decimal instance.
+    // if the provided value is an ion.dom.Decimal instance.
     if (other instanceof Decimal) {
       isSupportedType = true;
       valueToCompare = other.decimalValue();
-    }
-    if (options.coerceNumericType === true && other instanceof Float) {
+    } else if (options.coerceNumericType === true && other instanceof Float) {
       isSupportedType = true;
       valueToCompare = new ion.Decimal(other.toString());
-    }
-    if (!options.onlyCompareIon) {
+    } else if (!options.onlyCompareIon) {
       // We will consider other Decimal-ish types
       if (other instanceof ion.Decimal) {
         // expectedValue is a non-DOM Decimal
