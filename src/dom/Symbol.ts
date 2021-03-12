@@ -56,13 +56,13 @@ export class Symbol extends Value(String, IonTypes.SYMBOL, _fromJsConstructor) {
   ): boolean {
     let isSupportedType: boolean = false;
     let valueToCompare: any = null;
-    if (options.onlyCompareIon) {
-      // `compareOnlyIon` requires that the provided value be an ion.dom.Symbol instance.
-      if (other instanceof Symbol) {
-        isSupportedType = true;
-        valueToCompare = other.stringValue();
-      }
-    } else {
+
+    // `compareOnlyIon` requires that the provided value be an ion.dom.Symbol instance.
+    if (other instanceof Symbol) {
+      isSupportedType = true;
+      valueToCompare = other.stringValue();
+    }
+    if (!options.onlyCompareIon) {
       // We will consider other Symbol-ish types
       if (typeof other === "string" || other instanceof global.String) {
         isSupportedType = true;

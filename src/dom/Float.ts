@@ -45,30 +45,29 @@ export class Float extends Value(Number, IonTypes.FLOAT, _fromJsConstructor) {
       ignoreAnnotations?: boolean;
       ignoreTimestampPrecision?: boolean;
       onlyCompareIon?: boolean;
-      equals: boolean;
+      coerceNumericType: boolean;
     } = {
       epsilon: null,
       ignoreAnnotations: false,
       ignoreTimestampPrecision: false,
       onlyCompareIon: true,
-      equals: false,
+      coerceNumericType: false,
     }
   ): boolean {
     let isSupportedType: boolean = false;
     let valueToCompare: any = null;
-    if (options.onlyCompareIon) {
-      // `compareOnlyIon` requires that the provided value be an ion.dom.Float instance.
-      if (other instanceof Float) {
-        isSupportedType = true;
-        valueToCompare = other.numberValue();
-      }
+    // `compareOnlyIon` requires that the provided value be an ion.dom.Float instance.
+    if (other instanceof Float) {
+      isSupportedType = true;
+      valueToCompare = other.numberValue();
+    }
 
-      // if other is Decimal convert both values to Decimal for comparison.
-      if (options.equals === true && other instanceof Decimal) {
-        let thisValue = new ion.Decimal(other.toString());
-        return thisValue!.equals(other.decimalValue());
-      }
-    } else {
+    // if other is Decimal convert both values to Decimal for comparison.
+    if (options.coerceNumericType === true && other instanceof Decimal) {
+      let thisValue = new ion.Decimal(other.toString());
+      return thisValue!.equals(other.decimalValue());
+    }
+    if (!options.onlyCompareIon) {
       // We will consider other Float-ish types
       if (other instanceof global.Number || typeof other === "number") {
         isSupportedType = true;

@@ -415,13 +415,13 @@ export function Value<Clazz extends Constructor>(
         ignoreAnnotations?: boolean;
         ignoreTimestampPrecision?: boolean;
         onlyCompareIon?: boolean;
-        equals: boolean; // to indicate the comparison type equals(true) or ionEquals(false)
+        coerceNumericType: boolean; // used to indicate numeric type conversion
       } = {
         epsilon: null,
         ignoreAnnotations: false,
         ignoreTimestampPrecision: false,
         onlyCompareIon: true,
-        equals: false,
+        coerceNumericType: false,
       }
     ): boolean {
       this._unsupportedOperation("_valueEquals");
@@ -443,7 +443,7 @@ export function Value<Clazz extends Constructor>(
         ignoreTimestampPrecision: true,
         ignoreAnnotations: true,
         epsilon: options.epsilon,
-        equals: true,
+        coerceNumericType: true,
       });
     }
 
@@ -483,7 +483,7 @@ export function Value<Clazz extends Constructor>(
         onlyCompareIon: true,
         ignoreTimestampPrecision: options.ignoreTimestampPrecision,
         epsilon: options.epsilon,
-        equals: false,
+        coerceNumericType: false,
       };
       return this._valueEquals(other, ion_options);
     }

@@ -167,13 +167,13 @@ export class Null extends Value(Object, IonTypes.NULL, FromJsConstructor.NONE) {
   ): boolean {
     let isSupportedType: boolean = false;
     let valueToCompare: any = null;
-    if (options.onlyCompareIon) {
-      // `compareOnlyIon` requires that the provided value be an ion.dom.Null instance.
-      if (other instanceof Null) {
-        isSupportedType = true;
-        valueToCompare = other;
-      }
-    } else {
+
+    // `compareOnlyIon` requires that the provided value be an ion.dom.Null instance.
+    if (other instanceof Null) {
+      isSupportedType = true;
+      valueToCompare = other;
+    }
+    if (!options.onlyCompareIon) {
       // We will consider other Null-ish types
       if (other === null && this._ionType.name === "null") {
         return true;

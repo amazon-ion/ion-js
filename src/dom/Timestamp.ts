@@ -100,13 +100,12 @@ export class Timestamp extends Value(
   ): boolean {
     let isSupportedType: boolean = false;
     let valueToCompare: any = null;
-    if (options.onlyCompareIon) {
-      // `compareOnlyIon` requires that the provided value be an ion.dom.Timestamp instance.
-      if (other instanceof Timestamp) {
-        isSupportedType = true;
-        valueToCompare = other.timestampValue();
-      }
-    } else {
+    // `compareOnlyIon` requires that the provided value be an ion.dom.Timestamp instance.
+    if (other instanceof Timestamp) {
+      isSupportedType = true;
+      valueToCompare = other.timestampValue();
+    }
+    if (!options.onlyCompareIon) {
       // We will consider other Timestamp-ish types
       if (other instanceof ion.Timestamp) {
         // expectedValue is a non-DOM Timestamp
