@@ -84,7 +84,7 @@ export class Timestamp extends Value(
     writer.writeTimestamp(this.timestampValue());
   }
 
-  _ionEquals(
+  _valueEquals(
     other: any,
     options: {
       epsilon?: number | null;
@@ -100,13 +100,11 @@ export class Timestamp extends Value(
   ): boolean {
     let isSupportedType: boolean = false;
     let valueToCompare: any = null;
-    if (options.onlyCompareIon) {
-      // `compareOnlyIon` requires that the provided value be an ion.dom.Timestamp instance.
-      if (other instanceof Timestamp) {
-        isSupportedType = true;
-        valueToCompare = other.timestampValue();
-      }
-    } else {
+    // if the provided value is an ion.dom.Symbol instance.
+    if (other instanceof Timestamp) {
+      isSupportedType = true;
+      valueToCompare = other.timestampValue();
+    } else if (!options.onlyCompareIon) {
       // We will consider other Timestamp-ish types
       if (other instanceof ion.Timestamp) {
         // expectedValue is a non-DOM Timestamp

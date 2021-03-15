@@ -59,7 +59,7 @@ export class Boolean extends Value(
     writer.writeBoolean(this.booleanValue());
   }
 
-  _ionEquals(
+  _valueEquals(
     other: any,
     options: {
       epsilon?: number | null;
@@ -75,13 +75,11 @@ export class Boolean extends Value(
   ): boolean {
     let isSupportedType: boolean = false;
     let valueToCompare: any = null;
-    if (options.onlyCompareIon) {
-      // `compareOnlyIon` requires that the provided value be an ion.dom.Boolean instance.
-      if (other instanceof Boolean) {
-        isSupportedType = true;
-        valueToCompare = other.booleanValue();
-      }
-    } else {
+    // if the provided value is an ion.dom.Boolean instance.
+    if (other instanceof Boolean) {
+      isSupportedType = true;
+      valueToCompare = other.booleanValue();
+    } else if (!options.onlyCompareIon) {
       // We will consider other Boolean-ish types
       if (typeof other === "boolean" || other instanceof global.Boolean) {
         isSupportedType = true;

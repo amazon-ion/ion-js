@@ -151,7 +151,7 @@ export class Null extends Value(Object, IonTypes.NULL, FromJsConstructor.NONE) {
     writer.writeNull(this.getType());
   }
 
-  _ionEquals(
+  _valueEquals(
     other: any,
     options: {
       epsilon?: number | null;
@@ -167,13 +167,12 @@ export class Null extends Value(Object, IonTypes.NULL, FromJsConstructor.NONE) {
   ): boolean {
     let isSupportedType: boolean = false;
     let valueToCompare: any = null;
-    if (options.onlyCompareIon) {
-      // `compareOnlyIon` requires that the provided value be an ion.dom.Null instance.
-      if (other instanceof Null) {
-        isSupportedType = true;
-        valueToCompare = other;
-      }
-    } else {
+
+    // if the provided value is an ion.dom.Null instance.
+    if (other instanceof Null) {
+      isSupportedType = true;
+      valueToCompare = other;
+    } else if (!options.onlyCompareIon) {
       // We will consider other Null-ish types
       if (other === null && this._ionType.name === "null") {
         return true;
