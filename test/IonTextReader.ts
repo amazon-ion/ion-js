@@ -162,6 +162,19 @@ class IonTextReaderTests {
         assert.isNull(ionReader.next());
     }
 
+    @test "Parse through struct throws error on broken input"() {
+        let invalidIonToRead = "{broken";
+
+        let ionReader = ion.makeReader(invalidIonToRead);
+        ionReader.next();
+
+        assert.equal(ion.IonTypes.STRUCT, ionReader.type());
+
+        ionReader.stepIn(); // Step into the base struct.
+
+        assert.throws(() => ionReader.next());
+    }
+
     @test "Reads an array"() {
         let ionToRead = "{ key : ['v1', 'v2'] }";
         let ionReader = ion.makeReader(ionToRead);
