@@ -195,7 +195,7 @@ export class Struct extends Value(
     return new this(fields, annotations);
   }
 
-  _ionEquals(
+  _valueEquals(
     other: any,
     options: {
       epsilon?: number | null;
@@ -211,13 +211,12 @@ export class Struct extends Value(
   ): boolean {
     let isSupportedType: boolean = false;
     let valueToCompare: any = null;
-    if (options.onlyCompareIon) {
-      // `compareOnlyIon` requires that the provided value be an ion.dom.Struct instance.
-      if (other instanceof Struct) {
-        isSupportedType = true;
-        valueToCompare = other.allFields();
-      }
-    } else {
+
+    // if the provided value is an ion.dom.Struct instance.
+    if (other instanceof Struct) {
+      isSupportedType = true;
+      valueToCompare = other.allFields();
+    } else if (!options.onlyCompareIon) {
       // We will consider other Struct-ish types
       if (typeof other === "object" || other instanceof global.Object) {
         isSupportedType = true;
@@ -270,8 +269,14 @@ export class Struct extends Value(
     }
 
     for (let i: number = 0; i < child.length; i++) {
-      if (!child[i].equals(expectedChild[i], options)) {
-        return false;
+      if (options.onlyCompareIon) {
+        if (!child[i].ionEquals(expectedChild[i], options)) {
+          return false;
+        }
+      } else {
+        if (!child[i].equals(expectedChild[i])) {
+          return false;
+        }
       }
     }
     return true;

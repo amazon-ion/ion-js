@@ -5,6 +5,8 @@ import {
   Primitives,
 } from "./FromJsConstructor";
 import { Value } from "./Value";
+import { Decimal } from "./Decimal";
+import * as ion from "../Ion";
 
 const _fromJsConstructor: FromJsConstructor = new FromJsConstructorBuilder()
   .withPrimitives(Primitives.Number)
@@ -36,29 +38,33 @@ export class Float extends Value(Number, IonTypes.FLOAT, _fromJsConstructor) {
     writer.writeFloat64(this.numberValue());
   }
 
-  _ionEquals(
+  _valueEquals(
     other: any,
     options: {
       epsilon?: number | null;
       ignoreAnnotations?: boolean;
       ignoreTimestampPrecision?: boolean;
       onlyCompareIon?: boolean;
+      coerceNumericType: boolean;
     } = {
       epsilon: null,
       ignoreAnnotations: false,
       ignoreTimestampPrecision: false,
       onlyCompareIon: true,
+      coerceNumericType: false,
     }
   ): boolean {
     let isSupportedType: boolean = false;
     let valueToCompare: any = null;
-    if (options.onlyCompareIon) {
-      // `compareOnlyIon` requires that the provided value be an ion.dom.Float instance.
-      if (other instanceof Float) {
-        isSupportedType = true;
-        valueToCompare = other.numberValue();
-      }
-    } else {
+    // if the provided value is an ion.dom.Float instance.
+    if (other instanceof Float) {
+      isSupportedType = true;
+      valueToCompare = other.numberValue();
+    } else if (options.coerceNumericType === true && other instanceof Decimal) {
+      // if other is Decimal convert both values to Decimal for comparison.
+      let thisValue = new ion.Decimal(other.toString());
+      return thisValue!.equals(other.decimalValue());
+    } else if (!options.onlyCompareIon) {
       // We will consider other Float-ish types
       if (other instanceof global.Number || typeof other === "number") {
         isSupportedType = true;

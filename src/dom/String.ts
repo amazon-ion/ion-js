@@ -40,7 +40,7 @@ export class String extends Value(
     writer.writeString(this.stringValue());
   }
 
-  _ionEquals(
+  _valueEquals(
     other: any,
     options: {
       epsilon?: number | null;
@@ -56,13 +56,12 @@ export class String extends Value(
   ): boolean {
     let isSupportedType: boolean = false;
     let valueToCompare: any = null;
-    if (options.onlyCompareIon) {
-      // `compareOnlyIon` requires that the provided value be an ion.dom.String instance.
-      if (other instanceof String) {
-        isSupportedType = true;
-        valueToCompare = other.stringValue();
-      }
-    } else {
+
+    // if the provided value is an ion.dom.String instance.
+    if (other instanceof String) {
+      isSupportedType = true;
+      valueToCompare = other.stringValue();
+    } else if (!options.onlyCompareIon) {
       // We will consider other String-ish types
       if (typeof other === "string" || other instanceof global.String) {
         isSupportedType = true;

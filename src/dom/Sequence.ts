@@ -75,7 +75,7 @@ export function Sequence(ionType: IonType) {
       writer.stepOut();
     }
 
-    _ionEquals(
+    _valueEquals(
       other: any,
       options: {
         epsilon?: number | null;
@@ -118,8 +118,14 @@ export function Sequence(ionType: IonType) {
         return false;
       }
       for (let i = 0; i < actualSequence.length; i++) {
-        if (!actualSequence[i].equals(expectedSequence[i], options)) {
-          return false;
+        if (options.onlyCompareIon) {
+          if (!actualSequence[i].ionEquals(expectedSequence[i], options)) {
+            return false;
+          }
+        } else {
+          if (!actualSequence[i].equals(expectedSequence[i])) {
+            return false;
+          }
         }
       }
       return true;

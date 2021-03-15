@@ -529,8 +529,8 @@ describe('DOM', () => {
       assert.equal(55, s.getAll("age")[0]);
       assert.equal(41, s.getAll("age")[1]);
       assert.equal(2, s.getAll("age").length);
-      assert.isTrue(s1.getAll('name','middle')![0].equals("Jacob", {onlyCompareIon: false}));
-      assert.isTrue(s1.getAll('name','middle')![1].equals("Bob", {onlyCompareIon: false}));
+      assert.isTrue(s1.getAll('name','middle')![0].equals("Jacob"));
+      assert.isTrue(s1.getAll('name','middle')![1].equals("Bob"));
       assert.equal(2, s1.getAll('name','middle')!.length);
 
 

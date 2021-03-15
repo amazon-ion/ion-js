@@ -77,7 +77,7 @@ function domRoundTripTest(typeName: string, ...valuesToRoundTrip: any[]) {
         // Load the serialized version of the value
         let roundTripped = load(writer.getBytes())!;
         // Verify that nothing was lost in the round trip
-        assert.isTrue(domValue.equals(roundTripped));
+        assert.isTrue(domValue.ionEquals(roundTripped));
       });
     }
   });
@@ -96,7 +96,7 @@ function domValueTest(jsValue, expectedIonType) {
     let equalityTestValue = jsValue;
     // Verify that the new dom.Value is considered equal to the original (unwrapped) JS value.
     assert.isTrue(
-      domValue.equals(equalityTestValue, { onlyCompareIon: false })
+      domValue.equals(equalityTestValue)
     );
     assert.equal(expectedIonType, domValue.getType());
     let expectedDomType: any = JsValueConversion._domConstructorFor(
