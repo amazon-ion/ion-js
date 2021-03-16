@@ -687,6 +687,7 @@ export class ParserTextRaw {
       ch = this._read_after_whitespace(true);
       if (ch != CH_CL) {
         this._error("expected ':'");
+        return;
       }
       this._ops.unshift(this._read_struct_comma);
       this._ops.unshift(this._read_value);

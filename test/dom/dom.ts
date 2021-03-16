@@ -491,6 +491,9 @@ describe('DOM', () => {
       }
 
       assert.equal(2, s.fields().length)
+
+      // broken struct
+      assert.throws(() => load('{broken'));
    });
 
    it('load() Struct with duplicate fields as any', () => {
