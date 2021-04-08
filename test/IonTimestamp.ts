@@ -242,4 +242,10 @@ describe("Timestamp", () => {
         assert.deepEqual(ts.getSecondsDecimal(), ion.Decimal.parse('45'));
         assert.deepEqual(ts._getFractionalSeconds(), ion.Decimal.ZERO);
     });
+    it('constructor with Date', () => {
+        const date = new Date(2000, 0, 1, 12, 30, 45);
+        let timestamp1 = new ion.Timestamp(date.getTimezoneOffset() * -1, 2000, 1, 1, 12, 30, 45);
+        let timestamp2 = new ion.Timestamp(date);
+        assert.isTrue(timestamp1!.equals(timestamp2!));
+    });
 });
