@@ -77,44 +77,44 @@ export class Timestamp {
    *                along with some fractional seconds
    */
   constructor(
-      localOffset: number,
-      year: number,
-      month?: number | null,
-      day?: number | null,
-      hour?: number | null,
-      minutes?: number | null,
-      seconds?: number | Decimal | null,
+    localOffset: number,
+    year: number,
+    month?: number | null,
+    day?: number | null,
+    hour?: number | null,
+    minutes?: number | null,
+    seconds?: number | Decimal | null
   );
 
   constructor(
-      localOffset: number | Date | null = null,
-      year: number| null = null,
-      month: number | null = null,
-      day: number| null = null,
-      hour: number | null = null,
-      minutes: number | null = null,
-      seconds: number | Decimal | null = null,
+    localOffset: number | Date | null = null,
+    year: number | null = null,
+    month: number | null = null,
+    day: number | null = null,
+    hour: number | null = null,
+    minutes: number | null = null,
+    seconds: number | Decimal | null = null
   ) {
     if (localOffset instanceof Date) {
       const seconds = new Decimal(
-          // The coefficient is the total number of milliseconds as an integer
-          (localOffset.getSeconds()) + localOffset.getMilliseconds(),
-          // And the exponent is -3 to indicate the scale of that integer
-          0
+        // The coefficient is the total number of milliseconds as an integer
+        localOffset.getSeconds() + localOffset.getMilliseconds(),
+        // And the exponent is -3 to indicate the scale of that integer
+        0
       );
 
-      this._localOffset = localOffset.getTimezoneOffset() * -1
-      this._year = localOffset.getFullYear()
-      this._month = localOffset.getMonth() + 1
-      this._day = localOffset.getDate()
-      this._hour = localOffset.getHours()
-      this._minutes = localOffset.getMinutes()
-      this._secondsDecimal = seconds
+      this._localOffset = localOffset.getTimezoneOffset() * -1;
+      this._year = localOffset.getFullYear();
+      this._month = localOffset.getMonth() + 1;
+      this._day = localOffset.getDate();
+      this._hour = localOffset.getHours();
+      this._minutes = localOffset.getMinutes();
+      this._secondsDecimal = seconds;
       this._precision = TimestampPrecision.YEAR;
     } else {
       if (localOffset === null || year === null) {
         throw new Error(
-            "Timestamp's constructor was called without localOffset or year."
+          "Timestamp's constructor was called without localOffset or year."
         );
       } else {
         this._localOffset = localOffset;
@@ -123,54 +123,54 @@ export class Timestamp {
 
       this._precision = TimestampPrecision.YEAR;
       this._checkRequiredField(
-          "Offset",
-          this._localOffset,
-          Timestamp._MIN_OFFSET,
-          Timestamp._MAX_OFFSET
+        "Offset",
+        this._localOffset,
+        Timestamp._MIN_OFFSET,
+        Timestamp._MAX_OFFSET
       );
       this._checkRequiredField(
-          "Year",
-          this._year,
-          Timestamp._MIN_YEAR,
-          Timestamp._MAX_YEAR
+        "Year",
+        this._year,
+        Timestamp._MIN_YEAR,
+        Timestamp._MAX_YEAR
       );
       this._month = this._checkOptionalField(
-          "Month",
-          month,
-          Timestamp._MIN_MONTH,
-          Timestamp._MAX_MONTH,
-          1,
-          TimestampPrecision.MONTH
+        "Month",
+        month,
+        Timestamp._MIN_MONTH,
+        Timestamp._MAX_MONTH,
+        1,
+        TimestampPrecision.MONTH
       );
       this._day = this._checkOptionalField(
-          "Day",
-          day,
-          Timestamp._MIN_DAY,
-          Timestamp._MAX_DAY,
-          1,
-          TimestampPrecision.DAY
+        "Day",
+        day,
+        Timestamp._MIN_DAY,
+        Timestamp._MAX_DAY,
+        1,
+        TimestampPrecision.DAY
       );
       this._hour = this._checkOptionalField(
-          "Hour",
-          hour,
-          Timestamp._MIN_HOUR,
-          Timestamp._MAX_HOUR,
-          0,
-          TimestampPrecision.HOUR_AND_MINUTE
+        "Hour",
+        hour,
+        Timestamp._MIN_HOUR,
+        Timestamp._MAX_HOUR,
+        0,
+        TimestampPrecision.HOUR_AND_MINUTE
       );
       this._minutes = this._checkOptionalField(
-          "Minutes",
-          minutes,
-          Timestamp._MIN_MINUTE,
-          Timestamp._MAX_MINUTE,
-          0,
-          TimestampPrecision.HOUR_AND_MINUTE
+        "Minutes",
+        minutes,
+        Timestamp._MIN_MINUTE,
+        Timestamp._MAX_MINUTE,
+        0,
+        TimestampPrecision.HOUR_AND_MINUTE
       );
 
       if (typeof seconds === "number") {
         if (!Number.isInteger(seconds)) {
           throw new Error(
-              "The provided seconds number was not an integer (" + seconds + ")"
+            "The provided seconds number was not an integer (" + seconds + ")"
           );
         }
         this._secondsDecimal = new Decimal(seconds, 0);
@@ -184,10 +184,10 @@ export class Timestamp {
       this._secondsDecimal = Decimal.ZERO;
     } else {
       this._checkFieldRange(
-          "Seconds",
-          this._secondsDecimal,
-          Timestamp._MIN_SECONDS,
-          Timestamp._MAX_SECONDS
+        "Seconds",
+        this._secondsDecimal,
+        Timestamp._MIN_SECONDS,
+        Timestamp._MAX_SECONDS
       );
       this._precision = TimestampPrecision.SECONDS;
     }
@@ -209,7 +209,7 @@ export class Timestamp {
       if (this._month === 2 && this._day === 29) {
         if (!this._isLeapYear(this._year)) {
           throw new Error(
-              `Given February 29th but year ${this._year} is not a leap year`
+            `Given February 29th but year ${this._year} is not a leap year`
           );
         }
       }
@@ -218,10 +218,10 @@ export class Timestamp {
     // verify that year (compensated by offset) is within the valid range:
     const utcYear = this.getDate().getUTCFullYear();
     this._checkFieldRange(
-        "Year",
-        utcYear,
-        Timestamp._MIN_YEAR,
-        Timestamp._MAX_YEAR
+      "Year",
+      utcYear,
+      Timestamp._MIN_YEAR,
+      Timestamp._MAX_YEAR
     );
   }
   /**
