@@ -87,7 +87,7 @@ export class Timestamp {
   );
 
   constructor(
-    localOffset: number | Date | null = null,
+    dateOrLocalOffset: number | Date | null = null,
     year: number | null = null,
     month: number | null = null,
     day: number | null = null,
@@ -95,26 +95,33 @@ export class Timestamp {
     minutes: number | null = null,
     seconds: number | Decimal | null = null
   ) {
-    if (localOffset instanceof Date) {
+    if (dateOrLocalOffset instanceof Date) {
+      const date = dateOrLocalOffset;
       const seconds = new Decimal(
         // The coefficient is the total number of milliseconds as an integer
-        localOffset.getSeconds() + localOffset.getMilliseconds(),
-        // And the exponent is -3 to indicate the scale of that integer
+        date.getSeconds() + date.getMilliseconds(),
+        // And the exponent is 0 to indicate the scale of that integer
         0
       );
 
-      this._localOffset = localOffset.getTimezoneOffset() * -1;
-      this._year = localOffset.getFullYear();
-      this._month = localOffset.getMonth() + 1;
-      this._day = localOffset.getDate();
-      this._hour = localOffset.getHours();
-      this._minutes = localOffset.getMinutes();
+      this._localOffset = date.getTimezoneOffset() * -1;
+      this._year = date.getFullYear();
+      this._month = date.getMonth() + 1;
+      this._day = date.getDate();
+      this._hour = date.getHours();
+      this._minutes = date.getMinutes();
       this._secondsDecimal = seconds;
       this._precision = TimestampPrecision.YEAR;
     } else {
-      if (localOffset === null || year === null) {
+      const localOffset = dateOrLocalOffset;
+
+      if (localOffset === null) {
         throw new Error(
-          "Timestamp's constructor was called without localOffset or year."
+          "Timestamp's constructor was called without localOffset"
+        );
+      } else if (year === null) {
+        throw new Error(
+            "Timestamp's constructor was called without year"
         );
       } else {
         this._localOffset = localOffset;
