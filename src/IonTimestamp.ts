@@ -120,9 +120,7 @@ export class Timestamp {
           "Timestamp's constructor was called without localOffset"
         );
       } else if (year === null) {
-        throw new Error(
-            "Timestamp's constructor was called without year"
-        );
+        throw new Error("Timestamp's constructor was called without year");
       } else {
         this._localOffset = localOffset;
         this._year = year;
