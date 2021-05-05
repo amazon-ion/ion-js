@@ -292,7 +292,7 @@ exports["default"] = IntSize;
  * permissions and limitations under the License.
  */
 
-function _createForOfIteratorHelper(o, allowArrayLike) { var it; if (typeof Symbol === "undefined" || o[Symbol.iterator] == null) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = o[Symbol.iterator](); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
+function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
 
 function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
 
@@ -790,6 +790,11 @@ var BinaryReader = /*#__PURE__*/function () {
   }
 
   (0, _createClass2["default"])(BinaryReader, [{
+    key: "position",
+    value: function position() {
+      return this._parser.source().position();
+    }
+  }, {
     key: "next",
     value: function next() {
       this._annotations = null;
@@ -884,7 +889,12 @@ var BinaryReader = /*#__PURE__*/function () {
   }, {
     key: "byteValue",
     value: function byteValue() {
-      return this._parser.byteValue();
+      return this._parser.uInt8ArrayValue();
+    }
+  }, {
+    key: "uInt8ArrayValue",
+    value: function uInt8ArrayValue() {
+      return this._parser.uInt8ArrayValue();
     }
   }, {
     key: "booleanValue",
@@ -1069,7 +1079,7 @@ var _possibleConstructorReturn2 = _interopRequireDefault(require("@babel/runtime
 
 var _getPrototypeOf2 = _interopRequireDefault(require("@babel/runtime/helpers/getPrototypeOf"));
 
-function _createForOfIteratorHelper(o, allowArrayLike) { var it; if (typeof Symbol === "undefined" || o[Symbol.iterator] == null) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = o[Symbol.iterator](); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
+function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
 
 function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
 
@@ -1077,7 +1087,7 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
 
 function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = (0, _getPrototypeOf2["default"])(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = (0, _getPrototypeOf2["default"])(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return (0, _possibleConstructorReturn2["default"])(this, result); }; }
 
-function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
 
 var __importDefault = void 0 && (void 0).__importDefault || function (mod) {
   return mod && mod.__esModule ? mod : {
@@ -1643,6 +1653,16 @@ var AbstractNode = /*#__PURE__*/function () {
   }
 
   (0, _createClass2["default"])(AbstractNode, [{
+    key: "typeCode",
+    get: function get() {
+      return this._type.binaryTypeId;
+    }
+  }, {
+    key: "writer",
+    get: function get() {
+      return this._writer;
+    }
+  }, {
     key: "writeTypeDescriptorAndLength",
     value: function writeTypeDescriptorAndLength(typeCode, isNull, length) {
       var typeDescriptor = typeCode << 4;
@@ -1681,8 +1701,8 @@ var AbstractNode = /*#__PURE__*/function () {
         var annotationsLength = this.annotations.length;
         var annotationsLengthLength = IonLowLevelBinaryWriter_1.LowLevelBinaryWriter.getVariableLengthUnsignedIntSize(annotationsLength);
         var containedValueLength = this.getContainedValueLength();
-        var containedValueLengthLength = AbstractNode.getLengthLength(containedValueLength);
-        return TYPE_DESCRIPTOR_LENGTH + containedValueLengthLength + annotationsLengthLength + annotationsLength;
+        var annotationsWrapperLengthLength = AbstractNode.getLengthLength(containedValueLength + annotationsLength + annotationsLengthLength);
+        return TYPE_DESCRIPTOR_LENGTH + annotationsWrapperLengthLength + annotationsLengthLength + annotationsLength;
       }
 
       return 0;
@@ -1710,16 +1730,6 @@ var AbstractNode = /*#__PURE__*/function () {
     key: "hasAnnotations",
     value: function hasAnnotations() {
       return this.annotations.length > 0;
-    }
-  }, {
-    key: "typeCode",
-    get: function get() {
-      return this._type.binaryTypeId;
-    }
-  }, {
-    key: "writer",
-    get: function get() {
-      return this._writer;
     }
   }], [{
     key: "getLengthLength",
@@ -2533,6 +2543,26 @@ var Import = /*#__PURE__*/function () {
   }
 
   (0, _createClass2["default"])(Import, [{
+    key: "parent",
+    get: function get() {
+      return this._parent;
+    }
+  }, {
+    key: "offset",
+    get: function get() {
+      return this._offset;
+    }
+  }, {
+    key: "length",
+    get: function get() {
+      return this._length;
+    }
+  }, {
+    key: "symbolTable",
+    get: function get() {
+      return this._symbolTable;
+    }
+  }, {
     key: "getSymbolText",
     value: function getSymbolText(symbolId) {
       if (this.parent === undefined) {
@@ -2576,26 +2606,6 @@ var Import = /*#__PURE__*/function () {
 
       return undefined;
     }
-  }, {
-    key: "parent",
-    get: function get() {
-      return this._parent;
-    }
-  }, {
-    key: "offset",
-    get: function get() {
-      return this._offset;
-    }
-  }, {
-    key: "length",
-    get: function get() {
-      return this._length;
-    }
-  }, {
-    key: "symbolTable",
-    get: function get() {
-      return this._symbolTable;
-    }
   }]);
   return Import;
 }();
@@ -2625,7 +2635,7 @@ var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime/helpers/cl
 
 var _createClass2 = _interopRequireDefault(require("@babel/runtime/helpers/createClass"));
 
-function _createForOfIteratorHelper(o, allowArrayLike) { var it; if (typeof Symbol === "undefined" || o[Symbol.iterator] == null) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = o[Symbol.iterator](); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
+function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
 
 function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
 
@@ -2669,6 +2679,21 @@ var LocalSymbolTable = /*#__PURE__*/function () {
   }
 
   (0, _createClass2["default"])(LocalSymbolTable, [{
+    key: "symbols",
+    get: function get() {
+      return this._symbols;
+    }
+  }, {
+    key: "maxId",
+    get: function get() {
+      return this.offset + this._symbols.length - 1;
+    }
+  }, {
+    key: "import",
+    get: function get() {
+      return this._import;
+    }
+  }, {
     key: "getSymbolId",
     value: function getSymbolId(symbol_) {
       return this._import.getSymbolId(symbol_) || this.index[symbol_];
@@ -2725,21 +2750,6 @@ var LocalSymbolTable = /*#__PURE__*/function () {
     key: "numberOfSymbols",
     value: function numberOfSymbols() {
       return this._symbols.length;
-    }
-  }, {
-    key: "symbols",
-    get: function get() {
-      return this._symbols;
-    }
-  }, {
-    key: "maxId",
-    get: function get() {
-      return this.offset + this._symbols.length - 1;
-    }
-  }, {
-    key: "import",
-    get: function get() {
-      return this._import;
     }
   }]);
   return LocalSymbolTable;
@@ -2972,9 +2982,9 @@ var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefau
 
 var _slicedToArray2 = _interopRequireDefault(require("@babel/runtime/helpers/slicedToArray"));
 
-var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime/helpers/classCallCheck"));
-
 var _createClass2 = _interopRequireDefault(require("@babel/runtime/helpers/createClass"));
+
+var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime/helpers/classCallCheck"));
 
 var __createBinding = void 0 && (void 0).__createBinding || (Object.create ? function (o, m, k, k2) {
   if (k2 === undefined) k2 = k;
@@ -3093,22 +3103,6 @@ function get_ion_type(rt) {
   }
 }
 
-var TS_SHIFT = 5;
-var TS_MASK = 0x1f;
-
-function encode_type_stack(type_, len) {
-  var ts = len << TS_SHIFT | type_ & TS_MASK;
-  return ts;
-}
-
-function decode_type_stack_type(ts) {
-  return ts & TS_MASK;
-}
-
-function decode_type_stack_len(ts) {
-  return ts >>> TS_SHIFT;
-}
-
 var VINT_SHIFT = 7;
 var VINT_MASK = 0x7f;
 var VINT_FLAG = 0x80;
@@ -3128,6 +3122,12 @@ var ivm_image_1 = IonConstants_1.IVM.binary[1];
 var ivm_image_2 = IonConstants_1.IVM.binary[2];
 var ivm_image_3 = IonConstants_1.IVM.binary[3];
 
+var EncodingContainer = function EncodingContainer(type, length) {
+  (0, _classCallCheck2["default"])(this, EncodingContainer);
+  this.type = type;
+  this.length = length;
+};
+
 var ParserBinaryRaw = /*#__PURE__*/function () {
   function ParserBinaryRaw(source) {
     (0, _classCallCheck2["default"])(this, ParserBinaryRaw);
@@ -3139,12 +3139,17 @@ var ParserBinaryRaw = /*#__PURE__*/function () {
     this._as = -1;
     this._ae = -1;
     this._a = [];
-    this._ts = [TB_DATAGRAM];
+    this._ts = [new EncodingContainer(TB_DATAGRAM, 0)];
     this._in_struct = false;
     this._in = source;
   }
 
   (0, _createClass2["default"])(ParserBinaryRaw, [{
+    key: "source",
+    value: function source() {
+      return this._in;
+    }
+  }, {
     key: "next",
     value: function next() {
       if (this._curr === undefined && this._len > 0) {
@@ -3176,7 +3181,7 @@ var ParserBinaryRaw = /*#__PURE__*/function () {
       }
 
       len = t._in.getRemaining() - t._len;
-      ts = encode_type_stack(t._raw_type, len);
+      ts = new EncodingContainer(t._raw_type, len);
 
       t._ts.push(ts);
 
@@ -3197,8 +3202,8 @@ var ParserBinaryRaw = /*#__PURE__*/function () {
       }
 
       ts = t._ts.pop();
-      l = decode_type_stack_len(ts);
-      parent_type = decode_type_stack_type(t._ts[t._ts.length - 1]);
+      l = ts.length;
+      parent_type = t._ts[t._ts.length - 1].type;
       t._in_struct = parent_type === IonBinary.TB_STRUCT;
       t.clear_value();
       r = t._in.getRemaining();
@@ -3268,6 +3273,11 @@ var ParserBinaryRaw = /*#__PURE__*/function () {
   }, {
     key: "byteValue",
     value: function byteValue() {
+      return this.uInt8ArrayValue();
+    }
+  }, {
+    key: "uInt8ArrayValue",
+    value: function uInt8ArrayValue() {
       switch (this._raw_type) {
         case IonBinary.TB_NULL:
           return null;
@@ -3354,8 +3364,13 @@ var ParserBinaryRaw = /*#__PURE__*/function () {
           }
 
           this.load_value();
-          var bigInt = this._curr;
-          return jsbi_1["default"].toNumber(bigInt);
+
+          if (this._curr instanceof jsbi_1["default"]) {
+            var bigInt = this._curr;
+            return jsbi_1["default"].toNumber(bigInt);
+          }
+
+          return this._curr;
 
         case IonBinary.TB_FLOAT:
           if (this.isNull()) {
@@ -3686,6 +3701,10 @@ var ParserBinaryRaw = /*#__PURE__*/function () {
         return JsbiSupport_1.JsbiSupport.ZERO;
       }
 
+      if (this._len < 6) {
+        return this.readUnsignedIntAsNumber();
+      }
+
       return this.readUnsignedIntAsBigInt();
     }
   }, {
@@ -3708,7 +3727,9 @@ var ParserBinaryRaw = /*#__PURE__*/function () {
           break;
 
         case IonBinary.TB_NEG_INT:
-          this._curr = jsbi_1["default"].unaryMinus(this._readIntegerMagnitude());
+          var value = this._readIntegerMagnitude();
+
+          this._curr = value instanceof jsbi_1["default"] ? jsbi_1["default"].unaryMinus(value) : -value;
           break;
 
         case IonBinary.TB_FLOAT:
@@ -4415,6 +4436,11 @@ var ParserTextRaw = /*#__PURE__*/function () {
       return this._fieldnameType;
     }
   }, {
+    key: "source",
+    value: function source() {
+      return this._in;
+    }
+  }, {
     key: "annotations",
     value: function annotations() {
       return this._ann;
@@ -4756,6 +4782,8 @@ var ParserTextRaw = /*#__PURE__*/function () {
 
         if (ch != CH_CL) {
           this._error("expected ':'");
+
+          return;
         }
 
         this._ops.unshift(this._read_struct_comma);
@@ -6160,7 +6188,7 @@ var _getPrototypeOf2 = _interopRequireDefault(require("@babel/runtime/helpers/ge
 
 function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = (0, _getPrototypeOf2["default"])(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = (0, _getPrototypeOf2["default"])(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return (0, _possibleConstructorReturn2["default"])(this, result); }; }
 
-function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -6403,6 +6431,21 @@ var SharedSymbolTable = /*#__PURE__*/function () {
   }
 
   (0, _createClass2["default"])(SharedSymbolTable, [{
+    key: "numberOfSymbols",
+    get: function get() {
+      return this._numberOfSymbols;
+    }
+  }, {
+    key: "name",
+    get: function get() {
+      return this._name;
+    }
+  }, {
+    key: "version",
+    get: function get() {
+      return this._version;
+    }
+  }, {
     key: "getSymbolText",
     value: function getSymbolText(symbolId) {
       if (symbolId < 0) {
@@ -6419,21 +6462,6 @@ var SharedSymbolTable = /*#__PURE__*/function () {
     key: "getSymbolId",
     value: function getSymbolId(text) {
       return this._idsByText.get(text);
-    }
-  }, {
-    key: "numberOfSymbols",
-    get: function get() {
-      return this._numberOfSymbols;
-    }
-  }, {
-    key: "name",
-    get: function get() {
-      return this._name;
-    }
-  }, {
-    key: "version",
-    get: function get() {
-      return this._version;
     }
   }]);
   return SharedSymbolTable;
@@ -6472,7 +6500,7 @@ var _createClass2 = _interopRequireDefault(require("@babel/runtime/helpers/creat
 
 function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = (0, _getPrototypeOf2["default"])(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = (0, _getPrototypeOf2["default"])(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return (0, _possibleConstructorReturn2["default"])(this, result); }; }
 
-function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -6823,7 +6851,7 @@ var _getPrototypeOf2 = _interopRequireDefault(require("@babel/runtime/helpers/ge
 
 function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = (0, _getPrototypeOf2["default"])(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = (0, _getPrototypeOf2["default"])(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return (0, _possibleConstructorReturn2["default"])(this, result); }; }
 
-function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -7825,6 +7853,11 @@ var TextReader = /*#__PURE__*/function () {
       return false;
     }
   }, {
+    key: "position",
+    value: function position() {
+      return this._parser.source().position();
+    }
+  }, {
     key: "next",
     value: function next() {
       this._raw = undefined;
@@ -8016,6 +8049,11 @@ var TextReader = /*#__PURE__*/function () {
   }, {
     key: "byteValue",
     value: function byteValue() {
+      return this.uInt8ArrayValue();
+    }
+  }, {
+    key: "uInt8ArrayValue",
+    value: function uInt8ArrayValue() {
       this.load_raw();
 
       switch (this._type) {
@@ -8222,7 +8260,7 @@ var _getPrototypeOf2 = _interopRequireDefault(require("@babel/runtime/helpers/ge
 
 var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime/helpers/classCallCheck"));
 
-function _createForOfIteratorHelper(o, allowArrayLike) { var it; if (typeof Symbol === "undefined" || o[Symbol.iterator] == null) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = o[Symbol.iterator](); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
+function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
 
 function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
 
@@ -8230,7 +8268,7 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
 
 function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = (0, _getPrototypeOf2["default"])(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = (0, _getPrototypeOf2["default"])(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return (0, _possibleConstructorReturn2["default"])(this, result); }; }
 
-function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
 
 var __importDefault = void 0 && (void 0).__importDefault || function (mod) {
   return mod && mod.__esModule ? mod : {
@@ -8294,6 +8332,16 @@ var TextWriter = /*#__PURE__*/function (_AbstractWriter_1$Abs) {
   }
 
   (0, _createClass2["default"])(TextWriter, [{
+    key: "isTopLevel",
+    get: function get() {
+      return this.depth() === 0;
+    }
+  }, {
+    key: "currentContainer",
+    get: function get() {
+      return this.containerContext[this.depth()];
+    }
+  }, {
     key: "getBytes",
     value: function getBytes() {
       return this.writeable.getBytes();
@@ -8703,16 +8751,6 @@ var TextWriter = /*#__PURE__*/function (_AbstractWriter_1$Abs) {
 
       return false;
     }
-  }, {
-    key: "isTopLevel",
-    get: function get() {
-      return this.depth() === 0;
-    }
-  }, {
-    key: "currentContainer",
-    get: function get() {
-      return this.containerContext[this.depth()];
-    }
   }], [{
     key: "_serializeFloat",
     value: function _serializeFloat(writer, value) {
@@ -8794,35 +8832,62 @@ var TimestampPrecision;
 })(TimestampPrecision = exports.TimestampPrecision || (exports.TimestampPrecision = {}));
 
 var Timestamp = /*#__PURE__*/function () {
-  function Timestamp(localOffset, year) {
+  function Timestamp() {
+    var dateOrLocalOffset = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+    var year = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
     var month = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
     var day = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
     var hour = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : null;
     var minutes = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : null;
     var seconds = arguments.length > 6 && arguments[6] !== undefined ? arguments[6] : null;
     (0, _classCallCheck2["default"])(this, Timestamp);
-    this._localOffset = localOffset;
-    this._year = year;
-    this._precision = TimestampPrecision.YEAR;
 
-    this._checkRequiredField("Offset", this._localOffset, Timestamp._MIN_OFFSET, Timestamp._MAX_OFFSET);
+    if (dateOrLocalOffset instanceof Date) {
+      var date = dateOrLocalOffset;
 
-    this._checkRequiredField("Year", this._year, Timestamp._MIN_YEAR, Timestamp._MAX_YEAR);
+      var _seconds = new IonDecimal_1.Decimal(date.getSeconds() + date.getMilliseconds(), 0);
 
-    this._month = this._checkOptionalField("Month", month, Timestamp._MIN_MONTH, Timestamp._MAX_MONTH, 1, TimestampPrecision.MONTH);
-    this._day = this._checkOptionalField("Day", day, Timestamp._MIN_DAY, Timestamp._MAX_DAY, 1, TimestampPrecision.DAY);
-    this._hour = this._checkOptionalField("Hour", hour, Timestamp._MIN_HOUR, Timestamp._MAX_HOUR, 0, TimestampPrecision.HOUR_AND_MINUTE);
-    this._minutes = this._checkOptionalField("Minutes", minutes, Timestamp._MIN_MINUTE, Timestamp._MAX_MINUTE, 0, TimestampPrecision.HOUR_AND_MINUTE);
+      this._localOffset = date.getTimezoneOffset() * -1;
+      this._year = date.getFullYear();
+      this._month = date.getMonth() + 1;
+      this._day = date.getDate();
+      this._hour = date.getHours();
+      this._minutes = date.getMinutes();
+      this._secondsDecimal = _seconds;
+      this._precision = TimestampPrecision.YEAR;
+    } else {
+      var localOffset = dateOrLocalOffset;
 
-    if (typeof seconds === "number") {
-      if (!Number.isInteger(seconds)) {
-        throw new Error("The provided seconds number was not an integer (" + seconds + ")");
+      if (localOffset === null) {
+        throw new Error("Timestamp's constructor was called without localOffset");
+      } else if (year === null) {
+        throw new Error("Timestamp's constructor was called without year");
+      } else {
+        this._localOffset = localOffset;
+        this._year = year;
       }
 
-      this._secondsDecimal = new IonDecimal_1.Decimal(seconds, 0);
-    } else {
-      if (seconds !== null) {
-        this._secondsDecimal = seconds;
+      this._precision = TimestampPrecision.YEAR;
+
+      this._checkRequiredField("Offset", this._localOffset, Timestamp._MIN_OFFSET, Timestamp._MAX_OFFSET);
+
+      this._checkRequiredField("Year", this._year, Timestamp._MIN_YEAR, Timestamp._MAX_YEAR);
+
+      this._month = this._checkOptionalField("Month", month, Timestamp._MIN_MONTH, Timestamp._MAX_MONTH, 1, TimestampPrecision.MONTH);
+      this._day = this._checkOptionalField("Day", day, Timestamp._MIN_DAY, Timestamp._MAX_DAY, 1, TimestampPrecision.DAY);
+      this._hour = this._checkOptionalField("Hour", hour, Timestamp._MIN_HOUR, Timestamp._MAX_HOUR, 0, TimestampPrecision.HOUR_AND_MINUTE);
+      this._minutes = this._checkOptionalField("Minutes", minutes, Timestamp._MIN_MINUTE, Timestamp._MAX_MINUTE, 0, TimestampPrecision.HOUR_AND_MINUTE);
+
+      if (typeof seconds === "number") {
+        if (!Number.isInteger(seconds)) {
+          throw new Error("The provided seconds number was not an integer (" + seconds + ")");
+        }
+
+        this._secondsDecimal = new IonDecimal_1.Decimal(seconds, 0);
+      } else {
+        if (seconds !== null) {
+          this._secondsDecimal = seconds;
+        }
       }
     }
 
@@ -9468,6 +9533,7 @@ exports.IonTypes = {
 };
 
 },{"./IonType":27}],29:[function(require,module,exports){
+(function (global){(function (){
 "use strict";
 /*!
  * Copyright 2012 Amazon.com, Inc. or its affiliates. All Rights Reserved.
@@ -9488,6 +9554,16 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.decodeUtf8 = exports.encodeUtf8 = void 0;
+var JS_DECODER_MAX_BYTES = 512;
+var textDecoder;
+
+if (global["TextDecoder"] != null) {
+  textDecoder = new global["TextDecoder"]("utf8", {
+    fatal: true
+  });
+} else {
+  textDecoder = null;
+}
 
 function encodeUtf8(s) {
   var i = 0,
@@ -9535,6 +9611,10 @@ function encodeUtf8(s) {
 exports.encodeUtf8 = encodeUtf8;
 
 function decodeUtf8(bytes) {
+  if (bytes.length > JS_DECODER_MAX_BYTES && textDecoder != null) {
+    return textDecoder.decode(bytes);
+  }
+
   var i = 0,
       s = "",
       c;
@@ -9582,6 +9662,7 @@ function decodeUtf8(bytes) {
 
 exports.decodeUtf8 = decodeUtf8;
 
+}).call(this)}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{}],30:[function(require,module,exports){
 "use strict";
 /*!
@@ -9620,6 +9701,22 @@ var Writeable = /*#__PURE__*/function () {
   }
 
   (0, _createClass2["default"])(Writeable, [{
+    key: "currentBuffer",
+    get: function get() {
+      return this.buffers[this.buffers.length - 1];
+    }
+  }, {
+    key: "totalSize",
+    get: function get() {
+      var size = 0;
+
+      for (var i = 0; i < this.buffers.length - 1; i++) {
+        size += this.buffers[i].length;
+      }
+
+      return size + this.index;
+    }
+  }, {
     key: "writeByte",
     value: function writeByte(_byte) {
       this.clean = false;
@@ -9671,22 +9768,6 @@ var Writeable = /*#__PURE__*/function () {
       this.index = 0;
       this.clean = true;
       return buffer;
-    }
-  }, {
-    key: "currentBuffer",
-    get: function get() {
-      return this.buffers[this.buffers.length - 1];
-    }
-  }, {
-    key: "totalSize",
-    get: function get() {
-      var size = 0;
-
-      for (var i = 0; i < this.buffers.length - 1; i++) {
-        size += this.buffers[i].length;
-      }
-
-      return size + this.index;
     }
   }]);
   return Writeable;
@@ -9981,11 +10062,6 @@ var SignAndMagnitudeInt = /*#__PURE__*/function () {
   }
 
   (0, _createClass2["default"])(SignAndMagnitudeInt, [{
-    key: "equals",
-    value: function equals(other) {
-      return jsbi_1["default"].equal(this._magnitude, other._magnitude) && this._isNegative === other._isNegative;
-    }
-  }, {
     key: "magnitude",
     get: function get() {
       return this._magnitude;
@@ -9994,6 +10070,11 @@ var SignAndMagnitudeInt = /*#__PURE__*/function () {
     key: "isNegative",
     get: function get() {
       return this._isNegative;
+    }
+  }, {
+    key: "equals",
+    value: function equals(other) {
+      return jsbi_1["default"].equal(this._magnitude, other._magnitude) && this._isNegative === other._isNegative;
     }
   }], [{
     key: "fromNumber",
@@ -10026,7 +10107,7 @@ var _getPrototypeOf2 = _interopRequireDefault(require("@babel/runtime/helpers/ge
 
 function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = (0, _getPrototypeOf2["default"])(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = (0, _getPrototypeOf2["default"])(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return (0, _possibleConstructorReturn2["default"])(this, result); }; }
 
-function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -10083,7 +10164,7 @@ var _getPrototypeOf2 = _interopRequireDefault(require("@babel/runtime/helpers/ge
 
 function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = (0, _getPrototypeOf2["default"])(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = (0, _getPrototypeOf2["default"])(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return (0, _possibleConstructorReturn2["default"])(this, result); }; }
 
-function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -10098,7 +10179,7 @@ var Value_1 = require("./Value");
 
 var _fromJsConstructor = new FromJsConstructor_1.FromJsConstructorBuilder().withPrimitives(FromJsConstructor_1.Primitives.Boolean).withClassesToUnbox(global.Boolean).build();
 
-var Boolean = /*#__PURE__*/function (_Value_1$Value) {
+var _Boolean = /*#__PURE__*/function (_Value_1$Value) {
   (0, _inherits2["default"])(Boolean, _Value_1$Value);
 
   var _super = _createSuper(Boolean);
@@ -10126,11 +10207,43 @@ var Boolean = /*#__PURE__*/function (_Value_1$Value) {
       writer.setAnnotations(this.getAnnotations());
       writer.writeBoolean(this.booleanValue());
     }
+  }, {
+    key: "_valueEquals",
+    value: function _valueEquals(other) {
+      var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {
+        epsilon: null,
+        ignoreAnnotations: false,
+        ignoreTimestampPrecision: false,
+        onlyCompareIon: true
+      };
+      var isSupportedType = false;
+      var valueToCompare = null;
+
+      if (other instanceof _Boolean) {
+        isSupportedType = true;
+        valueToCompare = other.booleanValue();
+      } else if (!options.onlyCompareIon) {
+        if (typeof other === "boolean" || other instanceof global.Boolean) {
+          isSupportedType = true;
+          valueToCompare = other.valueOf();
+        }
+      }
+
+      if (!isSupportedType) {
+        return false;
+      }
+
+      if (this.booleanValue() !== valueToCompare) {
+        return false;
+      }
+
+      return true;
+    }
   }]);
   return Boolean;
 }(Value_1.Value(global.Boolean, Ion_1.IonTypes.BOOL, _fromJsConstructor));
 
-exports.Boolean = Boolean;
+exports.Boolean = _Boolean;
 
 }).call(this)}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"../Ion":4,"./FromJsConstructor":39,"./Value":51,"@babel/runtime/helpers/classCallCheck":61,"@babel/runtime/helpers/createClass":63,"@babel/runtime/helpers/getPrototypeOf":67,"@babel/runtime/helpers/inherits":68,"@babel/runtime/helpers/interopRequireDefault":69,"@babel/runtime/helpers/possibleConstructorReturn":76}],36:[function(require,module,exports){
@@ -10148,7 +10261,7 @@ var _possibleConstructorReturn2 = _interopRequireDefault(require("@babel/runtime
 
 var _getPrototypeOf2 = _interopRequireDefault(require("@babel/runtime/helpers/getPrototypeOf"));
 
-function _createForOfIteratorHelper(o, allowArrayLike) { var it; if (typeof Symbol === "undefined" || o[Symbol.iterator] == null) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = o[Symbol.iterator](); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
+function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
 
 function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
 
@@ -10156,7 +10269,7 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
 
 function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = (0, _getPrototypeOf2["default"])(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = (0, _getPrototypeOf2["default"])(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return (0, _possibleConstructorReturn2["default"])(this, result); }; }
 
-function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -10240,7 +10353,7 @@ var _getPrototypeOf2 = _interopRequireDefault(require("@babel/runtime/helpers/ge
 
 function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = (0, _getPrototypeOf2["default"])(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = (0, _getPrototypeOf2["default"])(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return (0, _possibleConstructorReturn2["default"])(this, result); }; }
 
-function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
 
 var __createBinding = void 0 && (void 0).__createBinding || (Object.create ? function (o, m, k, k2) {
   if (k2 === undefined) k2 = k;
@@ -10289,6 +10402,8 @@ var FromJsConstructor_1 = require("./FromJsConstructor");
 
 var Value_1 = require("./Value");
 
+var Float_1 = require("./Float");
+
 var _fromJsConstructor = new FromJsConstructor_1.FromJsConstructorBuilder().withClasses(ion.Decimal).build();
 
 var Decimal = /*#__PURE__*/function (_Value_1$Value) {
@@ -10336,13 +10451,49 @@ var Decimal = /*#__PURE__*/function (_Value_1$Value) {
       writer.setAnnotations(this.getAnnotations());
       writer.writeDecimal(this.decimalValue());
     }
+  }, {
+    key: "_valueEquals",
+    value: function _valueEquals(other) {
+      var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {
+        epsilon: null,
+        ignoreAnnotations: false,
+        ignoreTimestampPrecision: false,
+        onlyCompareIon: true,
+        coerceNumericType: false
+      };
+      var isSupportedType = false;
+      var valueToCompare = null;
+
+      if (other instanceof Decimal) {
+        isSupportedType = true;
+        valueToCompare = other.decimalValue();
+      } else if (options.coerceNumericType === true && other instanceof Float_1.Float) {
+        isSupportedType = true;
+        valueToCompare = new ion.Decimal(other.toString());
+      } else if (!options.onlyCompareIon) {
+        if (other instanceof ion.Decimal) {
+          isSupportedType = true;
+          valueToCompare = other;
+        } else if (other instanceof Number || typeof other === "number") {
+          isSupportedType = true;
+          valueToCompare = new ion.Decimal(other.toString());
+        }
+      }
+
+      if (!isSupportedType) {
+        return false;
+      }
+
+      return this.decimalValue().equals(valueToCompare);
+    }
   }]);
   return Decimal;
 }(Value_1.Value(Number, Ion_1.IonTypes.DECIMAL, _fromJsConstructor));
 
 exports.Decimal = Decimal;
 
-},{"../Ion":4,"./FromJsConstructor":39,"./Value":51,"@babel/runtime/helpers/classCallCheck":61,"@babel/runtime/helpers/createClass":63,"@babel/runtime/helpers/getPrototypeOf":67,"@babel/runtime/helpers/inherits":68,"@babel/runtime/helpers/interopRequireDefault":69,"@babel/runtime/helpers/possibleConstructorReturn":76}],38:[function(require,module,exports){
+},{"../Ion":4,"./Float":38,"./FromJsConstructor":39,"./Value":51,"@babel/runtime/helpers/classCallCheck":61,"@babel/runtime/helpers/createClass":63,"@babel/runtime/helpers/getPrototypeOf":67,"@babel/runtime/helpers/inherits":68,"@babel/runtime/helpers/interopRequireDefault":69,"@babel/runtime/helpers/possibleConstructorReturn":76}],38:[function(require,module,exports){
+(function (global){(function (){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -10359,7 +10510,41 @@ var _getPrototypeOf2 = _interopRequireDefault(require("@babel/runtime/helpers/ge
 
 function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = (0, _getPrototypeOf2["default"])(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = (0, _getPrototypeOf2["default"])(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return (0, _possibleConstructorReturn2["default"])(this, result); }; }
 
-function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
+
+var __createBinding = void 0 && (void 0).__createBinding || (Object.create ? function (o, m, k, k2) {
+  if (k2 === undefined) k2 = k;
+  Object.defineProperty(o, k2, {
+    enumerable: true,
+    get: function get() {
+      return m[k];
+    }
+  });
+} : function (o, m, k, k2) {
+  if (k2 === undefined) k2 = k;
+  o[k2] = m[k];
+});
+
+var __setModuleDefault = void 0 && (void 0).__setModuleDefault || (Object.create ? function (o, v) {
+  Object.defineProperty(o, "default", {
+    enumerable: true,
+    value: v
+  });
+} : function (o, v) {
+  o["default"] = v;
+});
+
+var __importStar = void 0 && (void 0).__importStar || function (mod) {
+  if (mod && mod.__esModule) return mod;
+  var result = {};
+  if (mod != null) for (var k in mod) {
+    if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+  }
+
+  __setModuleDefault(result, mod);
+
+  return result;
+};
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -10371,6 +10556,10 @@ var Ion_1 = require("../Ion");
 var FromJsConstructor_1 = require("./FromJsConstructor");
 
 var Value_1 = require("./Value");
+
+var Decimal_1 = require("./Decimal");
+
+var ion = __importStar(require("../Ion"));
 
 var _fromJsConstructor = new FromJsConstructor_1.FromJsConstructorBuilder().withPrimitives(FromJsConstructor_1.Primitives.Number).withClassesToUnbox(Number).build();
 
@@ -10402,13 +10591,54 @@ var Float = /*#__PURE__*/function (_Value_1$Value) {
       writer.setAnnotations(this.getAnnotations());
       writer.writeFloat64(this.numberValue());
     }
+  }, {
+    key: "_valueEquals",
+    value: function _valueEquals(other) {
+      var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {
+        epsilon: null,
+        ignoreAnnotations: false,
+        ignoreTimestampPrecision: false,
+        onlyCompareIon: true,
+        coerceNumericType: false
+      };
+      var isSupportedType = false;
+      var valueToCompare = null;
+
+      if (other instanceof Float) {
+        isSupportedType = true;
+        valueToCompare = other.numberValue();
+      } else if (options.coerceNumericType === true && other instanceof Decimal_1.Decimal) {
+        var thisValue = new ion.Decimal(other.toString());
+        return thisValue.equals(other.decimalValue());
+      } else if (!options.onlyCompareIon) {
+        if (other instanceof global.Number || typeof other === "number") {
+          isSupportedType = true;
+          valueToCompare = other.valueOf();
+        }
+      }
+
+      if (!isSupportedType) {
+        return false;
+      }
+
+      var result = Object.is(this.numberValue(), valueToCompare);
+
+      if (options.epsilon != null) {
+        if (result || Math.abs(this.numberValue() - valueToCompare) <= options.epsilon) {
+          return true;
+        }
+      }
+
+      return result;
+    }
   }]);
   return Float;
 }(Value_1.Value(Number, Ion_1.IonTypes.FLOAT, _fromJsConstructor));
 
 exports.Float = Float;
 
-},{"../Ion":4,"./FromJsConstructor":39,"./Value":51,"@babel/runtime/helpers/classCallCheck":61,"@babel/runtime/helpers/createClass":63,"@babel/runtime/helpers/getPrototypeOf":67,"@babel/runtime/helpers/inherits":68,"@babel/runtime/helpers/interopRequireDefault":69,"@babel/runtime/helpers/possibleConstructorReturn":76}],39:[function(require,module,exports){
+}).call(this)}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{"../Ion":4,"./Decimal":37,"./FromJsConstructor":39,"./Value":51,"@babel/runtime/helpers/classCallCheck":61,"@babel/runtime/helpers/createClass":63,"@babel/runtime/helpers/getPrototypeOf":67,"@babel/runtime/helpers/inherits":68,"@babel/runtime/helpers/interopRequireDefault":69,"@babel/runtime/helpers/possibleConstructorReturn":76}],39:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -10539,6 +10769,7 @@ exports.Primitives = {
 };
 
 },{"../Ion":4,"../util":56,"@babel/runtime/helpers/classCallCheck":61,"@babel/runtime/helpers/createClass":63,"@babel/runtime/helpers/interopRequireDefault":69,"@babel/runtime/helpers/typeof":81}],40:[function(require,module,exports){
+(function (global){(function (){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -10555,7 +10786,7 @@ var _getPrototypeOf2 = _interopRequireDefault(require("@babel/runtime/helpers/ge
 
 function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = (0, _getPrototypeOf2["default"])(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = (0, _getPrototypeOf2["default"])(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return (0, _possibleConstructorReturn2["default"])(this, result); }; }
 
-function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
 
 var __importDefault = void 0 && (void 0).__importDefault || function (mod) {
   return mod && mod.__esModule ? mod : {
@@ -10646,12 +10877,58 @@ var Integer = /*#__PURE__*/function (_Value_1$Value) {
         writer.writeInt(this._bigIntValue);
       }
     }
+  }, {
+    key: "_valueEquals",
+    value: function _valueEquals(other) {
+      var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {
+        epsilon: null,
+        ignoreAnnotations: false,
+        ignoreTimestampPrecision: false,
+        onlyCompareIon: true
+      };
+      var isSupportedType = false;
+      var valueToCompare = null;
+
+      if (other instanceof Integer) {
+        isSupportedType = true;
+
+        if (this._bigIntValue == null && other._bigIntValue == null) {
+          valueToCompare = other.numberValue();
+        } else {
+          valueToCompare = other.bigIntValue();
+        }
+      } else if (!options.onlyCompareIon) {
+        if (other instanceof global.Number || typeof other === "number") {
+          isSupportedType = true;
+
+          if (this.bigIntValue == null) {
+            valueToCompare = other.valueOf();
+          } else {
+            valueToCompare = jsbi_1["default"].BigInt(other.valueOf());
+          }
+        } else if (other instanceof jsbi_1["default"]) {
+          isSupportedType = true;
+          valueToCompare = other;
+        }
+      }
+
+      if (!isSupportedType) {
+        return false;
+      }
+
+      if (valueToCompare instanceof jsbi_1["default"]) {
+        return jsbi_1["default"].equal(this.bigIntValue(), valueToCompare);
+      }
+
+      return this.numberValue() == valueToCompare;
+    }
   }]);
   return Integer;
 }(Value_1.Value(Number, Ion_1.IonTypes.INT, _fromJsConstructor));
 
 exports.Integer = Integer;
 
+}).call(this)}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"../Ion":4,"./FromJsConstructor":39,"./Value":51,"@babel/runtime/helpers/classCallCheck":61,"@babel/runtime/helpers/createClass":63,"@babel/runtime/helpers/getPrototypeOf":67,"@babel/runtime/helpers/inherits":68,"@babel/runtime/helpers/interopRequireDefault":69,"@babel/runtime/helpers/possibleConstructorReturn":76,"jsbi":84}],41:[function(require,module,exports){
 "use strict";
 
@@ -10795,7 +11072,7 @@ var _getPrototypeOf2 = _interopRequireDefault(require("@babel/runtime/helpers/ge
 
 function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = (0, _getPrototypeOf2["default"])(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = (0, _getPrototypeOf2["default"])(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return (0, _possibleConstructorReturn2["default"])(this, result); }; }
 
-function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -10823,6 +11100,7 @@ var List = /*#__PURE__*/function (_Sequence_1$Sequence) {
 exports.List = List;
 
 },{"../Ion":4,"./Sequence":46,"@babel/runtime/helpers/classCallCheck":61,"@babel/runtime/helpers/getPrototypeOf":67,"@babel/runtime/helpers/inherits":68,"@babel/runtime/helpers/interopRequireDefault":69,"@babel/runtime/helpers/possibleConstructorReturn":76}],43:[function(require,module,exports){
+(function (global){(function (){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -10839,12 +11117,14 @@ var _getPrototypeOf2 = _interopRequireDefault(require("@babel/runtime/helpers/ge
 
 function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = (0, _getPrototypeOf2["default"])(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = (0, _getPrototypeOf2["default"])(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return (0, _possibleConstructorReturn2["default"])(this, result); }; }
 
-function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.Lob = void 0;
+
+var Ion_1 = require("../Ion");
 
 var FromJsConstructor_1 = require("./FromJsConstructor");
 
@@ -10875,6 +11155,49 @@ function Lob(ionType) {
       value: function uInt8ArrayValue() {
         return this;
       }
+    }, {
+      key: "_valueEquals",
+      value: function _valueEquals(other) {
+        var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {
+          epsilon: null,
+          ignoreAnnotations: false,
+          ignoreTimestampPrecision: false,
+          onlyCompareIon: true
+        };
+        var isSupportedType = false;
+        var valueToCompare = null;
+
+        if (options.onlyCompareIon) {
+          if (other.getType() === Ion_1.IonTypes.CLOB || other.getType() === Ion_1.IonTypes.BLOB) {
+            isSupportedType = true;
+            valueToCompare = other.uInt8ArrayValue();
+          }
+        } else {
+          if (other instanceof global.Uint8Array) {
+            isSupportedType = true;
+            valueToCompare = other.valueOf();
+          }
+        }
+
+        if (!isSupportedType) {
+          return false;
+        }
+
+        var current = this.uInt8ArrayValue();
+        var expected = valueToCompare;
+
+        if (current.length !== expected.length) {
+          return false;
+        }
+
+        for (var i = 0; i < current.length; i++) {
+          if (current[i] !== expected[i]) {
+            return false;
+          }
+        }
+
+        return true;
+      }
     }]);
     return _class;
   }(Value_1.Value(Uint8Array, ionType, _fromJsConstructor));
@@ -10882,7 +11205,8 @@ function Lob(ionType) {
 
 exports.Lob = Lob;
 
-},{"./FromJsConstructor":39,"./Value":51,"@babel/runtime/helpers/classCallCheck":61,"@babel/runtime/helpers/createClass":63,"@babel/runtime/helpers/getPrototypeOf":67,"@babel/runtime/helpers/inherits":68,"@babel/runtime/helpers/interopRequireDefault":69,"@babel/runtime/helpers/possibleConstructorReturn":76}],44:[function(require,module,exports){
+}).call(this)}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{"../Ion":4,"./FromJsConstructor":39,"./Value":51,"@babel/runtime/helpers/classCallCheck":61,"@babel/runtime/helpers/createClass":63,"@babel/runtime/helpers/getPrototypeOf":67,"@babel/runtime/helpers/inherits":68,"@babel/runtime/helpers/interopRequireDefault":69,"@babel/runtime/helpers/possibleConstructorReturn":76}],44:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -10899,7 +11223,7 @@ var _getPrototypeOf2 = _interopRequireDefault(require("@babel/runtime/helpers/ge
 
 function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = (0, _getPrototypeOf2["default"])(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = (0, _getPrototypeOf2["default"])(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return (0, _possibleConstructorReturn2["default"])(this, result); }; }
 
-function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -11029,6 +11353,33 @@ var Null = /*#__PURE__*/function (_Value_1$Value) {
       writer.setAnnotations(this.getAnnotations());
       writer.writeNull(this.getType());
     }
+  }, {
+    key: "_valueEquals",
+    value: function _valueEquals(other) {
+      var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {
+        epsilon: null,
+        ignoreAnnotations: false,
+        ignoreTimestampPrecision: false,
+        onlyCompareIon: true
+      };
+      var isSupportedType = false;
+      var valueToCompare = null;
+
+      if (other instanceof Null) {
+        isSupportedType = true;
+        valueToCompare = other;
+      } else if (!options.onlyCompareIon) {
+        if (other === null && this._ionType.name === "null") {
+          return true;
+        }
+      }
+
+      if (!isSupportedType) {
+        return false;
+      }
+
+      return this._ionType.name === valueToCompare._ionType.name;
+    }
   }], [{
     key: "_operationIsSupported",
     value: function _operationIsSupported(ionType, operation) {
@@ -11058,7 +11409,7 @@ var _getPrototypeOf2 = _interopRequireDefault(require("@babel/runtime/helpers/ge
 
 function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = (0, _getPrototypeOf2["default"])(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = (0, _getPrototypeOf2["default"])(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return (0, _possibleConstructorReturn2["default"])(this, result); }; }
 
-function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -11092,6 +11443,7 @@ var SExpression = /*#__PURE__*/function (_Sequence_1$Sequence) {
 exports.SExpression = SExpression;
 
 },{"../Ion":4,"./Sequence":46,"@babel/runtime/helpers/classCallCheck":61,"@babel/runtime/helpers/createClass":63,"@babel/runtime/helpers/getPrototypeOf":67,"@babel/runtime/helpers/inherits":68,"@babel/runtime/helpers/interopRequireDefault":69,"@babel/runtime/helpers/possibleConstructorReturn":76}],46:[function(require,module,exports){
+(function (global){(function (){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -11110,7 +11462,7 @@ var _possibleConstructorReturn2 = _interopRequireDefault(require("@babel/runtime
 
 var _getPrototypeOf2 = _interopRequireDefault(require("@babel/runtime/helpers/getPrototypeOf"));
 
-function _createForOfIteratorHelper(o, allowArrayLike) { var it; if (typeof Symbol === "undefined" || o[Symbol.iterator] == null) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = o[Symbol.iterator](); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
+function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
 
 function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
 
@@ -11118,12 +11470,14 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
 
 function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = (0, _getPrototypeOf2["default"])(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = (0, _getPrototypeOf2["default"])(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return (0, _possibleConstructorReturn2["default"])(this, result); }; }
 
-function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.Sequence = void 0;
+
+var Ion_1 = require("../Ion");
 
 var FromJsConstructor_1 = require("./FromJsConstructor");
 
@@ -11222,6 +11576,55 @@ function Sequence(ionType) {
 
         writer.stepOut();
       }
+    }, {
+      key: "_valueEquals",
+      value: function _valueEquals(other) {
+        var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {
+          epsilon: null,
+          ignoreAnnotations: false,
+          ignoreTimestampPrecision: false,
+          onlyCompareIon: true
+        };
+        var isSupportedType = false;
+        var valueToCompare = null;
+
+        if (options.onlyCompareIon) {
+          if (other.getType() === Ion_1.IonTypes.LIST || other.getType() === Ion_1.IonTypes.SEXP) {
+            isSupportedType = true;
+            valueToCompare = other.elements();
+          }
+        } else {
+          if (other instanceof global.Array) {
+            isSupportedType = true;
+            valueToCompare = other;
+          }
+        }
+
+        if (!isSupportedType) {
+          return false;
+        }
+
+        var actualSequence = this.elements();
+        var expectedSequence = valueToCompare;
+
+        if (actualSequence.length !== expectedSequence.length) {
+          return false;
+        }
+
+        for (var i = 0; i < actualSequence.length; i++) {
+          if (options.onlyCompareIon) {
+            if (!actualSequence[i].ionEquals(expectedSequence[i], options)) {
+              return false;
+            }
+          } else {
+            if (!actualSequence[i].equals(expectedSequence[i])) {
+              return false;
+            }
+          }
+        }
+
+        return true;
+      }
     }], [{
       key: "_fromJsValue",
       value: function _fromJsValue(jsValue, annotations) {
@@ -11241,7 +11644,8 @@ function Sequence(ionType) {
 
 exports.Sequence = Sequence;
 
-},{"./FromJsConstructor":39,"./Value":51,"@babel/runtime/helpers/classCallCheck":61,"@babel/runtime/helpers/createClass":63,"@babel/runtime/helpers/getPrototypeOf":67,"@babel/runtime/helpers/inherits":68,"@babel/runtime/helpers/interopRequireDefault":69,"@babel/runtime/helpers/possibleConstructorReturn":76,"@babel/runtime/helpers/toConsumableArray":80,"@babel/runtime/helpers/typeof":81}],47:[function(require,module,exports){
+}).call(this)}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{"../Ion":4,"./FromJsConstructor":39,"./Value":51,"@babel/runtime/helpers/classCallCheck":61,"@babel/runtime/helpers/createClass":63,"@babel/runtime/helpers/getPrototypeOf":67,"@babel/runtime/helpers/inherits":68,"@babel/runtime/helpers/interopRequireDefault":69,"@babel/runtime/helpers/possibleConstructorReturn":76,"@babel/runtime/helpers/toConsumableArray":80,"@babel/runtime/helpers/typeof":81}],47:[function(require,module,exports){
 (function (global){(function (){
 "use strict";
 
@@ -11259,7 +11663,7 @@ var _getPrototypeOf2 = _interopRequireDefault(require("@babel/runtime/helpers/ge
 
 function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = (0, _getPrototypeOf2["default"])(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = (0, _getPrototypeOf2["default"])(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return (0, _possibleConstructorReturn2["default"])(this, result); }; }
 
-function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -11302,6 +11706,39 @@ var String = /*#__PURE__*/function (_Value_1$Value) {
       writer.setAnnotations(this.getAnnotations());
       writer.writeString(this.stringValue());
     }
+  }, {
+    key: "_valueEquals",
+    value: function _valueEquals(other) {
+      var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {
+        epsilon: null,
+        ignoreAnnotations: false,
+        ignoreTimestampPrecision: false,
+        onlyCompareIon: true
+      };
+      var isSupportedType = false;
+      var valueToCompare = null;
+
+      if (other instanceof String) {
+        isSupportedType = true;
+        valueToCompare = other.stringValue();
+      } else if (!options.onlyCompareIon) {
+        if (typeof other === "string" || other instanceof global.String) {
+          isSupportedType = true;
+          valueToCompare = other.valueOf();
+        }
+      }
+
+      if (!isSupportedType) {
+        return false;
+      }
+
+      return this.compareValue(valueToCompare) === 0;
+    }
+  }, {
+    key: "compareValue",
+    value: function compareValue(expectedValue) {
+      return this.stringValue().localeCompare(expectedValue);
+    }
   }]);
   return String;
 }(Value_1.Value(global.String, Ion_1.IonTypes.STRING, _fromJsConstructor));
@@ -11310,6 +11747,7 @@ exports.String = String;
 
 }).call(this)}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"../Ion":4,"./FromJsConstructor":39,"./Value":51,"@babel/runtime/helpers/classCallCheck":61,"@babel/runtime/helpers/createClass":63,"@babel/runtime/helpers/getPrototypeOf":67,"@babel/runtime/helpers/inherits":68,"@babel/runtime/helpers/interopRequireDefault":69,"@babel/runtime/helpers/possibleConstructorReturn":76}],48:[function(require,module,exports){
+(function (global){(function (){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -11332,7 +11770,7 @@ var _possibleConstructorReturn2 = _interopRequireDefault(require("@babel/runtime
 
 var _getPrototypeOf2 = _interopRequireDefault(require("@babel/runtime/helpers/getPrototypeOf"));
 
-function _createForOfIteratorHelper(o, allowArrayLike) { var it; if (typeof Symbol === "undefined" || o[Symbol.iterator] == null) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = o[Symbol.iterator](); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
+function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
 
 function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
 
@@ -11340,7 +11778,7 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
 
 function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = (0, _getPrototypeOf2["default"])(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = (0, _getPrototypeOf2["default"])(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return (0, _possibleConstructorReturn2["default"])(this, result); }; }
 
-function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -11375,7 +11813,7 @@ var Struct = /*#__PURE__*/function (_Value_1$Value) {
             fieldName = _step$value[0],
             fieldValue = _step$value[1];
 
-        _this._fields[fieldName] = fieldValue;
+        _this._fields[fieldName] = fieldValue instanceof Value_1.Value ? [fieldValue] : fieldValue;
       }
     } catch (err) {
       _iterator.e(err);
@@ -11387,7 +11825,7 @@ var Struct = /*#__PURE__*/function (_Value_1$Value) {
 
     return (0, _possibleConstructorReturn2["default"])(_this, new Proxy((0, _assertThisInitialized2["default"])(_this), {
       set: function set(target, name, value) {
-        target._fields[name] = value;
+        target._fields[name] = [value];
         return true;
       },
       get: function get(target, name) {
@@ -11395,7 +11833,13 @@ var Struct = /*#__PURE__*/function (_Value_1$Value) {
           return target[name];
         }
 
-        return target._fields[name];
+        var length = target._fields[name] !== undefined ? target._fields[name].length : -1;
+
+        if (length === -1) {
+          return target._fields[name];
+        }
+
+        return target._fields[name][length - 1];
       },
       deleteProperty: function deleteProperty(target, name) {
         if (name in target._fields) {
@@ -11410,8 +11854,40 @@ var Struct = /*#__PURE__*/function (_Value_1$Value) {
   (0, _createClass2["default"])(Struct, [{
     key: "get",
     value: function get() {
+      var _child;
+
       for (var _len = arguments.length, pathElements = new Array(_len), _key = 0; _key < _len; _key++) {
         pathElements[_key] = arguments[_key];
+      }
+
+      if (pathElements.length === 0) {
+        throw new Error("Value#get requires at least one parameter.");
+      }
+
+      var pathHead = pathElements[0],
+          pathTail = pathElements.slice(1);
+
+      if (typeof pathHead !== "string") {
+        throw new Error("Cannot index into a struct with a ".concat((0, _typeof2["default"])(pathHead), "."));
+      }
+
+      var child = this._fields[pathHead];
+
+      if (child === undefined) {
+        return null;
+      }
+
+      if (pathTail.length === 0) {
+        return child[child.length - 1];
+      }
+
+      return (_child = child[child.length - 1]).get.apply(_child, (0, _toConsumableArray2["default"])(pathTail));
+    }
+  }, {
+    key: "getAll",
+    value: function getAll() {
+      for (var _len2 = arguments.length, pathElements = new Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+        pathElements[_key2] = arguments[_key2];
       }
 
       if (pathElements.length === 0) {
@@ -11435,7 +11911,11 @@ var Struct = /*#__PURE__*/function (_Value_1$Value) {
         return child;
       }
 
-      return child.get.apply(child, (0, _toConsumableArray2["default"])(pathTail));
+      var values = [];
+      child.forEach(function (value) {
+        return values.push.apply(values, (0, _toConsumableArray2["default"])(value.getAll.apply(value, (0, _toConsumableArray2["default"])(pathTail))));
+      });
+      return values;
     }
   }, {
     key: "fieldNames",
@@ -11443,9 +11923,33 @@ var Struct = /*#__PURE__*/function (_Value_1$Value) {
       return Object.keys(this._fields);
     }
   }, {
+    key: "allFields",
+    value: function allFields() {
+      return Object.entries(this._fields);
+    }
+  }, {
     key: "fields",
     value: function fields() {
-      return Object.entries(this._fields);
+      var singleValueFields = Object.create(null);
+
+      var _iterator2 = _createForOfIteratorHelper(this.allFields()),
+          _step2;
+
+      try {
+        for (_iterator2.s(); !(_step2 = _iterator2.n()).done;) {
+          var _step2$value = (0, _slicedToArray2["default"])(_step2.value, 2),
+              fieldName = _step2$value[0],
+              values = _step2$value[1];
+
+          singleValueFields[fieldName] = values[values.length - 1];
+        }
+      } catch (err) {
+        _iterator2.e(err);
+      } finally {
+        _iterator2.f();
+      }
+
+      return Object.entries(singleValueFields);
     }
   }, {
     key: "elements",
@@ -11460,7 +11964,7 @@ var Struct = /*#__PURE__*/function (_Value_1$Value) {
   }, {
     key: "toString",
     value: function toString() {
-      return "{" + (0, _toConsumableArray2["default"])(this.fields()).map(function (_ref) {
+      return "{" + (0, _toConsumableArray2["default"])(this.allFields()).map(function (_ref) {
         var _ref2 = (0, _slicedToArray2["default"])(_ref, 2),
             name = _ref2[0],
             value = _ref2[1];
@@ -11474,22 +11978,34 @@ var Struct = /*#__PURE__*/function (_Value_1$Value) {
       writer.setAnnotations(this.getAnnotations());
       writer.stepIn(Ion_1.IonTypes.STRUCT);
 
-      var _iterator2 = _createForOfIteratorHelper(this),
-          _step2;
+      var _iterator3 = _createForOfIteratorHelper(this.allFields()),
+          _step3;
 
       try {
-        for (_iterator2.s(); !(_step2 = _iterator2.n()).done;) {
-          var _step2$value = (0, _slicedToArray2["default"])(_step2.value, 2),
-              fieldName = _step2$value[0],
-              value = _step2$value[1];
+        for (_iterator3.s(); !(_step3 = _iterator3.n()).done;) {
+          var _step3$value = (0, _slicedToArray2["default"])(_step3.value, 2),
+              fieldName = _step3$value[0],
+              values = _step3$value[1];
 
-          writer.writeFieldName(fieldName);
-          value.writeTo(writer);
+          var _iterator4 = _createForOfIteratorHelper(values),
+              _step4;
+
+          try {
+            for (_iterator4.s(); !(_step4 = _iterator4.n()).done;) {
+              var value = _step4.value;
+              writer.writeFieldName(fieldName);
+              value.writeTo(writer);
+            }
+          } catch (err) {
+            _iterator4.e(err);
+          } finally {
+            _iterator4.f();
+          }
         }
       } catch (err) {
-        _iterator2.e(err);
+        _iterator3.e(err);
       } finally {
-        _iterator2.f();
+        _iterator3.f();
       }
 
       writer.stepOut();
@@ -11507,7 +12023,105 @@ var Struct = /*#__PURE__*/function (_Value_1$Value) {
   }, {
     key: "toJSON",
     value: function toJSON() {
-      return this._fields;
+      var normalizedFields = Object.create(null);
+
+      var _iterator5 = _createForOfIteratorHelper(this.fields()),
+          _step5;
+
+      try {
+        for (_iterator5.s(); !(_step5 = _iterator5.n()).done;) {
+          var _step5$value = (0, _slicedToArray2["default"])(_step5.value, 2),
+              key = _step5$value[0],
+              value = _step5$value[1];
+
+          normalizedFields[key] = value;
+        }
+      } catch (err) {
+        _iterator5.e(err);
+      } finally {
+        _iterator5.f();
+      }
+
+      return normalizedFields;
+    }
+  }, {
+    key: "_valueEquals",
+    value: function _valueEquals(other) {
+      var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {
+        epsilon: null,
+        ignoreAnnotations: false,
+        ignoreTimestampPrecision: false,
+        onlyCompareIon: true
+      };
+      var isSupportedType = false;
+      var valueToCompare = null;
+
+      if (other instanceof Struct) {
+        isSupportedType = true;
+        valueToCompare = other.allFields();
+      } else if (!options.onlyCompareIon) {
+        if ((0, _typeof2["default"])(other) === "object" || other instanceof global.Object) {
+          isSupportedType = true;
+          valueToCompare = Value_1.Value.from(other).allFields();
+        }
+      }
+
+      if (!isSupportedType) {
+        return false;
+      }
+
+      if (this.allFields().length !== valueToCompare.length) {
+        return false;
+      }
+
+      var matchFound = true;
+      var paired = new Array(valueToCompare.length);
+
+      for (var i = 0; matchFound && i < this.allFields().length; i++) {
+        matchFound = false;
+
+        for (var j = 0; !matchFound && j < valueToCompare.length; j++) {
+          if (!paired[j]) {
+            var child = this.allFields()[i];
+            var expectedChild = valueToCompare[j];
+            matchFound = child[0] === expectedChild[0] && this._ionValueEquals(child[1].sort(), expectedChild[1].sort(), options);
+
+            if (matchFound) {
+              paired[j] = true;
+            }
+          }
+        }
+      }
+
+      for (var _i = 0; _i < paired.length; _i++) {
+        if (!paired[_i]) {
+          matchFound = false;
+          break;
+        }
+      }
+
+      return matchFound;
+    }
+  }, {
+    key: "_ionValueEquals",
+    value: function _ionValueEquals(child, expectedChild, options) {
+      if (child.length !== expectedChild.length) {
+        return false;
+      }
+
+      for (var i = 0; i < child.length; i++) {
+        if (options.onlyCompareIon) {
+          if (!child[i].ionEquals(expectedChild[i], options)) {
+            return false;
+          }
+        } else {
+          if (!child[i].equals(expectedChild[i])) {
+            return false;
+          }
+        }
+      }
+
+      return true;
     }
   }], [{
     key: "_fromJsValue",
@@ -11521,7 +12135,7 @@ var Struct = /*#__PURE__*/function (_Value_1$Value) {
             key = _ref4[0],
             value = _ref4[1];
 
-        return [key, Value_1.Value.from(value)];
+        return [key, [Value_1.Value.from(value)]];
       });
       return new this(fields, annotations);
     }
@@ -11531,6 +12145,7 @@ var Struct = /*#__PURE__*/function (_Value_1$Value) {
 
 exports.Struct = Struct;
 
+}).call(this)}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"../Ion":4,"./FromJsConstructor":39,"./Value":51,"@babel/runtime/helpers/assertThisInitialized":60,"@babel/runtime/helpers/classCallCheck":61,"@babel/runtime/helpers/createClass":63,"@babel/runtime/helpers/getPrototypeOf":67,"@babel/runtime/helpers/inherits":68,"@babel/runtime/helpers/interopRequireDefault":69,"@babel/runtime/helpers/possibleConstructorReturn":76,"@babel/runtime/helpers/slicedToArray":78,"@babel/runtime/helpers/toConsumableArray":80,"@babel/runtime/helpers/typeof":81}],49:[function(require,module,exports){
 (function (global){(function (){
 "use strict";
@@ -11549,7 +12164,7 @@ var _getPrototypeOf2 = _interopRequireDefault(require("@babel/runtime/helpers/ge
 
 function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = (0, _getPrototypeOf2["default"])(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = (0, _getPrototypeOf2["default"])(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return (0, _possibleConstructorReturn2["default"])(this, result); }; }
 
-function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -11592,6 +12207,39 @@ var _Symbol = /*#__PURE__*/function (_Value_1$Value) {
       writer.setAnnotations(this.getAnnotations());
       writer.writeSymbol(this.stringValue());
     }
+  }, {
+    key: "_valueEquals",
+    value: function _valueEquals(other) {
+      var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {
+        epsilon: null,
+        ignoreAnnotations: false,
+        ignoreTimestampPrecision: false,
+        onlyCompareIon: true
+      };
+      var isSupportedType = false;
+      var valueToCompare = null;
+
+      if (other instanceof _Symbol) {
+        isSupportedType = true;
+        valueToCompare = other.stringValue();
+      } else if (!options.onlyCompareIon) {
+        if (typeof other === "string" || other instanceof global.String) {
+          isSupportedType = true;
+          valueToCompare = other.valueOf();
+        }
+      }
+
+      if (!isSupportedType) {
+        return false;
+      }
+
+      return this.compareValue(valueToCompare) === 0;
+    }
+  }, {
+    key: "compareValue",
+    value: function compareValue(expectedValue) {
+      return this.stringValue().localeCompare(expectedValue);
+    }
   }]);
   return _Symbol;
 }(Value_1.Value(String, Ion_1.IonTypes.SYMBOL, _fromJsConstructor));
@@ -11600,6 +12248,7 @@ exports.Symbol = _Symbol;
 
 }).call(this)}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"../Ion":4,"./FromJsConstructor":39,"./Value":51,"@babel/runtime/helpers/classCallCheck":61,"@babel/runtime/helpers/createClass":63,"@babel/runtime/helpers/getPrototypeOf":67,"@babel/runtime/helpers/inherits":68,"@babel/runtime/helpers/interopRequireDefault":69,"@babel/runtime/helpers/possibleConstructorReturn":76}],50:[function(require,module,exports){
+(function (global){(function (){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -11616,7 +12265,7 @@ var _getPrototypeOf2 = _interopRequireDefault(require("@babel/runtime/helpers/ge
 
 function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = (0, _getPrototypeOf2["default"])(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = (0, _getPrototypeOf2["default"])(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return (0, _possibleConstructorReturn2["default"])(this, result); }; }
 
-function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
 
 var __createBinding = void 0 && (void 0).__createBinding || (Object.create ? function (o, m, k, k2) {
   if (k2 === undefined) k2 = k;
@@ -11713,6 +12362,44 @@ var Timestamp = /*#__PURE__*/function (_Value_1$Value) {
       writer.setAnnotations(this.getAnnotations());
       writer.writeTimestamp(this.timestampValue());
     }
+  }, {
+    key: "_valueEquals",
+    value: function _valueEquals(other) {
+      var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {
+        epsilon: null,
+        ignoreAnnotations: false,
+        ignoreTimestampPrecision: false,
+        onlyCompareIon: true
+      };
+      var isSupportedType = false;
+      var valueToCompare = null;
+
+      if (other instanceof Timestamp) {
+        isSupportedType = true;
+        valueToCompare = other.timestampValue();
+      } else if (!options.onlyCompareIon) {
+        if (other instanceof ion.Timestamp) {
+          isSupportedType = true;
+          valueToCompare = other;
+        } else if (other instanceof global.Date) {
+          if (this.dateValue().getTime() === other.getTime()) {
+            return true;
+          } else {
+            return false;
+          }
+        }
+      }
+
+      if (!isSupportedType) {
+        return false;
+      }
+
+      if (options.ignoreTimestampPrecision) {
+        return this.timestampValue().compareTo(valueToCompare) === 0;
+      }
+
+      return this.timestampValue().equals(valueToCompare);
+    }
   }], [{
     key: "_timestampFromDate",
     value: function _timestampFromDate(date) {
@@ -11726,6 +12413,7 @@ var Timestamp = /*#__PURE__*/function (_Value_1$Value) {
 
 exports.Timestamp = Timestamp;
 
+}).call(this)}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"../Ion":4,"./FromJsConstructor":39,"./Value":51,"@babel/runtime/helpers/classCallCheck":61,"@babel/runtime/helpers/createClass":63,"@babel/runtime/helpers/getPrototypeOf":67,"@babel/runtime/helpers/inherits":68,"@babel/runtime/helpers/interopRequireDefault":69,"@babel/runtime/helpers/possibleConstructorReturn":76}],51:[function(require,module,exports){
 "use strict";
 
@@ -11745,7 +12433,7 @@ var _getPrototypeOf2 = _interopRequireDefault(require("@babel/runtime/helpers/ge
 
 function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = (0, _getPrototypeOf2["default"])(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = (0, _getPrototypeOf2["default"])(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return (0, _possibleConstructorReturn2["default"])(this, result); }; }
 
-function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
 
 var __createBinding = void 0 && (void 0).__createBinding || (Object.create ? function (o, m, k, k2) {
   if (k2 === undefined) k2 = k;
@@ -11899,6 +12587,11 @@ function Value(BaseClass, ionType, fromJsConstructor) {
         this._unsupportedOperation("fields");
       }
     }, {
+      key: "allFields",
+      value: function allFields() {
+        this._unsupportedOperation("allFields");
+      }
+    }, {
       key: "elements",
       value: function elements() {
         this._unsupportedOperation("elements");
@@ -11907,6 +12600,11 @@ function Value(BaseClass, ionType, fromJsConstructor) {
       key: "get",
       value: function get() {
         this._unsupportedOperation("get");
+      }
+    }, {
+      key: "getAll",
+      value: function getAll() {
+        this._unsupportedOperation("getAll");
       }
     }, {
       key: "as",
@@ -11926,6 +12624,75 @@ function Value(BaseClass, ionType, fromJsConstructor) {
       key: "deleteField",
       value: function deleteField(name) {
         this._unsupportedOperation("deleteField");
+      }
+    }, {
+      key: "_valueEquals",
+      value: function _valueEquals(other) {
+        var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {
+          epsilon: null,
+          ignoreAnnotations: false,
+          ignoreTimestampPrecision: false,
+          onlyCompareIon: true,
+          coerceNumericType: false
+        };
+
+        this._unsupportedOperation("_valueEquals");
+      }
+    }, {
+      key: "equals",
+      value: function equals(other) {
+        var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {
+          epsilon: null
+        };
+        var onlyCompareIon = false;
+
+        if (other instanceof Value) {
+          onlyCompareIon = true;
+        }
+
+        return this._valueEquals(other, {
+          onlyCompareIon: onlyCompareIon,
+          ignoreTimestampPrecision: true,
+          ignoreAnnotations: true,
+          epsilon: options.epsilon,
+          coerceNumericType: true
+        });
+      }
+    }, {
+      key: "ionEquals",
+      value: function ionEquals(other) {
+        var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {
+          epsilon: null,
+          ignoreAnnotations: false,
+          ignoreTimestampPrecision: false
+        };
+
+        if (!options.ignoreAnnotations) {
+          if (!(other instanceof Value)) {
+            return false;
+          }
+
+          var actualAnnotations = this.getAnnotations();
+          var expectedAnnotations = other.getAnnotations();
+
+          if (actualAnnotations.length !== expectedAnnotations.length) {
+            return false;
+          }
+
+          for (var i = 0; i < actualAnnotations.length; i++) {
+            if (actualAnnotations[i].localeCompare(expectedAnnotations[i]) !== 0) {
+              return false;
+            }
+          }
+        }
+
+        var ion_options = {
+          onlyCompareIon: true,
+          ignoreTimestampPrecision: options.ignoreTimestampPrecision,
+          epsilon: options.epsilon,
+          coerceNumericType: false
+        };
+        return this._valueEquals(other, ion_options);
       }
     }], [{
       key: "_getIonType",
@@ -12145,7 +12912,11 @@ function _loadStruct(reader) {
   reader.stepIn();
 
   while (reader.next()) {
-    children.set(reader.fieldName(), _loadValue(reader));
+    if (children.has(reader.fieldName())) {
+      children.get(reader.fieldName()).push(_loadValue(reader));
+    } else {
+      children.set(reader.fieldName(), [_loadValue(reader)]);
+    }
   }
 
   reader.stepOut();
@@ -12317,7 +13088,7 @@ var _wrapNativeSuper2 = _interopRequireDefault(require("@babel/runtime/helpers/w
 
 function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = (0, _getPrototypeOf2["default"])(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = (0, _getPrototypeOf2["default"])(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return (0, _possibleConstructorReturn2["default"])(this, result); }; }
 
-function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -12377,7 +13148,7 @@ var _createClass2 = _interopRequireDefault(require("@babel/runtime/helpers/creat
 
 function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = (0, _getPrototypeOf2["default"])(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = (0, _getPrototypeOf2["default"])(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return (0, _possibleConstructorReturn2["default"])(this, result); }; }
 
-function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
 
 var __importDefault = void 0 && (void 0).__importDefault || function (mod) {
   return mod && mod.__esModule ? mod : {
@@ -12726,8 +13497,13 @@ var IonIntEvent = /*#__PURE__*/function (_AbstractIonEvent2) {
   (0, _createClass2["default"])(IonIntEvent, [{
     key: "valueCompare",
     value: function valueCompare(expected) {
-      if (expected instanceof IonIntEvent && jsbi_1["default"].equal(this.ionValue, expected.ionValue)) {
-        return new ComparisonResult_1.ComparisonResult(ComparisonResult_2.ComparisonResultType.EQUAL);
+      if (expected instanceof IonIntEvent) {
+        var actualValue = this.ionValue instanceof jsbi_1["default"] ? this.ionValue : jsbi_1["default"].BigInt(this.ionValue);
+        var expectedValue = expected.ionValue instanceof jsbi_1["default"] ? expected.ionValue : jsbi_1["default"].BigInt(expected.ionValue);
+
+        if (jsbi_1["default"].equal(actualValue, expectedValue)) {
+          return new ComparisonResult_1.ComparisonResult(ComparisonResult_2.ComparisonResultType.EQUAL);
+        }
       }
 
       return new ComparisonResult_1.ComparisonResult(ComparisonResult_2.ComparisonResultType.NOT_EQUAL, this.ionValue + " vs. " + expected.ionValue);
@@ -13900,21 +14676,24 @@ function _arrayLikeToArray(arr, len) {
 }
 
 module.exports = _arrayLikeToArray;
+module.exports["default"] = module.exports, module.exports.__esModule = true;
 },{}],58:[function(require,module,exports){
 function _arrayWithHoles(arr) {
   if (Array.isArray(arr)) return arr;
 }
 
 module.exports = _arrayWithHoles;
+module.exports["default"] = module.exports, module.exports.__esModule = true;
 },{}],59:[function(require,module,exports){
-var arrayLikeToArray = require("./arrayLikeToArray");
+var arrayLikeToArray = require("./arrayLikeToArray.js");
 
 function _arrayWithoutHoles(arr) {
   if (Array.isArray(arr)) return arrayLikeToArray(arr);
 }
 
 module.exports = _arrayWithoutHoles;
-},{"./arrayLikeToArray":57}],60:[function(require,module,exports){
+module.exports["default"] = module.exports, module.exports.__esModule = true;
+},{"./arrayLikeToArray.js":57}],60:[function(require,module,exports){
 function _assertThisInitialized(self) {
   if (self === void 0) {
     throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
@@ -13924,6 +14703,7 @@ function _assertThisInitialized(self) {
 }
 
 module.exports = _assertThisInitialized;
+module.exports["default"] = module.exports, module.exports.__esModule = true;
 },{}],61:[function(require,module,exports){
 function _classCallCheck(instance, Constructor) {
   if (!(instance instanceof Constructor)) {
@@ -13932,14 +14712,16 @@ function _classCallCheck(instance, Constructor) {
 }
 
 module.exports = _classCallCheck;
+module.exports["default"] = module.exports, module.exports.__esModule = true;
 },{}],62:[function(require,module,exports){
-var setPrototypeOf = require("./setPrototypeOf");
+var setPrototypeOf = require("./setPrototypeOf.js");
 
-var isNativeReflectConstruct = require("./isNativeReflectConstruct");
+var isNativeReflectConstruct = require("./isNativeReflectConstruct.js");
 
 function _construct(Parent, args, Class) {
   if (isNativeReflectConstruct()) {
     module.exports = _construct = Reflect.construct;
+    module.exports["default"] = module.exports, module.exports.__esModule = true;
   } else {
     module.exports = _construct = function _construct(Parent, args, Class) {
       var a = [null];
@@ -13949,13 +14731,16 @@ function _construct(Parent, args, Class) {
       if (Class) setPrototypeOf(instance, Class.prototype);
       return instance;
     };
+
+    module.exports["default"] = module.exports, module.exports.__esModule = true;
   }
 
   return _construct.apply(null, arguments);
 }
 
 module.exports = _construct;
-},{"./isNativeReflectConstruct":71,"./setPrototypeOf":77}],63:[function(require,module,exports){
+module.exports["default"] = module.exports, module.exports.__esModule = true;
+},{"./isNativeReflectConstruct.js":71,"./setPrototypeOf.js":77}],63:[function(require,module,exports){
 function _defineProperties(target, props) {
   for (var i = 0; i < props.length; i++) {
     var descriptor = props[i];
@@ -13973,6 +14758,7 @@ function _createClass(Constructor, protoProps, staticProps) {
 }
 
 module.exports = _createClass;
+module.exports["default"] = module.exports, module.exports.__esModule = true;
 },{}],64:[function(require,module,exports){
 function _defineProperty(obj, key, value) {
   if (key in obj) {
@@ -13990,6 +14776,7 @@ function _defineProperty(obj, key, value) {
 }
 
 module.exports = _defineProperty;
+module.exports["default"] = module.exports, module.exports.__esModule = true;
 },{}],65:[function(require,module,exports){
 function _extends() {
   module.exports = _extends = Object.assign || function (target) {
@@ -14006,16 +14793,19 @@ function _extends() {
     return target;
   };
 
+  module.exports["default"] = module.exports, module.exports.__esModule = true;
   return _extends.apply(this, arguments);
 }
 
 module.exports = _extends;
+module.exports["default"] = module.exports, module.exports.__esModule = true;
 },{}],66:[function(require,module,exports){
-var superPropBase = require("./superPropBase");
+var superPropBase = require("./superPropBase.js");
 
 function _get(target, property, receiver) {
   if (typeof Reflect !== "undefined" && Reflect.get) {
     module.exports = _get = Reflect.get;
+    module.exports["default"] = module.exports, module.exports.__esModule = true;
   } else {
     module.exports = _get = function _get(target, property, receiver) {
       var base = superPropBase(target, property);
@@ -14028,23 +14818,28 @@ function _get(target, property, receiver) {
 
       return desc.value;
     };
+
+    module.exports["default"] = module.exports, module.exports.__esModule = true;
   }
 
   return _get(target, property, receiver || target);
 }
 
 module.exports = _get;
-},{"./superPropBase":79}],67:[function(require,module,exports){
+module.exports["default"] = module.exports, module.exports.__esModule = true;
+},{"./superPropBase.js":79}],67:[function(require,module,exports){
 function _getPrototypeOf(o) {
   module.exports = _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) {
     return o.__proto__ || Object.getPrototypeOf(o);
   };
+  module.exports["default"] = module.exports, module.exports.__esModule = true;
   return _getPrototypeOf(o);
 }
 
 module.exports = _getPrototypeOf;
+module.exports["default"] = module.exports, module.exports.__esModule = true;
 },{}],68:[function(require,module,exports){
-var setPrototypeOf = require("./setPrototypeOf");
+var setPrototypeOf = require("./setPrototypeOf.js");
 
 function _inherits(subClass, superClass) {
   if (typeof superClass !== "function" && superClass !== null) {
@@ -14062,7 +14857,8 @@ function _inherits(subClass, superClass) {
 }
 
 module.exports = _inherits;
-},{"./setPrototypeOf":77}],69:[function(require,module,exports){
+module.exports["default"] = module.exports, module.exports.__esModule = true;
+},{"./setPrototypeOf.js":77}],69:[function(require,module,exports){
 function _interopRequireDefault(obj) {
   return obj && obj.__esModule ? obj : {
     "default": obj
@@ -14070,12 +14866,14 @@ function _interopRequireDefault(obj) {
 }
 
 module.exports = _interopRequireDefault;
+module.exports["default"] = module.exports, module.exports.__esModule = true;
 },{}],70:[function(require,module,exports){
 function _isNativeFunction(fn) {
   return Function.toString.call(fn).indexOf("[native code]") !== -1;
 }
 
 module.exports = _isNativeFunction;
+module.exports["default"] = module.exports, module.exports.__esModule = true;
 },{}],71:[function(require,module,exports){
 function _isNativeReflectConstruct() {
   if (typeof Reflect === "undefined" || !Reflect.construct) return false;
@@ -14083,7 +14881,7 @@ function _isNativeReflectConstruct() {
   if (typeof Proxy === "function") return true;
 
   try {
-    Date.prototype.toString.call(Reflect.construct(Date, [], function () {}));
+    Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {}));
     return true;
   } catch (e) {
     return false;
@@ -14091,22 +14889,27 @@ function _isNativeReflectConstruct() {
 }
 
 module.exports = _isNativeReflectConstruct;
+module.exports["default"] = module.exports, module.exports.__esModule = true;
 },{}],72:[function(require,module,exports){
 function _iterableToArray(iter) {
-  if (typeof Symbol !== "undefined" && Symbol.iterator in Object(iter)) return Array.from(iter);
+  if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter);
 }
 
 module.exports = _iterableToArray;
+module.exports["default"] = module.exports, module.exports.__esModule = true;
 },{}],73:[function(require,module,exports){
 function _iterableToArrayLimit(arr, i) {
-  if (typeof Symbol === "undefined" || !(Symbol.iterator in Object(arr))) return;
+  var _i = arr && (typeof Symbol !== "undefined" && arr[Symbol.iterator] || arr["@@iterator"]);
+
+  if (_i == null) return;
   var _arr = [];
   var _n = true;
   var _d = false;
-  var _e = undefined;
+
+  var _s, _e;
 
   try {
-    for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) {
+    for (_i = _i.call(arr); !(_n = (_s = _i.next()).done); _n = true) {
       _arr.push(_s.value);
 
       if (i && _arr.length === i) break;
@@ -14126,22 +14929,25 @@ function _iterableToArrayLimit(arr, i) {
 }
 
 module.exports = _iterableToArrayLimit;
+module.exports["default"] = module.exports, module.exports.__esModule = true;
 },{}],74:[function(require,module,exports){
 function _nonIterableRest() {
   throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
 }
 
 module.exports = _nonIterableRest;
+module.exports["default"] = module.exports, module.exports.__esModule = true;
 },{}],75:[function(require,module,exports){
 function _nonIterableSpread() {
   throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
 }
 
 module.exports = _nonIterableSpread;
+module.exports["default"] = module.exports, module.exports.__esModule = true;
 },{}],76:[function(require,module,exports){
-var _typeof = require("@babel/runtime/helpers/typeof");
+var _typeof = require("@babel/runtime/helpers/typeof")["default"];
 
-var assertThisInitialized = require("./assertThisInitialized");
+var assertThisInitialized = require("./assertThisInitialized.js");
 
 function _possibleConstructorReturn(self, call) {
   if (call && (_typeof(call) === "object" || typeof call === "function")) {
@@ -14152,33 +14958,37 @@ function _possibleConstructorReturn(self, call) {
 }
 
 module.exports = _possibleConstructorReturn;
-},{"./assertThisInitialized":60,"@babel/runtime/helpers/typeof":81}],77:[function(require,module,exports){
+module.exports["default"] = module.exports, module.exports.__esModule = true;
+},{"./assertThisInitialized.js":60,"@babel/runtime/helpers/typeof":81}],77:[function(require,module,exports){
 function _setPrototypeOf(o, p) {
   module.exports = _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) {
     o.__proto__ = p;
     return o;
   };
 
+  module.exports["default"] = module.exports, module.exports.__esModule = true;
   return _setPrototypeOf(o, p);
 }
 
 module.exports = _setPrototypeOf;
+module.exports["default"] = module.exports, module.exports.__esModule = true;
 },{}],78:[function(require,module,exports){
-var arrayWithHoles = require("./arrayWithHoles");
+var arrayWithHoles = require("./arrayWithHoles.js");
 
-var iterableToArrayLimit = require("./iterableToArrayLimit");
+var iterableToArrayLimit = require("./iterableToArrayLimit.js");
 
-var unsupportedIterableToArray = require("./unsupportedIterableToArray");
+var unsupportedIterableToArray = require("./unsupportedIterableToArray.js");
 
-var nonIterableRest = require("./nonIterableRest");
+var nonIterableRest = require("./nonIterableRest.js");
 
 function _slicedToArray(arr, i) {
   return arrayWithHoles(arr) || iterableToArrayLimit(arr, i) || unsupportedIterableToArray(arr, i) || nonIterableRest();
 }
 
 module.exports = _slicedToArray;
-},{"./arrayWithHoles":58,"./iterableToArrayLimit":73,"./nonIterableRest":74,"./unsupportedIterableToArray":82}],79:[function(require,module,exports){
-var getPrototypeOf = require("./getPrototypeOf");
+module.exports["default"] = module.exports, module.exports.__esModule = true;
+},{"./arrayWithHoles.js":58,"./iterableToArrayLimit.js":73,"./nonIterableRest.js":74,"./unsupportedIterableToArray.js":82}],79:[function(require,module,exports){
+var getPrototypeOf = require("./getPrototypeOf.js");
 
 function _superPropBase(object, property) {
   while (!Object.prototype.hasOwnProperty.call(object, property)) {
@@ -14190,21 +15000,23 @@ function _superPropBase(object, property) {
 }
 
 module.exports = _superPropBase;
-},{"./getPrototypeOf":67}],80:[function(require,module,exports){
-var arrayWithoutHoles = require("./arrayWithoutHoles");
+module.exports["default"] = module.exports, module.exports.__esModule = true;
+},{"./getPrototypeOf.js":67}],80:[function(require,module,exports){
+var arrayWithoutHoles = require("./arrayWithoutHoles.js");
 
-var iterableToArray = require("./iterableToArray");
+var iterableToArray = require("./iterableToArray.js");
 
-var unsupportedIterableToArray = require("./unsupportedIterableToArray");
+var unsupportedIterableToArray = require("./unsupportedIterableToArray.js");
 
-var nonIterableSpread = require("./nonIterableSpread");
+var nonIterableSpread = require("./nonIterableSpread.js");
 
 function _toConsumableArray(arr) {
   return arrayWithoutHoles(arr) || iterableToArray(arr) || unsupportedIterableToArray(arr) || nonIterableSpread();
 }
 
 module.exports = _toConsumableArray;
-},{"./arrayWithoutHoles":59,"./iterableToArray":72,"./nonIterableSpread":75,"./unsupportedIterableToArray":82}],81:[function(require,module,exports){
+module.exports["default"] = module.exports, module.exports.__esModule = true;
+},{"./arrayWithoutHoles.js":59,"./iterableToArray.js":72,"./nonIterableSpread.js":75,"./unsupportedIterableToArray.js":82}],81:[function(require,module,exports){
 function _typeof(obj) {
   "@babel/helpers - typeof";
 
@@ -14212,18 +15024,23 @@ function _typeof(obj) {
     module.exports = _typeof = function _typeof(obj) {
       return typeof obj;
     };
+
+    module.exports["default"] = module.exports, module.exports.__esModule = true;
   } else {
     module.exports = _typeof = function _typeof(obj) {
       return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
     };
+
+    module.exports["default"] = module.exports, module.exports.__esModule = true;
   }
 
   return _typeof(obj);
 }
 
 module.exports = _typeof;
+module.exports["default"] = module.exports, module.exports.__esModule = true;
 },{}],82:[function(require,module,exports){
-var arrayLikeToArray = require("./arrayLikeToArray");
+var arrayLikeToArray = require("./arrayLikeToArray.js");
 
 function _unsupportedIterableToArray(o, minLen) {
   if (!o) return;
@@ -14235,14 +15052,15 @@ function _unsupportedIterableToArray(o, minLen) {
 }
 
 module.exports = _unsupportedIterableToArray;
-},{"./arrayLikeToArray":57}],83:[function(require,module,exports){
-var getPrototypeOf = require("./getPrototypeOf");
+module.exports["default"] = module.exports, module.exports.__esModule = true;
+},{"./arrayLikeToArray.js":57}],83:[function(require,module,exports){
+var getPrototypeOf = require("./getPrototypeOf.js");
 
-var setPrototypeOf = require("./setPrototypeOf");
+var setPrototypeOf = require("./setPrototypeOf.js");
 
-var isNativeFunction = require("./isNativeFunction");
+var isNativeFunction = require("./isNativeFunction.js");
 
-var construct = require("./construct");
+var construct = require("./construct.js");
 
 function _wrapNativeSuper(Class) {
   var _cache = typeof Map === "function" ? new Map() : undefined;
@@ -14275,11 +15093,13 @@ function _wrapNativeSuper(Class) {
     return setPrototypeOf(Wrapper, Class);
   };
 
+  module.exports["default"] = module.exports, module.exports.__esModule = true;
   return _wrapNativeSuper(Class);
 }
 
 module.exports = _wrapNativeSuper;
-},{"./construct":62,"./getPrototypeOf":67,"./isNativeFunction":70,"./setPrototypeOf":77}],84:[function(require,module,exports){
+module.exports["default"] = module.exports, module.exports.__esModule = true;
+},{"./construct.js":62,"./getPrototypeOf.js":67,"./isNativeFunction.js":70,"./setPrototypeOf.js":77}],84:[function(require,module,exports){
 (function(e,t){"object"==typeof exports&&"undefined"!=typeof module?module.exports=t():"function"==typeof define&&define.amd?define(t):(e=e||self,e.JSBI=t())})(this,function(){'use strict';function e(t){return e="function"==typeof Symbol&&"symbol"==typeof Symbol.iterator?function(e){return typeof e}:function(e){return e&&"function"==typeof Symbol&&e.constructor===Symbol&&e!==Symbol.prototype?"symbol":typeof e},e(t)}function t(e,t){if(!(e instanceof t))throw new TypeError("Cannot call a class as a function")}function i(e,t){for(var _,n=0;n<t.length;n++)_=t[n],_.enumerable=_.enumerable||!1,_.configurable=!0,"value"in _&&(_.writable=!0),Object.defineProperty(e,_.key,_)}function _(e,t,_){return t&&i(e.prototype,t),_&&i(e,_),e}function n(e,t){if("function"!=typeof t&&null!==t)throw new TypeError("Super expression must either be null or a function");e.prototype=Object.create(t&&t.prototype,{constructor:{value:e,writable:!0,configurable:!0}}),t&&l(e,t)}function g(e){return g=Object.setPrototypeOf?Object.getPrototypeOf:function(e){return e.__proto__||Object.getPrototypeOf(e)},g(e)}function l(e,t){return l=Object.setPrototypeOf||function(e,t){return e.__proto__=t,e},l(e,t)}function o(){if("undefined"==typeof Reflect||!Reflect.construct)return!1;if(Reflect.construct.sham)return!1;if("function"==typeof Proxy)return!0;try{return Date.prototype.toString.call(Reflect.construct(Date,[],function(){})),!0}catch(t){return!1}}function a(){return a=o()?Reflect.construct:function(e,t,i){var _=[null];_.push.apply(_,t);var n=Function.bind.apply(e,_),g=new n;return i&&l(g,i.prototype),g},a.apply(null,arguments)}function s(e){return-1!==Function.toString.call(e).indexOf("[native code]")}function u(e){var t="function"==typeof Map?new Map:void 0;return u=function(e){function i(){return a(e,arguments,g(this).constructor)}if(null===e||!s(e))return e;if("function"!=typeof e)throw new TypeError("Super expression must either be null or a function");if("undefined"!=typeof t){if(t.has(e))return t.get(e);t.set(e,i)}return i.prototype=Object.create(e.prototype,{constructor:{value:i,enumerable:!1,writable:!0,configurable:!0}}),l(i,e)},u(e)}function r(e){if(void 0===e)throw new ReferenceError("this hasn't been initialised - super() hasn't been called");return e}function d(e,t){return t&&("object"==typeof t||"function"==typeof t)?t:r(e)}var h=function(i){var o=Math.abs,a=Math.max,s=Math.imul,u=Math.clz32;function l(e,i){var _;if(t(this,l),e>l.__kMaxLength)throw new RangeError("Maximum BigInt size exceeded");return _=d(this,g(l).call(this,e)),_.sign=i,_}return n(l,i),_(l,[{key:"toDebugString",value:function(){var e=["BigInt["],t=!0,i=!1,_=void 0;try{for(var n,g,l=this[Symbol.iterator]();!(t=(n=l.next()).done);t=!0)g=n.value,e.push((g?(g>>>0).toString(16):g)+", ")}catch(e){i=!0,_=e}finally{try{t||null==l.return||l.return()}finally{if(i)throw _}}return e.push("]"),e.join("")}},{key:"toString",value:function(){var e=0<arguments.length&&void 0!==arguments[0]?arguments[0]:10;if(2>e||36<e)throw new RangeError("toString() radix argument must be between 2 and 36");return 0===this.length?"0":0==(e&e-1)?l.__toStringBasePowerOfTwo(this,e):l.__toStringGeneric(this,e,!1)}},{key:"__copy",value:function(){for(var e=new l(this.length,this.sign),t=0;t<this.length;t++)e[t]=this[t];return e}},{key:"__trim",value:function(){for(var e=this.length,t=this[e-1];0===t;)e--,t=this[e-1],this.pop();return 0===e&&(this.sign=!1),this}},{key:"__initializeDigits",value:function(){for(var e=0;e<this.length;e++)this[e]=0}},{key:"__clzmsd",value:function(){return u(this[this.length-1])}},{key:"__inplaceMultiplyAdd",value:function(e,t,_){_>this.length&&(_=this.length);for(var n=65535&e,g=e>>>16,l=0,o=65535&t,a=t>>>16,u=0;u<_;u++){var r=this.__digit(u),d=65535&r,h=r>>>16,b=s(d,n),m=s(d,g),c=s(h,n),v=s(h,g),y=o+(65535&b),f=a+l+(y>>>16)+(b>>>16)+(65535&m)+(65535&c);o=(m>>>16)+(c>>>16)+(65535&v)+(f>>>16),l=o>>>16,o&=65535,a=v>>>16;this.__setDigit(u,65535&y|f<<16)}if(0!==l||0!==o||0!==a)throw new Error("implementation bug")}},{key:"__inplaceAdd",value:function(e,t,_){for(var n,g=0,l=0;l<_;l++)n=this.__halfDigit(t+l)+e.__halfDigit(l)+g,g=n>>>16,this.__setHalfDigit(t+l,n);return g}},{key:"__inplaceSub",value:function(e,t,_){var n=0;if(1&t){t>>=1;for(var g=this.__digit(t),l=65535&g,o=0;o<_-1>>>1;o++){var a=e.__digit(o),s=(g>>>16)-(65535&a)-n;n=1&s>>>16,this.__setDigit(t+o,s<<16|65535&l),g=this.__digit(t+o+1),l=(65535&g)-(a>>>16)-n,n=1&l>>>16}var u=e.__digit(o),r=(g>>>16)-(65535&u)-n;n=1&r>>>16,this.__setDigit(t+o,r<<16|65535&l);if(t+o+1>=this.length)throw new RangeError("out of bounds");0==(1&_)&&(g=this.__digit(t+o+1),l=(65535&g)-(u>>>16)-n,n=1&l>>>16,this.__setDigit(t+e.length,4294901760&g|65535&l))}else{t>>=1;for(var d=0;d<e.length-1;d++){var h=this.__digit(t+d),b=e.__digit(d),m=(65535&h)-(65535&b)-n;n=1&m>>>16;var c=(h>>>16)-(b>>>16)-n;n=1&c>>>16,this.__setDigit(t+d,c<<16|65535&m)}var v=this.__digit(t+d),y=e.__digit(d),f=(65535&v)-(65535&y)-n;n=1&f>>>16;var k=0;0==(1&_)&&(k=(v>>>16)-(y>>>16)-n,n=1&k>>>16),this.__setDigit(t+d,k<<16|65535&f)}return n}},{key:"__inplaceRightShift",value:function(e){if(0!==e){for(var t,_=this.__digit(0)>>>e,n=this.length-1,g=0;g<n;g++)t=this.__digit(g+1),this.__setDigit(g,t<<32-e|_),_=t>>>e;this.__setDigit(n,_)}}},{key:"__digit",value:function(e){return this[e]}},{key:"__unsignedDigit",value:function(e){return this[e]>>>0}},{key:"__setDigit",value:function(e,t){this[e]=0|t}},{key:"__setDigitGrow",value:function(e,t){this[e]=0|t}},{key:"__halfDigitLength",value:function(){var e=this.length;return 65535>=this.__unsignedDigit(e-1)?2*e-1:2*e}},{key:"__halfDigit",value:function(e){return 65535&this[e>>>1]>>>((1&e)<<4)}},{key:"__setHalfDigit",value:function(e,t){var i=e>>>1,_=this.__digit(i),n=1&e?65535&_|t<<16:4294901760&_|65535&t;this.__setDigit(i,n)}}],[{key:"BigInt",value:function(t){var i=Math.floor,_=Number.isFinite;if("number"==typeof t){if(0===t)return l.__zero();if((0|t)===t)return 0>t?l.__oneDigit(-t,!0):l.__oneDigit(t,!1);if(!_(t)||i(t)!==t)throw new RangeError("The number "+t+" cannot be converted to BigInt because it is not an integer");return l.__fromDouble(t)}if("string"==typeof t){var n=l.__fromString(t);if(null===n)throw new SyntaxError("Cannot convert "+t+" to a BigInt");return n}if("boolean"==typeof t)return!0===t?l.__oneDigit(1,!1):l.__zero();if("object"===e(t)){if(t.constructor===l)return t;var g=l.__toPrimitive(t);return l.BigInt(g)}throw new TypeError("Cannot convert "+t+" to a BigInt")}},{key:"toNumber",value:function(e){var t=e.length;if(0===t)return 0;if(1===t){var i=e.__unsignedDigit(0);return e.sign?-i:i}var _=e.__digit(t-1),n=u(_),g=32*t-n;if(1024<g)return e.sign?-Infinity:1/0;var o=g-1,a=_,s=t-1,r=n+1,d=32===r?0:a<<r;d>>>=12;var h=r-12,b=12<=r?0:a<<20+r,m=20+r;0<h&&0<s&&(s--,a=e.__digit(s),d|=a>>>32-h,b=a<<h,m=h),0<m&&0<s&&(s--,a=e.__digit(s),b|=a>>>32-m,m-=32);var c=l.__decideRounding(e,m,s,a);if((1===c||0===c&&1==(1&b))&&(b=b+1>>>0,0===b&&(d++,0!=d>>>20&&(d=0,o++,1023<o))))return e.sign?-Infinity:1/0;var v=e.sign?-2147483648:0;return o=o+1023<<20,l.__kBitConversionInts[1]=v|o|d,l.__kBitConversionInts[0]=b,l.__kBitConversionDouble[0]}},{key:"unaryMinus",value:function(e){if(0===e.length)return e;var t=e.__copy();return t.sign=!e.sign,t}},{key:"bitwiseNot",value:function(e){return e.sign?l.__absoluteSubOne(e).__trim():l.__absoluteAddOne(e,!0)}},{key:"exponentiate",value:function(e,t){if(t.sign)throw new RangeError("Exponent must be positive");if(0===t.length)return l.__oneDigit(1,!1);if(0===e.length)return e;if(1===e.length&&1===e.__digit(0))return e.sign&&0==(1&t.__digit(0))?l.unaryMinus(e):e;if(1<t.length)throw new RangeError("BigInt too big");var i=t.__unsignedDigit(0);if(1===i)return e;if(i>=l.__kMaxLengthBits)throw new RangeError("BigInt too big");if(1===e.length&&2===e.__digit(0)){var _=1+(i>>>5),n=e.sign&&0!=(1&i),g=new l(_,n);g.__initializeDigits();var o=1<<(31&i);return g.__setDigit(_-1,o),g}var a=null,s=e;for(0!=(1&i)&&(a=e),i>>=1;0!==i;i>>=1)s=l.multiply(s,s),0!=(1&i)&&(null===a?a=s:a=l.multiply(a,s));return a}},{key:"multiply",value:function(e,t){if(0===e.length)return e;if(0===t.length)return t;var _=e.length+t.length;32<=e.__clzmsd()+t.__clzmsd()&&_--;var n=new l(_,e.sign!==t.sign);n.__initializeDigits();for(var g=0;g<e.length;g++)l.__multiplyAccumulate(t,e.__digit(g),n,g);return n.__trim()}},{key:"divide",value:function(e,t){if(0===t.length)throw new RangeError("Division by zero");if(0>l.__absoluteCompare(e,t))return l.__zero();var i,_=e.sign!==t.sign,n=t.__unsignedDigit(0);if(1===t.length&&65535>=n){if(1===n)return _===e.sign?e:l.unaryMinus(e);i=l.__absoluteDivSmall(e,n,null)}else i=l.__absoluteDivLarge(e,t,!0,!1);return i.sign=_,i.__trim()}},{key:"remainder",value:function e(t,i){if(0===i.length)throw new RangeError("Division by zero");if(0>l.__absoluteCompare(t,i))return t;var _=i.__unsignedDigit(0);if(1===i.length&&65535>=_){if(1===_)return l.__zero();var n=l.__absoluteModSmall(t,_);return 0===n?l.__zero():l.__oneDigit(n,t.sign)}var e=l.__absoluteDivLarge(t,i,!1,!0);return e.sign=t.sign,e.__trim()}},{key:"add",value:function(e,t){var i=e.sign;return i===t.sign?l.__absoluteAdd(e,t,i):0<=l.__absoluteCompare(e,t)?l.__absoluteSub(e,t,i):l.__absoluteSub(t,e,!i)}},{key:"subtract",value:function(e,t){var i=e.sign;return i===t.sign?0<=l.__absoluteCompare(e,t)?l.__absoluteSub(e,t,i):l.__absoluteSub(t,e,!i):l.__absoluteAdd(e,t,i)}},{key:"leftShift",value:function(e,t){return 0===t.length||0===e.length?e:t.sign?l.__rightShiftByAbsolute(e,t):l.__leftShiftByAbsolute(e,t)}},{key:"signedRightShift",value:function(e,t){return 0===t.length||0===e.length?e:t.sign?l.__leftShiftByAbsolute(e,t):l.__rightShiftByAbsolute(e,t)}},{key:"unsignedRightShift",value:function(){throw new TypeError("BigInts have no unsigned right shift; use >> instead")}},{key:"lessThan",value:function(e,t){return 0>l.__compareToBigInt(e,t)}},{key:"lessThanOrEqual",value:function(e,t){return 0>=l.__compareToBigInt(e,t)}},{key:"greaterThan",value:function(e,t){return 0<l.__compareToBigInt(e,t)}},{key:"greaterThanOrEqual",value:function(e,t){return 0<=l.__compareToBigInt(e,t)}},{key:"equal",value:function(e,t){if(e.sign!==t.sign)return!1;if(e.length!==t.length)return!1;for(var _=0;_<e.length;_++)if(e.__digit(_)!==t.__digit(_))return!1;return!0}},{key:"notEqual",value:function(e,t){return!l.equal(e,t)}},{key:"bitwiseAnd",value:function(e,t){if(!e.sign&&!t.sign)return l.__absoluteAnd(e,t).__trim();if(e.sign&&t.sign){var i=a(e.length,t.length)+1,_=l.__absoluteSubOne(e,i),n=l.__absoluteSubOne(t);return _=l.__absoluteOr(_,n,_),l.__absoluteAddOne(_,!0,_).__trim()}if(e.sign){var g=[t,e];e=g[0],t=g[1]}return l.__absoluteAndNot(e,l.__absoluteSubOne(t)).__trim()}},{key:"bitwiseXor",value:function(e,t){if(!e.sign&&!t.sign)return l.__absoluteXor(e,t).__trim();if(e.sign&&t.sign){var i=a(e.length,t.length),_=l.__absoluteSubOne(e,i),n=l.__absoluteSubOne(t);return l.__absoluteXor(_,n,_).__trim()}var g=a(e.length,t.length)+1;if(e.sign){var o=[t,e];e=o[0],t=o[1]}var s=l.__absoluteSubOne(t,g);return s=l.__absoluteXor(s,e,s),l.__absoluteAddOne(s,!0,s).__trim()}},{key:"bitwiseOr",value:function(e,t){var i=a(e.length,t.length);if(!e.sign&&!t.sign)return l.__absoluteOr(e,t).__trim();if(e.sign&&t.sign){var _=l.__absoluteSubOne(e,i),n=l.__absoluteSubOne(t);return _=l.__absoluteAnd(_,n,_),l.__absoluteAddOne(_,!0,_).__trim()}if(e.sign){var g=[t,e];e=g[0],t=g[1]}var o=l.__absoluteSubOne(t,i);return o=l.__absoluteAndNot(o,e,o),l.__absoluteAddOne(o,!0,o).__trim()}},{key:"asIntN",value:function(e,t){if(0===t.length)return t;if(0===e)return l.__zero();if(e>=l.__kMaxLengthBits)return t;var _=e+31>>>5;if(t.length<_)return t;var n=t.__unsignedDigit(_-1),g=1<<(31&e-1);if(t.length===_&&n<g)return t;if(!((n&g)===g))return l.__truncateToNBits(e,t);if(!t.sign)return l.__truncateAndSubFromPowerOfTwo(e,t,!0);if(0==(n&g-1)){for(var o=_-2;0<=o;o--)if(0!==t.__digit(o))return l.__truncateAndSubFromPowerOfTwo(e,t,!1);return t.length===_&&n===g?t:l.__truncateToNBits(e,t)}return l.__truncateAndSubFromPowerOfTwo(e,t,!1)}},{key:"asUintN",value:function(e,t){if(0===t.length)return t;if(0===e)return l.__zero();if(t.sign){if(e>l.__kMaxLengthBits)throw new RangeError("BigInt too big");return l.__truncateAndSubFromPowerOfTwo(e,t,!1)}if(e>=l.__kMaxLengthBits)return t;var i=e+31>>>5;if(t.length<i)return t;var _=31&e;if(t.length==i){if(0==_)return t;var n=t.__digit(i-1);if(0==n>>>_)return t}return l.__truncateToNBits(e,t)}},{key:"ADD",value:function(e,t){if(e=l.__toPrimitive(e),t=l.__toPrimitive(t),"string"==typeof e)return"string"!=typeof t&&(t=t.toString()),e+t;if("string"==typeof t)return e.toString()+t;if(e=l.__toNumeric(e),t=l.__toNumeric(t),l.__isBigInt(e)&&l.__isBigInt(t))return l.add(e,t);if("number"==typeof e&&"number"==typeof t)return e+t;throw new TypeError("Cannot mix BigInt and other types, use explicit conversions")}},{key:"LT",value:function(e,t){return l.__compare(e,t,0)}},{key:"LE",value:function(e,t){return l.__compare(e,t,1)}},{key:"GT",value:function(e,t){return l.__compare(e,t,2)}},{key:"GE",value:function(e,t){return l.__compare(e,t,3)}},{key:"EQ",value:function(t,i){for(;;){if(l.__isBigInt(t))return l.__isBigInt(i)?l.equal(t,i):l.EQ(i,t);if("number"==typeof t){if(l.__isBigInt(i))return l.__equalToNumber(i,t);if("object"!==e(i))return t==i;i=l.__toPrimitive(i)}else if("string"==typeof t){if(l.__isBigInt(i))return t=l.__fromString(t),null!==t&&l.equal(t,i);if("object"!==e(i))return t==i;i=l.__toPrimitive(i)}else if("boolean"==typeof t){if(l.__isBigInt(i))return l.__equalToNumber(i,+t);if("object"!==e(i))return t==i;i=l.__toPrimitive(i)}else if("symbol"===e(t)){if(l.__isBigInt(i))return!1;if("object"!==e(i))return t==i;i=l.__toPrimitive(i)}else if("object"===e(t)){if("object"===e(i)&&i.constructor!==l)return t==i;t=l.__toPrimitive(t)}else return t==i}}},{key:"NE",value:function(e,t){return!l.EQ(e,t)}},{key:"__zero",value:function(){return new l(0,!1)}},{key:"__oneDigit",value:function(e,t){var i=new l(1,t);return i.__setDigit(0,e),i}},{key:"__decideRounding",value:function(e,t,i,_){if(0<t)return-1;var n;if(0>t)n=-t-1;else{if(0===i)return-1;i--,_=e.__digit(i),n=31}var g=1<<n;if(0==(_&g))return-1;if(g-=1,0!=(_&g))return 1;for(;0<i;)if(i--,0!==e.__digit(i))return 1;return 0}},{key:"__fromDouble",value:function(e){l.__kBitConversionDouble[0]=e;var t,i=2047&l.__kBitConversionInts[1]>>>20,_=i-1023,n=(_>>>5)+1,g=new l(n,0>e),o=1048575&l.__kBitConversionInts[1]|1048576,a=l.__kBitConversionInts[0],s=20,u=31&_,r=0;if(u<s){var d=s-u;r=d+32,t=o>>>d,o=o<<32-d|a>>>d,a<<=32-d}else if(u===s)r=32,t=o,o=a;else{var h=u-s;r=32-h,t=o<<h|a>>>32-h,o=a<<h}g.__setDigit(n-1,t);for(var b=n-2;0<=b;b--)0<r?(r-=32,t=o,o=a):t=0,g.__setDigit(b,t);return g.__trim()}},{key:"__isWhitespace",value:function(e){return!!(13>=e&&9<=e)||(159>=e?32==e:131071>=e?160==e||5760==e:196607>=e?(e&=131071,10>=e||40==e||41==e||47==e||95==e||4096==e):65279==e)}},{key:"__fromString",value:function(e){var t=1<arguments.length&&void 0!==arguments[1]?arguments[1]:0,i=0,_=e.length,n=0;if(n===_)return l.__zero();for(var g=e.charCodeAt(n);l.__isWhitespace(g);){if(++n===_)return l.__zero();g=e.charCodeAt(n)}if(43===g){if(++n===_)return null;g=e.charCodeAt(n),i=1}else if(45===g){if(++n===_)return null;g=e.charCodeAt(n),i=-1}if(0===t){if(t=10,48===g){if(++n===_)return l.__zero();if(g=e.charCodeAt(n),88===g||120===g){if(t=16,++n===_)return null;g=e.charCodeAt(n)}else if(79===g||111===g){if(t=8,++n===_)return null;g=e.charCodeAt(n)}else if(66===g||98===g){if(t=2,++n===_)return null;g=e.charCodeAt(n)}}}else if(16===t&&48===g){if(++n===_)return l.__zero();if(g=e.charCodeAt(n),88===g||120===g){if(++n===_)return null;g=e.charCodeAt(n)}}for(;48===g;){if(++n===_)return l.__zero();g=e.charCodeAt(n)}var o=_-n,a=l.__kMaxBitsPerChar[t],s=l.__kBitsPerCharTableMultiplier-1;if(o>1073741824/a)return null;var u=a*o+s>>>l.__kBitsPerCharTableShift,r=new l(u+31>>>5,!1),h=10>t?t:10,b=10<t?t-10:0;if(0==(t&t-1)){a>>=l.__kBitsPerCharTableShift;var c=[],v=[],y=!1;do{for(var f,k=0,D=0;;){if(f=void 0,g-48>>>0<h)f=g-48;else if((32|g)-97>>>0<b)f=(32|g)-87;else{y=!0;break}if(D+=a,k=k<<a|f,++n===_){y=!0;break}if(g=e.charCodeAt(n),32<D+a)break}c.push(k),v.push(D)}while(!y);l.__fillFromParts(r,c,v)}else{r.__initializeDigits();var p=!1,B=0;do{for(var S,C=0,A=1;;){if(S=void 0,g-48>>>0<h)S=g-48;else if((32|g)-97>>>0<b)S=(32|g)-87;else{p=!0;break}var T=A*t;if(4294967295<T)break;if(A=T,C=C*t+S,B++,++n===_){p=!0;break}g=e.charCodeAt(n)}s=32*l.__kBitsPerCharTableMultiplier-1;var m=a*B+s>>>l.__kBitsPerCharTableShift+5;r.__inplaceMultiplyAdd(A,C,m)}while(!p)}for(;n!==_;){if(!l.__isWhitespace(g))return null;g=e.charCodeAt(n++)}return 0!==i&&10!==t?null:(r.sign=-1===i,r.__trim())}},{key:"__fillFromParts",value:function(e,t,_){for(var n=0,g=0,l=0,o=t.length-1;0<=o;o--){var a=t[o],s=_[o];g|=a<<l,l+=s,32===l?(e.__setDigit(n++,g),l=0,g=0):32<l&&(e.__setDigit(n++,g),l-=32,g=a>>>s-l)}if(0!==g){if(n>=e.length)throw new Error("implementation bug");e.__setDigit(n++,g)}for(;n<e.length;n++)e.__setDigit(n,0)}},{key:"__toStringBasePowerOfTwo",value:function(e,t){var _=e.length,n=t-1;n=(85&n>>>1)+(85&n),n=(51&n>>>2)+(51&n),n=(15&n>>>4)+(15&n);var g=n,o=t-1,a=e.__digit(_-1),s=u(a),r=0|(32*_-s+g-1)/g;if(e.sign&&r++,268435456<r)throw new Error("string too long");for(var d=Array(r),h=r-1,b=0,m=0,c=0;c<_-1;c++){var v=e.__digit(c),y=(b|v<<m)&o;d[h--]=l.__kConversionChars[y];var f=g-m;for(b=v>>>f,m=32-f;m>=g;)d[h--]=l.__kConversionChars[b&o],b>>>=g,m-=g}var k=(b|a<<m)&o;for(d[h--]=l.__kConversionChars[k],b=a>>>g-m;0!==b;)d[h--]=l.__kConversionChars[b&o],b>>>=g;if(e.sign&&(d[h--]="-"),-1!==h)throw new Error("implementation bug");return d.join("")}},{key:"__toStringGeneric",value:function(e,t,_){var n=e.length;if(0===n)return"";if(1===n){var g=e.__unsignedDigit(0).toString(t);return!1===_&&e.sign&&(g="-"+g),g}var o=32*n-u(e.__digit(n-1)),a=l.__kMaxBitsPerChar[t],s=a-1,r=o*l.__kBitsPerCharTableMultiplier;r+=s-1,r=0|r/s;var d,h,b=r+1>>1,m=l.exponentiate(l.__oneDigit(t,!1),l.__oneDigit(b,!1)),c=m.__unsignedDigit(0);if(1===m.length&&65535>=c){d=new l(e.length,!1),d.__initializeDigits();for(var v,y=0,f=2*e.length-1;0<=f;f--)v=y<<16|e.__halfDigit(f),d.__setHalfDigit(f,0|v/c),y=0|v%c;h=y.toString(t)}else{var k=l.__absoluteDivLarge(e,m,!0,!0);d=k.quotient;var D=k.remainder.__trim();h=l.__toStringGeneric(D,t,!0)}d.__trim();for(var p=l.__toStringGeneric(d,t,!0);h.length<b;)h="0"+h;return!1===_&&e.sign&&(p="-"+p),p+h}},{key:"__unequalSign",value:function(e){return e?-1:1}},{key:"__absoluteGreater",value:function(e){return e?-1:1}},{key:"__absoluteLess",value:function(e){return e?1:-1}},{key:"__compareToBigInt",value:function(e,t){var i=e.sign;if(i!==t.sign)return l.__unequalSign(i);var _=l.__absoluteCompare(e,t);return 0<_?l.__absoluteGreater(i):0>_?l.__absoluteLess(i):0}},{key:"__compareToNumber",value:function(e,t){if(!0|t){var i=e.sign,_=0>t;if(i!==_)return l.__unequalSign(i);if(0===e.length){if(_)throw new Error("implementation bug");return 0===t?0:-1}if(1<e.length)return l.__absoluteGreater(i);var n=o(t),g=e.__unsignedDigit(0);return g>n?l.__absoluteGreater(i):g<n?l.__absoluteLess(i):0}return l.__compareToDouble(e,t)}},{key:"__compareToDouble",value:function(e,t){if(t!==t)return t;if(t===1/0)return-1;if(t===-Infinity)return 1;var i=e.sign;if(i!==0>t)return l.__unequalSign(i);if(0===t)throw new Error("implementation bug: should be handled elsewhere");if(0===e.length)return-1;l.__kBitConversionDouble[0]=t;var _=2047&l.__kBitConversionInts[1]>>>20;if(2047==_)throw new Error("implementation bug: handled elsewhere");var n=_-1023;if(0>n)return l.__absoluteGreater(i);var g=e.length,o=e.__digit(g-1),a=u(o),s=32*g-a,r=n+1;if(s<r)return l.__absoluteLess(i);if(s>r)return l.__absoluteGreater(i);var d=1048576|1048575&l.__kBitConversionInts[1],h=l.__kBitConversionInts[0],b=20,m=31-a;if(m!==(s-1)%31)throw new Error("implementation bug");var c,v=0;if(m<b){var y=b-m;v=y+32,c=d>>>y,d=d<<32-y|h>>>y,h<<=32-y}else if(m===b)v=32,c=d,d=h;else{var f=m-b;v=32-f,c=d<<f|h>>>32-f,d=h<<f}if(o>>>=0,c>>>=0,o>c)return l.__absoluteGreater(i);if(o<c)return l.__absoluteLess(i);for(var k=g-2;0<=k;k--){0<v?(v-=32,c=d>>>0,d=h,h=0):c=0;var D=e.__unsignedDigit(k);if(D>c)return l.__absoluteGreater(i);if(D<c)return l.__absoluteLess(i)}if(0!==d||0!==h){if(0===v)throw new Error("implementation bug");return l.__absoluteLess(i)}return 0}},{key:"__equalToNumber",value:function(e,t){return t|0===t?0===t?0===e.length:1===e.length&&e.sign===0>t&&e.__unsignedDigit(0)===o(t):0===l.__compareToDouble(e,t)}},{key:"__comparisonResultToBool",value:function(e,t){switch(t){case 0:return 0>e;case 1:return 0>=e;case 2:return 0<e;case 3:return 0<=e;}throw new Error("unreachable")}},{key:"__compare",value:function(e,t,i){if(e=l.__toPrimitive(e),t=l.__toPrimitive(t),"string"==typeof e&&"string"==typeof t)switch(i){case 0:return e<t;case 1:return e<=t;case 2:return e>t;case 3:return e>=t;}if(l.__isBigInt(e)&&"string"==typeof t)return t=l.__fromString(t),null!==t&&l.__comparisonResultToBool(l.__compareToBigInt(e,t),i);if("string"==typeof e&&l.__isBigInt(t))return e=l.__fromString(e),null!==e&&l.__comparisonResultToBool(l.__compareToBigInt(e,t),i);if(e=l.__toNumeric(e),t=l.__toNumeric(t),l.__isBigInt(e)){if(l.__isBigInt(t))return l.__comparisonResultToBool(l.__compareToBigInt(e,t),i);if("number"!=typeof t)throw new Error("implementation bug");return l.__comparisonResultToBool(l.__compareToNumber(e,t),i)}if("number"!=typeof e)throw new Error("implementation bug");if(l.__isBigInt(t))return l.__comparisonResultToBool(l.__compareToNumber(t,e),2^i);if("number"!=typeof t)throw new Error("implementation bug");return 0===i?e<t:1===i?e<=t:2===i?e>t:3===i?e>=t:void 0}},{key:"__absoluteAdd",value:function(e,t,_){if(e.length<t.length)return l.__absoluteAdd(t,e,_);if(0===e.length)return e;if(0===t.length)return e.sign===_?e:l.unaryMinus(e);var n=e.length;(0===e.__clzmsd()||t.length===e.length&&0===t.__clzmsd())&&n++;for(var g=new l(n,_),o=0,a=0;a<t.length;a++){var s=t.__digit(a),u=e.__digit(a),r=(65535&u)+(65535&s)+o,d=(u>>>16)+(s>>>16)+(r>>>16);o=d>>>16,g.__setDigit(a,65535&r|d<<16)}for(;a<e.length;a++){var h=e.__digit(a),b=(65535&h)+o,m=(h>>>16)+(b>>>16);o=m>>>16,g.__setDigit(a,65535&b|m<<16)}return a<g.length&&g.__setDigit(a,o),g.__trim()}},{key:"__absoluteSub",value:function(e,t,_){if(0===e.length)return e;if(0===t.length)return e.sign===_?e:l.unaryMinus(e);for(var n=new l(e.length,_),g=0,o=0;o<t.length;o++){var a=e.__digit(o),s=t.__digit(o),u=(65535&a)-(65535&s)-g;g=1&u>>>16;var r=(a>>>16)-(s>>>16)-g;g=1&r>>>16,n.__setDigit(o,65535&u|r<<16)}for(;o<e.length;o++){var d=e.__digit(o),h=(65535&d)-g;g=1&h>>>16;var b=(d>>>16)-g;g=1&b>>>16,n.__setDigit(o,65535&h|b<<16)}return n.__trim()}},{key:"__absoluteAddOne",value:function(e,t){var _=2<arguments.length&&void 0!==arguments[2]?arguments[2]:null,n=e.length;null===_?_=new l(n,t):_.sign=t;for(var g=!0,o=0;o<n;o++){var a=e.__digit(o),s=-1===a;g&&(a=0|a+1),g=s,_.__setDigit(o,a)}return g&&_.__setDigitGrow(n,1),_}},{key:"__absoluteSubOne",value:function(e,t){var _=e.length;t=t||_;for(var n=new l(t,!1),g=!0,o=0;o<_;o++){var a=e.__digit(o),s=0===a;g&&(a=0|a-1),g=s,n.__setDigit(o,a)}for(var u=_;u<t;u++)n.__setDigit(u,0);return n}},{key:"__absoluteAnd",value:function(e,t){var _=2<arguments.length&&void 0!==arguments[2]?arguments[2]:null,n=e.length,g=t.length,o=g;if(n<g){o=n;var a=e,s=n;e=t,n=g,t=a,g=s}var u=o;null===_?_=new l(u,!1):u=_.length;for(var r=0;r<o;r++)_.__setDigit(r,e.__digit(r)&t.__digit(r));for(;r<u;r++)_.__setDigit(r,0);return _}},{key:"__absoluteAndNot",value:function(e,t){var _=2<arguments.length&&void 0!==arguments[2]?arguments[2]:null,n=e.length,g=t.length,o=g;n<g&&(o=n);var a=n;null===_?_=new l(a,!1):a=_.length;for(var s=0;s<o;s++)_.__setDigit(s,e.__digit(s)&~t.__digit(s));for(;s<n;s++)_.__setDigit(s,e.__digit(s));for(;s<a;s++)_.__setDigit(s,0);return _}},{key:"__absoluteOr",value:function(e,t){var _=2<arguments.length&&void 0!==arguments[2]?arguments[2]:null,n=e.length,g=t.length,o=g;if(n<g){o=n;var a=e,s=n;e=t,n=g,t=a,g=s}var u=n;null===_?_=new l(u,!1):u=_.length;for(var r=0;r<o;r++)_.__setDigit(r,e.__digit(r)|t.__digit(r));for(;r<n;r++)_.__setDigit(r,e.__digit(r));for(;r<u;r++)_.__setDigit(r,0);return _}},{key:"__absoluteXor",value:function(e,t){var _=2<arguments.length&&void 0!==arguments[2]?arguments[2]:null,n=e.length,g=t.length,o=g;if(n<g){o=n;var a=e,s=n;e=t,n=g,t=a,g=s}var u=n;null===_?_=new l(u,!1):u=_.length;for(var r=0;r<o;r++)_.__setDigit(r,e.__digit(r)^t.__digit(r));for(;r<n;r++)_.__setDigit(r,e.__digit(r));for(;r<u;r++)_.__setDigit(r,0);return _}},{key:"__absoluteCompare",value:function(e,t){var _=e.length-t.length;if(0!=_)return _;for(var n=e.length-1;0<=n&&e.__digit(n)===t.__digit(n);)n--;return 0>n?0:e.__unsignedDigit(n)>t.__unsignedDigit(n)?1:-1}},{key:"__multiplyAccumulate",value:function(e,t,_,n){if(0!==t){for(var g=65535&t,l=t>>>16,o=0,a=0,u=0,r=0;r<e.length;r++,n++){var d=_.__digit(n),h=65535&d,b=d>>>16,m=e.__digit(r),c=65535&m,v=m>>>16,y=s(c,g),f=s(c,l),k=s(v,g),D=s(v,l);h+=a+(65535&y),b+=u+o+(h>>>16)+(y>>>16)+(65535&f)+(65535&k),o=b>>>16,a=(f>>>16)+(k>>>16)+(65535&D)+o,o=a>>>16,a&=65535,u=D>>>16,d=65535&h|b<<16,_.__setDigit(n,d)}for(;0!==o||0!==a||0!==u;n++){var p=_.__digit(n),B=(65535&p)+a,S=(p>>>16)+(B>>>16)+u+o;a=0,u=0,o=S>>>16,p=65535&B|S<<16,_.__setDigit(n,p)}}}},{key:"__internalMultiplyAdd",value:function(e,t,_,g,l){for(var o=_,a=0,u=0;u<g;u++){var r=e.__digit(u),d=s(65535&r,t),h=(65535&d)+a+o;o=h>>>16;var b=s(r>>>16,t),m=(65535&b)+(d>>>16)+o;o=m>>>16,a=b>>>16,l.__setDigit(u,m<<16|65535&h)}if(l.length>g)for(l.__setDigit(g++,o+a);g<l.length;)l.__setDigit(g++,0);else if(0!==o+a)throw new Error("implementation bug")}},{key:"__absoluteDivSmall",value:function(e,t,_){null===_&&(_=new l(e.length,!1));for(var n=0,g=2*e.length-1;0<=g;g-=2){var o=(n<<16|e.__halfDigit(g))>>>0,a=0|o/t;n=0|o%t,o=(n<<16|e.__halfDigit(g-1))>>>0;var s=0|o/t;n=0|o%t,_.__setDigit(g>>>1,a<<16|s)}return _}},{key:"__absoluteModSmall",value:function(e,t){for(var _,n=0,g=2*e.length-1;0<=g;g--)_=(n<<16|e.__halfDigit(g))>>>0,n=0|_%t;return n}},{key:"__absoluteDivLarge",value:function(e,t,i,_){var g=t.__halfDigitLength(),n=t.length,o=e.__halfDigitLength()-g,a=null;i&&(a=new l(o+2>>>1,!1),a.__initializeDigits());var r=new l(g+2>>>1,!1);r.__initializeDigits();var d=l.__clz16(t.__halfDigit(g-1));0<d&&(t=l.__specialLeftShift(t,d,0));for(var h=l.__specialLeftShift(e,d,1),u=t.__halfDigit(g-1),b=0,m=o;0<=m;m--){var v=65535,y=h.__halfDigit(m+g);if(y!==u){var f=(y<<16|h.__halfDigit(m+g-1))>>>0;v=0|f/u;for(var k=0|f%u,D=t.__halfDigit(g-2),p=h.__halfDigit(m+g-2);s(v,D)>>>0>(k<<16|p)>>>0&&(v--,k+=u,!(65535<k)););}l.__internalMultiplyAdd(t,v,0,n,r);var B=h.__inplaceSub(r,m,g+1);0!==B&&(B=h.__inplaceAdd(t,m,g),h.__setHalfDigit(m+g,h.__halfDigit(m+g)+B),v--),i&&(1&m?b=v<<16:a.__setDigit(m>>>1,b|v))}return _?(h.__inplaceRightShift(d),i?{quotient:a,remainder:h}:h):i?a:void 0}},{key:"__clz16",value:function(e){return u(e)-16}},{key:"__specialLeftShift",value:function(e,t,_){var g=e.length,n=new l(g+_,!1);if(0===t){for(var o=0;o<g;o++)n.__setDigit(o,e.__digit(o));return 0<_&&n.__setDigit(g,0),n}for(var a,s=0,u=0;u<g;u++)a=e.__digit(u),n.__setDigit(u,a<<t|s),s=a>>>32-t;return 0<_&&n.__setDigit(g,s),n}},{key:"__leftShiftByAbsolute",value:function(e,t){var _=l.__toShiftAmount(t);if(0>_)throw new RangeError("BigInt too big");var n=_>>>5,g=31&_,o=e.length,a=0!==g&&0!=e.__digit(o-1)>>>32-g,s=o+n+(a?1:0),u=new l(s,e.sign);if(0===g){for(var r=0;r<n;r++)u.__setDigit(r,0);for(;r<s;r++)u.__setDigit(r,e.__digit(r-n))}else{for(var h=0,b=0;b<n;b++)u.__setDigit(b,0);for(var m,c=0;c<o;c++)m=e.__digit(c),u.__setDigit(c+n,m<<g|h),h=m>>>32-g;if(a)u.__setDigit(o+n,h);else if(0!==h)throw new Error("implementation bug")}return u.__trim()}},{key:"__rightShiftByAbsolute",value:function(e,t){var _=e.length,n=e.sign,g=l.__toShiftAmount(t);if(0>g)return l.__rightShiftByMaximum(n);var o=g>>>5,a=31&g,s=_-o;if(0>=s)return l.__rightShiftByMaximum(n);var u=!1;if(n){if(0!=(e.__digit(o)&(1<<a)-1))u=!0;else for(var r=0;r<o;r++)if(0!==e.__digit(r)){u=!0;break}}if(u&&0===a){var h=e.__digit(_-1);0==~h&&s++}var b=new l(s,n);if(0===a)for(var m=o;m<_;m++)b.__setDigit(m-o,e.__digit(m));else{for(var c,v=e.__digit(o)>>>a,y=_-o-1,f=0;f<y;f++)c=e.__digit(f+o+1),b.__setDigit(f,c<<32-a|v),v=c>>>a;b.__setDigit(y,v)}return u&&(b=l.__absoluteAddOne(b,!0,b)),b.__trim()}},{key:"__rightShiftByMaximum",value:function(e){return e?l.__oneDigit(1,!0):l.__zero()}},{key:"__toShiftAmount",value:function(e){if(1<e.length)return-1;var t=e.__unsignedDigit(0);return t>l.__kMaxLengthBits?-1:t}},{key:"__toPrimitive",value:function(t){var i=1<arguments.length&&void 0!==arguments[1]?arguments[1]:"default";if("object"!==e(t))return t;if(t.constructor===l)return t;var _=t[Symbol.toPrimitive];if(_){var n=_(i);if("object"!==e(n))return n;throw new TypeError("Cannot convert object to primitive value")}var g=t.valueOf;if(g){var o=g.call(t);if("object"!==e(o))return o}var a=t.toString;if(a){var s=a.call(t);if("object"!==e(s))return s}throw new TypeError("Cannot convert object to primitive value")}},{key:"__toNumeric",value:function(e){return l.__isBigInt(e)?e:+e}},{key:"__isBigInt",value:function(t){return"object"===e(t)&&t.constructor===l}},{key:"__truncateToNBits",value:function(e,t){for(var _=e+31>>>5,n=new l(_,t.sign),g=_-1,o=0;o<g;o++)n.__setDigit(o,t.__digit(o));var a=t.__digit(g);if(0!=(31&e)){var s=32-(31&e);a=a<<s>>>s}return n.__setDigit(g,a),n.__trim()}},{key:"__truncateAndSubFromPowerOfTwo",value:function(e,t,_){for(var n=Math.min,g=e+31>>>5,o=new l(g,_),a=0,s=g-1,u=0,r=n(s,t.length);a<r;a++){var d=t.__digit(a),h=0-(65535&d)-u;u=1&h>>>16;var b=0-(d>>>16)-u;u=1&b>>>16,o.__setDigit(a,65535&h|b<<16)}for(;a<s;a++)o.__setDigit(a,0|-u);var m,c=s<t.length?t.__digit(s):0,v=31&e;if(0===v){var y=0-(65535&c)-u;u=1&y>>>16;var f=0-(c>>>16)-u;m=65535&y|f<<16}else{var k=32-v;c=c<<k>>>k;var D=1<<32-k,p=(65535&D)-(65535&c)-u;u=1&p>>>16;var B=(D>>>16)-(c>>>16)-u;m=65535&p|B<<16,m&=D-1}return o.__setDigit(s,m),o.__trim()}},{key:"__digitPow",value:function(e,t){for(var i=1;0<t;)1&t&&(i*=e),t>>>=1,e*=e;return i}}]),l}(u(Array));return h.__kMaxLength=33554432,h.__kMaxLengthBits=h.__kMaxLength<<5,h.__kMaxBitsPerChar=[0,0,32,51,64,75,83,90,96,102,107,111,115,119,122,126,128,131,134,136,139,141,143,145,147,149,151,153,154,156,158,159,160,162,163,165,166],h.__kBitsPerCharTableShift=5,h.__kBitsPerCharTableMultiplier=1<<h.__kBitsPerCharTableShift,h.__kConversionChars=["0","1","2","3","4","5","6","7","8","9","a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z"],h.__kBitConversionBuffer=new ArrayBuffer(8),h.__kBitConversionDouble=new Float64Array(h.__kBitConversionBuffer),h.__kBitConversionInts=new Int32Array(h.__kBitConversionBuffer),h});
 
 },{}]},{},[4])(4)

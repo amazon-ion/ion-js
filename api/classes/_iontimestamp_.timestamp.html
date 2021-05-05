@@ -116,13 +116,40 @@
 					<a name="constructor" class="tsd-anchor"></a>
 					<h3>constructor</h3>
 					<ul class="tsd-signatures tsd-kind-constructor tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">new <wbr>Timestamp<span class="tsd-signature-symbol">(</span>date<span class="tsd-signature-symbol">: </span><a href="_dom_timestamp_.timestamp.html#date" class="tsd-signature-type">Date</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_iontimestamp_.timestamp.html" class="tsd-signature-type">Timestamp</a></li>
 						<li class="tsd-signature tsd-kind-icon">new <wbr>Timestamp<span class="tsd-signature-symbol">(</span>localOffset<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, year<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, month<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span>, day<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span>, hour<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span>, minutes<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span>, seconds<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> | </span><a href="_iondecimal_.decimal.html" class="tsd-signature-type">Decimal</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_iontimestamp_.timestamp.html" class="tsd-signature-type">Timestamp</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/b358e06/src/IonTimestamp.ts#L53">src/IonTimestamp.ts:53</a></li>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/24e2dfa/src/IonTimestamp.ts#L53">src/IonTimestamp.ts:53</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Creates a new Ion Timestamp with millisecond precision from a JavaScript Date.</p>
+								</div>
+								<p>Logically, an instance of this class represents an instant in time based on
+								an offset from UTC and the other provided parameters.</p>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>date: <a href="_dom_timestamp_.timestamp.html#date" class="tsd-signature-type">Date</a></h5>
+									<div class="tsd-comment tsd-typography">
+										<div class="lead">
+											<p>a valid JavaScript date object</p>
+										</div>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="_iontimestamp_.timestamp.html" class="tsd-signature-type">Timestamp</a></h4>
+						</li>
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/24e2dfa/src/IonTimestamp.ts#L59">src/IonTimestamp.ts:59</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -153,7 +180,7 @@
 									</div>
 								</li>
 								<li>
-									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> month: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span><span class="tsd-signature-symbol"> = null</span></h5>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> month: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span></h5>
 									<div class="tsd-comment tsd-typography">
 										<div class="lead">
 											<p>the month (range: [1-12])</p>
@@ -161,7 +188,7 @@
 									</div>
 								</li>
 								<li>
-									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> day: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span><span class="tsd-signature-symbol"> = null</span></h5>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> day: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span></h5>
 									<div class="tsd-comment tsd-typography">
 										<div class="lead">
 											<p>the day of the month (range: [1-31])</p>
@@ -169,7 +196,7 @@
 									</div>
 								</li>
 								<li>
-									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> hour: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span><span class="tsd-signature-symbol"> = null</span></h5>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> hour: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span></h5>
 									<div class="tsd-comment tsd-typography">
 										<div class="lead">
 											<p>the hour of the day (range: [0-23])</p>
@@ -177,7 +204,7 @@
 									</div>
 								</li>
 								<li>
-									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> minutes: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span><span class="tsd-signature-symbol"> = null</span></h5>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> minutes: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span></h5>
 									<div class="tsd-comment tsd-typography">
 										<div class="lead">
 											<p>number of minutes (range: [0-59])</p>
@@ -185,7 +212,7 @@
 									</div>
 								</li>
 								<li>
-									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> seconds: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> | </span><a href="_iondecimal_.decimal.html" class="tsd-signature-type">Decimal</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span><span class="tsd-signature-symbol"> = null</span></h5>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> seconds: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> | </span><a href="_iondecimal_.decimal.html" class="tsd-signature-type">Decimal</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span></h5>
 									<div class="tsd-comment tsd-typography">
 										<div class="lead">
 											<p>number of seconds specified as a number (range: [0-59]),
@@ -212,7 +239,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/b358e06/src/IonTimestamp.ts#L430">src/IonTimestamp.ts:430</a></li>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/24e2dfa/src/IonTimestamp.ts#L474">src/IonTimestamp.ts:474</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -290,7 +317,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/b358e06/src/IonTimestamp.ts#L403">src/IonTimestamp.ts:403</a></li>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/24e2dfa/src/IonTimestamp.ts#L447">src/IonTimestamp.ts:447</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -320,7 +347,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/b358e06/src/IonTimestamp.ts#L343">src/IonTimestamp.ts:343</a></li>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/24e2dfa/src/IonTimestamp.ts#L387">src/IonTimestamp.ts:387</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -355,7 +382,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/b358e06/src/IonTimestamp.ts#L317">src/IonTimestamp.ts:317</a></li>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/24e2dfa/src/IonTimestamp.ts#L361">src/IonTimestamp.ts:361</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -377,7 +404,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/b358e06/src/IonTimestamp.ts#L324">src/IonTimestamp.ts:324</a></li>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/24e2dfa/src/IonTimestamp.ts#L368">src/IonTimestamp.ts:368</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -399,7 +426,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/b358e06/src/IonTimestamp.ts#L380">src/IonTimestamp.ts:380</a></li>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/24e2dfa/src/IonTimestamp.ts#L424">src/IonTimestamp.ts:424</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -421,7 +448,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/b358e06/src/IonTimestamp.ts#L373">src/IonTimestamp.ts:373</a></li>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/24e2dfa/src/IonTimestamp.ts#L417">src/IonTimestamp.ts:417</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -443,7 +470,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/b358e06/src/IonTimestamp.ts#L494">src/IonTimestamp.ts:494</a></li>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/24e2dfa/src/IonTimestamp.ts#L538">src/IonTimestamp.ts:538</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -466,7 +493,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/b358e06/src/IonTimestamp.ts#L442">src/IonTimestamp.ts:442</a></li>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/24e2dfa/src/IonTimestamp.ts#L486">src/IonTimestamp.ts:486</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -488,7 +515,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/b358e06/src/IonTimestamp.ts#L195">src/IonTimestamp.ts:195</a></li>
+									<li>Defined in <a href="https://github.com/amzn/ion-js/blob/24e2dfa/src/IonTimestamp.ts#L239">src/IonTimestamp.ts:239</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
