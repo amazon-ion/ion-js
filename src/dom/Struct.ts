@@ -140,7 +140,11 @@ export class Struct extends Value(
   }
 
   elements(): Value[] {
-    return Object.values(this._fields);
+    let singleValueFields = Object.create(null);
+    for (const [fieldName, values] of this.allFields()) {
+      singleValueFields[fieldName] = values[values.length - 1];
+    }
+    return Object.values(singleValueFields);
   }
 
   [Symbol.iterator](): IterableIterator<[string, Value]> {
