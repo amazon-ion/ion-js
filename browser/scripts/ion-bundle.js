@@ -11954,7 +11954,26 @@ var Struct = /*#__PURE__*/function (_Value_1$Value) {
   }, {
     key: "elements",
     value: function elements() {
-      return Object.values(this._fields);
+      var singleValueFields = Object.create(null);
+
+      var _iterator3 = _createForOfIteratorHelper(this.allFields()),
+          _step3;
+
+      try {
+        for (_iterator3.s(); !(_step3 = _iterator3.n()).done;) {
+          var _step3$value = (0, _slicedToArray2["default"])(_step3.value, 2),
+              fieldName = _step3$value[0],
+              values = _step3$value[1];
+
+          singleValueFields[fieldName] = values[values.length - 1];
+        }
+      } catch (err) {
+        _iterator3.e(err);
+      } finally {
+        _iterator3.f();
+      }
+
+      return Object.values(singleValueFields);
     }
   }, {
     key: Symbol.iterator,
@@ -11978,34 +11997,34 @@ var Struct = /*#__PURE__*/function (_Value_1$Value) {
       writer.setAnnotations(this.getAnnotations());
       writer.stepIn(Ion_1.IonTypes.STRUCT);
 
-      var _iterator3 = _createForOfIteratorHelper(this.allFields()),
-          _step3;
+      var _iterator4 = _createForOfIteratorHelper(this.allFields()),
+          _step4;
 
       try {
-        for (_iterator3.s(); !(_step3 = _iterator3.n()).done;) {
-          var _step3$value = (0, _slicedToArray2["default"])(_step3.value, 2),
-              fieldName = _step3$value[0],
-              values = _step3$value[1];
+        for (_iterator4.s(); !(_step4 = _iterator4.n()).done;) {
+          var _step4$value = (0, _slicedToArray2["default"])(_step4.value, 2),
+              fieldName = _step4$value[0],
+              values = _step4$value[1];
 
-          var _iterator4 = _createForOfIteratorHelper(values),
-              _step4;
+          var _iterator5 = _createForOfIteratorHelper(values),
+              _step5;
 
           try {
-            for (_iterator4.s(); !(_step4 = _iterator4.n()).done;) {
-              var value = _step4.value;
+            for (_iterator5.s(); !(_step5 = _iterator5.n()).done;) {
+              var value = _step5.value;
               writer.writeFieldName(fieldName);
               value.writeTo(writer);
             }
           } catch (err) {
-            _iterator4.e(err);
+            _iterator5.e(err);
           } finally {
-            _iterator4.f();
+            _iterator5.f();
           }
         }
       } catch (err) {
-        _iterator3.e(err);
+        _iterator4.e(err);
       } finally {
-        _iterator3.f();
+        _iterator4.f();
       }
 
       writer.stepOut();
@@ -12025,21 +12044,21 @@ var Struct = /*#__PURE__*/function (_Value_1$Value) {
     value: function toJSON() {
       var normalizedFields = Object.create(null);
 
-      var _iterator5 = _createForOfIteratorHelper(this.fields()),
-          _step5;
+      var _iterator6 = _createForOfIteratorHelper(this.fields()),
+          _step6;
 
       try {
-        for (_iterator5.s(); !(_step5 = _iterator5.n()).done;) {
-          var _step5$value = (0, _slicedToArray2["default"])(_step5.value, 2),
-              key = _step5$value[0],
-              value = _step5$value[1];
+        for (_iterator6.s(); !(_step6 = _iterator6.n()).done;) {
+          var _step6$value = (0, _slicedToArray2["default"])(_step6.value, 2),
+              key = _step6$value[0],
+              value = _step6$value[1];
 
           normalizedFields[key] = value;
         }
       } catch (err) {
-        _iterator5.e(err);
+        _iterator6.e(err);
       } finally {
-        _iterator5.f();
+        _iterator6.f();
       }
 
       return normalizedFields;
