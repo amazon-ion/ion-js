@@ -57,6 +57,7 @@ export class Integer extends Value(Number, IonTypes.INT, _fromJsConstructor) {
   }
 
   numberValue(): number {
+    // this represents a number value
     return this._numberValue;
   }
 
