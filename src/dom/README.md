@@ -264,3 +264,140 @@ assert.isTrue(string === "" + ionString);
 assert.isTrue(string === ionString.stringValue());
 assert.isFalse(ionString === ionString2);
 ```
+
+### `dom.Value` equivalence
+
+dom.Value object equivalence is implemented by two methods ionEquals(compares two dom.Value objects based on strict or non-strict comparison type) and equals(compares a dom.Value object with a corresponding JS object).
+
+#### `ionEquals`:
+
+This method compares a dom.Value object with another dom.Value object with either strict or non-strict comparison type. 
+
+*Strict equivalence* refers to Ion data model equivalence as defined in Ion Equivalence (https://www.javadoc.io/doc/com.amazon.ion/ion-java/latest/com/amazon/ion/util/Equivalence.html) and by Ion Specification (http://amzn.github.io/ion-docs/docs/spec.html)
+*Structural or non-strict equivalence* follows the same rules as strict equivalence,except that
+
+* 1. Annotations are not considered, and
+* 2. Timestamps that represent the same instant in time are always considered equivalent.
+
+#### `equals`:
+
+This method compares a dom.Value object with a corresponding JS object. 
+
+#### Integer Example:
+```javascript
+let int1: Value = load("foo::bar::7");
+let int2: Value = load("foo::bar::7");
+let int3: Value = load("7");
+
+// Equivalence between two Ion DOM Values
+int1.ionEquals(int2); // returns true
+int1.ionEquals(int3); // returns false as annotations didn't match in a strict equivalence
+int1.ionEquals(int3, {ignoreAnnotations: true}); // returns true for non-strict equivalence
+
+// Equivalence between JS Value and Ion DOM Value
+int1.equals(7); // returns true
+int1.ionEquals(7); // returns false
+```
+
+#### Float Example:
+```javascript
+let float1: Value = load("baz::qux::15e-1");
+let float2: Value = load("baz::qux::15e-1");
+let float3: Value = load("15e-1");
+let float4: Value = load("1.5");
+let float5: Value = load("12e-1");
+
+// Equivalence between two Ion DOM Values
+float1.ionEquals(float2); // returns true
+float1.ionEquals(float3); // return false as annotations didn't match in a strict equivalence
+
+float1.ionEquals(float4); // returns false as Decimal and Float values will not be equivalent
+float3.ionEquals(float5, {epsilon: 0.5}); // returns true as both values are equivalent by epsilon value
+float3.ionEquals(float5, {epsilon: 0.2}); // returns false as both values are not equivalent by epsilon value
+
+// Equivalence between JS Value and Ion DOM Value
+float1.equals(1.5); // returns true
+float1.ionEquals(1.5); // returns false
+```
+
+#### Timestamp example:
+```javascript
+let timestamp1: Value = load("DOB::2020-01-16T20:15:54.066Z");
+let timestamp2: Value = load("DOB::2020-01-16T20:15:54.066Z");
+let timestamp3: Value = load("DOB::2001T");
+let timestamp4: Value = load("DOB::2001-01-01T");
+
+// Equivalence between two Ion DOM Values
+timestamp1.ionEquals(timestamp2); // returns true 
+timestamp1.ionEquals(timestamp3); // returns false as in strict mode the precision and local offsets are also compared
+timestamp3.ionEquals(timestamp4, {ignoreTimestampPrecision: true}); // retruns true as in non strict comparison precision and local offset are ignored along with annotations
+
+// Equivalence between JS Value and Ion DOM Value
+timestamp1.equals(new Date("2020-01-16T20:15:54.066Z")); // returns true
+timestamp1.equals(new Date("2020-02-16T20:15:54.066Z")); // returns false 
+```
+
+#### List Example:
+```javascript
+let list1: Value = load('planets::["Mercury", "Venus", "Earth", "Mars"]');
+let list2: Value = load('planets::["Mercury", "Venus", "Earth", "Mars"]');
+let list3: Value = load('planets::["Mercury", "Venus"]');
+
+// Equivalence between two Ion DOM Values
+list1.ionEquals(list2) // returns true
+list1.ionEquals(list3) // returns false because the lists have different length
+
+// Equivalence between JS Value and Ion DOM Value
+list1.equals(["Mercury", "Venus", "Earth", "Mars"]); // returns true
+list1.equals(["Mercury", "Venus", "Earth"]); // returns false because the lists differ with one lement "Mars"
+```
+
+####Struct Example:
+```javascript
+let struct1: Value = load(
+  "foo::bar::{" +
+    "name: {" +
+    'first: "John", ' +
+    'middle: "Jacob", ' +
+    'last: "Jingleheimer-Schmidt",' +
+    "}," +
+    "age: 41" +
+    "}"
+);
+let struct2: Value = load(
+  "foo::bar::{" +
+    "name: {" +
+    'first: "John", ' +
+    'middle: "Jacob", ' +
+    'last: "Jingleheimer-Schmidt",' +
+    "}," +
+    "age: 41" +
+    "}"
+);
+let struct3: Value = load(
+  "foo::bar::{" +
+    "name: {" +
+    'first: "Jessica", ' +
+    'middle: "Jacob", ' +
+    'last: "Jingleheimer-Schmidt",' +
+    "}," +
+    "age: 41" +
+    "}"
+);
+
+// Equivalence between two Ion DOM Values
+struct1.ionEquals(struct2); // returns true
+struct1.ionEquals(struct3); // retruns false because name is different for both values
+
+// Equivalence between JS Value and Ion DOM Value
+struct1.equals(
+    {
+      name: {
+        first: "John",
+        middle: "Jacob",
+        last: "Jingleheimer-Schmidt",
+      },
+      age: 41,
+    }
+); // retrurns true
+```
