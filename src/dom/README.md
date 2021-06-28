@@ -280,13 +280,13 @@ This method compares a `dom.Value` object with another `dom.Value` object with e
 * Annotations are not considered, and
 * Timestamps that represent the same instant in time are always considered equivalent.
 
-Optional parameters that can be used with this method:
+This method accepts an optional configuration object that allows you to modify how equivalence is determined. It recognizes the following properties:
 
-| option                      | description                                                                    |
-| --------------------------- | :------------------------------------------------------------------------------|
-|`epsilon`                    | used by `Float` for an equality with given epsilon precision. (Default: `null`)|
-|`ignoreAnnotations`          | specifies whether to ignore annotations or not for equality. (Default: `false`)|
-|`ignoreTimestampPrecision`   | specifies whether to ignore timestamp local offset and precision or not for equality. (Default: `false`)|
+| option                      | description                                                                           | default |
+| --------------------------- | :-------------------------------------------------------------------------------------|:--------|
+|`epsilon`                    | used by `Float` for an equality with given epsilon precision.                         | `null`  |
+|`ignoreAnnotations`          | specifies whether to ignore annotations or not for equality.                          | `false` |
+|`ignoreTimestampPrecision`   | specifies whether to ignore timestamp local offset and precision or not for equality. | `false` |
 
 #### `equals`
 
@@ -296,9 +296,7 @@ If the other object is a `dom.Value` instance then this comparison checks for st
 _NOTE:_ 
 
 * This method also provides an optional parameter `epsilon` for `Float` type comparison.
-* This method allows coerce numeric types comparison for `Decimal` and `Float` values:
-    * Comparison of `Float` with `Decimal` or `number` type is allowed.
-    * Comparison of `Decimal` with `Float` or `number` type is allowed.
+* This method allows `Decimal`, `Float`, and `number` values to be compared to one another.
 
 #### Integer Example
 ```javascript
