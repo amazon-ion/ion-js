@@ -271,7 +271,7 @@ assert.isFalse(ionString === ionString2);
 1. `ionEquals`, which tests two `dom.Value` instances for equivalence according to the Ion data model.
 2. `equals`, which tests for value-based equality and can be used to compare a `dom.Value` with a corresponding JS object.
 
-#### `ionEquals`:
+#### `ionEquals`
 
 This method compares a `dom.Value` object with another `dom.Value` object with either strict or non-strict comparison type. 
 
@@ -288,7 +288,7 @@ Optional parameters that can be used with this method:
 |`ignoreAnnotations`          | specifies whether to ignore annotations or not for equality. (Default: `false`)|
 |`ignoreTimestampPrecision`   | specifies whether to ignore timestamp local offset and precision or not for equality. (Default: `false`)|
 
-#### `equals`:
+#### `equals`
 
 This method compares a `dom.Value` object with a corresponding JS object as defined in [Ion Data Types section](#iondom-data-types). 
 If the other object is a `dom.Value` instance then this comparison checks for structural (or "non-strict") equivalence.
@@ -300,7 +300,7 @@ _NOTE:_
     * Comparison of `Float` with `Decimal` or `number` type is allowed.
     * Comparison of `Decimal` with `Float` or `number` type is allowed.
 
-#### Integer Example:
+#### Integer Example
 ```javascript
 let intSame1: Value = load("foo::bar::7");
 let intSame2: Value = load("foo::bar::7");
@@ -316,7 +316,7 @@ intSame1.equals(7); // returns true
 intSame1.ionEquals(7); // returns false
 ```
 
-#### Float Example:
+#### Float Example
 ```javascript
 let floatSame1: Value = load("baz::qux::15e-1");
 let floatSame2: Value = load("baz::qux::15e-1");
@@ -337,7 +337,7 @@ floatSame1.equals(1.5); // returns true
 floatSame1.ionEquals(1.5); // returns false
 ```
 
-#### Timestamp example:
+#### Timestamp example
 ```javascript
 let timestampSame1: Value = load("DOB::2020-01-16T20:15:54.066Z");
 let timestampSame2: Value = load("DOB::2020-01-16T20:15:54.066Z");
@@ -354,7 +354,7 @@ timestampSame1.equals(new Date("2020-01-16T20:15:54.066Z")); // returns true
 timestampSame1.equals(new Date("2020-02-16T20:15:54.066Z")); // returns false as month is different 
 ```
 
-#### List Example:
+#### List Example
 ```javascript
 let listSame1: Value = load('planets::["Mercury", "Venus", "Earth", "Mars"]');
 let listSame2: Value = load('planets::["Mercury", "Venus", "Earth", "Mars"]');
@@ -366,10 +366,10 @@ listSame1.ionEquals(listWithDifferentLength) // returns false because the lists 
 
 // Equivalence between JS Value and Ion DOM Value
 listSame1.equals(["Mercury", "Venus", "Earth", "Mars"]); // returns true
-listSame1.equals(["Mercury", "Venus", "Earth"]); // returns false because the lists differ with one lement "Mars"
+listSame1.equals(["Mercury", "Venus", "Earth"]); // returns false because the lists differ with one element "Mars"
 ```
 
-####Struct Example:
+####Struct Example
 ```javascript
 let structSame1: Value = load(
   "foo::bar::{" +
@@ -416,5 +416,5 @@ structSame1.equals(
       },
       age: 41,
     }
-); // retrurns true
+); // returns true
 ```
