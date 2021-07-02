@@ -10,6 +10,7 @@ simpler for developers to work with.
 - [`ion.dumpBinary()`, `ion.dumpText()`, and `ion.dumpPrettyText()`](#iondumpbinary-iondumptext-and-iondumpprettytext)
 - [`ion.dom` Data Types](#iondom-data-types)
 - [Testing Equality](#testing-equality)
+- [`dom.Value` equivalence](#domvalue-equivalence)
 
 ### `ion.load()`
 
@@ -263,4 +264,156 @@ assert.isFalse(string === ionString);
 assert.isTrue(string === "" + ionString);
 assert.isTrue(string === ionString.stringValue());
 assert.isFalse(ionString === ionString2);
+```
+
+### `dom.Value` equivalence
+
+`dom.Value` provides two ways to test equality:
+1. `ionEquals`, which tests two `dom.Value` instances for equivalence according to the Ion data model.
+2. `equals`, which tests for value-based equality and can be used to compare a `dom.Value` with a corresponding JS object.
+
+#### `ionEquals`
+
+This method compares a `dom.Value` object with another `dom.Value` object with either strict or non-strict comparison type. 
+
+*Strict equivalence* refers to Ion data model equivalence as defined in [Ion Equivalence](https://www.javadoc.io/doc/com.amazon.ion/ion-java/latest/com/amazon/ion/util/Equivalence.html) and by [Ion Specification](http://amzn.github.io/ion-docs/docs/spec.html)
+*Structural* (or *non-strict*) *equivalence* follows the same rules as strict equivalence,except that:
+* Annotations are not considered, and
+* Timestamps that represent the same instant in time are always considered equivalent.
+
+This method accepts an optional configuration object that allows you to modify how equivalence is determined. It recognizes the following properties:
+
+| option                      | description                                                                           | default |
+| --------------------------- | :-------------------------------------------------------------------------------------|:--------|
+|`epsilon`                    | used by `Float` for an equality with given epsilon precision.                         | `null`  |
+|`ignoreAnnotations`          | specifies whether to ignore annotations or not for equality.                          | `false` |
+|`ignoreTimestampPrecision`   | specifies whether to ignore timestamp local offset and precision or not for equality. | `false` |
+
+#### `equals`
+
+This method compares a `dom.Value` object with a corresponding JS object as defined in [Ion Data Types section](#iondom-data-types). 
+If the other object is a `dom.Value` instance then this comparison checks for structural (or "non-strict") equivalence.
+
+_NOTE:_ 
+
+* This method also provides an optional parameter `epsilon` for `Float` type comparison.
+* This method allows `Decimal`, `Float`, and `number` values to be compared to one another.
+
+#### Integer Example
+```javascript
+let intSame1: Value = load("foo::bar::7");
+let intSame2: Value = load("foo::bar::7");
+let intUnannotated: Value = load("7");
+
+// Equivalence between two Ion DOM Values
+intSame1.ionEquals(intSame2); // returns true
+intSame1.ionEquals(intUnannotated); // returns false as annotations didn't match in a strict equivalence
+intSame1.ionEquals(intUnannotated, {ignoreAnnotations: true}); // returns true for non-strict equivalence
+
+// Equivalence between JS Value and Ion DOM Value
+intSame1.equals(7); // returns true
+intSame1.ionEquals(7); // returns false
+```
+
+#### Float Example
+```javascript
+let floatSame1: Value = load("baz::qux::15e-1");
+let floatSame2: Value = load("baz::qux::15e-1");
+let floatUnannotated: Value = load("15e-1");
+let decimal: Value = load("1.5");
+let floatNearBy: Value = load("12e-1");
+
+// Equivalence between two Ion DOM Values
+floatSame1.ionEquals(floatSame2); // returns true
+floatSame1.ionEquals(floatUnannotated); // return false as annotations didn't match in a strict equivalence
+
+floatSame1.ionEquals(decimal); // returns false as Decimal and Float values will not be equivalent
+floatUnannotated.ionEquals(floatNearBy, {epsilon: 0.5}); // returns true as both values are equivalent by epsilon value
+floatUnannotated.ionEquals(floatNearBy, {epsilon: 0.2}); // returns false as both values are not equivalent by epsilon value
+
+// Equivalence between JS Value and Ion DOM Value
+floatSame1.equals(1.5); // returns true
+floatSame1.ionEquals(1.5); // returns false
+```
+
+#### Timestamp example
+```javascript
+let timestampSame1: Value = load("DOB::2020-01-16T20:15:54.066Z");
+let timestampSame2: Value = load("DOB::2020-01-16T20:15:54.066Z");
+let timestampWithYearPrecision: Value = load("DOB::2001T");
+let timestampWithDatePrecision: Value = load("DOB::2001-01-01T");
+
+// Equivalence between two Ion DOM Values
+timestampSame1.ionEquals(timestampSame2); // returns true 
+timestampSame1.ionEquals(timestampWithYearPrecision); // returns false as in strict mode the precision and local offsets are also compared
+timestampWithYearPrecision.ionEquals(timestampWithDatePrecision, {ignoreTimestampPrecision: true}); // retruns true as in non strict comparison precision are ignored
+
+// Equivalence between JS Value and Ion DOM Value
+timestampSame1.equals(new Date("2020-01-16T20:15:54.066Z")); // returns true
+timestampSame1.equals(new Date("2020-02-16T20:15:54.066Z")); // returns false as month is different 
+```
+
+#### List Example
+```javascript
+let listSame1: Value = load('planets::["Mercury", "Venus", "Earth", "Mars"]');
+let listSame2: Value = load('planets::["Mercury", "Venus", "Earth", "Mars"]');
+let listWithDifferentLength: Value = load('planets::["Mercury", "Venus"]');
+
+// Equivalence between two Ion DOM Values
+listSame1.ionEquals(listSame2) // returns true
+listSame1.ionEquals(listWithDifferentLength) // returns false because the lists have different length
+
+// Equivalence between JS Value and Ion DOM Value
+listSame1.equals(["Mercury", "Venus", "Earth", "Mars"]); // returns true
+listSame1.equals(["Mercury", "Venus", "Earth"]); // returns false because the lists differ with one element "Mars"
+```
+
+####Struct Example
+```javascript
+let structSame1: Value = load(
+  "foo::bar::{" +
+    "name: {" +
+    'first: "John", ' +
+    'middle: "Jacob", ' +
+    'last: "Jingleheimer-Schmidt",' +
+    "}," +
+    "age: 41" +
+    "}"
+);
+let structSame2: Value = load(
+  "foo::bar::{" +
+    "name: {" +
+    'first: "John", ' +
+    'middle: "Jacob", ' +
+    'last: "Jingleheimer-Schmidt",' +
+    "}," +
+    "age: 41" +
+    "}"
+);
+let structWithDifferentFieldValue: Value = load(
+  "foo::bar::{" +
+    "name: {" +
+    'first: "Jessica", ' +
+    'middle: "Jacob", ' +
+    'last: "Jingleheimer-Schmidt",' +
+    "}," +
+    "age: 41" +
+    "}"
+);
+
+// Equivalence between two Ion DOM Values
+structSame1.ionEquals(structSame2); // returns true
+structSame1.ionEquals(structWithDifferentFieldValue); // retruns false because name is different for both values
+
+// Equivalence between JS Value and Ion DOM Value
+structSame1.equals(
+    {
+      name: {
+        first: "John",
+        middle: "Jacob",
+        last: "Jingleheimer-Schmidt",
+      },
+      age: 41,
+    }
+); // returns true
 ```
