@@ -170,7 +170,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md)
 This library is licensed under [Apache License version 2.0](LICENSE)
 
 ## Links
-For more information about Ion or its other impleemntation, please see:
+For more information about Ion or its other implementation, please see:
 
 * [Ion](https://amzn.github.io/ion-docs/)
 * [Ion Specification](https://amzn.github.io/ion-docs/spec.html)
