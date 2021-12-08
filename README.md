@@ -163,11 +163,19 @@ Notes:
 
 * ion-js supports shared symbol table for Ion Binary. Below is an example of how shared symbol table can be used here: 
 ```javascript
-// create a shared symbol table and use it with binary writer
-let sst = new SharedSymbolTable('foo', 1, ['id', 'name']);
-let writer = new BinaryWriter(new LocalSymbolTable(new Import(new Import(null, getSystemSymbolTable()), sst)), new Writeable());
+// Create a SharedSymbolTable with the desired strings
+let sharedSymbolTable = new SharedSymbolTable('foo', 1, ['id', 'name']);
+// Define an import chain
+// The system symbol table does not import any other tables (`null` below)
+let systemSymbolTableImport = new Import(null, getSystemSymbolTable());
+// The shared symbol table imports the system symbol table
+let sharedSymbolTableImport = new Import(systemSymbolTableImport, sharedSymbolTable);
+// Create a local symbol table that imports the shared symbol table
+let localSymbolTable = new LocalSymbolTable(sharedSymbolTableImport);
+// Create a writer that uses our new local symbol table
+let writer = new BinaryWriter(localSymbolTable, new Writeable());
 
-// write id and name fields in a struct
+// Write id and name fields in a struct
 writer.stepIn(IonTypes.STRUCT);
 writer.writeFieldName("id");
 writer.writeInt(5);
@@ -176,11 +184,12 @@ writer.writeString("Max");
 writer.stepOut();
 writer.close();
 
-// create a catalog with shared symbol table
+// Create a catalog with shared symbol table
 let catalog = new Catalog();
-catalog.add(sst);
+catalog.add(sharedSymbolTable);
 
-// create reader with catalog
+// Create a reader with catalog
+let bytes = writer.getBytes();
 let reader = new BinaryReader(new BinarySpan(bytes), catalog);
 ```
 
