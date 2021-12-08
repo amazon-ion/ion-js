@@ -155,11 +155,34 @@ at `dist/browser/js/ion-bundle.js`.
 | `sexp`                    | yes           | yes           | none                                          |
 | annotations               | yes           | yes           | none                                          |
 | local symbol tables       | yes           | yes           | none                                          |
-| shared symbol tables      | no            | no            | none                                          |
+| shared symbol tables      | no            | yes           | none                                          |
 
 Notes:
 * [test/iontests.ts](https://github.com/amzn/ion-js/blob/master/test/iontests.ts) defines multiple skipList variables
   referencing test vectors that are not expected to work at this time.
+
+* ion-js supports shared symbol table for Ion Binary. Below is an example of how shared symbol table can be used here: 
+```javascript
+// create a shared symbol table and use it with binary writer
+let sst = new SharedSymbolTable('foo', 1, ['id', 'name']);
+let writer = new BinaryWriter(new LocalSymbolTable(new Import(new Import(null, getSystemSymbolTable()), sst)), new Writeable());
+
+// write id and name fields in a struct
+writer.stepIn(IonTypes.STRUCT);
+writer.writeFieldName("id");
+writer.writeInt(5);
+writer.writeFieldName("name");
+writer.writeString("Max");
+writer.stepOut();
+writer.close();
+
+// create a catalog with SST
+let catalog = new Catalog();
+catalog.add(sst);
+
+// create reader with catalog
+let reader = new BinaryReader(new BinarySpan(bytes), catalog);
+```
 
 ## Contributing
 
@@ -173,7 +196,7 @@ This library is licensed under [Apache License version 2.0](LICENSE)
 For more information about Ion or its other implementation, please see:
 
 * [Ion](https://amzn.github.io/ion-docs/)
-* [Ion Specification](https://amzn.github.io/ion-docs/spec.html)
+* [Ion Specification](https://amzn.github.io/ioggggn-docs/spec.html)
 * [Ion Cookbook](https://amzn.github.io/ion-docs/cookbook.html) uses the Java library for its examples.
 * [Ion C](https://github.com/amzn/ion-c)
 * [Ion Java](https://github.com/amzn/ion-java)
