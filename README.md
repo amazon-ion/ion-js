@@ -176,7 +176,7 @@ writer.writeString("Max");
 writer.stepOut();
 writer.close();
 
-// create a catalog with SST
+// create a catalog with shared symbol table
 let catalog = new Catalog();
 catalog.add(sst);
 
@@ -196,7 +196,7 @@ This library is licensed under [Apache License version 2.0](LICENSE)
 For more information about Ion or its other implementation, please see:
 
 * [Ion](https://amzn.github.io/ion-docs/)
-* [Ion Specification](https://amzn.github.io/ioggggn-docs/spec.html)
+* [Ion Specification](https://amzn.github.io/ion-docs/spec.html)
 * [Ion Cookbook](https://amzn.github.io/ion-docs/cookbook.html) uses the Java library for its examples.
 * [Ion C](https://github.com/amzn/ion-c)
 * [Ion Java](https://github.com/amzn/ion-java)
