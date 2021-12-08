@@ -155,11 +155,43 @@ at `dist/browser/js/ion-bundle.js`.
 | `sexp`                    | yes           | yes           | none                                          |
 | annotations               | yes           | yes           | none                                          |
 | local symbol tables       | yes           | yes           | none                                          |
-| shared symbol tables      | no            | no            | none                                          |
+| shared symbol tables      | no            | yes           | none                                          |
 
 Notes:
 * [test/iontests.ts](https://github.com/amzn/ion-js/blob/master/test/iontests.ts) defines multiple skipList variables
   referencing test vectors that are not expected to work at this time.
+
+* ion-js supports shared symbol table for Ion Binary. Below is an example of how shared symbol table can be used here: 
+```javascript
+// Create a SharedSymbolTable with the desired strings
+let sharedSymbolTable = new SharedSymbolTable('foo', 1, ['id', 'name']);
+// Define an import chain
+// The system symbol table does not import any other tables (`null` below)
+let systemSymbolTableImport = new Import(null, getSystemSymbolTable());
+// The shared symbol table imports the system symbol table
+let sharedSymbolTableImport = new Import(systemSymbolTableImport, sharedSymbolTable);
+// Create a local symbol table that imports the shared symbol table
+let localSymbolTable = new LocalSymbolTable(sharedSymbolTableImport);
+// Create a writer that uses our new local symbol table
+let writer = new BinaryWriter(localSymbolTable, new Writeable());
+
+// Write id and name fields in a struct
+writer.stepIn(IonTypes.STRUCT);
+writer.writeFieldName("id");
+writer.writeInt(5);
+writer.writeFieldName("name");
+writer.writeString("Max");
+writer.stepOut();
+writer.close();
+
+// Create a catalog with shared symbol table
+let catalog = new Catalog();
+catalog.add(sharedSymbolTable);
+
+// Create a reader with catalog
+let bytes = writer.getBytes();
+let reader = new BinaryReader(new BinarySpan(bytes), catalog);
+```
 
 ## Contributing
 
