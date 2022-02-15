@@ -17,6 +17,7 @@ import {assert} from 'chai';
 import SignAndMagnitudeInt from "../src/SignAndMagnitudeInt";
 import {BinarySpan} from "../src/IonSpan";
 import {ParserBinaryRaw} from "../src/IonParserBinaryRaw";
+import JSBI from "jsbi";
 
 /**
  * Tests for reading the UInt primitive follow.
@@ -49,7 +50,8 @@ let unsignedIntBytesMatchValue = (bytes: number[],
                                       ParserBinaryRaw._readUnsignedIntAsBigIntFrom) => {
     let binarySpan = new BinarySpan(new Uint8Array(bytes));
     let actual = readFrom(binarySpan, bytes.length);
-    assert.equal(actual, expected)
+    actual = actual instanceof JSBI ? JSBI.toNumber(actual) : actual;
+    assert.equal(actual, expected);
 };
 
 let unsignedIntReadingTests = [

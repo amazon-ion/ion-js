@@ -109,10 +109,10 @@ function domValueTest(jsValue, expectedIonType) {
   return () => {
     // Test Value.from() with and without specifying annotations
     let annotations = ["foo", "bar", "baz"];
-    it("" + jsValue, () => {
+    it(`${jsValue}`, () => {
       validateDomValue(Value.from(jsValue), []);
     });
-    it(annotations.join("::") + "::" + jsValue, () => {
+    it(annotations.join("::") + `::${jsValue}`, () => {
       validateDomValue(Value.from(jsValue, annotations), annotations);
     });
   };

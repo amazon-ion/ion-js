@@ -15,6 +15,7 @@
 
 import {assert} from 'chai';
 import * as ion from '../src/Ion';
+import JSBI from "jsbi";
 
 function readerToBytes(reader) {
     let writer = ion.makeTextWriter();
@@ -33,7 +34,7 @@ describe('Annotations', () => {
         let reader = ion.makeReader(data);
         reader.next();
         assert.deepEqual(reader.annotations(), ['a', 'b']);
-        assert.equal(reader.value(), '123');
+        assert.equal(reader.value()?.toString(), '123');
         assert.equal(readerToString(reader), 'a::b::123');
     });
 
