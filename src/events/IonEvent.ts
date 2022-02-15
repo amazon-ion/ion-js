@@ -870,7 +870,7 @@ class IonListEvent extends AbsIonContainerEvent {
       ) {
         return new ComparisonResult(
           ComparisonResultType.NOT_EQUAL,
-          `${child.ionValue} vs. ${expectedContainer[1].ionValue}`,
+          `${child.ionValue} vs. ${expectedContainer[i].ionValue}`,
           i + 1,
           i + 1
         );
