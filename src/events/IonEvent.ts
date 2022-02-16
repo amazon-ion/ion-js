@@ -468,7 +468,7 @@ class IonIntEvent extends AbstractIonEvent {
     }
     return new ComparisonResult(
       ComparisonResultType.NOT_EQUAL,
-      this.ionValue + " vs. " + expected.ionValue
+      `${this.ionValue} vs. ${expected.ionValue}`
     );
   }
 
@@ -870,7 +870,7 @@ class IonListEvent extends AbsIonContainerEvent {
       ) {
         return new ComparisonResult(
           ComparisonResultType.NOT_EQUAL,
-          child.ionValue + " vs. " + expectedContainer[i].ionValue,
+          `${child.ionValue} vs. ${expectedContainer[i].ionValue}`,
           i + 1,
           i + 1
         );

@@ -223,7 +223,7 @@ describe('DOM', () => {
       assert.equal(101.5, +d);
       assert.equal(101.5, d.numberValue());
       assert.isTrue(new ion.Decimal('101.5').equals(d.decimalValue()!));
-      assert.equal(1015, +d.decimalValue()!.getCoefficient());
+      assert.equal(1015, JSBI.toNumber(d.decimalValue()!.getCoefficient()));
    });
 
    it('load() Decimal as any', () => {
@@ -234,7 +234,7 @@ describe('DOM', () => {
       assert.equal(101.5, d);
       assert.equal(101.5, +d);
       assert.isTrue(new ion.Decimal('101.5').equals(d.decimalValue()));
-      assert.equal(1015, +d.decimalValue()!.getCoefficient());
+      assert.equal(1015, JSBI.toNumber(d.decimalValue()!.getCoefficient()));
    });
 
    it('load() Timestamp as Value', () => {

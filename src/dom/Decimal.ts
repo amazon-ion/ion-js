@@ -31,7 +31,7 @@ export class Decimal extends Value(
    * @param annotations   An optional array of strings to associate with `value`.
    */
   constructor(value: ion.Decimal, annotations: string[] = []) {
-    super(...[value.getCoefficient(), value.getExponent(), value.isNegative()]);
+    super(value.numberValue());
     this._decimalValue = value;
     this._numberValue = value.numberValue();
     this._setAnnotations(annotations);

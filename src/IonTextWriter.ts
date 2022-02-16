@@ -171,7 +171,7 @@ export class TextWriter extends AbstractWriter {
       const scale = -exponent;
 
       if (exponent == 0) {
-        s += coefficient + ".";
+        s += coefficient.toString() + ".";
       } else if (exponent < 0) {
         // Avoid printing small negative exponents using a heuristic
         // adapted from http://speleotrove.com/decimal/daconvs.html
@@ -186,15 +186,15 @@ export class TextWriter extends AbstractWriter {
         } else if (adjustedExponent >= -6) {
           s += "0.";
           s += "00000".substring(0, scale - significantDigits);
-          s += coefficient;
+          s += coefficient.toString();
         } else {
-          s += coefficient;
+          s += coefficient.toString();
           s += "d-";
           s += scale.toString();
         }
       } else {
         // exponent > 0
-        s += coefficient + "d" + exponent;
+        s += coefficient.toString() + "d" + exponent;
       }
 
       this.writeUtf8(s);

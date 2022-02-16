@@ -7,7 +7,9 @@
   "scripts": {
     "commit": "git-cz",
     "prepare": "grunt release",
-    "test": "nyc mocha",
+    "test": "npm run test-jsbi4 && npm run test-jsbi3",
+    "test-jsbi3": "npm install jsbi@3.1.1 && nyc mocha",
+    "test-jsbi4": "npm install jsbi@4.0.0 && nyc mocha",
     "release": "grunt release",
     "test-driver": "cd test-driver && npm install",
     "build-test-driver": "cd test-driver && npm run build",

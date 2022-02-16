@@ -7,7 +7,7 @@ export function valueName(value: any): string {
     }
     if (typeof value === "object") {
         let typeText = _hasValue(value.constructor) ? value.constructor.name : 'Object';
-        let valueText = _hasValue(value.toString) ? ''+value : JSON.stringify(value);
+        let valueText = _hasValue(value.toString) ? `${value}` : JSON.stringify(value);
 
         return `${typeText}(${valueText})`;
     }
