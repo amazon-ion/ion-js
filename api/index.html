@@ -265,35 +265,62 @@ $ git <span class="hljs-keyword">submodule </span>update</code></pre>
 						<tr>
 							<td align="center">shared symbol tables</td>
 							<td align="center">no</td>
-							<td align="center">no</td>
+							<td align="center">yes</td>
 							<td align="center">none</td>
 						</tr>
 				</tbody></table>
 				<p>Notes:</p>
 				<ul>
-					<li><a href="https://github.com/amzn/ion-js/blob/master/test/iontests.ts">test/iontests.ts</a> defines multiple skipList variables
-					referencing test vectors that are not expected to work at this time.</li>
+					<li><p><a href="https://github.com/amzn/ion-js/blob/master/test/iontests.ts">test/iontests.ts</a> defines multiple skipList variables
+						referencing test vectors that are not expected to work at this time.</p>
+					</li>
+					<li><p>ion-js supports shared symbol table for Ion Binary. Below is an example of how shared symbol table can be used here: </p>
+						<pre><code class="language-javascript"><span class="hljs-comment">// Create a SharedSymbolTable with the desired strings</span>
+<span class="hljs-keyword">let</span> sharedSymbolTable = <span class="hljs-keyword">new</span> SharedSymbolTable(<span class="hljs-string">'foo'</span>, <span class="hljs-number">1</span>, [<span class="hljs-string">'id'</span>, <span class="hljs-string">'name'</span>]);
+<span class="hljs-comment">// Define an import chain</span>
+<span class="hljs-comment">// The system symbol table does not import any other tables (`null` below)</span>
+<span class="hljs-keyword">let</span> systemSymbolTableImport = <span class="hljs-keyword">new</span> Import(<span class="hljs-literal">null</span>, getSystemSymbolTable());
+<span class="hljs-comment">// The shared symbol table imports the system symbol table</span>
+<span class="hljs-keyword">let</span> sharedSymbolTableImport = <span class="hljs-keyword">new</span> Import(systemSymbolTableImport, sharedSymbolTable);
+<span class="hljs-comment">// Create a local symbol table that imports the shared symbol table</span>
+<span class="hljs-keyword">let</span> localSymbolTable = <span class="hljs-keyword">new</span> LocalSymbolTable(sharedSymbolTableImport);
+<span class="hljs-comment">// Create a writer that uses our new local symbol table</span>
+<span class="hljs-keyword">let</span> writer = <span class="hljs-keyword">new</span> BinaryWriter(localSymbolTable, <span class="hljs-keyword">new</span> Writeable());
+</code></pre>
+					</li>
 				</ul>
-				<a href="#contributing" id="contributing" style="color: inherit; text-decoration: none;">
-					<h2>Contributing</h2>
-				</a>
-				<p>See <a href="CONTRIBUTING.md">CONTRIBUTING.md</a></p>
-				<a href="#license" id="license" style="color: inherit; text-decoration: none;">
-					<h2>License</h2>
-				</a>
-				<p>This library is licensed under <a href="LICENSE">Apache License version 2.0</a></p>
-				<a href="#links" id="links" style="color: inherit; text-decoration: none;">
-					<h2>Links</h2>
-				</a>
-				<p>For more information about Ion or its other impleemntation, please see:</p>
-				<ul>
-					<li><a href="https://amzn.github.io/ion-docs/">Ion</a></li>
-					<li><a href="https://amzn.github.io/ion-docs/spec.html">Ion Specification</a></li>
-					<li><a href="https://amzn.github.io/ion-docs/cookbook.html">Ion Cookbook</a> uses the Java library for its examples.</li>
-					<li><a href="https://github.com/amzn/ion-c">Ion C</a></li>
-					<li><a href="https://github.com/amzn/ion-java">Ion Java</a></li>
-					<li><a href="https://github.com/amzn/ion-python">Ion Python</a></li>
-				</ul>
+				<p>// Write id and name fields in a struct
+					writer.stepIn(IonTypes.STRUCT);
+					writer.writeFieldName(&quot;id&quot;);
+					writer.writeInt(5);
+					writer.writeFieldName(&quot;name&quot;);
+					writer.writeString(&quot;Max&quot;);
+					writer.stepOut();
+				writer.close();</p>
+				<p>// Create a catalog with shared symbol table
+					let catalog = new Catalog();
+				catalog.add(sharedSymbolTable);</p>
+				<p>// Create a reader with catalog
+					let bytes = writer.getBytes();
+				let reader = new BinaryReader(new BinarySpan(bytes), catalog);</p>
+				<pre><code>
+<span class="hljs-section">## Contributing</span>
+
+See [<span class="hljs-string">CONTRIBUTING.md</span>](<span class="hljs-link">CONTRIBUTING.md</span>)
+
+<span class="hljs-section">## License</span>
+
+This library is licensed under [<span class="hljs-string">Apache License version 2.0</span>](<span class="hljs-link">LICENSE</span>)
+
+<span class="hljs-section">## Links</span>
+For more information about Ion or its other implementation, please see:
+<span class="hljs-bullet">
+* </span>[<span class="hljs-string">Ion</span>](<span class="hljs-link">https://amzn.github.io/ion-docs/</span>)
+<span class="hljs-bullet">* </span>[<span class="hljs-string">Ion Specification</span>](<span class="hljs-link">https://amzn.github.io/ion-docs/spec.html</span>)
+<span class="hljs-bullet">* </span>[<span class="hljs-string">Ion Cookbook</span>](<span class="hljs-link">https://amzn.github.io/ion-docs/cookbook.html</span>) uses the Java library for its examples.
+<span class="hljs-bullet">* </span>[<span class="hljs-string">Ion C</span>](<span class="hljs-link">https://github.com/amzn/ion-c</span>)
+<span class="hljs-bullet">* </span>[<span class="hljs-string">Ion Java</span>](<span class="hljs-link">https://github.com/amzn/ion-java</span>)
+<span class="hljs-bullet">* </span>[<span class="hljs-string">Ion Python</span>](<span class="hljs-link">https://github.com/amzn/ion-python</span>)</code></pre>
 			</div>
 		</div>
 		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
