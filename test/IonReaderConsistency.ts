@@ -2,18 +2,19 @@ import {assert} from "chai";
 import * as ion from "../src/Ion";
 import {IonTypes} from "../src/IonTypes";
 import {IonType} from "../src/Ion";
+import JSBI from "jsbi";
 
 describe('IonReaderConsistency', () => {
     let writerTypes = [
-        {name: 'Binary', instance: ion.makeBinaryWriter()},
-        {name: 'Text',   instance: ion.makeTextWriter()},
-        {name: 'Pretty', instance: ion.makePrettyWriter()},
+        {name: 'Binary', mkInstance: () => ion.makeBinaryWriter()},
+        {name: 'Text',   mkInstance: () => ion.makeTextWriter()},
+        {name: 'Pretty', mkInstance: () => ion.makePrettyWriter()},
     ];
 
     // regression test for https://github.com/amzn/ion-js/issues/514
     writerTypes.forEach(writerType => {
-        let writer = writerType.instance;
         it('Reads annotations correctly from structs created by a ' + writerType.name + ' writer', () => {
+            let writer = writerType.mkInstance();
             // writes the following values with the provided writer, sums the 'id' ints
             // within structs annotated with 'foo', and verifies the sum is 26:
             //
@@ -82,6 +83,16 @@ describe('IonReaderConsistency', () => {
             }
 
             assert.equal(sum, 26);
+        });
+
+        it('Reads big-ints created by a ' + writerType.name + ' writer', () => {
+            let writer = writerType.mkInstance();
+            writer.writeInt(1);
+            writer.close();
+            let reader = ion.makeReader(writer.getBytes());
+            reader.next();
+            let result = reader.bigIntValue()!;
+            assert.isTrue(JSBI.equal(result, JSBI.BigInt('1')))
         });
     });
 });
