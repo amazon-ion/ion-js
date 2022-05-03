@@ -472,6 +472,10 @@ export class ParserBinaryRaw {
           return null;
         }
         this.load_value();
+        if (!(this._curr instanceof JSBI)) {
+          const num = this._curr!;
+          return JSBI.BigInt(num);
+        }
         return this._curr!;
       default:
         throw new Error(
