@@ -5,7 +5,7 @@ An implementation of [Amazon Ion](https://amzn.github.io/ion-docs/) for JavaScri
 [![License](https://img.shields.io/hexpm/l/plug.svg)](https://github.com/amzn/ion-js/blob/master/LICENSE)
 [![Documentation](https://img.shields.io/badge/docs-api-green.svg)](https://amzn.github.io/ion-js/api/index.html)
 
-This package is tested to work with Node JS major versions **10**, **12**, **14**, and **16**.  While this library
+This package is tested with Node JS major versions **10**, **12**, **14**, and **16**.  While this library
 should be usable within browsers that support **ES5+**, please note that it is not currently being tested
 in any browser environments.
 
