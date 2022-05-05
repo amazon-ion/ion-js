@@ -1,0 +1,55 @@
+name: ion-js release
+
+on:
+  release:
+    types: [created]
+
+jobs:
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    steps:
+      - name: set env
+        run: echo "RELEASE_TAG=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+      # Setup .npmrc file to publish to npm
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '16.x'
+          registry-url: 'https://registry.npmjs.org'
+      - run: npm install
+      - name: grunt release
+        run: ./node_modules/.bin/grunt release
+      - name: create zip file
+        run: zip -r "ion-js.$RELEASE_TAG-dist.zip" ./dist
+      - name: upload zip file to github release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release upload "$RELEASE_TAG" "ion-js.$RELEASE_TAG-dist.zip"
+      - name: clean prior to publishing to npm
+        run: |
+          rm -rf .nyc_output
+          rm "ion-js.$RELEASE_TAG-dist.zip"
+      - name: npm publish
+        # skip npm publishing if running in a fork
+        if: github.repository == 'amzn/ion-js'
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm publish
+      - name: checkout gh-pages
+        uses: actions/checkout@v3
+        with:
+          ref: gh-pages
+          clean: false # keep the build outputs
+      - name: update gh-pages documentation
+        run: |
+          rm -rf api browser
+          cp -R ./docs/api .
+          cp -R ./docs/browser .
+          git add ./api ./browser
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git commit -m "adds documentation for $RELEASE_TAG"
+          git push
