@@ -3344,6 +3344,12 @@ var ParserBinaryRaw = /*#__PURE__*/function () {
           }
 
           this.load_value();
+
+          if (!(this._curr instanceof jsbi_1["default"])) {
+            var num = this._curr;
+            return jsbi_1["default"].BigInt(num);
+          }
+
           return this._curr;
 
         default:
