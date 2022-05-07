@@ -66,7 +66,7 @@ export class Float extends Value(Number, IonTypes.FLOAT, _fromJsConstructor) {
       return thisValue!.equals(other.decimalValue());
     } else if (!options.onlyCompareIon) {
       // We will consider other Float-ish types
-      if (other instanceof global.Number || typeof other === "number") {
+      if (other instanceof Number || typeof other === "number") {
         isSupportedType = true;
         valueToCompare = other.valueOf();
       }

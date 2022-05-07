@@ -110,7 +110,7 @@ export class Timestamp extends Value(
         // expectedValue is a non-DOM Timestamp
         isSupportedType = true;
         valueToCompare = other;
-      } else if (other instanceof global.Date) {
+      } else if (other instanceof Date) {
         if (this.dateValue().getTime() === other.getTime()) {
           return true;
         } else {

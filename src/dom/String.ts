@@ -4,11 +4,12 @@ import {
   FromJsConstructorBuilder,
   Primitives,
 } from "./FromJsConstructor";
+import { _NativeJsString } from "./JsValueConversion";
 import { Value } from "./Value";
 
 const _fromJsConstructor: FromJsConstructor = new FromJsConstructorBuilder()
   .withPrimitives(Primitives.String)
-  .withClassesToUnbox(global.String)
+  .withClassesToUnbox(_NativeJsString)
   .build();
 
 /**
@@ -17,7 +18,7 @@ const _fromJsConstructor: FromJsConstructor = new FromJsConstructorBuilder()
  * [1] http://amzn.github.io/ion-docs/docs/spec.html#string
  */
 export class String extends Value(
-  global.String,
+  _NativeJsString,
   IonTypes.STRING,
   _fromJsConstructor
 ) {
@@ -63,7 +64,7 @@ export class String extends Value(
       valueToCompare = other.stringValue();
     } else if (!options.onlyCompareIon) {
       // We will consider other String-ish types
-      if (typeof other === "string" || other instanceof global.String) {
+      if (typeof other === "string" || other instanceof _NativeJsString) {
         isSupportedType = true;
         valueToCompare = other.valueOf();
       }

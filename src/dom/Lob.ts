@@ -61,7 +61,7 @@ export function Lob(ionType: IonType) {
         }
       } else {
         // We will consider other Lob-ish types
-        if (other instanceof global.Uint8Array) {
+        if (other instanceof Uint8Array) {
           isSupportedType = true;
           valueToCompare = other.valueOf();
         }
