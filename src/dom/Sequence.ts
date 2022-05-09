@@ -102,7 +102,7 @@ export function Sequence(ionType: IonType) {
         }
       } else {
         // We will consider other Sequence-ish types
-        if (other instanceof global.Array) {
+        if (other instanceof Array) {
           isSupportedType = true;
           valueToCompare = other;
         }

@@ -17,8 +17,10 @@ const JS_DECODER_MAX_BYTES = 512;
 
 // Check whether this runtime supports the `TextDecoder` feature
 let textDecoder;
-if (global["TextDecoder"] != null) {
-  textDecoder = new global["TextDecoder"]("utf8", { fatal: true });
+// @ts-expect-error: Typescript will complain about TextDecoder being undefined
+if (typeof TextDecoder !== "undefined") {
+  // @ts-expect-error: Typescript will complain about TextDecoder being undefined
+  textDecoder = new TextDecoder("utf8", { fatal: true });
 } else {
   textDecoder = null;
 }

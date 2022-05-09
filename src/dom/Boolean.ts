@@ -4,11 +4,12 @@ import {
   FromJsConstructorBuilder,
   Primitives,
 } from "./FromJsConstructor";
+import { _NativeJsBoolean } from "./JsValueConversion";
 import { Value } from "./Value";
 
 const _fromJsConstructor: FromJsConstructor = new FromJsConstructorBuilder()
   .withPrimitives(Primitives.Boolean)
-  .withClassesToUnbox(global.Boolean)
+  .withClassesToUnbox(_NativeJsBoolean)
   .build();
 
 /**
@@ -36,7 +37,7 @@ const _fromJsConstructor: FromJsConstructor = new FromJsConstructorBuilder()
  * [2] https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean#Description
  */
 export class Boolean extends Value(
-  global.Boolean,
+  _NativeJsBoolean,
   IonTypes.BOOL,
   _fromJsConstructor
 ) {
@@ -81,7 +82,7 @@ export class Boolean extends Value(
       valueToCompare = other.booleanValue();
     } else if (!options.onlyCompareIon) {
       // We will consider other Boolean-ish types
-      if (typeof other === "boolean" || other instanceof global.Boolean) {
+      if (typeof other === "boolean" || other instanceof _NativeJsBoolean) {
         isSupportedType = true;
         valueToCompare = other.valueOf();
       }

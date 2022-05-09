@@ -5,6 +5,13 @@ import { IonTypes } from "../IonTypes";
 import { _hasValue } from "../util";
 import { Value } from "./Value";
 
+// In ./Boolean.ts and ./String.ts, the native Boolean and String types
+// are shadowed by the export class defined in the file, but said class
+// definitions still need to reference the original class definitions.
+// This provides a mechanism for doing so.
+export const _NativeJsBoolean = Boolean;
+export const _NativeJsString = String;
+
 // Typescript interfaces can be used to describe classes' static methods; this can
 // be a bit surprising as the methods in the interface are not marked 'static' and
 // the class definition does not need to indicate that it implements this interface.

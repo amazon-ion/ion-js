@@ -8,7 +8,7 @@ import { Value } from "./Value";
 
 const _fromJsConstructor: FromJsConstructor = new FromJsConstructorBuilder()
   .withPrimitives(Primitives.String)
-  .withClassesToUnbox(global.String)
+  .withClassesToUnbox(String)
   .build();
 
 // TODO:
@@ -63,7 +63,7 @@ export class Symbol extends Value(String, IonTypes.SYMBOL, _fromJsConstructor) {
       valueToCompare = other.stringValue();
     } else if (!options.onlyCompareIon) {
       // We will consider other Symbol-ish types
-      if (typeof other === "string" || other instanceof global.String) {
+      if (typeof other === "string" || other instanceof String) {
         isSupportedType = true;
         valueToCompare = other.valueOf();
       }

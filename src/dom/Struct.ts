@@ -222,7 +222,7 @@ export class Struct extends Value(
       valueToCompare = other.allFields();
     } else if (!options.onlyCompareIon) {
       // We will consider other Struct-ish types
-      if (typeof other === "object" || other instanceof global.Object) {
+      if (typeof other === "object" || other instanceof Object) {
         isSupportedType = true;
         valueToCompare = Value.from(other).allFields();
       }

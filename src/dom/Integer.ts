@@ -108,7 +108,7 @@ export class Integer extends Value(Number, IonTypes.INT, _fromJsConstructor) {
       }
     } else if (!options.onlyCompareIon) {
       // We will consider other Integer-ish types
-      if (other instanceof global.Number || typeof other === "number") {
+      if (other instanceof Number || typeof other === "number") {
         isSupportedType = true;
         if (this.bigIntValue == null) {
           valueToCompare = other.valueOf();
