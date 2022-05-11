@@ -9538,7 +9538,6 @@ exports.IonTypes = {
 };
 
 },{"./IonType":27}],29:[function(require,module,exports){
-(function (global){(function (){
 "use strict";
 /*!
  * Copyright 2012 Amazon.com, Inc. or its affiliates. All Rights Reserved.
@@ -9562,8 +9561,8 @@ exports.decodeUtf8 = exports.encodeUtf8 = void 0;
 var JS_DECODER_MAX_BYTES = 512;
 var textDecoder;
 
-if (global["TextDecoder"] != null) {
-  textDecoder = new global["TextDecoder"]("utf8", {
+if (typeof TextDecoder !== "undefined") {
+  textDecoder = new TextDecoder("utf8", {
     fatal: true
   });
 } else {
@@ -9667,7 +9666,6 @@ function decodeUtf8(bytes) {
 
 exports.decodeUtf8 = decodeUtf8;
 
-}).call(this)}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{}],30:[function(require,module,exports){
 "use strict";
 /*!
@@ -10152,7 +10150,6 @@ var Blob = /*#__PURE__*/function (_Lob_1$Lob) {
 exports.Blob = Blob;
 
 },{"../Ion":4,"./Lob":43,"@babel/runtime/helpers/classCallCheck":61,"@babel/runtime/helpers/createClass":63,"@babel/runtime/helpers/getPrototypeOf":67,"@babel/runtime/helpers/inherits":68,"@babel/runtime/helpers/interopRequireDefault":69,"@babel/runtime/helpers/possibleConstructorReturn":76}],35:[function(require,module,exports){
-(function (global){(function (){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -10180,9 +10177,11 @@ var Ion_1 = require("../Ion");
 
 var FromJsConstructor_1 = require("./FromJsConstructor");
 
+var JsValueConversion_1 = require("./JsValueConversion");
+
 var Value_1 = require("./Value");
 
-var _fromJsConstructor = new FromJsConstructor_1.FromJsConstructorBuilder().withPrimitives(FromJsConstructor_1.Primitives.Boolean).withClassesToUnbox(global.Boolean).build();
+var _fromJsConstructor = new FromJsConstructor_1.FromJsConstructorBuilder().withPrimitives(FromJsConstructor_1.Primitives.Boolean).withClassesToUnbox(JsValueConversion_1._NativeJsBoolean).build();
 
 var _Boolean = /*#__PURE__*/function (_Value_1$Value) {
   (0, _inherits2["default"])(Boolean, _Value_1$Value);
@@ -10228,7 +10227,7 @@ var _Boolean = /*#__PURE__*/function (_Value_1$Value) {
         isSupportedType = true;
         valueToCompare = other.booleanValue();
       } else if (!options.onlyCompareIon) {
-        if (typeof other === "boolean" || other instanceof global.Boolean) {
+        if (typeof other === "boolean" || other instanceof JsValueConversion_1._NativeJsBoolean) {
           isSupportedType = true;
           valueToCompare = other.valueOf();
         }
@@ -10246,12 +10245,11 @@ var _Boolean = /*#__PURE__*/function (_Value_1$Value) {
     }
   }]);
   return Boolean;
-}(Value_1.Value(global.Boolean, Ion_1.IonTypes.BOOL, _fromJsConstructor));
+}(Value_1.Value(JsValueConversion_1._NativeJsBoolean, Ion_1.IonTypes.BOOL, _fromJsConstructor));
 
 exports.Boolean = _Boolean;
 
-}).call(this)}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../Ion":4,"./FromJsConstructor":39,"./Value":51,"@babel/runtime/helpers/classCallCheck":61,"@babel/runtime/helpers/createClass":63,"@babel/runtime/helpers/getPrototypeOf":67,"@babel/runtime/helpers/inherits":68,"@babel/runtime/helpers/interopRequireDefault":69,"@babel/runtime/helpers/possibleConstructorReturn":76}],36:[function(require,module,exports){
+},{"../Ion":4,"./FromJsConstructor":39,"./JsValueConversion":41,"./Value":51,"@babel/runtime/helpers/classCallCheck":61,"@babel/runtime/helpers/createClass":63,"@babel/runtime/helpers/getPrototypeOf":67,"@babel/runtime/helpers/inherits":68,"@babel/runtime/helpers/interopRequireDefault":69,"@babel/runtime/helpers/possibleConstructorReturn":76}],36:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -10498,7 +10496,6 @@ var Decimal = /*#__PURE__*/function (_Value_1$Value) {
 exports.Decimal = Decimal;
 
 },{"../Ion":4,"./Float":38,"./FromJsConstructor":39,"./Value":51,"@babel/runtime/helpers/classCallCheck":61,"@babel/runtime/helpers/createClass":63,"@babel/runtime/helpers/getPrototypeOf":67,"@babel/runtime/helpers/inherits":68,"@babel/runtime/helpers/interopRequireDefault":69,"@babel/runtime/helpers/possibleConstructorReturn":76}],38:[function(require,module,exports){
-(function (global){(function (){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -10616,7 +10613,7 @@ var Float = /*#__PURE__*/function (_Value_1$Value) {
         var thisValue = new ion.Decimal(other.toString());
         return thisValue.equals(other.decimalValue());
       } else if (!options.onlyCompareIon) {
-        if (other instanceof global.Number || typeof other === "number") {
+        if (other instanceof Number || typeof other === "number") {
           isSupportedType = true;
           valueToCompare = other.valueOf();
         }
@@ -10642,7 +10639,6 @@ var Float = /*#__PURE__*/function (_Value_1$Value) {
 
 exports.Float = Float;
 
-}).call(this)}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"../Ion":4,"./Decimal":37,"./FromJsConstructor":39,"./Value":51,"@babel/runtime/helpers/classCallCheck":61,"@babel/runtime/helpers/createClass":63,"@babel/runtime/helpers/getPrototypeOf":67,"@babel/runtime/helpers/inherits":68,"@babel/runtime/helpers/interopRequireDefault":69,"@babel/runtime/helpers/possibleConstructorReturn":76}],39:[function(require,module,exports){
 "use strict";
 
@@ -10774,7 +10770,6 @@ exports.Primitives = {
 };
 
 },{"../Ion":4,"../util":56,"@babel/runtime/helpers/classCallCheck":61,"@babel/runtime/helpers/createClass":63,"@babel/runtime/helpers/interopRequireDefault":69,"@babel/runtime/helpers/typeof":81}],40:[function(require,module,exports){
-(function (global){(function (){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -10903,7 +10898,7 @@ var Integer = /*#__PURE__*/function (_Value_1$Value) {
           valueToCompare = other.bigIntValue();
         }
       } else if (!options.onlyCompareIon) {
-        if (other instanceof global.Number || typeof other === "number") {
+        if (other instanceof Number || typeof other === "number") {
           isSupportedType = true;
 
           if (this.bigIntValue == null) {
@@ -10933,7 +10928,6 @@ var Integer = /*#__PURE__*/function (_Value_1$Value) {
 
 exports.Integer = Integer;
 
-}).call(this)}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"../Ion":4,"./FromJsConstructor":39,"./Value":51,"@babel/runtime/helpers/classCallCheck":61,"@babel/runtime/helpers/createClass":63,"@babel/runtime/helpers/getPrototypeOf":67,"@babel/runtime/helpers/inherits":68,"@babel/runtime/helpers/interopRequireDefault":69,"@babel/runtime/helpers/possibleConstructorReturn":76,"jsbi":84}],41:[function(require,module,exports){
 "use strict";
 
@@ -10950,7 +10944,7 @@ var __importDefault = void 0 && (void 0).__importDefault || function (mod) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports._ionValueFromJsValue = exports._domConstructorFor = void 0;
+exports._ionValueFromJsValue = exports._domConstructorFor = exports._NativeJsString = exports._NativeJsBoolean = void 0;
 
 var jsbi_1 = __importDefault(require("jsbi"));
 
@@ -10960,6 +10954,8 @@ var IonTypes_1 = require("../IonTypes");
 
 var util_1 = require("../util");
 
+exports._NativeJsBoolean = Boolean;
+exports._NativeJsString = String;
 var _domTypesByIonType = null;
 
 function _getDomTypesByIonTypeMap() {
@@ -11107,7 +11103,6 @@ var List = /*#__PURE__*/function (_Sequence_1$Sequence) {
 exports.List = List;
 
 },{"../Ion":4,"./Sequence":46,"@babel/runtime/helpers/classCallCheck":61,"@babel/runtime/helpers/createClass":63,"@babel/runtime/helpers/getPrototypeOf":67,"@babel/runtime/helpers/inherits":68,"@babel/runtime/helpers/interopRequireDefault":69,"@babel/runtime/helpers/possibleConstructorReturn":76}],43:[function(require,module,exports){
-(function (global){(function (){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -11180,7 +11175,7 @@ function Lob(ionType) {
             valueToCompare = other.uInt8ArrayValue();
           }
         } else {
-          if (other instanceof global.Uint8Array) {
+          if (other instanceof Uint8Array) {
             isSupportedType = true;
             valueToCompare = other.valueOf();
           }
@@ -11212,7 +11207,6 @@ function Lob(ionType) {
 
 exports.Lob = Lob;
 
-}).call(this)}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"../Ion":4,"./FromJsConstructor":39,"./Value":51,"@babel/runtime/helpers/classCallCheck":61,"@babel/runtime/helpers/createClass":63,"@babel/runtime/helpers/getPrototypeOf":67,"@babel/runtime/helpers/inherits":68,"@babel/runtime/helpers/interopRequireDefault":69,"@babel/runtime/helpers/possibleConstructorReturn":76}],44:[function(require,module,exports){
 "use strict";
 
@@ -11450,7 +11444,6 @@ var SExpression = /*#__PURE__*/function (_Sequence_1$Sequence) {
 exports.SExpression = SExpression;
 
 },{"../Ion":4,"./Sequence":46,"@babel/runtime/helpers/classCallCheck":61,"@babel/runtime/helpers/createClass":63,"@babel/runtime/helpers/getPrototypeOf":67,"@babel/runtime/helpers/inherits":68,"@babel/runtime/helpers/interopRequireDefault":69,"@babel/runtime/helpers/possibleConstructorReturn":76}],46:[function(require,module,exports){
-(function (global){(function (){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -11601,7 +11594,7 @@ function Sequence(ionType) {
             valueToCompare = other.elements();
           }
         } else {
-          if (other instanceof global.Array) {
+          if (other instanceof Array) {
             isSupportedType = true;
             valueToCompare = other;
           }
@@ -11651,9 +11644,7 @@ function Sequence(ionType) {
 
 exports.Sequence = Sequence;
 
-}).call(this)}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"../Ion":4,"./FromJsConstructor":39,"./Value":51,"@babel/runtime/helpers/classCallCheck":61,"@babel/runtime/helpers/createClass":63,"@babel/runtime/helpers/getPrototypeOf":67,"@babel/runtime/helpers/inherits":68,"@babel/runtime/helpers/interopRequireDefault":69,"@babel/runtime/helpers/possibleConstructorReturn":76,"@babel/runtime/helpers/toConsumableArray":80,"@babel/runtime/helpers/typeof":81}],47:[function(require,module,exports){
-(function (global){(function (){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -11681,9 +11672,11 @@ var Ion_1 = require("../Ion");
 
 var FromJsConstructor_1 = require("./FromJsConstructor");
 
+var JsValueConversion_1 = require("./JsValueConversion");
+
 var Value_1 = require("./Value");
 
-var _fromJsConstructor = new FromJsConstructor_1.FromJsConstructorBuilder().withPrimitives(FromJsConstructor_1.Primitives.String).withClassesToUnbox(global.String).build();
+var _fromJsConstructor = new FromJsConstructor_1.FromJsConstructorBuilder().withPrimitives(FromJsConstructor_1.Primitives.String).withClassesToUnbox(JsValueConversion_1._NativeJsString).build();
 
 var String = /*#__PURE__*/function (_Value_1$Value) {
   (0, _inherits2["default"])(String, _Value_1$Value);
@@ -11729,7 +11722,7 @@ var String = /*#__PURE__*/function (_Value_1$Value) {
         isSupportedType = true;
         valueToCompare = other.stringValue();
       } else if (!options.onlyCompareIon) {
-        if (typeof other === "string" || other instanceof global.String) {
+        if (typeof other === "string" || other instanceof JsValueConversion_1._NativeJsString) {
           isSupportedType = true;
           valueToCompare = other.valueOf();
         }
@@ -11748,13 +11741,11 @@ var String = /*#__PURE__*/function (_Value_1$Value) {
     }
   }]);
   return String;
-}(Value_1.Value(global.String, Ion_1.IonTypes.STRING, _fromJsConstructor));
+}(Value_1.Value(JsValueConversion_1._NativeJsString, Ion_1.IonTypes.STRING, _fromJsConstructor));
 
 exports.String = String;
 
-}).call(this)}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../Ion":4,"./FromJsConstructor":39,"./Value":51,"@babel/runtime/helpers/classCallCheck":61,"@babel/runtime/helpers/createClass":63,"@babel/runtime/helpers/getPrototypeOf":67,"@babel/runtime/helpers/inherits":68,"@babel/runtime/helpers/interopRequireDefault":69,"@babel/runtime/helpers/possibleConstructorReturn":76}],48:[function(require,module,exports){
-(function (global){(function (){
+},{"../Ion":4,"./FromJsConstructor":39,"./JsValueConversion":41,"./Value":51,"@babel/runtime/helpers/classCallCheck":61,"@babel/runtime/helpers/createClass":63,"@babel/runtime/helpers/getPrototypeOf":67,"@babel/runtime/helpers/inherits":68,"@babel/runtime/helpers/interopRequireDefault":69,"@babel/runtime/helpers/possibleConstructorReturn":76}],48:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -12086,7 +12077,7 @@ var Struct = /*#__PURE__*/function (_Value_1$Value, _Symbol$iterator) {
         isSupportedType = true;
         valueToCompare = other.allFields();
       } else if (!options.onlyCompareIon) {
-        if ((0, _typeof2["default"])(other) === "object" || other instanceof global.Object) {
+        if ((0, _typeof2["default"])(other) === "object" || other instanceof Object) {
           isSupportedType = true;
           valueToCompare = Value_1.Value.from(other).allFields();
         }
@@ -12171,9 +12162,7 @@ var Struct = /*#__PURE__*/function (_Value_1$Value, _Symbol$iterator) {
 
 exports.Struct = Struct;
 
-}).call(this)}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"../Ion":4,"./FromJsConstructor":39,"./Value":51,"@babel/runtime/helpers/assertThisInitialized":60,"@babel/runtime/helpers/classCallCheck":61,"@babel/runtime/helpers/createClass":63,"@babel/runtime/helpers/getPrototypeOf":67,"@babel/runtime/helpers/inherits":68,"@babel/runtime/helpers/interopRequireDefault":69,"@babel/runtime/helpers/possibleConstructorReturn":76,"@babel/runtime/helpers/slicedToArray":78,"@babel/runtime/helpers/toConsumableArray":80,"@babel/runtime/helpers/typeof":81}],49:[function(require,module,exports){
-(function (global){(function (){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -12203,7 +12192,7 @@ var FromJsConstructor_1 = require("./FromJsConstructor");
 
 var Value_1 = require("./Value");
 
-var _fromJsConstructor = new FromJsConstructor_1.FromJsConstructorBuilder().withPrimitives(FromJsConstructor_1.Primitives.String).withClassesToUnbox(global.String).build();
+var _fromJsConstructor = new FromJsConstructor_1.FromJsConstructorBuilder().withPrimitives(FromJsConstructor_1.Primitives.String).withClassesToUnbox(String).build();
 
 var _Symbol = /*#__PURE__*/function (_Value_1$Value) {
   (0, _inherits2["default"])(_Symbol, _Value_1$Value);
@@ -12249,7 +12238,7 @@ var _Symbol = /*#__PURE__*/function (_Value_1$Value) {
         isSupportedType = true;
         valueToCompare = other.stringValue();
       } else if (!options.onlyCompareIon) {
-        if (typeof other === "string" || other instanceof global.String) {
+        if (typeof other === "string" || other instanceof String) {
           isSupportedType = true;
           valueToCompare = other.valueOf();
         }
@@ -12272,9 +12261,7 @@ var _Symbol = /*#__PURE__*/function (_Value_1$Value) {
 
 exports.Symbol = _Symbol;
 
-}).call(this)}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"../Ion":4,"./FromJsConstructor":39,"./Value":51,"@babel/runtime/helpers/classCallCheck":61,"@babel/runtime/helpers/createClass":63,"@babel/runtime/helpers/getPrototypeOf":67,"@babel/runtime/helpers/inherits":68,"@babel/runtime/helpers/interopRequireDefault":69,"@babel/runtime/helpers/possibleConstructorReturn":76}],50:[function(require,module,exports){
-(function (global){(function (){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -12407,7 +12394,7 @@ var Timestamp = /*#__PURE__*/function (_Value_1$Value) {
         if (other instanceof ion.Timestamp) {
           isSupportedType = true;
           valueToCompare = other;
-        } else if (other instanceof global.Date) {
+        } else if (other instanceof Date) {
           if (this.dateValue().getTime() === other.getTime()) {
             return true;
           } else {
@@ -12439,7 +12426,6 @@ var Timestamp = /*#__PURE__*/function (_Value_1$Value) {
 
 exports.Timestamp = Timestamp;
 
-}).call(this)}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"../Ion":4,"./FromJsConstructor":39,"./Value":51,"@babel/runtime/helpers/classCallCheck":61,"@babel/runtime/helpers/createClass":63,"@babel/runtime/helpers/getPrototypeOf":67,"@babel/runtime/helpers/inherits":68,"@babel/runtime/helpers/interopRequireDefault":69,"@babel/runtime/helpers/possibleConstructorReturn":76}],51:[function(require,module,exports){
 "use strict";
 
