@@ -13,7 +13,6 @@
  * permissions and limitations under the License.
  */
 
-import JSBI from "jsbi";
 import { Decimal } from "./IonDecimal";
 import { Reader } from "./IonReader";
 import { Timestamp } from "./IonTimestamp";
@@ -40,7 +39,7 @@ export interface Writer {
    *  If `number` is not an integer between the range specified by `Number.MIN_SAFE_INTEGER`
    *  and `Number.MAX_SAFE_INTEGER`, an implementation may truncate or round the value.
    */
-  writeInt(value: number | JSBI | null): void;
+  writeInt(value: number | bigint | null): void;
 
   /**
    * Writes a `number` value as an Ion 32-bit binary `float` value.

@@ -13,7 +13,6 @@
  * permissions and limitations under the License.
  */
 
-import JSBI from "jsbi";
 import IntSize from "./IntSize";
 import { Decimal } from "./IonDecimal";
 import { Timestamp } from "./IonTimestamp";
@@ -24,7 +23,7 @@ export type ReaderScalarValue =
   | null
   | boolean
   | number
-  | JSBI
+  | bigint
   | Decimal
   | Timestamp
   | string
@@ -175,7 +174,7 @@ export interface Reader {
    *
    * @throw Error when the reader is not positioned on an `int` typed value.
    */
-  bigIntValue(): JSBI | null;
+  bigIntValue(): bigint | null;
 
   /**
    * Indicates whether the current int value is small enough to be stored in a number without loss of precision

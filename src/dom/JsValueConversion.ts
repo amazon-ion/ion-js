@@ -1,4 +1,3 @@
-import JSBI from "jsbi";
 import { Decimal, dom, Timestamp } from "../Ion";
 import { IonType } from "../IonType";
 import { IonTypes } from "../IonTypes";
@@ -88,10 +87,7 @@ function _inferType(value: any): IonType {
     case "object":
       break;
     case "bigint":
-      break;
-    // ^-- We `break` here to defer handling native bigints to the 'valueof JSBI' test below,
-    // which will handle native bigints correctly if Babel is being used to convert JSBI
-    // logic to native bigint logic.
+      return IonTypes.INT;
     // TODO: Javascript symbols are not a 1:1 match for Ion symbols, but we may wish
     //       to support them in Value.from() anyway.
     // case "symbol":
@@ -101,26 +97,8 @@ function _inferType(value: any): IonType {
       );
   }
 
-  // TODO: Use the code below to create an easy-to-understand _babelJsbiIsEnabled() test.
-  // If `value` is a native bigint but we're not using Babel for native bigint support, we need to
-  // throw an Error.
-  //
-  // If Babel is being used, this test becomes:
-  //      typeof(value) === 'bigint'
-  // which will return true for native bigints, leading to the creation of an Integer.
-  //
-  // If Babel is not being used, then this remains a JSBI instanceof test, which will
-  // return false for native bigints.
-  if (value instanceof JSBI) {
+  if (value instanceof BigInt) {
     return IonTypes.INT;
-  } else if (typeof value === "bigint") {
-    // If Babel is being used, this check will be identical to the one above it and it will
-    // never be reached. If Babel is not being used, this test will return true for native
-    // bigints (which aren't supported without Babel) while allowing other Object types
-    // to be processed below.
-    throw new Error(
-      "bigints are not supported without using Babel for JSBI compilation."
-    );
   }
   if (value instanceof Number) {
     return Number.isInteger(value.valueOf()) ? IonTypes.INT : IonTypes.FLOAT;

@@ -1,4 +1,3 @@
-import JSBI from "jsbi";
 import { Decimal, IonType, IonTypes, Writer } from "../Ion";
 import { FromJsConstructor } from "./FromJsConstructor";
 import { PathElement, Value } from "./Value";
@@ -96,7 +95,7 @@ export class Null extends Value(Object, IonTypes.NULL, FromJsConstructor.NONE) {
     return this._convertToJsNull("numberValue");
   }
 
-  bigIntValue(): JSBI | null {
+  bigIntValue(): bigint | null {
     return this._convertToJsNull("bigIntValue");
   }
 

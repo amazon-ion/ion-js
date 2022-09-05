@@ -36,3 +36,13 @@ export function _assertDefined(value: any): void {
     throw new Error("Expected value to be defined");
   }
 }
+
+/**
+ * Indicates whether the provided bigint value is within the range[ Number.MIN_SAFE_INTEGER, Number.MAX_SAFE_INTEGER].
+ *
+ * @param value     The integer to test.
+ * @return          True if toNumber(value) can be called without losing any precision.
+ */
+export function isSafeInteger(value: bigint): boolean {
+  return value >= Number.MIN_SAFE_INTEGER && value <= Number.MAX_SAFE_INTEGER;
+}

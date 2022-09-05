@@ -8,11 +8,11 @@
     "**/*.d.ts"
   ],
   "compilerOptions": {
-    "target": "es6",
+    "target": "es2020",
     "module": "commonjs",
     "moduleResolution": "node",
     "esModuleInterop": true,
-    "lib": ["es6", "es2017.object"],
+    "lib": ["es2020"],
     "declaration": true,
     "inlineSources": true,
     "sourceMap": true,
