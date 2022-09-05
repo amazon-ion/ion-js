@@ -1,4 +1,3 @@
-import JSBI from "jsbi";
 import { Decimal, IonType, Timestamp, Writer } from "../Ion";
 import { _hasValue } from "../util";
 import { FromJsConstructor } from "./FromJsConstructor";
@@ -55,7 +54,7 @@ export interface Value {
    * For the Integer type, returns a BigInt representation of the Value; otherwise throws
    * an Error.
    */
-  bigIntValue(): JSBI | null;
+  bigIntValue(): bigint | null;
 
   /**
    * For the Decimal type, returns an ion.Decimal representation of the Value; otherwise
@@ -339,7 +338,7 @@ export function Value<Clazz extends Constructor>(
       this._unsupportedOperation("numberValue");
     }
 
-    bigIntValue(): JSBI | null {
+    bigIntValue(): bigint | null {
       this._unsupportedOperation("bigIntValue");
     }
 

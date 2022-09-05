@@ -13,9 +13,6 @@
  * permissions and limitations under the License.
  */
 
-import JSBI from "jsbi";
-import { JsbiSupport } from "./JsbiSupport";
-
 /**
  * Represents a signed, arbitrarily sized integer.
  *
@@ -27,11 +24,11 @@ import { JsbiSupport } from "./JsbiSupport";
  */
 export default class SignAndMagnitudeInt {
   constructor(
-    public readonly _magnitude: JSBI,
-    public readonly _isNegative = JsbiSupport.isNegative(_magnitude)
+    public readonly _magnitude: bigint,
+    public readonly _isNegative = _magnitude < 0n
   ) {}
 
-  get magnitude(): JSBI {
+  get magnitude(): bigint {
     return this._magnitude;
   }
 
@@ -42,13 +39,13 @@ export default class SignAndMagnitudeInt {
   public static fromNumber(value: number): SignAndMagnitudeInt {
     const isNegative = value < 0 || Object.is(value, -0);
     const absoluteValue = Math.abs(value);
-    const magnitude = JSBI.BigInt(absoluteValue);
+    const magnitude = BigInt(absoluteValue);
     return new SignAndMagnitudeInt(magnitude, isNegative);
   }
 
   public equals(other: SignAndMagnitudeInt): boolean {
     return (
-      JSBI.equal(this._magnitude, other._magnitude) &&
+      this._magnitude === other._magnitude &&
       this._isNegative === other._isNegative
     );
   }

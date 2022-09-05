@@ -13,8 +13,6 @@
  * permissions and limitations under the License.
  */
 
-import JSBI from "jsbi";
-import { JsbiSupport } from "./JsbiSupport";
 import { _hasValue, _sign } from "./util";
 
 /**
@@ -47,9 +45,9 @@ export class Decimal {
   // Note that while the scheme described in the above link uses an unsigned integer to represent its coefficient,
   // this class uses a signed integer. The sign of the value returned by `getCoefficient()` will always agree
   // with the sign returned by `isNegative()` except in the case of -0, which cannot be natively represented
-  // by the JSBI and BigInt data types. In the case of -0, `isNegative()` will return `true` and `getCoefficient()`
+  // by the BigInt data type. In the case of -0, `isNegative()` will return `true` and `getCoefficient()`
   // will return a positive zero.
-  private _coefficient: JSBI;
+  private _coefficient: bigint;
   private _exponent: number;
   private _isNegative: boolean;
 
@@ -79,11 +77,11 @@ export class Decimal {
    * @param exponent      See the class-level [[Decimal]] documentation for details.
    * @param isNegative    Must be set to 'true' when constructing -0. May be omitted otherwise.
    */
-  constructor(coefficient: JSBI, exponent: number, isNegative?: boolean);
+  constructor(coefficient: bigint, exponent: number, isNegative?: boolean);
 
   // This is the unified implementation of the above signatures and is not visible to users.
   constructor(
-    coefficient: number | JSBI | string,
+    coefficient: number | bigint | string,
     exponent?: number,
     isNegative: boolean = false
   ) {
@@ -101,14 +99,14 @@ export class Decimal {
       return Decimal._fromNumberCoefficient(coefficient, exponent!);
     }
 
-    if (coefficient instanceof JSBI) {
+    if (typeof coefficient === "bigint") {
       if (!_hasValue(isNegative)) {
         // If isNegative was not specified, infer isNegative from the coefficient.
         // This will work for all values except -0.
-        isNegative = JsbiSupport.isNegative(coefficient);
-      } else if (isNegative != JsbiSupport.isNegative(coefficient)) {
+        isNegative = coefficient < 0n;
+      } else if (isNegative != coefficient < 0n) {
         // If isNegative was specified, make sure that the coefficient's sign agrees with it.
-        coefficient = JSBI.unaryMinus(coefficient);
+        coefficient *= -1n;
       }
       return Decimal._fromBigIntCoefficient(isNegative, coefficient, exponent!);
     }
@@ -135,7 +133,7 @@ export class Decimal {
     const isNegative = coefficient < 0 || Object.is(coefficient, -0);
     return this._fromBigIntCoefficient(
       isNegative,
-      JSBI.BigInt(coefficient),
+      BigInt(coefficient),
       exponent
     );
   }
@@ -146,7 +144,7 @@ export class Decimal {
    */
   static _fromBigIntCoefficient(
     isNegative: boolean,
-    coefficient: JSBI,
+    coefficient: bigint,
     exponent: number
   ): Decimal {
     const value = Object.create(this.prototype);
@@ -185,9 +183,9 @@ export class Decimal {
       coefficientText = str.substring(0, exponentDelimiterIndex);
     }
 
-    const coefficient: JSBI = JSBI.BigInt(coefficientText);
+    const coefficient = BigInt(coefficientText);
     const isNegative: boolean =
-      JsbiSupport.isNegative(coefficient) || coefficientText.startsWith("-0");
+      coefficient < 0n || coefficientText.startsWith("-0");
     return Decimal._fromBigIntCoefficient(isNegative, coefficient, exponent);
   }
 
@@ -207,7 +205,7 @@ export class Decimal {
     if (this._isNegativeZero()) {
       return -0;
     }
-    return JSBI.toNumber(this._coefficient) * Math.pow(10, this._exponent);
+    return Number(this._coefficient) * Math.pow(10, this._exponent);
   }
 
   /**
@@ -227,7 +225,7 @@ export class Decimal {
     let cStr = this._coefficient.toString();
 
     if (cStr[0] === "-") {
-      cStr = cStr.substr(1, cStr.length);
+      cStr = cStr.substring(1, cStr.length);
     }
 
     const precision = cStr.length;
@@ -241,19 +239,19 @@ export class Decimal {
       } else {
         if (cStr.length <= -this._exponent) {
           cStr = "0".repeat(-this._exponent - cStr.length + 1) + cStr;
-          s += cStr.substr(0, 1) + "." + cStr.substr(1);
+          s += cStr.substring(0, 1) + "." + cStr.substring(1);
         } else {
           s +=
-            cStr.substr(0, precision + this._exponent) +
+            cStr.substring(0, precision + this._exponent) +
             "." +
-            cStr.substr(precision + this._exponent);
+            cStr.substring(precision + this._exponent);
         }
       }
     } else {
       // use exponential notation
       s += cStr[0];
       if (cStr.length > 1) {
-        s += "." + cStr.substr(1);
+        s += "." + cStr.substring(1);
       }
       s += "E" + (adjustedExponent > 0 ? "+" : "") + adjustedExponent;
     }
@@ -273,7 +271,7 @@ export class Decimal {
    * Note that the BigInt data type is unable to represent -0 natively. If you wish to check for a -0 coefficient,
    * test whether the coefficient is zero and then call [[isNegative]].
    */
-  getCoefficient(): JSBI {
+  getCoefficient(): bigint {
     return this._coefficient;
   }
 
@@ -295,7 +293,7 @@ export class Decimal {
       this.getExponent() === that.getExponent() &&
       _sign(this.getExponent()) === _sign(that.getExponent()) &&
       this.isNegative() === that.isNegative() &&
-      JSBI.equal(this.getCoefficient(), that.getCoefficient())
+      this.getCoefficient() === that.getCoefficient()
     );
   }
 
@@ -310,10 +308,7 @@ export class Decimal {
    * does not.
    */
   compareTo(that: Decimal): number {
-    if (
-      JsbiSupport.isZero(this._coefficient) &&
-      JsbiSupport.isZero(that._coefficient)
-    ) {
+    if (this._coefficient === 0n && that._coefficient === 0n) {
       return 0;
     }
 
@@ -350,11 +345,11 @@ export class Decimal {
       thatCoefficientStr += "0".repeat(thisPrecision - thatPrecision);
     }
 
-    const thisJsbi = JSBI.BigInt(thisCoefficientStr);
-    const thatJsbi = JSBI.BigInt(thatCoefficientStr);
-    if (JSBI.greaterThan(thisJsbi, thatJsbi)) {
+    const thisBigInt = BigInt(thisCoefficientStr);
+    const thatBigInt = BigInt(thatCoefficientStr);
+    if (thisBigInt > thatBigInt) {
       return neg ? -1 : 1;
-    } else if (JSBI.lessThan(thisJsbi, thatJsbi)) {
+    } else if (thisBigInt < thatBigInt) {
       return neg ? 1 : -1;
     }
 
@@ -362,12 +357,12 @@ export class Decimal {
   }
 
   /**
-   * Constructor helper shared by the public constructor and _fromJsbiCoefficient.
+   * Constructor helper shared by the public constructor and _fromBigIntCoefficient.
    * @hidden
    */
   private _initialize(
     isNegative: boolean,
-    coefficient: JSBI,
+    coefficient: bigint,
     exponent: number
   ) {
     this._isNegative = isNegative;
@@ -381,7 +376,7 @@ export class Decimal {
   }
 
   private _isNegativeZero(): boolean {
-    return this.isNegative() && JsbiSupport.isZero(this._coefficient);
+    return this.isNegative() && this._coefficient == 0n;
   }
 
   /**
@@ -414,7 +409,7 @@ export class Decimal {
       // but simpler to describe and reason about if we make this adjustment)
       magnitude -= 1;
     }
-    if (JsbiSupport.isZero(this._coefficient)) {
+    if (this._coefficient === 0n) {
       magnitude = -Infinity;
     }
     return [coefficientStr, precision, magnitude];

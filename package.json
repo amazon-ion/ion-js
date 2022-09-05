@@ -7,9 +7,7 @@
   "scripts": {
     "commit": "git-cz",
     "prepare": "grunt release",
-    "test": "npm run test-jsbi4 && npm run test-jsbi3",
-    "test-jsbi3": "npm install jsbi@3.1.1 && nyc mocha",
-    "test-jsbi4": "npm install jsbi@4.0.0 && nyc mocha",
+    "test": "nyc mocha",
     "release": "grunt release",
     "test-driver": "cd test-driver && npm install",
     "build-test-driver": "cd test-driver && npm run build",
@@ -74,7 +72,6 @@
     "grunt-ts": "^6.0.0-beta.21",
     "grunt-tslint": "^5.0.2",
     "grunt-typedoc": "^0.2.4",
-    "jsbi": "3.1.1",
     "mocha": "^6.2.3",
     "mocha-typescript": "^1.1.17",
     "nyc": "^14.1.1",
@@ -86,8 +83,5 @@
     "typedoc": "^0.16.10",
     "typescript": "^3.9.3",
     "yargs": "^15.4.1"
-  },
-  "peerDependencies": {
-    "jsbi": "^3.1.1"
   }
 }

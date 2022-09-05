@@ -13,29 +13,29 @@
  * permissions and limitations under the License.
  */
 
-import JSBI from "jsbi";
-import { JsbiSupport } from "./JsbiSupport";
-
-// TODO: Add fast paths for JSBI values that can fit in a standard Number.
+// TODO: Add fast paths for BigInt values that can fit in a standard Number.
 /**
- * This class provides logic to convert JSBI values to and from the UInt, Int, VarUInt, and VarInt primitives from the
+ * This class provides logic to convert BigInt values to and from the UInt, Int, VarUInt, and VarInt primitives from the
  * Ion spec.
  */
-export class JsbiSerde {
-  private static readonly SERIALIZED_JSBI_SIZES_TO_PRECOMPUTE = 64;
-  private static readonly BITS_PER_BYTE = JSBI.BigInt(8);
-  private static readonly BYTE_MAX_VALUE = JSBI.BigInt(0xff);
-  private static readonly SIZE_THRESHOLDS = JsbiSerde.calculateSizeThresholds();
+export class BigIntSerde {
+  private static readonly SERIALIZED_BIGINT_SIZES_TO_PRECOMPUTE = 64;
+  private static readonly BITS_PER_BYTE = 8n;
+  private static readonly BYTE_MAX_VALUE = BigInt(0xff);
+  private static readonly SIZE_THRESHOLDS = BigIntSerde.calculateSizeThresholds();
 
   /**
-   * Encodes the specified JSBI value as a sign-and-magnitude integer.
+   * Encodes the specified BigInt value as a sign-and-magnitude integer.
    *
    * @param value         The integer to encode.
    * @param isNegative    Whether or not the integer is negative. This cannot be inferred when `value` is zero,
-   *                      as the JSBI data type cannot natively represent negative zero.
+   *                      as the BigInt data type cannot natively represent negative zero.
    * @return              A byte array containing the encoded Int.
    */
-  public static toSignedIntBytes(value: JSBI, isNegative: boolean): Uint8Array {
+  public static toSignedIntBytes(
+    value: bigint,
+    isNegative: boolean
+  ): Uint8Array {
     let bytes: Uint8Array = this.toUnsignedIntBytes(value);
     if (bytes[0] >= 128) {
       const extendedBytes: Uint8Array = new Uint8Array(bytes.length + 1);
@@ -52,55 +52,53 @@ export class JsbiSerde {
    * Reads the provided byte array as a big-endian, unsigned integer.
    *
    * @param bytes     A byte array containing an encoded UInt.
-   * @return          A JSBI value representing the encoded UInt.
+   * @return          A BigInt value representing the encoded UInt.
    */
-  public static fromUnsignedBytes(bytes: Uint8Array): JSBI {
-    let magnitude: JSBI = JsbiSupport.ZERO;
+  public static fromUnsignedBytes(bytes: Uint8Array): bigint {
+    let magnitude = 0n;
     for (let m = 0; m < bytes.length; m++) {
-      const byte = JSBI.BigInt(bytes[m]);
-      magnitude = JSBI.leftShift(magnitude, this.BITS_PER_BYTE);
-      magnitude = JSBI.bitwiseOr(magnitude, byte);
+      const byte = BigInt(bytes[m]);
+      magnitude = magnitude << this.BITS_PER_BYTE;
+      magnitude = magnitude | byte;
     }
     return magnitude;
   }
 
   /**
-   * Encodes the specified JSBI value as a big-endian, unsigned integer.
-   * @param value     The JSBI value to encode.
+   * Encodes the specified BigInt value as a big-endian, unsigned integer.
+   * @param value     The BigInt value to encode.
    * @return          A byte array containing the encoded UInt.
    */
-  public static toUnsignedIntBytes(value: JSBI): Uint8Array {
+  public static toUnsignedIntBytes(value: bigint): Uint8Array {
     // Remove the sign if negative
-    if (JsbiSupport.isNegative(value)) {
-      value = JSBI.unaryMinus(value);
+    if (value < 0n) {
+      value = -value;
     }
 
     const sizeInBytes = this.getUnsignedIntSizeInBytes(value);
     const bytes = new Uint8Array(sizeInBytes);
     for (let m = sizeInBytes - 1; m >= 0; m--) {
-      const lastByte = JSBI.toNumber(
-        JSBI.bitwiseAnd(value, this.BYTE_MAX_VALUE)
-      );
-      value = JSBI.signedRightShift(value, this.BITS_PER_BYTE);
+      const lastByte = Number(value & this.BYTE_MAX_VALUE);
+      value = value >> this.BITS_PER_BYTE;
       bytes[m] = lastByte;
     }
 
     return bytes;
   }
 
-  // Determines how many bytes will be needed to store the UInt encoding of the given JSBI value.
-  static getUnsignedIntSizeInBytes(value: JSBI): number {
+  // Determines how many bytes will be needed to store the UInt encoding of the given BigInt value.
+  static getUnsignedIntSizeInBytes(value: bigint): number {
     // TODO: Profile on real data sets to see if binary search is preferable to a low-to-high linear search.
     for (let m = 0; m < this.SIZE_THRESHOLDS.length; m++) {
       const threshold = this.SIZE_THRESHOLDS[m];
-      if (JSBI.lessThanOrEqual(value, threshold)) {
+      if (value <= threshold) {
         return m + 1;
       }
     }
 
     let sizeInBytes = this.SIZE_THRESHOLDS.length;
-    let threshold: JSBI = this.calculateSizeThreshold(sizeInBytes);
-    while (JSBI.greaterThan(value, threshold)) {
+    let threshold = this.calculateSizeThreshold(sizeInBytes);
+    while (value > threshold) {
       // TODO: Make larger jumps, then refine the search.
       sizeInBytes++;
       threshold = this.calculateSizeThreshold(sizeInBytes);
@@ -110,21 +108,18 @@ export class JsbiSerde {
   }
 
   // Called once during initialization. Creates an array of thresholds that can be referred to to determine how many
-  // bytes will be needed to store the UInt encoding of a given JSBI value.
-  private static calculateSizeThresholds(): Array<JSBI> {
-    const thresholds: Array<JSBI> = [];
-    for (let m = 1; m <= this.SERIALIZED_JSBI_SIZES_TO_PRECOMPUTE; m++) {
+  // bytes will be needed to store the UInt encoding of a given BigInt value.
+  private static calculateSizeThresholds(): Array<bigint> {
+    const thresholds: Array<bigint> = [];
+    for (let m = 1; m <= this.SERIALIZED_BIGINT_SIZES_TO_PRECOMPUTE; m++) {
       thresholds.push(this.calculateSizeThreshold(m));
     }
     return thresholds;
   }
 
-  private static calculateSizeThreshold(numberOfBytes: number): JSBI {
-    const exponent: JSBI = JSBI.multiply(
-      JSBI.BigInt(numberOfBytes),
-      this.BITS_PER_BYTE
-    );
-    const threshold = JSBI.exponentiate(JsbiSupport.TWO, exponent);
-    return JSBI.subtract(threshold, JsbiSupport.ONE);
+  private static calculateSizeThreshold(numberOfBytes: number): bigint {
+    const exponent = BigInt(numberOfBytes) * this.BITS_PER_BYTE;
+    const threshold = 2n ** exponent;
+    return threshold - 1n;
   }
 }

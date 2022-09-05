@@ -1,10 +1,9 @@
 import { assert } from "chai";
-import { Value, load, loadAll } from "../../src/dom";
-import { Decimal, dom, IonType, IonTypes, Timestamp } from "../../src/Ion";
-import * as ion from "../../src/Ion";
-import JSBI from "jsbi";
+import { load, Value } from "../../src/dom";
 import * as JsValueConversion from "../../src/dom/JsValueConversion";
 import { Constructor } from "../../src/dom/Value";
+import * as ion from "../../src/Ion";
+import { Decimal, dom, IonType, IonTypes } from "../../src/Ion";
 import {
   exampleDatesWhere,
   exampleIonValuesWhere,
@@ -95,9 +94,7 @@ function domValueTest(jsValue, expectedIonType) {
   function validateDomValue(domValue: Value, annotations) {
     let equalityTestValue = jsValue;
     // Verify that the new dom.Value is considered equal to the original (unwrapped) JS value.
-    assert.isTrue(
-      domValue.equals(equalityTestValue)
-    );
+    assert.isTrue(domValue.equals(equalityTestValue));
     assert.equal(expectedIonType, domValue.getType());
     let expectedDomType: any = JsValueConversion._domConstructorFor(
       expectedIonType
@@ -125,7 +122,7 @@ describe("Value", () => {
     describe("Boolean", domValueTest(new Boolean(true), IonTypes.BOOL));
     describe("number (integer)", domValueTest(7, IonTypes.INT));
     describe("Number (integer)", domValueTest(new Number(7), IonTypes.INT));
-    describe("BigInt", domValueTest(JSBI.BigInt(7), IonTypes.INT));
+    describe("BigInt", domValueTest(7n, IonTypes.INT));
     describe("number (floating point)", domValueTest(7.5, IonTypes.FLOAT));
     describe(
       "Number (floating point)",

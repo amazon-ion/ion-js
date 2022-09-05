@@ -22,12 +22,10 @@
 import * as IonText from "./IonText";
 import { is_keyword, is_whitespace } from "./IonText";
 
-import JSBI from "jsbi";
 import { StringSpan } from "./IonSpan";
 import { SymbolToken } from "./IonSymbolToken";
 import { IonType } from "./IonType";
 import { IonTypes } from "./IonTypes";
-import { JsbiSupport } from "./JsbiSupport";
 
 const EOF = -1; // EOF is end of container, distinct from undefined which is value has been consumed
 const ERROR = -2;
@@ -403,15 +401,22 @@ export class ParserTextRaw {
     return this._curr_null;
   }
 
-  bigIntValue(): JSBI | null {
+  bigIntValue(): bigint | null {
     if (this.isNull()) {
       return null;
     }
-    const intText = this.get_value_as_string(this._curr);
+    const intText = this.get_value_as_string(this._curr).toLowerCase();
+
     switch (this._curr) {
       case T_INT:
       case T_HEXINT:
-        return JsbiSupport.bigIntFromString(intText);
+        // Negative hex ints are not supported by BigInt
+        if (intText.startsWith("-")) {
+          const i = BigInt(intText.slice(1));
+          return -i;
+        }
+
+        return BigInt(intText);
       default:
         throw new Error(
           "intValue() was called when the current value was not an integer."
@@ -427,7 +432,7 @@ export class ParserTextRaw {
     switch (this._curr) {
       case T_INT:
       case T_HEXINT:
-        return JSBI.toNumber(JsbiSupport.bigIntFromString(s));
+        return Number(BigInt(s));
       case T_FLOAT:
         return Number(s);
       case T_FLOAT_SPECIAL:

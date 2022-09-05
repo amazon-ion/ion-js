@@ -30,8 +30,7 @@
     "src/IonTest*.ts",
     "src/IonEvent*.ts",
 
-    "src/JsbiSerde.ts",
-    "src/JsbiSupport.ts",
+    "src/BigIntSerde.ts",
     "src/SignAndMagnitudeInt.ts"
   ],
 

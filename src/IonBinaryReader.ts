@@ -19,7 +19,6 @@
 // Handles system symbols, and conversion from the parsed
 // input byte array  to the desired Javascript value (scalar or
 // object, such as IonValue).
-import JSBI from "jsbi";
 import IntSize from "./IntSize";
 import { Catalog } from "./IonCatalog";
 import { IVM } from "./IonConstants";
@@ -35,7 +34,7 @@ import { ion_symbol_table_sid, makeSymbolTable } from "./IonSymbols";
 import { Timestamp } from "./IonTimestamp";
 import { IonType } from "./IonType";
 import { IonTypes } from "./IonTypes";
-import { JsbiSupport } from "./JsbiSupport";
+import { isSafeInteger } from "./util";
 
 const BOC = -2; // beginning of container?
 const EOF = -1;
@@ -198,12 +197,12 @@ export class BinaryReader implements Reader {
     return this._parser.decimalValue();
   }
 
-  bigIntValue(): JSBI | null {
+  bigIntValue(): bigint | null {
     return this._parser.bigIntValue();
   }
 
   intSize(): IntSize {
-    if (JsbiSupport.isSafeInteger(this.bigIntValue()!)) {
+    if (isSafeInteger(this.bigIntValue()!)) {
       return IntSize.Number;
     }
     return IntSize.BigInt;
