@@ -2,9 +2,9 @@ name: Node.js CI
 
 on:
   push:
-    branches: [ master ]
+    branches: [ master, v5.0.0-development ]
   pull_request:
-    branches: [ master ]
+    branches: [ master, v5.0.0-development ]
 
 jobs:
   build:
@@ -12,15 +12,16 @@ jobs:
     runs-on: ubuntu-latest
 
     strategy:
+      fail-fast: false
       matrix:
-          node-version: [10.x, 12.x, 14.x, 16.x]
+          node-version: [14.x, 16.x, 18.x]
 
     steps:
         - uses: actions/checkout@v2
           with:
             submodules: recursive
         - name: Use Node.js ${{ matrix.node-version }}
-          uses: actions/setup-node@v2
+          uses: actions/setup-node@v3
           with:
             node-version: ${{ matrix.node-version }}
         - run: npm install
