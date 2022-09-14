@@ -19,8 +19,21 @@
 // Returns on any value with value type. The _start and _end
 // members are set for scalar types.
 
-import * as IonText from "./IonText";
-import { is_keyword, is_whitespace } from "./IonText";
+import {
+  asAscii,
+  ESCAPED_NEWLINE,
+  isNumericTerminator,
+  is_base64_char,
+  is_digit,
+  is_hex_digit,
+  is_keyword,
+  is_letter,
+  is_letter_or_digit,
+  is_operator_char,
+  is_whitespace,
+  WHITESPACE_COMMENT1,
+  WHITESPACE_COMMENT2,
+} from "./IonText";
 
 import { StringSpan } from "./IonSpan";
 import { SymbolToken } from "./IonSymbolToken";
@@ -293,7 +306,7 @@ function is_valid_string_char(ch: number, allow_new_line: boolean): boolean {
   if (ch == CH_NL) {
     return allow_new_line;
   }
-  if (IonText.is_whitespace(ch)) {
+  if (is_whitespace(ch)) {
     return true;
   }
   if (ch < 32) {
@@ -483,7 +496,7 @@ export class ParserTextRaw {
       case T_BLOB:
         for (index = this._start; index < this._end; index++) {
           ch = this._in.valueAt(index);
-          if (IonText.is_base64_char(ch)) {
+          if (is_base64_char(ch)) {
             s += String.fromCharCode(ch);
           }
         }
@@ -678,7 +691,7 @@ export class ParserTextRaw {
         this._value_push(EOF);
         return;
       default:
-        if (IonText.is_letter(ch)) {
+        if (is_letter(ch)) {
           op = this._read_symbol;
         }
         break;
@@ -776,7 +789,7 @@ export class ParserTextRaw {
       if (fn != undefined) {
         fn.call(this, ch, accept_operator_symbols, calling_op);
       } else {
-        this._error("unexpected character '" + IonText.asAscii(ch) + "'");
+        this._error("unexpected character '" + asAscii(ch) + "'");
       }
     }
   }
@@ -839,7 +852,7 @@ export class ParserTextRaw {
   ) {
     const ch2 = this._peek("inf");
     this._unread(ch1); // in any case we'll leave this character for the next function to use
-    if (IonText.isNumericTerminator(ch2)) {
+    if (isNumericTerminator(ch2)) {
       this._ops.unshift(this._read_plus_inf);
     } else if (accept_operator_symbols) {
       this._ops.unshift(this._read_operator_symbol);
@@ -857,12 +870,12 @@ export class ParserTextRaw {
       ch2 = this._peek();
     if (ch2 == CH_i) {
       ch2 = this._peek("inf");
-      if (IonText.isNumericTerminator(ch2)) {
+      if (isNumericTerminator(ch2)) {
         op = this._read_minus_inf;
       } else if (accept_operator_symbols) {
         op = this._read_operator_symbol;
       }
-    } else if (IonText.is_digit(ch2)) {
+    } else if (is_digit(ch2)) {
       op = this._read_number;
     } else if (accept_operator_symbols) {
       op = this._read_operator_symbol;
@@ -936,7 +949,7 @@ export class ParserTextRaw {
         if (this._peek() === CH_DT) {
           this._read(); // consume the dot
           const ch = this._read();
-          if (IonText.is_letter(ch) !== true) {
+          if (is_letter(ch) !== true) {
             throw new Error("Expected type name after 'null.'");
           }
           this._read_symbol();
@@ -1006,7 +1019,7 @@ export class ParserTextRaw {
         this._read_hex_int();
         return;
       }
-      if (IonText.is_digit(ch)) {
+      if (is_digit(ch)) {
         this._error("leading zeros are not allowed");
       }
       ch = CH_0;
@@ -1017,7 +1030,7 @@ export class ParserTextRaw {
       t = T_DECIMAL;
       ch = this._read_optional_digits(this._read());
     }
-    if (!IonText.isNumericTerminator(ch)) {
+    if (!isNumericTerminator(ch)) {
       if (ch == CH_d || ch == CH_D) {
         t = T_DECIMAL;
         ch = this._read_exponent();
@@ -1026,7 +1039,7 @@ export class ParserTextRaw {
         ch = this._read_exponent();
       }
     }
-    if (!IonText.isNumericTerminator(ch)) {
+    if (!isNumericTerminator(ch)) {
       this._error("invalid character after number");
     } else {
       this._unread(ch);
@@ -1041,7 +1054,7 @@ export class ParserTextRaw {
       ch = this._read(); // read the first hex digits
       ch = this._read_required_hex_digits(ch);
     }
-    if (IonText.isNumericTerminator(ch)) {
+    if (isNumericTerminator(ch)) {
       this._unread(ch);
       this._end = this._in.position();
       this._value_push(T_HEXINT);
@@ -1086,7 +1099,7 @@ export class ParserTextRaw {
         return;
       }
     }
-    if (IonText.isNumericTerminator(this._peek())) {
+    if (isNumericTerminator(this._peek())) {
       this._end = this._in.position();
       this._value_push(T_FLOAT_SPECIAL);
     } else {
@@ -1115,7 +1128,7 @@ export class ParserTextRaw {
     }
 
     ch = this._readPastNDigits(2); // reads past day, throws on non digits.
-    if (IonText.isNumericTerminator(ch)) {
+    if (isNumericTerminator(ch)) {
       this._unread(ch);
       this._end = this._in.position();
       this._value_push(T_TIMESTAMP);
@@ -1127,12 +1140,12 @@ export class ParserTextRaw {
     }
 
     const peekChar = this._in.peek();
-    if (IonText.isNumericTerminator(peekChar)) {
+    if (isNumericTerminator(peekChar)) {
       // checks to see if timestamp value has terminated.
       this._end = this._in.position();
       this._value_push(T_TIMESTAMP);
       return;
-    } else if (!IonText.is_digit(peekChar)) {
+    } else if (!is_digit(peekChar)) {
       throw new Error(
         "Timestamp DATE must be followed by numeric terminator or additional TIME digits."
       );
@@ -1150,17 +1163,17 @@ export class ParserTextRaw {
       ch = this._readPastNDigits(2);
       if (ch === CH_DT) {
         // read fractional seconds
-        if (!IonText.is_digit(this._read())) {
+        if (!is_digit(this._read())) {
           throw new Error(
             "W3C timestamp spec requires atleast one digit after decimal point."
           );
         }
-        while (IonText.is_digit((ch = this._read()))) {}
+        while (is_digit((ch = this._read()))) {}
       }
     }
 
     if (ch === CH_Z) {
-      if (!IonText.isNumericTerminator(this._peek())) {
+      if (!isNumericTerminator(this._peek())) {
         throw new Error("Illegal terminator after Zulu offset.");
       }
       this._end = this._in.position();
@@ -1176,7 +1189,7 @@ export class ParserTextRaw {
     this._readNDigits(2);
 
     ch = this._peek();
-    if (!IonText.isNumericTerminator(ch)) {
+    if (!isNumericTerminator(ch)) {
       throw new Error("Improperly formatted timestamp.");
     }
     this._end = this._in.position();
@@ -1188,7 +1201,7 @@ export class ParserTextRaw {
     this._start = this._in.position() - 1;
     for (;;) {
       ch = this._read();
-      if (!IonText.is_letter_or_digit(ch)) {
+      if (!is_letter_or_digit(ch)) {
         break;
       }
     }
@@ -1202,7 +1215,7 @@ export class ParserTextRaw {
     this._start = this._in.position();
     for (;;) {
       ch = this._read();
-      if (!IonText.is_operator_char(ch)) {
+      if (!is_operator_char(ch)) {
         break;
       }
     }
@@ -1384,10 +1397,10 @@ export class ParserTextRaw {
     this._start = this._in.position(); // is this going to be accurate where is the start being set that leads to this value?
     while (true) {
       ch = this._read();
-      if (IonText.is_base64_char(ch)) {
+      if (is_base64_char(ch)) {
         base64_chars++;
         this._end = this._in.position();
-      } else if (!IonText.is_whitespace(ch)) {
+      } else if (!is_whitespace(ch)) {
         break;
       }
     }
@@ -1528,7 +1541,7 @@ export class ParserTextRaw {
         if (ii + 2 < end && this._in.valueAt(ii + 2) == CH_NL) {
           this._esc_len = 2;
         }
-        return IonText.ESCAPED_NEWLINE;
+        return ESCAPED_NEWLINE;
       case ESC_x: // = CH_x, //  values['x'] = ESCAPE_HEX; //    any  \xHH  2-digit hexadecimal unicode character equivalent to \ u00HH
         if (ii + 3 >= end) {
           throw new Error("invalid escape sequence");
@@ -1583,7 +1596,7 @@ export class ParserTextRaw {
         if (ii + 2 < end && this._in.valueAt(ii + 2) == CH_NL) {
           this._esc_len = 2;
         }
-        return IonText.ESCAPED_NEWLINE;
+        return ESCAPED_NEWLINE;
       case ESC_x: // = CH_x, //  values['x'] = ESCAPE_HEX; //    any  \xHH  2-digit hexadecimal unicode character equivalent to \ u00HH
         if (ii + 3 >= end) {
           throw new Error("invalid escape sequence");
@@ -1654,10 +1667,10 @@ export class ParserTextRaw {
       ch = this._read();
       if (ch == CH_FORWARD_SLASH) {
         this._read_to_newline();
-        ch = IonText.WHITESPACE_COMMENT1;
+        ch = WHITESPACE_COMMENT1;
       } else if (ch == CH_AS) {
         this._read_to_close_comment();
-        ch = IonText.WHITESPACE_COMMENT2;
+        ch = WHITESPACE_COMMENT2;
       } else {
         this._unread(ch);
         ch = CH_FORWARD_SLASH;
@@ -1710,12 +1723,12 @@ export class ParserTextRaw {
     let ch;
     if (recognize_comments) {
       ch = this._read_skipping_comments();
-      while (IonText.is_whitespace(ch)) {
+      while (is_whitespace(ch)) {
         ch = this._read_skipping_comments();
       }
     } else {
       ch = this._read();
-      while (IonText.is_whitespace(ch)) {
+      while (is_whitespace(ch)) {
         ch = this._read();
       }
     }
@@ -1755,13 +1768,13 @@ export class ParserTextRaw {
       ch: number,
       is_digits = true;
     const chars: number[] = [];
-    if (!IonText.is_digit(ch1)) {
+    if (!is_digit(ch1)) {
       return ERROR;
     }
     for (ii = 0; ii < 3; ii++) {
       ch = this._read();
       chars.push(ch);
-      if (!IonText.is_digit(ch)) {
+      if (!is_digit(ch)) {
         is_digits = false;
         break;
       }
@@ -1774,12 +1787,12 @@ export class ParserTextRaw {
   }
 
   private _read_required_digits(ch: number): number {
-    if (!IonText.is_digit(ch)) {
+    if (!is_digit(ch)) {
       return ERROR;
     }
     for (;;) {
       ch = this._read();
-      if (!IonText.is_digit(ch)) {
+      if (!is_digit(ch)) {
         break;
       }
     }
@@ -1787,7 +1800,7 @@ export class ParserTextRaw {
   }
 
   private _read_optional_digits(ch: number): number {
-    while (IonText.is_digit(ch)) {
+    while (is_digit(ch)) {
       ch = this._read();
     }
     return ch;
@@ -1799,7 +1812,7 @@ export class ParserTextRaw {
       throw new Error("Cannot read a lack of or negative number of digits.");
     }
     while (n--) {
-      if (!IonText.is_digit((ch = this._read()))) {
+      if (!is_digit((ch = this._read()))) {
         throw new Error("Expected digit, got: " + String.fromCharCode(ch));
       }
     }
@@ -1813,12 +1826,12 @@ export class ParserTextRaw {
   }
 
   private _read_required_hex_digits(ch: number): number {
-    if (!IonText.is_hex_digit(ch)) {
+    if (!is_hex_digit(ch)) {
       return ERROR;
     }
     for (;;) {
       ch = this._read();
-      if (!IonText.is_hex_digit(ch)) {
+      if (!is_hex_digit(ch)) {
         break;
       }
     }
@@ -1830,7 +1843,7 @@ export class ParserTextRaw {
       ii = 0;
     while (ii < n) {
       ch = this._read();
-      if (!IonText.is_hex_digit(ch)) {
+      if (!is_hex_digit(ch)) {
         this._error("" + n + " digits required " + ii + " found");
         return ERROR;
       }
