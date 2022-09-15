@@ -13,9 +13,8 @@
  * permissions and limitations under the License.
  */
 
-import JSBI from "jsbi";
+import { BigIntSerde } from "./BigIntSerde";
 import { Writeable } from "./IonWriteable";
-import { JsbiSerde } from "./JsbiSerde";
 
 /**
  * Values in the Ion binary format are serialized as a sequence of low-level fields. This
@@ -40,14 +39,14 @@ export class LowLevelBinaryWriter {
     return Math.ceil(numberOfBits / 8);
   }
 
-  static getUnsignedIntSize(value: number | JSBI): number {
-    if (value instanceof JSBI) {
-      return JsbiSerde.getUnsignedIntSizeInBytes(value);
+  static getUnsignedIntSize(value: number | bigint): number {
+    if (typeof value === "bigint") {
+      return BigIntSerde.getUnsignedIntSizeInBytes(value);
     }
     if (value === 0) {
       return 1;
     }
-    const numberOfBits = Math.floor(Math["log2"](value)) + 1;
+    const numberOfBits = Math.floor(Math.log2(value)) + 1;
     const numberOfBytes = Math.ceil(numberOfBits / 8);
     return numberOfBytes;
   }
@@ -57,7 +56,7 @@ export class LowLevelBinaryWriter {
     if (absoluteValue === 0) {
       return 1;
     }
-    const valueBits: number = Math.floor(Math["log2"](absoluteValue)) + 1;
+    const valueBits: number = Math.floor(Math.log2(absoluteValue)) + 1;
     const trailingStopBits: number = Math.floor(valueBits / 7);
     const leadingStopBit = 1;
     const signBit = 1;
@@ -70,7 +69,7 @@ export class LowLevelBinaryWriter {
     if (value === 0) {
       return 1;
     }
-    const valueBits: number = Math.floor(Math["log2"](value)) + 1;
+    const valueBits: number = Math.floor(Math.log2(value)) + 1;
     const stopBits: number = Math.ceil(valueBits / 7);
     return Math.ceil((valueBits + stopBits) / 8);
   }
@@ -97,9 +96,9 @@ export class LowLevelBinaryWriter {
     this.writeable.writeBytes(tempBuf);
   }
 
-  writeUnsignedInt(originalValue: number | JSBI): void {
-    if (originalValue instanceof JSBI) {
-      const encodedBytes = JsbiSerde.toUnsignedIntBytes(originalValue);
+  writeUnsignedInt(originalValue: number | bigint): void {
+    if (typeof originalValue === "bigint") {
+      const encodedBytes = BigIntSerde.toUnsignedIntBytes(originalValue);
       this.writeable.writeBytes(encodedBytes);
       return;
     }

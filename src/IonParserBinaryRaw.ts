@@ -45,7 +45,7 @@
 //    timestampValue
 //    uInt8ArrayValue
 
-import JSBI from "jsbi";
+import { BigIntSerde } from "./BigIntSerde";
 import * as IonBinary from "./IonBinary";
 import { IVM } from "./IonConstants";
 import { Decimal } from "./IonDecimal";
@@ -54,8 +54,6 @@ import { Timestamp, TimestampPrecision } from "./IonTimestamp";
 import { IonType } from "./IonType";
 import { IonTypes } from "./IonTypes";
 import { decodeUtf8 } from "./IonUnicode";
-import { JsbiSerde } from "./JsbiSerde";
-import { JsbiSupport } from "./JsbiSupport";
 import SignAndMagnitudeInt from "./SignAndMagnitudeInt";
 
 const EOF = -1; // EOF is end of container; distinct from undefined which is value has been consumed
@@ -213,21 +211,21 @@ export class ParserBinaryRaw {
     numberOfBytes: number
   ): SignAndMagnitudeInt {
     if (numberOfBytes == 0) {
-      return new SignAndMagnitudeInt(JsbiSupport.ZERO);
+      return new SignAndMagnitudeInt(0n);
     }
     const bytes: Uint8Array = input.view(numberOfBytes);
     const isNegative = (bytes[0] & 0x80) == 0x80;
     const numbers = Array.prototype.slice.call(bytes);
     numbers[0] = bytes[0] & 0x7f;
-    const magnitude: JSBI = JsbiSerde.fromUnsignedBytes(numbers);
+    const magnitude = BigIntSerde.fromUnsignedBytes(numbers);
     return new SignAndMagnitudeInt(magnitude, isNegative);
   }
 
   static _readUnsignedIntAsBigIntFrom(
     input: BinarySpan,
     numberOfBytes: number
-  ): JSBI {
-    return JsbiSerde.fromUnsignedBytes(
+  ): bigint {
+    return BigIntSerde.fromUnsignedBytes(
       Array.prototype.slice.call(input.view(numberOfBytes))
     );
   }
@@ -306,9 +304,7 @@ export class ParserBinaryRaw {
       numberOfCoefficientBytes
     );
     const isNegative = signedInt.isNegative;
-    const coefficient = isNegative
-      ? JSBI.unaryMinus(signedInt.magnitude)
-      : signedInt.magnitude;
+    const coefficient = isNegative ? -signedInt.magnitude : signedInt.magnitude;
     return Decimal._fromBigIntCoefficient(isNegative, coefficient, exponent);
   }
 
@@ -462,7 +458,7 @@ export class ParserBinaryRaw {
     throw new Error("Current value is not a decimal.");
   }
 
-  bigIntValue(): JSBI | null {
+  bigIntValue(): bigint | null {
     switch (this._raw_type) {
       case IonBinary.TB_NULL:
         return null;
@@ -472,9 +468,9 @@ export class ParserBinaryRaw {
           return null;
         }
         this.load_value();
-        if (!(this._curr instanceof JSBI)) {
+        if (!(typeof this._curr === "bigint")) {
           const num = this._curr!;
-          return JSBI.BigInt(num);
+          return BigInt(num);
         }
         return this._curr!;
       default:
@@ -494,9 +490,9 @@ export class ParserBinaryRaw {
           return null;
         }
         this.load_value();
-        if (this._curr instanceof JSBI) {
-          const bigInt: JSBI = this._curr!;
-          return JSBI.toNumber(bigInt);
+        if (typeof this._curr === "bigint") {
+          const bigInt: bigint = this._curr!;
+          return Number(bigInt);
         }
         return this._curr!;
       case IonBinary.TB_FLOAT:
@@ -551,7 +547,7 @@ export class ParserBinaryRaw {
     return ParserBinaryRaw._readVarSignedIntFrom(this._in);
   }
 
-  private readUnsignedIntAsBigInt(): JSBI {
+  private readUnsignedIntAsBigInt(): bigint {
     return ParserBinaryRaw._readUnsignedIntAsBigIntFrom(this._in, this._len);
   }
 
@@ -608,7 +604,7 @@ export class ParserBinaryRaw {
     }
     if (this._in.position() < end) {
       const exponent: number = this.readVarSignedInt();
-      let coefficient: JSBI = JsbiSupport.ZERO;
+      let coefficient = 0n;
       let isNegative = false;
       if (this._in.position() < end) {
         const deserializedSignedInt = ParserBinaryRaw._readSignedIntFrom(
@@ -783,11 +779,11 @@ export class ParserBinaryRaw {
    * Positive integers and negative integers are both encoded as an unsigned integer magnitude.
    * This function will read in the magnitude, leaving it to the caller to set the value's sign as appropriate.
    *
-   * It returns `number` for `_len` less than 6 bytes. Otherwise, it returns `JSBI.BigInt` value.
+   * It returns `number` for `_len` less than 6 bytes. Otherwise, it returns `BigInt` value.
    */
-  private _readIntegerMagnitude(): JSBI | number {
+  private _readIntegerMagnitude(): bigint | number {
     if (this._len === 0) {
-      return JsbiSupport.ZERO;
+      return 0n;
     }
     if (this._len < 6) {
       return this.readUnsignedIntAsNumber();
@@ -810,7 +806,7 @@ export class ParserBinaryRaw {
         break;
       case IonBinary.TB_NEG_INT:
         let value = this._readIntegerMagnitude();
-        this._curr = value instanceof JSBI ? JSBI.unaryMinus(value) : -value;
+        this._curr = typeof value === "bigint" ? -value : -value;
         break;
       case IonBinary.TB_FLOAT:
         this._curr = this.read_binary_float();

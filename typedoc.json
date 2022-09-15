@@ -1,7 +1,6 @@
 {
   "name": "Ion-JS Library",
 
-  "excludeNotExported": true,
   "excludePrivate": true,
   "excludeProtected": true,
 
@@ -30,8 +29,7 @@
     "src/IonTest*.ts",
     "src/IonEvent*.ts",
 
-    "src/JsbiSerde.ts",
-    "src/JsbiSupport.ts",
+    "src/BigIntSerde.ts",
     "src/SignAndMagnitudeInt.ts"
   ],
 

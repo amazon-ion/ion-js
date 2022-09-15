@@ -13,9 +13,7 @@
  * permissions and limitations under the License.
  */
 
-import JSBI from "jsbi";
-import { ComparisonResult } from "../ComparisonResult";
-import { ComparisonResultType } from "../ComparisonResult";
+import { ComparisonResult, ComparisonResultType } from "../ComparisonResult";
 import { BinaryWriter } from "../IonBinaryWriter";
 import { Decimal } from "../IonDecimal";
 import { defaultLocalSymbolTable } from "../IonLocalSymbolTable";
@@ -452,17 +450,17 @@ class IonIntEvent extends AbstractIonEvent {
 
   valueCompare(expected: IonEvent): ComparisonResult {
     if (expected instanceof IonIntEvent) {
-      // convert both values to `JSBI.BigInt` first and then compare for precision.
+      // convert both values to bigint first and then compare for precision.
       let actualValue =
-        this.ionValue instanceof JSBI
+        typeof this.ionValue === "bigint"
           ? this.ionValue
-          : JSBI.BigInt(this.ionValue);
+          : BigInt(this.ionValue);
       let expectedValue =
-        expected.ionValue instanceof JSBI
+        typeof expected.ionValue === "bigint"
           ? expected.ionValue
-          : JSBI.BigInt(expected.ionValue);
+          : BigInt(expected.ionValue);
 
-      if (JSBI.equal(actualValue, expectedValue)) {
+      if (actualValue === expectedValue) {
         return new ComparisonResult(ComparisonResultType.EQUAL);
       }
     }

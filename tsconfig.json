@@ -1,18 +1,14 @@
 // Base Typscript Compiler Configuration
 // Targets CommonJS Module system and ES6 feature set.
 {
-  "include": [
-    "src/**/*"
-  ],
-  "exclude": [
-    "**/*.d.ts"
-  ],
+  "include": ["src/**/*"],
+  "exclude": ["**/*.d.ts"],
   "compilerOptions": {
-    "target": "es6",
+    "target": "es2020",
     "module": "commonjs",
     "moduleResolution": "node",
     "esModuleInterop": true,
-    "lib": ["es6", "es2017.object"],
+    "lib": ["ESNext"],
     "declaration": true,
     "inlineSources": true,
     "sourceMap": true,

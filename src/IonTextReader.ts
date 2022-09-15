@@ -19,7 +19,6 @@
 // Handles system symbols, and conversion from the parsed
 // input string to the desired Javascript value (scalar or
 // object, such as IonValue).
-import JSBI from "jsbi";
 import IntSize from "./IntSize";
 import { Catalog } from "./IonCatalog";
 import { Decimal } from "./IonDecimal";
@@ -35,7 +34,7 @@ import { fromBase64 } from "./IonText";
 import { Timestamp } from "./IonTimestamp";
 import { IonType } from "./IonType";
 import { IonTypes } from "./IonTypes";
-import { JsbiSupport } from "./JsbiSupport";
+import { isSafeInteger } from "./util";
 
 const BEGINNING_OF_CONTAINER = -2; // cloned from IonParserTextRaw
 const EOF = -1;
@@ -332,7 +331,7 @@ export class TextReader implements Reader {
     throw new Error("Current value is not a decimal.");
   }
 
-  bigIntValue(): JSBI | null {
+  bigIntValue(): bigint | null {
     switch (this._type) {
       case IonTypes.NULL:
         return null;
@@ -346,7 +345,7 @@ export class TextReader implements Reader {
   }
 
   intSize(): IntSize {
-    if (JsbiSupport.isSafeInteger(this.bigIntValue()!)) {
+    if (isSafeInteger(this.bigIntValue()!)) {
       return IntSize.Number;
     }
     return IntSize.BigInt;
