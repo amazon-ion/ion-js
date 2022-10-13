@@ -250,15 +250,10 @@ describe("Timestamp", () => {
 
         const date2 = new Date(2000, 0, 1, 12, 30, 20, 20);
         let timestamp3 = new ion.Timestamp(date2.getTimezoneOffset() * -1, 2000, 1, 1, 12, 30, new ion.Decimal(
-            40,
-            0
+            20020,
+            -3
         ));
         let timestamp4 = new ion.Timestamp(date2);
         assert.isTrue(timestamp3!.equals(timestamp4!));
-    });
-    it('constructor with Date that has milliseconds', () => {
-        const date = new Date(2000, 0, 1, 12, 30, 45, 900);
-        let timestamp = new ion.Timestamp(date);
-        assert.equal(timestamp.getSecondsDecimal(), new ion.Decimal('45.900'));
     });
 });
