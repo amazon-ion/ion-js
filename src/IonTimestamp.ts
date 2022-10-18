@@ -97,9 +97,10 @@ export class Timestamp {
   ) {
     if (dateOrLocalOffset instanceof Date) {
       const date = dateOrLocalOffset;
-      const seconds = date.getMilliseconds() === 0 
-        ? new Decimal(date.getSeconds(), 0)
-        : new Decimal(date.getSeconds() * 1000 + date.getMilliseconds(), -3);
+      const seconds =
+        date.getMilliseconds() === 0
+          ? new Decimal(date.getSeconds(), 0)
+          : new Decimal(date.getSeconds() * 1000 + date.getMilliseconds(), -3);
 
       this._localOffset = date.getTimezoneOffset() * -1;
       this._year = date.getFullYear();
