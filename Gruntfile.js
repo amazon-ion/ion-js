@@ -49,10 +49,8 @@ module.exports = function(grunt) {
         tsconfig: './test-driver/tsconfig.json'
       }
     },
-    tslint: {
-      all: ['src/**/*.ts', 'test/**/*.ts'],
-      src: 'src/**/*.ts',
-      test: 'test/**/*.ts',
+    eslint: {
+      target: ['src/**/*.ts', 'test/**/*.ts']
     },
     /**
      * Copy of generated .js files to
@@ -159,7 +157,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-shell');
   grunt.loadNpmTasks('grunt-ts');
-  grunt.loadNpmTasks('grunt-tslint');
+  grunt.loadNpmTasks('grunt-eslint');
   grunt.loadNpmTasks('grunt-typedoc');
 
   // Copy tasks
@@ -181,7 +179,8 @@ module.exports = function(grunt) {
   grunt.registerTask('mocha', ['shell:mochaWithCoverage']);
 
   // Tests
-  grunt.registerTask('test', ['mocha', 'build']); // Test via ts-node. If all goes well, build.
+  grunt.registerTask('lint', ['eslint']); // Test via ts-node. If all goes well, build.
+  grunt.registerTask('test', ['mocha', 'eslint', 'build']); // Test via ts-node. If all goes well, build.
   grunt.registerTask('test:coverage', ['mocha']); // Run the tests and show coverage metrics, but do not build.
 
   // Documentation
