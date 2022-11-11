@@ -179,7 +179,7 @@ module.exports = function(grunt) {
   grunt.registerTask('mocha', ['shell:mochaWithCoverage']);
 
   // Tests
-  grunt.registerTask('lint', ['eslint']); // Test via ts-node. If all goes well, build.
+  grunt.registerTask('lint', ['eslint']);
   grunt.registerTask('test', ['mocha', 'eslint', 'build']); // Test via ts-node. If all goes well, build.
   grunt.registerTask('test:coverage', ['mocha']); // Run the tests and show coverage metrics, but do not build.
 
