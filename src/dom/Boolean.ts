@@ -23,6 +23,7 @@ const _fromJsConstructor: FromJsConstructor = new FromJsConstructorBuilder()
  * > Any object of which the value is not undefined or null, including a Boolean object
  *   whose value is false, evaluates to true when passed to a conditional statement.
  *
+ * ```javascript
  *      var b = false;
  *      if (b) {
  *          // this code will NOT be executed
@@ -32,7 +33,7 @@ const _fromJsConstructor: FromJsConstructor = new FromJsConstructorBuilder()
  *      if (b) {
  *          // this code WILL be executed
  *      }
- *
+ * ```
  * [1] http://amzn.github.io/ion-docs/docs/spec.html#bool
  * [2] https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean#Description
  */

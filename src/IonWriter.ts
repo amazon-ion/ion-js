@@ -22,7 +22,7 @@ import { IonType } from "./IonType";
  * Serializes data in Ion text or binary format to an implementation defined buffer.
  */
 export interface Writer {
-  /** Writes a null value of the given [[IonType]]. */
+  /** Writes a null value of the given {@link IonType}. */
   writeNull(type: IonType): void;
 
   /**
@@ -58,16 +58,16 @@ export interface Writer {
   writeFloat64(value: number | null): void;
 
   /**
-   * Writes a [[Decimal]] value as an Ion `decimal` value.
+   * Writes a {@link Decimal} value as an Ion `decimal` value.
    *
-   * @param value The [[Decimal]] to write, which may be `null` to write a `null.decimal`.
+   * @param value The {@link Decimal} to write, which may be `null` to write a `null.decimal`.
    */
   writeDecimal(value: Decimal | null): void;
 
   /**
-   * Writes a [[Timestamp]] value as an Ion `timestamp` value.
+   * Writes a {@link Timestamp} value as an Ion `timestamp` value.
    *
-   * @param value The [[Timestamp]] to write, which may be `null` to write a `null.timestamp`.
+   * @param value The {@link Timestamp} to write, which may be `null` to write a `null.timestamp`.
    */
   writeTimestamp(value: Timestamp | null): void;
 
@@ -127,7 +127,7 @@ export interface Writer {
   /**
    * Writes the field name for a member of a `struct`.
    *
-   * @throws Error if the [[Writer]] is not within a `struct` or this method was already
+   * @throws Error if the {@link Writer} is not within a `struct` or this method was already
    *  called before a value was written.
    */
   writeFieldName(fieldName: string): void;
@@ -163,7 +163,7 @@ export interface Writer {
   /**
    * Flushes data to the internal buffer and finalizes the Ion stream.
    *
-   * @throws Error if the [[Writer]] is already closed or the writer is not
+   * @throws Error if the {@link Writer} is already closed or the writer is not
    *  at the top-level (i.e. inside of a container).
    */
   close(): void;
@@ -171,9 +171,9 @@ export interface Writer {
   /**
    * Retrieves the serialized buffer as an array of octets.  The buffer will
    * be either a UTF-8 encoded buffer for Ion text or Ion binary.  The buffer is
-   * not well-defined until [[close]] is invoked.
+   * not well-defined until {@link close} is invoked.
    *
-   * @throws Error if [[close]] has not been invoked.
+   * @throws Error if {@link close} has not been invoked.
    */
   getBytes(): Uint8Array;
 

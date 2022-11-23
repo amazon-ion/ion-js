@@ -53,7 +53,7 @@ export type ReaderOctetBuffer = ArrayBufferLike | ArrayLike<number>;
 export type ReaderBuffer = ReaderOctetBuffer | string;
 
 /**
- * Create an {Reader} over Ion data in a {ReaderBuffer}.
+ * Create an {@link Reader} over Ion data in a {@link ReaderBuffer}.
  *
  * @param buf       The Ion data to be used by the reader. Typically a string, UTF-8 encoded buffer (text), or raw
  *                  binary buffer.
