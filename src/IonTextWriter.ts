@@ -452,8 +452,8 @@ export class TextWriter extends AbstractWriter {
 
   /**
    * Ion's textual representation doesn't distinguish between 32- and 64-bit floats.
-   * This method provides a common implementation of [[writeFloat32]] and [[writeFloat64]], which
-   * are distinct functions to satisfy the [[Writer]] interface.
+   * This method provides a common implementation of {@link writeFloat32} and {@link writeFloat64}, which
+   * are distinct functions to satisfy the {@link Writer} interface.
    *
    * @param value - A numeric value to write as an Ion float.
    */
@@ -463,7 +463,7 @@ export class TextWriter extends AbstractWriter {
 
   /**
    * This method provides an implementation of Serializer<number> that can be used in calls to
-   * [[_writeValue]]. It maintains the expected binding to `this` even when used as a callback.
+   * {@link _writeValue}. It maintains the expected binding to `this` even when used as a callback.
    *
    * @param value
    */

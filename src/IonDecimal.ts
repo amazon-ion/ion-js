@@ -61,8 +61,8 @@ export class Decimal {
   /**
    * Creates a new Decimal value using the provided coefficient and exponent values.
    *
-   * @param coefficient   See the class-level [[Decimal]] documentation for details.
-   * @param exponent      See the class-level [[Decimal]] documentation for details.
+   * @param coefficient   See the class-level {@link Decimal} documentation for details.
+   * @param exponent      See the class-level {@link Decimal} documentation for details.
    */
   constructor(coefficient: number, exponent: number);
 
@@ -73,8 +73,8 @@ export class Decimal {
    * the provided coefficient's sign will be used. If isNegative is specified but is not in agreement with
    * the coefficient's sign, the value of isNegative takes precedence.
    *
-   * @param coefficient   See the class-level [[Decimal]] documentation for details.
-   * @param exponent      See the class-level [[Decimal]] documentation for details.
+   * @param coefficient   See the class-level {@link Decimal} documentation for details.
+   * @param exponent      See the class-level {@link Decimal} documentation for details.
    * @param isNegative    Must be set to 'true' when constructing -0. May be omitted otherwise.
    */
   constructor(coefficient: bigint, exponent: number, isNegative?: boolean);
@@ -269,7 +269,7 @@ export class Decimal {
    * Returns a BigInt representing the coefficient of this Decimal value.
    *
    * Note that the BigInt data type is unable to represent -0 natively. If you wish to check for a -0 coefficient,
-   * test whether the coefficient is zero and then call [[isNegative]].
+   * test whether the coefficient is zero and then call {@link isNegative}.
    */
   getCoefficient(): bigint {
     return this._coefficient;

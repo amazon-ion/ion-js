@@ -18,7 +18,7 @@ import { Decimal } from "./IonDecimal";
 import { Timestamp } from "./IonTimestamp";
 import { IonType } from "./IonType";
 
-/** Represents the possible return values of [[Reader.value]]. */
+/** Represents the possible return values of {@link Reader.value}. */
 export type ReaderScalarValue =
   | null
   | boolean
@@ -32,12 +32,12 @@ export type ReaderScalarValue =
 /**
  * A pull parser interface over Ion data.
  *
- * Generally, users will use [[next]] and [[stepIn]] and [[stepOut]]
+ * Generally, users will use {@link next} and {@link stepIn} and {@link stepOut}
  * to traverse the structure of the data. The **Value** suffixed methods are
- * used to extract the scalar data out of the current position of the [[Reader]].
+ * used to extract the scalar data out of the current position of the {@link Reader}.
  *
- * [[Reader]] instances start *before* a value, thus you have to
- * invoke [[next]] to position a newly created reader on the first value.
+ * {@link Reader} instances start *before* a value, thus you have to
+ * invoke {@link next} to position a newly created reader on the first value.
  */
 export interface Reader {
   /**
@@ -56,16 +56,16 @@ export interface Reader {
    * mid-stream system level values that must be processed to guarantee that the
    * Reader is in a valid state. It is safe, however, to start at the beginning of a data
    * source and call next() until you reach the desired position, as the reader
-   * will still have the opportunity to process system-level values along the way.)
+   * will still have the opportunity to process system-level values along the way.
    *
-   * @returns the [[number]] of bytes or UTF-16 code units that the reader has processed.
+   * @returns the number of bytes or UTF-16 code units that the reader has processed.
    */
   position(): number;
 
   /**
    * Advances the reader to the next value in the stream at the current depth.
    *
-   * @return The corresponding [[IonType]] of the value the reader moves to, or `null`
+   * @return The corresponding {@link IonType} of the value the reader moves to, or `null`
    *  if the reader is at the end of the stream or container.
    */
   next(): IonType | null;
@@ -74,7 +74,7 @@ export interface Reader {
    * Steps into the container the reader is currently positioned on.  Note that this
    * positions the reader *before* the first value within the container.
    *
-   * @throw Error if the reader is not positioned on a container or the container [[isNull]].
+   * @throw Error if the reader is not positioned on a container or the container {@link isNull}.
    */
   stepIn(): void;
 
@@ -82,7 +82,7 @@ export interface Reader {
    * Steps out of the current container.  This is only valid when the reader is inside of a container
    * (i.e. `depth() > 0`).  Note that the positions the reader *after* the container that was
    * stepped out of, but *before* the next value after the container.  One should generally
-   * call [[next]] after invoking this method.
+   * call {@link next} after invoking this method.
    *
    * @throw Error if the reader is not positioned within a container.
    */
@@ -110,7 +110,7 @@ export interface Reader {
   isNull(): boolean;
 
   /**
-   * Returns the [[IonType]] associated with the current value.
+   * Returns the {@link IonType} associated with the current value.
    *
    * @return `null` if the reader is not positioned on a value.
    */
@@ -119,7 +119,7 @@ export interface Reader {
   /**
    * Returns the current value as a `boolean`.  This is only valid if `type() == IonTypes.BOOL`.
    *
-   * @return `null` if the current Ion value [[isNull]].
+   * @return `null` if the current Ion value {@link isNull}.
    *
    * @throw Error when the reader is not positioned on a `bool` typed value.
    */
@@ -129,7 +129,7 @@ export interface Reader {
    * Returns the current value as a `Uint8Array`.  This is only valid if `type() == IonTypes.CLOB`
    * or `type() == IonTypes.BLOB`.
    *
-   * @return `null` if the current Ion value [[isNull]].
+   * @return `null` if the current Ion value {@link isNull}.
    *
    * @throw Error when the reader is not positioned on a `clob` or `blob` typed value.
    * @deprecated since version 4.2. Use the `uInt8ArrayValue` method instead.
@@ -140,16 +140,16 @@ export interface Reader {
    * Returns the current value as a `Uint8Array`.  This is only valid if `type() == IonTypes.CLOB`
    * or `type() == IonTypes.BLOB`.
    *
-   * @return `null` if the current Ion value [[isNull]].
+   * @return `null` if the current Ion value {@link isNull}.
    *
    * @throw Error when the reader is not positioned on a `clob` or `blob` typed value.
    */
   uInt8ArrayValue(): Uint8Array | null;
 
   /**
-   * Returns the current value as a [[Decimal]].  This is only valid if `type() == IonTypes.DECIMAL`.
+   * Returns the current value as a {@link Decimal}.  This is only valid if `type() == IonTypes.DECIMAL`.
    *
-   * @return `null` if the current Ion value [[isNull]].
+   * @return `null` if the current Ion value {@link isNull}.
    *
    * @throw Error when the reader is not positioned on a `decimal` typed value.
    */
@@ -159,7 +159,7 @@ export interface Reader {
    * Returns the current value as a `number`.  This is only valid if `type() == IonTypes.INT`
    * or `type() == IonTypes.FLOAT`.
    *
-   * @return `null` if the current Ion value [[isNull]]. For `int` values that are outside of
+   * @return `null` if the current Ion value {@link isNull}. For `int` values that are outside of
    *  the range specified by `Number.MIN_SAFE_INTEGER` and `Number.MAX_SAFE_INTEGER`, this method
    *  will truncate the result.
    *
@@ -170,7 +170,7 @@ export interface Reader {
   /**
    * Returns the current value as a `BigInt`.  This is only valid if `type() == IonTypes.INT`.
    *
-   * @return `null` if the current Ion value [[isNull]] or a BigInt containing the deserialized integer.
+   * @return `null` if the current Ion value {@link isNull} or a BigInt containing the deserialized integer.
    *
    * @throw Error when the reader is not positioned on an `int` typed value.
    */
@@ -180,7 +180,7 @@ export interface Reader {
    * Indicates whether the current int value is small enough to be stored in a number without loss of precision
    * or if a BigInt is required.
    *
-   * @return [[IntSize.Number]] if the value will fit in a number, [[IntSize.BigInt]] otherwise.
+   * @return {@link IntSize.Number} if the value will fit in a number, {@link IntSize.BigInt} otherwise.
    */
   intSize(): IntSize;
 
@@ -188,16 +188,16 @@ export interface Reader {
    * Returns the current value as a `string`.  This is only valid if `type() == IonTypes.STRING`
    * or `type() == IonTypes.SYMBOL`.
    *
-   * @return `null` if the current Ion value [[isNull]].
+   * @return `null` if the current Ion value {@link isNull}.
    *
    * @throw Error when the reader is not positioned on a `string` or `symbol` typed value.
    */
   stringValue(): string | null;
 
   /**
-   * Returns the current value as a [[Timestamp]].  This is only valid if `type() == IonTypes.TIMESTAMP`.
+   * Returns the current value as a {@link Timestamp}.  This is only valid if `type() == IonTypes.TIMESTAMP`.
    *
-   * @return `null` if the current Ion value [[isNull]].
+   * @return `null` if the current Ion value {@link isNull}.
    *
    * @throw Error when the reader is not positioned on a `timestamp` typed value.
    */
@@ -206,7 +206,7 @@ export interface Reader {
   /**
    * Returns the current scalar value.  This is only valid when `type().scalar == true`.
    *
-   * @return `null` if the current value is [[isNull]], equivalent to the corresponding `xxxValue` methods
+   * @return `null` if the current value is {@link isNull}, equivalent to the corresponding `xxxValue` methods
    *  for all scalar types.
    *
    * @throw Error when the reader is not positioned on a scalar value.
