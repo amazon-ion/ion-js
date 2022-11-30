@@ -1,4 +1,4 @@
-// Base Typscript Compiler Configuration
+// Base Typescript Compiler Configuration
 // Targets CommonJS Module system and ES6 feature set.
 {
   "include": ["src/**/*"],
