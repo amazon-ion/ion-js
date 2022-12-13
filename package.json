@@ -7,11 +7,12 @@
   "scripts": {
     "commit": "git-cz",
     "prepare": "grunt release",
+    "lint": "grunt lint && prettier --check 'src/**/*.ts'",
+    "lint:fix": "prettier --write 'src/**/*.ts'",
     "test": "nyc mocha",
     "release": "grunt release",
     "test-driver": "cd test-driver && npm install",
-    "build-test-driver": "cd test-driver && npm run build",
-    "prettier-check": "prettier --check 'src/**/*.ts'"
+    "build-test-driver": "cd test-driver && npm run build"
   },
   "repository": {
     "type": "git",
@@ -56,10 +57,14 @@
     "@types/chai": "^4.2.11",
     "@types/mocha": "^5.2.7",
     "@types/node": "^12.12.42",
+    "@typescript-eslint/eslint-plugin": "^4.33.0",
+    "@typescript-eslint/parser": "^4.33.0",
     "babelify": "^10.0.0",
     "chai": "^4.3.6",
     "commitizen": "^4.2.5",
     "cz-conventional-changelog": "^3.2.0",
+    "eslint": "^7.32.0",
+    "eslint-config-prettier": "^8.5.0",
     "grunt": "^1.5.3",
     "grunt-babel": "^8.0.0",
     "grunt-browserify": "^5.3.0",
@@ -68,9 +73,9 @@
     "grunt-contrib-copy": "^1.0.0",
     "grunt-contrib-jshint": "^2.1.0",
     "grunt-contrib-uglify": "^4.0.1",
+    "grunt-eslint": "^23.0.0",
     "grunt-shell": "^3.0.1",
     "grunt-ts": "^6.0.0-beta.22",
-    "grunt-tslint": "^5.0.2",
     "grunt-typedoc": "^0.2.4",
     "mocha": "^6.2.3",
     "mocha-typescript": "^1.1.17",
@@ -79,7 +84,6 @@
     "semantic-release": "^17.2.3",
     "source-map-support": "^0.5.19",
     "ts-node": "^8.10.1",
-    "tslint": "^5.20.1",
     "typedoc": "^0.23.14",
     "typescript": "^4.8.3",
     "yargs": "^17.5.1"
