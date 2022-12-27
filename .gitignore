@@ -104,8 +104,8 @@ fabric.properties
 # Comment Reason: https://github.com/joeblau/gitignore.io/issues/186#issuecomment-215987721
 
 ## Ignoring iml files breaks when using IntelliJ modules. We do not at the moment.
- *.iml
- .idea
+*.iml
+.idea
 
 # modules.xml
 # .idea/misc.xml
