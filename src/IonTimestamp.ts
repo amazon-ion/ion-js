@@ -232,7 +232,7 @@ export class Timestamp {
    * The provided string must be a text-encoded Timestamp as specified
    * in the Ion specification.
    *
-   * @see https://amzn.github.io/ion-docs/docs/spec.html#timestamp
+   * @see https://amazon-ion.github.io/ion-docs/docs/spec.html#timestamp
    */
   static parse(str: string): Timestamp | null {
     return _TimestampParser._parse(str);

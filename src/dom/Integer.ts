@@ -22,7 +22,7 @@ const _fromJsConstructor: FromJsConstructor = new FromJsConstructorBuilder()
 /**
  * Represents an integer value in an Ion stream.
  *
- * [1] http://amzn.github.io/ion-docs/docs/spec.html#int
+ * [1] https://amazon-ion.github.io/ion-docs/docs/spec.html#int
  */
 export class Integer extends Value(Number, IonTypes.INT, _fromJsConstructor) {
   private _bigIntValue: JSBI | null;

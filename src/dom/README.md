@@ -276,7 +276,7 @@ assert.isFalse(ionString === ionString2);
 
 This method compares a `dom.Value` object with another `dom.Value` object with either strict or non-strict comparison type. 
 
-*Strict equivalence* refers to Ion data model equivalence as defined in [Ion Equivalence](https://www.javadoc.io/doc/com.amazon.ion/ion-java/latest/com/amazon/ion/util/Equivalence.html) and by [Ion Specification](http://amzn.github.io/ion-docs/docs/spec.html)
+*Strict equivalence* refers to Ion data model equivalence as defined in [Ion Equivalence](https://www.javadoc.io/doc/com.amazon.ion/ion-java/latest/com/amazon/ion/util/Equivalence.html) and by [Ion Specification](https://amazon-ion.github.io/ion-docs/docs/spec.html)
 *Structural* (or *non-strict*) *equivalence* follows the same rules as strict equivalence,except that:
 * Annotations are not considered, and
 * Timestamps that represent the same instant in time are always considered equivalent.

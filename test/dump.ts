@@ -38,7 +38,7 @@ function roundTripTest(dumpFn: (...values: any[]) => any,
         //      In the meantime, the core writing/equality logic is more strictly tested by
         //      test/dom/Value.ts, which evaluates the data produced by the Value.writeTo() function
         //      at the core of the ion.dump*() methods.
-        //      [1] https://github.com/amzn/ion-js/issues/576
+        //      [1] https://github.com/amazon-ion/ion-js/issues/576
         assert.deepEqual(actualValue.getAnnotations(), expectedValue.getAnnotations());
         assert.equal(actualValue.isNull(), expectedValue.isNull());
         assert.equal(actualValue.getType(), expectedValue.getType());
@@ -82,7 +82,7 @@ describe('dump*()', () => {
         assert.deepEqual(ionValue, ionBinaryValue);
     });
     it('Struct with annotated field large enough to require a VarUInt length', () => {
-        // this ionText is taken from https://github.com/amzn/ion-js/issues/621
+        // this ionText is taken from https://github.com/amazon-ion/ion-js/issues/621
         let ionText = "'com.example.organization.model.data.ClassName2@1.0'::{\n" +
             "  values: [\n" +
             "    'com.example.organization.model.data.ClassName1@1.0'::{\n" +

@@ -25,7 +25,7 @@ import { PathElement, Value } from "./Value";
  *      dollars::null.decimal
  *      meters::null.float
  *
- * [1] http://amzn.github.io/ion-docs/docs/spec.html#null
+ * [1] https://amazon-ion.github.io/ion-docs/docs/spec.html#null
  */
 export class Null extends Value(Object, IonTypes.NULL, FromJsConstructor.NONE) {
   private static _supportedIonTypesByOperation = new Map<string, Set<IonType>>([

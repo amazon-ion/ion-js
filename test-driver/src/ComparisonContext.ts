@@ -23,7 +23,7 @@ import {IonEvent, IonEventFactory, IonEventType} from "ion-js";
 
 /**
  * ComparisonContext to create a structure for lhs and rhs streams
- * for more information: https://github.com/amzn/ion-test-driver#comparisonreport
+ * for more information: https://github.com/amazon-ion/ion-test-driver#comparisonreport
  */
 export class ComparisonContext {
     location: string;
