@@ -92,7 +92,7 @@ export interface Reader {
   /** Returns the depth of the reader.  This is `0` if the reader is not inside of a container. */
   depth(): number;
 
-  // TODO implement symboltokens to replace string[] https://github.com/amzn/ion-js/issues/121
+  // TODO implement symboltokens to replace string[] https://github.com/amazon-ion/ion-js/issues/121
   /**
    * Returns the annotations for the current value.
    *

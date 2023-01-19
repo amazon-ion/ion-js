@@ -18,14 +18,14 @@ import fs from "fs";
 import yargs from "yargs";
 
 /** common CLI arguments structure
- *  for more information: https://github.com/amzn/ion-test-driver#standardized-cli
+ *  for more information: https://github.com/amazon-ion/ion-test-driver#standardized-cli
  */
 export class IonCliCommonArgs {
     inputFiles: Array<string>;
     outputFormatName: OutputFormat;
 
     // outputFile,errorReportFile: 'any' datatype to use stdout as well as file write stream to write ion data
-    // for more information : https://github.com/amzn/ion-js/issues/627
+    // for more information : https://github.com/amazon-ion/ion-js/issues/627
     outputFile: any;
     errorReportFile: any;
 

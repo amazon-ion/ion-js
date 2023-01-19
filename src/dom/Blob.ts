@@ -4,7 +4,7 @@ import { Lob } from "./Lob";
 /**
  * Represents a blob[1] value in an Ion stream.
  *
- * [1] http://amzn.github.io/ion-docs/docs/spec.html#blob
+ * [1] https://amazon-ion.github.io/ion-docs/docs/spec.html#blob
  */
 export class Blob extends Lob(IonTypes.BLOB) {
   /**

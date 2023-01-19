@@ -18,7 +18,7 @@ const _fromJsConstructor: FromJsConstructor = new FromJsConstructorBuilder()
 /**
  * Represents a symbol[1] value in an Ion stream.
  *
- * [1] http://amzn.github.io/ion-docs/docs/spec.html#symbol
+ * [1] https://amazon-ion.github.io/ion-docs/docs/spec.html#symbol
  */
 export class Symbol extends Value(String, IonTypes.SYMBOL, _fromJsConstructor) {
   /**

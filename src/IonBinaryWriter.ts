@@ -52,7 +52,7 @@ enum States {
   CLOSED,
 }
 
-/** Four-bit type codes per http://amzn.github.io/ion-docs/binary.html#typed-value-formats */
+/** Four-bit type codes per https://amazon-ion.github.io/ion-docs/binary.html#typed-value-formats */
 enum TypeCodes {
   NULL = 0,
   BOOL = 1,
@@ -77,7 +77,7 @@ enum TypeCodes {
  * This implementation caches serialized values in an in-memory tree.
  * It does not support multiple local symbol tables (aka "symbol table append").
  *
- * @see http://amzn.github.io/ion-docs/binary.html
+ * @see https://amazon-ion.github.io/ion-docs/binary.html
  */
 export class BinaryWriter extends AbstractWriter {
   private readonly symbolTable: LocalSymbolTable;
@@ -167,7 +167,7 @@ export class BinaryWriter extends AbstractWriter {
     const isPositiveZero: boolean =
       JSBI.equal(coefficient, JsbiSupport.ZERO) && !value.isNegative();
     if (isPositiveZero && exponent === 0 && _sign(exponent) === 1) {
-      // Special case per the spec: http://amzn.github.io/ion-docs/docs/binary.html#5-decimal
+      // Special case per the spec: https://amazon-ion.github.io/ion-docs/docs/binary.html#5-decimal
       this.addNode(
         new BytesNode(
           this.writer,
