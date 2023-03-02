@@ -47,7 +47,10 @@ export class Decimal extends Value(
   constructor(value: number, annotations?: string[]);
 
   // This is the unified implementation of the above signatures and is not visible to users.
-  constructor(value: ion.Decimal | string | number, annotations: string[] = []) {
+  constructor(
+    value: ion.Decimal | string | number,
+    annotations: string[] = []
+  ) {
     if (typeof value === "string") {
       super(Number(value));
       this._decimalValue = new ion.Decimal(value);
@@ -59,7 +62,7 @@ export class Decimal extends Value(
     } else {
       // if value is a number type
       super(value);
-      this._decimalValue = new ion.Decimal(""+value);
+      this._decimalValue = new ion.Decimal("" + value);
       this._numberValue = value;
     }
     this._setAnnotations(annotations);
