@@ -24,7 +24,7 @@ import { SharedSymbolTable } from "./IonSharedSymbolTable";
  * import from a given symbol table may be specified as the "length" of the
  * import.
  *
- * @see http://amzn.github.io/ion-docs/symbols.html#imports
+ * @see https://amazon-ion.github.io/ion-docs/symbols.html#imports
  */
 export class Import {
   private readonly _offset: number;

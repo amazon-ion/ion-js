@@ -5,7 +5,7 @@ import { Value } from "./Value";
 /**
  * Represents an s-expression[1] value in an Ion stream.
  *
- * [1] http://amzn.github.io/ion-docs/docs/spec.html#sexp
+ * [1] https://amazon-ion.github.io/ion-docs/docs/spec.html#sexp
  */
 export class SExpression extends Sequence(IonTypes.SEXP) {
   /**

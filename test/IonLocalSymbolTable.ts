@@ -141,7 +141,7 @@ describe('Local symbol table', () => {
         assert.equal(originalLength + 1, symbolTable.symbols.length, "Duplicate symbol added to symbol table");
     });
 
-    // See https://github.com/amzn/ion-js/issues/645
+    // See https://github.com/amazon-ion/ion-js/issues/645
     it('SST Object properties are not treated as symbols (Issue #645)', () => {
         const symbolTable = defaultLocalSymbolTable();
         symbolTable.addSymbol("foo");
@@ -156,7 +156,7 @@ describe('Local symbol table', () => {
         assert.isUndefined(symbolTable.getSymbolId('toString'));
     });
 
-    // See https://github.com/amzn/ion-js/issues/649
+    // See https://github.com/amazon-ion/ion-js/issues/649
     it('Symbol tables do not discard duplicate text during instantiation (Issue #649)', () => {
         const extraSymbols = ["foo", "foo", "bar", "bar"];
         const symbolTable = new LocalSymbolTable(getSystemSymbolTableImport(), extraSymbols);

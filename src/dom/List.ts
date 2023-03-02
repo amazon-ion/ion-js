@@ -5,7 +5,7 @@ import { Value } from "./Value";
 /**
  * Represents a list value in an Ion stream.
  *
- * [1] http://amzn.github.io/ion-docs/docs/spec.html#list
+ * [1] https://amazon-ion.github.io/ion-docs/docs/spec.html#list
  */
 export class List extends Sequence(IonTypes.LIST) {
   /**

@@ -27,7 +27,7 @@ if (typeof TextDecoder !== "undefined") {
 
 /**
  * @file Constants and helper methods for Unicode.
- * @see https://amzn.github.io/ion-docs/stringclob.html
+ * @see https://amazon-ion.github.io/ion-docs/stringclob.html
  * @see http://www.unicode.org/versions/Unicode5.0.0/
  */
 export function encodeUtf8(s: string): Uint8Array {

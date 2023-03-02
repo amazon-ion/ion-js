@@ -11,7 +11,7 @@ describe('IonReaderConsistency', () => {
         {name: 'Pretty', mkInstance: () => ion.makePrettyWriter()},
     ];
 
-    // regression test for https://github.com/amzn/ion-js/issues/514
+    // regression test for https://github.com/amazon-ion/ion-js/issues/514
     writerTypes.forEach(writerType => {
         it('Reads annotations correctly from structs created by a ' + writerType.name + ' writer', () => {
             let writer = writerType.mkInstance();

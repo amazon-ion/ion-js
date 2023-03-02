@@ -23,7 +23,7 @@ export enum ErrorType {
 }
 
 /** Error structure for error report
- * for more information: https://github.com/amzn/ion-test-driver#errorreport
+ * for more information: https://github.com/amazon-ion/ion-test-driver#errorreport
  */
 export class IonCliError {
     errorType: ErrorType;

@@ -15,7 +15,7 @@
 
 /**
  * A shared symbol table.
- * @see https://amzn.github.io/ion-docs/docs/symbols.html#shared-symbol-tables
+ * @see https://amazon-ion.github.io/ion-docs/docs/symbols.html#shared-symbol-tables
  */
 export class SharedSymbolTable {
   protected readonly _idsByText: Map<string, number>;

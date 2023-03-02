@@ -22,7 +22,7 @@ import { PathElement, Value } from "./Value";
  *     let s: any = ion.load('{fieldNames: ["foo", "bar", "baz"]}'); // Conflicts with Struct#fieldNames()
  *     assert.equal(s.get('fieldNames', 0).stringValue(), "foo"); // Passes
  *
- * [1] http://amzn.github.io/ion-docs/docs/spec.html#struct
+ * [1] https://amazon-ion.github.io/ion-docs/docs/spec.html#struct
  */
 export class Struct extends Value(
   Object,

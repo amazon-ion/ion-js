@@ -5,7 +5,7 @@ import {load, Value} from "../../src/dom";
 import {encodeUtf8} from "../../src/IonUnicode";
 
 // Verifies that subtypes of dom.Value down-convert to JSON following the documented process[1].
-// [1] http://amzn.github.io/ion-docs/guides/cookbook.html#down-converting-to-json
+// [1] https://amazon-ion.github.io/ion-docs/guides/cookbook.html#down-converting-to-json
 
 // Calls dom.Value.from() on each Javascript value to create a corresponding Ion value, then verifies that
 // JSON.stringify() produces the same output for both.

@@ -20,7 +20,7 @@ import { JsbiSerde } from "./JsbiSerde";
 /**
  * Values in the Ion binary format are serialized as a sequence of low-level fields. This
  * writer is responsible for emitting those fields in the proper format.
- * @see http://amzn.github.io/ion-docs/binary.html#basic-field-formats
+ * @see https://amazon-ion.github.io/ion-docs/binary.html#basic-field-formats
  */
 export class LowLevelBinaryWriter {
   private readonly writeable: Writeable;
