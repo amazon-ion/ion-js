@@ -1,7 +1,7 @@
 import { assert } from "chai";
 import { load, loadAll, Value } from "../../src/dom";
 import * as ion from "../../src/Ion";
-import { IonTypes } from "../../src/Ion";
+import { dom, IonTypes } from "../../src/Ion";
 import { encodeUtf8 } from "../../src/IonUnicode";
 
 /**
@@ -216,6 +216,9 @@ describe("DOM", () => {
     assert.equal(101.5, +d);
     assert.equal(101.5, d.numberValue());
     assert.isTrue(new ion.Decimal("101.5").equals(d.decimalValue()!));
+    assert.isTrue(new dom.Decimal('101.5').equals(d));
+    assert.isTrue(new dom.Decimal(101.5).equals(d));
+    assert.isFalse(new dom.Decimal(101.0).equals(d));
     assert.equal(1015, Number(d.decimalValue()!.getCoefficient()));
   });
 
