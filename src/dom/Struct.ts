@@ -147,8 +147,9 @@ export class Struct extends Value(
     return Object.values(singleValueFields);
   }
 
-  allElements(): Value[][] {
-    return Object.values(this._fields);
+  allElements(): Value[] {
+    // TODO: this can use flat()  method once we have esnext
+    return [].concat.apply([], Object.values(this._fields));
   }
 
   [Symbol.iterator](): IterableIterator<[string, Value]> {

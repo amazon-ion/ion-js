@@ -164,7 +164,7 @@ export interface Value {
   elements(): Value[];
 
   /**
-   * For the Struct, List, and SExpression types, returns an array containing the container's
+   * For the Struct types, returns an array containing the container's
    * nested values; otherwise throws an Error.
    * If there are duplicate fields in a Struct, then it only returns all the values for that field.
    *
@@ -177,13 +177,14 @@ export interface Value {
    *         foo: 1,
    *         foo: null,
    *         foo: true,
+   *         bar: 10,
    *     }
    *
-   * a call to `elements()` would return a field name "foo" with a `dom.Boolean` representing `true`
-   * while a call to `allElements()` would return  a field name "foo" with an `Array` of
-   * `dom.Value`s: `[1, null, true]`.
+   * a call to `elements()` would return a field name "foo" with a `dom.Boolean` representing `true` and a field name "bar"
+   * with a `dom.Integer` representing `10`. while a call to `allElements()` would return all field values as an `Array` of
+   * `dom.Value`s: `[1, null, true, 10]`.
    */
-  allElements(): Value[][];
+  allElements(): Value[];
 
   /**
    * Allows for easy type casting from Value to a particular implementation of Value.
@@ -402,7 +403,7 @@ export function Value<Clazz extends Constructor>(
       this._unsupportedOperation("elements");
     }
 
-    allElements(): Value[][] {
+    allElements(): Value[] {
       this._unsupportedOperation("allElements");
     }
 

@@ -540,11 +540,11 @@ describe('DOM', () => {
       assert.equal("Jessie", s1.elements()[0]['first']);
 
       // allElements returns values for given Struct where for a fieldname it contains an array of all values
-      assert.isTrue(Array.isArray(s.allElements()[0]));
-      assert.deepEqual([load('55'), load('41')], s.allElements()[0]);
-      assert.isTrue(Array.isArray(s1.allElements()[0]));
-      assert.equal("John", s1.allElements()[0][0]['first']);
-      assert.equal("Jessie", s1.allElements()[0][1]['first']);
+      assert.isTrue(Array.isArray(s.allElements()));
+      assert.deepEqual([load('55'), load('41')], s.allElements());
+      assert.isTrue(Array.isArray(s1.allElements()));
+      assert.equal("John", s1.allElements()[0]['first']);
+      assert.equal("Jessie", s1.allElements()[1]['first']);
 
       // Iteration
       for (let [fieldName, value] of s) {
