@@ -60,13 +60,15 @@ export class Decimal extends Value(
       super(value.numberValue());
       this._decimalValue = value;
       this._numberValue = value.numberValue();
-    } else if (typeof value === "number")  {
+    } else if (typeof value === "number") {
       // if value is a number type
       super(value);
       this._decimalValue = new ion.Decimal("" + value);
       this._numberValue = value;
     } else {
-      throw new Error("Decimal value can only be created from number, ion.Decimal or string");
+      throw new Error(
+        "Decimal value can only be created from number, ion.Decimal or string"
+      );
     }
     this._setAnnotations(annotations);
   }
