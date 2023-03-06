@@ -72,7 +72,7 @@
     "grunt-contrib-clean": "^2.0.0",
     "grunt-contrib-copy": "^1.0.0",
     "grunt-contrib-jshint": "^2.1.0",
-    "grunt-contrib-uglify": "^4.0.1",
+    "grunt-contrib-uglify": "^5.2.2",
     "grunt-eslint": "^23.0.0",
     "grunt-shell": "^3.0.1",
     "grunt-ts": "^6.0.0-beta.22",
