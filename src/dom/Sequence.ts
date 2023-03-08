@@ -24,6 +24,16 @@ export function Sequence(ionType: IonType) {
         this.push(child);
       }
       this._setAnnotations(annotations);
+
+      return new Proxy(this, {
+        set: function (target, index, value): boolean {
+          if (!(value instanceof Value)) {
+            value = Value.from(value);
+          }
+          target[index] = value;
+          return true; // Indicates that the assignment succeeded
+        },
+      });
     }
 
     get(...pathElements: PathElement[]): Value | null {
