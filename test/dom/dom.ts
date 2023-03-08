@@ -365,6 +365,7 @@ describe("DOM", () => {
     l[0] = "Saturn";
     assert.equal(l[0], "Saturn");
     assert.equal(IonTypes.STRING, l[0].getType());
+    assert.isTrue(l[0].ionEquals(dom.Value.from("Saturn")));
   });
 
   it("load() List as any", () => {
@@ -415,6 +416,7 @@ describe("DOM", () => {
     s[0] = "Saturn";
     assert.equal(s[0], "Saturn");
     assert.equal(IonTypes.STRING, s[0].getType());
+    assert.isTrue(s[0].ionEquals(dom.Value.from("Saturn")));
   });
 
   it("load() SExpression as any", () => {
@@ -475,6 +477,7 @@ describe("DOM", () => {
     s["age"] = 43;
     assert.equal(43, s["age"]);
     assert.equal(IonTypes.INT, s["age"].getType());
+    assert.isTrue(s["age"].ionEquals(dom.Value.from(43)));
   });
 
   it("load() Struct as any", () => {
