@@ -64,6 +64,9 @@ export class Struct extends Value(
       // All values set by the user are stored in `this._fields` to avoid
       // potentially overwriting Struct methods.
       set: function (target, name, value): boolean {
+        if (!(value instanceof Value)) {
+          value = Value.from(value);
+        }
         target._fields[name] = [value];
         return true; // Indicates that the assignment succeeded
       },

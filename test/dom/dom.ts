@@ -360,6 +360,12 @@ describe("DOM", () => {
 
     let planets: string[] = l.elements().map((s) => s.stringValue()!);
     assert.equal(4, planets.length);
+
+    // set a JS value into the list that automatically upconverts to dom Value
+    l[0] = "Saturn";
+    assert.equal(l[0], "Saturn");
+    assert.equal(IonTypes.STRING, l[0].getType());
+    assert.isTrue(l[0].ionEquals(dom.Value.from("Saturn")));
   });
 
   it("load() List as any", () => {
@@ -405,6 +411,12 @@ describe("DOM", () => {
 
     let planets: string[] = s.elements().map((s) => s.stringValue()!);
     assert.equal(4, planets.length);
+
+    // set a JS value into the sexpression that automatically upconverts to dom Value
+    s[0] = "Saturn";
+    assert.equal(s[0], "Saturn");
+    assert.equal(IonTypes.STRING, s[0].getType());
+    assert.isTrue(s[0].ionEquals(dom.Value.from("Saturn")));
   });
 
   it("load() SExpression as any", () => {
@@ -460,6 +472,12 @@ describe("DOM", () => {
     }
 
     assert.equal(2, s.fields().length);
+
+    // set a field value using a JS value that automatically upconverts to dom Value
+    s["age"] = 43;
+    assert.equal(43, s["age"]);
+    assert.equal(IonTypes.INT, s["age"].getType());
+    assert.isTrue(s["age"].ionEquals(dom.Value.from(43)));
   });
 
   it("load() Struct as any", () => {
