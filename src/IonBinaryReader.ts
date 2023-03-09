@@ -181,10 +181,6 @@ export class BinaryReader implements Reader {
     return this._raw_type === TB_NULL || this._parser.isNull();
   }
 
-  byteValue(): Uint8Array | null {
-    return this._parser.uInt8ArrayValue();
-  }
-
   uInt8ArrayValue(): Uint8Array | null {
     return this._parser.uInt8ArrayValue();
   }
@@ -254,7 +250,7 @@ export class BinaryReader implements Reader {
         return null;
       case IonTypes.BLOB:
       case IonTypes.CLOB:
-        return this.byteValue();
+        return this.uInt8ArrayValue();
       case IonTypes.BOOL:
         return this.booleanValue();
       case IonTypes.DECIMAL:

@@ -298,10 +298,6 @@ export class TextReader implements Reader {
     throw new Error("Current value is not a Boolean.");
   }
 
-  byteValue(): Uint8Array | null {
-    return this.uInt8ArrayValue();
-  }
-
   uInt8ArrayValue(): Uint8Array | null {
     this.load_raw();
     switch (this._type) {
@@ -423,7 +419,7 @@ export class TextReader implements Reader {
         return null;
       case IonTypes.BLOB:
       case IonTypes.CLOB:
-        return this.byteValue();
+        return this.uInt8ArrayValue();
       case IonTypes.BOOL:
         return this.booleanValue();
       case IonTypes.DECIMAL:
