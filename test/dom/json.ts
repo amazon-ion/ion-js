@@ -145,5 +145,17 @@ describe('JSON', () => {
                 JSON.stringify(load('foo'))
             );
         });
+        it('Struct is instanceof dom.Value inside JSON.stringify', () => {
+            let struct: Value = load(`$ion_1_0
+                    {
+                      foo:"bar"
+                    }`)!;
+
+            const replacer = (key, value) => {
+                assert.isTrue(value instanceof Value)
+            }
+
+            JSON.stringify(struct, replacer, 2);
+        })
     });
 });
