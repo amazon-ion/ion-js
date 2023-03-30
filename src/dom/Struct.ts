@@ -182,7 +182,7 @@ export class Struct extends Value(
   }
 
   toJSON() {
-    let normalizedFields = Object.create(null);
+    let normalizedFields = Object.create(Struct.prototype);
     for (const [key, value] of this.fields()) {
       normalizedFields[key] = value;
     }
