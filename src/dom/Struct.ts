@@ -149,11 +149,7 @@ export class Struct extends Value(
   }
 
   elements(): Value[] {
-    let singleValueFields = Object.create(null);
-    for (const [fieldName, values] of this.allFields()) {
-      singleValueFields[fieldName] = values[values.length - 1];
-    }
-    return Object.values(singleValueFields);
+    return Object.values(this._fields).flat() as Value[];
   }
 
   [Symbol.iterator](): IterableIterator<[string, Value]> {
