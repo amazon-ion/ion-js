@@ -610,7 +610,7 @@ export class IonEventStream {
    *  ```javascript
    *  {event_type: SCALAR, ion_type: INT, field_name: {text:"foo"}, value_text: "1", value_binary: [0x21, 0x01], depth:1}
    *  ```
-   *  for more information: https://github.com/amzn/ion-test-driver#symboltoken-1
+   *  for more information: https://github.com/amazon-ion/ion-test-driver#symboltoken-1
    */
   private resolveFieldNameFromSerializedSymbolToken(): string | null {
     if (this.reader.isNull()) {

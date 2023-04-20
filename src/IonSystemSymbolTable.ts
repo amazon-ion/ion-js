@@ -15,7 +15,7 @@
 
 /**
  * @file Helper methods for obtaining the system symbol table or its Import.
- * @see https://amzn.github.io/ion-docs/docs/symbols.html#system-symbols
+ * @see https://amazon-ion.github.io/ion-docs/docs/symbols.html#system-symbols
  */
 import { Import } from "./IonImport";
 import { SharedSymbolTable } from "./IonSharedSymbolTable";

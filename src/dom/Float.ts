@@ -16,7 +16,7 @@ const _fromJsConstructor: FromJsConstructor = new FromJsConstructorBuilder()
 /**
  * Represents a float[1] value in an Ion stream.
  *
- * [1] http://amzn.github.io/ion-docs/docs/spec.html#float
+ * [1] https://amazon-ion.github.io/ion-docs/docs/spec.html#float
  */
 export class Float extends Value(Number, IonTypes.FLOAT, _fromJsConstructor) {
   /**

@@ -97,12 +97,10 @@ export class Timestamp {
   ) {
     if (dateOrLocalOffset instanceof Date) {
       const date = dateOrLocalOffset;
-      const seconds = new Decimal(
-        // The coefficient is the total number of milliseconds as an integer
-        date.getSeconds() + date.getMilliseconds(),
-        // And the exponent is 0 to indicate the scale of that integer
-        0
-      );
+      const seconds =
+        date.getMilliseconds() === 0
+          ? new Decimal(date.getSeconds(), 0)
+          : new Decimal(date.getSeconds() * 1000 + date.getMilliseconds(), -3);
 
       this._localOffset = date.getTimezoneOffset() * -1;
       this._year = date.getFullYear();
@@ -234,7 +232,7 @@ export class Timestamp {
    * The provided string must be a text-encoded Timestamp as specified
    * in the Ion specification.
    *
-   * @see https://amzn.github.io/ion-docs/docs/spec.html#timestamp
+   * @see https://amazon-ion.github.io/ion-docs/docs/spec.html#timestamp
    */
   static parse(str: string): Timestamp | null {
     return _TimestampParser._parse(str);

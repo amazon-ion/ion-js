@@ -201,7 +201,7 @@ export interface Value {
    *      considered equivalent.
    *
    * [1] https://www.javadoc.io/doc/com.amazon.ion/ion-java/latest/com/amazon/ion/util/Equivalence.html
-   * [2] http://amzn.github.io/ion-docs/docs/spec.html
+   * [2] https://amazon-ion.github.io/ion-docs/docs/spec.html
    *
    * @param other                       other Ion Value to be compared with this Ion Value.
    * @param options                     options provided for equivalence as below

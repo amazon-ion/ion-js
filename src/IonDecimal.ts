@@ -41,7 +41,7 @@ export class Decimal {
   public static readonly ONE = new Decimal(1, 0);
 
   // For more information about the (sign, coefficient, exponent) data model, see:
-  // https://amzn.github.io/ion-docs/docs/decimal.html#data-model
+  // https://amazon-ion.github.io/ion-docs/docs/decimal.html#data-model
   // Note that while the scheme described in the above link uses an unsigned integer to represent its coefficient,
   // this class uses a signed integer. The sign of the value returned by `getCoefficient()` will always agree
   // with the sign returned by `isNegative()` except in the case of -0, which cannot be natively represented
@@ -368,7 +368,7 @@ export class Decimal {
     this._isNegative = isNegative;
     this._coefficient = coefficient;
     // If the exponent is -0, set it to 0, which is equivalent.
-    // See: https://github.com/amzn/ion-js/issues/474
+    // See: https://github.com/amazon-ion/ion-js/issues/474
     if (Object.is(-0, exponent)) {
       exponent = 0;
     }

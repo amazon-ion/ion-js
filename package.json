@@ -4,6 +4,10 @@
   "description": "A JavaScript implementation of the Ion data interchange format",
   "main": "dist/commonjs/es6/Ion.js",
   "types": "dist/commonjs/es6/Ion.d.ts",
+  "exports": {
+    "import": "./dist/es6/es6/Ion.js",
+    "require": "./dist/commonjs/es6/Ion.js"
+  },
   "scripts": {
     "commit": "git-cz",
     "prepare": "grunt release",
@@ -16,19 +20,19 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/amzn/ion-js.git"
+    "url": "https://github.com/amazon-ion/ion-js.git"
   },
   "keywords": [
     "ion",
     "JSON",
     "data format"
   ],
-  "author": "The Ion Team <ion-team@amazon.com> (https://amzn.github.io/ion-docs/index.html)",
+  "author": "The Ion Team <ion-team@amazon.com> (https://amazon-ion.github.io/ion-docs/index.html)",
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/amzn/ion-js/issues"
+    "url": "https://github.com/amazon-ion/ion-js/issues"
   },
-  "homepage": "https://github.com/amzn/ion-js#readme",
+  "homepage": "https://github.com/amazon-ion/ion-js#readme",
   "config": {
     "commitizen": {
       "path": "node_modules/cz-conventional-changelog"

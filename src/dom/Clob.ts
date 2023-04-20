@@ -4,7 +4,7 @@ import { Lob } from "./Lob";
 /**
  * Represents a clob[1] value in an Ion stream.
  *
- * [1] http://amzn.github.io/ion-docs/docs/spec.html#clob
+ * [1] https://amazon-ion.github.io/ion-docs/docs/spec.html#clob
  */
 export class Clob extends Lob(IonTypes.CLOB) {
   /**
@@ -26,7 +26,7 @@ export class Clob extends Lob(IonTypes.CLOB) {
     // we write each byte out as a Unicode escape (e.g. 127 -> 0x7f -> \u007f)
     // unless it happens to fall within the ASCII range.
     // See the Ion cookbook's guide to down-converting to JSON for details:
-    // http://amzn.github.io/ion-docs/guides/cookbook.html#down-converting-to-json
+    // https://amazon-ion.github.io/ion-docs/guides/cookbook.html#down-converting-to-json
     let encodedText = "";
     for (const byte of this) {
       if (byte >= 32 && byte <= 126) {

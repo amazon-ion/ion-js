@@ -34,7 +34,8 @@ const _fromJsConstructor: FromJsConstructor = new FromJsConstructorBuilder()
  *          // this code WILL be executed
  *      }
  * ```
- * [1] http://amzn.github.io/ion-docs/docs/spec.html#bool
+ *
+ * [1] https://amazon-ion.github.io/ion-docs/docs/spec.html#bool
  * [2] https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean#Description
  */
 export class Boolean extends Value(

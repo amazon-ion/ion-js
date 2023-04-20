@@ -1,9 +1,9 @@
 # Amazon Ion JavaScript
-An implementation of [Amazon Ion](https://amzn.github.io/ion-docs/) for JavaScript written in TypeScript.
+An implementation of [Amazon Ion](https://amazon-ion.github.io/ion-docs/) for JavaScript written in TypeScript.
 
 [![NPM Version](https://img.shields.io/npm/v/ion-js.svg)](https://www.npmjs.com/package/ion-js)
-[![License](https://img.shields.io/hexpm/l/plug.svg)](https://github.com/amzn/ion-js/blob/master/LICENSE)
-[![Documentation](https://img.shields.io/badge/docs-api-green.svg)](https://amzn.github.io/ion-js/api/index.html)
+[![License](https://img.shields.io/hexpm/l/plug.svg)](https://github.com/amazon-ion/ion-js/blob/master/LICENSE)
+[![Documentation](https://img.shields.io/badge/docs-api-green.svg)](https://amazon-ion.github.io/ion-js/api/index.html)
 
 This package is tested with Node JS major versions **14**, **16**, and **18**.  While this library
 should be usable within browsers that support **ES5+**, please note that it is not currently being tested
@@ -46,8 +46,8 @@ version) are not designed or tested to behave correctly.
 
 You can include the Ion-js bundle (ES5 compatible) using the URLs
 
-* [ion-bundle.min.js](https://amzn.github.io/ion-js/browser/scripts/ion-bundle.min.js)
-* [ion-bundle.js](https://amzn.github.io/ion-js/browser/scripts/ion-bundle.js)
+* [ion-bundle.min.js](https://amazon-ion.github.io/ion-js/browser/scripts/ion-bundle.min.js)
+* [ion-bundle.js](https://amazon-ion.github.io/ion-js/browser/scripts/ion-bundle.js)
 
 These will create and initialize `window.ion` which has the same exact API as our `npm` package. Here is an example
 
@@ -64,7 +64,7 @@ These will create and initialize `window.ion` which has the same exact API as ou
 
 ### API
 
-[TypeDoc](https://typedoc.org/) generated documentation can be found at [here](https://amzn.github.io/ion-js/api/).
+[TypeDoc](https://typedoc.org/) generated documentation can be found at [here](https://amazon-ion.github.io/ion-js/api/).
 Please note that anything not documented in the the API documentation is not supported for public use and is
 subject to change in any version.
 
@@ -77,7 +77,7 @@ The easiest way to clone the `ion-js` repository and initialize its `ion-tests`
 submodule is to run the following command.
 
 ```
-$ git clone --recursive https://github.com/amzn/ion-js.git ion-js
+$ git clone --recursive https://github.com/amazon-ion/ion-js.git ion-js
 ```
 
 Alternatively, the submodule may be initialized independently from the clone
@@ -157,7 +157,7 @@ at `dist/browser/js/ion-bundle.js`.
 | shared symbol tables      | no            | yes           | none                                          |
 
 Notes:
-* [test/iontests.ts](https://github.com/amzn/ion-js/blob/master/test/iontests.ts) defines multiple skipList variables
+* [test/iontests.ts](https://github.com/amazon-ion/ion-js/blob/master/test/iontests.ts) defines multiple skipList variables
   referencing test vectors that are not expected to work at this time.
 
 * ion-js supports shared symbol table for Ion Binary. Below is an example of how shared symbol table can be used here: 
@@ -203,9 +203,9 @@ This library is licensed under [Apache License version 2.0](LICENSE)
 ## Links
 For more information about Ion or its other implementation, please see:
 
-* [Ion](https://amzn.github.io/ion-docs/)
-* [Ion Specification](https://amzn.github.io/ion-docs/spec.html)
-* [Ion Cookbook](https://amzn.github.io/ion-docs/cookbook.html) uses the Java library for its examples.
-* [Ion C](https://github.com/amzn/ion-c)
-* [Ion Java](https://github.com/amzn/ion-java)
-* [Ion Python](https://github.com/amzn/ion-python)
+* [Ion](https://amazon-ion.github.io/ion-docs/)
+* [Ion Specification](https://amazon-ion.github.io/ion-docs/spec.html)
+* [Ion Cookbook](https://amazon-ion.github.io/ion-docs/cookbook.html) uses the Java library for its examples.
+* [Ion C](https://github.com/amazon-ion/ion-c)
+* [Ion Java](https://github.com/amazon-ion/ion-java)
+* [Ion Python](https://github.com/amazon-ion/ion-python)

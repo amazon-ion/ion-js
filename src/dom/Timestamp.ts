@@ -14,7 +14,7 @@ const _fromJsConstructor: FromJsConstructor = new FromJsConstructorBuilder()
 /**
  * Represents a timestamp[1] value in an Ion stream.
  *
- * [1] http://amzn.github.io/ion-docs/docs/spec.html#timestamp
+ * [1] https://amazon-ion.github.io/ion-docs/docs/spec.html#timestamp
  */
 export class Timestamp extends Value(
   Date,

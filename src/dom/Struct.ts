@@ -28,7 +28,7 @@ import { PathElement, Value } from "./Value";
  *     assert.equal(s.get('fieldNames', 0).stringValue(), "foo"); // Passes
  * ```
  *
- * [1] http://amzn.github.io/ion-docs/docs/spec.html#struct
+ * [1] https://amazon-ion.github.io/ion-docs/docs/spec.html#struct
  */
 export class Struct extends Value(
   Object,
@@ -187,7 +187,7 @@ export class Struct extends Value(
   }
 
   toJSON() {
-    let normalizedFields = Object.create(null);
+    let normalizedFields = Object.create(Struct.prototype);
     for (const [key, value] of this.fields()) {
       normalizedFields[key] = value;
     }

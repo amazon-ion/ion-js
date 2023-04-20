@@ -15,7 +15,7 @@ const _fromJsConstructor: FromJsConstructor = new FromJsConstructorBuilder()
 /**
  * Represents a decimal[1] value in an Ion stream.
  *
- * [1] http://amzn.github.io/ion-docs/docs/spec.html#decimal
+ * [1] https://amazon-ion.github.io/ion-docs/docs/spec.html#decimal
  */
 export class Decimal extends Value(
   Number,

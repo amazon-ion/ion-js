@@ -352,8 +352,8 @@ let goodSkipList = toSkipList([
   "ion-tests/iontestdata/good/utf16.ion",
   "ion-tests/iontestdata/good/utf32.ion",
   "ion-tests/iontestdata/good/item1.10n",
-  "ion-tests/iontestdata/good/typecodes/T7-large.10n", // https://github.com/amzn/ion-js/issues/541
-  "ion-tests/iontestdata/good/typecodes/T7-small.10n", // https://github.com/amzn/ion-js/issues/541
+  "ion-tests/iontestdata/good/typecodes/T7-large.10n", // https://github.com/amazon-ion/ion-js/issues/541
+  "ion-tests/iontestdata/good/typecodes/T7-small.10n", // https://github.com/amazon-ion/ion-js/issues/541
 ]);
 
 let badSkipList = toSkipList([
@@ -373,44 +373,44 @@ let badSkipList = toSkipList([
   "ion-tests/iontestdata/bad/timestamp/timestampSept31.10n",
   "ion-tests/iontestdata/bad/timestamp/outOfRange/leapDayNonLeapYear_1.10n",
   "ion-tests/iontestdata/bad/timestamp/outOfRange/leapDayNonLeapYear_2.10n",
-  "ion-tests/iontestdata/bad/annotationSymbolIDUnmapped.10n", // https://github.com/amzn/ion-js/issues/542
-  "ion-tests/iontestdata/bad/annotationSymbolIDUnmapped.ion", // https://github.com/amzn/ion-js/issues/542
-  "ion-tests/iontestdata/bad/fieldNameSymbolIDUnmapped.10n", // https://github.com/amzn/ion-js/issues/542
-  "ion-tests/iontestdata/bad/fieldNameSymbolIDUnmapped.ion", // https://github.com/amzn/ion-js/issues/542
-  "ion-tests/iontestdata/bad/timestamp/timestampFraction10d-1.10n", // https://github.com/amzn/ion-js/issues/543
-  "ion-tests/iontestdata/bad/timestamp/timestampFraction11d-1.10n", // https://github.com/amzn/ion-js/issues/543
-  "ion-tests/iontestdata/bad/timestamp/timestampFraction1d0.10n", // https://github.com/amzn/ion-js/issues/543
-  "ion-tests/iontestdata/bad/typecodes/type_15_length_0.10n", // https://github.com/amzn/ion-js/issues/544
-  "ion-tests/iontestdata/bad/typecodes/type_15_length_1.10n", // https://github.com/amzn/ion-js/issues/544
-  "ion-tests/iontestdata/bad/typecodes/type_15_length_10.10n", // https://github.com/amzn/ion-js/issues/544
-  "ion-tests/iontestdata/bad/typecodes/type_15_length_11.10n", // https://github.com/amzn/ion-js/issues/544
-  "ion-tests/iontestdata/bad/typecodes/type_15_length_12.10n", // https://github.com/amzn/ion-js/issues/544
-  "ion-tests/iontestdata/bad/typecodes/type_15_length_13.10n", // https://github.com/amzn/ion-js/issues/544
-  "ion-tests/iontestdata/bad/typecodes/type_15_length_14.10n", // https://github.com/amzn/ion-js/issues/544
-  "ion-tests/iontestdata/bad/typecodes/type_15_length_15.10n", // https://github.com/amzn/ion-js/issues/544
-  "ion-tests/iontestdata/bad/typecodes/type_15_length_2.10n", // https://github.com/amzn/ion-js/issues/544
-  "ion-tests/iontestdata/bad/typecodes/type_15_length_3.10n", // https://github.com/amzn/ion-js/issues/544
-  "ion-tests/iontestdata/bad/typecodes/type_15_length_4.10n", // https://github.com/amzn/ion-js/issues/544
-  "ion-tests/iontestdata/bad/typecodes/type_15_length_5.10n", // https://github.com/amzn/ion-js/issues/544
-  "ion-tests/iontestdata/bad/typecodes/type_15_length_6.10n", // https://github.com/amzn/ion-js/issues/544
-  "ion-tests/iontestdata/bad/typecodes/type_15_length_7.10n", // https://github.com/amzn/ion-js/issues/544
-  "ion-tests/iontestdata/bad/typecodes/type_15_length_8.10n", // https://github.com/amzn/ion-js/issues/544
-  "ion-tests/iontestdata/bad/typecodes/type_15_length_9.10n", // https://github.com/amzn/ion-js/issues/544
-  "ion-tests/iontestdata/bad/typecodes/type_1_length_10.10n", // https://github.com/amzn/ion-js/issues/545
-  "ion-tests/iontestdata/bad/typecodes/type_1_length_11.10n", // https://github.com/amzn/ion-js/issues/545
-  "ion-tests/iontestdata/bad/typecodes/type_1_length_12.10n", // https://github.com/amzn/ion-js/issues/545
-  "ion-tests/iontestdata/bad/typecodes/type_1_length_13.10n", // https://github.com/amzn/ion-js/issues/545
-  "ion-tests/iontestdata/bad/typecodes/type_1_length_14.10n", // https://github.com/amzn/ion-js/issues/545
-  "ion-tests/iontestdata/bad/typecodes/type_1_length_2.10n", // https://github.com/amzn/ion-js/issues/545
-  "ion-tests/iontestdata/bad/typecodes/type_1_length_3.10n", // https://github.com/amzn/ion-js/issues/545
-  "ion-tests/iontestdata/bad/typecodes/type_1_length_4.10n", // https://github.com/amzn/ion-js/issues/545
-  "ion-tests/iontestdata/bad/typecodes/type_1_length_5.10n", // https://github.com/amzn/ion-js/issues/545
-  "ion-tests/iontestdata/bad/typecodes/type_1_length_6.10n", // https://github.com/amzn/ion-js/issues/545
-  "ion-tests/iontestdata/bad/typecodes/type_1_length_7.10n", // https://github.com/amzn/ion-js/issues/545
-  "ion-tests/iontestdata/bad/typecodes/type_1_length_8.10n", // https://github.com/amzn/ion-js/issues/545
-  "ion-tests/iontestdata/bad/typecodes/type_1_length_9.10n", // https://github.com/amzn/ion-js/issues/545
-  "ion-tests/iontestdata/bad/typecodes/type_3_length_0.10n", // https://github.com/amzn/ion-js/issues/546
-  "ion-tests/iontestdata/bad/typecodes/type_6_length_0.10n", // https://github.com/amzn/ion-js/issues/547
+  "ion-tests/iontestdata/bad/annotationSymbolIDUnmapped.10n", // https://github.com/amazon-ion/ion-js/issues/542
+  "ion-tests/iontestdata/bad/annotationSymbolIDUnmapped.ion", // https://github.com/amazon-ion/ion-js/issues/542
+  "ion-tests/iontestdata/bad/fieldNameSymbolIDUnmapped.10n", // https://github.com/amazon-ion/ion-js/issues/542
+  "ion-tests/iontestdata/bad/fieldNameSymbolIDUnmapped.ion", // https://github.com/amazon-ion/ion-js/issues/542
+  "ion-tests/iontestdata/bad/timestamp/timestampFraction10d-1.10n", // https://github.com/amazon-ion/ion-js/issues/543
+  "ion-tests/iontestdata/bad/timestamp/timestampFraction11d-1.10n", // https://github.com/amazon-ion/ion-js/issues/543
+  "ion-tests/iontestdata/bad/timestamp/timestampFraction1d0.10n", // https://github.com/amazon-ion/ion-js/issues/543
+  "ion-tests/iontestdata/bad/typecodes/type_15_length_0.10n", // https://github.com/amazon-ion/ion-js/issues/544
+  "ion-tests/iontestdata/bad/typecodes/type_15_length_1.10n", // https://github.com/amazon-ion/ion-js/issues/544
+  "ion-tests/iontestdata/bad/typecodes/type_15_length_10.10n", // https://github.com/amazon-ion/ion-js/issues/544
+  "ion-tests/iontestdata/bad/typecodes/type_15_length_11.10n", // https://github.com/amazon-ion/ion-js/issues/544
+  "ion-tests/iontestdata/bad/typecodes/type_15_length_12.10n", // https://github.com/amazon-ion/ion-js/issues/544
+  "ion-tests/iontestdata/bad/typecodes/type_15_length_13.10n", // https://github.com/amazon-ion/ion-js/issues/544
+  "ion-tests/iontestdata/bad/typecodes/type_15_length_14.10n", // https://github.com/amazon-ion/ion-js/issues/544
+  "ion-tests/iontestdata/bad/typecodes/type_15_length_15.10n", // https://github.com/amazon-ion/ion-js/issues/544
+  "ion-tests/iontestdata/bad/typecodes/type_15_length_2.10n", // https://github.com/amazon-ion/ion-js/issues/544
+  "ion-tests/iontestdata/bad/typecodes/type_15_length_3.10n", // https://github.com/amazon-ion/ion-js/issues/544
+  "ion-tests/iontestdata/bad/typecodes/type_15_length_4.10n", // https://github.com/amazon-ion/ion-js/issues/544
+  "ion-tests/iontestdata/bad/typecodes/type_15_length_5.10n", // https://github.com/amazon-ion/ion-js/issues/544
+  "ion-tests/iontestdata/bad/typecodes/type_15_length_6.10n", // https://github.com/amazon-ion/ion-js/issues/544
+  "ion-tests/iontestdata/bad/typecodes/type_15_length_7.10n", // https://github.com/amazon-ion/ion-js/issues/544
+  "ion-tests/iontestdata/bad/typecodes/type_15_length_8.10n", // https://github.com/amazon-ion/ion-js/issues/544
+  "ion-tests/iontestdata/bad/typecodes/type_15_length_9.10n", // https://github.com/amazon-ion/ion-js/issues/544
+  "ion-tests/iontestdata/bad/typecodes/type_1_length_10.10n", // https://github.com/amazon-ion/ion-js/issues/545
+  "ion-tests/iontestdata/bad/typecodes/type_1_length_11.10n", // https://github.com/amazon-ion/ion-js/issues/545
+  "ion-tests/iontestdata/bad/typecodes/type_1_length_12.10n", // https://github.com/amazon-ion/ion-js/issues/545
+  "ion-tests/iontestdata/bad/typecodes/type_1_length_13.10n", // https://github.com/amazon-ion/ion-js/issues/545
+  "ion-tests/iontestdata/bad/typecodes/type_1_length_14.10n", // https://github.com/amazon-ion/ion-js/issues/545
+  "ion-tests/iontestdata/bad/typecodes/type_1_length_2.10n", // https://github.com/amazon-ion/ion-js/issues/545
+  "ion-tests/iontestdata/bad/typecodes/type_1_length_3.10n", // https://github.com/amazon-ion/ion-js/issues/545
+  "ion-tests/iontestdata/bad/typecodes/type_1_length_4.10n", // https://github.com/amazon-ion/ion-js/issues/545
+  "ion-tests/iontestdata/bad/typecodes/type_1_length_5.10n", // https://github.com/amazon-ion/ion-js/issues/545
+  "ion-tests/iontestdata/bad/typecodes/type_1_length_6.10n", // https://github.com/amazon-ion/ion-js/issues/545
+  "ion-tests/iontestdata/bad/typecodes/type_1_length_7.10n", // https://github.com/amazon-ion/ion-js/issues/545
+  "ion-tests/iontestdata/bad/typecodes/type_1_length_8.10n", // https://github.com/amazon-ion/ion-js/issues/545
+  "ion-tests/iontestdata/bad/typecodes/type_1_length_9.10n", // https://github.com/amazon-ion/ion-js/issues/545
+  "ion-tests/iontestdata/bad/typecodes/type_3_length_0.10n", // https://github.com/amazon-ion/ion-js/issues/546
+  "ion-tests/iontestdata/bad/typecodes/type_6_length_0.10n", // https://github.com/amazon-ion/ion-js/issues/547
 ]);
 
 let eventSkipList = toSkipList([
@@ -443,12 +443,12 @@ let eventSkipList = toSkipList([
   "ion-tests/iontestdata/good/utf16.ion",
   "ion-tests/iontestdata/good/utf32.ion",
   "ion-tests/iontestdata/good/item1.10n",
-  "ion-tests/iontestdata/good/typecodes/T6-large.10n", // https://github.com/amzn/ion-js/issues/554
-  "ion-tests/iontestdata/good/typecodes/T11.10n", // https://github.com/amzn/ion-js/issues/548
-  "ion-tests/iontestdata/good/typecodes/T12.10n", // https://github.com/amzn/ion-js/issues/548
-  "ion-tests/iontestdata/good/typecodes/T13.10n", // https://github.com/amzn/ion-js/issues/548
-  "ion-tests/iontestdata/good/typecodes/T7-large.10n", // https://github.com/amzn/ion-js/issues/549
-  "ion-tests/iontestdata/good/typecodes/T7-small.10n", // https://github.com/amzn/ion-js/issues/549
+  "ion-tests/iontestdata/good/typecodes/T6-large.10n", // https://github.com/amazon-ion/ion-js/issues/554
+  "ion-tests/iontestdata/good/typecodes/T11.10n", // https://github.com/amazon-ion/ion-js/issues/548
+  "ion-tests/iontestdata/good/typecodes/T12.10n", // https://github.com/amazon-ion/ion-js/issues/548
+  "ion-tests/iontestdata/good/typecodes/T13.10n", // https://github.com/amazon-ion/ion-js/issues/548
+  "ion-tests/iontestdata/good/typecodes/T7-large.10n", // https://github.com/amazon-ion/ion-js/issues/549
+  "ion-tests/iontestdata/good/typecodes/T7-small.10n", // https://github.com/amazon-ion/ion-js/issues/549
 ]);
 
 let readerCompareSkipList = toSkipList([]);
@@ -470,9 +470,9 @@ let equivsSkipList = toSkipList([
   "ion-tests/iontestdata/good/equivs/systemSymbolsAsAnnotations.ion",
   "ion-tests/iontestdata/good/equivs/textNewlines.ion",
 
-  "ion-tests/iontestdata/good/equivs/clobNewlines.ion", // https://github.com/amzn/ion-js/issues/550
-  "ion-tests/iontestdata/good/equivs/localSymbolTableWithAnnotations.ion", // https://github.com/amzn/ion-js/issues/551
-  "ion-tests/iontestdata/good/equivs/longStringsWithComments.ion", // https://github.com/amzn/ion-js/issues/552
+  "ion-tests/iontestdata/good/equivs/clobNewlines.ion", // https://github.com/amazon-ion/ion-js/issues/550
+  "ion-tests/iontestdata/good/equivs/localSymbolTableWithAnnotations.ion", // https://github.com/amazon-ion/ion-js/issues/551
+  "ion-tests/iontestdata/good/equivs/longStringsWithComments.ion", // https://github.com/amazon-ion/ion-js/issues/552
 ]);
 
 let nonEquivsSkipList = toSkipList([

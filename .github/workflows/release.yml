@@ -61,7 +61,7 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
       - name: npm publish
         # skip npm publishing if running in a fork
-        if: github.repository == 'amzn/ion-js'
+        if: github.repository == 'amazon-ion/ion-js'
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: npm publish

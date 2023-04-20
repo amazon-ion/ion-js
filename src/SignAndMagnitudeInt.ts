@@ -19,7 +19,7 @@
  * BigInts cannot represent negative zero. This class should be used in situations where negative zero is
  * a supported value, such as when decoding binary Ion Int/VarInt.
  *
- * http://amzn.github.io/ion-docs/docs/binary.html#uint-and-int-fields
+ * https://amazon-ion.github.io/ion-docs/docs/binary.html#uint-and-int-fields
  *
  */
 export default class SignAndMagnitudeInt {

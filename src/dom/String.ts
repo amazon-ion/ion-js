@@ -15,7 +15,7 @@ const _fromJsConstructor: FromJsConstructor = new FromJsConstructorBuilder()
 /**
  * Represents a string[1] value in an Ion stream.
  *
- * [1] http://amzn.github.io/ion-docs/docs/spec.html#string
+ * [1] https://amazon-ion.github.io/ion-docs/docs/spec.html#string
  */
 export class String extends Value(
   _NativeJsString,

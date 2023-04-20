@@ -21,7 +21,7 @@ import SignAndMagnitudeInt from "../src/SignAndMagnitudeInt";
 /**
  * Tests for reading the UInt primitive follow.
  *
- * Spec: http://amzn.github.io/ion-docs/docs/binary.html#uint-and-int-fields
+ * Spec: https://amazon-ion.github.io/ion-docs/docs/binary.html#uint-and-int-fields
  */
 
 // Returns the largest unsigned integer value that can be stored in `numberOfBits` bits.
@@ -139,7 +139,7 @@ describe("Reading unsigned ints", () => {
 /**
  * Tests for reading the Int primitive follow.
  *
- * Spec: http://amzn.github.io/ion-docs/docs/binary.html#uint-and-int-fields
+ * Spec: https://amazon-ion.github.io/ion-docs/docs/binary.html#uint-and-int-fields
  */
 
 let signedIntBytesMatch = function (
@@ -185,7 +185,7 @@ describe("Reading signed ints", () => {
 /**
  * Tests for reading the VarUInt primitive follow.
  *
- * Spec: http://amzn.github.io/ion-docs/docs/binary.html#varuint-and-varint-fields
+ * Spec: https://amazon-ion.github.io/ion-docs/docs/binary.html#varuint-and-varint-fields
  */
 
 let varUnsignedIntBytesMatchValue = function (
@@ -247,7 +247,7 @@ describe("Reading variable unsigned ints", () => {
 /**
  * Tests for reading the VarInt primitive follow.
  *
- * Spec: http://amzn.github.io/ion-docs/docs/binary.html#varuint-and-varint-fields
+ * Spec: https://amazon-ion.github.io/ion-docs/docs/binary.html#varuint-and-varint-fields
  */
 
 let varSignedIntBytesMatchValue = function (bytes: number[], expected: number) {
@@ -314,7 +314,7 @@ describe("Reading variable signed ints", () => {
 /**
  * Tests for reading Float values follow.
  *
- * Spec: http://amzn.github.io/ion-docs/docs/binary.html#4-float
+ * Spec: https://amazon-ion.github.io/ion-docs/docs/binary.html#4-float
  */
 
 let serializeFloat = function (
