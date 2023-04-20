@@ -544,11 +544,13 @@ describe("DOM", () => {
     assert.isTrue(s1.getAll("name", "middle")![1].equals("Bob"));
     assert.equal(2, s1.getAll("name", "middle")!.length);
 
-    // elements returns values for given Struct where for a fieldname it only contains the last value
-    // instead of an array of all values
+    // elements returns values for given Struct where for a fieldname returns all its values
     assert.equal(55, s.elements()[0]);
     assert.isFalse(Array.isArray(s.elements()[0]));
     assert.equal("John", s1.elements()[0]["first"]);
+    assert.equal("Jessie", s1.elements()[1]["first"]);
+    assert.equal(41, +s1.elements()[2]);
+    assert.equal(3, s1.elements().length);
 
     // Iteration
     for (let [fieldName, value] of s) {
