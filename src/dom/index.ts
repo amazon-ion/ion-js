@@ -110,9 +110,9 @@ function _loadValue(reader: Reader): Value {
     case IonTypes.STRING:
       return new ion.dom.String(reader.stringValue()!, annotations);
     case IonTypes.CLOB:
-      return new Clob(reader.byteValue()!, annotations);
+      return new Clob(reader.uInt8ArrayValue()!, annotations);
     case IonTypes.BLOB:
-      return new Blob(reader.byteValue()!, annotations);
+      return new Blob(reader.uInt8ArrayValue()!, annotations);
     // Containers
     case IonTypes.LIST:
       return _loadList(reader);

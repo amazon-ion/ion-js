@@ -1,7 +1,6 @@
 import { assert } from "chai";
-import { Value, load } from "../../src/dom";
+import { load, Value } from "../../src/dom";
 import { Decimal } from "../../src/IonDecimal";
-import JSBI from "jsbi";
 
 /**
  * This file contains 'equals()' tests for each Ion data type:
@@ -63,8 +62,8 @@ describe("Equivalence", () => {
     assert.isFalse(int1.equals(10));
     assert.isTrue(int1.equals(new Number(7)));
     assert.isFalse(int1.equals(new Number(10)));
-    assert.isTrue(int1.equals(JSBI.BigInt(7)));
-    assert.isFalse(int1.equals(JSBI.BigInt(10)));
+    assert.isTrue(int1.equals(7n));
+    assert.isFalse(int1.equals(10n));
   });
 
   it("equals() for Float", () => {
@@ -81,18 +80,16 @@ describe("Equivalence", () => {
     // Decimal and Float values will not be equivalent
     assert.isFalse(float1.ionEquals(float4));
     // both values should be at least equivalent by epsilon value
-    assert.isTrue(float3.ionEquals(float5, {epsilon: 0.5}));
-    assert.isFalse(float3.ionEquals(float5, {epsilon: 0.2}));
+    assert.isTrue(float3.ionEquals(float5, { epsilon: 0.5 }));
+    assert.isFalse(float3.ionEquals(float5, { epsilon: 0.2 }));
     // Equivalence between JS Value and Ion DOM Value
     assert.isTrue(float1.equals(1.5));
     assert.isFalse(float1.ionEquals(1.5));
     assert.isFalse(float1.equals(1.2));
-    assert.isTrue(float1.equals(1.2, {epsilon: 0.5}));
+    assert.isTrue(float1.equals(1.2, { epsilon: 0.5 }));
     assert.isTrue(float1.equals(new Number(1.5)));
     assert.isFalse(float1.equals(new Number(1.2)));
-    assert.isTrue(
-        float1.equals(new Number(1.2), {epsilon: 0.5})
-    );
+    assert.isTrue(float1.equals(new Number(1.2), { epsilon: 0.5 }));
   });
 
   it("equals() for Decimal", () => {
@@ -104,12 +101,8 @@ describe("Equivalence", () => {
     assert.isFalse(decimal1.ionEquals(decimal3));
     assert.isFalse(decimal3.ionEquals(decimal1));
     // Equivalence between JS Value and Ion DOM Value
-    assert.isTrue(
-        decimal1.equals(new Decimal("101.5"))
-    );
-    assert.isFalse(
-        decimal1.equals(new Decimal("105.8"))
-    );
+    assert.isTrue(decimal1.equals(new Decimal("101.5")));
+    assert.isFalse(decimal1.equals(new Decimal("105.8")));
   });
 
   it("equals() for Timestamp", () => {
@@ -124,12 +117,8 @@ describe("Equivalence", () => {
     // Non strict mode precision and local offset are ignored along with annotations
     assert.isTrue(timestamp3.equals(timestamp4));
     // Equivalence between JS Value and Ion DOM Value
-    assert.isTrue(
-      timestamp1.equals(new Date("2020-01-16T20:15:54.066Z"))
-    );
-    assert.isFalse(
-      timestamp1.equals(new Date("2020-02-16T20:15:54.066Z"))
-    );
+    assert.isTrue(timestamp1.equals(new Date("2020-01-16T20:15:54.066Z")));
+    assert.isFalse(timestamp1.equals(new Date("2020-02-16T20:15:54.066Z")));
   });
 
   it("equals() for Symbol", () => {
@@ -141,12 +130,8 @@ describe("Equivalence", () => {
     assert.isFalse(symbol1.ionEquals(symbol3));
     // Equivalence between JS Value and Ion DOM Value
     assert.isTrue(symbol1.equals("Saturn"));
-    assert.isTrue(
-      symbol1.equals(new String("Saturn"))
-    );
-    assert.isFalse(
-      symbol1.equals(new String("Jupiter"))
-    );
+    assert.isTrue(symbol1.equals(new String("Saturn")));
+    assert.isFalse(symbol1.equals(new String("Jupiter")));
     assert.isFalse(symbol1.equals("Jupiter"));
     assert.isFalse(symbol1.ionEquals(new String("Saturn")));
     assert.isFalse(symbol1.ionEquals("Saturn"));
@@ -161,12 +146,8 @@ describe("Equivalence", () => {
     assert.isFalse(string1.ionEquals(string3));
     // Equivalence between JS Value and Ion DOM Value
     assert.isTrue(string1.equals("Saturn"));
-    assert.isTrue(
-      string1.equals(new String("Saturn"))
-    );
-    assert.isFalse(
-      string1.equals(new String("Jupiter"))
-    );
+    assert.isTrue(string1.equals(new String("Saturn")));
+    assert.isFalse(string1.equals(new String("Jupiter")));
     assert.isFalse(string1.equals("Jupiter"));
     assert.isFalse(string1.ionEquals(new String("Saturn")));
     assert.isFalse(string1.ionEquals("Saturn"));
@@ -181,12 +162,8 @@ describe("Equivalence", () => {
     assert.isTrue(clob1.ionEquals(clob2));
     assert.isFalse(clob1.ionEquals(clob3));
     // Equivalence between JS Value and Ion DOM Value
-    assert.isTrue(
-      clob4.equals(new Uint8Array([72, 101, 108, 108, 111]))
-    );
-    assert.isFalse(
-      clob4.equals(new Uint8Array([72, 101, 108, 108]))
-    );
+    assert.isTrue(clob4.equals(new Uint8Array([72, 101, 108, 108, 111])));
+    assert.isFalse(clob4.equals(new Uint8Array([72, 101, 108, 108])));
   });
 
   it("equals() for Blob", () => {
@@ -214,12 +191,8 @@ describe("Equivalence", () => {
     assert.isFalse(list1.ionEquals(list4));
     assert.isFalse(list4.ionEquals(list1));
     // Equivalence between JS Value and Ion DOM Value
-    assert.isTrue(
-      list1.equals(["Mercury", "Venus", "Earth", "Mars"])
-    );
-    assert.isFalse(
-      list1.equals(["Mercury", "Venus", "Earth"])
-    );
+    assert.isTrue(list1.equals(["Mercury", "Venus", "Earth", "Mars"]));
+    assert.isFalse(list1.equals(["Mercury", "Venus", "Earth"]));
   });
 
   it("equals() for SExpression", () => {
@@ -293,27 +266,23 @@ describe("Equivalence", () => {
     assert.isTrue(struct4.equals(struct5));
     // Equivalence between JS Value and Ion DOM Value
     assert.isTrue(
-      struct1.equals(
-        {
-          name: {
-            first: "John",
-            middle: "Jacob",
-            last: "Jingleheimer-Schmidt",
-          },
-          age: 41,
-        }
-      )
+      struct1.equals({
+        name: {
+          first: "John",
+          middle: "Jacob",
+          last: "Jingleheimer-Schmidt",
+        },
+        age: 41,
+      })
     );
     assert.isFalse(
-      struct1.equals(
-        {
-          name: {
-            first: "John",
-            middle: "Jacob",
-            last: "Jingleheimer-Schmidt",
-          },
-        }
-      )
+      struct1.equals({
+        name: {
+          first: "John",
+          middle: "Jacob",
+          last: "Jingleheimer-Schmidt",
+        },
+      })
     );
   });
 
@@ -328,11 +297,7 @@ describe("Equivalence", () => {
 
   it("equals() for List inside Struct", () => {
     let value: Value = load("{ foo: [9, 8, 7, 6, 5, 4, 3, 2, 1, 0] }")!;
-    assert.isTrue(
-      value.equals(
-        { foo: [9, 8, 7, 6, 5, 4, 3, 2, 1, 0] }
-      )
-    );
+    assert.isTrue(value.equals({ foo: [9, 8, 7, 6, 5, 4, 3, 2, 1, 0] }));
   });
 
   it("equals() for Struct with duplicate fields", () => {

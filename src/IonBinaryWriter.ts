@@ -13,8 +13,8 @@
  * permissions and limitations under the License.
  */
 
-import JSBI from "jsbi";
 import { AbstractWriter } from "./AbstractWriter";
+import { BigIntSerde } from "./BigIntSerde";
 import { Decimal } from "./IonDecimal";
 import { Import } from "./IonImport";
 import { LocalSymbolTable } from "./IonLocalSymbolTable";
@@ -24,8 +24,6 @@ import { IonType } from "./IonType";
 import { IonTypes } from "./IonTypes";
 import { encodeUtf8 } from "./IonUnicode";
 import { Writeable } from "./IonWriteable";
-import { JsbiSerde } from "./JsbiSerde";
-import { JsbiSupport } from "./JsbiSupport";
 import { _assertDefined, _sign } from "./util";
 
 const MAJOR_VERSION: number = 1;
@@ -162,10 +160,9 @@ export class BinaryWriter extends AbstractWriter {
     }
 
     const exponent: number = value.getExponent();
-    const coefficient: JSBI = value.getCoefficient();
+    const coefficient: bigint = value.getCoefficient();
 
-    const isPositiveZero: boolean =
-      JSBI.equal(coefficient, JsbiSupport.ZERO) && !value.isNegative();
+    const isPositiveZero: boolean = coefficient === 0n && !value.isNegative();
     if (isPositiveZero && exponent === 0 && _sign(exponent) === 1) {
       // Special case per the spec: https://amazon-ion.github.io/ion-docs/docs/binary.html#5-decimal
       this.addNode(
@@ -181,10 +178,9 @@ export class BinaryWriter extends AbstractWriter {
     }
 
     const isNegative = value.isNegative();
-    const writeCoefficient =
-      isNegative || JSBI.notEqual(coefficient, JsbiSupport.ZERO);
+    const writeCoefficient = isNegative || coefficient !== 0n;
     const coefficientBytes: Uint8Array = writeCoefficient
-      ? JsbiSerde.toSignedIntBytes(coefficient, isNegative)
+      ? BigIntSerde.toSignedIntBytes(coefficient, isNegative)
       : EMPTY_UINT8ARRAY;
 
     const bufLen =
@@ -270,7 +266,7 @@ export class BinaryWriter extends AbstractWriter {
     );
   }
 
-  writeInt(value: number | JSBI | null): void {
+  writeInt(value: number | bigint | null): void {
     _assertDefined(value);
     this.checkWriteValue();
     if (value === null) {
@@ -374,9 +370,9 @@ export class BinaryWriter extends AbstractWriter {
       const fractionalSeconds = value._getFractionalSeconds();
       if (fractionalSeconds.getExponent() !== 0) {
         writer.writeVariableLengthSignedInt(fractionalSeconds.getExponent());
-        if (!JsbiSupport.isZero(fractionalSeconds.getCoefficient())) {
+        if (fractionalSeconds.getCoefficient() !== 0n) {
           writer.writeBytes(
-            JsbiSerde.toSignedIntBytes(
+            BigIntSerde.toSignedIntBytes(
               fractionalSeconds.getCoefficient(),
               fractionalSeconds.isNegative()
             )
@@ -856,27 +852,27 @@ class IntNode extends LeafNode {
     writer: LowLevelBinaryWriter,
     parent: Node,
     annotations: Uint8Array,
-    private readonly value: number | JSBI
+    private readonly value: number | bigint
   ) {
     super(writer, parent, IonTypes.INT, annotations);
 
-    if (!(typeof this.value === "number" || this.value instanceof JSBI)) {
-      throw new Error("Expected " + this.value + " to be a number or JSBI");
+    if (!(typeof this.value === "number" || typeof this.value === "bigint")) {
+      throw new Error("Expected " + this.value + " to be a number or bigint");
     }
 
-    if (JSBI.GT(this.value, 0)) {
+    if (this.value > 0n) {
       this.intTypeCode = TypeCodes.POSITIVE_INT;
       const writer: LowLevelBinaryWriter = new LowLevelBinaryWriter(
         new Writeable(LowLevelBinaryWriter.getUnsignedIntSize(this.value))
       );
       writer.writeUnsignedInt(this.value);
       this.bytes = writer.getBytes();
-    } else if (JSBI.LT(this.value, 0)) {
+    } else if (this.value < 0n) {
       this.intTypeCode = TypeCodes.NEGATIVE_INT;
-      let magnitude: number | JSBI;
-      if (value instanceof JSBI) {
-        if (JsbiSupport.isNegative(value)) {
-          magnitude = JSBI.unaryMinus(value);
+      let magnitude: number | bigint;
+      if (typeof value === "bigint") {
+        if (value < 0n) {
+          magnitude = -value;
         } else {
           magnitude = value;
         }

@@ -200,13 +200,13 @@ export function is_whitespace(ch: number): boolean {
   if (ch > 32) {
     return false;
   }
-  if (ch == this.WHITESPACE_COMMENT1) {
+  if (ch == WHITESPACE_COMMENT1) {
     return true;
   }
-  if (ch == this.WHITESPACE_COMMENT2) {
+  if (ch == WHITESPACE_COMMENT2) {
     return true;
   }
-  if (ch == this.ESCAPED_NEWLINE) {
+  if (ch == ESCAPED_NEWLINE) {
     return true;
   }
   return _is_whitespace[ch];

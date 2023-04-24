@@ -1,6 +1,6 @@
 {
   "name": "ion-js",
-  "version": "4.3.1-SNAPSHOT",
+  "version": "5.0.0-SNAPSHOT",
   "description": "A JavaScript implementation of the Ion data interchange format",
   "main": "dist/commonjs/es6/Ion.js",
   "types": "dist/commonjs/es6/Ion.d.ts",
@@ -11,13 +11,12 @@
   "scripts": {
     "commit": "git-cz",
     "prepare": "grunt release",
-    "test": "npm run test-jsbi4 && npm run test-jsbi3",
-    "test-jsbi3": "npm install jsbi@3.1.1 && nyc mocha",
-    "test-jsbi4": "npm install jsbi@4.0.0 && nyc mocha",
+    "lint": "grunt lint && prettier --check 'src/**/*.ts'",
+    "lint:fix": "prettier --write 'src/**/*.ts'",
+    "test": "nyc mocha",
     "release": "grunt release",
     "test-driver": "cd test-driver && npm install",
-    "build-test-driver": "cd test-driver && npm run build",
-    "prettier-check": "prettier --check 'src/**/*.ts'"
+    "build-test-driver": "cd test-driver && npm run build"
   },
   "repository": {
     "type": "git",
@@ -51,10 +50,10 @@
     "check-coverage": false
   },
   "devDependencies": {
-    "@babel/cli": "^7.10.0",
-    "@babel/core": "^7.10.0",
-    "@babel/plugin-transform-object-assign": "^7.2.0",
-    "@babel/plugin-transform-runtime": "^7.10.0",
+    "@babel/cli": "^7.18.10",
+    "@babel/core": "^7.19.1",
+    "@babel/plugin-transform-object-assign": "^7.18.6",
+    "@babel/plugin-transform-runtime": "^7.19.1",
     "@babel/polyfill": "^7.8.7",
     "@babel/preset-env": "^7.10.0",
     "@babel/runtime": "^7.10.0",
@@ -62,23 +61,26 @@
     "@types/chai": "^4.2.11",
     "@types/mocha": "^5.2.7",
     "@types/node": "^12.12.42",
+    "@typescript-eslint/eslint-plugin": "^4.33.0",
+    "@typescript-eslint/parser": "^4.33.0",
     "babelify": "^10.0.0",
-    "chai": "^4.2.0",
-    "commitizen": "^4.1.2",
+    "chai": "^4.3.6",
+    "commitizen": "^4.2.5",
     "cz-conventional-changelog": "^3.2.0",
-    "grunt": "^1.1.0",
+    "eslint": "^7.32.0",
+    "eslint-config-prettier": "^8.5.0",
+    "grunt": "^1.5.3",
     "grunt-babel": "^8.0.0",
     "grunt-browserify": "^5.3.0",
     "grunt-cli": "^1.3.2",
     "grunt-contrib-clean": "^2.0.0",
     "grunt-contrib-copy": "^1.0.0",
     "grunt-contrib-jshint": "^2.1.0",
-    "grunt-contrib-uglify": "^4.0.1",
+    "grunt-contrib-uglify": "^5.2.2",
+    "grunt-eslint": "^23.0.0",
     "grunt-shell": "^3.0.1",
-    "grunt-ts": "^6.0.0-beta.21",
-    "grunt-tslint": "^5.0.2",
+    "grunt-ts": "^6.0.0-beta.22",
     "grunt-typedoc": "^0.2.4",
-    "jsbi": "3.1.1",
     "mocha": "^6.2.3",
     "mocha-typescript": "^1.1.17",
     "nyc": "^14.1.1",
@@ -86,12 +88,9 @@
     "semantic-release": "^17.2.3",
     "source-map-support": "^0.5.19",
     "ts-node": "^8.10.1",
-    "tslint": "^5.20.1",
-    "typedoc": "^0.16.10",
-    "typescript": "^3.9.3",
-    "yargs": "^15.4.1"
-  },
-  "peerDependencies": {
-    "jsbi": "^3.1.1"
+    "typedoc": "^0.20.37",
+    "typescript": "Mixed-in classes with functions returning `this` have TS2526 error is DTS file. Refernce issue: https://github.com/microsoft/TypeScript/issues/52687. Upgrade to a latest typescript version once this issue is resolved",
+    "typescript": "^3.9.10",
+    "yargs": "^17.5.1"
   }
 }

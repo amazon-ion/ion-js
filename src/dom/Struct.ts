@@ -7,20 +7,26 @@ import { PathElement, Value } from "./Value";
  *
  * Struct fields can be accessed as properties on this object. For example:
  *
+ * ```typescript
  *    let s: any = ion.load('{foo: 1, bar: 2, baz: qux::3}');
  *    assert.equal(6, s.foo + s['bar'] + s.baz);
+ * ```
  *
  * If a field in the struct has the same name as a method on the Struct class, attempting to access that property
  * will always resolve to the method.
  *
+ * ```typescript
  *     let s: any = ion.load('{fieldNames: ["foo", "bar", "baz"]}'); // Conflicts with Struct#fieldNames()
  *     assert.deepEqual(s.fieldNames, ["foo", "bar", "baz"]); // Fails; `s.fieldNames` is a method
  *     assert.deepEqual(s.fieldNames(), ["fieldNames"]); // Passes
+ * ```
  *
  * Unlike direct property accesses, Struct's get() method will only resolve to fields.
  *
+ * ```typescript
  *     let s: any = ion.load('{fieldNames: ["foo", "bar", "baz"]}'); // Conflicts with Struct#fieldNames()
  *     assert.equal(s.get('fieldNames', 0).stringValue(), "foo"); // Passes
+ * ```
  *
  * [1] https://amazon-ion.github.io/ion-docs/docs/spec.html#struct
  */
@@ -58,6 +64,9 @@ export class Struct extends Value(
       // All values set by the user are stored in `this._fields` to avoid
       // potentially overwriting Struct methods.
       set: function (target, name, value): boolean {
+        if (!(value instanceof Value)) {
+          value = Value.from(value);
+        }
         target._fields[name] = [value];
         return true; // Indicates that the assignment succeeded
       },
@@ -140,11 +149,7 @@ export class Struct extends Value(
   }
 
   elements(): Value[] {
-    let singleValueFields = Object.create(null);
-    for (const [fieldName, values] of this.allFields()) {
-      singleValueFields[fieldName] = values[values.length - 1];
-    }
-    return Object.values(singleValueFields);
+    return Object.values(this._fields).flat() as Value[];
   }
 
   [Symbol.iterator](): IterableIterator<[string, Value]> {

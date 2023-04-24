@@ -5,7 +5,7 @@ An implementation of [Amazon Ion](https://amazon-ion.github.io/ion-docs/) for Ja
 [![License](https://img.shields.io/hexpm/l/plug.svg)](https://github.com/amazon-ion/ion-js/blob/master/LICENSE)
 [![Documentation](https://img.shields.io/badge/docs-api-green.svg)](https://amazon-ion.github.io/ion-js/api/index.html)
 
-This package is tested with Node JS major versions **10**, **12**, **14**, **16**, and **18**.  While this library
+This package is tested with Node JS major versions **14**, **16**, and **18**.  While this library
 should be usable within browsers that support **ES5+**, please note that it is not currently being tested
 in any browser environments.
 
@@ -15,9 +15,9 @@ You can use this library either as a Node.js module or inside an HTML page.
 
 ### NPM
 
-1. Add `ion-js` and `jsbi` to your dependencies using `npm`
+1. Add `ion-js` to your dependencies using `npm`
     ```
-    npm install --save ion-js jsbi
+    npm install --save ion-js
     ```
 1. Use the library to read/write Ion data. Here is an example that reads Ion data from a JavaScript string:
     ```javascript

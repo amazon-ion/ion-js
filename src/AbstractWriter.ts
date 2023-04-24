@@ -114,10 +114,10 @@ export abstract class AbstractWriter implements Writer {
         this.writeString(reader.stringValue());
         break;
       case IonTypes.CLOB:
-        this.writeClob(reader.byteValue());
+        this.writeClob(reader.uInt8ArrayValue());
         break;
       case IonTypes.BLOB:
-        this.writeBlob(reader.byteValue());
+        this.writeBlob(reader.uInt8ArrayValue());
         break;
       case IonTypes.LIST:
         this.stepIn(IonTypes.LIST);

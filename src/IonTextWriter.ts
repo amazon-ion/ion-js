@@ -13,16 +13,15 @@
  * permissions and limitations under the License.
  */
 
-import JSBI from "jsbi";
 import { AbstractWriter } from "./AbstractWriter";
 import { Decimal } from "./IonDecimal";
 import {
   CharCodes,
   ClobEscapes,
   escape,
-  is_keyword,
   isIdentifier,
   isOperator,
+  is_keyword,
   StringEscapes,
   SymbolEscapes,
   toBase64,
@@ -32,8 +31,7 @@ import { IonType } from "./IonType";
 import { IonTypes } from "./IonTypes";
 import { encodeUtf8 } from "./IonUnicode";
 import { Writeable } from "./IonWriteable";
-import { JsbiSupport } from "./JsbiSupport";
-import { _assertDefined, _sign } from "./util";
+import { _assertDefined } from "./util";
 
 type Serializer<T> = (value: T) => void;
 
@@ -160,8 +158,8 @@ export class TextWriter extends AbstractWriter {
       let s = "";
 
       let coefficient = value.getCoefficient();
-      if (JSBI.lessThan(coefficient, JsbiSupport.ZERO)) {
-        coefficient = JSBI.unaryMinus(coefficient);
+      if (coefficient < 0n) {
+        coefficient = -coefficient;
       }
       if (value.isNegative()) {
         s += "-";
@@ -240,9 +238,9 @@ export class TextWriter extends AbstractWriter {
     this._writeFloat(value);
   }
 
-  writeInt(value: number | JSBI): void {
+  writeInt(value: number | bigint): void {
     _assertDefined(value);
-    this._serializeValue(IonTypes.INT, value, (value: number | JSBI) => {
+    this._serializeValue(IonTypes.INT, value, (value: number | bigint) => {
       this.writeUtf8(value.toString(10));
     });
   }
@@ -454,8 +452,8 @@ export class TextWriter extends AbstractWriter {
 
   /**
    * Ion's textual representation doesn't distinguish between 32- and 64-bit floats.
-   * This method provides a common implementation of [[writeFloat32]] and [[writeFloat64]], which
-   * are distinct functions to satisfy the [[Writer]] interface.
+   * This method provides a common implementation of {@link writeFloat32} and {@link writeFloat64}, which
+   * are distinct functions to satisfy the {@link Writer} interface.
    *
    * @param value - A numeric value to write as an Ion float.
    */
@@ -465,7 +463,7 @@ export class TextWriter extends AbstractWriter {
 
   /**
    * This method provides an implementation of Serializer<number> that can be used in calls to
-   * [[_writeValue]]. It maintains the expected binding to `this` even when used as a callback.
+   * {@link _writeValue}. It maintains the expected binding to `this` even when used as a callback.
    *
    * @param value
    */

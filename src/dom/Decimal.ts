@@ -27,13 +27,49 @@ export class Decimal extends Value(
 
   /**
    * Constructor.
-   * @param value         The numeric value to represent as a decimal.
+   * @param value         The Ion decimal value to represent as a decimal.
    * @param annotations   An optional array of strings to associate with `value`.
    */
-  constructor(value: ion.Decimal, annotations: string[] = []) {
-    super(value.numberValue());
-    this._decimalValue = value;
-    this._numberValue = value.numberValue();
+  constructor(value: ion.Decimal, annotations?: string[]);
+
+  /**
+   * Constructor.
+   * @param value         The text Ion value to be parsed as a decimal.
+   * @param annotations   An optional array of strings to associate with `value`.
+   */
+  constructor(value: string, annotations?: string[]);
+
+  /**
+   * Constructor.
+   * @param value         The number value to represent as a decimal.
+   * @param annotations   An optional array of strings to associate with `value`.
+   */
+  constructor(value: number, annotations?: string[]);
+
+  // This is the unified implementation of the above signatures and is not visible to users.
+  constructor(
+    value: ion.Decimal | string | number,
+    annotations: string[] = []
+  ) {
+    if (typeof value === "string") {
+      let numberValue = Number(value);
+      super(numberValue);
+      this._decimalValue = new ion.Decimal(value);
+      this._numberValue = numberValue;
+    } else if (value instanceof ion.Decimal) {
+      super(value.numberValue());
+      this._decimalValue = value;
+      this._numberValue = value.numberValue();
+    } else if (typeof value === "number") {
+      // if value is a number type
+      super(value);
+      this._decimalValue = new ion.Decimal("" + value);
+      this._numberValue = value;
+    } else {
+      throw new Error(
+        "Decimal value can only be created from number, ion.Decimal or string"
+      );
+    }
     this._setAnnotations(annotations);
   }
 

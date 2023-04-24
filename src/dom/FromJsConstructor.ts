@@ -149,4 +149,5 @@ export const Primitives = {
   Boolean: "boolean",
   Number: "number",
   String: "string",
+  BigInt: "bigint",
 };

@@ -1,4 +1,3 @@
-import JSBI from "jsbi";
 import { Decimal, IonType, Timestamp, Writer } from "../Ion";
 import { _hasValue } from "../util";
 import { FromJsConstructor } from "./FromJsConstructor";
@@ -55,7 +54,7 @@ export interface Value {
    * For the Integer type, returns a BigInt representation of the Value; otherwise throws
    * an Error.
    */
-  bigIntValue(): JSBI | null;
+  bigIntValue(): bigint | null;
 
   /**
    * For the Decimal type, returns an ion.Decimal representation of the Value; otherwise
@@ -111,17 +110,19 @@ export interface Value {
    * with a given field name instead of just the last one. For example, for the
    * following struct:
    *
+   * ```javascript
    *     {
    *         foo: 1,
    *         foo: null,
    *         foo: true,
    *     }
+   * ```
    *
    * a call to `get("foo")` would return a `dom.Boolean` representing `true`
    * while a call to `getAll("foo")` would return an `Array` of
    * `dom.Value`s: `[1, null, true]`.
    *
-   * @param One or more values to be used to index into the Value.
+   * @param pathElements One or more values to be used to index into the Value.
    * @returns null if no value is found at the specified path. Otherwise, returns the discovered Value.
    */
   getAll(...pathElements: PathElement[]): Value[] | null;
@@ -144,11 +145,13 @@ export interface Value {
    * to a field name. For example, for the
    * following struct:
    *
+   * ```javascript
    *     {
    *         foo: 1,
    *         foo: null,
    *         foo: true,
    *     }
+   * ```
    *
    * a call to `fields()` would return a field name "foo" with a `dom.Boolean` representing `true`
    * while a call to `allFields()` would return  a field name "foo" with an `Array` of
@@ -339,7 +342,7 @@ export function Value<Clazz extends Constructor>(
       this._unsupportedOperation("numberValue");
     }
 
-    bigIntValue(): JSBI | null {
+    bigIntValue(): bigint | null {
       this._unsupportedOperation("bigIntValue");
     }
 
