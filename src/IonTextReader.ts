@@ -190,7 +190,7 @@ export class TextReader implements Reader {
           break;
         }
         this._type = get_ion_type(this._raw_type);
-        this._symtab = makeSymbolTable(this._cat, this);
+        this._symtab = makeSymbolTable(this._cat, this, this._symtab);
         this._raw = undefined;
         this._raw_type = undefined;
       } else {

@@ -459,7 +459,6 @@ let equivsSkipList = toSkipList([
   "ion-tests/iontestdata/good/equivs/decimalsWithUnderscores.ion",
   "ion-tests/iontestdata/good/equivs/floatsWithUnderscores.ion",
   "ion-tests/iontestdata/good/equivs/intsWithUnderscores.ion",
-  "ion-tests/iontestdata/good/equivs/localSymbolTableAppend.ion",
   "ion-tests/iontestdata/good/equivs/localSymbolTableNullSlots.ion",
   "ion-tests/iontestdata/good/equivs/localSymbolTables.ion",
   "ion-tests/iontestdata/good/equivs/nonIVMNoOps.ion",
