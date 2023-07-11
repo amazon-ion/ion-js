@@ -97,6 +97,19 @@ class IonTextReaderTests {
         assert.equal(ionReader.stringValue(), 'taco');
     }
 
+    @test "resolves symbol IDs for symbol table append"() {
+        let ionToRead = `$ion_symbol_table::{ symbols:[ "foo", "bar" ]} $ion_symbol_table::{ imports: $ion_symbol_table, symbols:[ "baz" ]}[$10, $11, $12]`;
+        let ionReader = ion.makeReader(ionToRead);
+        ionReader.next();
+        ionReader.stepIn();
+        ionReader.next();
+        assert.equal(ionReader.stringValue(), "foo");
+        ionReader.next();
+        assert.equal(ionReader.stringValue(), "bar");
+        ionReader.next();
+        assert.equal(ionReader.stringValue(), "baz");
+    }
+
     @test "Parse through struct"() {
         let ionToRead = "{ key : \"string\" }";
         let ionReader = ion.makeReader(ionToRead);

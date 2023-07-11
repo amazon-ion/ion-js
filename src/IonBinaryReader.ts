@@ -130,7 +130,7 @@ export class BinaryReader implements Reader {
         if (this._parser.getAnnotation(0) !== ion_symbol_table_sid) {
           break;
         }
-        this._symtab = makeSymbolTable(this._cat, this);
+        this._symtab = makeSymbolTable(this._cat, this, this._symtab);
       } else {
         break;
       }

@@ -20,6 +20,7 @@ import { Reader } from "./IonReader";
 import { SharedSymbolTable } from "./IonSharedSymbolTable";
 import { SubstituteSymbolTable } from "./IonSubstituteSymbolTable";
 import { getSystemSymbolTableImport } from "./IonSystemSymbolTable";
+import { IonTypes } from "./Ion";
 
 export const ion_symbol_table = "$ion_symbol_table";
 export const ion_symbol_table_sid = 3;
@@ -100,15 +101,18 @@ function load_symbols(reader: Reader): (string | null)[] {
  *
  * @param catalog The catalog to resolve imported shared symbol tables from.
  * @param reader The Ion {Reader} over the local symbol table in its serialized form.
+ * @param currentSymbolTable Current local symbol table for the reader.
  */
 export function makeSymbolTable(
   catalog: Catalog,
-  reader: Reader
+  reader: Reader,
+  currentSymbolTable: LocalSymbolTable
 ): LocalSymbolTable {
   let import_: Import | null = null;
   let symbols: (string | null)[] = [];
   let foundSymbols: boolean = false;
   let foundImports: boolean = false;
+  let foundLstAppend: boolean = false;
 
   reader.stepIn();
   while (reader.next()) {
@@ -117,14 +121,35 @@ export function makeSymbolTable(
         if (foundImports) {
           throw new Error("Multiple import fields found.");
         }
-        import_ = load_imports(reader, catalog);
+        let ion_type = reader.type();
+        if (
+          ion_type === IonTypes.SYMBOL &&
+          reader.stringValue() === ion_symbol_table
+        ) {
+          // this is a local symbol table append
+          import_ = currentSymbolTable.import;
+          let symbols_ = symbols;
+          symbols = currentSymbolTable.symbols;
+          symbols.push(...symbols_);
+          foundLstAppend = true;
+        } else if (ion_type === IonTypes.LIST) {
+          import_ = load_imports(reader, catalog);
+        } else {
+          throw new Error(
+            `Expected import field name to be a list or symbol found ${ion_type}`
+          );
+        }
         foundImports = true;
         break;
       case "symbols":
         if (foundSymbols) {
           throw new Error("Multiple symbol fields found.");
         }
-        symbols = load_symbols(reader);
+        if (foundLstAppend) {
+          symbols.push(...load_symbols(reader));
+        } else {
+          symbols = load_symbols(reader);
+        }
         foundSymbols = true;
         break;
     }
