@@ -62,6 +62,7 @@ jobs:
         with:
           node-version: '16.x'
           registry-url: 'https://registry.npmjs.org'
+      - run: npm ci
       - name: npm publish
         # skip npm publishing if running in a fork
         if: github.repository == 'amazon-ion/ion-js'
