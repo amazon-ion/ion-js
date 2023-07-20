@@ -33,6 +33,7 @@ jobs:
     needs: build
     permissions:
       checks: write
+      contents: write
     steps:
       - name: set env
         run: echo "RELEASE_TAG=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
@@ -75,6 +76,8 @@ jobs:
     needs: build
     permissions:
       checks: write
+      contents: write
+      pages: write
     steps:
       - name: set env
         run: echo "RELEASE_TAG=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
