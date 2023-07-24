@@ -776,7 +776,7 @@ var BinaryReader = /*#__PURE__*/function () {
           if (this._parser.getAnnotation(0) !== IonSymbols_1.ion_symbol_table_sid) {
             break;
           }
-          this._symtab = IonSymbols_1.makeSymbolTable(this._cat, this);
+          this._symtab = IonSymbols_1.makeSymbolTable(this._cat, this, this._symtab);
         } else {
           break;
         }
@@ -5772,6 +5772,8 @@ SymbolToken._UNKNOWN_SYMBOL_ID = -1;
  * express or implied. See the License for the specific language governing
  * permissions and limitations under the License.
  */
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
+var _toConsumableArray2 = _interopRequireDefault(require("@babel/runtime/helpers/toConsumableArray"));
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
@@ -5780,6 +5782,7 @@ var IonImport_1 = require("./IonImport");
 var IonLocalSymbolTable_1 = require("./IonLocalSymbolTable");
 var IonSubstituteSymbolTable_1 = require("./IonSubstituteSymbolTable");
 var IonSystemSymbolTable_1 = require("./IonSystemSymbolTable");
+var Ion_1 = require("./Ion");
 exports.ion_symbol_table = "$ion_symbol_table";
 exports.ion_symbol_table_sid = 3;
 var empty_struct = {};
@@ -5834,11 +5837,12 @@ function load_symbols(reader) {
   reader.stepOut();
   return symbols;
 }
-function makeSymbolTable(catalog, reader) {
+function makeSymbolTable(catalog, reader, currentSymbolTable) {
   var import_ = null;
   var symbols = [];
   var foundSymbols = false;
   var foundImports = false;
+  var foundLstAppend = false;
   reader.stepIn();
   while (reader.next()) {
     switch (reader.fieldName()) {
@@ -5846,14 +5850,31 @@ function makeSymbolTable(catalog, reader) {
         if (foundImports) {
           throw new Error("Multiple import fields found.");
         }
-        import_ = load_imports(reader, catalog);
+        var ion_type = reader.type();
+        if (ion_type === Ion_1.IonTypes.SYMBOL && reader.stringValue() === exports.ion_symbol_table) {
+          var _symbols;
+          import_ = currentSymbolTable["import"];
+          var symbols_ = symbols;
+          symbols = currentSymbolTable.symbols;
+          (_symbols = symbols).push.apply(_symbols, (0, _toConsumableArray2["default"])(symbols_));
+          foundLstAppend = true;
+        } else if (ion_type === Ion_1.IonTypes.LIST) {
+          import_ = load_imports(reader, catalog);
+        } else {
+          throw new Error("Expected import field name to be a list or symbol found ".concat(ion_type));
+        }
         foundImports = true;
         break;
       case "symbols":
         if (foundSymbols) {
           throw new Error("Multiple symbol fields found.");
         }
-        symbols = load_symbols(reader);
+        if (foundLstAppend) {
+          var _symbols2;
+          (_symbols2 = symbols).push.apply(_symbols2, (0, _toConsumableArray2["default"])(load_symbols(reader)));
+        } else {
+          symbols = load_symbols(reader);
+        }
         foundSymbols = true;
         break;
     }
@@ -5863,7 +5884,7 @@ function makeSymbolTable(catalog, reader) {
 }
 exports.makeSymbolTable = makeSymbolTable;
 
-},{"./IonImport":12,"./IonLocalSymbolTable":13,"./IonSubstituteSymbolTable":20,"./IonSystemSymbolTable":23}],23:[function(require,module,exports){
+},{"./Ion":5,"./IonImport":12,"./IonLocalSymbolTable":13,"./IonSubstituteSymbolTable":20,"./IonSystemSymbolTable":23,"@babel/runtime/helpers/interopRequireDefault":68,"@babel/runtime/helpers/toConsumableArray":79}],23:[function(require,module,exports){
 "use strict";
 
 /*!
@@ -6519,7 +6540,7 @@ var TextReader = /*#__PURE__*/function () {
             break;
           }
           this._type = IonParserTextRaw_1.get_ion_type(this._raw_type);
-          this._symtab = IonSymbols_1.makeSymbolTable(this._cat, this);
+          this._symtab = IonSymbols_1.makeSymbolTable(this._cat, this, this._symtab);
           this._raw = undefined;
           this._raw_type = undefined;
         } else {
