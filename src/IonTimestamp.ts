@@ -267,8 +267,8 @@ export class Timestamp {
     let fractionStr = "";
     if (exp < 0) {
       const idx = Math.max(coefStr.length + exp, 0);
-      secondsStr = coefStr.substr(0, idx);
-      fractionStr = coefStr.substr(idx);
+      secondsStr = coefStr.substring(0, idx);
+      fractionStr = coefStr.substring(idx);
       if (-secondsDecimal.getExponent() - coefStr.length > 0) {
         fractionStr = "0".repeat(-exp - coefStr.length) + fractionStr;
       }
