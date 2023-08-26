@@ -5,8 +5,8 @@
   "main": "dist/commonjs/es6/Ion.js",
   "types": "dist/commonjs/es6/Ion.d.ts",
   "exports": {
-    "import": "./dist/es6/es6/Ion.js",
-    "require": "./dist/commonjs/es6/Ion.js"
+    "module": "./dist/es6/es6/Ion.js",
+    "default": "./dist/commonjs/es6/Ion.js"
   },
   "scripts": {
     "commit": "git-cz",
