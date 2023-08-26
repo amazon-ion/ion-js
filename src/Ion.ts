@@ -58,15 +58,15 @@ export type ReaderBuffer = ReaderOctetBuffer | string;
  * @param buf       The Ion data to be used by the reader. Typically a string, UTF-8 encoded buffer (text), or raw
  *                  binary buffer.
  */
-export function makeReader(buf: ReaderBuffer): Reader {
+export function makeReader(buf: ReaderBuffer, catalog?: Catalog): Reader {
   if (typeof buf === "string") {
-    return new TextReader(new StringSpan(buf as string));
+    return new TextReader(new StringSpan(buf as string), catalog);
   }
   const bufArray = new Uint8Array(buf as ReaderOctetBuffer);
   if (isBinary(bufArray)) {
-    return new BinaryReader(new BinarySpan(bufArray));
+    return new BinaryReader(new BinarySpan(bufArray), catalog);
   } else {
-    return new TextReader(new StringSpan(decodeUtf8(bufArray)));
+    return new TextReader(new StringSpan(decodeUtf8(bufArray)), catalog);
   }
 }
 

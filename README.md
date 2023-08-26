@@ -189,7 +189,7 @@ catalog.add(sharedSymbolTable);
 
 // Create a reader with catalog
 let bytes = writer.getBytes();
-let reader = new BinaryReader(new BinarySpan(bytes), catalog);
+let reader = makeReader(bytes, catalog);
 ```
 
 ## Contributing
