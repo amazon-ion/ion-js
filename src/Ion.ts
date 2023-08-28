@@ -57,6 +57,7 @@ export type ReaderBuffer = ReaderOctetBuffer | string;
  *
  * @param buf       The Ion data to be used by the reader. Typically a string, UTF-8 encoded buffer (text), or raw
  *                  binary buffer.
+ * @param catalog        Optional catalog to be used by reader to resolve shared symbol table references.
  */
 export function makeReader(buf: ReaderBuffer, catalog?: Catalog): Reader {
   if (typeof buf === "string") {
