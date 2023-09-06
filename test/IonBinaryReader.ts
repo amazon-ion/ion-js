@@ -15,6 +15,11 @@
 
 import {assert} from 'chai';
 import * as ion from '../src/Ion';
+import { BinaryWriter } from '../src/IonBinaryWriter';
+import { Writeable } from '../src/IonWriteable';
+import { LocalSymbolTable } from '../src/IonLocalSymbolTable';
+import { getSystemSymbolTable } from '../src/IonSystemSymbolTable';
+import { Import } from '../src/IonImport';
 
 describe('Binary Reader', () => {
     it('timestamp', () => {
@@ -73,4 +78,32 @@ describe('Binary Reader', () => {
         // [0xE0, 0x1, 0x0, 0xEA, 0xF, 0x21, 0x7, 0x31, 0x11, 0x85, 0x48, 0x65, 0x6C, 0x6C, 0x6F, 0xB6, 0x21, 0x1, 0x21, 0x2, 0x21, 0x3]|
         assert.equal(binaryReader.position(), 22);
     });
+
+    it('test catalog', () => {
+      const symbols = ['id', 'name'];
+
+      // Create a SharedSymbolTable with the desired strings
+      const sharedSymbolTable = new ion.SharedSymbolTable('foo', 1, symbols);
+      // Create a symbol table with shared table and system table.
+      const localSymbolTable = new LocalSymbolTable([
+        sharedSymbolTable,
+        getSystemSymbolTable(),
+      ].reduceRight((parent, table) => new Import(parent, table), null as (null | Import)))
+      // dump the symbols as binary. The buffer should not define the symbols in the table.
+      const writer = new BinaryWriter(localSymbolTable, new Writeable());
+      symbols.forEach(symbol => writer.writeSymbol(symbol));
+      writer.close();
+      const buffer = writer.getBytes();
+
+      // Create a catalog with shared symbol table
+      let catalog = new ion.Catalog();
+      catalog.add(sharedSymbolTable);
+
+      // Reader with catalog should return correct symbol string values
+      let reader = ion.makeReader(buffer, catalog);
+      assert.deepEqual(ion.loadAll(reader), symbols.map(symbol => new ion.dom.Symbol(symbol)))
+
+      // Reader without catalog should error (really this is testing that our buffer references symbols from the table.
+      assert.throws(() => ion.loadAll(ion.makeReader(buffer)), "symbol is unresolvable")
+    })
 });
