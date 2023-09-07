@@ -310,7 +310,7 @@
 				catalog.add(sharedSymbolTable);</p>
 				<p>// Create a reader with catalog
 					let bytes = writer.getBytes();
-				let reader = new BinaryReader(new BinarySpan(bytes), catalog);</p>
+				let reader = makeReader(bytes, catalog);</p>
 				<pre><code>
 <span style="color: #000000">## </span><span style="color: #001080">Contributing</span>
 
