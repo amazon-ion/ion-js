@@ -368,7 +368,7 @@ listSame1.equals(["Mercury", "Venus", "Earth", "Mars"]); // returns true
 listSame1.equals(["Mercury", "Venus", "Earth"]); // returns false because the lists differ with one element "Mars"
 ```
 
-####Struct Example
+#### Struct Example
 ```javascript
 let structSame1: Value = load(
   "foo::bar::{" +
