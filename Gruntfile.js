@@ -107,7 +107,7 @@ module.exports = function(grunt) {
          },
         transform: [["babelify", 
                      { 
-                       "presets": ["@babel/preset-env"], // TODO this targets ES2015, we should be more specific
+                       "presets": ["@babel/preset-env"], // Follows the browserslist from package.json
                        "plugins" : [["@babel/transform-runtime"],
                                     ["@babel/transform-object-assign"]]
                      }]],
@@ -123,7 +123,7 @@ module.exports = function(grunt) {
          },
         transform: [["babelify", 
                      { 
-                       "presets": ["@babel/preset-env"], // TODO this targets ES2015, we should be more specific
+                       "presets": ["@babel/preset-env"], // Follows the browserslist from package.json
                        "plugins" : [["@babel/transform-runtime"],
                                     ["@babel/transform-object-assign"]]
                      }]],
