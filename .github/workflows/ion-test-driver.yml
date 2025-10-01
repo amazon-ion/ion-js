@@ -34,8 +34,10 @@ jobs:
           && echo "cur=`git rev-parse --short=7 ${{ github.event.pull_request.head.sha }}`" >> $GITHUB_ENV
 
       - name: Run ion-test-driver
+        env: 
+          HEAD_URL: ${{ github.event.pull_request.head.repo.html_url }}
         run: python3 ion-test-driver/amazon/iontest/ion_test_driver.py -o output
-          -i ion-js,${{ github.event.pull_request.head.repo.html_url }},${{ github.event.pull_request.head.sha }}
+          -i ion-js, "$HEAD_URL", ${{ github.event.pull_request.head.sha }}
           --replace ion-js,https://github.com/amazon-ion/ion-js.git,$main
 
       - name: Upload result
