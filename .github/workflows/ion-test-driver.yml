@@ -37,11 +37,11 @@ jobs:
         env: 
           HEAD_URL: ${{ github.event.pull_request.head.repo.html_url }}
         run: python3 ion-test-driver/amazon/iontest/ion_test_driver.py -o output
-          -i ion-js, "$HEAD_URL", ${{ github.event.pull_request.head.sha }}
+          -i "ion-js,$HEAD_URL,${{ github.event.pull_request.head.sha }}"
           --replace ion-js,https://github.com/amazon-ion/ion-js.git,$main
 
       - name: Upload result
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: ion-test-driver-result.ion
           path: output/results/ion-test-driver-results.ion
@@ -56,7 +56,7 @@ jobs:
           ion-js,$main ion-js,$cur output/results/ion-test-driver-results.ion
 
       - name: Upload analysis report
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: analysis-report.ion
           path: result.ion
