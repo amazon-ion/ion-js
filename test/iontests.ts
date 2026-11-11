@@ -471,7 +471,6 @@ let equivsSkipList = toSkipList([
 
   "ion-tests/iontestdata/good/equivs/clobNewlines.ion", // https://github.com/amazon-ion/ion-js/issues/550
   "ion-tests/iontestdata/good/equivs/localSymbolTableWithAnnotations.ion", // https://github.com/amazon-ion/ion-js/issues/551
-  "ion-tests/iontestdata/good/equivs/longStringsWithComments.ion", // https://github.com/amazon-ion/ion-js/issues/552
 ]);
 
 let nonEquivsSkipList = toSkipList([
