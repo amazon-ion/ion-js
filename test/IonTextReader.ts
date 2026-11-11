@@ -258,6 +258,50 @@ class IonTextReaderTests {
 
 
 
+    @test "Concatenates adjacent long strings however they are separated."() {
+        const cases: Array<[string, string]> = [
+            ["'''hello'''''' world'''", "hello world"],
+            ["'''hello''' ''' world'''", "hello world"],
+            ["'''hello'''   ''' world'''", "hello world"],
+            ["'''foo'''\n\n'''bar'''", "foobar"],
+            ["'''foo''' // comment\n'''bar'''", "foobar"],
+            ["'''foo''' // comment\r\n'''bar'''", "foobar"],
+            ["'''foo''' // comment\r'''bar'''", "foobar"],
+            ["'''foo''' /* comment */ '''bar'''", "foobar"],
+            ["'''foo''' /* a * b / c */ '''bar'''", "foobar"],
+            ["'''foo''' /*/ x */ '''bar'''", "foobar"],
+            ["'''foo'''/* one\ntwo */'''bar'''", "foobar"],
+            ["'''foo'''// one\n// two\n'''bar'''", "foobar"],
+            ["'''a''' '''b''' '''c'''", "abc"],
+            ["'''a''' '''''' '''c'''", "ac"],
+            ["'''a''' ''''''", "a"],
+            ["'''foo'''//\n'''bar'''", "foobar"],
+            ["'''foo'''/**/'''bar'''", "foobar"],
+            ["'''a'''  /* b */  // c\n  '''d'''", "ad"],
+        ];
+        for (const [text, expected] of cases) {
+            const reader: ion.Reader = ion.makeReader(text);
+            reader.next();
+            assert.equal(reader.stringValue(), expected, text);
+        }
+    }
+
+    @test "Concatenates adjacent long string clobs however they are separated."() {
+        const cases: Array<[string, string]> = [
+            ["{{'''ab''''''cd'''}}", "abcd"],
+            ["{{'''ab''' '''cd'''}}", "abcd"],
+            ["{{ '''ab'''\n\n'''cd''' }}", "abcd"],
+            ["{{'''a''' '''''' '''c'''}}", "ac"],
+            ["{{'''a''' ''''''}}", "a"],
+        ];
+        for (const [text, expected] of cases) {
+            const reader: ion.Reader = ion.makeReader(text);
+            reader.next();
+            const bytes = Array.from(reader.uInt8ArrayValue()!);
+            assert.deepEqual(bytes, Array.from(expected, (c) => c.charCodeAt(0)), text);
+        }
+    }
+
     @test "text IVM"() {
         let textReader = ion.makeReader("");
         let isNotIVM = ["$ion_schema_1_0", "$ion_1", "$ion_1_a", "$ion_", "ion_1_"];

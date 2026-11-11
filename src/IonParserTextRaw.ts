@@ -1433,71 +1433,65 @@ export class ParserTextRaw {
     return ch >= 0xdc00 && ch <= 0xdfff;
   }
 
+  // Returns the index of the first character at or after `index` that is neither
+  // whitespace nor, when acceptComments is set, part of a comment.
   private indexWhiteSpace(index: number, acceptComments: boolean): number {
-    let ch: number = this._in.valueAt(index);
-    if (!acceptComments) {
-      for (; is_whitespace(ch); ch = this._in.valueAt(index++)) {}
-    } else {
-      for (
-        ;
-        is_whitespace(ch) || ch === CH_FORWARD_SLASH;
-        ch = this._in.valueAt(index++)
-      ) {
-        if (ch === CH_FORWARD_SLASH) {
-          ch = this._in.valueAt(index++);
-          switch (ch) {
-            case CH_FORWARD_SLASH:
-              index = this.indexToNewLine(index);
-              break;
-            case CH_AS:
-              index = this.indexToCloseComment(index);
-              break;
-            default:
-              index--;
-              break;
-          }
-        }
-      }
-    }
-    return index;
-  }
-
-  private indexToNewLine(index: number) {
-    let ch: number = this._in.valueAt(index);
-    while (ch !== EOF && ch !== CH_NL) {
-      if (ch === CH_CR) {
-        if (this._in.valueAt(index + 1) !== CH_NL) {
+    for (;;) {
+      const ch: number = this._in.valueAt(index);
+      if (is_whitespace(ch)) {
+        index++;
+      } else if (acceptComments && ch === CH_FORWARD_SLASH) {
+        const next: number = this._in.valueAt(index + 1);
+        if (next === CH_FORWARD_SLASH) {
+          index = this.indexToNewLine(index + 2);
+        } else if (next === CH_AS) {
+          index = this.indexToCloseComment(index + 2);
+        } else {
           return index;
         }
+      } else {
+        return index;
       }
-      ch = this._in.valueAt(index++);
+    }
+  }
+
+  // Returns the index of the line break that ends a line comment, or of the end of input.
+  private indexToNewLine(index: number): number {
+    let ch: number = this._in.valueAt(index);
+    while (ch !== EOF && ch !== CH_NL && ch !== CH_CR) {
+      ch = this._in.valueAt(++index);
     }
     return index;
   }
 
+  // Returns the index just past the "*/" that closes a block comment, or the end of input.
   private indexToCloseComment(index: number): number {
-    while (
-      this._in.valueAt(index) !== CH_AS &&
-      this._in.valueAt(index + 1) !== CH_FORWARD_SLASH
-    ) {
+    while (this._in.valueAt(index) !== EOF) {
+      if (
+        this._in.valueAt(index) === CH_AS &&
+        this._in.valueAt(index + 1) === CH_FORWARD_SLASH
+      ) {
+        return index + 2;
+      }
       index++;
     }
     return index;
   }
 
+  // `entryIndex` is the first quote of the ''' that closes one segment of a long string
+  // whose value continues in a later segment. Returns the index of the last quote of the
+  // next segment's opening ''', so that the caller's index++ lands on its first character.
   private _skip_triple_quote_gap(
     entryIndex: number,
     end: number,
     acceptComments: boolean
   ): number {
-    let tempIndex: number = entryIndex + 3;
-    tempIndex = this.indexWhiteSpace(tempIndex, acceptComments);
-    if (tempIndex + 2 <= end && this.verifyTriple(tempIndex)) {
-      // index === ' index + 1 === ' index + 2 === ' and not at the end of the value
-      return tempIndex + 4; // indexes us past the triple quote we just found
-    } else {
-      return tempIndex + 1;
+    const next: number = this.indexWhiteSpace(entryIndex + 3, acceptComments);
+    if (next + 3 <= end && this.verifyTriple(next)) {
+      return next + 2;
     }
+    // Not reached for a well-formed value: skip only the closing quotes.
+    return entryIndex + 2;
   }
 
   private readClobEscapes(ii: number, end: number): number {
